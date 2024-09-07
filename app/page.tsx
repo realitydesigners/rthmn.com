@@ -1,5 +1,5 @@
 import { HeroSection } from "@/components/HeroSection";
-import Pricing from "@/components/PricingSection";
+import { PricingSection } from "@/components/PricingSection";
 import {
 	getProducts,
 	getSubscription,
@@ -7,6 +7,7 @@ import {
 } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/server";
 import { FAQSection } from "@/components/FAQSection";
+import { ServiceSection } from "@/components/ServiceSection";
 
 export default async function PricingPage() {
 	const supabase = createClient();
@@ -20,7 +21,8 @@ export default async function PricingPage() {
 		<div>
 			<HeroSection />
 			<FAQSection />
-			<Pricing
+			<ServiceSection />
+			<PricingSection
 				user={user}
 				products={products ?? []}
 				subscription={subscription}
