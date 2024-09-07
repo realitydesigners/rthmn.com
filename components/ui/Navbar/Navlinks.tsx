@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { oxanium } from "@/app/fonts";
-import { MenuModal } from "./MenuModal";
+import { DesktopMenuContent } from "./DesktopMenuContent";
 import { MobileMenuContent } from "./MobileMenuContent";
 
 interface NavlinksProps {
@@ -98,7 +98,7 @@ const Links = () => {
 					</Link>
 				</div>
 			</div>
-			<MenuModal activeDropdown={activeDropdown} />
+			<DesktopMenuContent activeDropdown={activeDropdown} />
 		</div>
 	);
 };
