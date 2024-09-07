@@ -64,7 +64,7 @@ const Links = () => {
 		<div className="relative group">
 			<div className="flex space-x-0">
 				<div
-					className="px-4 py-2"
+					className="px-4 py-6"
 					onMouseEnter={() => setActiveDropdown("pricing")}
 				>
 					<Link
@@ -75,7 +75,7 @@ const Links = () => {
 					</Link>
 				</div>
 				<div
-					className="px-4 py-2"
+					className="px-4 py-6"
 					onMouseEnter={() => setActiveDropdown("resources")}
 				>
 					<Link
@@ -87,7 +87,7 @@ const Links = () => {
 				</div>
 
 				<div
-					className="px-4 py-2"
+					className="px-4 py-6"
 					onMouseEnter={() => setActiveDropdown("account")}
 				>
 					<Link
