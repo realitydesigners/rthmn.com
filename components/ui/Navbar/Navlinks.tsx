@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { oxanium } from "@/app/fonts";
 import { MenuModal } from "./MenuModal";
+import { MobileMenuContent } from "./MobileMenuContent";
 
 interface NavlinksProps {
 	user?: {
@@ -56,7 +57,7 @@ const getIcon = (name: string): JSX.Element => {
 	return icons[name] || <path />;
 };
 
-const Links = ({ user }: { user: NavlinksProps["user"] }) => {
+const Links = () => {
 	const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
 	return (
@@ -84,19 +85,18 @@ const Links = ({ user }: { user: NavlinksProps["user"] }) => {
 						Resources
 					</Link>
 				</div>
-				{user && (
-					<div
-						className="px-4 py-2"
-						onMouseEnter={() => setActiveDropdown("account")}
+
+				<div
+					className="px-4 py-2"
+					onMouseEnter={() => setActiveDropdown("account")}
+				>
+					<Link
+						href="/account"
+						className={`font-bold heading-text ${oxanium.className}`}
 					>
-						<Link
-							href="/account"
-							className={`font-bold heading-text ${oxanium.className}`}
-						>
-							Account
-						</Link>
-					</div>
-				)}
+						Account
+					</Link>
+				</div>
 			</div>
 			<MenuModal activeDropdown={activeDropdown} />
 		</div>
@@ -219,24 +219,8 @@ export function Navlinks({ user }: NavlinksProps) {
 						</Link>
 
 						<nav className="hidden lg:flex space-x-4">
-							<Links user={user} />
+							<Links />
 						</nav>
-
-						{/* Mobile sign-in/sign-out button */}
-						<div className="absolute left-1/2 transform -translate-x-1/2 lg:hidden z-50">
-							{user ? (
-								<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
-									<input type="hidden" name="pathName" value={usePathname()} />
-									<button type="submit" className={buttonClasses}>
-										Sign out
-									</button>
-								</form>
-							) : (
-								<Link href="/signin" className={buttonClasses}>
-									Sign In
-								</Link>
-							)}
-						</div>
 
 						{/* Desktop sign-in/sign-out button */}
 						<div className="hidden lg:block">
@@ -271,10 +255,26 @@ export function Navlinks({ user }: NavlinksProps) {
 				<div
 					className={`fixed inset-0 z-40 bg-black bg-opacity-95 backdrop-blur-sm pt-16 lg:hidden ${oxanium.className}`}
 				>
-					<div className="h-full flex flex-col justify-center items-center overflow-y-auto">
-						<nav className="flex flex-col space-y-8 text-center">
-							<Links user={user} />
-						</nav>
+					<div className="h-full flex flex-col px-6 overflow-y-auto">
+						<MobileMenuContent />
+						<div className="mt-8">
+							{user ? (
+								<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
+									<input type="hidden" name="pathName" value={usePathname()} />
+									<button type="submit" className={`${buttonClasses} w-full`}>
+										Sign out
+									</button>
+								</form>
+							) : (
+								<Link
+									href="/signin"
+									className={`${buttonClasses} w-full block text-center`}
+									// onClick={() => setIsNavOpen(false)}
+								>
+									Sign In
+								</Link>
+							)}
+						</div>
 					</div>
 				</div>
 			)}
