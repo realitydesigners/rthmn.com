@@ -37,3 +37,15 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
     .single();
   return userDetails;
 });
+
+export const getSignals = cache(async (supabase: SupabaseClient) => {
+  const { data: signals, error } = await supabase
+    .from('signals')
+    .select('*'); 
+
+  if (error) {
+    console.error('Error fetching signals:', error);
+  }
+
+  return signals;
+});
