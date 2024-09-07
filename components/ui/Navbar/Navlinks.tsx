@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { oxanium } from "@/app/fonts";
+import { MenuModal } from "./MenuModal";
 
 interface NavlinksProps {
 	user?: {
@@ -55,21 +56,52 @@ const getIcon = (name: string): JSX.Element => {
 	return icons[name] || <path />;
 };
 
-const Links = ({ user }: { user: NavlinksProps["user"] }) => (
-	<>
-		<Link href="/" className={`font-bold heading-text ${oxanium.className}`}>
-			Pricing
-		</Link>
-		{user && (
-			<Link
-				href="/account"
-				className={`font-bold heading-text ${oxanium.className}`}
-			>
-				Account
-			</Link>
-		)}
-	</>
-);
+const Links = ({ user }: { user: NavlinksProps["user"] }) => {
+	const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+	return (
+		<div className="relative group">
+			<div className="flex space-x-0">
+				<div
+					className="px-4 py-2"
+					onMouseEnter={() => setActiveDropdown("pricing")}
+				>
+					<Link
+						href="/"
+						className={`font-bold heading-text ${oxanium.className}`}
+					>
+						Pricing
+					</Link>
+				</div>
+				<div
+					className="px-4 py-2"
+					onMouseEnter={() => setActiveDropdown("resources")}
+				>
+					<Link
+						href="/resources"
+						className={`font-bold heading-text ${oxanium.className}`}
+					>
+						Resources
+					</Link>
+				</div>
+				{user && (
+					<div
+						className="px-4 py-2"
+						onMouseEnter={() => setActiveDropdown("account")}
+					>
+						<Link
+							href="/account"
+							className={`font-bold heading-text ${oxanium.className}`}
+						>
+							Account
+						</Link>
+					</div>
+				)}
+			</div>
+			<MenuModal activeDropdown={activeDropdown} />
+		</div>
+	);
+};
 
 const MenuIcon = ({ isOpen }: { isOpen: boolean }) => (
 	<svg
@@ -224,7 +256,7 @@ export function Navlinks({ user }: NavlinksProps) {
 
 						<button
 							onClick={toggleNav}
-							className="lg:hidden w-12 h-12 items-center justify-center flex z-50"
+							className="lg:hidden w-14 h-14 items-center justify-center flex z-50 menu-icon-button"
 							type="button"
 							aria-label="Toggle navigation"
 						>

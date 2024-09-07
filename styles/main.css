@@ -150,3 +150,59 @@ body.no-scroll {
   width: 100%;
   height: 100%;
 }
+
+/* Update these styles at the end of the file */
+.group:hover .hidden {
+  display: block;
+}
+
+.group .hidden {
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.group:hover .hidden {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Add these new styles */
+.absolute.hidden.lg\:block {
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.absolute.hidden.lg\:block:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Add these new styles at the end of the file */
+.group {
+  position: relative;
+}
+
+.group:hover .hidden {
+  display: block;
+}
+
+.group > div > div {
+  transition: background-color 0.3s ease;
+}
+
+.group > div > div:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.group .absolute {
+  transition: opacity 0.3s ease, transform 0.3s ease, width 0.3s ease;
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.group:hover .absolute {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
