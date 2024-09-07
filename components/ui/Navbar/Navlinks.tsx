@@ -167,24 +167,14 @@ export default function Navlinks({ user }: NavlinksProps) {
 		setIsNavOpen(!isNavOpen);
 	};
 
-	const menuIcon = (
-		<svg
-			width="35"
-			height="35"
-			fill="none"
-			viewBox="0 0 24 24"
-			stroke="#fff"
-			aria-labelledby="menuTitle"
-		>
-			<title id="menuTitle">Menu</title>
-			<path
-				strokeLinecap="round"
-				strokeLinejoin="round"
-				strokeWidth={2}
-				d={isNavOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-			/>
-		</svg>
-	);
+	const buttonClasses = `
+        px-6 py-2
+        gradient-border-button
+        text-white font-medium
+        ${oxanium.className}
+        transition-all duration-300
+        hover:shadow-lg
+    `;
 
 	return (
 		<>
@@ -210,22 +200,16 @@ export default function Navlinks({ user }: NavlinksProps) {
 						<NavLinks user={user} />
 					</nav>
 				</div>
-				<div className="flex justify-end space-x-8 ">
+				<div className="flex justify-center items-center lg:justify-end space-x-8 ">
 					{user ? (
 						<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
 							<input type="hidden" name="pathName" value={usePathname()} />
-							<button
-								type="submit"
-								className={`font-medium heading-text ${oxanium.className}`}
-							>
+							<button type="submit" className={buttonClasses}>
 								Sign out
 							</button>
 						</form>
 					) : (
-						<Link
-							href="/signin"
-							className={`font-medium heading-text ${oxanium.className}`}
-						>
+						<Link href="/signin" className={buttonClasses}>
 							Sign In
 						</Link>
 					)}
@@ -236,17 +220,50 @@ export default function Navlinks({ user }: NavlinksProps) {
 					type="button"
 					aria-label="Toggle navigation"
 				>
-					{menuIcon}
+					<svg
+						width="35"
+						height="35"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke="#fff"
+						aria-labelledby="menuTitle"
+					>
+						<title id="menuTitle">Menu</title>
+						<path
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							strokeWidth={2}
+							d={isNavOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
+						/>
+					</svg>
 				</button>
 			</div>
 
 			{/* Mobile Navigation Menu */}
 			{isNavOpen && (
 				<div
-					className={`fixed inset-x-0 top-[72px] z-50 bg-black p-4 lg:hidden ${oxanium.className}`}
+					className={`fixed items-center justify-center inset-x-0 top-[72px] z-50 bg-black p-4 lg:hidden ${oxanium.className}`}
 				>
-					<nav className="flex flex-col space-y-4">
+					<nav className="flex flex-col  space-y-4">
 						<NavLinks user={user} />
+						{user ? (
+							<form
+								onSubmit={(e) => handleRequest(e, SignOut, router)}
+								className="mt-4"
+							>
+								<input type="hidden" name="pathName" value={usePathname()} />
+								<button type="submit" className={`w-full ${buttonClasses}`}>
+									Sign out
+								</button>
+							</form>
+						) : (
+							<Link
+								href="/signin"
+								className={`mt-4 block w-full ${buttonClasses}`}
+							>
+								Sign In
+							</Link>
+						)}
 					</nav>
 				</div>
 			)}
