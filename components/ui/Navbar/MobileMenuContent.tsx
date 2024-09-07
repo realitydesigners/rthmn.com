@@ -14,11 +14,11 @@ export const MobileMenuContent = () => {
 					</h2>
 					{item.links.map((link) => (
 						<Link
-							key={link}
-							href="#"
+							key={link.title}
+							href="/"
 							className={`heading-text font-bold py-2 text-base ${oxanium.className}`}
 						>
-							{link}
+							{link.title}
 						</Link>
 					))}
 				</div>
