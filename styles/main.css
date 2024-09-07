@@ -35,6 +35,7 @@ body {
   position: relative;
   min-height: 100%;
   margin: 0;
+  padding-top: 64px; /* Adjust this value based on your navbar height */
 }
 
 a {

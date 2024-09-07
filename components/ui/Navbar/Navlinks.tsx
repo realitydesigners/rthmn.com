@@ -189,81 +189,72 @@ export default function Navlinks({ user }: NavlinksProps) {
 			)}
 
 			<div
-				className={`relative flex flex-row justify-between py-4 align-center md:py-6 ${oxanium.className}`}
+				className={`fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm ${oxanium.className}`}
 			>
-				<div className="flex items-center flex-1">
-					<Link href="/" className="flex items-center gap-2">
-						<div className="flex h-8 w-8 items-center">{getIcon("logo")}</div>
-						<div className="heading-text text-xl font-bold">RTHMN</div>
-					</Link>
-					<nav className="ml-6 space-x-2 hidden lg:block">
-						<NavLinks user={user} />
-					</nav>
-				</div>
-				<div className="flex justify-center items-center lg:justify-end space-x-8 ">
-					{user ? (
-						<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
-							<input type="hidden" name="pathName" value={usePathname()} />
-							<button type="submit" className={buttonClasses}>
-								Sign out
-							</button>
-						</form>
-					) : (
-						<Link href="/signin" className={buttonClasses}>
-							Sign In
+				<div className="max-w-6xl mx-auto px-4">
+					<div className="flex items-center justify-between py-4 md:py-6">
+						<Link href="/" className="flex items-center gap-2">
+							<div className="flex h-8 w-8 items-center">{getIcon("logo")}</div>
+							<div className="heading-text text-xl font-bold">RTHMN</div>
 						</Link>
-					)}
+
+						<nav className="hidden lg:flex space-x-4">
+							<NavLinks user={user} />
+						</nav>
+
+						<div className="flex items-center  space-x-4">
+							{user ? (
+								<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
+									<input type="hidden" name="pathName" value={usePathname()} />
+									<button type="submit" className={buttonClasses}>
+										Sign out
+									</button>
+								</form>
+							) : (
+								<Link href="/signin" className={buttonClasses}>
+									Sign In
+								</Link>
+							)}
+
+							<button
+								onClick={toggleNav}
+								className="lg:hidden"
+								type="button"
+								aria-label="Toggle navigation"
+							>
+								<svg
+									width="24"
+									height="24"
+									fill="none"
+									viewBox="0 0 24 24"
+									stroke="currentColor"
+									aria-labelledby="menuTitle"
+								>
+									<title id="menuTitle">Menu</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d={
+											isNavOpen
+												? "M6 18L18 6M6 6l12 12"
+												: "M4 6h16M4 12h16M4 18h16"
+										}
+									/>
+								</svg>
+							</button>
+						</div>
+					</div>
 				</div>
-				<button
-					onClick={toggleNav}
-					className="lg:hidden"
-					type="button"
-					aria-label="Toggle navigation"
-				>
-					<svg
-						width="35"
-						height="35"
-						fill="none"
-						viewBox="0 0 24 24"
-						stroke="#fff"
-						aria-labelledby="menuTitle"
-					>
-						<title id="menuTitle">Menu</title>
-						<path
-							strokeLinecap="round"
-							strokeLinejoin="round"
-							strokeWidth={2}
-							d={isNavOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}
-						/>
-					</svg>
-				</button>
 			</div>
 
 			{/* Mobile Navigation Menu */}
 			{isNavOpen && (
 				<div
-					className={`fixed items-center justify-center inset-x-0 top-[72px] z-50 bg-black p-4 lg:hidden ${oxanium.className}`}
+					className={`fixed inset-x-0 top-[72px] z-40 bg-black bg-opacity-80 backdrop-blur-sm p-4 lg:hidden ${oxanium.className}`}
 				>
-					<nav className="flex flex-col  space-y-4">
+					<nav className="flex flex-col space-y-4">
 						<NavLinks user={user} />
-						{user ? (
-							<form
-								onSubmit={(e) => handleRequest(e, SignOut, router)}
-								className="mt-4"
-							>
-								<input type="hidden" name="pathName" value={usePathname()} />
-								<button type="submit" className={`w-full ${buttonClasses}`}>
-									Sign out
-								</button>
-							</form>
-						) : (
-							<Link
-								href="/signin"
-								className={`mt-4 block w-full ${buttonClasses}`}
-							>
-								Sign In
-							</Link>
-						)}
 					</nav>
 				</div>
 			)}
