@@ -4,8 +4,7 @@ import { SignOut } from "@/utils/auth-helpers/server";
 import { getRedirectMethod } from "@/utils/auth-helpers/settings";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
 import { oxanium } from "@/app/fonts";
 
 interface NavlinksProps {
@@ -52,89 +51,6 @@ const getIcon = (name: string): JSX.Element => {
 				</defs>
 			</svg>
 		),
-		library: (
-			<svg
-				viewBox="0 0 24 24"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				aria-labelledby="libraryTitle"
-			>
-				<title id="libraryTitle">Library</title>
-				<path
-					d="M4 3H20V21H4V3ZM6 5V19H18V5H6Z"
-					stroke="currentColor"
-					strokeWidth="2"
-				/>
-				<path d="M9 7H15" stroke="currentColor" strokeWidth="2" />
-				<path d="M9 11H15" stroke="currentColor" strokeWidth="2" />
-				<path d="M9 15H15" stroke="currentColor" strokeWidth="2" />
-			</svg>
-		),
-
-		lock: (
-			<svg
-				width="20"
-				height="20"
-				viewBox="0 0 18 20"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				aria-labelledby="lockTitle"
-			>
-				<title id="lockTitle">Lock</title>
-				<path
-					d="M1 11C1 9.11438 1 8.17157 1.58579 7.58579C2.17157 7 3.11438 7 5 7H13C14.8856 7 15.8284 7 16.4142 7.58579C17 8.17157 17 9.11438 17 11V13C17 15.8284 17 17.2426 16.1213 18.1213C15.2426 19 13.8284 19 11 19H7C4.17157 19 2.75736 19 1.87868 18.1213C1 17.2426 1 15.8284 1 13V11Z"
-					stroke="#444"
-					strokeWidth="2"
-				/>
-				<path
-					d="M13 6V5C13 2.79086 11.2091 1 9 1V1C6.79086 1 5 2.79086 5 5V6"
-					stroke="#444"
-					strokeWidth="2"
-					strokeLinecap="round"
-				/>
-				<circle cx="9" cy="13" r="2" fill="#444" />
-			</svg>
-		),
-		story: (
-			<svg
-				width="20"
-				height="16"
-				viewBox="0 0 20 16"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				aria-labelledby="storyTitle"
-			>
-				<title id="storyTitle">Story</title>
-				<path
-					d="M19 12.6953V1.66466C19 1.34631 18.6785 1.12861 18.3829 1.24685L14.1351 2.94596C14.0473 2.98109 13.9506 2.98765 13.8588 2.96471L6.14116 1.03529C6.04939 1.01235 5.95273 1.01891 5.8649 1.05404L1.28287 2.88685C1.11203 2.95519 1 3.12066 1 3.30466V14.3353C1 14.6537 1.32154 14.8714 1.61713 14.7531L5.8649 13.054C5.95273 13.0189 6.04939 13.0123 6.14117 13.0353L13.8588 14.9647C13.9506 14.9877 14.0473 14.9811 14.1351 14.946L18.7171 13.1131C18.888 13.0448 19 12.8793 19 12.6953Z"
-					stroke="#999"
-					strokeWidth="2"
-					strokeLinejoin="round"
-				/>
-				<path d="M14 15V3" stroke="#999" strokeWidth="2" />
-				<path d="M6 13L6 1" stroke="#999" strokeWidth="2" />
-			</svg>
-		),
-		video: (
-			<svg
-				width="20"
-				height="16"
-				viewBox="0 0 20 16"
-				fill="none"
-				xmlns="http://www.w3.org/2000/svg"
-				aria-labelledby="videoTitle"
-			>
-				<title id="videoTitle">Video</title>
-				<path
-					d="M19 12.6953V1.66466C19 1.34631 18.6785 1.12861 18.3829 1.24685L14.1351 2.94596C14.0473 2.98109 13.9506 2.98765 13.8588 2.96471L6.14116 1.03529C6.04939 1.01235 5.95273 1.01891 5.8649 1.05404L1.28287 2.88685C1.11203 2.95519 1 3.12066 1 3.30466V14.3353C1 14.6537 1.32154 14.8714 1.61713 14.7531L5.8649 13.054C5.95273 13.0189 6.04939 13.0123 6.14117 13.0353L13.8588 14.9647C13.9506 14.9877 14.0473 14.9811 14.1351 14.946L18.7171 13.1131C18.888 13.0448 19 12.8793 19 12.6953Z"
-					stroke="#999"
-					strokeWidth="2"
-					strokeLinejoin="round"
-				/>
-				<path d="M14 15V3" stroke="#999" strokeWidth="2" />
-				<path d="M6 13L6 1" stroke="#999" strokeWidth="2" />
-			</svg>
-		),
 	};
 	return icons[name] || <path />;
 };
@@ -155,9 +71,76 @@ const Links = ({ user }: { user: NavlinksProps["user"] }) => (
 	</>
 );
 
+const MenuIcon = ({ isOpen }: { isOpen: boolean }) => (
+	<svg
+		width="28"
+		height="28"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-labelledby="menuIconTitle"
+	>
+		<title id="menuIconTitle">{isOpen ? "Close Menu" : "Open Menu"}</title>
+		{isOpen ? (
+			// Close icon (X)
+			<>
+				<line x1="18" y1="6" x2="6" y2="18" />
+				<line x1="6" y1="6" x2="18" y2="18" />
+			</>
+		) : (
+			// Open icon (Three lines with slower expanding animation)
+			<>
+				<line x1="3" y1="12" x2="21" y2="12" />
+				<line x1="3" y1="6" x2="21" y2="6">
+					<animate
+						attributeName="x1"
+						values="3;6;3"
+						dur="3s"
+						repeatCount="indefinite"
+					/>
+					<animate
+						attributeName="x2"
+						values="21;18;21"
+						dur="3s"
+						repeatCount="indefinite"
+					/>
+				</line>
+				<line x1="3" y1="18" x2="21" y2="18">
+					<animate
+						attributeName="x1"
+						values="3;6;3"
+						dur="3s"
+						repeatCount="indefinite"
+					/>
+					<animate
+						attributeName="x2"
+						values="21;18;21"
+						dur="3s"
+						repeatCount="indefinite"
+					/>
+				</line>
+			</>
+		)}
+	</svg>
+);
+
 export function Navlinks({ user }: NavlinksProps) {
 	const router = getRedirectMethod() === "client" ? useRouter() : null;
 	const [isNavOpen, setIsNavOpen] = useState(false);
+
+	useEffect(() => {
+		if (isNavOpen) {
+			document.body.classList.add("no-scroll");
+		} else {
+			document.body.classList.remove("no-scroll");
+		}
+		return () => {
+			document.body.classList.remove("no-scroll");
+		};
+	}, [isNavOpen]);
 
 	const handleBackdropClick = () => {
 		setIsNavOpen(false);
@@ -191,9 +174,12 @@ export function Navlinks({ user }: NavlinksProps) {
 			<div
 				className={`fixed top-0 left-0 right-0 z-50 h-16 lg:h-20 bg-gradient-to-b from-black via-black to-transparent ${oxanium.className}`}
 			>
-				<div className="max-w-6xl mx-auto px-4 h-full">
+				<div className="max-w-6xl mx-auto  h-full">
 					<div className="flex items-center justify-between h-full">
-						<Link href="/" className="flex items-center gap-2 z-50">
+						<Link
+							href="/"
+							className="flex pl-4 xl:pl-0 items-center gap-2 z-50"
+						>
 							<div className="flex h-8 w-8 items-center">{getIcon("logo")}</div>
 							<div className="heading-text text-xl lg:block hidden font-bold">
 								RTHMN
@@ -238,32 +224,11 @@ export function Navlinks({ user }: NavlinksProps) {
 
 						<button
 							onClick={toggleNav}
-							className="lg:hidden z-50"
+							className="lg:hidden w-12 h-12 items-center justify-center flex z-50"
 							type="button"
 							aria-label="Toggle navigation"
 						>
-							<svg
-								width="24"
-								height="24"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor"
-								aria-labelledby="menuTitle"
-							>
-								<title id="menuTitle">
-									{isNavOpen ? "Close Menu" : "Open Menu"}
-								</title>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									strokeWidth={2}
-									d={
-										isNavOpen
-											? "M6 18L18 6M6 6l12 12"
-											: "M4 6h16M4 12h16M4 18h16"
-									}
-								/>
-							</svg>
+							<MenuIcon isOpen={isNavOpen} />
 						</button>
 					</div>
 				</div>
@@ -274,7 +239,7 @@ export function Navlinks({ user }: NavlinksProps) {
 				<div
 					className={`fixed inset-0 z-40 bg-black bg-opacity-95 backdrop-blur-sm pt-16 lg:hidden ${oxanium.className}`}
 				>
-					<div className="h-full flex flex-col justify-center items-center">
+					<div className="h-full flex flex-col justify-center items-center overflow-y-auto">
 						<nav className="flex flex-col space-y-8 text-center">
 							<Links user={user} />
 						</nav>
