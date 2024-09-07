@@ -57,3 +57,17 @@ p a {
 .height-screen-helper {
   min-height: calc(100vh - 80px);
 }
+
+.heading-text {
+   background: linear-gradient(to bottom, #ffffff, #83838a);
+   -webkit-background-clip: text;
+   background-clip: text;
+   -webkit-text-fill-color: transparent;
+}
+    
+.primary-text { 
+   background: linear-gradient(to bottom, #ffffffa0, #787c80);
+   -webkit-background-clip: text;
+   background-clip: text;
+   -webkit-text-fill-color: transparent;
+}
