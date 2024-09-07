@@ -2,7 +2,7 @@ import { oxanium } from "@/app/fonts";
 import Spline from "@splinetool/react-spline";
 import React from "react";
 
-const Hero = () => (
+export const HeroSection = () => (
 	<div
 		className={`flex h-screen w-full flex-col items-center justify-center ${oxanium.className}`}
 	>
@@ -39,4 +39,3 @@ const Hero = () => (
 	</div>
 );
 
-export default Hero;

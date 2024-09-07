@@ -1,11 +1,12 @@
-import Hero from "@/components/Hero";
-import Pricing from "@/components/ui/Pricing/Pricing";
+import { HeroSection } from "@/components/HeroSection";
+import Pricing from "@/components/PricingSection";
 import {
 	getProducts,
 	getSubscription,
 	getUser,
 } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/server";
+import { FAQSection } from "@/components/FAQSection";
 
 export default async function PricingPage() {
 	const supabase = createClient();
@@ -17,8 +18,8 @@ export default async function PricingPage() {
 
 	return (
 		<div>
-			<Hero />
-
+			<HeroSection />
+			<FAQSection />
 			<Pricing
 				user={user}
 				products={products ?? []}
