@@ -5,6 +5,7 @@ import {
   getSubscription,
   getUser
 } from '@/utils/supabase/queries';
+import Hero from '@/components/Hero';
 
 export default async function PricingPage() {
   const supabase = createClient();
@@ -15,10 +16,15 @@ export default async function PricingPage() {
   ]);
 
   return (
+	<div>
+
+		   <Hero />
+
     <Pricing
       user={user}
       products={products ?? []}
       subscription={subscription}
     />
+	</div>
   );
 }
