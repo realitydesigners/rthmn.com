@@ -139,7 +139,7 @@ const getIcon = (name: string): JSX.Element => {
 	return icons[name] || <path />;
 };
 
-const NavLinks = ({ user }: { user: NavlinksProps["user"] }) => (
+const Links = ({ user }: { user: NavlinksProps["user"] }) => (
 	<>
 		<Link href="/" className={`font-bold heading-text ${oxanium.className}`}>
 			Pricing
@@ -155,7 +155,7 @@ const NavLinks = ({ user }: { user: NavlinksProps["user"] }) => (
 	</>
 );
 
-export default function Navlinks({ user }: NavlinksProps) {
+export function Navlinks({ user }: NavlinksProps) {
 	const router = getRedirectMethod() === "client" ? useRouter() : null;
 	const [isNavOpen, setIsNavOpen] = useState(false);
 
@@ -180,7 +180,7 @@ export default function Navlinks({ user }: NavlinksProps) {
 		<>
 			{isNavOpen && (
 				<div
-					className="fixed inset-0 z-40 bg-black backdrop-blur-[.5em] lg:bg-black/20"
+					className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
 					onClick={handleBackdropClick}
 					onKeyDown={(e) => e.key === "Escape" && handleBackdropClick()}
 					role="button"
@@ -189,20 +189,23 @@ export default function Navlinks({ user }: NavlinksProps) {
 			)}
 
 			<div
-				className={`fixed top-0 left-0 right-0 z-50 bg-black bg-opacity-80 backdrop-blur-sm ${oxanium.className}`}
+				className={`fixed top-0 left-0 right-0 z-50 h-16 lg:h-20 bg-gradient-to-b from-black via-black to-transparent ${oxanium.className}`}
 			>
-				<div className="max-w-6xl mx-auto px-4">
-					<div className="flex items-center justify-between py-4 md:py-6">
-						<Link href="/" className="flex items-center gap-2">
+				<div className="max-w-6xl mx-auto px-4 h-full">
+					<div className="flex items-center justify-between h-full">
+						<Link href="/" className="flex items-center gap-2 z-50">
 							<div className="flex h-8 w-8 items-center">{getIcon("logo")}</div>
-							<div className="heading-text text-xl font-bold">RTHMN</div>
+							<div className="heading-text text-xl lg:block hidden font-bold">
+								RTHMN
+							</div>
 						</Link>
 
 						<nav className="hidden lg:flex space-x-4">
-							<NavLinks user={user} />
+							<Links user={user} />
 						</nav>
 
-						<div className="flex items-center  space-x-4">
+						{/* Mobile sign-in/sign-out button */}
+						<div className="absolute left-1/2 transform -translate-x-1/2 lg:hidden z-50">
 							{user ? (
 								<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
 									<input type="hidden" name="pathName" value={usePathname()} />
@@ -215,35 +218,53 @@ export default function Navlinks({ user }: NavlinksProps) {
 									Sign In
 								</Link>
 							)}
-
-							<button
-								onClick={toggleNav}
-								className="lg:hidden"
-								type="button"
-								aria-label="Toggle navigation"
-							>
-								<svg
-									width="24"
-									height="24"
-									fill="none"
-									viewBox="0 0 24 24"
-									stroke="currentColor"
-									aria-labelledby="menuTitle"
-								>
-									<title id="menuTitle">Menu</title>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d={
-											isNavOpen
-												? "M6 18L18 6M6 6l12 12"
-												: "M4 6h16M4 12h16M4 18h16"
-										}
-									/>
-								</svg>
-							</button>
 						</div>
+
+						{/* Desktop sign-in/sign-out button */}
+						<div className="hidden lg:block">
+							{user ? (
+								<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
+									<input type="hidden" name="pathName" value={usePathname()} />
+									<button type="submit" className={buttonClasses}>
+										Sign out
+									</button>
+								</form>
+							) : (
+								<Link href="/signin" className={buttonClasses}>
+									Sign In
+								</Link>
+							)}
+						</div>
+
+						<button
+							onClick={toggleNav}
+							className="lg:hidden z-50"
+							type="button"
+							aria-label="Toggle navigation"
+						>
+							<svg
+								width="24"
+								height="24"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke="currentColor"
+								aria-labelledby="menuTitle"
+							>
+								<title id="menuTitle">
+									{isNavOpen ? "Close Menu" : "Open Menu"}
+								</title>
+								<path
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									strokeWidth={2}
+									d={
+										isNavOpen
+											? "M6 18L18 6M6 6l12 12"
+											: "M4 6h16M4 12h16M4 18h16"
+									}
+								/>
+							</svg>
+						</button>
 					</div>
 				</div>
 			</div>
@@ -251,11 +272,13 @@ export default function Navlinks({ user }: NavlinksProps) {
 			{/* Mobile Navigation Menu */}
 			{isNavOpen && (
 				<div
-					className={`fixed inset-x-0 top-[72px] z-40 bg-black bg-opacity-80 backdrop-blur-sm p-4 lg:hidden ${oxanium.className}`}
+					className={`fixed inset-0 z-40 bg-black bg-opacity-95 backdrop-blur-sm pt-16 lg:hidden ${oxanium.className}`}
 				>
-					<nav className="flex flex-col space-y-4">
-						<NavLinks user={user} />
-					</nav>
+					<div className="h-full flex flex-col justify-center items-center">
+						<nav className="flex flex-col space-y-8 text-center">
+							<Links user={user} />
+						</nav>
+					</div>
 				</div>
 			)}
 		</>
