@@ -1,7 +1,21 @@
+import type { IconType } from "react-icons";
+import {
+	FaSignal,
+	FaChartLine,
+	FaCrown,
+	FaBlog,
+	FaBook,
+	FaCode,
+	FaCompass,
+	FaUser,
+	FaCog,
+	FaCreditCard,
+} from "react-icons/fa";
+
 export interface LinkItem {
 	title: string;
 	desc?: string;
-	icon?: string; // This could be a string reference to an icon or an SVG path
+	icon: IconType;
 }
 
 export interface LinkGroup {
@@ -16,17 +30,17 @@ export const allLinks: LinkGroup[] = [
 			{
 				title: "Signal Service",
 				desc: "Real-time market signals for informed trading decisions",
-				icon: "",
+				icon: FaSignal,
 			},
 			{
 				title: "Premium Signals",
 				desc: "Advanced signals with higher accuracy and frequency",
-				icon: "",
+				icon: FaChartLine,
 			},
 			{
 				title: "Elite Membership",
 				desc: "Exclusive access to all features and personalized support",
-				icon: "",
+				icon: FaCrown,
 			},
 		],
 	},
@@ -36,22 +50,22 @@ export const allLinks: LinkGroup[] = [
 			{
 				title: "Blog",
 				desc: "Latest insights and trading strategies",
-				icon: "",
+				icon: FaBlog,
 			},
 			{
 				title: "Documentation",
 				desc: "Comprehensive guides for using our platform",
-				icon: "",
+				icon: FaBook,
 			},
 			{
 				title: "API",
 				desc: "Integrate our services into your applications",
-				icon: "",
+				icon: FaCode,
 			},
 			{
 				title: "Support",
-				desc: "24/7 customer support for all your needs",
-				icon: "",
+				desc: "Support for all your needs",
+				icon: FaCompass,
 			},
 		],
 	},
@@ -61,17 +75,17 @@ export const allLinks: LinkGroup[] = [
 			{
 				title: "Profile",
 				desc: "Manage your personal information",
-				icon: "",
+				icon: FaUser,
 			},
 			{
 				title: "Settings",
 				desc: "Customize your trading environment",
-				icon: "",
+				icon: FaCog,
 			},
 			{
 				title: "Billing",
 				desc: "View and manage your subscription",
-				icon: "",
+				icon: FaCreditCard,
 			},
 		],
 	},

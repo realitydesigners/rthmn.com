@@ -1,25 +1,30 @@
 import type React from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { allLinks, type LinkItem } from "./AllLinks";
+import styles from "./styles.module.css";
 
 interface MenuModalProps {
 	activeDropdown: string | null;
 }
 
-const DropdownLink: React.FC<LinkItem & { className: string }> = ({
+const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
 	title,
 	desc,
-	icon,
+	icon: Icon,
 	className,
 }) => (
-	<Link href="#" className={`${className} flex items-start`} role="menuitem">
-		<div className="flex-shrink-0 mr-3">
-			{/* Replace this with your actual icon component or SVG */}
-			<div className="w-6 h-6 bg-gray-600">{icon}</div>
+	<Link
+		href="#"
+		className={`${styles.dropdownLink} ${className || ""}`}
+		role="menuitem"
+	>
+		<div className={styles.dropdownLinkIcon}>
+			<Icon className={styles.icon} />
 		</div>
-		<div>
-			<div className="font-bold">{title}</div>
-			<div className="text-xs text-gray-400">{desc}</div>
+		<div className={styles.dropdownLinkContent}>
+			<div className={styles.dropdownLinkTitle}>{title}</div>
+			<div className={styles.dropdownLinkDesc}>{desc}</div>
 		</div>
 	</Link>
 );
@@ -27,6 +32,14 @@ const DropdownLink: React.FC<LinkItem & { className: string }> = ({
 export const DesktopMenuContent: React.FC<MenuModalProps> = ({
 	activeDropdown,
 }) => {
+	const [animate, setAnimate] = useState(false);
+
+	useEffect(() => {
+		setAnimate(true);
+		const timer = setTimeout(() => setAnimate(false), 500);
+		return () => clearTimeout(timer);
+	}, [activeDropdown]);
+
 	const renderDropdownContent = () => {
 		const group = allLinks.find(
 			(g) => g.title.toLowerCase() === activeDropdown,
@@ -37,15 +50,19 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
 			case "resources":
 				return (
 					<div
-						className="grid grid-cols-2 gap-4 p-4 w-[600px]"
+						className={`${styles.dropdownContent} ${styles.dropdownResources} ${
+							animate ? styles.animateDropdown : ""
+						}`}
 						role="menu"
 						aria-orientation="vertical"
 					>
-						{group.links.map((item) => (
+						{group.links.map((item, index) => (
 							<DropdownLink
 								key={item.title}
 								{...item}
-								className="block px-3 py-2 text-sm text-white hover:bg-gray-800 rounded"
+								className={`${styles.dropdownItemResources} ${
+									styles[`animateItem${index % 4}`]
+								}`}
 							/>
 						))}
 					</div>
@@ -53,15 +70,19 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
 			case "pricing":
 				return (
 					<div
-						className="grid grid-cols-2 gap-4 p-4 w-[800px]"
+						className={`${styles.dropdownContent} ${styles.dropdownPricing} ${
+							animate ? styles.animateDropdown : ""
+						}`}
 						role="menu"
 						aria-orientation="vertical"
 					>
-						{group.links.map((item) => (
+						{group.links.map((item, index) => (
 							<DropdownLink
 								key={item.title}
 								{...item}
-								className="block px-3 py-2 text-sm text-white hover:bg-gray-800 rounded"
+								className={`${styles.dropdownItemPricing} ${
+									styles[`animateItem${index % 4}`]
+								}`}
 							/>
 						))}
 					</div>
@@ -69,15 +90,19 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
 			case "account":
 				return (
 					<div
-						className="grid grid-cols-2 gap-4 p-4 w-[500px]"
+						className={`${styles.dropdownContent} ${styles.dropdownAccount} ${
+							animate ? styles.animateDropdown : ""
+						}`}
 						role="menu"
 						aria-orientation="vertical"
 					>
-						{group.links.map((item) => (
+						{group.links.map((item, index) => (
 							<DropdownLink
 								key={item.title}
 								{...item}
-								className="block px-3 py-2 text-sm text-white hover:bg-gray-800 rounded"
+								className={`${styles.dropdownItemAccount} ${
+									styles[`animateItem${index % 4}`]
+								}`}
 							/>
 						))}
 					</div>
@@ -90,11 +115,14 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
 	if (!activeDropdown) return null;
 
 	return (
-		<div className="fixed left-0 right-0 flex justify-center">
-			<div className="mt-0 rounded-md shadow-lg bg-black bg-opacity-90 ring-1 ring-white ring-opacity-20 hidden group-hover:block">
-				<div className="h-2" />
+		<div className={styles.dropdownContainer}>
+			<div
+				className={`${styles.dropdownWrapper} ${animate ? styles.animateDropdown : ""}`}
+			>
 				{renderDropdownContent()}
 			</div>
 		</div>
 	);
 };
+
+export default DesktopMenuContent;
