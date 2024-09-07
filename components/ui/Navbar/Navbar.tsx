@@ -1,5 +1,5 @@
 import { createClient } from "@/utils/supabase/server";
-import s from "./Navbar.module.css";
+
 import Navlinks from "./Navlinks";
 
 export default async function Navbar() {
@@ -10,7 +10,7 @@ export default async function Navbar() {
 	} = await supabase.auth.getUser();
 
 	return (
-		<nav className={s.root}>
+		<nav className="w-full">
 			<a href="#skip" className="sr-only focus:not-sr-only">
 				Skip to content
 			</a>
