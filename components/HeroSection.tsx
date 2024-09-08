@@ -1,5 +1,6 @@
 import { oxanium } from "@/app/fonts";
-import Spline from "@splinetool/react-spline";
+// @ts-ignore
+import Spline from "@splinetool/react-spline/next";
 import React from "react";
 
 export const HeroSection = () => (
