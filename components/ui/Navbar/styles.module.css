@@ -8,20 +8,19 @@
 }
 
 .dropdownWrapper {
-  margin-top: 0.5rem;
   border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 25px 50px -12px rgb(0, 0, 0);
   transition: all 0.3s ease;
 }
 
 .dropdownContent {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  gap: .5rem;
   padding: .5rem;
   border-radius: 0.5rem;
   backdrop-filter: blur(12px);
-  background: rgba(0, 0, 0, 0.9);
+  background: rgb(0, 0, 0);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -32,7 +31,7 @@
 }
 
 .dropdownResources { width: 700px; }
-.dropdownPricing { width: 900px; }
+.dropdownPricing { width: 800px;  }
 .dropdownAccount { width: 600px; }
 
 .dropdownLink {
@@ -43,7 +42,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
-  background: rgba(25, 25, 25, 0.5);
+  background: rgba(25, 25, 25, 0.5); 
 }
 
 .dropdownLink::before {

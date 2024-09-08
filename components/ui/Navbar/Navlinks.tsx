@@ -5,7 +5,7 @@ import { getRedirectMethod } from "@/utils/auth-helpers/settings";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
-import { oxanium } from "@/app/fonts";
+import { oxanium, russo } from "@/app/fonts";
 import { DesktopMenuContent } from "./DesktopMenuContent";
 import { MobileMenuContent } from "./MobileMenuContent";
 
@@ -60,11 +60,15 @@ const getIcon = (name: string): JSX.Element => {
 const Links = () => {
 	const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+	const handleCloseDropdown = () => {
+		setActiveDropdown(null);
+	};
+
 	return (
 		<div className="relative group">
 			<div className="flex space-x-0">
 				<div
-					className="px-4 py-6"
+					className="px-4 py-4"
 					onMouseEnter={() => setActiveDropdown("pricing")}
 				>
 					<Link
@@ -75,7 +79,7 @@ const Links = () => {
 					</Link>
 				</div>
 				<div
-					className="px-4 py-6"
+					className="px-4 py-4"
 					onMouseEnter={() => setActiveDropdown("resources")}
 				>
 					<Link
@@ -87,7 +91,7 @@ const Links = () => {
 				</div>
 
 				<div
-					className="px-4 py-6"
+					className="px-4 py-4"
 					onMouseEnter={() => setActiveDropdown("account")}
 				>
 					<Link
@@ -98,7 +102,10 @@ const Links = () => {
 					</Link>
 				</div>
 			</div>
-			<DesktopMenuContent activeDropdown={activeDropdown} />
+			<DesktopMenuContent
+				activeDropdown={activeDropdown}
+				onClose={handleCloseDropdown}
+			/>
 		</div>
 	);
 };
@@ -213,7 +220,9 @@ export function Navlinks({ user }: NavlinksProps) {
 							className="flex pl-4 xl:pl-0 items-center gap-2 z-50"
 						>
 							<div className="flex h-8 w-8 items-center">{getIcon("logo")}</div>
-							<div className="heading-text text-xl lg:block hidden font-bold">
+							<div
+								className={`heading-text text-2xl pt-1 font-bold  ${russo.className}`}
+							>
 								RTHMN
 							</div>
 						</Link>
