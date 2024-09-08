@@ -1,7 +1,5 @@
 "use client";
-
 import Button from "@/components/ui/Button";
-import LogoCloud from "@/components/ui/LogoCloud";
 import { getErrorRedirect } from "@/utils/helpers";
 import { getStripe } from "@/utils/stripe/client";
 import { checkoutWithStripe } from "@/utils/stripe/server";
@@ -98,7 +96,6 @@ export function PricingSection({ user, products, subscription }: Props) {
 						.
 					</p>
 				</div>
-				<LogoCloud />
 			</section>
 		);
 	}
@@ -195,7 +192,6 @@ export function PricingSection({ user, products, subscription }: Props) {
 						);
 					})}
 				</div>
-				<LogoCloud />
 			</div>
 		</section>
 	);

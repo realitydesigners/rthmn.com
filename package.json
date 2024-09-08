@@ -24,6 +24,7 @@
     "supabase:pull": "npx supabase db pull"
   },
   "dependencies": {
+    "@biomejs/biome": "^1.8.3",
     "@radix-ui/react-toast": "^1.1.5",
     "@splinetool/react-spline": "^4.0.0",
     "@stripe/stripe-js": "2.4.0",
