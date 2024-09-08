@@ -7,7 +7,7 @@ export const HeroSection = () => (
 		className={`flex h-screen w-full flex-col items-center justify-center ${oxanium.className}`}
 	>
 		<div className="w-full h-screen absolute">
-			<Spline scene="https://prod.spline.design/y5ARq5Cux0dwuhC6/scene.splinecode" />
+			<Spline scene="https://prod.spline.design/0PMxshYRA0EskOl3/scene.splinecode" />
 		</div>
 		<div className="relative z-10 flex justify-center items-center flex-col">
 			<h1 className="heading-text font-bold block flex w-auto text-balance text-center text-[5rem] leading-[.9em] uppercase tracking-wide md:text-[9rem]">
