@@ -31,25 +31,6 @@ const features = [
   }
 ];
 
-const FeatureCard = ({ feature, index }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 50 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5, delay: index * 0.1 }}
-    className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 rounded-lg shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-700 hover:border-[#00ff9d]"
-  >
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      className="flex items-center mb-4"
-    >
-      <feature.icon className="text-[#00ff9d] text-3xl mr-4" />
-      <h3 className="text-2xl font-semibold text-white">{feature.title}</h3>
-    </motion.div>
-    <p className="text-gray-300">{feature.description}</p>
-  </motion.div>
-);
-
 export const FeaturesSection: React.FC = () => {
   return (
     <section className={`pt-60 lg:pt-20 pb-20 bg-black ${oxanium.className}`}>
