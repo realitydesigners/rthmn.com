@@ -1,8 +1,10 @@
 // @ts-ignore
-import Spline from "@splinetool/react-spline/next";
+import Spline from '@splinetool/react-spline/next';
 
-export const Scene = () => {
-	return (
-		<Spline scene="https://prod.spline.design/0PMxshYRA0EskOl3/scene.splinecode" />
-	);
+interface SceneProps {
+  scene: string;
+}
+
+export const Scene: React.FC<SceneProps> = ({ scene }) => {
+  return <Spline scene={scene} />;
 };
