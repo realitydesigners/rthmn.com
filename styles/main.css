@@ -31,7 +31,6 @@ body {
   position: relative;
   min-height: 100%;
   margin: 0;
-
 }
 
 a {
@@ -56,27 +55,35 @@ p a {
 }
 
 .heading-text {
-   background: linear-gradient(to bottom, #ffffff, #83838a);
-   -webkit-background-clip: text;
-   background-clip: text;
-   -webkit-text-fill-color: transparent;
+  background: linear-gradient(to bottom, #ffffff, #a6a6aa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
-    
-.primary-text { 
-   background: linear-gradient(to bottom, #ffffffa0, #787c80);
-   -webkit-background-clip: text;
-   background-clip: text;
-   -webkit-text-fill-color: transparent;
+
+.primary-text {
+  background: linear-gradient(to bottom, #ffffffa0, #787c80);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @keyframes gradient-animation {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 200% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
 }
 
 @keyframes rotate {
-  0% { --angle: 0deg; }
-  100% { --angle: 360deg; }
+  0% {
+    --angle: 0deg;
+  }
+  100% {
+    --angle: 360deg;
+  }
 }
 
 @property --angle {
@@ -92,7 +99,10 @@ p a {
   border: none;
   border-radius: 8px;
   z-index: 1;
-  transition: color 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    color 0.3s ease,
+    background-color 0.3s ease,
+    box-shadow 0.3s ease;
   overflow: hidden;
 }
 
@@ -139,8 +149,18 @@ p a {
 }
 
 .gradient-border-button::before {
-  mask: conic-gradient(from var(--angle), #000 0deg 45deg, transparent 45deg 315deg, #000 315deg 360deg);
-  -webkit-mask: conic-gradient(from var(--angle), #000 0deg 45deg, transparent 45deg 315deg, #000 315deg 360deg);
+  mask: conic-gradient(
+    from var(--angle),
+    #000 0deg 45deg,
+    transparent 45deg 315deg,
+    #000 315deg 360deg
+  );
+  -webkit-mask: conic-gradient(
+    from var(--angle),
+    #000 0deg 45deg,
+    transparent 45deg 315deg,
+    #000 315deg 360deg
+  );
 }
 
 /* Add this at the end of the file */
