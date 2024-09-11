@@ -1,4 +1,5 @@
 import { HeroSection } from '@/components/Hero/HeroSection';
+import { FeaturesSection } from '@/components/FeaturesSection';
 import { PricingSection } from '@/components/PricingSection';
 import { RyverSection } from '@/components/RyverSection/RyverSection';
 import {
@@ -21,6 +22,7 @@ export default async function PricingPage() {
   return (
     <div>
       <HeroSection />
+      <FeaturesSection />
       <FAQSection />
       <ServiceSection />
       {/* <PricingSection
