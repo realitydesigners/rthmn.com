@@ -235,7 +235,7 @@ export function Navlinks({ user }: NavlinksProps) {
         animate="visible"
         variants={navVariants}
       >
-        <div className="max-w-6xl mx-auto  h-full">
+        <div className="w-full lg:w-10/12 mx-auto  h-full">
           <div className="flex items-center justify-between h-full">
             <Link
               href="/"

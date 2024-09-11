@@ -7,13 +7,13 @@ import styles from './styles.module.css';
 
 export const HeroSection = () => (
   <div
-    className={`flex h-screen w-full flex-col items-center relative justify-center ${oxanium.className} bg-black`}
+    className={`flex h-screen w-full flex-col items-center relative justify-center ${oxanium.className} bg-black overflow--hidden`}
   >
     <div className="w-full h-screen absolute">
       <Scene scene="https://prod.spline.design/0PMxshYRA0EskOl3/scene.splinecode" />
     </div>
     <div className="absolute bottom-0 left-0 right-0 h-1/6 bg-gradient-to-t from-black via-black to-transparent"></div>
-    <div className="w-full h-[50vh] -bottom-60 lg:bottom-0 lg:w-1/2 lg:-right-8 lg:h-screen absolute z-[100]">
+    <div className="w-full h-[50vh] -bottom-60 lg:bottom-0 lg:w-1/2 right-0 lg:pl-24 lg:h-screen absolute z-[100]">
       <Scene scene="https://prod.spline.design/XfnZeAWiAwxJxDxf/scene.splinecode" />
     </div>
     <motion.div
@@ -29,7 +29,7 @@ export const HeroSection = () => (
         className={`${styles.gradientBanner} text-sm lg:text-md font-semibold mb-8`}
       >
         <span className="font-extrabold pr-1">BETA v1.0 </span> Releasing this
-        coming Fall 2024
+        Fall 2024
       </motion.div>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
