@@ -1,6 +1,6 @@
 'use client';
 import Spline from '@splinetool/react-spline';
-import { russo } from '@/app/fonts';
+import { russo, oxanium } from '@/app/fonts';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 
@@ -26,10 +26,10 @@ export function RyverSection() {
 
       <motion.div
         ref={sectionRef}
-        className="flex justify-center pt- h-screen bg-black"
+        className="flex justify-center h-screen bg-black"
         style={{ opacity, scale, y }}
       >
-        <div className="pt-12 lg:pt-60">
+        <div className="pt-32 lg:pt-60 flex flex-col  items-center">
           <motion.div
             className="flex relative justify-center items-center"
             initial={{ opacity: 0, y: 20 }}
@@ -87,6 +87,12 @@ export function RyverSection() {
               <path d="M109 1L1 124" stroke="#545F68" />
             </svg>
           </motion.div>
+          <div
+            className={`text-center pt-12 w-3/4 lg:w-1/2 heading-text text-2xl lg:text-4xl ${oxanium.className}`}
+          >
+            With RYVER Charts, you don’t just watch the market— you see how it
+            flows.
+          </div>
         </div>
       </motion.div>
       <div className="w-full h-screen bg-gray-200/5">
