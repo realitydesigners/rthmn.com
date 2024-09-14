@@ -1,20 +1,14 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
-import { createBrowserClient } from '@supabase/ssr';
-import type { User } from '@supabase/supabase-js';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Signal } from '@/types';
+import { useSignals } from '@/contexts/SignalProviderClient';
 import { getTimeAgo } from '@/utils/getTimeAgo';
 import { CondensedIcon, DetailedIcon } from '@/public/icons/icons';
 import { oxanium, russo } from '@/app/fonts';
 
 export function SignalSidebar() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
-  const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
+  const { signalsData, hasSubscription } = useSignals();
   const [viewMode, setViewMode] = useState<'condensed' | 'detailed'>(
     'detailed'
   );
@@ -23,58 +17,6 @@ export function SignalSidebar() {
   );
   const [isCondensedHovered, setIsCondensedHovered] = useState(false);
   const [isDetailedHovered, setIsDetailedHovered] = useState(false);
-
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
-      setUser(user);
-      if (!user) {
-        router.push('/signin');
-      }
-    };
-    getUser();
-  }, [supabase, router]);
-
-  useEffect(() => {
-    const checkSubscriptionAndFetchSignals = async () => {
-      if (!user) return;
-
-      const { data: subscriptionData, error: subscriptionError } =
-        await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('status', 'active')
-          .single();
-
-      if (subscriptionError) {
-        console.error('Error checking subscription:', subscriptionError);
-        setHasSubscription(false);
-        return;
-      }
-
-      setHasSubscription(!!subscriptionData);
-
-      const { data: signalsData, error: signalsError } = await supabase
-        .from('signals')
-        .select('*');
-
-      if (signalsError) {
-        console.error('Error fetching signals:', signalsError);
-      } else {
-        setSignalsData(signalsData);
-      }
-    };
-
-    checkSubscriptionAndFetchSignals();
-  }, [user, supabase]);
 
   useEffect(() => {
     const savedViewMode = localStorage.getItem('viewMode') as
@@ -123,9 +65,9 @@ export function SignalSidebar() {
     return (
       <div
         key={`${signal.id}-${signal.pair}-${index}`}
-        className={`mt-30 mb-1 flex w-full items-center justify-between border border-transparent bg-[#121212] ${
+        className={`mt-30 mb-1 flex w-full items-center justify-between border border-transparent bg-[#0a0a0a] ${
           isNewSignal ? 'bg-opacity-20' : ''
-        } transition-colors duration-300 ease-in-out hover:bg-[#181818]`}
+        } transition-colors duration-300 ease-in-out hover:bg-[#121212]`}
         onMouseEnter={() => handleSignalHover(signal.id)}
       >
         <div className="flex flex-1 flex-col p-2 text-xs uppercase">
@@ -171,9 +113,9 @@ export function SignalSidebar() {
     return (
       <div
         key={`${signal.id}-${signal.pair}-${index}`}
-        className={`mb-2 flex w-full items-center justify-between border border-transparent bg-[#121212] ${
+        className={`mb-2 flex w-full items-center justify-between border border-transparent bg-[#0a0a0a] ${
           isNewSignal ? 'bg-opacity-20' : ''
-        } transition-colors duration-300 ease-in-out hover:bg-[#181818]`}
+        } transition-colors duration-300 ease-in-out hover:bg-[#121212]`}
         onMouseEnter={() => handleSignalHover(signal.id)}
       >
         <div className="flex flex-1 flex-row items-center justify-between p-2 text-xs">
