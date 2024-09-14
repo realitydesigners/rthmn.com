@@ -24,7 +24,7 @@ export default function SignalsPage() {
 			} = await supabase.auth.getUser();
 			setUser(user);
 			if (!user) {
-				router.push("/login");
+				router.push("/signin");
 			}
 		};
 		getUser();
