@@ -10,7 +10,7 @@ export default function UserLayout({
     <SignalProvider>
       <div className="flex">
         <SignalSidebar />
-        <main className="ml-[300px] flex-1">{children}</main>
+        {children}
       </div>
     </SignalProvider>
   );

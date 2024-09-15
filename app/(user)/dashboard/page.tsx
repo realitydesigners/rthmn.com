@@ -21,12 +21,11 @@ interface BoxSlice {
 }
 
 function isActualData(slice: BoxSlice): boolean {
-  // Check if the high values are not normalized (i.e., not equal to 1)
   return slice.boxes.some((box) => box.high !== 1);
 }
 
 function extractActualData(data: BoxSlice[]): BoxSlice[] {
-  return data.filter(isActualData);
+  return Array.isArray(data) ? data.filter(isActualData) : [];
 }
 
 async function getBoxSlices(pair: string) {
@@ -75,7 +74,9 @@ export default async function Dashboard() {
   }
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
-  const actualData = extractActualData(boxSlicesData);
+  const actualData = Array.isArray(boxSlicesData)
+    ? extractActualData(boxSlicesData)
+    : [];
   console.log(
     'Actual data for HistogramBox:',
     JSON.stringify(actualData, null, 2)
@@ -83,14 +84,16 @@ export default async function Dashboard() {
 
   return (
     <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
-      <h1 className="mb-6 text-3xl font-bold">Trading Dashboard</h1>
+      <h1 className="mb-6 pt-32 text-3xl font-bold">Trading Dashboard</h1>
 
       <div className="mb-6">
         <h2 className="mb-4 text-xl font-semibold">
           Box Slices Histogram (USD_JPY)
         </h2>
         <p className="mb-2">Total Box Slices: {actualData.length}</p>
-        <HistogramBox data={actualData} isLoading={false} />
+        <div className="fixed bottom-0 w-full">
+          <HistogramBox data={actualData} isLoading={false} />
+        </div>
       </div>
     </div>
   );
