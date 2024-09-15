@@ -27,7 +27,7 @@ interface HistogramProps {
 
 const INITIAL_BAR_WIDTH = 6;
 const ZOOMED_BAR_WIDTH = 30;
-const VISIBLE_BOXES_COUNT = 5;
+const VISIBLE_BOXES_COUNT = 15;
 const HISTOGRAM_HEIGHT = 250; // Fixed height of the histogram
 
 const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
@@ -37,11 +37,14 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [boxOffset, setBoxOffset] = useState(0);
 
-  const boxes = useMemo(() => data[0]?.boxes || [], [data]);
+  const currentFrame = useMemo(() => data[0] || null, [data]);
 
   const visibleBoxes = useMemo(() => {
-    return boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
-  }, [boxes, boxOffset]);
+    return (
+      currentFrame?.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT) ||
+      []
+    );
+  }, [currentFrame, boxOffset]);
 
   const { maxRange, minLow, maxHigh } = useMemo(() => {
     let min = Infinity;
@@ -61,10 +64,8 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
   const handleOffsetChange = (change: number) => {
     setBoxOffset((prev) => {
       const newOffset = prev + change;
-      return Math.max(
-        0,
-        Math.min(newOffset, boxes.length - VISIBLE_BOXES_COUNT)
-      );
+      const maxOffset = (currentFrame?.boxes.length || 0) - VISIBLE_BOXES_COUNT;
+      return Math.max(0, Math.min(newOffset, maxOffset));
     });
   };
 
@@ -128,7 +129,9 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
         <button
           onClick={() => handleOffsetChange(1)}
           className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
-          disabled={boxOffset >= boxes.length - VISIBLE_BOXES_COUNT}
+          disabled={
+            boxOffset >= (currentFrame?.boxes.length || 0) - VISIBLE_BOXES_COUNT
+          }
         >
           ▼
         </button>
@@ -181,8 +184,11 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
           )}
       </AnimatePresence>
       <AnimatePresence>
-        {selectedFrame && (
-          <SelectedFrameDetails selectedFrame={selectedFrame} />
+        {currentFrame && (
+          <SelectedFrameDetails
+            selectedFrame={currentFrame}
+            visibleBoxes={visibleBoxes}
+          />
         )}
       </AnimatePresence>
     </div>
@@ -191,10 +197,12 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
 
 interface SelectedFrameDetailsProps {
   selectedFrame: BoxSlice;
+  visibleBoxes: Box[];
 }
 
 const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
-  selectedFrame
+  selectedFrame,
+  visibleBoxes
 }) => {
   return (
     <motion.div
@@ -215,7 +223,7 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
       </ul>
       <h4 className="mb-2 text-lg font-semibold">Boxes</h4>
       <ul className="space-y-1">
-        {selectedFrame.boxes.slice(0, 5).map((box, index) => (
+        {visibleBoxes.map((box, index) => (
           <motion.li
             key={index}
             initial={{ opacity: 0, x: -20 }}
