@@ -30,22 +30,12 @@ export type CandleData = {
 
 export interface BoxSlice {
   timestamp: string;
-  boxes: {
-    high: number;
-    low: number;
-    value: number;
-    size: number;
-  }[];
-  // ... other properties
+  boxes: Box[];
 }
 
-export interface BoxData {
+export interface Box {
   high: number;
   low: number;
   value: number;
-  changeToTime?: string;
-}
-
-export interface Pattern {
-  [key: number]: number[][];
+  size: number;
 }

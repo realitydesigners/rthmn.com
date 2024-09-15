@@ -1,24 +1,7 @@
 'use client';
 import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-
-interface Box {
-  high: number;
-  low: number;
-  value: number;
-  size: number;
-}
-
-interface BoxSlice {
-  timestamp: string;
-  boxes: Box[];
-  currentOHLC: {
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-  };
-}
+import { BoxSlice, Box } from '@/types';
 
 interface HistogramProps {
   data: BoxSlice[];
@@ -214,13 +197,6 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
     >
       <h3 className="mb-4 text-xl font-semibold">Frame Data</h3>
       <p className="mb-2">Timestamp: {selectedFrame.timestamp}</p>
-      <h4 className="mb-2 text-lg font-semibold">Current OHLC</h4>
-      <ul className="mb-4 space-y-1">
-        <li>Open: {selectedFrame.currentOHLC.open.toFixed(5)}</li>
-        <li>High: {selectedFrame.currentOHLC.high.toFixed(5)}</li>
-        <li>Low: {selectedFrame.currentOHLC.low.toFixed(5)}</li>
-        <li>Close: {selectedFrame.currentOHLC.close.toFixed(5)}</li>
-      </ul>
       <h4 className="mb-2 text-lg font-semibold">Boxes</h4>
       <ul className="space-y-1">
         {visibleBoxes.map((box, index) => (

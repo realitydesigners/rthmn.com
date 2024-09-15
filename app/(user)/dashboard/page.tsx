@@ -4,41 +4,40 @@ import { redirect } from 'next/navigation';
 import { oxanium } from '@/app/fonts';
 import HistogramBox from './HistogramBox';
 
+interface Box {
+  high: number;
+  low: number;
+  value: number;
+  size: number;
+}
+
 interface BoxSlice {
   timestamp: string;
-  boxes: Array<{
-    high: number;
-    low: number;
-    value: number;
-    size: number;
-  }>;
-  currentOHLC: {
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-  };
+  boxes: Box[];
 }
 
-function isActualData(slice: BoxSlice): boolean {
-  return slice.boxes.some((box) => box.high !== 1);
-}
+const isActualData = (slice: BoxSlice): boolean =>
+  slice.boxes.some((box) => box.high !== 1);
 
-function extractActualData(data: BoxSlice[]): BoxSlice[] {
-  return Array.isArray(data) ? data.filter(isActualData) : [];
-}
+const extractActualData = (data: BoxSlice[] | unknown): BoxSlice[] => {
+  if (!Array.isArray(data)) return [];
+  return data.filter(isActualData);
+};
 
-async function getBoxSlices(pair: string) {
+const getBoxSlices = async (pair: string): Promise<BoxSlice[]> => {
   try {
     const response = await fetch(`http://localhost:8080/boxslices/${pair}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const data = await response.json();
     console.log('Raw data from server:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
     console.error('Error fetching box slices:', error);
-    return { status: 'error', message: 'Failed to fetch box slices' };
+    return [];
   }
-}
+};
 
 export default async function Dashboard() {
   const cookieStore = cookies();
@@ -74,9 +73,7 @@ export default async function Dashboard() {
   }
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
-  const actualData = Array.isArray(boxSlicesData)
-    ? extractActualData(boxSlicesData)
-    : [];
+  const actualData = extractActualData(boxSlicesData);
   console.log(
     'Actual data for HistogramBox:',
     JSON.stringify(actualData, null, 2)
