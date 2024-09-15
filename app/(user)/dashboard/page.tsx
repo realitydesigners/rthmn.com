@@ -4,10 +4,36 @@ import { redirect } from 'next/navigation';
 import { oxanium } from '@/app/fonts';
 import HistogramBox from './HistogramBox';
 
+interface BoxSlice {
+  timestamp: string;
+  boxes: Array<{
+    high: number;
+    low: number;
+    value: number;
+    size: number;
+  }>;
+  currentOHLC: {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
+}
+
+function isActualData(slice: BoxSlice): boolean {
+  // Check if the high values are not normalized (i.e., not equal to 1)
+  return slice.boxes.some((box) => box.high !== 1);
+}
+
+function extractActualData(data: BoxSlice[]): BoxSlice[] {
+  return data.filter(isActualData);
+}
+
 async function getBoxSlices(pair: string) {
   try {
     const response = await fetch(`http://localhost:8080/boxslices/${pair}`);
     const data = await response.json();
+    console.log('Raw data from server:', JSON.stringify(data, null, 2));
     return data;
   } catch (error) {
     console.error('Error fetching box slices:', error);
@@ -49,8 +75,11 @@ export default async function Dashboard() {
   }
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
-  console.log('Box Slices Data:', JSON.stringify(boxSlicesData, null, 2));
-  console.log(`Number of box slices: ${boxSlicesData.length}`);
+  const actualData = extractActualData(boxSlicesData);
+  console.log(
+    'Actual data for HistogramBox:',
+    JSON.stringify(actualData, null, 2)
+  );
 
   return (
     <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
@@ -60,8 +89,8 @@ export default async function Dashboard() {
         <h2 className="mb-4 text-xl font-semibold">
           Box Slices Histogram (USD_JPY)
         </h2>
-        <p className="mb-2">Total Box Slices: {boxSlicesData.length}</p>
-        <HistogramBox data={boxSlicesData} isLoading={false} />
+        <p className="mb-2">Total Box Slices: {actualData.length}</p>
+        <HistogramBox data={actualData} isLoading={false} />
       </div>
     </div>
   );

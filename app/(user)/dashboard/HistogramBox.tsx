@@ -1,7 +1,24 @@
 'use client';
 import React, { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { BoxSlice } from '@/types';
+
+interface Box {
+  high: number;
+  low: number;
+  value: number;
+  size: number;
+}
+
+interface BoxSlice {
+  timestamp: string;
+  boxes: Box[];
+  currentOHLC: {
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+  };
+}
 
 interface HistogramProps {
   data: BoxSlice[];
@@ -14,18 +31,26 @@ const VISIBLE_BOXES_COUNT = 5;
 const HISTOGRAM_HEIGHT = 250; // Fixed height of the histogram
 
 const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
+  console.log('Data received in HistogramBox:', JSON.stringify(data, null, 2));
+
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [boxOffset, setBoxOffset] = useState(0);
 
-  const allBoxes = useMemo(() => data[0]?.boxes || [], [data]);
+  const boxes = useMemo(() => data[0]?.boxes || [], [data]);
 
   const visibleBoxes = useMemo(() => {
-    return allBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
-  }, [allBoxes, boxOffset]);
+    return boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
+  }, [boxes, boxOffset]);
 
-  const totalValue = useMemo(() => {
-    return visibleBoxes.reduce((sum, box) => sum + Math.abs(box.value), 0);
+  const { maxRange, minLow, maxHigh } = useMemo(() => {
+    let min = Infinity;
+    let max = -Infinity;
+    visibleBoxes.forEach((box) => {
+      min = Math.min(min, box.low);
+      max = Math.max(max, box.high);
+    });
+    return { maxRange: max - min, minLow: min, maxHigh: max };
   }, [visibleBoxes]);
 
   const handleFrameClick = useCallback((slice: BoxSlice, index: number) => {
@@ -38,41 +63,36 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
       const newOffset = prev + change;
       return Math.max(
         0,
-        Math.min(newOffset, allBoxes.length - VISIBLE_BOXES_COUNT)
+        Math.min(newOffset, boxes.length - VISIBLE_BOXES_COUNT)
       );
     });
   };
 
-  const renderNestedBoxes = useCallback(
-    (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element[] => {
-      let accumulatedHeight = 0;
-      return boxArray.map((box, idx) => {
-        const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
-        const relativeSize = Math.abs(box.value) / totalValue;
-        const height = relativeSize * HISTOGRAM_HEIGHT;
-        const positionStyle = box.value > 0 ? 'bottom' : 'top';
+  const renderBox = useCallback(
+    (box: Box, idx: number, isSelected: boolean): JSX.Element => {
+      const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
+      const heightPercentage = (box.high - box.low) / maxRange;
+      const bottomPercentage = (box.low - minLow) / maxRange;
+      const height = heightPercentage * HISTOGRAM_HEIGHT;
+      const bottom = bottomPercentage * HISTOGRAM_HEIGHT;
 
-        const element = (
-          <motion.div
-            className={`absolute ${boxColor} border border-black`}
-            style={{
-              width: '100%',
-              height: `${height}px`,
-              [positionStyle]: `${accumulatedHeight}px`,
-              left: 0,
-              right: 0
-            }}
-            key={idx}
-            layout
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          />
-        );
-
-        accumulatedHeight += height;
-        return element;
-      });
+      return (
+        <motion.div
+          className={`absolute ${boxColor} border border-black`}
+          style={{
+            width: '100%',
+            height: `${height}px`,
+            bottom: `${bottom}px`,
+            left: 0,
+            right: 0
+          }}
+          key={idx}
+          layout
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        />
+      );
     },
-    [totalValue]
+    [maxRange, minLow]
   );
 
   const renderFrame = useCallback(
@@ -81,18 +101,18 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
 
       return (
         <motion.div
-          key={`${slice.timestamp}-${index}`}
+          key={`frame-${index}`}
           className="relative flex h-[250px] flex-shrink-0 cursor-pointer flex-col"
           style={{ width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH }}
           onClick={() => handleFrameClick(slice, index)}
           layout
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
-          {renderNestedBoxes(visibleBoxes, isSelected)}
+          {visibleBoxes.map((box, idx) => renderBox(box, idx, isSelected))}
         </motion.div>
       );
     },
-    [renderNestedBoxes, handleFrameClick, selectedIndex, visibleBoxes]
+    [handleFrameClick, selectedIndex, visibleBoxes, renderBox]
   );
 
   return (
@@ -108,24 +128,25 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
         <button
           onClick={() => handleOffsetChange(1)}
           className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
-          disabled={boxOffset >= allBoxes.length - VISIBLE_BOXES_COUNT}
+          disabled={boxOffset >= boxes.length - VISIBLE_BOXES_COUNT}
         >
           ▼
         </button>
       </div>
       <AnimatePresence mode="wait">
-        {!isLoading && (!data || data.length === 0) && (
-          <motion.div
-            key="initial-state"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            className="absolute inset-0 flex items-center justify-center"
-          >
-            No data available
-          </motion.div>
-        )}
+        {!isLoading &&
+          (!data || data.length === 0 || !data[0]?.boxes?.length) && (
+            <motion.div
+              key="initial-state"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              No data available
+            </motion.div>
+          )}
         {isLoading && (
           <motion.div
             key="loading-spinner"
@@ -138,32 +159,30 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
             Loading...
           </motion.div>
         )}
-        {!isLoading && data && data.length > 0 && (
-          <motion.div
-            key="histogram-content"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div
-              className="flex w-auto items-center overflow-x-auto"
-              role="region"
-              aria-label="Histogram Chart"
+        {!isLoading &&
+          data &&
+          data.length > 0 &&
+          data[0]?.boxes?.length > 0 && (
+            <motion.div
+              key="histogram-content"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
-              {data.map((slice, index) => renderFrame(slice, index))}
-            </div>
-          </motion.div>
-        )}
+              <div
+                className="flex w-auto items-center overflow-x-auto"
+                role="region"
+                aria-label="Histogram Chart"
+              >
+                {data.map((slice, index) => renderFrame(slice, index))}
+              </div>
+            </motion.div>
+          )}
       </AnimatePresence>
       <AnimatePresence>
         {selectedFrame && (
-          <MemoizedSelectedFrameDetails
-            selectedFrame={{
-              ...selectedFrame,
-              boxes: visibleBoxes
-            }}
-          />
+          <SelectedFrameDetails selectedFrame={selectedFrame} />
         )}
       </AnimatePresence>
     </div>
@@ -186,11 +205,17 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
       className="absolute top-full z-50 mt-4 w-[450px] rounded-lg bg-gray-800 p-6 text-white shadow-xl"
     >
       <h3 className="mb-4 text-xl font-semibold">Frame Data</h3>
-      <p className="mb-4 text-sm text-[#A0A0A0]">
-        Time: {selectedFrame.timestamp}
-      </p>
+      <p className="mb-2">Timestamp: {selectedFrame.timestamp}</p>
+      <h4 className="mb-2 text-lg font-semibold">Current OHLC</h4>
+      <ul className="mb-4 space-y-1">
+        <li>Open: {selectedFrame.currentOHLC.open.toFixed(5)}</li>
+        <li>High: {selectedFrame.currentOHLC.high.toFixed(5)}</li>
+        <li>Low: {selectedFrame.currentOHLC.low.toFixed(5)}</li>
+        <li>Close: {selectedFrame.currentOHLC.close.toFixed(5)}</li>
+      </ul>
+      <h4 className="mb-2 text-lg font-semibold">Boxes</h4>
       <ul className="space-y-1">
-        {selectedFrame.boxes.map((box, index) => (
+        {selectedFrame.boxes.slice(0, 5).map((box, index) => (
           <motion.li
             key={index}
             initial={{ opacity: 0, x: -20 }}
@@ -222,7 +247,5 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
     </motion.div>
   );
 };
-
-const MemoizedSelectedFrameDetails = React.memo(SelectedFrameDetails);
 
 export default React.memo(HistogramBox);
