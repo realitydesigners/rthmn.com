@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { Signal } from '@/types';
 import { useSignals } from '@/contexts/SignalProviderClient';
 import { getTimeAgo } from '@/utils/getTimeAgo';
@@ -47,12 +46,6 @@ export function SignalSidebar() {
       );
       return newInteractedSignals;
     });
-    playSound('/sound/hover.mp3');
-  };
-
-  const playSound = (soundUrl: string) => {
-    const audio = new Audio(soundUrl);
-    audio.play();
   };
 
   const renderDetailedView = (signal: Signal, index: number) => {
