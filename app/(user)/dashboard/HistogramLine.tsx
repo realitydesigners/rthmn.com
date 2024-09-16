@@ -1,5 +1,11 @@
 'use client';
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect
+} from 'react';
 import type { BoxSlice, Box } from '@/types';
 
 interface HistogramProps {
@@ -9,7 +15,7 @@ interface HistogramProps {
 const BAR_WIDTH = 5;
 const CHART_HEIGHT = 300;
 const CHART_BACKGROUND = '#000';
-const VISIBLE_BOXES_COUNT = 5;
+const VISIBLE_BOXES_COUNT = 20;
 
 const areVisibleBoxesEqual = (
   slice1: BoxSlice,
@@ -221,6 +227,15 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
     setLockedPosition(null);
   }, []);
 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Scroll to the right when new data is added
+    if (containerRef.current) {
+      containerRef.current.scrollLeft = containerRef.current.scrollWidth;
+    }
+  }, [compressedData]);
+
   return (
     <div className="relative overflow-hidden rounded-lg border border-[#121212] bg-gray-700 shadow-xl">
       <div className="absolute left-2 top-2 z-10 flex space-x-2">
@@ -244,6 +259,7 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
         </button>
       </div>
       <div
+        ref={containerRef}
         className="w-full overflow-x-auto"
         style={{ backgroundColor: CHART_BACKGROUND }}
         role="region"

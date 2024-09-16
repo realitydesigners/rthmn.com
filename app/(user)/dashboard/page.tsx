@@ -11,23 +11,13 @@ const getBoxSlices = async (pair: string): Promise<BoxSlice[]> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    return data;
+    return data
+      .filter((slice: BoxSlice) => slice.boxes.some((box) => box.high !== 1))
+      .slice(0, 10000);
   } catch (error) {
     console.error('Error fetching box slices:', error);
     return [];
   }
-};
-
-const isActualData = (slice: BoxSlice): boolean =>
-  slice.boxes.some((box) => box.high !== 1);
-
-const extractActualData = (data: BoxSlice[] | unknown): BoxSlice[] => {
-  if (!Array.isArray(data)) return [];
-  return data.filter(isActualData);
-};
-
-const limitBoxSlices = (data: BoxSlice[], limit: number): BoxSlice[] => {
-  return data.slice(0, limit);
 };
 
 export default async function Dashboard() {
@@ -53,19 +43,7 @@ export default async function Dashboard() {
     redirect('/signin');
   }
 
-  const { data: subscriptionData, error: subscriptionError } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', user.id)
-    .single();
+  const initialData = await getBoxSlices('USD_JPY');
 
-  if (subscriptionError) {
-    console.error('Error fetching subscription data:', subscriptionError);
-  }
-
-  const boxSlicesData = await getBoxSlices('USD_JPY');
-  const actualData = extractActualData(boxSlicesData);
-  const initialLimitedData = limitBoxSlices(actualData, 5000);
-
-  return <DashboardClient initialData={initialLimitedData} />;
+  return <DashboardClient initialData={initialData} />;
 }
