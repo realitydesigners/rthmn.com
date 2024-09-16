@@ -1,11 +1,5 @@
 'use client';
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect
-} from 'react';
+import React, { useState, useCallback, useMemo, useRef } from 'react';
 import type { BoxSlice, Box } from '@/types';
 
 interface HistogramProps {
@@ -15,21 +9,63 @@ interface HistogramProps {
 const BAR_WIDTH = 5;
 const CHART_HEIGHT = 300;
 const CHART_BACKGROUND = '#000';
-const VISIBLE_BOXES_COUNT = 10;
+const VISIBLE_BOXES_COUNT = 5;
+
+const areVisibleBoxesEqual = (
+  slice1: BoxSlice,
+  slice2: BoxSlice,
+  offset: number,
+  count: number
+): boolean => {
+  const visibleBoxes1 = slice1.boxes.slice(offset, offset + count);
+  const visibleBoxes2 = slice2.boxes.slice(offset, offset + count);
+
+  if (visibleBoxes1.length !== visibleBoxes2.length) return false;
+
+  return visibleBoxes1.every((box, index) => {
+    const box2 = visibleBoxes2[index];
+    return (
+      box.high === box2.high &&
+      box.low === box2.low &&
+      box.value === box2.value &&
+      box.size === box2.size
+    );
+  });
+};
+
+const compressData = (
+  data: BoxSlice[],
+  offset: number,
+  count: number
+): BoxSlice[] => {
+  return data.reduce((acc: BoxSlice[], current: BoxSlice) => {
+    if (
+      acc.length === 0 ||
+      !areVisibleBoxesEqual(acc[acc.length - 1], current, offset, count)
+    ) {
+      acc.push(current);
+    }
+    return acc;
+  }, []);
+};
 
 const LineChart: React.FC<HistogramProps> = ({ data }) => {
+  const [boxOffset, setBoxOffset] = useState(0);
+  const compressedData = useMemo(
+    () => compressData(data, boxOffset, VISIBLE_BOXES_COUNT),
+    [data, boxOffset]
+  );
   const [hoveredFrame, setHoveredFrame] = useState<BoxSlice | null>(null);
   const [hoverPosition, setHoverPosition] = useState<number | null>(null);
   const [isModalLocked, setIsModalLocked] = useState(false);
   const [lockedPosition, setLockedPosition] = useState<number | null>(null);
-  const [boxOffset, setBoxOffset] = useState(0);
-  const svgRef = React.useRef<SVGSVGElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
 
   const visibleBoxes = useMemo(() => {
-    return data.map((frame) =>
+    return compressedData.map((frame) =>
       frame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
     );
-  }, [data, boxOffset]);
+  }, [compressedData, boxOffset]);
 
   const handleOffsetChange = (change: number) => {
     setBoxOffset((prev) => {
@@ -63,10 +99,10 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
   );
 
   const renderAreaAndLine = useCallback(() => {
-    if (!svgRef.current || data.length === 0) return null;
+    if (!svgRef.current || compressedData.length === 0) return null;
 
     let lastColor = 'green';
-    const points = data.map((slice, index) => {
+    const points = compressedData.map((slice, index) => {
       const middlePoint = calculateMiddlePoint(slice);
       const y = CHART_HEIGHT - middlePoint * CHART_HEIGHT;
       const visibleSliceBoxes = visibleBoxes[index];
@@ -145,7 +181,7 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
         />
       </>
     );
-  }, [data, calculateMiddlePoint, visibleBoxes]);
+  }, [compressedData, calculateMiddlePoint, visibleBoxes]);
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<SVGSVGElement>) => {
@@ -159,13 +195,13 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
       setHoverPosition(x);
 
       const frameIndex = Math.floor(x / BAR_WIDTH);
-      if (frameIndex >= 0 && frameIndex < data.length) {
-        setHoveredFrame(data[frameIndex]);
+      if (frameIndex >= 0 && frameIndex < compressedData.length) {
+        setHoveredFrame(compressedData[frameIndex]);
       } else {
         setHoveredFrame(null);
       }
     },
-    [data, isModalLocked]
+    [compressedData, isModalLocked]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -189,6 +225,13 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
     <div className="relative overflow-hidden rounded-lg border border-[#121212] bg-gray-700 shadow-xl">
       <div className="absolute left-2 top-2 z-10 flex space-x-2">
         <button
+          onClick={() => handleOffsetChange(-1)}
+          className="rounded bg-black px-2 py-1 text-white hover:bg-gray-600"
+          disabled={boxOffset === 0}
+        >
+          +
+        </button>
+        <button
           onClick={() => handleOffsetChange(1)}
           className="rounded bg-black px-2 py-1 text-white hover:bg-gray-600"
           disabled={
@@ -199,13 +242,6 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
         >
           -
         </button>
-        <button
-          onClick={() => handleOffsetChange(-1)}
-          className="rounded bg-black px-2 py-1 text-white hover:bg-gray-600"
-          disabled={boxOffset === 0}
-        >
-          +
-        </button>
       </div>
       <div
         className="w-full overflow-x-auto"
@@ -215,7 +251,7 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
       >
         <svg
           ref={svgRef}
-          width={data.length * BAR_WIDTH}
+          width={compressedData.length * BAR_WIDTH}
           height={CHART_HEIGHT}
           onMouseMove={handleMouseMove}
           onMouseLeave={handleMouseLeave}
@@ -240,7 +276,9 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
                   chartHeight={CHART_HEIGHT}
                   onMouseEnter={handleModalMouseEnter}
                   onMouseLeave={handleModalMouseLeave}
-                  visibleBoxes={visibleBoxes[data.indexOf(hoveredFrame)]}
+                  visibleBoxes={
+                    visibleBoxes[compressedData.indexOf(hoveredFrame)]
+                  }
                   boxOffset={boxOffset}
                 />
                 <PriceDisplay

@@ -68,11 +68,7 @@ export default async function Dashboard() {
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
   const actualData = extractActualData(boxSlicesData);
-  const limitedData = limitBoxSlices(actualData, 1000);
-  console.log(
-    'Limited data for Histograms:',
-    JSON.stringify(limitedData, null, 2)
-  );
+  const limitedData = limitBoxSlices(actualData, 5000);
 
   return (
     <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
@@ -83,12 +79,7 @@ export default async function Dashboard() {
           Box Slices Histogram (USD_JPY)
         </h2>
         <p className="mb-2">Total Box Slices: {limitedData.length}</p>
-        <div className="mb-6">
-          <HistogramBox data={limitedData} isLoading={false} />
-        </div>
-        <div className="mt-6 h-[400px]">
-          {' '}
-          {/* Set a specific height here */}
+        <div className="mt-6 h-[400px] pr-[300px]">
           <HistogramLine data={limitedData} />
         </div>
       </div>
