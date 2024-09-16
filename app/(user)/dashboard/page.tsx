@@ -1,18 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { oxanium } from '@/app/fonts';
-import HistogramBox from './HistogramBox';
-import HistogramLine from './HistogramLine';
 import { BoxSlice } from '@/types';
-
-const isActualData = (slice: BoxSlice): boolean =>
-  slice.boxes.some((box) => box.high !== 1);
-
-const extractActualData = (data: BoxSlice[] | unknown): BoxSlice[] => {
-  if (!Array.isArray(data)) return [];
-  return data.filter(isActualData);
-};
+import DashboardClient from './DashboardClient';
 
 const getBoxSlices = async (pair: string): Promise<BoxSlice[]> => {
   try {
@@ -21,12 +11,19 @@ const getBoxSlices = async (pair: string): Promise<BoxSlice[]> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-
     return data;
   } catch (error) {
     console.error('Error fetching box slices:', error);
     return [];
   }
+};
+
+const isActualData = (slice: BoxSlice): boolean =>
+  slice.boxes.some((box) => box.high !== 1);
+
+const extractActualData = (data: BoxSlice[] | unknown): BoxSlice[] => {
+  if (!Array.isArray(data)) return [];
+  return data.filter(isActualData);
 };
 
 const limitBoxSlices = (data: BoxSlice[], limit: number): BoxSlice[] => {
@@ -68,21 +65,7 @@ export default async function Dashboard() {
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
   const actualData = extractActualData(boxSlicesData);
-  const limitedData = limitBoxSlices(actualData, 5000);
+  const initialLimitedData = limitBoxSlices(actualData, 5000);
 
-  return (
-    <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
-      <h1 className="mb-6 pt-32 text-3xl font-bold">Trading Dashboard</h1>
-
-      <div className="mb-6">
-        <h2 className="mb-4 text-xl font-semibold">
-          Box Slices Histogram (USD_JPY)
-        </h2>
-        <p className="mb-2">Total Box Slices: {limitedData.length}</p>
-        <div className="mt-6 h-[400px] pr-[300px]">
-          <HistogramLine data={limitedData} />
-        </div>
-      </div>
-    </div>
-  );
+  return <DashboardClient initialData={initialLimitedData} />;
 }
