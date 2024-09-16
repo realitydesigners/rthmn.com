@@ -3,18 +3,8 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { oxanium } from '@/app/fonts';
 import HistogramBox from './HistogramBox';
-
-interface Box {
-  high: number;
-  low: number;
-  value: number;
-  size: number;
-}
-
-interface BoxSlice {
-  timestamp: string;
-  boxes: Box[];
-}
+import HistogramLine from './HistogramLine';
+import { BoxSlice } from '@/types';
 
 const isActualData = (slice: BoxSlice): boolean =>
   slice.boxes.some((box) => box.high !== 1);
@@ -31,12 +21,16 @@ const getBoxSlices = async (pair: string): Promise<BoxSlice[]> => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
-    console.log('Raw data from server:', JSON.stringify(data, null, 2));
+
     return data;
   } catch (error) {
     console.error('Error fetching box slices:', error);
     return [];
   }
+};
+
+const limitBoxSlices = (data: BoxSlice[], limit: number): BoxSlice[] => {
+  return data.slice(0, limit);
 };
 
 export default async function Dashboard() {
@@ -74,9 +68,10 @@ export default async function Dashboard() {
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
   const actualData = extractActualData(boxSlicesData);
+  const limitedData = limitBoxSlices(actualData, 200);
   console.log(
-    'Actual data for HistogramBox:',
-    JSON.stringify(actualData, null, 2)
+    'Limited data for Histograms:',
+    JSON.stringify(limitedData, null, 2)
   );
 
   return (
@@ -87,9 +82,12 @@ export default async function Dashboard() {
         <h2 className="mb-4 text-xl font-semibold">
           Box Slices Histogram (USD_JPY)
         </h2>
-        <p className="mb-2">Total Box Slices: {actualData.length}</p>
-        <div className="fixed bottom-0 w-full">
-          <HistogramBox data={actualData} isLoading={false} />
+        <p className="mb-2">Total Box Slices: {limitedData.length}</p>
+        <div className="mb-6">
+          <HistogramBox data={limitedData} isLoading={false} />
+        </div>
+        <div className="mt-6">
+          <HistogramLine data={limitedData} />
         </div>
       </div>
     </div>

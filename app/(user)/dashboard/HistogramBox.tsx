@@ -10,34 +10,31 @@ interface HistogramProps {
 
 const INITIAL_BAR_WIDTH = 6;
 const ZOOMED_BAR_WIDTH = 30;
-const VISIBLE_BOXES_COUNT = 15;
-const HISTOGRAM_HEIGHT = 250; // Fixed height of the histogram
+const VISIBLE_BOXES_COUNT = 10;
+const HISTOGRAM_HEIGHT = 250;
 
 const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
-  console.log('Data received in HistogramBox:', JSON.stringify(data, null, 2));
-
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [boxOffset, setBoxOffset] = useState(0);
 
-  const currentFrame = useMemo(() => data[0] || null, [data]);
-
   const visibleBoxes = useMemo(() => {
-    return (
-      currentFrame?.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT) ||
-      []
+    return data.map((frame) =>
+      frame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
     );
-  }, [currentFrame, boxOffset]);
+  }, [data, boxOffset]);
 
   const { maxRange, minLow, maxHigh } = useMemo(() => {
     let min = Infinity;
     let max = -Infinity;
-    visibleBoxes.forEach((box) => {
-      min = Math.min(min, box.low);
-      max = Math.max(max, box.high);
+    data.forEach((frame) => {
+      frame.boxes.forEach((box) => {
+        min = Math.min(min, box.low);
+        max = Math.max(max, box.high);
+      });
     });
     return { maxRange: max - min, minLow: min, maxHigh: max };
-  }, [visibleBoxes]);
+  }, [data]);
 
   const handleFrameClick = useCallback((slice: BoxSlice, index: number) => {
     setSelectedFrame((prev) => (prev === slice ? null : slice));
@@ -47,18 +44,25 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
   const handleOffsetChange = (change: number) => {
     setBoxOffset((prev) => {
       const newOffset = prev + change;
-      const maxOffset = (currentFrame?.boxes.length || 0) - VISIBLE_BOXES_COUNT;
+      const maxOffset = Math.max(
+        0,
+        Math.max(...data.map((frame) => frame.boxes.length)) -
+          VISIBLE_BOXES_COUNT
+      );
       return Math.max(0, Math.min(newOffset, maxOffset));
     });
   };
 
   const renderBox = useCallback(
-    (box: Box, idx: number, isSelected: boolean): JSX.Element => {
+    (
+      box: Box,
+      idx: number,
+      isSelected: boolean,
+      maxBoxValue: number
+    ): JSX.Element => {
       const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
-      const heightPercentage = (box.high - box.low) / maxRange;
-      const bottomPercentage = (box.low - minLow) / maxRange;
+      const heightPercentage = Math.abs(box.value) / maxBoxValue;
       const height = heightPercentage * HISTOGRAM_HEIGHT;
-      const bottom = bottomPercentage * HISTOGRAM_HEIGHT;
 
       return (
         <motion.div
@@ -66,7 +70,7 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
           style={{
             width: '100%',
             height: `${height}px`,
-            bottom: `${bottom}px`,
+            bottom: 0,
             left: 0,
             right: 0
           }}
@@ -76,12 +80,17 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
         />
       );
     },
-    [maxRange, minLow]
+    []
   );
 
   const renderFrame = useCallback(
     (slice: BoxSlice, index: number) => {
       const isSelected = index === selectedIndex;
+      const frameVisibleBoxes = visibleBoxes[index];
+
+      const maxBoxValue = Math.max(
+        ...frameVisibleBoxes.map((box) => Math.abs(box.value))
+      );
 
       return (
         <motion.div
@@ -92,11 +101,13 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
           layout
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         >
-          {visibleBoxes.map((box, idx) => renderBox(box, idx, isSelected))}
+          {frameVisibleBoxes.map((box, idx) =>
+            renderBox(box, idx, isSelected, maxBoxValue)
+          )}
         </motion.div>
       );
     },
-    [handleFrameClick, selectedIndex, visibleBoxes, renderBox]
+    [handleFrameClick, selectedIndex, renderBox, visibleBoxes]
   );
 
   return (
@@ -113,7 +124,9 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
           onClick={() => handleOffsetChange(1)}
           className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
           disabled={
-            boxOffset >= (currentFrame?.boxes.length || 0) - VISIBLE_BOXES_COUNT
+            boxOffset >=
+            Math.max(...data.map((frame) => frame.boxes.length)) -
+              VISIBLE_BOXES_COUNT
           }
         >
           ▼
@@ -167,10 +180,11 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
           )}
       </AnimatePresence>
       <AnimatePresence>
-        {currentFrame && (
+        {selectedFrame && (
           <SelectedFrameDetails
-            selectedFrame={currentFrame}
-            visibleBoxes={visibleBoxes}
+            selectedFrame={selectedFrame}
+            visibleBoxes={visibleBoxes[selectedIndex!]}
+            boxOffset={boxOffset}
           />
         )}
       </AnimatePresence>
@@ -181,11 +195,13 @@ const HistogramBox: React.FC<HistogramProps> = ({ data, isLoading }) => {
 interface SelectedFrameDetailsProps {
   selectedFrame: BoxSlice;
   visibleBoxes: Box[];
+  boxOffset: number;
 }
 
 const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
   selectedFrame,
-  visibleBoxes
+  visibleBoxes,
+  boxOffset
 }) => {
   return (
     <motion.div
@@ -201,7 +217,7 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
       <ul className="space-y-1">
         {visibleBoxes.map((box, index) => (
           <motion.li
-            key={index}
+            key={boxOffset + index}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: index * 0.05 }}
@@ -218,12 +234,13 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
               </span>
             </div>
             <div className="flex items-center space-x-1 text-sm text-[#A0A0A0]">
+              <span>Size: {box.size}</span>
               <span>·</span>
               <span>Value: {Math.abs(box.value)}</span>
               <span>·</span>
-              <span>High: {box.high.toFixed(5)}</span>
+              <span>High: {box.high.toFixed(3)}</span>
               <span>·</span>
-              <span>Low: {box.low.toFixed(5)}</span>
+              <span>Low: {box.low.toFixed(3)}</span>
             </div>
           </motion.li>
         ))}
