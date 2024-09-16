@@ -68,7 +68,7 @@ export default async function Dashboard() {
 
   const boxSlicesData = await getBoxSlices('USD_JPY');
   const actualData = extractActualData(boxSlicesData);
-  const limitedData = limitBoxSlices(actualData, 200);
+  const limitedData = limitBoxSlices(actualData, 1000);
   console.log(
     'Limited data for Histograms:',
     JSON.stringify(limitedData, null, 2)
@@ -86,7 +86,9 @@ export default async function Dashboard() {
         <div className="mb-6">
           <HistogramBox data={limitedData} isLoading={false} />
         </div>
-        <div className="mt-6">
+        <div className="mt-6 h-[400px]">
+          {' '}
+          {/* Set a specific height here */}
           <HistogramLine data={limitedData} />
         </div>
       </div>

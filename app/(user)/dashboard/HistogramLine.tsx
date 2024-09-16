@@ -1,12 +1,12 @@
 'use client';
 import React, {
-  useEffect,
   useState,
-  useRef,
   useCallback,
-  useMemo
+  useMemo,
+  useRef,
+  useEffect
 } from 'react';
-import type { BoxSlice } from '@/types';
+import type { BoxSlice, Box } from '@/types';
 
 interface HistogramProps {
   data: BoxSlice[];
@@ -15,113 +15,77 @@ interface HistogramProps {
 const BAR_WIDTH = 5;
 const CHART_HEIGHT = 300;
 const CHART_BACKGROUND = '#000';
+const VISIBLE_BOXES_COUNT = 10;
 
 const LineChart: React.FC<HistogramProps> = ({ data }) => {
-  const [visibleFrames, setVisibleFrames] = useState<number>(0);
   const [hoveredFrame, setHoveredFrame] = useState<BoxSlice | null>(null);
   const [hoverPosition, setHoverPosition] = useState<number | null>(null);
   const [isModalLocked, setIsModalLocked] = useState(false);
   const [lockedPosition, setLockedPosition] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const svgRef = useRef<SVGSVGElement | null>(null);
+  const [boxOffset, setBoxOffset] = useState(0);
+  const svgRef = React.useRef<SVGSVGElement | null>(null);
 
-  const maxSize = useMemo(() => {
-    const sizes = data.flatMap((slice) =>
-      slice.boxes.map((box) => Math.abs(box.high - box.low))
+  const visibleBoxes = useMemo(() => {
+    return data.map((frame) =>
+      frame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
     );
-    return sizes.reduce((max, size) => Math.max(max, size), 0);
-  }, [data]);
+  }, [data, boxOffset]);
 
-  const calculateMiddlePoint = useCallback((slice: BoxSlice) => {
-    let upTotal = 0;
-    let downTotal = 0;
-    for (const box of slice.boxes) {
-      const size = Math.abs(box.high - box.low);
-      if (box.value > 0) upTotal += size;
-      else downTotal += size;
-    }
-    const total = upTotal + downTotal;
-    return total === 0 ? 0.5 : upTotal / total;
-  }, []);
-  const getLargestMovement = useCallback((slice: BoxSlice | undefined) => {
-    if (!slice || !slice.boxes || !Array.isArray(slice.boxes)) {
-      return 'N';
-    }
-    let largestU = 0;
-    let largestD = 0;
-    for (const box of slice.boxes) {
-      if (box && typeof box.high === 'number' && typeof box.low === 'number') {
-        const size = Math.abs(box.high - box.low);
-        if (box.value > 0) largestU = Math.max(largestU, size);
-        else largestD = Math.max(largestD, size);
-      }
-    }
-    return largestU > largestD ? 'U' : 'D';
-  }, []);
-
-  const handleMouseMove = useCallback(
-    (event: React.MouseEvent<SVGSVGElement>) => {
-      if (isModalLocked) return;
-
-      const svg = svgRef.current;
-      if (!svg) return;
-
-      const rect = svg.getBoundingClientRect();
-      const x = event.clientX - rect.left;
-      setHoverPosition(x);
-
-      const frameIndex = Math.floor(x / BAR_WIDTH);
-      if (frameIndex >= 0 && frameIndex < visibleFrames) {
-        setHoveredFrame(data[frameIndex]);
-      } else {
-        setHoveredFrame(null);
-      }
-    },
-    [data, visibleFrames, isModalLocked]
-  );
-
-  const handleMouseLeave = useCallback(() => {
-    if (!isModalLocked) {
-      setHoveredFrame(null);
-      setHoverPosition(null);
-    }
-  }, [isModalLocked]);
-
-  const handleModalMouseEnter = useCallback(() => {
-    setIsModalLocked(true);
-    setLockedPosition(hoverPosition);
-  }, [hoverPosition]);
-
-  const handleModalMouseLeave = useCallback(() => {
-    setIsModalLocked(false);
-    setLockedPosition(null);
-  }, []);
-
-  type Segment = {
-    points: string[];
-    color: string;
+  const handleOffsetChange = (change: number) => {
+    setBoxOffset((prev) => {
+      const newOffset = prev + change;
+      const maxOffset = Math.max(
+        0,
+        Math.max(...data.map((frame) => frame.boxes.length)) -
+          VISIBLE_BOXES_COUNT
+      );
+      return Math.max(0, Math.min(newOffset, maxOffset));
+    });
   };
+
+  const calculateMiddlePoint = useCallback(
+    (slice: BoxSlice) => {
+      const visibleSliceBoxes = slice.boxes.slice(
+        boxOffset,
+        boxOffset + VISIBLE_BOXES_COUNT
+      );
+      let upTotal = 0;
+      let downTotal = 0;
+      for (const box of visibleSliceBoxes) {
+        const size = Math.abs(box.high - box.low);
+        if (box.value > 0) upTotal += size;
+        else downTotal += size;
+      }
+      const total = upTotal + downTotal;
+      return total === 0 ? 0.5 : upTotal / total;
+    },
+    [boxOffset]
+  );
 
   const renderAreaAndLine = useCallback(() => {
     if (!svgRef.current || data.length === 0) return null;
 
     let lastColor = 'green';
-    const points = data.slice(0, visibleFrames).map((slice, index) => {
+    const points = data.map((slice, index) => {
       const middlePoint = calculateMiddlePoint(slice);
       const y = CHART_HEIGHT - middlePoint * CHART_HEIGHT;
-      const allSameDirection = slice.boxes.every(
-        (box) => Math.sign(box.value) === Math.sign(slice.boxes[0].value)
+      const visibleSliceBoxes = visibleBoxes[index];
+      const allSameDirection = visibleSliceBoxes.every(
+        (box) => Math.sign(box.value) === Math.sign(visibleSliceBoxes[0].value)
       );
 
       if (allSameDirection) {
-        lastColor = slice.boxes[0].value > 0 ? 'green' : 'red';
+        lastColor = visibleSliceBoxes[0].value > 0 ? 'green' : 'red';
       }
 
       return { x: index * BAR_WIDTH, y, color: lastColor };
     });
 
-    const segments: Segment[] = [];
-    let currentSegment: Segment = { points: [], color: points[0].color };
+    const segments: { points: string[]; color: string }[] = [];
+    let currentSegment: { points: string[]; color: string } = {
+      points: [],
+      color: points[0].color
+    };
 
     for (let i = 0; i < points.length; i++) {
       currentSegment.points.push(`${points[i].x},${points[i].y}`);
@@ -139,11 +103,6 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
         }
       }
     }
-
-    const hoveredPoint =
-      hoverPosition !== null
-        ? points[Math.floor(hoverPosition / BAR_WIDTH)]
-        : null;
 
     return (
       <>
@@ -184,51 +143,71 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
           stroke="#F3F4F6"
           strokeWidth="2"
         />
-        {hoverPosition !== null && (
-          <>
-            <line
-              x1={hoverPosition}
-              y1="0"
-              x2={hoverPosition}
-              y2={CHART_HEIGHT}
-              stroke="rgba(255, 255, 255, 0.5)"
-              strokeWidth="1"
-            />
-            {hoveredPoint && (
-              <circle
-                cx={hoveredPoint.x}
-                cy={hoveredPoint.y}
-                r="5"
-                fill="#F3F4F6"
-              />
-            )}
-          </>
-        )}
       </>
     );
-  }, [data, visibleFrames, calculateMiddlePoint, hoverPosition]);
+  }, [data, calculateMiddlePoint, visibleBoxes]);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setVisibleFrames((prev) => Math.min(prev + 100, data.length));
-    }, 100);
+  const handleMouseMove = useCallback(
+    (event: React.MouseEvent<SVGSVGElement>) => {
+      if (isModalLocked) return;
 
-    return () => clearInterval(timer);
-  }, [data.length]);
+      const svg = svgRef.current;
+      if (!svg) return;
 
-  useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTo({
-        left: containerRef.current.scrollWidth,
-        behavior: 'smooth'
-      });
+      const rect = svg.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      setHoverPosition(x);
+
+      const frameIndex = Math.floor(x / BAR_WIDTH);
+      if (frameIndex >= 0 && frameIndex < data.length) {
+        setHoveredFrame(data[frameIndex]);
+      } else {
+        setHoveredFrame(null);
+      }
+    },
+    [data, isModalLocked]
+  );
+
+  const handleMouseLeave = useCallback(() => {
+    if (!isModalLocked) {
+      setHoveredFrame(null);
+      setHoverPosition(null);
     }
-  }, [visibleFrames]);
+  }, [isModalLocked]);
+
+  const handleModalMouseEnter = useCallback(() => {
+    setIsModalLocked(true);
+    setLockedPosition(hoverPosition);
+  }, [hoverPosition]);
+
+  const handleModalMouseLeave = useCallback(() => {
+    setIsModalLocked(false);
+    setLockedPosition(null);
+  }, []);
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-[#121212] bg-gray-700 shadow-xl">
+      <div className="absolute left-2 top-2 z-10 flex space-x-2">
+        <button
+          onClick={() => handleOffsetChange(1)}
+          className="rounded bg-black px-2 py-1 text-white hover:bg-gray-600"
+          disabled={
+            boxOffset >=
+            Math.max(...data.map((frame) => frame.boxes.length)) -
+              VISIBLE_BOXES_COUNT
+          }
+        >
+          -
+        </button>
+        <button
+          onClick={() => handleOffsetChange(-1)}
+          className="rounded bg-black px-2 py-1 text-white hover:bg-gray-600"
+          disabled={boxOffset === 0}
+        >
+          +
+        </button>
+      </div>
       <div
-        ref={containerRef}
         className="w-full overflow-x-auto"
         style={{ backgroundColor: CHART_BACKGROUND }}
         role="region"
@@ -247,17 +226,25 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
           {hoveredFrame &&
             (hoverPosition !== null || lockedPosition !== null) && (
               <>
+                <line
+                  x1={isModalLocked ? lockedPosition! : hoverPosition!}
+                  y1="0"
+                  x2={isModalLocked ? lockedPosition! : hoverPosition!}
+                  y2={CHART_HEIGHT}
+                  stroke="rgba(255, 255, 255, 0.5)"
+                  strokeWidth="1"
+                />
                 <MemoizedHoveredFrameDetails
                   hoveredFrame={hoveredFrame}
                   position={isModalLocked ? lockedPosition : hoverPosition}
                   chartHeight={CHART_HEIGHT}
                   onMouseEnter={handleModalMouseEnter}
                   onMouseLeave={handleModalMouseLeave}
+                  visibleBoxes={visibleBoxes[data.indexOf(hoveredFrame)]}
+                  boxOffset={boxOffset}
                 />
                 <PriceDisplay
-                  price={
-                    hoveredFrame.price ?? calculateAveragePrice(hoveredFrame)
-                  }
+                  price={calculateAveragePrice(hoveredFrame)}
                   position={isModalLocked ? lockedPosition : hoverPosition}
                   chartHeight={CHART_HEIGHT}
                 />
@@ -275,11 +262,21 @@ interface HoveredFrameDetailsProps {
   chartHeight: number;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  visibleBoxes: Box[];
+  boxOffset: number;
 }
 
 const MemoizedHoveredFrameDetails: React.FC<HoveredFrameDetailsProps> =
   React.memo(
-    ({ hoveredFrame, position, chartHeight, onMouseEnter, onMouseLeave }) => {
+    ({
+      hoveredFrame,
+      position,
+      chartHeight,
+      onMouseEnter,
+      onMouseLeave,
+      visibleBoxes,
+      boxOffset
+    }) => {
       const [showDetails, setShowDetails] = useState(false);
 
       if (!hoveredFrame) return null;
@@ -311,9 +308,9 @@ const MemoizedHoveredFrameDetails: React.FC<HoveredFrameDetailsProps> =
             </button>
             {showDetails && (
               <ul className="space-y-2">
-                {hoveredFrame.boxes.map((box, index) => (
+                {visibleBoxes.map((box, index) => (
                   <li
-                    key={index}
+                    key={boxOffset + index}
                     className="flex items-center justify-between rounded-md bg-gray-700 p-2"
                   >
                     <span
@@ -369,4 +366,4 @@ const calculateAveragePrice = (frame: BoxSlice) => {
   );
 };
 
-export default LineChart;
+export default React.memo(LineChart);
