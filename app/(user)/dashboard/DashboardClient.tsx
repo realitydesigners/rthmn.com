@@ -1,11 +1,17 @@
 'use client';
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useMemo
+} from 'react';
 import { BoxSlice } from '@/types';
-import HistogramLine from './HistogramLine';
+import HistogramBox from './HistogramBox';
 import { oxanium } from '@/app/fonts';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
 
-const VISIBLE_BOXES_COUNT = 4; // or whatever number you want to show
+const VISIBLE_BOXES_COUNT = 20;
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
@@ -53,7 +59,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     return () => clearInterval(intervalId);
   }, [fetchUpdates]);
 
-  const handleOffsetChange = (change: number) => {
+  const handleOffsetChange = useCallback((change: number) => {
     setBoxOffset((prev) => {
       const newOffset = prev + change;
       const maxOffset = Math.max(
@@ -62,9 +68,9 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
       );
       return Math.max(0, Math.min(newOffset, maxOffset));
     });
-  };
+  }, []); // Remove the dependency on data
 
-  const formatTimestamp = (timestamp: string | null) => {
+  const formatTimestamp = useCallback((timestamp: string | null) => {
     if (!timestamp) return 'N/A';
     return new Date(timestamp).toLocaleString('en-US', {
       year: 'numeric',
@@ -76,8 +82,18 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
       hour12: false,
       timeZone: 'UTC'
     });
-  };
+  }, []);
 
+  const memoizedHistogramBox = useMemo(
+    () => (
+      <HistogramBox
+        data={data}
+        boxOffset={boxOffset}
+        onOffsetChange={handleOffsetChange}
+      />
+    ),
+    [data, boxOffset, handleOffsetChange]
+  );
   return (
     <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
       <h1 className="mb-6 pt-32 text-3xl font-bold">Trading Dashboard</h1>
@@ -104,16 +120,10 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
         >
           {isUpdating ? 'Updating...' : 'Refresh Data'}
         </button>
-        <div className="relative mt-6 h-[400px] pr-[300px]">
-          <HistogramLine
-            data={data}
-            boxOffset={boxOffset}
-            onOffsetChange={handleOffsetChange}
-          />
-        </div>
+        <div className="mr-[400px] mt-6">{memoizedHistogramBox}</div>
       </div>
     </div>
   );
 };
 
-export default DashboardClient;
+export default React.memo(DashboardClient); // Memoize the entire component
