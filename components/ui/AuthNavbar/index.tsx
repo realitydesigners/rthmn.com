@@ -76,7 +76,10 @@ export const AuthNavbar = ({ user }: { user: any }) => {
 
             <form onSubmit={(e) => handleRequest(e, SignOut, router)}>
               <input type="hidden" name="pathName" value={usePathname()} />
-              <button type="submit" className={buttonClasses}>
+              <button
+                type="submit"
+                className={`${oxanium.className} text-white`}
+              >
                 Sign out
               </button>
             </form>
