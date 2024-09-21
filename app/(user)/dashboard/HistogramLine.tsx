@@ -57,6 +57,22 @@ const compressData = (
 
 const LineChart: React.FC<HistogramProps> = ({ data }) => {
   const [boxOffset, setBoxOffset] = useState(0);
+  const [lastDataLength, setLastDataLength] = useState(data.length);
+
+  useEffect(() => {
+    if (data.length !== lastDataLength) {
+      setLastDataLength(data.length);
+      // Adjust boxOffset if necessary
+      setBoxOffset((prevOffset) => {
+        const maxOffset = Math.max(
+          0,
+          data[0]?.boxes.length - VISIBLE_BOXES_COUNT
+        );
+        return Math.min(prevOffset, maxOffset);
+      });
+    }
+  }, [data, lastDataLength]);
+
   const compressedData = useMemo(
     () => compressData(data, boxOffset, VISIBLE_BOXES_COUNT),
     [data, boxOffset]
@@ -78,8 +94,7 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
       const newOffset = prev + change;
       const maxOffset = Math.max(
         0,
-        Math.max(...data.map((frame) => frame.boxes.length)) -
-          VISIBLE_BOXES_COUNT
+        (data[0]?.boxes.length || 0) - VISIBLE_BOXES_COUNT
       );
       return Math.max(0, Math.min(newOffset, maxOffset));
     });
@@ -236,6 +251,11 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
     }
   }, [compressedData]);
 
+  useEffect(() => {
+    console.log('Data received in HistogramLine:', data);
+    // Add any necessary data processing here
+  }, [data]);
+
   return (
     <div className="relative overflow-hidden rounded-lg border border-[#121212] bg-gray-700 shadow-xl">
       <div className="absolute left-2 top-2 z-10 flex space-x-2">
@@ -250,9 +270,7 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
           onClick={() => handleOffsetChange(1)}
           className="rounded bg-black px-2 py-1 text-white hover:bg-gray-600"
           disabled={
-            boxOffset >=
-            Math.max(...data.map((frame) => frame.boxes.length)) -
-              VISIBLE_BOXES_COUNT
+            boxOffset >= (data[0]?.boxes.length || 0) - VISIBLE_BOXES_COUNT
           }
         >
           -

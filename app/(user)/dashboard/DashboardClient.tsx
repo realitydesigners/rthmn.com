@@ -3,29 +3,25 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { BoxSlice } from '@/types';
 import HistogramLine from './HistogramLine';
 import { oxanium } from '@/app/fonts';
+import { getBoxSlices } from '@/app/utils/getBoxSlices';
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
 }
 
 const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
-  const [data, setData] = useState<BoxSlice[]>(initialData.slice(-1000));
+  const [data, setData] = useState<BoxSlice[]>(initialData);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [chartKey, setChartKey] = useState(0);
 
   const fetchData = useCallback(async () => {
     setIsUpdating(true);
     try {
-      const response = await fetch(`http://localhost:8080/boxslices/USD_JPY`);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const newData: BoxSlice[] = await response.json();
-      const filteredData = newData.filter((slice) =>
-        slice.boxes.some((box) => box.high !== 1)
-      );
-      setData(filteredData.slice(-1000));
+      const newData = await getBoxSlices('USD_JPY');
+      setData(newData);
       setLastUpdateTime(new Date());
+      setChartKey((prevKey) => prevKey + 1);
     } catch (error) {
       console.error('Error fetching box slices:', error);
     } finally {
@@ -79,7 +75,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
           {isUpdating ? 'Updating...' : 'Refresh Data'}
         </button>
         <div className="mt-6 h-[400px] pr-[300px]">
-          <HistogramLine data={data} key={lastUpdateTime?.getTime()} />
+          <HistogramLine data={data} key={chartKey} />
         </div>
       </div>
     </div>

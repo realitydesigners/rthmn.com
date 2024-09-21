@@ -28,14 +28,14 @@ export type CandleData = {
   close: number;
 };
 
-export interface BoxSlice {
-  timestamp: string;
-  boxes: Box[];
-}
-
 export interface Box {
   high: number;
   low: number;
   value: number;
   size: number;
+}
+
+export interface BoxSlice {
+  timestamp: string;
+  boxes: Box[];
 }
