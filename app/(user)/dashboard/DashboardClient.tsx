@@ -96,31 +96,8 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
   );
   return (
     <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
-      <h1 className="mb-6 pt-32 text-3xl font-bold">Trading Dashboard</h1>
-      <div className="mb-6">
-        <h2 className="mb-4 text-xl font-semibold">
-          Box Slices Histogram (USD_JPY)
-        </h2>
-        <p className="mb-2">Total Box Slices: {data.length}</p>
-        <p className="mb-2">
-          Last Data Timestamp:{' '}
-          {formatTimestamp(data[data.length - 1]?.timestamp)} (UTC)
-        </p>
-        <p className="mb-2">
-          Last Update: {lastUpdateTime?.toLocaleString() || 'N/A'} (Local Time)
-        </p>
-        <p className="mb-2">
-          Status:{' '}
-          {isUpdating ? 'Updating...' : 'Idle (updates every 5 seconds)'}
-        </p>
-        <button
-          onClick={fetchUpdates}
-          className="mb-4 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-          disabled={isUpdating}
-        >
-          {isUpdating ? 'Updating...' : 'Refresh Data'}
-        </button>
-        <div className="mr-[400px] mt-6">{memoizedHistogramBox}</div>
+      <div className="mt-20">
+        <div className="bottom-0 mr-[400px] mt-6">{memoizedHistogramBox}</div>
       </div>
     </div>
   );

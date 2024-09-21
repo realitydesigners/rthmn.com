@@ -13,11 +13,11 @@ interface HistogramProps {
   boxOffset: number;
   onOffsetChange: (change: number) => void;
 }
-
 const INITIAL_BAR_WIDTH = 6;
 const ZOOMED_BAR_WIDTH = 30;
 const INITIAL_LOAD_COUNT = 1000;
 const VISIBLE_BOXES_COUNT = 20;
+const CONTAINER_HEIGHT = 300;
 
 const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
   if (frame1.boxes.length !== frame2.boxes.length) return false;
@@ -37,10 +37,11 @@ const HistogramBox: React.FC<HistogramProps> = ({
     useState<number>(INITIAL_LOAD_COUNT);
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const [viewType, setViewType] = useState<'scaled' | 'even'>('scaled');
 
-  let lastUniqueFrame: BoxSlice | null = null; // Keep track of the last unique frame
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  let lastUniqueFrame: BoxSlice | null = null;
 
   const deduplicatedData = useMemo(() => {
     return data.reduce((acc: BoxSlice[], current) => {
@@ -52,7 +53,6 @@ const HistogramBox: React.FC<HistogramProps> = ({
     }, []);
   }, [data]);
 
-  // Calculate max size based on the visible slices
   const maxSize = useMemo(() => {
     const sizes = deduplicatedData.flatMap((slice) =>
       slice.boxes
@@ -75,7 +75,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
     setSelectedIndex((prev) => (prev === index ? null : index));
   }, []);
 
-  const renderNestedBoxes = useCallback(
+  const renderScaledBoxes = useCallback(
     (
       boxArray: BoxSlice['boxes'],
       idx = 0,
@@ -86,7 +86,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
 
       const box = boxArray[idx];
       const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
-      const size = (Math.abs(box.value) / maxSize) * 250; // Scale the box height based on the max value
+      const size = (Math.abs(box.value) / maxSize) * 300;
 
       let positionStyle = 'absolute top-0 right-0';
 
@@ -114,28 +114,115 @@ const HistogramBox: React.FC<HistogramProps> = ({
           }}
           key={idx}
         >
-          {renderNestedBoxes(boxArray, idx + 1, boxColor, isSelected)}
+          {renderScaledBoxes(boxArray, idx + 1, boxColor, isSelected)}
         </div>
       );
     },
     [maxSize]
   );
 
+  const renderEvenBoxes = useCallback(
+    (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element => {
+      const boxHeight = CONTAINER_HEIGHT / VISIBLE_BOXES_COUNT;
+      const sortedBoxes = boxArray.slice(0, VISIBLE_BOXES_COUNT);
+
+      const positiveBoxes = sortedBoxes.filter((box) => box.value > 0);
+      const negativeBoxes = sortedBoxes.filter((box) => box.value <= 0);
+
+      let positiveOffset = 0;
+      let negativeOffset = 0;
+
+      return (
+        <div
+          className="relative"
+          style={{
+            width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
+            height: `${CONTAINER_HEIGHT}px`,
+            position: 'relative'
+          }}
+        >
+          {/* Render negative boxes stacking from the top */}
+          {negativeBoxes.map((box, idx) => {
+            const boxColor = 'bg-[#212121]'; // Negative color
+            const positionStyle: React.CSSProperties = {
+              position: 'absolute',
+              top: `${negativeOffset}px`,
+              width: '100%',
+              height: `${boxHeight}px`
+            };
+            negativeOffset += boxHeight;
+            return (
+              <div
+                key={`negative-${idx}`}
+                className={`${boxColor} border border-black`}
+                style={{
+                  ...positionStyle,
+                  margin: '-1px'
+                }}
+              />
+            );
+          })}
+          {/* Render positive boxes stacking from the bottom */}
+          {positiveBoxes.map((box, idx) => {
+            const boxColor = 'bg-[#555]'; // Positive color
+            const positionStyle: React.CSSProperties = {
+              position: 'absolute',
+              bottom: `${positiveOffset}px`,
+              width: '100%',
+              height: `${boxHeight}px`
+            };
+            positiveOffset += boxHeight;
+            return (
+              <div
+                key={`positive-${idx}`}
+                className={`${boxColor} border border-black`}
+                style={{
+                  ...positionStyle,
+                  margin: '-1px'
+                }}
+              />
+            );
+          })}
+        </div>
+      );
+    },
+    [VISIBLE_BOXES_COUNT, CONTAINER_HEIGHT]
+  );
+
+  const renderNestedBoxes = useCallback(
+    (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element | null => {
+      switch (viewType) {
+        case 'scaled':
+          return renderScaledBoxes(boxArray, 0, null, isSelected);
+        case 'even':
+          return renderEvenBoxes(boxArray, isSelected);
+        default:
+          return null;
+      }
+    },
+    [viewType, renderScaledBoxes, renderEvenBoxes]
+  );
+
   const renderFrame = useCallback(
     (slice: BoxSlice, index: number) => {
-      const boxArray = slice.boxes
-        .slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
-        .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+      const boxArray = slice.boxes.slice(
+        boxOffset,
+        boxOffset + VISIBLE_BOXES_COUNT
+      );
       const isSelected = index === selectedIndex;
 
       return (
         <div
           key={`${slice.timestamp}-${index}`}
-          className="relative flex h-[250px] flex-shrink-0 cursor-pointer flex-col"
-          style={{ width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH }}
+          className="relative flex-shrink-0 cursor-pointer"
+          style={{
+            width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
+            height: `${CONTAINER_HEIGHT}px`,
+            position: 'relative'
+          }}
           onClick={() => handleFrameClick(slice, index)}
         >
-          {renderNestedBoxes(boxArray, 0, null, isSelected)}
+          {renderNestedBoxes(boxArray, isSelected)}
         </div>
       );
     },
@@ -149,6 +236,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
 
   return (
     <div className="relative h-[300px] border border-[#181818] bg-black">
+      {/* Add a toggle button */}
       <div className="absolute left-2 top-2 z-10 flex space-x-2">
         <button
           onClick={() => onOffsetChange(-1)}
@@ -168,7 +256,18 @@ const HistogramBox: React.FC<HistogramProps> = ({
         >
           -
         </button>
+
+        {/* View Type Toggle Button */}
+        <button
+          onClick={() =>
+            setViewType((prev) => (prev === 'scaled' ? 'even' : 'scaled'))
+          }
+          className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
+        >
+          Toggle View: {viewType === 'scaled' ? 'Scaled' : 'Even'}
+        </button>
       </div>
+
       {data && data.length > 0 && (
         <div className="h-full">
           <div
