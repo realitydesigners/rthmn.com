@@ -10,6 +10,8 @@ import type { BoxSlice, Box } from '@/types';
 
 interface HistogramProps {
   data: BoxSlice[];
+  boxOffset: number;
+  onOffsetChange: (change: number) => void;
 }
 
 const BAR_WIDTH = 5;
@@ -58,11 +60,12 @@ const compressData = (
 const LineChart: React.FC<HistogramProps> = ({ data }) => {
   const [boxOffset, setBoxOffset] = useState(0);
   const [lastDataLength, setLastDataLength] = useState(data.length);
+  const [chartKey, setChartKey] = useState(0);
 
   useEffect(() => {
     if (data.length !== lastDataLength) {
       setLastDataLength(data.length);
-      // Adjust boxOffset if necessary
+      // Adjust boxOffset only if it exceeds the new maximum
       setBoxOffset((prevOffset) => {
         const maxOffset = Math.max(
           0,
@@ -252,8 +255,15 @@ const LineChart: React.FC<HistogramProps> = ({ data }) => {
   }, [compressedData]);
 
   useEffect(() => {
-    console.log('Data received in HistogramLine:', data);
-    // Add any necessary data processing here
+    console.log('Data received in HistogramLine:', data.length, 'items');
+    console.log('First item timestamp:', data[0]?.timestamp);
+    console.log('Last item timestamp:', data[data.length - 1]?.timestamp);
+    console.log('Current boxOffset:', boxOffset);
+  }, [data, boxOffset]);
+
+  // Force re-render when data changes
+  useEffect(() => {
+    setChartKey((prevKey) => prevKey + 1);
   }, [data]);
 
   return (

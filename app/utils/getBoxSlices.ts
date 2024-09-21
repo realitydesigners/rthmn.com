@@ -5,11 +5,23 @@ interface ApiResponse {
   data: BoxSlice[];
 }
 
-export async function getBoxSlices(pair: string): Promise<BoxSlice[]> {
+export async function getBoxSlices(
+  pair: string,
+  lastTimestamp?: string,
+  limit?: number
+): Promise<BoxSlice[]> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8080';
+  let url = `${baseUrl}/boxslices/${pair}`;
+
+  const params = new URLSearchParams();
+  if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
+  if (limit) params.append('limit', limit.toString());
+
+  if (params.toString()) url += `?${params.toString()}`;
+
   try {
-    console.log(`Fetching from: ${baseUrl}/boxslices/${pair}`);
-    const response = await fetch(`${baseUrl}/boxslices/${pair}`);
+    console.log(`Fetching from: ${url}`);
+    const response = await fetch(url);
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       const errorText = await response.text();
@@ -24,8 +36,12 @@ export async function getBoxSlices(pair: string): Promise<BoxSlice[]> {
       return [];
     }
 
-    // Slice the last 1000 items
-    return apiResponse.data.slice(-1000);
+    // If lastTimestamp is provided, return only the latest item
+    if (lastTimestamp) {
+      return apiResponse.data.slice(-1);
+    }
+
+    return apiResponse.data;
   } catch (error) {
     console.error('Fetch error:', error);
     return [];

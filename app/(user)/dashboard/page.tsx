@@ -28,7 +28,9 @@ export default async function Dashboard() {
       redirect('/signin');
     }
 
+    console.log('Fetching initial data in page.tsx');
     const initialData = await getBoxSlices('USD_JPY');
+    console.log(`Initial data fetched: ${initialData.length} items`);
 
     return <DashboardClient initialData={initialData} />;
   } catch (error: any) {

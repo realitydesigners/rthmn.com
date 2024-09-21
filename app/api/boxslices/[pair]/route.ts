@@ -6,8 +6,9 @@ export async function GET(
 ) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8080';
   const { pair } = params;
+  const lastTimestamp = request.nextUrl.searchParams.get('lastTimestamp');
 
-  const url = `${baseUrl}/boxslices/${pair}`;
+  const url = `${baseUrl}/boxslices/${pair}${lastTimestamp ? `?lastTimestamp=${lastTimestamp}` : ''}`;
   console.log(`Fetching from: ${url}`);
 
   try {
@@ -23,7 +24,7 @@ export async function GET(
     }
     const data = await response.json();
     console.log('Data received from Bun server:', data);
-    return NextResponse.json(data); // Pass through the entire response
+    return NextResponse.json(data);
   } catch (error: unknown) {
     console.error('Fetch error:', error);
     const errorMessage =
