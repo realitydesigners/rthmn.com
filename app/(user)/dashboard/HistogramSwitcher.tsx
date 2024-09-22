@@ -15,7 +15,7 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
       <button
         onClick={() => onChange('scaled')}
         className={`rounded p-1 ${
-          viewType === 'scaled' ? 'bg-blue-500' : 'bg-gray-700'
+          viewType === 'scaled' ? 'bg-[#181818]' : 'bg-black'
         }`}
         title="Scaled View"
       >
@@ -24,7 +24,7 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
       <button
         onClick={() => onChange('even')}
         className={`rounded p-1 ${
-          viewType === 'even' ? 'bg-blue-500' : 'bg-gray-700'
+          viewType === 'even' ? 'bg-[#181818]' : 'bg-black'
         }`}
         title="Even View"
       >
@@ -40,7 +40,7 @@ const ScaledIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5" // Changed to 1 for thinner lines
     strokeLinecap="round"
     strokeLinejoin="round"
     {...props}
@@ -59,7 +59,7 @@ const EvenIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5" // Changed to 1 for thinner lines
     strokeLinecap="round"
     strokeLinejoin="round"
     {...props}

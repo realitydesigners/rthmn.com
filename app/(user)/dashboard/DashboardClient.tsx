@@ -6,9 +6,6 @@ import HistogramLine from './HistogramLine';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
 import HistogramManager from './HistogramManager';
 
-const MIN_HISTOGRAM_HEIGHT = 100;
-const MAX_HISTOGRAM_HEIGHT = 600;
-
 interface DashboardClientProps {
   initialData: BoxSlice[];
 }
@@ -17,7 +14,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
   const [data, setData] = useState<BoxSlice[]>(initialData);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
-  const [histogramHeight, setHistogramHeight] = useState(300); // Default height
+  const [histogramHeight, setHistogramHeight] = useState(200); // Default height
   const lastTimestampRef = useRef<string | undefined>(
     initialData[initialData.length - 1]?.timestamp
   );
@@ -34,7 +31,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
       if (newData.length > 0) {
         setData((prevData) => {
           const updatedData = [...prevData, ...newData];
-          const finalData = updatedData.slice(-1000); // Keep this slice to maintain max 1000 items
+          const finalData = updatedData.slice(-500); // Keep this slice to maintain max 1000 items
           console.log('Updated data:', finalData.length, 'items');
           return finalData;
         });
@@ -51,13 +48,11 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
   }, [isUpdating]);
 
   const handleHistogramResize = useCallback((newHeight: number) => {
-    setHistogramHeight(
-      Math.min(Math.max(newHeight, MIN_HISTOGRAM_HEIGHT), MAX_HISTOGRAM_HEIGHT)
-    );
+    setHistogramHeight(newHeight); // Adjusted to directly set the new height
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(fetchUpdates, 1000);
+    const intervalId = setInterval(fetchUpdates, 5000);
     return () => clearInterval(intervalId);
   }, [fetchUpdates]);
 
@@ -73,8 +68,6 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
         data={data}
         height={histogramHeight}
         onResize={handleHistogramResize}
-        minHeight={MIN_HISTOGRAM_HEIGHT}
-        maxHeight={MAX_HISTOGRAM_HEIGHT}
       />
     </div>
   );

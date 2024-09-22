@@ -7,7 +7,7 @@ export default function UserLayout({
 }) {
   return (
     <SignalProvider>
-      <div className="h-screen w-full bg-red-400">{children}</div>
+      <div className="h-screen w-full">{children}</div>
     </SignalProvider>
   );
 }
