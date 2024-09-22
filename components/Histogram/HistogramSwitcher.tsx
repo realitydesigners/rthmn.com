@@ -2,8 +2,8 @@ import React from 'react';
 import { SVGProps } from 'react';
 
 interface HistogramSwitcherProps {
-  viewType: 'scaled' | 'even';
-  onChange: (viewType: 'scaled' | 'even') => void;
+  viewType: 'scaled' | 'even' | 'chart'; // Added 'chart' to the viewType
+  onChange: (viewType: 'scaled' | 'even' | 'chart') => void; // Updated onChange type
 }
 
 const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
@@ -30,17 +30,44 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
       >
         <EvenIcon className="h-6 w-6" />
       </button>
+      <button
+        onClick={() => onChange('chart')} // New button for chart view
+        className={`rounded p-1 ${
+          viewType === 'chart' ? 'bg-[#181818]' : 'bg-black'
+        }`}
+        title="Chart View"
+      >
+        <ChartIcon className="h-6 w-6" /> {/* New icon for chart view */}
+      </button>
     </div>
   );
 };
 
+// New ChartIcon component
+const ChartIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    {...props}
+  >
+    <path d="M3 17h18M3 13h12M3 9h6" />
+    <path d="M3 21V3" />
+  </svg>
+);
+
+// New ScaledIcon and EvenIcon components
 const ScaledIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.5" // Changed to 1 for thinner lines
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
     {...props}
@@ -59,7 +86,7 @@ const EvenIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="1.5" // Changed to 1 for thinner lines
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
     {...props}

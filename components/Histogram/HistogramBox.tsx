@@ -1,3 +1,4 @@
+// HistogramBox.jsx
 'use client';
 import React, {
   useEffect,
@@ -11,11 +12,12 @@ import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
 import { ScaledBoxes } from './ScaledBoxes'; // Import the function
 import { SquareBoxes } from './SquareBoxes'; // Import the function
+import { LineBoxes } from './LineBoxes';
 
 const HistogramBox: React.FC<{
   data: BoxSlice[];
   boxOffset: number;
-  viewType: 'scaled' | 'even';
+  viewType: 'scaled' | 'even' | 'chart';
   height: number;
   isDragging: boolean;
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
@@ -54,6 +56,7 @@ const HistogramBox: React.FC<{
   };
 
   const deduplicatedData = useMemo(() => {
+    lastUniqueFrame = null; // Reset lastUniqueFrame when data changes
     return data.reduce((acc: BoxSlice[], current) => {
       if (!lastUniqueFrame || !areFramesEqual(current, lastUniqueFrame)) {
         acc.push(current);
@@ -79,8 +82,16 @@ const HistogramBox: React.FC<{
     setSelectedIndex((prev) => (prev === index ? null : index));
   }, []);
 
+  // Modify renderNestedBoxes to accept additional parameters
   const renderNestedBoxes = useCallback(
-    (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element | null => {
+    (
+      boxArray: BoxSlice['boxes'],
+      isSelected: boolean,
+      meetingPointY: number,
+      prevMeetingPointY: number | null,
+      nextMeetingPointY: number | null,
+      sliceWidth: number
+    ): JSX.Element | null => {
       switch (viewType) {
         case 'scaled':
           return ScaledBoxes(
@@ -103,6 +114,21 @@ const HistogramBox: React.FC<{
             zoomedBarWidth,
             initialBarWidth
           );
+        case 'chart':
+          return (
+            <LineBoxes
+              boxArray={boxArray}
+              isSelected={isSelected}
+              height={height}
+              visibleBoxesCount={visibleBoxesCount}
+              zoomedBarWidth={zoomedBarWidth}
+              initialBarWidth={initialBarWidth}
+              meetingPointY={meetingPointY}
+              prevMeetingPointY={prevMeetingPointY}
+              nextMeetingPointY={nextMeetingPointY}
+              sliceWidth={sliceWidth}
+            />
+          );
         default:
           return null;
       }
@@ -113,48 +139,52 @@ const HistogramBox: React.FC<{
       height,
       zoomedBarWidth,
       initialBarWidth,
-      handleFrameClick
+      handleFrameClick,
+      visibleBoxesCount
     ]
   );
 
-  const renderFrame = useCallback(
-    (slice: BoxSlice, index: number) => {
+  const framesWithPoints = useMemo(() => {
+    return slicedData.map((slice, index) => {
       const boxArray = slice.boxes.slice(
         boxOffset,
         boxOffset + visibleBoxesCount
       );
       const isSelected = index === selectedIndex;
 
-      return (
-        <div
-          key={`${slice.timestamp}-${index}`}
-          className="relative flex-shrink-0 cursor-pointer"
-          style={{
-            width: isSelected ? zoomedBarWidth : initialBarWidth,
-            height: `${height}px`,
-            position: 'relative'
-          }}
-          onClick={() => handleFrameClick(slice, index)}
-        >
-          {renderNestedBoxes(boxArray, isSelected)}
-        </div>
-      );
-    },
-    [
-      renderNestedBoxes,
-      handleFrameClick,
-      selectedIndex,
-      boxOffset,
-      visibleBoxesCount,
-      zoomedBarWidth,
-      initialBarWidth
-    ]
-  );
+      // Calculate the middle point for this slice
+      const boxHeight = height / visibleBoxesCount;
+      const positiveBoxes = boxArray.filter((box) => box.value > 0);
+      const negativeBoxes = boxArray.filter((box) => box.value <= 0);
 
-  const frames = useMemo(
-    () => slicedData.map((slice, index) => renderFrame(slice, index)),
-    [slicedData, renderFrame]
-  );
+      const totalNegativeHeight = negativeBoxes.length * boxHeight;
+      const totalPositiveHeight = positiveBoxes.length * boxHeight;
+      const meetingPointY =
+        totalNegativeHeight +
+        (height - totalNegativeHeight - totalPositiveHeight) / 2;
+
+      const sliceWidth = isSelected ? zoomedBarWidth : initialBarWidth;
+
+      return {
+        frameData: {
+          boxArray,
+          isSelected,
+          meetingPointY,
+          sliceWidth
+        },
+        meetingPointY,
+        sliceWidth
+      };
+    });
+  }, [
+    slicedData,
+    selectedIndex,
+    boxOffset,
+    visibleBoxesCount,
+    zoomedBarWidth,
+    initialBarWidth,
+    height
+  ]);
 
   useEffect(() => {
     if (data.length > 0) {
@@ -163,7 +193,7 @@ const HistogramBox: React.FC<{
       const visibleValues = firstFrame.boxes.map((box) => box.value);
       setVisibleBoxValues(visibleValues);
     }
-  }, [data, boxOffset, setTotalBoxes, setVisibleBoxValues]);
+  }, [data, boxOffset]);
 
   const DraggableBorder = ({
     onMouseDown
@@ -172,7 +202,11 @@ const HistogramBox: React.FC<{
   }) => {
     return (
       <div
-        className={`absolute left-0 right-0 top-0 z-10 h-[1px] cursor-ns-resize rounded-full bg-[#181818] transition-all duration-200 hover:bg-blue-400 ${isDragging ? 'shadow-2xl shadow-blue-500' : 'hover:h-[3px] hover:shadow-2xl hover:shadow-blue-500'}`}
+        className={`absolute left-0 right-0 top-0 z-10 h-[1px] cursor-ns-resize rounded-full bg-[#181818] transition-all duration-200 hover:bg-blue-400 ${
+          isDragging
+            ? 'shadow-2xl shadow-blue-500'
+            : 'hover:h-[3px] hover:shadow-2xl hover:shadow-blue-500'
+        }`}
         onMouseDown={onMouseDown}
       />
     );
@@ -193,13 +227,43 @@ const HistogramBox: React.FC<{
       />
       {selectedFrame && <SelectedFrameDetails selectedFrame={selectedFrame} />}
       {data && data.length > 0 && (
-        <div className="h-full">
+        <div className="h-full" style={{ position: 'relative' }}>
           <div
             className="flex h-full w-auto items-end overflow-x-auto"
             role="region"
             aria-label="Histogram Chart"
           >
-            {frames}
+            {framesWithPoints.map((frameWithPoint, index) => {
+              const { frameData, meetingPointY, sliceWidth } = frameWithPoint;
+              const prevMeetingPointY =
+                index > 0 ? framesWithPoints[index - 1].meetingPointY : null;
+              const nextMeetingPointY =
+                index < framesWithPoints.length - 1
+                  ? framesWithPoints[index + 1].meetingPointY
+                  : null;
+
+              return (
+                <div
+                  key={`${index}`}
+                  className="relative flex-shrink-0 cursor-pointer"
+                  style={{
+                    width: frameData.sliceWidth,
+                    height: `${height}px`,
+                    position: 'relative'
+                  }}
+                  onClick={() => handleFrameClick(slicedData[index], index)}
+                >
+                  {renderNestedBoxes(
+                    frameData.boxArray,
+                    frameData.isSelected,
+                    meetingPointY,
+                    prevMeetingPointY,
+                    nextMeetingPointY,
+                    frameData.sliceWidth
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}

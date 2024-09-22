@@ -9,7 +9,7 @@ const VISIBLE_BOXES_COUNT = 16;
 const MIN_HISTOGRAM_HEIGHT = 100;
 const MAX_HISTOGRAM_HEIGHT = 400;
 const ZOOMED_BAR_WIDTH = 50;
-const INITIAL_BAR_WIDTH = 30;
+const INITIAL_BAR_WIDTH = 16;
 
 interface HistogramManagerProps {
   data: BoxSlice[];
@@ -23,7 +23,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   onResize
 }) => {
   const [boxOffset, setBoxOffset] = useState(0);
-  const [viewType, setViewType] = useState<'scaled' | 'even'>('scaled');
+  const [viewType, setViewType] = useState<'scaled' | 'even' | 'chart'>(
+    'scaled'
+  ); // Updated type
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(height);
@@ -32,9 +34,13 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     setBoxOffset((prevOffset) => Math.max(0, prevOffset + change));
   }, []);
 
-  const handleViewTypeChange = useCallback((newViewType: 'scaled' | 'even') => {
-    setViewType(newViewType);
-  }, []);
+  const handleViewChange = useCallback(
+    (newViewType: 'scaled' | 'even' | 'chart') => {
+      // Updated parameter type
+      setViewType(newViewType);
+    },
+    []
+  );
 
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
@@ -76,10 +82,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
           totalBoxes={data[0]?.boxes.length || 0}
           visibleBoxesCount={VISIBLE_BOXES_COUNT}
         />
-        <HistogramSwitcher
-          viewType={viewType}
-          onChange={handleViewTypeChange}
-        />
+        <HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
       </div>
       <HistogramBox
         data={data}

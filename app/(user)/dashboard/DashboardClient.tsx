@@ -64,6 +64,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
         className="overflow-auto bg-black p-4"
         style={{ height: `calc(100vh - ${histogramHeight}px)` }}
       ></div>
+
       <HistogramManager
         data={data}
         height={histogramHeight}
