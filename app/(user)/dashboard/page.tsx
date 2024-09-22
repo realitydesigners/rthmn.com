@@ -32,11 +32,10 @@ export default async function Dashboard() {
     const initialData = await getBoxSlices('USD_JPY');
     console.log(`Initial data fetched: ${initialData.length} items`);
 
-    // Slice the data here
-    const slicedInitialData = initialData.slice(-1000);
+    const slicedInitialData = initialData.slice(-5000);
 
     return (
-      <div className="">
+      <div className="w-full">
         <DashboardClient initialData={slicedInitialData} />
       </div>
     );

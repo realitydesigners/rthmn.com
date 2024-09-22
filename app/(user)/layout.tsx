@@ -8,8 +8,8 @@ export default function UserLayout({
 }) {
   return (
     <SignalProvider>
-      <div className="flex">
-        <SignalSidebar />
+      <div className="flex w-full bg-red-400 p-2">
+        {/* <SignalSidebar /> */}
         {children}
       </div>
     </SignalProvider>

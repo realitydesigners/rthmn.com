@@ -22,7 +22,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({ data }) => {
   }, []);
 
   return (
-    <div className="absolute bottom-0 bg-gray-200">
+    <div className="absolute bottom-0 w-full bg-gray-200 bg-red-600 p-2">
       <div className="absolute right-2 top-2 z-10 flex items-center space-x-2">
         <HistogramControls
           boxOffset={boxOffset}

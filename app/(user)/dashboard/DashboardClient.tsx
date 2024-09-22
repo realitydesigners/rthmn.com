@@ -59,26 +59,10 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     return () => clearInterval(intervalId);
   }, [fetchUpdates]);
 
-  const formatTimestamp = useCallback((timestamp: string | null) => {
-    if (!timestamp) return 'N/A';
-    return new Date(timestamp).toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'UTC'
-    });
-  }, []);
-
   return (
     <div
-      className={`flex w-full flex-col sm:px-6 lg:px-8 ${oxanium.className}`}
+      className={`relative flex min-h-screen w-full flex-col bg-red-200 ${oxanium.className}`}
     >
-      {/* <HistogramLine data={data} /> */}
-
       <HistogramManager data={data} />
     </div>
   );
