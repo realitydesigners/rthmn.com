@@ -2,6 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import HistogramBox from './HistogramBox';
 import HistogramControls from './HistogramControls';
+import HistogramSwitcher from './HistogramSwitcher';
 import type { BoxSlice } from '@/types';
 
 interface HistogramManagerProps {
@@ -21,21 +22,19 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({ data }) => {
   }, []);
 
   return (
-    <div className="relative">
-      <HistogramControls
-        boxOffset={boxOffset}
-        onOffsetChange={handleOffsetChange}
-        viewType={viewType}
-        onViewTypeChange={handleViewTypeChange}
-        totalBoxes={data[0]?.boxes.length || 0}
-      />
-      <HistogramBox
-        data={data}
-        boxOffset={boxOffset}
-        viewType={viewType}
-        onOffsetChange={handleOffsetChange}
-        onViewTypeChange={handleViewTypeChange}
-      />
+    <div className="absolute bottom-0 bg-gray-200">
+      <div className="absolute right-2 top-2 z-10 flex items-center space-x-2">
+        <HistogramControls
+          boxOffset={boxOffset}
+          onOffsetChange={handleOffsetChange}
+          totalBoxes={data[0]?.boxes.length || 0}
+        />
+        <HistogramSwitcher
+          viewType={viewType}
+          onChange={handleViewTypeChange}
+        />
+      </div>
+      <HistogramBox data={data} boxOffset={boxOffset} viewType={viewType} />
     </div>
   );
 };

@@ -36,7 +36,7 @@ export default async function Dashboard() {
     const slicedInitialData = initialData.slice(-1000);
 
     return (
-      <div>
+      <div className="">
         <DashboardClient initialData={slicedInitialData} />
       </div>
     );

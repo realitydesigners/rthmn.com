@@ -74,13 +74,12 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
   }, []);
 
   return (
-    <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
-      <div className="mt-20">
-        {/* <HistogramLine data={data} /> */}
-        <div className="bottom-0 mr-[400px] mt-6">
-          <HistogramManager data={data} />
-        </div>
-      </div>
+    <div
+      className={`flex w-full flex-col sm:px-6 lg:px-8 ${oxanium.className}`}
+    >
+      {/* <HistogramLine data={data} /> */}
+
+      <HistogramManager data={data} />
     </div>
   );
 };

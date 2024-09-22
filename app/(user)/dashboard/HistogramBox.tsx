@@ -8,24 +8,21 @@ import React, {
 } from 'react';
 import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
-import HistogramSwitcher from './HistogramSwitcher';
 
 interface HistogramProps {
   data: BoxSlice[];
   boxOffset: number;
   viewType: 'scaled' | 'even';
-  onOffsetChange: (offset: number) => void;
-  onViewTypeChange: (viewType: 'scaled' | 'even') => void;
 }
-const INITIAL_BAR_WIDTH = 6;
-const ZOOMED_BAR_WIDTH = 50;
+
 const INITIAL_LOAD_COUNT = 1000;
 const VISIBLE_BOXES_COUNT = 15;
+const ZOOMED_BAR_WIDTH = 50;
+const INITIAL_BAR_WIDTH = 6;
 const CONTAINER_HEIGHT = 300;
 
 const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
   if (frame1.boxes.length !== frame2.boxes.length) return false;
-
   return frame1.boxes.every((box1, index) => {
     const box2 = frame2.boxes[index];
     return box1.value === box2.value;
@@ -35,9 +32,7 @@ const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
 const HistogramBox: React.FC<HistogramProps> = ({
   data,
   boxOffset,
-  viewType,
-  onOffsetChange,
-  onViewTypeChange
+  viewType
 }) => {
   const [visibleFrames, setVisibleFrames] =
     useState<number>(INITIAL_LOAD_COUNT);
@@ -254,27 +249,8 @@ const HistogramBox: React.FC<HistogramProps> = ({
   }, [data, boxOffset]);
 
   return (
-    <div className="relative h-[300px] border border-[#181818] bg-black">
+    <div className="relative h-[300px] w-full border border-[#181818] bg-black pr-4">
       {selectedFrame && <SelectedFrameDetails selectedFrame={selectedFrame} />}
-      <div className="absolute left-2 top-2 z-10 flex items-center space-x-2">
-        <button
-          onClick={() => onOffsetChange(-1)}
-          className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
-          disabled={boxOffset === 0}
-        >
-          -
-        </button>
-        <button
-          onClick={() => onOffsetChange(1)}
-          className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
-          disabled={boxOffset >= totalBoxes - VISIBLE_BOXES_COUNT}
-        >
-          +
-        </button>
-
-        <HistogramSwitcher viewType={viewType} onChange={onViewTypeChange} />
-      </div>
-
       {data && data.length > 0 && (
         <div className="h-full">
           <div
