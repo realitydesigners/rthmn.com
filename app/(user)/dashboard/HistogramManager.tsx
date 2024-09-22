@@ -5,9 +5,11 @@ import HistogramControls from './HistogramControls';
 import HistogramSwitcher from './HistogramSwitcher';
 import type { BoxSlice } from '@/types';
 
-const VISIBLE_BOXES_COUNT = 15; // Move the constant here
-const MIN_HISTOGRAM_HEIGHT = 100; // Move the constant here
-const MAX_HISTOGRAM_HEIGHT = 600; // Move the constant here
+const VISIBLE_BOXES_COUNT = 16;
+const MIN_HISTOGRAM_HEIGHT = 100;
+const MAX_HISTOGRAM_HEIGHT = 400;
+const ZOOMED_BAR_WIDTH = 50;
+const INITIAL_BAR_WIDTH = 30;
 
 interface HistogramManagerProps {
   data: BoxSlice[];
@@ -66,13 +68,13 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
   return (
-    <div className="absolute bottom-0 left-0 right-0">
+    <div className="absolute bottom-0 m-2 w-full">
       <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
         <HistogramControls
           boxOffset={boxOffset}
           onOffsetChange={handleOffsetChange}
           totalBoxes={data[0]?.boxes.length || 0}
-          visibleBoxesCount={VISIBLE_BOXES_COUNT} // Pass the constant here
+          visibleBoxesCount={VISIBLE_BOXES_COUNT}
         />
         <HistogramSwitcher
           viewType={viewType}
@@ -88,7 +90,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         setIsDragging={setIsDragging}
         setStartY={setStartY}
         setStartHeight={setStartHeight}
-        visibleBoxesCount={VISIBLE_BOXES_COUNT} // Pass the constant here
+        visibleBoxesCount={VISIBLE_BOXES_COUNT}
+        zoomedBarWidth={ZOOMED_BAR_WIDTH}
+        initialBarWidth={INITIAL_BAR_WIDTH}
       />
     </div>
   );

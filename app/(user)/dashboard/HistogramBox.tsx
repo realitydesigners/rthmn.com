@@ -10,10 +10,6 @@ import React, {
 import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
 
-// Define constants for bar widths
-const ZOOMED_BAR_WIDTH = 50; // Define this constant
-const INITIAL_BAR_WIDTH = 12; // Define this constant
-
 const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
   if (frame1.boxes.length !== frame2.boxes.length) return false;
   return frame1.boxes.every((box1, index) => {
@@ -31,7 +27,9 @@ const HistogramBox: React.FC<{
   setIsDragging: React.Dispatch<React.SetStateAction<boolean>>;
   setStartY: React.Dispatch<React.SetStateAction<number>>;
   setStartHeight: React.Dispatch<React.SetStateAction<number>>;
-  visibleBoxesCount: number; // Accept the prop here
+  visibleBoxesCount: number;
+  zoomedBarWidth: number;
+  initialBarWidth: number;
 }> = ({
   data,
   boxOffset,
@@ -41,7 +39,9 @@ const HistogramBox: React.FC<{
   setIsDragging,
   setStartY,
   setStartHeight,
-  visibleBoxesCount // Use the prop here
+  visibleBoxesCount,
+  zoomedBarWidth,
+  initialBarWidth
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,11 +65,11 @@ const HistogramBox: React.FC<{
   const maxSize = useMemo(() => {
     const sizes = deduplicatedData.flatMap((slice) =>
       slice.boxes
-        .slice(boxOffset, boxOffset + visibleBoxesCount) // Use the prop here
+        .slice(boxOffset, boxOffset + visibleBoxesCount)
         .map((box) => Math.abs(box.value))
     );
     return sizes.reduce((max, size) => Math.max(max, size), 0);
-  }, [deduplicatedData, boxOffset, visibleBoxesCount]); // Update dependencies
+  }, [deduplicatedData, boxOffset, visibleBoxesCount]);
 
   const slicedData = useMemo(() => deduplicatedData, [deduplicatedData]);
 
@@ -111,7 +111,7 @@ const HistogramBox: React.FC<{
         <div
           className={`${positionStyle} ${boxColor} border border-black`}
           style={{
-            width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
+            width: isSelected ? zoomedBarWidth : initialBarWidth,
             height: size,
             margin: '-1px'
           }}
@@ -121,7 +121,7 @@ const HistogramBox: React.FC<{
         </div>
       );
     },
-    [maxSize, height]
+    [maxSize, height, zoomedBarWidth, initialBarWidth]
   );
 
   const renderEvenBoxes = useCallback(
@@ -139,7 +139,7 @@ const HistogramBox: React.FC<{
         <div
           className="relative"
           style={{
-            width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
+            width: isSelected ? zoomedBarWidth : initialBarWidth,
             height: `${height}px`,
             position: 'relative'
           }}
@@ -189,7 +189,7 @@ const HistogramBox: React.FC<{
         </div>
       );
     },
-    [height, visibleBoxesCount]
+    [height, visibleBoxesCount, zoomedBarWidth, initialBarWidth]
   );
 
   const renderNestedBoxes = useCallback(
@@ -219,7 +219,7 @@ const HistogramBox: React.FC<{
           key={`${slice.timestamp}-${index}`}
           className="relative flex-shrink-0 cursor-pointer"
           style={{
-            width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
+            width: isSelected ? zoomedBarWidth : initialBarWidth,
             height: `${height}px`,
             position: 'relative'
           }}
@@ -234,7 +234,9 @@ const HistogramBox: React.FC<{
       handleFrameClick,
       selectedIndex,
       boxOffset,
-      visibleBoxesCount
+      visibleBoxesCount,
+      zoomedBarWidth,
+      initialBarWidth
     ]
   );
 
@@ -247,14 +249,11 @@ const HistogramBox: React.FC<{
     if (data.length > 0) {
       const firstFrame = data[0];
       setTotalBoxes(firstFrame.boxes.length);
-      const visibleValues = firstFrame.boxes
-        .slice(boxOffset, boxOffset + visibleBoxesCount)
-        .map((box) => box.value);
+      const visibleValues = firstFrame.boxes.map((box) => box.value);
       setVisibleBoxValues(visibleValues);
     }
-  }, [data, boxOffset, visibleBoxesCount, setTotalBoxes, setVisibleBoxValues]);
+  }, [data, boxOffset, setTotalBoxes, setVisibleBoxValues]);
 
-  // DraggableBorder component defined here
   const DraggableBorder = ({
     onMouseDown
   }: {
@@ -270,7 +269,7 @@ const HistogramBox: React.FC<{
 
   return (
     <div
-      className="relative w-full border border-[#181818] bg-black pr-4"
+      className="relative w-full border border-[#181818] bg-black pr-60"
       style={{ height: `${height}px`, transition: 'height 0.1s ease-out' }}
       ref={containerRef}
     >
@@ -285,7 +284,7 @@ const HistogramBox: React.FC<{
       {data && data.length > 0 && (
         <div className="h-full">
           <div
-            className="flex h-full w-auto items-end overflow-x-auto"
+            className="flex h-full w-auto items-end overflow-x-auto" // Add padding-right here
             role="region"
             aria-label="Histogram Chart"
           >
