@@ -3,9 +3,10 @@ import React, { useState, useCallback, useEffect } from 'react';
 import HistogramBox from './HistogramBox';
 import HistogramControls from './HistogramControls';
 import HistogramSwitcher from './HistogramSwitcher';
+import VisibleBoxesModal from './VisibleBoxesModal';
 import type { BoxSlice } from '@/types';
 
-const VISIBLE_BOXES_COUNT = 16;
+const VISIBLE_BOXES_COUNT = 10;
 const MIN_HISTOGRAM_HEIGHT = 100;
 const MAX_HISTOGRAM_HEIGHT = 400;
 const ZOOMED_BAR_WIDTH = 16;
@@ -22,13 +23,14 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   height,
   onResize
 }) => {
-  const [boxOffset, setBoxOffset] = useState(15);
+  const [boxOffset, setBoxOffset] = useState(20);
   const [viewType, setViewType] = useState<'scaled' | 'even' | 'chart'>(
     'chart'
-  ); // Updated type
+  );
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(height);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleOffsetChange = useCallback((change: number) => {
     setBoxOffset((prevOffset) => Math.max(0, prevOffset + change));
@@ -36,7 +38,6 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 
   const handleViewChange = useCallback(
     (newViewType: 'scaled' | 'even' | 'chart') => {
-      // Updated parameter type
       setViewType(newViewType);
     },
     []
@@ -59,6 +60,10 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     setIsDragging(false);
   }, [setIsDragging]);
 
+  const handleOpenVisibleBoxesModal = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
   useEffect(() => {
     if (isDragging) {
       document.addEventListener('mousemove', handleMouseMove);
@@ -73,14 +78,18 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
+  const visibleBoxes =
+    data[0]?.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT) || [];
+
   return (
-    <div className="absolute bottom-0 m-2 w-full">
+    <div className="absolute bottom-0 w-full">
       <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
         <HistogramControls
           boxOffset={boxOffset}
           onOffsetChange={handleOffsetChange}
           totalBoxes={data[0]?.boxes.length || 0}
           visibleBoxesCount={VISIBLE_BOXES_COUNT}
+          onOpenVisibleBoxesModal={handleOpenVisibleBoxesModal}
         />
         <HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
       </div>
@@ -97,6 +106,12 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         zoomedBarWidth={ZOOMED_BAR_WIDTH}
         initialBarWidth={INITIAL_BAR_WIDTH}
       />
+      {isModalOpen && (
+        <VisibleBoxesModal
+          visibleBoxes={visibleBoxes}
+          onClose={() => setIsModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

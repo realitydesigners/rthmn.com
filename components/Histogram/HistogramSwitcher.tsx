@@ -1,49 +1,90 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { SVGProps } from 'react';
 
 interface HistogramSwitcherProps {
-  viewType: 'scaled' | 'even' | 'chart'; // Added 'chart' to the viewType
-  onChange: (viewType: 'scaled' | 'even' | 'chart') => void; // Updated onChange type
+  viewType: 'scaled' | 'even' | 'chart';
+  onChange: (viewType: 'scaled' | 'even' | 'chart') => void;
 }
 
 const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
   viewType,
   onChange
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleIconClick = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleOptionClick = (newViewType: 'scaled' | 'even' | 'chart') => {
+    onChange(newViewType);
+    setIsOpen(false);
+  };
+
+  const getCurrentIcon = () => {
+    switch (viewType) {
+      case 'scaled':
+        return <ScaledIcon className="h-6 w-6" />;
+      case 'even':
+        return <EvenIcon className="h-6 w-6" />;
+      case 'chart':
+        return <ChartIcon className="h-6 w-6" />;
+    }
+  };
+
   return (
-    <div className="flex space-x-2">
+    <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => onChange('scaled')}
-        className={`rounded p-1 ${
-          viewType === 'scaled' ? 'bg-[#181818]' : 'bg-black'
-        }`}
-        title="Scaled View"
+        onClick={handleIconClick}
+        className="bg-black p-1 hover:bg-[#181818]"
+        title={`Current: ${viewType} View`}
       >
-        <ScaledIcon className="h-6 w-6" />
+        {getCurrentIcon()}
       </button>
-      <button
-        onClick={() => onChange('even')}
-        className={`rounded p-1 ${
-          viewType === 'even' ? 'bg-[#181818]' : 'bg-black'
-        }`}
-        title="Even View"
-      >
-        <EvenIcon className="h-6 w-6" />
-      </button>
-      <button
-        onClick={() => onChange('chart')} // New button for chart view
-        className={`rounded p-1 ${
-          viewType === 'chart' ? 'bg-[#181818]' : 'bg-black'
-        }`}
-        title="Chart View"
-      >
-        <ChartIcon className="h-6 w-6" /> {/* New icon for chart view */}
-      </button>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-32 shadow-lg">
+          {['scaled', 'even', 'chart'].map((type) => (
+            <button
+              key={type}
+              onClick={() =>
+                handleOptionClick(type as 'scaled' | 'even' | 'chart')
+              }
+              className={`flex w-full items-center px-4 py-2 text-left text-sm ${
+                viewType === type
+                  ? 'bg-[#181818] text-white'
+                  : 'text-gray-300 hover:bg-[#181818] hover:text-white'
+              }`}
+            >
+              {type === 'scaled' && <ScaledIcon className="mr-2 h-5 w-5" />}
+              {type === 'even' && <EvenIcon className="mr-2 h-5 w-5" />}
+              {type === 'chart' && <ChartIcon className="mr-2 h-5 w-5" />}
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
 
-// New ChartIcon component
+// Icon components remain the same
 const ChartIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +101,6 @@ const ChartIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
   </svg>
 );
 
-// New ScaledIcon and EvenIcon components
 const ScaledIcon: React.FC<SVGProps<SVGSVGElement>> = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
