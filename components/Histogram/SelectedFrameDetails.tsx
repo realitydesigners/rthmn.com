@@ -9,7 +9,7 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
   selectedFrame
 }) => {
   return (
-    <div className="absolute top-full z-50 mt-4 w-[450px] rounded-lg bg-gray-800 p-6 text-white shadow-xl">
+    <div className="bottom absolute left-0 z-50 mb-4 h-full w-[450px] rounded-lg bg-gray-800 p-6 text-white shadow-xl">
       <h3 className="mb-4 text-xl font-semibold">Frame Data</h3>
       <p className="mb-4 text-sm text-[#A0A0A0]">
         Time: {selectedFrame.timestamp}

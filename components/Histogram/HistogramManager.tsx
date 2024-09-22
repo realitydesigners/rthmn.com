@@ -8,7 +8,7 @@ import type { BoxSlice } from '@/types';
 const VISIBLE_BOXES_COUNT = 16;
 const MIN_HISTOGRAM_HEIGHT = 100;
 const MAX_HISTOGRAM_HEIGHT = 400;
-const ZOOMED_BAR_WIDTH = 50;
+const ZOOMED_BAR_WIDTH = 16;
 const INITIAL_BAR_WIDTH = 16;
 
 interface HistogramManagerProps {
@@ -22,9 +22,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   height,
   onResize
 }) => {
-  const [boxOffset, setBoxOffset] = useState(0);
+  const [boxOffset, setBoxOffset] = useState(15);
   const [viewType, setViewType] = useState<'scaled' | 'even' | 'chart'>(
-    'scaled'
+    'chart'
   ); // Updated type
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);

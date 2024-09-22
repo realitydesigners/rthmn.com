@@ -1,5 +1,5 @@
 // LineBoxes.jsx
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { BoxSlice } from '@/types';
 
 interface LineBoxesProps {
@@ -29,7 +29,6 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
 }) => {
   const boxHeight = height / visibleBoxesCount;
   const sortedBoxes = boxArray.slice(0, visibleBoxesCount);
-
   const positiveBoxes = sortedBoxes.filter((box) => box.value > 0);
   const negativeBoxes = sortedBoxes.filter((box) => box.value <= 0);
 
@@ -37,6 +36,14 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
   let negativeOffset = 0;
 
   const width = sliceWidth;
+  const sectionColor = useMemo(() => {
+    const largestBox = sortedBoxes.reduce((max, box) =>
+      Math.abs(box.value) > Math.abs(max.value) ? box : max
+    );
+    return largestBox.value > 0 ? 'green' : 'red';
+  }, [sortedBoxes]);
+
+  const gradientId = `gradient-${sectionColor}`;
 
   return (
     <div
@@ -47,9 +54,27 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
         position: 'relative'
       }}
     >
+      <svg className="absolute inset-0 h-full w-full">
+        <defs>
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop
+              offset="0%"
+              stopColor={sectionColor === 'green' ? '#0F766E' : '#B91C1C'}
+              stopOpacity="0.7"
+            />
+            <stop
+              offset="100%"
+              stopColor={sectionColor === 'green' ? '#0F766E' : '#B91C1C'}
+              stopOpacity="0.01"
+            />
+          </linearGradient>
+        </defs>
+        <rect width="100%" height="100%" fill={`url(#${gradientId})`} />
+      </svg>
+
       {/* Render negative boxes stacking from the top */}
       {negativeBoxes.map((box, idx) => {
-        const boxColor = 'bg-[#222]'; // Negative color
+        const boxColor = ''; // Negative color
         const positionStyle: React.CSSProperties = {
           position: 'absolute',
           top: `${negativeOffset}px`,
@@ -71,10 +96,10 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
               className="absolute left-1/2 -translate-x-1/2 transform"
               style={{
                 top: '50%',
-                width: '2px',
-                height: '2px',
+                width: '1px',
+                height: '1px',
                 borderRadius: '50%',
-                backgroundColor: 'red',
+                backgroundColor: '#999',
                 position: 'absolute'
               }}
             />
@@ -84,7 +109,7 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
 
       {/* Render positive boxes stacking from the bottom */}
       {positiveBoxes.map((box, idx) => {
-        const boxColor = 'bg-[#444]'; // Positive color
+        const boxColor = ''; // Positive color
         const positionStyle: React.CSSProperties = {
           position: 'absolute',
           bottom: `${positiveOffset}px`,
@@ -106,10 +131,10 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
               className="absolute left-1/2 -translate-x-1/2 transform"
               style={{
                 top: '50%',
-                width: '2px',
-                height: '2px',
+                width: '1px',
+                height: '1px',
                 borderRadius: '50%',
-                backgroundColor: 'green',
+                backgroundColor: '#999',
                 position: 'absolute'
               }}
             />
@@ -128,17 +153,6 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
             y1={prevMeetingPointY}
             x2={width / 2}
             y2={meetingPointY}
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
-        )}
-        {nextMeetingPointY !== null && (
-          <line
-            x1={width / 2}
-            y1={meetingPointY}
-            x2={width + width / 2}
-            y2={nextMeetingPointY}
             stroke="white"
             strokeWidth="2"
             strokeLinecap="round"
