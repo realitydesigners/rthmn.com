@@ -8,16 +8,19 @@ import React, {
 } from 'react';
 import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
+import HistogramSwitcher from './HistogramSwitcher';
 
 interface HistogramProps {
   data: BoxSlice[];
   boxOffset: number;
-  onOffsetChange: (change: number) => void;
+  viewType: 'scaled' | 'even';
+  onOffsetChange: (offset: number) => void;
+  onViewTypeChange: (viewType: 'scaled' | 'even') => void;
 }
 const INITIAL_BAR_WIDTH = 6;
-const ZOOMED_BAR_WIDTH = 30;
+const ZOOMED_BAR_WIDTH = 50;
 const INITIAL_LOAD_COUNT = 1000;
-const VISIBLE_BOXES_COUNT = 20;
+const VISIBLE_BOXES_COUNT = 15;
 const CONTAINER_HEIGHT = 300;
 
 const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
@@ -32,13 +35,14 @@ const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
 const HistogramBox: React.FC<HistogramProps> = ({
   data,
   boxOffset,
-  onOffsetChange
+  viewType,
+  onOffsetChange,
+  onViewTypeChange
 }) => {
   const [visibleFrames, setVisibleFrames] =
     useState<number>(INITIAL_LOAD_COUNT);
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [viewType, setViewType] = useState<'scaled' | 'even'>('scaled');
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
@@ -235,39 +239,40 @@ const HistogramBox: React.FC<HistogramProps> = ({
     [slicedData, renderFrame]
   );
 
+  const [visibleBoxValues, setVisibleBoxValues] = useState<number[]>([]);
+  const [totalBoxes, setTotalBoxes] = useState(0);
+
+  useEffect(() => {
+    if (data.length > 0) {
+      const firstFrame = data[0];
+      setTotalBoxes(firstFrame.boxes.length);
+      const visibleValues = firstFrame.boxes
+        .slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
+        .map((box) => box.value);
+      setVisibleBoxValues(visibleValues);
+    }
+  }, [data, boxOffset]);
+
   return (
     <div className="relative h-[300px] border border-[#181818] bg-black">
       {selectedFrame && <SelectedFrameDetails selectedFrame={selectedFrame} />}
-      {/* Add a toggle button */}
-      <div className="absolute left-2 top-2 z-10 flex space-x-2">
+      <div className="absolute left-2 top-2 z-10 flex items-center space-x-2">
         <button
           onClick={() => onOffsetChange(-1)}
           className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
           disabled={boxOffset === 0}
         >
-          +
+          -
         </button>
         <button
           onClick={() => onOffsetChange(1)}
           className="rounded bg-gray-700 px-2 py-1 text-white hover:bg-gray-600"
-          disabled={
-            boxOffset >=
-            Math.max(...data.map((frame) => frame.boxes.length)) -
-              VISIBLE_BOXES_COUNT
-          }
+          disabled={boxOffset >= totalBoxes - VISIBLE_BOXES_COUNT}
         >
-          -
+          +
         </button>
 
-        {/* View Type Toggle Button */}
-        <button
-          onClick={() =>
-            setViewType((prev) => (prev === 'scaled' ? 'even' : 'scaled'))
-          }
-          className="rounded bg-blue-500 px-2 py-1 text-white hover:bg-blue-400"
-        >
-          Toggle View: {viewType === 'scaled' ? 'Scaled' : 'Even'}
-        </button>
+        <HistogramSwitcher viewType={viewType} onChange={onViewTypeChange} />
       </div>
 
       {data && data.length > 0 && (

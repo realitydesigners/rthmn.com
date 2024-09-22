@@ -32,7 +32,14 @@ export default async function Dashboard() {
     const initialData = await getBoxSlices('USD_JPY');
     console.log(`Initial data fetched: ${initialData.length} items`);
 
-    return <DashboardClient initialData={initialData} />;
+    // Slice the data here
+    const slicedInitialData = initialData.slice(-1000);
+
+    return (
+      <div>
+        <DashboardClient initialData={slicedInitialData} />
+      </div>
+    );
   } catch (error: any) {
     if (error.status === 429) {
       console.error('Rate limit reached:', error);

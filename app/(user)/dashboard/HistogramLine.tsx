@@ -17,7 +17,7 @@ interface HistogramProps {
 const BAR_WIDTH = 5;
 const CHART_HEIGHT = 300;
 const CHART_BACKGROUND = '#000';
-const VISIBLE_BOXES_COUNT = 20;
+const VISIBLE_BOXES_COUNT = 15;
 
 const areVisibleBoxesEqual = (
   slice1: BoxSlice,

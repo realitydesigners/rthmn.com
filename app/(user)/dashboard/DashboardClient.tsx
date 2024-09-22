@@ -7,9 +7,10 @@ import React, {
   useMemo
 } from 'react';
 import { BoxSlice } from '@/types';
-import HistogramBox from './HistogramBox';
 import { oxanium } from '@/app/fonts';
+import HistogramLine from './HistogramLine';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
+import HistogramManager from './HistogramManager';
 
 const VISIBLE_BOXES_COUNT = 20;
 
@@ -18,10 +19,9 @@ interface DashboardClientProps {
 }
 
 const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
-  const [data, setData] = useState<BoxSlice[]>(initialData.slice(-1000));
+  const [data, setData] = useState<BoxSlice[]>(initialData);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
-  const [boxOffset, setBoxOffset] = useState(0);
   const lastTimestampRef = useRef<string | undefined>(
     initialData[initialData.length - 1]?.timestamp
   );
@@ -38,7 +38,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
       if (newData.length > 0) {
         setData((prevData) => {
           const updatedData = [...prevData, ...newData];
-          const finalData = updatedData.slice(-1000);
+          const finalData = updatedData.slice(-1000); // Keep this slice to maintain max 1000 items
           console.log('Updated data:', finalData.length, 'items');
           return finalData;
         });
@@ -59,17 +59,6 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     return () => clearInterval(intervalId);
   }, [fetchUpdates]);
 
-  const handleOffsetChange = useCallback((change: number) => {
-    setBoxOffset((prev) => {
-      const newOffset = prev + change;
-      const maxOffset = Math.max(
-        0,
-        (data[0]?.boxes.length || 0) - VISIBLE_BOXES_COUNT
-      );
-      return Math.max(0, Math.min(newOffset, maxOffset));
-    });
-  }, []); // Remove the dependency on data
-
   const formatTimestamp = useCallback((timestamp: string | null) => {
     if (!timestamp) return 'N/A';
     return new Date(timestamp).toLocaleString('en-US', {
@@ -84,23 +73,16 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     });
   }, []);
 
-  const memoizedHistogramBox = useMemo(
-    () => (
-      <HistogramBox
-        data={data}
-        boxOffset={boxOffset}
-        onOffsetChange={handleOffsetChange}
-      />
-    ),
-    [data, boxOffset, handleOffsetChange]
-  );
   return (
     <div className={`w-full sm:px-6 lg:px-8 ${oxanium.className}`}>
       <div className="mt-20">
-        <div className="bottom-0 mr-[400px] mt-6">{memoizedHistogramBox}</div>
+        {/* <HistogramLine data={data} /> */}
+        <div className="bottom-0 mr-[400px] mt-6">
+          <HistogramManager data={data} />
+        </div>
       </div>
     </div>
   );
 };
 
-export default React.memo(DashboardClient); // Memoize the entire component
+export default React.memo(DashboardClient);
