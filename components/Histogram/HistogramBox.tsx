@@ -9,14 +9,8 @@ import React, {
 
 import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
-
-const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
-  if (frame1.boxes.length !== frame2.boxes.length) return false;
-  return frame1.boxes.every((box1, index) => {
-    const box2 = frame2.boxes[index];
-    return box1.value === box2.value;
-  });
-};
+import { ScaledBoxes } from './ScaledBoxes'; // Import the function
+import { SquareBoxes } from './SquareBoxes'; // Import the function
 
 const HistogramBox: React.FC<{
   data: BoxSlice[];
@@ -44,13 +38,20 @@ const HistogramBox: React.FC<{
   initialBarWidth
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [visibleBoxValues, setVisibleBoxValues] = useState<number[]>([]);
   const [totalBoxes, setTotalBoxes] = useState(0);
 
   let lastUniqueFrame: BoxSlice | null = null;
+
+  const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
+    if (frame1.boxes.length !== frame2.boxes.length) return false;
+    return frame1.boxes.every((box1, index) => {
+      const box2 = frame2.boxes[index];
+      return box1.value === box2.value;
+    });
+  };
 
   const deduplicatedData = useMemo(() => {
     return data.reduce((acc: BoxSlice[], current) => {
@@ -78,132 +79,42 @@ const HistogramBox: React.FC<{
     setSelectedIndex((prev) => (prev === index ? null : index));
   }, []);
 
-  const renderScaledBoxes = useCallback(
-    (
-      boxArray: BoxSlice['boxes'],
-      idx = 0,
-      prevColor: string | null = null,
-      isSelected: boolean
-    ): JSX.Element | null => {
-      if (idx >= boxArray.length) return null;
-
-      const box = boxArray[idx];
-      const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
-      const size = (Math.abs(box.value) / maxSize) * height;
-
-      let positionStyle = 'absolute top-0 right-0';
-
-      if (prevColor !== null) {
-        if (prevColor !== boxColor) {
-          positionStyle =
-            prevColor === 'bg-[#212121]'
-              ? 'absolute bottom-0 right-0'
-              : 'absolute top-0 right-0';
-        } else {
-          positionStyle =
-            box.value > 0
-              ? 'absolute top-0 right-0'
-              : 'absolute bottom-0 right-0';
-        }
-      }
-
-      return (
-        <div
-          className={`${positionStyle} ${boxColor} border border-black`}
-          style={{
-            width: isSelected ? zoomedBarWidth : initialBarWidth,
-            height: size,
-            margin: '-1px'
-          }}
-          key={idx}
-        >
-          {renderScaledBoxes(boxArray, idx + 1, boxColor, isSelected)}
-        </div>
-      );
-    },
-    [maxSize, height, zoomedBarWidth, initialBarWidth]
-  );
-
-  const renderEvenBoxes = useCallback(
-    (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element => {
-      const boxHeight = height / visibleBoxesCount;
-      const sortedBoxes = boxArray.slice(0, visibleBoxesCount);
-
-      const positiveBoxes = sortedBoxes.filter((box) => box.value > 0);
-      const negativeBoxes = sortedBoxes.filter((box) => box.value <= 0);
-
-      let positiveOffset = 0;
-      let negativeOffset = 0;
-
-      return (
-        <div
-          className="relative"
-          style={{
-            width: isSelected ? zoomedBarWidth : initialBarWidth,
-            height: `${height}px`,
-            position: 'relative'
-          }}
-        >
-          {/* Render negative boxes stacking from the top */}
-          {negativeBoxes.map((box, idx) => {
-            const boxColor = 'bg-[#212121]'; // Negative color
-            const positionStyle: React.CSSProperties = {
-              position: 'absolute',
-              top: `${negativeOffset}px`,
-              width: '100%',
-              height: `${boxHeight}px`
-            };
-            negativeOffset += boxHeight;
-            return (
-              <div
-                key={`negative-${idx}`}
-                className={`${boxColor} border border-black`}
-                style={{
-                  ...positionStyle,
-                  margin: '0px'
-                }}
-              />
-            );
-          })}
-          {/* Render positive boxes stacking from the bottom */}
-          {positiveBoxes.map((box, idx) => {
-            const boxColor = 'bg-[#555]'; // Positive color
-            const positionStyle: React.CSSProperties = {
-              position: 'absolute',
-              bottom: `${positiveOffset}px`,
-              width: '100%',
-              height: `${boxHeight}px`
-            };
-            positiveOffset += boxHeight;
-            return (
-              <div
-                key={`positive-${idx}`}
-                className={`${boxColor} border border-black`}
-                style={{
-                  ...positionStyle,
-                  margin: '0px'
-                }}
-              />
-            );
-          })}
-        </div>
-      );
-    },
-    [height, visibleBoxesCount, zoomedBarWidth, initialBarWidth]
-  );
-
   const renderNestedBoxes = useCallback(
     (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element | null => {
       switch (viewType) {
         case 'scaled':
-          return renderScaledBoxes(boxArray, 0, null, isSelected);
+          return ScaledBoxes(
+            boxArray,
+            0,
+            null,
+            isSelected,
+            maxSize,
+            height,
+            zoomedBarWidth,
+            initialBarWidth,
+            handleFrameClick
+          );
         case 'even':
-          return renderEvenBoxes(boxArray, isSelected);
+          return SquareBoxes(
+            boxArray,
+            isSelected,
+            height,
+            visibleBoxesCount,
+            zoomedBarWidth,
+            initialBarWidth
+          );
         default:
           return null;
       }
     },
-    [viewType, renderScaledBoxes, renderEvenBoxes]
+    [
+      viewType,
+      maxSize,
+      height,
+      zoomedBarWidth,
+      initialBarWidth,
+      handleFrameClick
+    ]
   );
 
   const renderFrame = useCallback(
@@ -284,7 +195,7 @@ const HistogramBox: React.FC<{
       {data && data.length > 0 && (
         <div className="h-full">
           <div
-            className="flex h-full w-auto items-end overflow-x-auto" // Add padding-right here
+            className="flex h-full w-auto items-end overflow-x-auto"
             role="region"
             aria-label="Histogram Chart"
           >

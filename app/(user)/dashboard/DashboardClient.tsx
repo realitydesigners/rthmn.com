@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BoxSlice } from '@/types';
 import { oxanium } from '@/app/fonts';
-import HistogramLine from './HistogramLine';
+import HistogramLine from '../../../components/Histogram/HistogramLine';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
-import HistogramManager from './HistogramManager';
+import HistogramManager from '../../../components/Histogram/HistogramManager';
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
