@@ -1,18 +1,13 @@
 'use client';
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useMemo
-} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BoxSlice } from '@/types';
 import { oxanium } from '@/app/fonts';
 import HistogramLine from './HistogramLine';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
 import HistogramManager from './HistogramManager';
 
-const VISIBLE_BOXES_COUNT = 20;
+const MIN_HISTOGRAM_HEIGHT = 100;
+const MAX_HISTOGRAM_HEIGHT = 600;
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
@@ -22,6 +17,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
   const [data, setData] = useState<BoxSlice[]>(initialData);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [histogramHeight, setHistogramHeight] = useState(300); // Default height
   const lastTimestampRef = useRef<string | undefined>(
     initialData[initialData.length - 1]?.timestamp
   );
@@ -54,16 +50,32 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     }
   }, [isUpdating]);
 
+  const handleHistogramResize = useCallback((newHeight: number) => {
+    setHistogramHeight(
+      Math.min(Math.max(newHeight, MIN_HISTOGRAM_HEIGHT), MAX_HISTOGRAM_HEIGHT)
+    );
+  }, []);
+
   useEffect(() => {
-    const intervalId = setInterval(fetchUpdates, 5000);
+    const intervalId = setInterval(fetchUpdates, 1000);
     return () => clearInterval(intervalId);
   }, [fetchUpdates]);
 
   return (
     <div
-      className={`relative flex min-h-screen w-full flex-col bg-red-200 ${oxanium.className}`}
+      className={`relative h-screen w-full overflow-hidden ${oxanium.className}`}
     >
-      <HistogramManager data={data} />
+      <div
+        className="overflow-auto bg-black p-4"
+        style={{ height: `calc(100vh - ${histogramHeight}px)` }}
+      ></div>
+      <HistogramManager
+        data={data}
+        height={histogramHeight}
+        onResize={handleHistogramResize}
+        minHeight={MIN_HISTOGRAM_HEIGHT}
+        maxHeight={MAX_HISTOGRAM_HEIGHT}
+      />
     </div>
   );
 };

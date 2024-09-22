@@ -6,6 +6,7 @@ import React, {
   useCallback,
   useMemo
 } from 'react';
+import { DraggableCore } from 'react-draggable';
 import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
 
@@ -13,13 +14,15 @@ interface HistogramProps {
   data: BoxSlice[];
   boxOffset: number;
   viewType: 'scaled' | 'even';
+  height: number;
+  onResize: (newHeight: number) => void;
+  minHeight: number;
+  maxHeight: number;
 }
 
-const INITIAL_LOAD_COUNT = 1000;
 const VISIBLE_BOXES_COUNT = 15;
 const ZOOMED_BAR_WIDTH = 50;
 const INITIAL_BAR_WIDTH = 6;
-const CONTAINER_HEIGHT = 300;
 
 const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
   if (frame1.boxes.length !== frame2.boxes.length) return false;
@@ -32,14 +35,18 @@ const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
 const HistogramBox: React.FC<HistogramProps> = ({
   data,
   boxOffset,
-  viewType
+  viewType,
+  height,
+  onResize,
+  minHeight,
+  maxHeight
 }) => {
-  const [visibleFrames, setVisibleFrames] =
-    useState<number>(INITIAL_LOAD_COUNT);
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startY, setStartY] = useState(0);
+  const [startHeight, setStartHeight] = useState(height);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   let lastUniqueFrame: BoxSlice | null = null;
 
@@ -62,13 +69,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
     return sizes.reduce((max, size) => Math.max(max, size), 0);
   }, [deduplicatedData, boxOffset]);
 
-  const slicedData = useMemo(
-    () =>
-      deduplicatedData.slice(
-        Math.max(0, deduplicatedData.length - visibleFrames)
-      ),
-    [deduplicatedData, visibleFrames]
-  );
+  const slicedData = useMemo(() => deduplicatedData, [deduplicatedData]);
 
   const handleFrameClick = useCallback((slice: BoxSlice, index: number) => {
     setSelectedFrame((prev) => (prev === slice ? null : slice));
@@ -86,7 +87,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
 
       const box = boxArray[idx];
       const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
-      const size = (Math.abs(box.value) / maxSize) * 300;
+      const size = (Math.abs(box.value) / maxSize) * height;
 
       let positionStyle = 'absolute top-0 right-0';
 
@@ -118,12 +119,12 @@ const HistogramBox: React.FC<HistogramProps> = ({
         </div>
       );
     },
-    [maxSize]
+    [maxSize, height]
   );
 
   const renderEvenBoxes = useCallback(
     (boxArray: BoxSlice['boxes'], isSelected: boolean): JSX.Element => {
-      const boxHeight = CONTAINER_HEIGHT / VISIBLE_BOXES_COUNT;
+      const boxHeight = height / VISIBLE_BOXES_COUNT;
       const sortedBoxes = boxArray.slice(0, VISIBLE_BOXES_COUNT);
 
       const positiveBoxes = sortedBoxes.filter((box) => box.value > 0);
@@ -137,7 +138,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
           className="relative"
           style={{
             width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
-            height: `${CONTAINER_HEIGHT}px`,
+            height: `${height}px`,
             position: 'relative'
           }}
         >
@@ -186,7 +187,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
         </div>
       );
     },
-    [VISIBLE_BOXES_COUNT, CONTAINER_HEIGHT]
+    [height]
   );
 
   const renderNestedBoxes = useCallback(
@@ -217,7 +218,7 @@ const HistogramBox: React.FC<HistogramProps> = ({
           className="relative flex-shrink-0 cursor-pointer"
           style={{
             width: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
-            height: `${CONTAINER_HEIGHT}px`,
+            height: `${height}px`,
             position: 'relative'
           }}
           onClick={() => handleFrameClick(slice, index)}
@@ -248,13 +249,60 @@ const HistogramBox: React.FC<HistogramProps> = ({
     }
   }, [data, boxOffset]);
 
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true);
+      setStartY(e.clientY);
+      setStartHeight(height);
+    },
+    [height]
+  );
+
+  const handleMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (!isDragging) return;
+      const deltaY = startY - e.clientY;
+      const newHeight = Math.min(
+        Math.max(startHeight + deltaY, minHeight),
+        maxHeight
+      );
+      onResize(newHeight);
+    },
+    [isDragging, startY, startHeight, minHeight, maxHeight, onResize]
+  );
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  useEffect(() => {
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, handleMouseMove, handleMouseUp]);
+
   return (
-    <div className="relative h-[300px] w-full border border-[#181818] bg-black pr-4">
+    <div
+      className="relative w-full border border-[#181818] bg-black pr-4"
+      style={{ height: `${height}px`, transition: 'height 0.1s ease-out' }}
+      ref={containerRef}
+    >
+      <div
+        className="absolute left-0 right-0 top-0 z-10 h-4 cursor-ns-resize bg-gray-400"
+        onMouseDown={handleMouseDown}
+      />
       {selectedFrame && <SelectedFrameDetails selectedFrame={selectedFrame} />}
       {data && data.length > 0 && (
-        <div className="h-full">
+        <div className="mt-4 h-[calc(100%-1rem)]">
           <div
-            ref={containerRef}
             className="flex h-full w-auto items-end overflow-x-auto"
             role="region"
             aria-label="Histogram Chart"

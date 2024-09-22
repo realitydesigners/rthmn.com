@@ -7,9 +7,19 @@ import type { BoxSlice } from '@/types';
 
 interface HistogramManagerProps {
   data: BoxSlice[];
+  height: number;
+  onResize: (newHeight: number) => void;
+  minHeight: number;
+  maxHeight: number;
 }
 
-const HistogramManager: React.FC<HistogramManagerProps> = ({ data }) => {
+const HistogramManager: React.FC<HistogramManagerProps> = ({
+  data,
+  height,
+  onResize,
+  minHeight,
+  maxHeight
+}) => {
   const [boxOffset, setBoxOffset] = useState(0);
   const [viewType, setViewType] = useState<'scaled' | 'even'>('scaled');
 
@@ -22,8 +32,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({ data }) => {
   }, []);
 
   return (
-    <div className="absolute bottom-0 w-full bg-gray-200 bg-red-600 p-2">
-      <div className="absolute right-2 top-2 z-10 flex items-center space-x-2">
+    <div className="absolute bottom-0 left-0 right-0">
+      <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
         <HistogramControls
           boxOffset={boxOffset}
           onOffsetChange={handleOffsetChange}
@@ -34,9 +44,17 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({ data }) => {
           onChange={handleViewTypeChange}
         />
       </div>
-      <HistogramBox data={data} boxOffset={boxOffset} viewType={viewType} />
+      <HistogramBox
+        data={data}
+        boxOffset={boxOffset}
+        viewType={viewType}
+        height={height}
+        onResize={onResize}
+        minHeight={minHeight}
+        maxHeight={maxHeight}
+      />
     </div>
   );
 };
 
-export default HistogramManager;
+export default React.memo(HistogramManager);
