@@ -1,5 +1,3 @@
-// HistogramBox.jsx
-'use client';
 import React, {
   useEffect,
   useState,
@@ -10,8 +8,8 @@ import React, {
 
 import type { BoxSlice } from '@/types';
 import SelectedFrameDetails from './SelectedFrameDetails';
-import { ScaledBoxes } from './ScaledBoxes'; // Import the function
-import { SquareBoxes } from './SquareBoxes'; // Import the function
+import { ScaledBoxes } from './ScaledBoxes';
+import { SquareBoxes } from './SquareBoxes';
 import { LineBoxes } from './LineBoxes';
 
 const HistogramBox: React.FC<{
@@ -56,7 +54,7 @@ const HistogramBox: React.FC<{
   };
 
   const deduplicatedData = useMemo(() => {
-    lastUniqueFrame = null; // Reset lastUniqueFrame when data changes
+    lastUniqueFrame = null;
     return data.reduce((acc: BoxSlice[], current) => {
       if (!lastUniqueFrame || !areFramesEqual(current, lastUniqueFrame)) {
         acc.push(current);
@@ -82,7 +80,6 @@ const HistogramBox: React.FC<{
     setSelectedIndex((prev) => (prev === index ? null : index));
   }, []);
 
-  // Modify renderNestedBoxes to accept additional parameters
   const renderNestedBoxes = useCallback(
     (
       boxArray: BoxSlice['boxes'],
@@ -94,25 +91,29 @@ const HistogramBox: React.FC<{
     ): JSX.Element | null => {
       switch (viewType) {
         case 'scaled':
-          return ScaledBoxes(
-            boxArray,
-            0,
-            null,
-            isSelected,
-            maxSize,
-            height,
-            zoomedBarWidth,
-            initialBarWidth,
-            handleFrameClick
+          return (
+            <ScaledBoxes
+              boxArray={boxArray}
+              idx={0}
+              prevColor={null}
+              isSelected={isSelected}
+              maxSize={maxSize}
+              height={height}
+              zoomedBarWidth={zoomedBarWidth}
+              initialBarWidth={initialBarWidth}
+              handleFrameClick={handleFrameClick}
+            />
           );
         case 'even':
-          return SquareBoxes(
-            boxArray,
-            isSelected,
-            height,
-            visibleBoxesCount,
-            zoomedBarWidth,
-            initialBarWidth
+          return (
+            <SquareBoxes
+              boxArray={boxArray}
+              isSelected={isSelected}
+              height={height}
+              visibleBoxesCount={visibleBoxesCount}
+              zoomedBarWidth={zoomedBarWidth}
+              initialBarWidth={initialBarWidth}
+            />
           );
         case 'chart':
           return (
@@ -152,7 +153,6 @@ const HistogramBox: React.FC<{
       );
       const isSelected = index === selectedIndex;
 
-      // Calculate the middle point for this slice
       const boxHeight = height / visibleBoxesCount;
       const positiveBoxes = boxArray.filter((box) => box.value > 0);
       const negativeBoxes = boxArray.filter((box) => box.value <= 0);

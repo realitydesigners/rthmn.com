@@ -1,17 +1,27 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import type { BoxSlice } from '@/types';
 
-export const ScaledBoxes = (
-  boxArray: BoxSlice['boxes'],
-  idx: number,
-  prevColor: string | null,
-  isSelected: boolean,
-  maxSize: number,
-  height: number,
-  zoomedBarWidth: number,
-  initialBarWidth: number,
-  handleFrameClick: (slice: BoxSlice, index: number) => void
-): JSX.Element | null => {
+export const ScaledBoxes: React.FC<{
+  boxArray: BoxSlice['boxes'];
+  idx: number;
+  prevColor: string | null;
+  isSelected: boolean;
+  maxSize: number;
+  height: number;
+  zoomedBarWidth: number;
+  initialBarWidth: number;
+  handleFrameClick: (slice: BoxSlice, index: number) => void;
+}> = ({
+  boxArray,
+  idx,
+  prevColor,
+  isSelected,
+  maxSize,
+  height,
+  zoomedBarWidth,
+  initialBarWidth,
+  handleFrameClick
+}) => {
   if (idx >= boxArray.length) return null;
 
   const box = boxArray[idx];
@@ -42,17 +52,17 @@ export const ScaledBoxes = (
       }}
       key={idx}
     >
-      {ScaledBoxes(
-        boxArray,
-        idx + 1,
-        boxColor,
-        isSelected,
-        maxSize,
-        height,
-        zoomedBarWidth,
-        initialBarWidth,
-        handleFrameClick
-      )}
+      <ScaledBoxes
+        boxArray={boxArray}
+        idx={idx + 1}
+        prevColor={boxColor}
+        isSelected={isSelected}
+        maxSize={maxSize}
+        height={height}
+        zoomedBarWidth={zoomedBarWidth}
+        initialBarWidth={initialBarWidth}
+        handleFrameClick={handleFrameClick}
+      />
     </div>
   );
 };

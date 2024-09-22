@@ -1,14 +1,21 @@
 import React from 'react';
 import type { BoxSlice } from '@/types';
 
-export const SquareBoxes = (
-  boxArray: BoxSlice['boxes'],
-  isSelected: boolean,
-  height: number,
-  visibleBoxesCount: number,
-  zoomedBarWidth: number,
-  initialBarWidth: number
-): JSX.Element => {
+export const SquareBoxes: React.FC<{
+  boxArray: BoxSlice['boxes'];
+  isSelected: boolean;
+  height: number;
+  visibleBoxesCount: number;
+  zoomedBarWidth: number;
+  initialBarWidth: number;
+}> = ({
+  boxArray,
+  isSelected,
+  height,
+  visibleBoxesCount,
+  zoomedBarWidth,
+  initialBarWidth
+}) => {
   const boxHeight = height / visibleBoxesCount;
   const sortedBoxes = boxArray.slice(0, visibleBoxesCount);
 
@@ -18,11 +25,13 @@ export const SquareBoxes = (
   let positiveOffset = 0;
   let negativeOffset = 0;
 
+  const width = isSelected ? zoomedBarWidth : initialBarWidth;
+
   return (
     <div
       className="relative"
       style={{
-        width: isSelected ? zoomedBarWidth : initialBarWidth,
+        width: width,
         height: `${height}px`,
         position: 'relative'
       }}
