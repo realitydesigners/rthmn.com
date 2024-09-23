@@ -37,6 +37,9 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
 
   const width = sliceWidth;
   const sectionColor = useMemo(() => {
+    if (sortedBoxes.length === 0) {
+      return 'gray'; // Default color when there are no boxes
+    }
     const largestBox = sortedBoxes.reduce((max, box) =>
       Math.abs(box.value) > Math.abs(max.value) ? box : max
     );
@@ -59,12 +62,24 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop
               offset="0%"
-              stopColor={sectionColor === 'green' ? '#46FFF9' : '#FF4646'}
+              stopColor={
+                sectionColor === 'green'
+                  ? '#46FFF9'
+                  : sectionColor === 'red'
+                    ? '#FF4646'
+                    : '#808080'
+              }
               stopOpacity="0.6"
             />
             <stop
               offset="100%"
-              stopColor={sectionColor === 'green' ? '#46FFF9' : '#FF4646'}
+              stopColor={
+                sectionColor === 'green'
+                  ? '#46FFF9'
+                  : sectionColor === 'red'
+                    ? '#FF4646'
+                    : '#808080'
+              }
               stopOpacity="0.1"
             />
           </linearGradient>

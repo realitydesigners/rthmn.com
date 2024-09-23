@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import HistogramBox from './HistogramBox';
 import HistogramControls from './HistogramControls';
 import HistogramSwitcher from './HistogramSwitcher';
@@ -35,10 +35,31 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
     null
   );
+  console.log(boxOffset);
+  console.log(selectedFrame);
 
-  const handleOffsetChange = useCallback((newOffset: number) => {
-    setBoxOffset(newOffset);
-  }, []);
+  const currentFrame = useMemo(() => {
+    return selectedFrame || (data.length > 0 ? data[0] : null);
+  }, [selectedFrame, data]);
+
+  const visibleBoxes = useMemo(() => {
+    return currentFrame
+      ? currentFrame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
+      : [];
+  }, [currentFrame, boxOffset]);
+
+  const handleOffsetChange = useCallback(
+    (change: number) => {
+      setBoxOffset((prevOffset) => {
+        const newOffset = prevOffset + change;
+        const maxOffset =
+          (data[selectedFrameIndex ?? 0]?.boxes.length || 0) -
+          VISIBLE_BOXES_COUNT;
+        return Math.max(0, Math.min(newOffset, maxOffset));
+      });
+    },
+    [data, selectedFrameIndex]
+  );
 
   const handleViewChange = useCallback(
     (newViewType: 'scaled' | 'even' | 'chart') => {
@@ -83,18 +104,14 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  const visibleBoxes = selectedFrame
-    ? selectedFrame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
-    : [];
-
   return (
     <div className="absolute bottom-0 m-2 w-full">
       <div className="mb-2 flex justify-center">
         <BoxOffsetSelector
-          onOffsetChange={handleOffsetChange}
+          onOffsetChange={(newOffset) => setBoxOffset(newOffset)}
           currentOffset={boxOffset}
-          selectedFrame={selectedFrame}
-          data={data}
+          selectedFrame={currentFrame}
+          visibleBoxes={visibleBoxes}
         />
       </div>
       <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
