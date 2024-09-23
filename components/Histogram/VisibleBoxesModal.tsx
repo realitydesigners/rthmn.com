@@ -1,8 +1,8 @@
 import React from 'react';
-import type { Box } from '@/types';
+import type { BoxSlice } from '@/types';
 
 interface VisibleBoxesModalProps {
-  visibleBoxes: Box[];
+  visibleBoxes: BoxSlice;
   onClose: () => void;
 }
 
@@ -14,8 +14,11 @@ const VisibleBoxesModal: React.FC<VisibleBoxesModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
       <div className="max-h-[80vh] w-[80vw] overflow-auto rounded-lg bg-gray-800 p-6 shadow-xl">
         <h2 className="mb-4 text-2xl font-bold text-white">Visible Boxes</h2>
+        <p className="mb-4 text-lg text-gray-300">
+          Timestamp: {visibleBoxes.timestamp}
+        </p>
         <div className="grid grid-cols-4 gap-4">
-          {visibleBoxes.map((box, index) => (
+          {visibleBoxes.boxes.map((box, index) => (
             <div
               key={index}
               className="rounded border border-gray-600 bg-gray-700 p-3 shadow"

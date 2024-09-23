@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 
 import type { BoxSlice } from '@/types';
-import SelectedFrameDetails from './SelectedFrameDetails';
 import { ScaledBoxes } from './ScaledBoxes';
 import { SquareBoxes } from './SquareBoxes';
 import { LineBoxes } from './LineBoxes';
@@ -24,6 +23,7 @@ const HistogramBox: React.FC<{
   visibleBoxesCount: number;
   zoomedBarWidth: number;
   initialBarWidth: number;
+  onFrameSelect: (frame: BoxSlice, index: number) => void;
 }> = ({
   data,
   boxOffset,
@@ -35,7 +35,8 @@ const HistogramBox: React.FC<{
   setStartHeight,
   visibleBoxesCount,
   zoomedBarWidth,
-  initialBarWidth
+  initialBarWidth,
+  onFrameSelect
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
@@ -75,10 +76,14 @@ const HistogramBox: React.FC<{
 
   const slicedData = useMemo(() => deduplicatedData, [deduplicatedData]);
 
-  const handleFrameClick = useCallback((slice: BoxSlice, index: number) => {
-    setSelectedFrame((prev) => (prev === slice ? null : slice));
-    setSelectedIndex((prev) => (prev === index ? null : index));
-  }, []);
+  const handleFrameClick = useCallback(
+    (slice: BoxSlice, index: number) => {
+      setSelectedFrame((prev) => (prev === slice ? null : slice));
+      setSelectedIndex((prev) => (prev === index ? null : index));
+      onFrameSelect(slice, index);
+    },
+    [onFrameSelect]
+  );
 
   const renderNestedBoxes = useCallback(
     (
@@ -225,7 +230,7 @@ const HistogramBox: React.FC<{
           setStartHeight(height);
         }}
       />
-      {selectedFrame && <SelectedFrameDetails selectedFrame={selectedFrame} />}
+
       {data && data.length > 0 && (
         <div className="h-full" style={{ position: 'relative' }}>
           <div

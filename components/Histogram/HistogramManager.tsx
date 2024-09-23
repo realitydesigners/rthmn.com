@@ -3,10 +3,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import HistogramBox from './HistogramBox';
 import HistogramControls from './HistogramControls';
 import HistogramSwitcher from './HistogramSwitcher';
-import VisibleBoxesModal from './VisibleBoxesModal';
+import BoxOffsetSelector from './BoxOffsetSelector';
+import SelectedFrameDetails from './SelectedFrameDetails';
 import type { BoxSlice } from '@/types';
 
-const VISIBLE_BOXES_COUNT = 10;
+const VISIBLE_BOXES_COUNT = 16;
 const MIN_HISTOGRAM_HEIGHT = 100;
 const MAX_HISTOGRAM_HEIGHT = 400;
 const ZOOMED_BAR_WIDTH = 16;
@@ -23,14 +24,17 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   height,
   onResize
 }) => {
-  const [boxOffset, setBoxOffset] = useState(20);
+  const [boxOffset, setBoxOffset] = useState(0);
   const [viewType, setViewType] = useState<'scaled' | 'even' | 'chart'>(
     'chart'
   );
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(height);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
+  const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
+    null
+  );
 
   const handleOffsetChange = useCallback((change: number) => {
     setBoxOffset((prevOffset) => Math.max(0, prevOffset + change));
@@ -60,8 +64,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     setIsDragging(false);
   }, [setIsDragging]);
 
-  const handleOpenVisibleBoxesModal = useCallback(() => {
-    setIsModalOpen(true);
+  const handleFrameSelect = useCallback((frame: BoxSlice, index: number) => {
+    setSelectedFrame((prev) => (prev === frame ? null : frame));
+    setSelectedFrameIndex((prev) => (prev === index ? null : index));
   }, []);
 
   useEffect(() => {
@@ -78,18 +83,25 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  const visibleBoxes =
-    data[0]?.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT) || [];
+  const visibleBoxes = selectedFrame
+    ? selectedFrame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
+    : [];
 
   return (
-    <div className="absolute bottom-0 w-full">
+    <div className="absolute bottom-0 m-2 w-full">
+      <div className="mb-2 flex justify-center">
+        <BoxOffsetSelector
+          onOffsetChange={setBoxOffset}
+          currentOffset={boxOffset}
+          data={data[selectedFrameIndex ?? 0]?.boxes || []}
+        />
+      </div>
       <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
         <HistogramControls
           boxOffset={boxOffset}
           onOffsetChange={handleOffsetChange}
-          totalBoxes={data[0]?.boxes.length || 0}
+          totalBoxes={data[selectedFrameIndex ?? 0]?.boxes.length || 0}
           visibleBoxesCount={VISIBLE_BOXES_COUNT}
-          onOpenVisibleBoxesModal={handleOpenVisibleBoxesModal}
         />
         <HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
       </div>
@@ -105,11 +117,16 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         visibleBoxesCount={VISIBLE_BOXES_COUNT}
         zoomedBarWidth={ZOOMED_BAR_WIDTH}
         initialBarWidth={INITIAL_BAR_WIDTH}
+        onFrameSelect={handleFrameSelect}
       />
-      {isModalOpen && (
-        <VisibleBoxesModal
+      {selectedFrame && (
+        <SelectedFrameDetails
+          selectedFrame={selectedFrame}
           visibleBoxes={visibleBoxes}
-          onClose={() => setIsModalOpen(false)}
+          onClose={() => {
+            setSelectedFrame(null);
+            setSelectedFrameIndex(null);
+          }}
         />
       )}
     </div>
