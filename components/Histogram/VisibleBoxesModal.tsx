@@ -25,8 +25,6 @@ const VisibleBoxesModal: React.FC<VisibleBoxesModalProps> = ({
             >
               <p className="font-semibold text-white">Box {index + 1}</p>
               <p className="text-gray-300">Value: {box.value}</p>
-              <p className="text-gray-300">High: {box.high.toFixed(5)}</p>
-              <p className="text-gray-300">Low: {box.low.toFixed(5)}</p>
             </div>
           ))}
         </div>

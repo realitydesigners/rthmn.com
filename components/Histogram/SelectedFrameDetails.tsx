@@ -39,8 +39,6 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
                 </div>
                 <div className="text-xs text-gray-500">
                   <p>Value: {Math.abs(box.value)}</p>
-                  <p>High: {box.high.toFixed(5)}</p>
-                  <p>Low: {box.low.toFixed(5)}</p>
                 </div>
               </div>
             ))}
@@ -56,8 +54,6 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
               >
                 <p className="font-semibold">Box {index + 1}</p>
                 <p className="text-gray-400">Value: {box.value}</p>
-                <p className="text-gray-400">High: {box.high.toFixed(5)}</p>
-                <p className="text-gray-400">Low: {box.low.toFixed(5)}</p>
               </div>
             ))}
           </div>

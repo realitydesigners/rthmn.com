@@ -17,17 +17,15 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
   const lastTimestampRef = useRef<string | undefined>(
     initialData[initialData.length - 1]?.timestamp
   );
+  console.log(data, 'data');
 
-  // Function to compare two frames
+  // Update the areFramesEqual function
   const areFramesEqual = useCallback(
     (frame1: BoxSlice, frame2: BoxSlice): boolean => {
       if (frame1.boxes.length !== frame2.boxes.length) return false;
 
       for (let i = 0; i < frame1.boxes.length; i++) {
-        const box1 = frame1.boxes[i];
-        const box2 = frame2.boxes[i];
-
-        if (box1.value !== box2.value) {
+        if (frame1.boxes[i].value !== frame2.boxes[i].value) {
           return false;
         }
       }
@@ -71,18 +69,9 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
 
       if (newData.length > 0) {
         setData((prevData) => {
-          const updatedData = [...prevData];
-
-          for (const newFrame of newData) {
-            const lastFrame = updatedData[updatedData.length - 1];
-            if (lastFrame && areFramesEqual(lastFrame, newFrame)) {
-              // The new frame is identical to the last frame, skip adding it
-              continue;
-            }
-            updatedData.push(newFrame);
-          }
-
-          const finalData = updatedData.slice(-250); // Keep this slice to maintain max 500 items
+          const updatedData = [...prevData, ...newData];
+          const deduplicatedData = deduplicateData(updatedData);
+          const finalData = deduplicatedData.slice(-250);
           console.log(
             'Updated data after deduplication:',
             finalData.length,
@@ -100,7 +89,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     } finally {
       setIsUpdating(false);
     }
-  }, [isUpdating, areFramesEqual]);
+  }, [isUpdating, deduplicateData]);
 
   const handleHistogramResize = useCallback((newHeight: number) => {
     setHistogramHeight(newHeight);

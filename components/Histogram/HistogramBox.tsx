@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 
 import type { BoxSlice } from '@/types';
+
 import { ScaledBoxes } from './ScaledBoxes';
 import { SquareBoxes } from './SquareBoxes';
 import { LineBoxes } from './LineBoxes';

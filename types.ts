@@ -29,10 +29,7 @@ export type CandleData = {
 };
 
 export interface Box {
-  high: number;
-  low: number;
   value: number;
-  size: number;
 }
 
 export interface BoxSlice {
