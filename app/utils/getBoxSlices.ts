@@ -2,7 +2,10 @@ import { BoxSlice } from '@/types';
 
 interface ApiResponse {
   status: string;
-  data: BoxSlice[];
+  data: Array<{
+    timestamp: string;
+    boxes: number[];
+  }>;
 }
 
 export async function getBoxSlices(
@@ -11,7 +14,7 @@ export async function getBoxSlices(
   limit?: number
 ): Promise<BoxSlice[]> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8080';
-  let url = `${baseUrl}/boxslices/${pair}`;
+  let url = `${baseUrl}/processed-boxslices/${pair}`;
 
   const params = new URLSearchParams();
   if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
@@ -36,12 +39,13 @@ export async function getBoxSlices(
       return [];
     }
 
-    // If lastTimestamp is provided, return only the latest item
-    if (lastTimestamp) {
-      return apiResponse.data.slice(-1);
-    }
+    // Transform the data to match the BoxSlice type
+    const transformedData: BoxSlice[] = apiResponse.data.map((item) => ({
+      timestamp: item.timestamp,
+      boxes: item.boxes.map((value) => ({ value }))
+    }));
 
-    return apiResponse.data;
+    return transformedData;
   } catch (error) {
     console.error('Fetch error:', error);
     return [];

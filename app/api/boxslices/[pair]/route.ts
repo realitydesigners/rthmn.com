@@ -8,7 +8,7 @@ export async function GET(
   const { pair } = params;
   const lastTimestamp = request.nextUrl.searchParams.get('lastTimestamp');
 
-  const url = `${baseUrl}/boxslices/${pair}${lastTimestamp ? `?lastTimestamp=${lastTimestamp}` : ''}`;
+  const url = `${baseUrl}/processed-boxslices/${pair}${lastTimestamp ? `?lastTimestamp=${lastTimestamp}` : ''}`;
   console.log(`Fetching from: ${url}`);
 
   try {

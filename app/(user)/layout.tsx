@@ -1,5 +1,4 @@
 import { SignalProvider } from '@/contexts/SignalProvider';
-import { SignalSidebar } from '@/components/SignalSidebar';
 
 export default function UserLayout({
   children
@@ -8,10 +7,7 @@ export default function UserLayout({
 }) {
   return (
     <SignalProvider>
-      <div className="flex">
-        <SignalSidebar />
-        {children}
-      </div>
+      <div className="h-screen w-full">{children}</div>
     </SignalProvider>
   );
 }

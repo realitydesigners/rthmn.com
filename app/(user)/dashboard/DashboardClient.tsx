@@ -1,30 +1,62 @@
 'use client';
-import React, {
-  useState,
-  useEffect,
-  useCallback,
-  useRef,
-  useMemo
-} from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { BoxSlice } from '@/types';
 import { oxanium } from '@/app/fonts';
-import HistogramLine from './HistogramLine';
+import HistogramManager from '../../../components/Histogram/HistogramManager';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
-import HistogramManager from './HistogramManager';
-
-const VISIBLE_BOXES_COUNT = 20;
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
 }
 
 const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
-  const [data, setData] = useState<BoxSlice[]>(initialData);
+  const [data, setData] = useState<BoxSlice[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
+  const [histogramHeight, setHistogramHeight] = useState(200); // Default height
   const lastTimestampRef = useRef<string | undefined>(
     initialData[initialData.length - 1]?.timestamp
   );
+  console.log(data, 'data');
+
+  // Update the areFramesEqual function
+  const areFramesEqual = useCallback(
+    (frame1: BoxSlice, frame2: BoxSlice): boolean => {
+      if (frame1.boxes.length !== frame2.boxes.length) return false;
+
+      for (let i = 0; i < frame1.boxes.length; i++) {
+        if (frame1.boxes[i].value !== frame2.boxes[i].value) {
+          return false;
+        }
+      }
+      return true;
+    },
+    []
+  );
+
+  // Deduplicate initialData by comparing each frame to the previous one
+  const deduplicateData = useCallback(
+    (data: BoxSlice[]): BoxSlice[] => {
+      if (data.length === 0) return data;
+      const deduplicatedData = [data[0]];
+
+      for (let i = 1; i < data.length; i++) {
+        const prevFrame = deduplicatedData[deduplicatedData.length - 1];
+        const currentFrame = data[i];
+        if (!areFramesEqual(prevFrame, currentFrame)) {
+          deduplicatedData.push(currentFrame);
+        }
+      }
+      return deduplicatedData;
+    },
+    [areFramesEqual]
+  );
+
+  // Initialize data with deduplicated initialData
+  useEffect(() => {
+    const deduplicatedInitialData = deduplicateData(initialData);
+    setData(deduplicatedInitialData);
+  }, [initialData, deduplicateData]);
 
   const fetchUpdates = useCallback(async () => {
     if (isUpdating) return;
@@ -38,8 +70,13 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
       if (newData.length > 0) {
         setData((prevData) => {
           const updatedData = [...prevData, ...newData];
-          const finalData = updatedData.slice(-1000); // Keep this slice to maintain max 1000 items
-          console.log('Updated data:', finalData.length, 'items');
+          const deduplicatedData = deduplicateData(updatedData);
+          const finalData = deduplicatedData.slice(-250);
+          console.log(
+            'Updated data after deduplication:',
+            finalData.length,
+            'items'
+          );
           return finalData;
         });
         lastTimestampRef.current = newData[newData.length - 1].timestamp;
@@ -52,34 +89,31 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     } finally {
       setIsUpdating(false);
     }
-  }, [isUpdating]);
+  }, [isUpdating, deduplicateData]);
+
+  const handleHistogramResize = useCallback((newHeight: number) => {
+    setHistogramHeight(newHeight);
+  }, []);
 
   useEffect(() => {
     const intervalId = setInterval(fetchUpdates, 5000);
     return () => clearInterval(intervalId);
   }, [fetchUpdates]);
 
-  const formatTimestamp = useCallback((timestamp: string | null) => {
-    if (!timestamp) return 'N/A';
-    return new Date(timestamp).toLocaleString('en-US', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-      timeZone: 'UTC'
-    });
-  }, []);
-
   return (
     <div
-      className={`flex w-full flex-col sm:px-6 lg:px-8 ${oxanium.className}`}
+      className={`relative h-screen w-full overflow-hidden ${oxanium.className}`}
     >
-      {/* <HistogramLine data={data} /> */}
+      <div
+        className="overflow-auto bg-black p-4"
+        style={{ height: `calc(100vh - ${histogramHeight}px)` }}
+      ></div>
 
-      <HistogramManager data={data} />
+      <HistogramManager
+        data={data}
+        height={histogramHeight}
+        onResize={handleHistogramResize}
+      />
     </div>
   );
 };
