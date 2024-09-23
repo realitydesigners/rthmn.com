@@ -36,8 +36,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     null
   );
 
-  const handleOffsetChange = useCallback((change: number) => {
-    setBoxOffset((prevOffset) => Math.max(0, prevOffset + change));
+  const handleOffsetChange = useCallback((newOffset: number) => {
+    setBoxOffset(newOffset);
   }, []);
 
   const handleViewChange = useCallback(
@@ -91,9 +91,10 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     <div className="absolute bottom-0 m-2 w-full">
       <div className="mb-2 flex justify-center">
         <BoxOffsetSelector
-          onOffsetChange={setBoxOffset}
+          onOffsetChange={handleOffsetChange}
           currentOffset={boxOffset}
-          data={data[selectedFrameIndex ?? 0]?.boxes || []}
+          selectedFrame={selectedFrame}
+          data={data}
         />
       </div>
       <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">

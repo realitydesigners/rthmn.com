@@ -59,13 +59,13 @@ export const LineBoxes: React.FC<LineBoxesProps> = ({
           <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
             <stop
               offset="0%"
-              stopColor={sectionColor === 'green' ? '#0F766E' : '#B91C1C'}
-              stopOpacity="0.7"
+              stopColor={sectionColor === 'green' ? '#46FFF9' : '#FF4646'}
+              stopOpacity="0.6"
             />
             <stop
               offset="100%"
-              stopColor={sectionColor === 'green' ? '#0F766E' : '#B91C1C'}
-              stopOpacity="0.01"
+              stopColor={sectionColor === 'green' ? '#46FFF9' : '#FF4646'}
+              stopOpacity="0.1"
             />
           </linearGradient>
         </defs>
