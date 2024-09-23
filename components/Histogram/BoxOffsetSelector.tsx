@@ -37,7 +37,6 @@ const BoxOffsetSelector: React.FC<BoxOffsetSelectorProps> = ({
 
   const getTrendForOffset = (offset: number): 'up' | 'down' => {
     if (!selectedFrame || selectedFrame.boxes.length === 0) {
-      console.log(`No frame or empty boxes for offset ${offset}`);
       return 'down';
     }
 
@@ -48,7 +47,7 @@ const BoxOffsetSelector: React.FC<BoxOffsetSelectorProps> = ({
     const largestBox = boxesForOffset.reduce((max, box) =>
       Math.abs(box.value) > Math.abs(max.value) ? box : max
     );
-    console.log(`Largest box for offset ${offset}:`, largestBox);
+
     return largestBox.value > 0 ? 'up' : 'down';
   };
 
