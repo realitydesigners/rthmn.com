@@ -44,6 +44,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     null
   );
   const containerRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const currentFrame = useMemo(() => {
     return selectedFrame || (data.length > 0 ? data[0] : null);
@@ -249,6 +250,14 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     );
   };
 
+  // Auto-scroll to the right when new data is received
+  useEffect(() => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollLeft =
+        scrollContainerRef.current.scrollWidth;
+    }
+  }, [data]);
+
   return (
     <div className="absolute bottom-0 m-2 w-full">
       <div className="mb-2 flex justify-center">
@@ -287,6 +296,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
               className="flex h-full w-auto items-end overflow-x-auto"
               role="region"
               aria-label="Histogram Chart"
+              ref={scrollContainerRef} // Add ref to the scroll container
             >
               {framesWithPoints.map((frameWithPoint, index) => {
                 const { frameData, meetingPointY, sliceWidth } = frameWithPoint;
