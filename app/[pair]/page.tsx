@@ -1,10 +1,17 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import DashboardClient from './DashboardClient';
+import DashboardClient from '../(user)/dashboard/DashboardClient';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
 
-export default async function Dashboard() {
+interface PageProps {
+  params: {
+    pair: string;
+  };
+}
+
+export default async function PairPage({ params }: PageProps) {
+  const { pair } = params;
   const cookieStore = cookies();
 
   const supabase = createServerClient(
@@ -27,13 +34,13 @@ export default async function Dashboard() {
     redirect('/signin');
   }
 
-  // Fetch only the last 250 items
-  const initialData = await getBoxSlices('USD_JPY', undefined, 250);
+  // Fetch only the last 250 items for the given pair
+  const initialData = await getBoxSlices(pair, undefined, 250);
   console.log('Initial data length:', initialData.length);
 
   return (
     <div className="w-full">
-      <DashboardClient initialData={initialData} pair={''} />
+      <DashboardClient initialData={initialData} pair={pair} />
     </div>
   );
 }

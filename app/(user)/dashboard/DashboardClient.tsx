@@ -7,9 +7,13 @@ import { getBoxSlices } from '@/app/utils/getBoxSlices';
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
+  pair: string;
 }
 
-const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
+const DashboardClient: React.FC<DashboardClientProps> = ({
+  initialData,
+  pair
+}) => {
   const [data, setData] = useState<BoxSlice[]>([]);
   const [isUpdating, setIsUpdating] = useState(false);
   const [lastUpdateTime, setLastUpdateTime] = useState<Date | null>(null);
@@ -54,7 +58,11 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
 
   // Initialize data with deduplicated initialData
   useEffect(() => {
-    console.log('Initial data received:', initialData.length, 'items');
+    console.log(
+      'Initial data received in DashboardClient:',
+      initialData.length,
+      'items'
+    );
     const deduplicatedInitialData = deduplicateData(initialData);
     console.log(
       'Deduplicated initial data:',
@@ -64,6 +72,11 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     setData(deduplicatedInitialData);
   }, [initialData, deduplicateData]);
 
+  // Log whenever data state changes
+  useEffect(() => {
+    console.log('Data state updated:', data.length, 'items');
+  }, [data]);
+
   const fetchUpdates = useCallback(async () => {
     if (isUpdating) return;
 
@@ -71,7 +84,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     try {
       console.log('Fetching updates since:', lastTimestampRef.current);
       const newData = await getBoxSlices(
-        'USD_JPY',
+        pair, // Use the pair prop here
         lastTimestampRef.current,
         250
       );
@@ -99,7 +112,7 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     } finally {
       setIsUpdating(false);
     }
-  }, [isUpdating, deduplicateData]);
+  }, [isUpdating, deduplicateData, pair]); // Add pair to the dependency array
 
   const handleHistogramResize = useCallback((newHeight: number) => {
     setHistogramHeight(newHeight);
@@ -117,7 +130,11 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
       <div
         className="overflow-auto bg-black p-4"
         style={{ height: `calc(100vh - ${histogramHeight}px)` }}
-      ></div>
+      >
+        <p>Current pair: {pair}</p>
+        {/* You can add a debug display here if needed */}
+        <p>Current data length: {data.length}</p>
+      </div>
 
       <HistogramManager
         data={data}

@@ -8,6 +8,10 @@ interface ApiResponse {
   }>;
 }
 
+function formatTimestamp(timestamp: string): string {
+  return new Date(timestamp).toISOString();
+}
+
 export async function getBoxSlices(
   pair: string,
   lastTimestamp?: string,
@@ -17,7 +21,8 @@ export async function getBoxSlices(
   let url = `${baseUrl}/processed-boxslices/${pair}`;
 
   const params = new URLSearchParams();
-  if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
+  if (lastTimestamp)
+    params.append('lastTimestamp', formatTimestamp(lastTimestamp));
   if (count) params.append('count', count.toString());
 
   if (params.toString()) url += `?${params.toString()}`;
