@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 import { type PropsWithChildren, Suspense } from 'react';
 import Script from 'next/script';
 import 'styles/main.css';
+import AppProviders from './AppProviders';
 
 const title = 'Next.js Subscription Starter';
 const description = 'Brought to you by Vercel, Stripe, and Supabase.';
@@ -26,17 +27,19 @@ export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <body className="bg-black">
-        <DynamicNavbar />
-        <main
-          id="skip"
-          className="md:min-h[calc(100dvh-5rem)] min-h-[calc(100dvh-4rem)]"
-        >
-          {children}
-        </main>
-        <Suspense>
-          <Toaster />
-        </Suspense>
-        {clarityTrackingCode && (
+        <AppProviders>
+          <DynamicNavbar />
+          <main
+            id="skip"
+            className="md:min-h[calc(100dvh-5rem)] min-h-[calc(100dvh-4rem)]"
+          >
+            {children}
+          </main>
+          <Suspense>
+            <Toaster />
+          </Suspense>
+        </AppProviders>
+        {/* {clarityTrackingCode && (
           <Script id="microsoft-clarity" strategy="afterInteractive">
             {`
               (function(c,l,a,r,i,t,y){
@@ -63,7 +66,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
               `}
             </Script>
           </>
-        )}
+        )} */}
       </body>
     </html>
   );

@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import DashboardClient from '../(user)/dashboard/DashboardClient';
+import PairClient from './PairClient';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
 
 interface PageProps {
@@ -40,7 +40,7 @@ export default async function PairPage({ params }: PageProps) {
 
   return (
     <div className="w-full">
-      <DashboardClient initialData={initialData} pair={pair} />
+      <PairClient initialData={initialData} pair={pair} />
     </div>
   );
 }

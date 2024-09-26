@@ -114,36 +114,12 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
-  // New code from HistogramBox
-  const areFramesEqual = (frame1: BoxSlice, frame2: BoxSlice) => {
-    if (frame1.boxes.length !== frame2.boxes.length) return false;
-    return frame1.boxes.every((box1, index) => {
-      const box2 = frame2.boxes[index];
-      return box1.value === box2.value;
-    });
-  };
-
-  const deduplicatedData = useMemo(() => {
-    let lastUniqueFrame: BoxSlice | null = null;
-    return data.reduce((acc: BoxSlice[], current) => {
-      if (!lastUniqueFrame || !areFramesEqual(current, lastUniqueFrame)) {
-        acc.push(current);
-        lastUniqueFrame = current;
-      }
-      return acc;
-    }, []);
-  }, [data]);
-
   const maxSize = useMemo(() => {
-    const sizes = deduplicatedData.flatMap((slice) =>
-      slice.boxes
-        .slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
-        .map((box) => Math.abs(box.value))
+    const sizes = data.flatMap((slice) =>
+      slice.boxes.map((box) => Math.abs(box.value))
     );
     return sizes.reduce((max, size) => Math.max(max, size), 0);
-  }, [deduplicatedData, boxOffset]);
-
-  const slicedData = useMemo(() => deduplicatedData, [deduplicatedData]);
+  }, [data]);
 
   const renderNestedBoxes = useCallback(
     (
@@ -154,11 +130,15 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
       nextMeetingPointY: number | null,
       sliceWidth: number
     ): JSX.Element | null => {
+      const visibleBoxArray = boxArray.slice(
+        boxOffset,
+        boxOffset + VISIBLE_BOXES_COUNT
+      );
       switch (viewType) {
         case 'scaled':
           return (
             <ScaledBoxes
-              boxArray={boxArray}
+              boxArray={visibleBoxArray}
               idx={0}
               prevColor={null}
               isSelected={isSelected}
@@ -172,7 +152,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         case 'even':
           return (
             <SquareBoxes
-              boxArray={boxArray}
+              boxArray={visibleBoxArray}
               isSelected={isSelected}
               height={height}
               visibleBoxesCount={VISIBLE_BOXES_COUNT}
@@ -183,7 +163,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         case 'chart':
           return (
             <LineBoxes
-              boxArray={boxArray}
+              boxArray={visibleBoxArray}
               isSelected={isSelected}
               height={height}
               visibleBoxesCount={VISIBLE_BOXES_COUNT}
@@ -199,20 +179,21 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
           return null;
       }
     },
-    [viewType, maxSize, height, handleFrameSelect]
+    [viewType, maxSize, height, handleFrameSelect, boxOffset]
   );
 
   const framesWithPoints = useMemo(() => {
-    return slicedData.map((slice, index) => {
-      const boxArray = slice.boxes.slice(
-        boxOffset,
-        boxOffset + VISIBLE_BOXES_COUNT
-      );
+    return data.map((slice, index) => {
+      const boxArray = slice.boxes;
       const isSelected = index === selectedFrameIndex;
 
       const boxHeight = height / VISIBLE_BOXES_COUNT;
-      const positiveBoxes = boxArray.filter((box) => box.value > 0);
-      const negativeBoxes = boxArray.filter((box) => box.value <= 0);
+      const visibleBoxes = boxArray.slice(
+        boxOffset,
+        boxOffset + VISIBLE_BOXES_COUNT
+      );
+      const positiveBoxes = visibleBoxes.filter((box) => box.value > 0);
+      const negativeBoxes = visibleBoxes.filter((box) => box.value <= 0);
 
       const totalNegativeHeight = negativeBoxes.length * boxHeight;
       const totalPositiveHeight = positiveBoxes.length * boxHeight;
@@ -233,7 +214,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         sliceWidth
       };
     });
-  }, [slicedData, selectedFrameIndex, boxOffset, height]);
+  }, [data, selectedFrameIndex, height, boxOffset]);
 
   const DraggableBorder = ({
     onMouseDown
@@ -301,45 +282,64 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         {data && data.length > 0 && (
           <div className="h-full" style={{ position: 'relative' }}>
             <div
-              className="flex h-full w-auto items-end overflow-x-auto"
+              className="flex h-full w-full items-end overflow-x-auto"
               role="region"
               aria-label="Histogram Chart"
-              ref={scrollContainerRef} // Add ref to the scroll container
+              ref={scrollContainerRef}
+              style={{
+                width: '100%',
+                overflowX: 'auto',
+                overflowY: 'hidden'
+              }}
             >
-              {framesWithPoints.map((frameWithPoint, index) => {
-                const { frameData, meetingPointY, sliceWidth } = frameWithPoint;
-                const prevMeetingPointY =
-                  index > 0 ? framesWithPoints[index - 1].meetingPointY : null;
-                const nextMeetingPointY =
-                  index < framesWithPoints.length - 1
-                    ? framesWithPoints[index + 1].meetingPointY
-                    : null;
+              <div
+                style={{
+                  display: 'inline-flex',
+                  width: `${data.length * INITIAL_BAR_WIDTH}px`,
+                  height: '100%'
+                }}
+              >
+                {framesWithPoints.map((frameWithPoint, index) => {
+                  const { frameData, meetingPointY, sliceWidth } =
+                    frameWithPoint;
+                  const prevMeetingPointY =
+                    index > 0
+                      ? framesWithPoints[index - 1].meetingPointY
+                      : null;
+                  const nextMeetingPointY =
+                    index < framesWithPoints.length - 1
+                      ? framesWithPoints[index + 1].meetingPointY
+                      : null;
 
-                return (
-                  <div
-                    key={`${index}`}
-                    className="relative flex-shrink-0 cursor-pointer"
-                    style={{
-                      width: frameData.sliceWidth,
-                      height: `${height}px`,
-                      position: 'relative'
-                    }}
-                    onClick={() => handleFrameSelect(slicedData[index], index)}
-                  >
-                    {renderNestedBoxes(
-                      frameData.boxArray,
-                      frameData.isSelected,
-                      meetingPointY,
-                      prevMeetingPointY,
-                      nextMeetingPointY,
-                      frameData.sliceWidth
-                    )}
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={`${index}`}
+                      className="relative flex-shrink-0 cursor-pointer"
+                      style={{
+                        width: sliceWidth,
+                        height: `${height}px`,
+                        position: 'relative'
+                      }}
+                      onClick={() => handleFrameSelect(data[index], index)}
+                    >
+                      {renderNestedBoxes(
+                        frameData.boxArray,
+                        frameData.isSelected,
+                        meetingPointY,
+                        prevMeetingPointY,
+                        nextMeetingPointY,
+                        sliceWidth
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
         )}
+      </div>
+      <div className="absolute left-2 top-2 z-20 text-white">
+        Displaying {data.length} frames (Offset: {boxOffset})
       </div>
       {selectedFrame && (
         <SelectedFrameDetails
