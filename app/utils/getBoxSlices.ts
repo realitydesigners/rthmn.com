@@ -11,14 +11,14 @@ interface ApiResponse {
 export async function getBoxSlices(
   pair: string,
   lastTimestamp?: string,
-  limit?: number
+  count?: number
 ): Promise<BoxSlice[]> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8080';
   let url = `${baseUrl}/processed-boxslices/${pair}`;
 
   const params = new URLSearchParams();
   if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
-  if (limit) params.append('limit', limit.toString());
+  if (count) params.append('count', count.toString());
 
   if (params.toString()) url += `?${params.toString()}`;
 
@@ -45,6 +45,7 @@ export async function getBoxSlices(
       boxes: item.boxes.map((value) => ({ value }))
     }));
 
+    console.log(`Returning ${transformedData.length} items from getBoxSlices`);
     return transformedData;
   } catch (error) {
     console.error('Fetch error:', error);

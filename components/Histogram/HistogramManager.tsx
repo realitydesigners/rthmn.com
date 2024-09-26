@@ -10,6 +10,7 @@ import HistogramControls from './HistogramControls';
 import HistogramSwitcher from './HistogramSwitcher';
 import BoxOffsetSelector from './BoxOffsetSelector';
 import SelectedFrameDetails from './SelectedFrameDetails';
+import OffsetModal from './OffsetModal';
 import { ScaledBoxes } from './ScaledBoxes';
 import { SquareBoxes } from './SquareBoxes';
 import { LineBoxes } from './LineBoxes';
@@ -43,6 +44,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
     null
   );
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
@@ -276,6 +278,12 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
           visibleBoxesCount={VISIBLE_BOXES_COUNT}
         />
         <HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
+        >
+          Show Offset Info
+        </button>
       </div>
       <div
         className="relative w-full border border-[#181818] bg-black pr-60"
@@ -341,6 +349,13 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
             setSelectedFrame(null);
             setSelectedFrameIndex(null);
           }}
+        />
+      )}
+      {isModalOpen && (
+        <OffsetModal
+          offset={boxOffset}
+          visibleBoxes={visibleBoxes}
+          onClose={() => setIsModalOpen(false)}
         />
       )}
     </div>

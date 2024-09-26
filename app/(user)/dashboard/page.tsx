@@ -27,12 +27,13 @@ export default async function Dashboard() {
     redirect('/signin');
   }
 
-  const initialData = await getBoxSlices('USD_JPY');
-  const slicedInitialData = initialData.slice(-250);
+  // Fetch only the last 250 items
+  const initialData = await getBoxSlices('USD_JPY', undefined, 250);
+  console.log('Initial data length:', initialData.length);
 
   return (
     <div className="w-full">
-      <DashboardClient initialData={slicedInitialData} />
+      <DashboardClient initialData={initialData} />
     </div>
   );
 }

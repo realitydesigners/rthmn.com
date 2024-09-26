@@ -54,7 +54,13 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
 
   // Initialize data with deduplicated initialData
   useEffect(() => {
+    console.log('Initial data received:', initialData.length, 'items');
     const deduplicatedInitialData = deduplicateData(initialData);
+    console.log(
+      'Deduplicated initial data:',
+      deduplicatedInitialData.length,
+      'items'
+    );
     setData(deduplicatedInitialData);
   }, [initialData, deduplicateData]);
 
@@ -64,7 +70,11 @@ const DashboardClient: React.FC<DashboardClientProps> = ({ initialData }) => {
     setIsUpdating(true);
     try {
       console.log('Fetching updates since:', lastTimestampRef.current);
-      const newData = await getBoxSlices('USD_JPY', lastTimestampRef.current);
+      const newData = await getBoxSlices(
+        'USD_JPY',
+        lastTimestampRef.current,
+        250
+      );
       console.log('New data fetched:', newData.length, 'items');
 
       if (newData.length > 0) {
