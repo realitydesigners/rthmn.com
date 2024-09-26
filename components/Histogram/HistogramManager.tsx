@@ -15,9 +15,10 @@ import { ScaledBoxes } from './ScaledBoxes';
 import { SquareBoxes } from './SquareBoxes';
 import { LineBoxes } from './LineBoxes';
 import { Oscillator } from './charts/Oscillator';
+import DataDotSelector from './DataDotSelector';
 import type { BoxSlice } from '@/types';
 
-const VISIBLE_BOXES_COUNT = 16;
+const VISIBLE_BOXES_COUNT = 8;
 const MIN_HISTOGRAM_HEIGHT = 100;
 const MAX_HISTOGRAM_HEIGHT = 400;
 const ZOOMED_BAR_WIDTH = 16;
@@ -256,12 +257,18 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 
   return (
     <div className="absolute bottom-0 m-2 w-full">
-      <div className="mb-2 flex justify-center">
+      <div className="mb-2 flex flex-col items-center space-y-2">
         <BoxOffsetSelector
           onOffsetChange={(newOffset) => setBoxOffset(newOffset)}
           currentOffset={boxOffset}
           selectedFrame={currentFrame}
           visibleBoxes={visibleBoxes}
+        />
+        <DataDotSelector
+          currentFrame={currentFrame}
+          onOffsetChange={(newOffset) => setBoxOffset(newOffset)}
+          currentOffset={boxOffset}
+          visibleBoxesCount={VISIBLE_BOXES_COUNT}
         />
       </div>
       <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
