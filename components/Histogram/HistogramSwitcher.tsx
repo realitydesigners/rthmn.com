@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { SVGProps } from 'react';
 
 interface HistogramSwitcherProps {
-  viewType: 'scaled' | 'even' | 'chart';
-  onChange: (viewType: 'scaled' | 'even' | 'chart') => void;
+  viewType: 'scaled' | 'even' | 'chart' | 'oscillator';
+  onChange: (viewType: 'scaled' | 'even' | 'chart' | 'oscillator') => void;
 }
 
 const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
@@ -33,7 +33,9 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
     setIsOpen(!isOpen);
   };
 
-  const handleOptionClick = (newViewType: 'scaled' | 'even' | 'chart') => {
+  const handleOptionClick = (
+    newViewType: 'scaled' | 'even' | 'chart' | 'oscillator'
+  ) => {
     onChange(newViewType);
     setIsOpen(false);
   };
@@ -45,6 +47,8 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
       case 'even':
         return <EvenIcon className="h-6 w-6" />;
       case 'chart':
+        return <ChartIcon className="h-6 w-6" />;
+      case 'oscillator':
         return <ChartIcon className="h-6 w-6" />;
     }
   };
@@ -60,11 +64,13 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
       </button>
       {isOpen && (
         <div className="absolute right-0 mt-2 w-32 shadow-lg">
-          {['scaled', 'even', 'chart'].map((type) => (
+          {['scaled', 'even', 'chart', 'oscillator'].map((type) => (
             <button
               key={type}
               onClick={() =>
-                handleOptionClick(type as 'scaled' | 'even' | 'chart')
+                handleOptionClick(
+                  type as 'scaled' | 'even' | 'chart' | 'oscillator'
+                )
               }
               className={`flex w-full items-center px-4 py-2 text-left text-sm ${
                 viewType === type
@@ -75,6 +81,7 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
               {type === 'scaled' && <ScaledIcon className="mr-2 h-5 w-5" />}
               {type === 'even' && <EvenIcon className="mr-2 h-5 w-5" />}
               {type === 'chart' && <ChartIcon className="mr-2 h-5 w-5" />}
+              {type === 'oscillator' && <ChartIcon className="mr-2 h-5 w-5" />}
               {type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}

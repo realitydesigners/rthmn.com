@@ -14,6 +14,7 @@ import OffsetModal from './OffsetModal';
 import { ScaledBoxes } from './ScaledBoxes';
 import { SquareBoxes } from './SquareBoxes';
 import { LineBoxes } from './LineBoxes';
+import { Oscillator } from './charts/Oscillator';
 import type { BoxSlice } from '@/types';
 
 const VISIBLE_BOXES_COUNT = 16;
@@ -34,9 +35,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   onResize
 }) => {
   const [boxOffset, setBoxOffset] = useState(0);
-  const [viewType, setViewType] = useState<'scaled' | 'even' | 'chart'>(
-    'chart'
-  );
+  const [viewType, setViewType] = useState<
+    'scaled' | 'even' | 'chart' | 'oscillator'
+  >('oscillator');
   const [isDragging, setIsDragging] = useState(false);
   const [startY, setStartY] = useState(0);
   const [startHeight, setStartHeight] = useState(height);
@@ -72,7 +73,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   );
 
   const handleViewChange = useCallback(
-    (newViewType: 'scaled' | 'even' | 'chart') => {
+    (newViewType: 'scaled' | 'even' | 'chart' | 'oscillator') => {
       setViewType(newViewType);
     },
     []
@@ -163,6 +164,21 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         case 'chart':
           return (
             <LineBoxes
+              boxArray={visibleBoxArray}
+              isSelected={isSelected}
+              height={height}
+              visibleBoxesCount={VISIBLE_BOXES_COUNT}
+              zoomedBarWidth={ZOOMED_BAR_WIDTH}
+              initialBarWidth={INITIAL_BAR_WIDTH}
+              meetingPointY={meetingPointY}
+              prevMeetingPointY={prevMeetingPointY}
+              nextMeetingPointY={nextMeetingPointY}
+              sliceWidth={sliceWidth}
+            />
+          );
+        case 'oscillator':
+          return (
+            <Oscillator
               boxArray={visibleBoxArray}
               isSelected={isSelected}
               height={height}
