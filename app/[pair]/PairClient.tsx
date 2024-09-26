@@ -2,7 +2,6 @@
 import React, { useState, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { BoxSlice } from '@/types';
-import { oxanium } from '@/app/fonts';
 import HistogramManager from '../../components/Histogram/HistogramManager';
 import { getBoxSlices } from '@/app/utils/getBoxSlices';
 
@@ -32,21 +31,9 @@ const PairClient: React.FC<DashboardClientProps> = ({ initialData, pair }) => {
   }, []);
 
   if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {(error as Error).message}</div>;
 
   return (
-    <div
-      className={`relative h-screen w-full overflow-hidden ${oxanium.className}`}
-    >
-      <div
-        className="overflow-auto bg-black p-4"
-        style={{ height: `calc(100vh - ${histogramHeight}px)` }}
-      >
-        <p>Current pair: {pair}</p>
-        <p>Current data length: {data.length}</p>
-        <button onClick={() => refetch()}>Refresh Data</button>
-      </div>
-
+    <div>
       <HistogramManager
         data={data}
         height={histogramHeight}

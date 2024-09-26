@@ -1,49 +1,73 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
 import { BoxSlice } from '@/types';
 
 interface DataDotSelectorProps {
   currentFrame: BoxSlice | null;
-  onOffsetChange: (offset: number) => void;
+  onRangeChange: (start: number, end: number) => void;
   currentOffset: number;
   visibleBoxesCount: number;
 }
 
 const DataDotSelector: React.FC<DataDotSelectorProps> = ({
   currentFrame,
-  onOffsetChange,
-  currentOffset,
-  visibleBoxesCount
+  onRangeChange
 }) => {
+  const [rangeStart, setRangeStart] = useState<number | null>(null);
+  const [rangeEnd, setRangeEnd] = useState<number | null>(null);
+
   const dots = useMemo(() => {
     if (!currentFrame) return [];
 
     return currentFrame.boxes.map((box, index) => ({
       value: box.value,
       isPositive: box.value > 0,
-      isSelected:
-        index >= currentOffset && index < currentOffset + visibleBoxesCount
+      isInRange:
+        rangeStart !== null &&
+        rangeEnd !== null &&
+        index >= Math.min(rangeStart, rangeEnd) &&
+        index <= Math.max(rangeStart, rangeEnd)
     }));
-  }, [currentFrame, currentOffset, visibleBoxesCount]);
+  }, [currentFrame, rangeStart, rangeEnd]);
+
+  const handleDotClick = useCallback(
+    (index: number) => {
+      if (rangeStart === null) {
+        setRangeStart(index);
+        setRangeEnd(null);
+      } else if (rangeEnd === null) {
+        setRangeEnd(index);
+        onRangeChange(Math.min(rangeStart, index), Math.max(rangeStart, index));
+      } else {
+        setRangeStart(index);
+        setRangeEnd(null);
+      }
+    },
+    [rangeStart, rangeEnd, onRangeChange]
+  );
 
   return (
-    <div className="flex items-center justify-center space-x-1 bg-black p-2">
+    <div className="space-x- flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-gray-900 to-gray-900/75 p-3 shadow-lg">
       {dots.map((dot, index) => (
         <button
           key={index}
-          className={`h-3 w-3 rounded-full transition-all duration-200 ${
-            dot.isPositive ? 'bg-green-500' : 'bg-red-500'
+          className={`l h-2 w-2 transition-all duration-200 ${
+            dot.isPositive
+              ? 'h-2 w-2 rounded-full bg-gradient-to-r from-teal-400 to-green-500'
+              : 'h-2 w-2 rounded-full bg-gradient-to-r from-red-500 to-pink-500'
           } ${
-            dot.isSelected
-              ? 'ring-2 ring-blue-500 ring-offset-1 ring-offset-black'
+            dot.isInRange
+              ? 'h-2 w-2 rounded-full ring-1 ring-blue-400/50 ring-offset-2 ring-offset-gray-800'
               : ''
           } ${
-            index >= currentOffset && index < currentOffset + visibleBoxesCount
-              ? 'opacity-100'
-              : 'opacity-50'
-          } hover:opacity-100`}
-          onClick={() => onOffsetChange(index)}
+            index === rangeStart || index === rangeEnd
+              ? 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-800'
+              : ''
+          } transform hover:scale-110 hover:opacity-100`}
+          onClick={() => handleDotClick(index)}
           title={`Offset: ${index}, Value: ${dot.value}`}
-        />
+        >
+          <span className="sr-only">Select dot {index}</span>
+        </button>
       ))}
     </div>
   );

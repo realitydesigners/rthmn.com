@@ -18,11 +18,11 @@ import { Oscillator } from './charts/Oscillator';
 import DataDotSelector from './DataDotSelector';
 import type { BoxSlice } from '@/types';
 
-const VISIBLE_BOXES_COUNT = 8;
 const MIN_HISTOGRAM_HEIGHT = 100;
 const MAX_HISTOGRAM_HEIGHT = 400;
 const ZOOMED_BAR_WIDTH = 16;
 const INITIAL_BAR_WIDTH = 16;
+const DEFAULT_VISIBLE_BOXES_COUNT = 8;
 
 interface HistogramManagerProps {
   data: BoxSlice[];
@@ -49,6 +49,13 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [visibleBoxesCount, setVisibleBoxesCount] = useState(
+    DEFAULT_VISIBLE_BOXES_COUNT
+  );
+  const [customRangeStart, setCustomRangeStart] = useState(0);
+  const [customRangeEnd, setCustomRangeEnd] = useState(
+    DEFAULT_VISIBLE_BOXES_COUNT - 1
+  );
 
   const currentFrame = useMemo(() => {
     return selectedFrame || (data.length > 0 ? data[0] : null);
@@ -56,9 +63,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 
   const visibleBoxes = useMemo(() => {
     return currentFrame
-      ? currentFrame.boxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT)
+      ? currentFrame.boxes.slice(customRangeStart, customRangeEnd + 1)
       : [];
-  }, [currentFrame, boxOffset]);
+  }, [currentFrame, customRangeStart, customRangeEnd]);
 
   const handleOffsetChange = useCallback(
     (change: number) => {
@@ -66,11 +73,11 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         const newOffset = prevOffset + change;
         const maxOffset =
           (data[selectedFrameIndex ?? 0]?.boxes.length || 0) -
-          VISIBLE_BOXES_COUNT;
+          visibleBoxesCount;
         return Math.max(0, Math.min(newOffset, maxOffset));
       });
     },
-    [data, selectedFrameIndex]
+    [data, selectedFrameIndex, visibleBoxesCount]
   );
 
   const handleViewChange = useCallback(
@@ -100,6 +107,13 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   const handleFrameSelect = useCallback((frame: BoxSlice, index: number) => {
     setSelectedFrame((prev) => (prev === frame ? null : frame));
     setSelectedFrameIndex((prev) => (prev === index ? null : index));
+  }, []);
+
+  const handleRangeChange = useCallback((start: number, end: number) => {
+    setCustomRangeStart(start);
+    setCustomRangeEnd(end);
+    setBoxOffset(start);
+    setVisibleBoxesCount(end - start + 1);
   }, []);
 
   useEffect(() => {
@@ -134,7 +148,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     ): JSX.Element | null => {
       const visibleBoxArray = boxArray.slice(
         boxOffset,
-        boxOffset + VISIBLE_BOXES_COUNT
+        boxOffset + visibleBoxesCount
       );
       switch (viewType) {
         case 'scaled':
@@ -157,7 +171,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
               boxArray={visibleBoxArray}
               isSelected={isSelected}
               height={height}
-              visibleBoxesCount={VISIBLE_BOXES_COUNT}
+              visibleBoxesCount={visibleBoxesCount}
               zoomedBarWidth={ZOOMED_BAR_WIDTH}
               initialBarWidth={INITIAL_BAR_WIDTH}
             />
@@ -168,7 +182,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
               boxArray={visibleBoxArray}
               isSelected={isSelected}
               height={height}
-              visibleBoxesCount={VISIBLE_BOXES_COUNT}
+              visibleBoxesCount={visibleBoxesCount}
               zoomedBarWidth={ZOOMED_BAR_WIDTH}
               initialBarWidth={INITIAL_BAR_WIDTH}
               meetingPointY={meetingPointY}
@@ -182,7 +196,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
             <Oscillator
               boxArray={visibleBoxArray}
               height={height}
-              visibleBoxesCount={VISIBLE_BOXES_COUNT}
+              visibleBoxesCount={visibleBoxesCount}
               meetingPointY={meetingPointY}
               prevMeetingPointY={prevMeetingPointY}
               nextMeetingPointY={nextMeetingPointY}
@@ -193,7 +207,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
           return null;
       }
     },
-    [viewType, maxSize, height, handleFrameSelect, boxOffset]
+    [viewType, maxSize, height, handleFrameSelect, boxOffset, visibleBoxesCount]
   );
 
   const framesWithPoints = useMemo(() => {
@@ -201,10 +215,10 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
       const boxArray = slice.boxes;
       const isSelected = index === selectedFrameIndex;
 
-      const boxHeight = height / VISIBLE_BOXES_COUNT;
+      const boxHeight = height / visibleBoxesCount;
       const visibleBoxes = boxArray.slice(
         boxOffset,
-        boxOffset + VISIBLE_BOXES_COUNT
+        boxOffset + visibleBoxesCount
       );
       const positiveBoxes = visibleBoxes.filter((box) => box.value > 0);
       const negativeBoxes = visibleBoxes.filter((box) => box.value <= 0);
@@ -228,7 +242,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         sliceWidth
       };
     });
-  }, [data, selectedFrameIndex, height, boxOffset]);
+  }, [data, selectedFrameIndex, height, boxOffset, visibleBoxesCount]);
 
   const DraggableBorder = ({
     onMouseDown
@@ -256,8 +270,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   }, [data]);
 
   return (
-    <div className="absolute bottom-0 m-2 w-full">
-      <div className="mb-2 flex flex-col items-center space-y-2">
+    <div className="absolute bottom-0 m-2 flex w-full items-center justify-center">
+      <div className="absolute top-2 z-20 -mt-16 flex items-center justify-center space-x-2">
         <BoxOffsetSelector
           onOffsetChange={(newOffset) => setBoxOffset(newOffset)}
           currentOffset={boxOffset}
@@ -266,25 +280,23 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         />
         <DataDotSelector
           currentFrame={currentFrame}
-          onOffsetChange={(newOffset) => setBoxOffset(newOffset)}
+          onRangeChange={handleRangeChange}
           currentOffset={boxOffset}
-          visibleBoxesCount={VISIBLE_BOXES_COUNT}
+          visibleBoxesCount={visibleBoxesCount}
         />
-      </div>
-      <div className="absolute right-2 top-2 z-20 flex items-center space-x-2">
         <HistogramControls
           boxOffset={boxOffset}
           onOffsetChange={handleOffsetChange}
           totalBoxes={data[selectedFrameIndex ?? 0]?.boxes.length || 0}
-          visibleBoxesCount={VISIBLE_BOXES_COUNT}
+          visibleBoxesCount={visibleBoxesCount}
         />
         <HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
-        <button
+        {/* <button
           onClick={() => setIsModalOpen(true)}
           className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
         >
           Show Offset Info
-        </button>
+        </button> */}
       </div>
       <div
         className="relative w-full border border-[#181818] bg-black pr-60"
@@ -358,9 +370,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
           </div>
         )}
       </div>
-      <div className="absolute left-2 top-2 z-20 text-white">
+      {/* <div className="absolute left-2 top-2 z-20 text-white">
         Displaying {data.length} frames (Offset: {boxOffset})
-      </div>
+      </div> */}
       {selectedFrame && (
         <SelectedFrameDetails
           selectedFrame={selectedFrame}
