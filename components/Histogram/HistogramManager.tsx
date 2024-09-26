@@ -180,11 +180,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
           return (
             <Oscillator
               boxArray={visibleBoxArray}
-              isSelected={isSelected}
               height={height}
               visibleBoxesCount={VISIBLE_BOXES_COUNT}
-              zoomedBarWidth={ZOOMED_BAR_WIDTH}
-              initialBarWidth={INITIAL_BAR_WIDTH}
               meetingPointY={meetingPointY}
               prevMeetingPointY={prevMeetingPointY}
               nextMeetingPointY={nextMeetingPointY}
