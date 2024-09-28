@@ -211,6 +211,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
   );
 
   const framesWithPoints = useMemo(() => {
+    // Use the original order of data (most recent at the end)
     return data.map((slice, index) => {
       const boxArray = slice.boxes;
       const isSelected = index === selectedFrameIndex;
@@ -314,34 +315,29 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         {data && data.length > 0 && (
           <div className="h-full" style={{ position: 'relative' }}>
             <div
-              className="flex h-full w-full items-end overflow-x-auto"
+              className="hide-scrollbar flex h-full w-full items-end overflow-x-auto"
               role="region"
               aria-label="Histogram Chart"
               ref={scrollContainerRef}
-              style={{
-                width: '100%',
-                overflowX: 'auto',
-                overflowY: 'hidden'
-              }}
             >
               <div
                 style={{
                   display: 'inline-flex',
                   width: `${data.length * INITIAL_BAR_WIDTH}px`,
                   height: '100%',
-                  flexDirection: 'row-reverse' // This will reverse the order of the children
+                  flexDirection: 'row'
                 }}
               >
                 {framesWithPoints.map((frameWithPoint, index) => {
                   const { frameData, meetingPointY, sliceWidth } =
                     frameWithPoint;
                   const prevMeetingPointY =
-                    index < framesWithPoints.length - 1
-                      ? framesWithPoints[index + 1].meetingPointY
-                      : null;
-                  const nextMeetingPointY =
                     index > 0
                       ? framesWithPoints[index - 1].meetingPointY
+                      : null;
+                  const nextMeetingPointY =
+                    index < framesWithPoints.length - 1
+                      ? framesWithPoints[index + 1].meetingPointY
                       : null;
 
                   return (

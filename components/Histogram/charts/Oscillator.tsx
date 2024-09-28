@@ -1,7 +1,6 @@
 import React, { useMemo, useRef, useEffect } from 'react';
-import type { BoxSlice } from '@/types';
+import type { Box } from '@/types';
 
-// Color variables for easy customization
 const COLORS = {
   GREEN: {
     DARK: '#023E8A', // Deep blue-green
@@ -24,7 +23,7 @@ const COLORS = {
 };
 
 interface OscillatorProps {
-  boxArray: BoxSlice['boxes'];
+  boxArray: Box[];
   height: number;
   visibleBoxesCount: number;
   meetingPointY: number;
@@ -76,27 +75,35 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 
     ctx.clearRect(0, 0, width, height);
 
-    const drawBox = (y: number, isPositive: boolean) => {
+    const drawBox = (box: Box, y: number, isPositive: boolean) => {
       ctx.beginPath();
       ctx.rect(0, y, width, boxHeight);
-      ctx.strokeStyle = colors.LIGHT; // Use LIGHT color for borders
+      ctx.strokeStyle = colors.LIGHT;
       ctx.stroke();
 
+      // Draw high-low range
+      const rangeHeight =
+        ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
+      const rangeY = isPositive ? y + boxHeight - rangeHeight : y;
+      ctx.fillStyle = colors.LIGHT;
+      ctx.fillRect(width * 0.25, rangeY, width * 0.5, rangeHeight);
+
+      // Draw center point
       const centerX = width / 2;
       const centerY = y + boxHeight / 2;
       ctx.beginPath();
-      ctx.arc(centerX, centerY, 0.5, 0, 2 * Math.PI); // Reduced dot size to 0.5
-      ctx.fillStyle = colors.DOT; // Use darker DOT color for center points
+      ctx.arc(centerX, centerY, 0.5, 0, 2 * Math.PI);
+      ctx.fillStyle = colors.DOT;
       ctx.fill();
     };
 
-    negativeBoxes.forEach((_, idx) => {
-      drawBox(negativeOffset, false);
+    negativeBoxes.forEach((box) => {
+      drawBox(box, negativeOffset, false);
       negativeOffset += boxHeight;
     });
 
-    positiveBoxes.forEach((_, idx) => {
-      drawBox(height - positiveOffset - boxHeight, true);
+    positiveBoxes.forEach((box) => {
+      drawBox(box, height - positiveOffset - boxHeight, true);
       positiveOffset += boxHeight;
     });
   }, [

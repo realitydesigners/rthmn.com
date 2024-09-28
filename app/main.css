@@ -24,13 +24,29 @@ body {
     'Helvetica', sans-serif;
   text-rendering: optimizeLegibility;
   -moz-osx-font-smoothing: grayscale;
-  @apply text-white bg-black antialiased;
+  @apply bg-black text-white antialiased;
 }
 
 body {
   position: relative;
   min-height: 100%;
   margin: 0;
+}
+
+body.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 a {
@@ -161,12 +177,4 @@ p a {
     transparent 45deg 315deg,
     #000 315deg 360deg
   );
-}
-
-/* Add this at the end of the file */
-body.no-scroll {
-  overflow: hidden;
-  position: fixed;
-  width: 100%;
-  height: 100%;
 }
