@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { BoxSlice, PairData } from "@/types";
@@ -8,6 +8,7 @@ import { getBoxSlices } from "@/app/utils/getBoxSlices";
 import PairsSidebar from "@/components/PairsSidebar";
 import { getTrendForOffset } from "@/app/utils/getTrendForOffset";
 import { compareSlices } from "@/app/utils/compareSlices";
+import debounce from "lodash/debounce";
 
 interface DashboardClientProps {
 	initialData: BoxSlice[];
@@ -28,61 +29,62 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		return offsetParam ? parseInt(offsetParam, 10) : 0;
 	});
 	const [sidebarWidth, setSidebarWidth] = useState(300);
-	const [filteredData, setFilteredData] = useState<BoxSlice[]>(initialData);
 	const [visibleBoxesCount, setVisibleBoxesCount] = useState(10);
 
 	const fetchData = useCallback(async () => {
-		const newData = await getBoxSlices(pair, undefined, 250);
-		return newData;
+		return getBoxSlices(pair, undefined, 250);
 	}, [pair]);
 
-	const { data, isLoading, error, refetch } = useQuery<BoxSlice[]>({
+	const { data, isLoading, error } = useQuery<BoxSlice[]>({
 		queryKey: ["boxSlices", pair],
 		queryFn: fetchData,
 		initialData: initialData,
 		refetchInterval: 5000,
 	});
 
+	const filteredData = useMemo(() => {
+		if (!data) return [];
+		return data.reduce((acc: BoxSlice[], currentSlice, index) => {
+			if (
+				index === 0 ||
+				!compareSlices(
+					currentSlice,
+					acc[acc.length - 1],
+					boxOffset,
+					visibleBoxesCount,
+				)
+			) {
+				acc.push(currentSlice);
+			}
+			return acc;
+		}, []);
+	}, [data, boxOffset, visibleBoxesCount]);
+
 	const handleHistogramResize = useCallback((newHeight: number) => {
 		setHistogramHeight(newHeight);
 	}, []);
 
+	const debouncedUpdateURL = useMemo(
+		() =>
+			debounce((newOffset: number) => {
+				const params = new URLSearchParams(searchParams.toString());
+				params.set("offset", newOffset.toString());
+				router.push(`?${params.toString()}`, { scroll: false });
+			}, 300),
+		[searchParams, router],
+	);
+
 	const handleOffsetChange = useCallback(
 		(newOffset: number) => {
 			setBoxOffset(newOffset);
-			const params = new URLSearchParams(searchParams.toString());
-			params.set("offset", newOffset.toString());
-			router.push(`?${params.toString()}`, { scroll: false });
+			debouncedUpdateURL(newOffset);
 		},
-		[searchParams, router],
+		[debouncedUpdateURL],
 	);
 
 	const handleVisibleBoxesCountChange = useCallback((newCount: number) => {
 		setVisibleBoxesCount(newCount);
 	}, []);
-
-	useEffect(() => {
-		if (data) {
-			const newFilteredData = data.reduce(
-				(acc: BoxSlice[], currentSlice, index) => {
-					if (
-						index === 0 ||
-						!compareSlices(
-							currentSlice,
-							acc[acc.length - 1],
-							boxOffset,
-							visibleBoxesCount,
-						)
-					) {
-						acc.push(currentSlice);
-					}
-					return acc;
-				},
-				[],
-			);
-			setFilteredData(newFilteredData);
-		}
-	}, [data, boxOffset, visibleBoxesCount]);
 
 	useEffect(() => {
 		const offsetParam = searchParams.get("offset");
