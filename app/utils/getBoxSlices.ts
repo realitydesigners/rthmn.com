@@ -4,21 +4,30 @@ interface ApiResponse {
   status: string;
   data: Array<{
     timestamp: string;
-    boxes: number[];
+    boxes: Array<{
+      high: number;
+      low: number;
+      value: number;
+    }>;
   }>;
+}
+
+function formatTimestamp(timestamp: string): string {
+  return new Date(timestamp).toISOString();
 }
 
 export async function getBoxSlices(
   pair: string,
   lastTimestamp?: string,
-  limit?: number
+  count?: number
 ): Promise<BoxSlice[]> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8080';
-  let url = `${baseUrl}/processed-boxslices/${pair}`;
+  let url = `${baseUrl}/boxslices/${pair}`;
 
   const params = new URLSearchParams();
-  if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
-  if (limit) params.append('limit', limit.toString());
+  if (lastTimestamp)
+    params.append('lastTimestamp', formatTimestamp(lastTimestamp));
+  if (count) params.append('count', count.toString());
 
   if (params.toString()) url += `?${params.toString()}`;
 
@@ -42,9 +51,14 @@ export async function getBoxSlices(
     // Transform the data to match the BoxSlice type
     const transformedData: BoxSlice[] = apiResponse.data.map((item) => ({
       timestamp: item.timestamp,
-      boxes: item.boxes.map((value) => ({ value }))
+      boxes: item.boxes.map((box) => ({
+        high: box.high,
+        low: box.low,
+        value: box.value
+      }))
     }));
 
+    console.log(`Returning ${transformedData.length} items from getBoxSlices`);
     return transformedData;
   } catch (error) {
     console.error('Fetch error:', error);
