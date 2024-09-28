@@ -50,11 +50,6 @@ export const Oscillator: React.FC<OscillatorProps> = ({
         top: '#8B0000', // Dark red
         bottom: '#FF4646' // Light red
       };
-    } else {
-      return {
-        top: '#A0A0A0', // Light gray
-        bottom: '#404040' // Dark gray
-      };
     }
   }, [sectionColor]);
 

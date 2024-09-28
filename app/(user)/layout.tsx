@@ -1,13 +1,13 @@
-import { SignalProvider } from '@/contexts/SignalProvider';
+import { SignalProvider } from "@/contexts/SignalProvider";
 
 export default function UserLayout({
-  children
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return (
-    <SignalProvider>
-      <div className="h-screen w-full">{children}</div>
-    </SignalProvider>
-  );
+	return (
+		<SignalProvider>
+			<div className="h-screen w-full">{children}</div>
+		</SignalProvider>
+	);
 }
