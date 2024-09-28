@@ -1,5 +1,27 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef, useEffect } from 'react';
 import type { BoxSlice } from '@/types';
+
+// Color variables for easy customization
+const COLORS = {
+  GREEN: {
+    DARK: '#023E8A', // Deep blue-green
+    LIGHT: '#0077B6', // Brighter blue-green
+    LINE: '#90E0EF', // Light cyan for the line
+    DOT: '#015C92' // Darker cyan for the dot
+  },
+  RED: {
+    DARK: '#7D0633', // Deep burgundy
+    LIGHT: '#B80D57', // Brighter burgundy
+    LINE: '#FF7096', // Light pink for the line
+    DOT: '#C41E3A' // Darker red for the dot
+  },
+  GRAY: {
+    DARK: '#2B2D42', // Dark slate
+    LIGHT: '#8D99AE', // Cool gray
+    LINE: '#EDF2F4', // Very light gray-blue for the line
+    DOT: '#4A4E69' // Darker gray for the dot
+  }
+};
 
 interface OscillatorProps {
   boxArray: BoxSlice['boxes'];
@@ -31,7 +53,7 @@ export const Oscillator: React.FC<OscillatorProps> = ({
   const width = sliceWidth;
   const sectionColor = useMemo(() => {
     if (sortedBoxes.length === 0) {
-      return 'gray'; // Default color when there are no boxes
+      return 'gray';
     }
     const largestBox = sortedBoxes.reduce((max, box) =>
       Math.abs(box.value) > Math.abs(max.value) ? box : max
@@ -39,109 +61,80 @@ export const Oscillator: React.FC<OscillatorProps> = ({
     return largestBox.value > 0 ? 'green' : 'red';
   }, [sortedBoxes]);
 
-  const gradientColors = useMemo(() => {
-    if (sectionColor === 'green') {
-      return {
-        top: '#46FFF9', // Light green
-        bottom: '#008000' // Dark green
-      };
-    } else if (sectionColor === 'red') {
-      return {
-        top: '#8B0000', // Dark red
-        bottom: '#FF4646' // Light red
-      };
-    }
+  const colors = useMemo(() => {
+    return COLORS[sectionColor.toUpperCase() as keyof typeof COLORS];
   }, [sectionColor]);
 
-  const borderColor = useMemo(() => {
-    return sectionColor === 'green'
-      ? '#008000'
-      : sectionColor === 'red'
-        ? '#8B0000'
-        : '#404040';
-  }, [sectionColor]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const gradientId = `gradient-${sectionColor}`;
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-  const renderBox = (
-    box: BoxSlice['boxes'][number],
-    idx: number,
-    isPositive: boolean
-  ) => {
-    const positionStyle: React.CSSProperties = {
-      position: 'absolute',
-      [isPositive ? 'bottom' : 'top']:
-        `${isPositive ? positiveOffset : negativeOffset}px`,
-      width: '100%',
-      height: `${boxHeight}px`,
-      borderColor: borderColor,
-      borderWidth: '1px',
-      borderStyle: 'solid'
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, width, height);
+
+    const drawBox = (y: number, isPositive: boolean) => {
+      ctx.beginPath();
+      ctx.rect(0, y, width, boxHeight);
+      ctx.strokeStyle = colors.LIGHT; // Use LIGHT color for borders
+      ctx.stroke();
+
+      const centerX = width / 2;
+      const centerY = y + boxHeight / 2;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, 0.5, 0, 2 * Math.PI); // Reduced dot size to 0.5
+      ctx.fillStyle = colors.DOT; // Use darker DOT color for center points
+      ctx.fill();
     };
 
-    if (isPositive) {
-      positiveOffset += boxHeight;
-    } else {
+    negativeBoxes.forEach((_, idx) => {
+      drawBox(negativeOffset, false);
       negativeOffset += boxHeight;
-    }
+    });
 
-    return (
-      <div
-        key={`${isPositive ? 'positive' : 'negative'}-${idx}`}
-        style={positionStyle}
-      >
-        <div
-          className="absolute left-1/2 -translate-x-1/2 transform"
-          style={{
-            top: '50%',
-            width: '1px',
-            height: '1px',
-            borderRadius: '50%',
-            backgroundColor: borderColor,
-            position: 'absolute'
-          }}
-        />
-      </div>
-    );
-  };
+    positiveBoxes.forEach((_, idx) => {
+      drawBox(height - positiveOffset - boxHeight, true);
+      positiveOffset += boxHeight;
+    });
+  }, [
+    boxArray,
+    height,
+    width,
+    boxHeight,
+    colors,
+    positiveBoxes,
+    negativeBoxes
+  ]);
 
   return (
     <div
-      className="relative"
+      className="relative overflow-hidden"
       style={{
         width: width,
-        height: `${height}px`,
-        position: 'relative'
+        height: `${height}px`
       }}
     >
-      <svg className="absolute inset-0 h-full w-full">
-        <defs>
-          <linearGradient id={gradientId} x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop
-              offset="0%"
-              stopColor={gradientColors.top}
-              stopOpacity="0.1"
-            />
-            <stop
-              offset="100%"
-              stopColor={gradientColors.bottom}
-              stopOpacity=".9"
-            />
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill={`url(#${gradientId})`} />
-      </svg>
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `linear-gradient(to bottom, ${colors.LIGHT}, ${colors.DARK})`,
+          opacity: 0.7
+        }}
+      />
 
-      {/* Render negative boxes */}
-      {negativeBoxes.map((box, idx) => renderBox(box, idx, false))}
+      <canvas
+        ref={canvasRef}
+        width={width}
+        height={height}
+        className="absolute inset-0"
+      />
 
-      {/* Render positive boxes */}
-      {positiveBoxes.map((box, idx) => renderBox(box, idx, true))}
-
-      {/* Updated SVG for right-angled lines */}
       <svg
         className="pointer-events-none absolute left-0 top-0 h-full w-full"
-        style={{ zIndex: 1, overflow: 'visible' }}
+        style={{ zIndex: 2, overflow: 'visible' }}
       >
         {prevMeetingPointY !== null && (
           <path
@@ -150,11 +143,20 @@ export const Oscillator: React.FC<OscillatorProps> = ({
                 V ${meetingPointY} 
                 H ${width / 2}`}
             fill="none"
-            stroke="white"
-            strokeWidth="2"
+            stroke={colors.LINE}
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
-          />
+            className="transition-all duration-300 ease-in-out"
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0"
+              to="20"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </path>
         )}
         {nextMeetingPointY !== null && (
           <path
@@ -163,11 +165,20 @@ export const Oscillator: React.FC<OscillatorProps> = ({
                 V ${nextMeetingPointY} 
                 H ${width * 1.5}`}
             fill="none"
-            stroke="white"
-            strokeWidth="2"
+            stroke={colors.LINE}
+            strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
-          />
+            className="transition-all duration-300 ease-in-out"
+          >
+            <animate
+              attributeName="stroke-dashoffset"
+              from="0"
+              to="20"
+              dur="2s"
+              repeatCount="indefinite"
+            />
+          </path>
         )}
       </svg>
     </div>
