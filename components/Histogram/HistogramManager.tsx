@@ -293,10 +293,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 		<div className="absolute bottom-0 m-2 flex w-full items-center justify-center">
 			<div className="absolute top-2 z-20 -mt-16 flex items-center justify-center space-x-2">
 				<BoxOffsetSelector
-					onOffsetChange={handleOffsetChange}
+					onOffsetChange={onOffsetChange}
 					currentOffset={internalBoxOffset}
-					selectedFrame={currentFrame}
-					visibleBoxes={visibleBoxes}
+					selectedFrame={data[data.length - 1]} // Pass the most recent frame
 				/>
 
 				<HistogramControls
