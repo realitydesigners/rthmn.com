@@ -21,7 +21,7 @@ const offsets = [
   { label: '1M', value: 19 }
 ];
 
-const MIN_SIDEBAR_WIDTH = 200;
+const MIN_SIDEBAR_WIDTH = 375;
 const MAX_SIDEBAR_WIDTH = 400;
 
 const PairsSidebar: React.FC<PairsSidebarProps> = ({

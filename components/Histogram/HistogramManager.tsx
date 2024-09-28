@@ -16,7 +16,7 @@ import { Oscillator } from './charts/Oscillator';
 import type { BoxSlice } from '@/types';
 
 const MIN_HISTOGRAM_HEIGHT = 100;
-const MAX_HISTOGRAM_HEIGHT = 400;
+const MAX_HISTOGRAM_HEIGHT = 350;
 const ZOOMED_BAR_WIDTH = 16;
 const INITIAL_BAR_WIDTH = 16;
 const DEFAULT_VISIBLE_BOXES_COUNT = 8;
