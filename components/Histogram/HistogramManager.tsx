@@ -7,8 +7,6 @@ import React, {
 	useRef,
 } from "react";
 import HistogramControls from "./HistogramControls";
-import HistogramSwitcher from "./HistogramSwitcher";
-import BoxOffsetSelector from "./BoxOffsetSelector";
 import SelectedFrameDetails from "./SelectedFrameDetails";
 import OffsetModal from "./OffsetModal";
 import { ScaledBoxes } from "./ScaledBoxes";
@@ -291,29 +289,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 
 	return (
 		<div className="absolute bottom-0 m-2 flex w-full items-center justify-center">
-			<div className="absolute top-2 z-20 -mt-16 flex items-center justify-center space-x-2">
-				<BoxOffsetSelector
-					onOffsetChange={onOffsetChange}
-					currentOffset={internalBoxOffset}
-					selectedFrame={data[data.length - 1]} // Pass the most recent frame
-				/>
-
-				<HistogramControls
-					boxOffset={internalBoxOffset}
-					onOffsetChange={handleOffsetChange}
-					totalBoxes={data[0]?.boxes.length || 0}
-					visibleBoxesCount={visibleBoxesCount}
-				/>
-				<HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
-				{/* <button
-          onClick={() => setIsModalOpen(true)}
-          className="rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
-        >
-          Show Offset Info
-        </button> */}
-			</div>
 			<div
-				className="relative w-full border border-[#181818] bg-black pr-60"
+				className="relative flex w-full border border-[#181818] bg-black"
 				style={{ height: `${height}px`, transition: "height 0.1s ease-out" }}
 				ref={containerRef}
 			>
@@ -326,63 +303,76 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 				/>
 
 				{data && data.length > 0 && (
-					<div className="h-full" style={{ position: "relative" }}>
-						<div
-							className="hide-scrollbar flex h-full w-full items-end overflow-x-auto"
-							role="region"
-							aria-label="Histogram Chart"
-							ref={scrollContainerRef}
-						>
+					<div className="flex h-full w-full">
+						<div className="h-full w-full pr-16">
+							{" "}
+							{/* Add right padding to make space for controls */}
 							<div
-								style={{
-									display: "inline-flex",
-									width: `${data.length * INITIAL_BAR_WIDTH}px`,
-									height: "100%",
-									flexDirection: "row",
-								}}
+								className="hide-scrollbar flex h-full w-full items-end overflow-x-auto"
+								role="region"
+								aria-label="Histogram Chart"
+								ref={scrollContainerRef}
 							>
-								{framesWithPoints.map((frameWithPoint, index) => {
-									const { frameData, meetingPointY, sliceWidth } =
-										frameWithPoint;
-									const prevMeetingPointY =
-										index > 0
-											? framesWithPoints[index - 1].meetingPointY
-											: null;
-									const nextMeetingPointY =
-										index < framesWithPoints.length - 1
-											? framesWithPoints[index + 1].meetingPointY
-											: null;
+								<div
+									style={{
+										display: "inline-flex",
+										width: `${data.length * INITIAL_BAR_WIDTH}px`,
+										height: "100%",
+										flexDirection: "row",
+									}}
+								>
+									{framesWithPoints.map((frameWithPoint, index) => {
+										const { frameData, meetingPointY, sliceWidth } =
+											frameWithPoint;
+										const prevMeetingPointY =
+											index > 0
+												? framesWithPoints[index - 1].meetingPointY
+												: null;
+										const nextMeetingPointY =
+											index < framesWithPoints.length - 1
+												? framesWithPoints[index + 1].meetingPointY
+												: null;
 
-									return (
-										<div
-											key={`${index}`}
-											className="relative flex-shrink-0 cursor-pointer"
-											style={{
-												width: sliceWidth,
-												height: `${height}px`,
-												position: "relative",
-											}}
-											onClick={() => handleFrameSelect(data[index], index)}
-										>
-											{renderNestedBoxes(
-												frameData.boxArray,
-												frameData.isSelected,
-												meetingPointY,
-												prevMeetingPointY,
-												nextMeetingPointY,
-												sliceWidth,
-											)}
-										</div>
-									);
-								})}
+										return (
+											<div
+												key={`${index}`}
+												className="relative flex-shrink-0 cursor-pointer"
+												style={{
+													width: sliceWidth,
+													height: `${height}px`,
+													position: "relative",
+												}}
+												onClick={() => handleFrameSelect(data[index], index)}
+											>
+												{renderNestedBoxes(
+													frameData.boxArray,
+													frameData.isSelected,
+													meetingPointY,
+													prevMeetingPointY,
+													nextMeetingPointY,
+													sliceWidth,
+												)}
+											</div>
+										);
+									})}
+								</div>
 							</div>
+						</div>
+						<div className="absolute right-0 top-0 h-full w-16 border-l border-[#181818] bg-black">
+							<HistogramControls
+								boxOffset={internalBoxOffset}
+								onOffsetChange={onOffsetChange}
+								totalBoxes={data[0]?.boxes.length || 0}
+								visibleBoxesCount={visibleBoxesCount}
+								viewType={viewType}
+								onViewChange={handleViewChange}
+								selectedFrame={data[data.length - 1]}
+								height={height}
+							/>
 						</div>
 					</div>
 				)}
 			</div>
-			{/* <div className="absolute left-2 top-2 z-20 text-white">
-        Displaying {data.length} frames (Offset: {boxOffset})
-      </div> */}
 			{selectedFrame && (
 				<SelectedFrameDetails
 					selectedFrame={selectedFrame}
