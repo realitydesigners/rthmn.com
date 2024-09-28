@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import PairClient from "./PairClient";
 import { getBoxSlices } from "@/app/utils/getBoxSlices";
+import { getLatestBoxSlices } from "@/app/utils/getLatestBoxSlices";
 
 interface PageProps {
 	params: {
@@ -38,9 +39,17 @@ export default async function PairPage({ params }: PageProps) {
 	const initialData = await getBoxSlices(pair, undefined, 250);
 	console.log("Initial data length:", initialData.length);
 
+	// Fetch latest box slices for all pairs
+	const allPairsData = await getLatestBoxSlices();
+	console.log("All pairs latest data:", allPairsData);
+
 	return (
 		<div className="w-full">
-			<PairClient initialData={initialData} pair={pair} />
+			<PairClient
+				initialData={initialData}
+				pair={pair}
+				allPairsData={allPairsData}
+			/>
 		</div>
 	);
 }
