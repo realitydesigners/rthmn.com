@@ -3,22 +3,25 @@ import type { Box } from "@/types";
 
 const COLORS = {
 	GREEN: {
-		DARK: "#023E8A", // Deep blue-green
-		LIGHT: "#0077B6", // Brighter blue-green
-		LINE: "#90E0EF", // Light cyan for the line
-		DOT: "#015C92", // Darker cyan for the dot
+		DARK: "#023E8A",
+		MEDIUM: "#0077B6",
+		LIGHT: "#90E0EF",
+		DOT: "#015C92",
+		GRID: "rgba(0, 119, 182, 0.3)", // Medium blue with opacity for grid
 	},
 	RED: {
-		DARK: "#7D0633", // Deep burgundy
-		LIGHT: "#B80D57", // Brighter burgundy
-		LINE: "#FF7096", // Light pink for the line
-		DOT: "#C41E3A", // Darker red for the dot
+		DARK: "#7D0633",
+		MEDIUM: "#B80D57",
+		LIGHT: "#FF7096",
+		DOT: "#C41E3A",
+		GRID: "rgba(184, 13, 87, 0.3)", // Medium red with opacity for grid
 	},
 	GRAY: {
-		DARK: "#2B2D42", // Dark slate
-		LIGHT: "#8D99AE", // Cool gray
-		LINE: "#EDF2F4", // Very light gray-blue for the line
-		DOT: "#4A4E69", // Darker gray for the dot
+		DARK: "#2B2D42",
+		MEDIUM: "#8D99AE",
+		LIGHT: "#EDF2F4",
+		DOT: "#4A4E69",
+		GRID: "rgba(141, 153, 174, 0.3)", // Medium gray with opacity for grid
 	},
 };
 
@@ -43,26 +46,16 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 }) => {
 	const boxHeight = height / visibleBoxesCount;
 	const sortedBoxes = boxArray.slice(0, visibleBoxesCount);
-	const positiveBoxes = sortedBoxes.filter((box) => box.value > 0);
-	const negativeBoxes = sortedBoxes.filter((box) => box.value <= 0);
 
-	let positiveOffset = 0;
-	let negativeOffset = 0;
-
-	const width = sliceWidth;
 	const sectionColor = useMemo(() => {
-		if (sortedBoxes.length === 0) {
-			return "gray";
-		}
+		if (sortedBoxes.length === 0) return "gray";
 		const largestBox = sortedBoxes.reduce((max, box) =>
 			Math.abs(box.value) > Math.abs(max.value) ? box : max,
 		);
 		return largestBox.value > 0 ? "green" : "red";
 	}, [sortedBoxes]);
 
-	const colors = useMemo(() => {
-		return COLORS[sectionColor.toUpperCase() as keyof typeof COLORS];
-	}, [sectionColor]);
+	const colors = COLORS[sectionColor.toUpperCase() as keyof typeof COLORS];
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -73,68 +66,73 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return;
 
-		ctx.clearRect(0, 0, width, height);
+		ctx.clearRect(0, 0, sliceWidth, height);
 
-		const drawBox = (box: Box, y: number, isPositive: boolean) => {
+		// Draw background gradient
+		const gradient = ctx.createLinearGradient(0, 0, 0, height);
+		gradient.addColorStop(0, colors.DARK);
+		gradient.addColorStop(1, colors.MEDIUM);
+		ctx.fillStyle = gradient;
+		ctx.fillRect(0, 0, sliceWidth, height);
+
+		// Draw grid
+		ctx.beginPath();
+		for (let i = 0; i <= visibleBoxesCount; i++) {
+			const y = i * boxHeight;
+			ctx.moveTo(0, y);
+			ctx.lineTo(sliceWidth, y);
+		}
+		ctx.strokeStyle = colors.GRID;
+		ctx.lineWidth = 1;
+		ctx.stroke();
+
+		// Draw boxes
+		sortedBoxes.forEach((box, index) => {
+			const y = index * boxHeight;
+
+			// Draw box border using GRID color
 			ctx.beginPath();
-			ctx.rect(0, y, width, boxHeight);
-			ctx.strokeStyle = colors.LIGHT;
+			ctx.rect(0, y, sliceWidth, boxHeight);
+			ctx.strokeStyle = colors.GRID;
+			ctx.lineWidth = 1;
 			ctx.stroke();
 
 			// Draw high-low range
 			const rangeHeight =
 				((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
-			const rangeY = isPositive ? y + boxHeight - rangeHeight : y;
-			ctx.fillStyle = colors.LIGHT;
-			ctx.fillRect(width * 0.25, rangeY, width * 0.5, rangeHeight);
+			const rangeY = box.value > 0 ? y + boxHeight - rangeHeight : y;
+			ctx.fillStyle = colors.MEDIUM;
+			ctx.fillRect(sliceWidth * 0.25, rangeY, sliceWidth * 0.5, rangeHeight);
 
 			// Draw center point
-			const centerX = width / 2;
+			const centerX = sliceWidth / 2;
 			const centerY = y + boxHeight / 2;
 			ctx.beginPath();
-			ctx.arc(centerX, centerY, 0.5, 0, 2 * Math.PI);
+			ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
 			ctx.fillStyle = colors.DOT;
 			ctx.fill();
-		};
-
-		negativeBoxes.forEach((box) => {
-			drawBox(box, negativeOffset, false);
-			negativeOffset += boxHeight;
-		});
-
-		positiveBoxes.forEach((box) => {
-			drawBox(box, height - positiveOffset - boxHeight, true);
-			positiveOffset += boxHeight;
 		});
 	}, [
 		boxArray,
 		height,
-		width,
+		sliceWidth,
 		boxHeight,
 		colors,
-		positiveBoxes,
-		negativeBoxes,
+		visibleBoxesCount,
+		sortedBoxes,
 	]);
 
 	return (
 		<div
 			className="relative overflow-hidden"
 			style={{
-				width: width,
+				width: sliceWidth,
 				height: `${height}px`,
 			}}
 		>
-			<div
-				className="absolute inset-0"
-				style={{
-					background: `linear-gradient(to bottom, ${colors.LIGHT}, ${colors.DARK})`,
-					opacity: 0.7,
-				}}
-			/>
-
 			<canvas
 				ref={canvasRef}
-				width={width}
+				width={sliceWidth}
 				height={height}
 				className="absolute inset-0"
 			/>
@@ -145,12 +143,12 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 			>
 				{prevMeetingPointY !== null && (
 					<path
-						d={`M ${-width / 2} ${prevMeetingPointY} 
+						d={`M ${-sliceWidth / 2} ${prevMeetingPointY} 
                 H 0 
                 V ${meetingPointY} 
-                H ${width / 2}`}
+                H ${sliceWidth / 2}`}
 						fill="none"
-						stroke={colors.LINE}
+						stroke={colors.LIGHT}
 						strokeWidth="3"
 						strokeLinecap="round"
 						strokeLinejoin="round"
@@ -167,12 +165,12 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 				)}
 				{nextMeetingPointY !== null && (
 					<path
-						d={`M ${width / 2} ${meetingPointY} 
-                H ${width} 
+						d={`M ${sliceWidth / 2} ${meetingPointY} 
+                H ${sliceWidth} 
                 V ${nextMeetingPointY} 
-                H ${width * 1.5}`}
+                H ${sliceWidth * 1.5}`}
 						fill="none"
-						stroke={colors.LINE}
+						stroke={colors.LIGHT}
 						strokeWidth="3"
 						strokeLinecap="round"
 						strokeLinejoin="round"

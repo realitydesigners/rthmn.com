@@ -17,23 +17,23 @@ const HistogramControls: React.FC<HistogramControlsProps> = ({
 		<div className="flex items-center space-x-2">
 			<button
 				onClick={() => onOffsetChange(-1)}
-				className="h-8 w-8 rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
+				className="flex h-8 w-8 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
 				disabled={boxOffset === 0}
 			>
-				<ChevronLeftIcon />
+				<MinusIcon />
 			</button>
 			<button
 				onClick={() => onOffsetChange(1)}
-				className="h-8 w-8 rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
+				className="flex h-8 w-8 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
 				disabled={boxOffset >= totalBoxes - visibleBoxesCount}
 			>
-				<ChevronRightIcon />
+				<PlusIcon />
 			</button>
 		</div>
 	);
 };
 
-const ChevronLeftIcon: React.FC = () => (
+const MinusIcon: React.FC = () => (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 24 24"
@@ -44,11 +44,11 @@ const ChevronLeftIcon: React.FC = () => (
 		strokeLinejoin="round"
 		className="h-5 w-5"
 	>
-		<polyline points="15 18 9 12 15 6"></polyline>
+		<line x1="5" y1="12" x2="19" y2="12"></line>
 	</svg>
 );
 
-const ChevronRightIcon: React.FC = () => (
+const PlusIcon: React.FC = () => (
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 24 24"
@@ -59,7 +59,8 @@ const ChevronRightIcon: React.FC = () => (
 		strokeLinejoin="round"
 		className="h-5 w-5"
 	>
-		<polyline points="9 18 15 12 9 6"></polyline>
+		<line x1="12" y1="5" x2="12" y2="19"></line>
+		<line x1="5" y1="12" x2="19" y2="12"></line>
 	</svg>
 );
 

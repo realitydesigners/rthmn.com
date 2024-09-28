@@ -57,13 +57,13 @@ const HistogramSwitcher: React.FC<HistogramSwitcherProps> = ({
 		<div className="relative" ref={dropdownRef}>
 			<button
 				onClick={handleIconClick}
-				className="bg-black p-1 hover:bg-[#181818]"
+				className="rounded border border-[#181818] bg-black p-1 hover:bg-[#181818]"
 				title={`Current: ${viewType} View`}
 			>
 				{getCurrentIcon()}
 			</button>
 			{isOpen && (
-				<div className="absolute right-0 mt-2 w-32 shadow-lg">
+				<div className="absolute right-0 mt-2 w-32 rounded border border-[#181818] bg-black shadow-lg">
 					{["scaled", "even", "chart", "oscillator"].map((type) => (
 						<button
 							key={type}

@@ -1,21 +1,18 @@
 "use client";
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useSearchParams } from "next/navigation";
 import { BoxSlice } from "@/types";
 import HistogramManager from "../../components/Histogram/HistogramManager";
 import { getBoxSlices } from "@/app/utils/getBoxSlices";
 import PairsSidebar from "@/components/PairsSidebar";
+import { PairData } from "@/types/pairs";
 
 interface OHLC {
 	open: number;
 	high: number;
 	low: number;
 	close: number;
-}
-
-interface PairData {
-	boxes: BoxSlice[];
-	currentOHLC: OHLC;
 }
 
 interface DashboardClientProps {
@@ -29,7 +26,13 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	pair,
 	allPairsData,
 }) => {
+	const searchParams = useSearchParams();
 	const [histogramHeight, setHistogramHeight] = useState(200);
+	const [boxOffset, setBoxOffset] = useState(() => {
+		const offsetParam = searchParams.get("offset");
+		return offsetParam ? parseInt(offsetParam, 10) : 0;
+	});
+
 	console.log("All pairs latest data:", allPairsData);
 
 	const fetchData = useCallback(async () => {
@@ -49,6 +52,14 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		setHistogramHeight(newHeight);
 	}, []);
 
+	useEffect(() => {
+		const offsetParam = searchParams.get("offset");
+		if (offsetParam) {
+			const newOffset = parseInt(offsetParam, 10);
+			setBoxOffset(newOffset);
+		}
+	}, [searchParams]);
+
 	if (isLoading) return <div>Loading...</div>;
 	if (error) return <div>Error: {(error as Error).message}</div>;
 	if (!data) return <div>No data available</div>;
@@ -61,6 +72,8 @@ const PairClient: React.FC<DashboardClientProps> = ({
 					data={data}
 					height={histogramHeight}
 					onResize={handleHistogramResize}
+					boxOffset={boxOffset}
+					onOffsetChange={setBoxOffset}
 				/>
 			</div>
 		</div>

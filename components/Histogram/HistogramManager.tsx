@@ -15,7 +15,6 @@ import { ScaledBoxes } from "./ScaledBoxes";
 import { SquareBoxes } from "./SquareBoxes";
 import { LineBoxes } from "./LineBoxes";
 import { Oscillator } from "./charts/Oscillator";
-import DataDotSelector from "./DataDotSelector";
 import type { BoxSlice } from "@/types";
 
 const MIN_HISTOGRAM_HEIGHT = 100;
@@ -28,14 +27,17 @@ interface HistogramManagerProps {
 	data: BoxSlice[];
 	height: number;
 	onResize: (newHeight: number) => void;
+	boxOffset: number;
+	onOffsetChange: (newOffset: number) => void;
 }
 
 const HistogramManager: React.FC<HistogramManagerProps> = ({
 	data,
 	height,
 	onResize,
+	boxOffset,
+	onOffsetChange,
 }) => {
-	const [boxOffset, setBoxOffset] = useState(0);
 	const [viewType, setViewType] = useState<
 		"scaled" | "even" | "chart" | "oscillator"
 	>("oscillator");
@@ -57,27 +59,34 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 		DEFAULT_VISIBLE_BOXES_COUNT - 1,
 	);
 
+	const [internalBoxOffset, setInternalBoxOffset] = useState(boxOffset);
+
+	useEffect(() => {
+		setInternalBoxOffset(boxOffset);
+	}, [boxOffset]);
+
 	const currentFrame = useMemo(() => {
 		return selectedFrame || (data.length > 0 ? data[0] : null);
 	}, [selectedFrame, data]);
 
 	const visibleBoxes = useMemo(() => {
 		return currentFrame
-			? currentFrame.boxes.slice(customRangeStart, customRangeEnd + 1)
+			? currentFrame.boxes.slice(
+					internalBoxOffset,
+					internalBoxOffset + visibleBoxesCount,
+				)
 			: [];
-	}, [currentFrame, customRangeStart, customRangeEnd]);
+	}, [currentFrame, internalBoxOffset, visibleBoxesCount]);
 
 	const handleOffsetChange = useCallback(
 		(change: number) => {
-			setBoxOffset((prevOffset) => {
-				const newOffset = prevOffset + change;
-				const maxOffset =
-					(data[selectedFrameIndex ?? 0]?.boxes.length || 0) -
-					visibleBoxesCount;
-				return Math.max(0, Math.min(newOffset, maxOffset));
-			});
+			const newOffset = internalBoxOffset + change;
+			const maxOffset = (data[0]?.boxes.length || 0) - visibleBoxesCount;
+			const clampedOffset = Math.max(0, Math.min(newOffset, maxOffset));
+			setInternalBoxOffset(clampedOffset);
+			onOffsetChange(clampedOffset);
 		},
-		[data, selectedFrameIndex, visibleBoxesCount],
+		[internalBoxOffset, data, visibleBoxesCount, onOffsetChange],
 	);
 
 	const handleViewChange = useCallback(
@@ -109,12 +118,15 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 		setSelectedFrameIndex((prev) => (prev === index ? null : index));
 	}, []);
 
-	const handleRangeChange = useCallback((start: number, end: number) => {
-		setCustomRangeStart(start);
-		setCustomRangeEnd(end);
-		setBoxOffset(start);
-		setVisibleBoxesCount(end - start + 1);
-	}, []);
+	const handleRangeChange = useCallback(
+		(start: number, end: number) => {
+			setCustomRangeStart(start);
+			setCustomRangeEnd(end);
+			onOffsetChange(start);
+			setVisibleBoxesCount(end - start + 1);
+		},
+		[onOffsetChange],
+	);
 
 	useEffect(() => {
 		if (isDragging) {
@@ -147,8 +159,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 			sliceWidth: number,
 		): JSX.Element | null => {
 			const visibleBoxArray = boxArray.slice(
-				boxOffset,
-				boxOffset + visibleBoxesCount,
+				internalBoxOffset,
+				internalBoxOffset + visibleBoxesCount,
 			);
 			switch (viewType) {
 				case "scaled":
@@ -212,7 +224,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 			maxSize,
 			height,
 			handleFrameSelect,
-			boxOffset,
+			internalBoxOffset,
 			visibleBoxesCount,
 		],
 	);
@@ -225,8 +237,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 
 			const boxHeight = height / visibleBoxesCount;
 			const visibleBoxes = boxArray.slice(
-				boxOffset,
-				boxOffset + visibleBoxesCount,
+				internalBoxOffset,
+				internalBoxOffset + visibleBoxesCount,
 			);
 			const positiveBoxes = visibleBoxes.filter((box) => box.value > 0);
 			const negativeBoxes = visibleBoxes.filter((box) => box.value <= 0);
@@ -250,7 +262,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 				sliceWidth,
 			};
 		});
-	}, [data, selectedFrameIndex, height, boxOffset, visibleBoxesCount]);
+	}, [data, selectedFrameIndex, height, internalBoxOffset, visibleBoxesCount]);
 
 	const DraggableBorder = ({
 		onMouseDown,
@@ -281,21 +293,16 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 		<div className="absolute bottom-0 m-2 flex w-full items-center justify-center">
 			<div className="absolute top-2 z-20 -mt-16 flex items-center justify-center space-x-2">
 				<BoxOffsetSelector
-					onOffsetChange={(newOffset) => setBoxOffset(newOffset)}
-					currentOffset={boxOffset}
+					onOffsetChange={handleOffsetChange}
+					currentOffset={internalBoxOffset}
 					selectedFrame={currentFrame}
 					visibleBoxes={visibleBoxes}
 				/>
-				<DataDotSelector
-					currentFrame={currentFrame}
-					onRangeChange={handleRangeChange}
-					currentOffset={boxOffset}
-					visibleBoxesCount={visibleBoxesCount}
-				/>
+
 				<HistogramControls
-					boxOffset={boxOffset}
+					boxOffset={internalBoxOffset}
 					onOffsetChange={handleOffsetChange}
-					totalBoxes={data[selectedFrameIndex ?? 0]?.boxes.length || 0}
+					totalBoxes={data[0]?.boxes.length || 0}
 					visibleBoxesCount={visibleBoxesCount}
 				/>
 				<HistogramSwitcher viewType={viewType} onChange={handleViewChange} />
@@ -389,7 +396,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 			)}
 			{isModalOpen && (
 				<OffsetModal
-					offset={boxOffset}
+					offset={internalBoxOffset}
 					visibleBoxes={visibleBoxes}
 					onClose={() => setIsModalOpen(false)}
 				/>
