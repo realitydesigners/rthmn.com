@@ -1,20 +1,4 @@
-interface BoxData {
-	high: number;
-	low: number;
-	value: number;
-}
-
-interface OHLC {
-	open: number;
-	high: number;
-	low: number;
-	close: number;
-}
-
-interface PairData {
-	boxes: BoxData[];
-	currentOHLC: OHLC;
-}
+import { PairData, Box, OHLC, BoxSlice } from "@/types";
 
 export async function getLatestBoxSlices(): Promise<Record<string, PairData>> {
 	const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:8080";
@@ -40,7 +24,27 @@ export async function getLatestBoxSlices(): Promise<Record<string, PairData>> {
 			return {};
 		}
 
-		return apiResponse.data;
+		// Convert the API response to match the PairData type from @/types
+		const convertedData: Record<string, PairData> = {};
+		for (const [pair, data] of Object.entries(apiResponse.data)) {
+			if (
+				typeof data === "object" &&
+				data !== null &&
+				"boxes" in data &&
+				"currentOHLC" in data
+			) {
+				const boxSlice: BoxSlice = {
+					timestamp: new Date().toISOString(),
+					boxes: (data.boxes as Box[]) || [],
+				};
+				convertedData[pair] = {
+					boxes: [boxSlice],
+					currentOHLC: data.currentOHLC as OHLC,
+				};
+			}
+		}
+
+		return convertedData;
 	} catch (error) {
 		console.error("Fetch error:", error);
 		return {};

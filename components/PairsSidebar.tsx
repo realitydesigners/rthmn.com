@@ -1,18 +1,16 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Box, OHLC } from "@/types";
-
-interface PairData {
-	boxes: Box[];
-	currentOHLC: OHLC;
-}
+import { Box, BoxSlice, OHLC, PairData } from "@/types";
 
 interface PairsSidebarProps {
 	pairs: Record<string, PairData>;
 	currentPair: string;
 	renderTrendIcon: (trend: "up" | "down") => JSX.Element;
-	getTrendForOffset: (boxes: Box[], offset: number) => "up" | "down";
+	getTrendForOffset: (
+		boxes: Box[] | BoxSlice[],
+		offset: number,
+	) => "up" | "down";
 }
 
 const offsets = [

@@ -35,13 +35,8 @@ export default async function PairPage({ params }: PageProps) {
 		redirect("/signin");
 	}
 
-	// Fetch only the last 250 items for the given pair
 	const initialData = await getBoxSlices(pair, undefined, 250);
-	console.log("Initial data length:", initialData.length);
-
-	// Fetch latest box slices for all pairs
 	const allPairsData = await getLatestBoxSlices();
-	console.log("All pairs latest data:", allPairsData);
 
 	return (
 		<div className="w-full">

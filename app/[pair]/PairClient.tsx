@@ -2,11 +2,10 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
-import { BoxSlice } from "@/types";
+import { BoxSlice, PairData } from "@/types";
 import HistogramManager from "../../components/Histogram/HistogramManager";
 import { getBoxSlices } from "@/app/utils/getBoxSlices";
 import PairsSidebar from "@/components/PairsSidebar";
-import { PairData } from "@/types";
 import { getTrendForOffset } from "@/app/utils/getTrendForOffset";
 
 interface OHLC {
@@ -35,11 +34,8 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		return offsetParam ? parseInt(offsetParam, 10) : 0;
 	});
 
-	console.log("All pairs latest data:", allPairsData);
-
 	const fetchData = useCallback(async () => {
 		const newData = await getBoxSlices(pair, undefined, 250);
-		console.log("New data fetched:", newData.length, "items");
 		return newData;
 	}, [pair]);
 
