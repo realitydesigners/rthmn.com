@@ -7,8 +7,8 @@ import { SquareBoxes } from "./charts/SquareBoxes";
 import { Oscillator } from "./charts/Oscillator";
 import type { BoxSlice, ViewType } from "@/types";
 
-const ZOOMED_BAR_WIDTH = 16;
-const INITIAL_BAR_WIDTH = 20;
+const ZOOMED_BAR_WIDTH = 0;
+const INITIAL_BAR_WIDTH = 50;
 
 interface HistogramManagerProps {
 	data: BoxSlice[];
@@ -262,7 +262,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 	return (
 		<div className="h-full w-full">
 			<div
-				className="relative flex w-full border-t border-[#181818] bg-black"
+				className="relative flex w-full border-t border-[#181818] bg-black pr-16"
 				style={{ height: `${height}px`, transition: "height 0.1s ease-out" }}
 				ref={containerRef}
 			>

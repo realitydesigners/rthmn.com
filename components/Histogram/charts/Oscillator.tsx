@@ -4,17 +4,17 @@ import type { Box } from "@/types";
 const COLORS = {
 	GREEN: {
 		DARK: "#001a1a",
-		MEDIUM: "#0a4d45",
+		MEDIUM: "#000",
 		LIGHT: "#22FFE7",
-		DOT: "#000",
-		GRID: "#000",
+		DOT: "#032C2C",
+		GRID: "#147571",
 	},
 	RED: {
 		DARK: "#1a0000",
-		MEDIUM: "#7a162f",
+		MEDIUM: "#000",
 		LIGHT: "#FF6E86",
-		DOT: "#000",
-		GRID: "#000",
+		DOT: "#330303",
+		GRID: "#8B1935",
 	},
 	NEUTRAL: {
 		DARK: "#1a1a1a",
@@ -78,7 +78,7 @@ const PulseWave: React.FC<{
 				<animate
 					attributeName="opacity"
 					values="0.7;0.3;0.7"
-					dur="2s"
+					dur="8s"
 					repeatCount="indefinite"
 				/>
 			</path>
@@ -169,7 +169,7 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 				ctx.lineTo(sliceWidth, y);
 			}
 			ctx.strokeStyle = colors.GRID;
-			ctx.lineWidth = 0.3;
+
 			ctx.stroke();
 
 			sortedBoxes.forEach((box, index) => {
@@ -266,14 +266,14 @@ export const Oscillator: React.FC<OscillatorProps> = ({
                 H ${sliceWidth / 2}`}
 						fill="none"
 						stroke={colors.LIGHT}
-						strokeWidth="4"
+						strokeWidth="3"
 						className="transition-all duration-100 ease-in-out"
 					>
 						<animate
 							attributeName="stroke-dashoffset"
 							from="0"
 							to="20"
-							dur="5s"
+							dur="20s"
 							repeatCount="indefinite"
 						/>
 					</path>
@@ -286,14 +286,14 @@ export const Oscillator: React.FC<OscillatorProps> = ({
                 H ${sliceWidth * 1.5}`}
 						fill="none"
 						stroke={colors.LIGHT}
-						strokeWidth="4"
+						strokeWidth="3"
 						className="transition-all duration-100 ease-in-out"
 					>
 						<animate
 							attributeName="stroke-dashoffset"
 							from="0"
 							to="20"
-							dur="5s"
+							dur="20s"
 							repeatCount="indefinite"
 						/>
 					</path>
@@ -312,7 +312,7 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 							<animate
 								attributeName="stroke-opacity"
 								values="0.5;1;0.5"
-								dur="1s"
+								dur="4s"
 								repeatCount="indefinite"
 							/>
 						</line>
@@ -328,7 +328,7 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 							<animate
 								attributeName="r"
 								values="4;6;4"
-								dur="1s"
+								dur="4s"
 								repeatCount="indefinite"
 							/>
 						</circle>
