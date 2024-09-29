@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import PairClient from "./PairClient";
 import { getBoxSlices } from "@/app/utils/getBoxSlices";
+import { getLatestBoxSlices } from "@/app/utils/getLatestBoxSlices";
 
 interface PageProps {
 	params: {
@@ -34,13 +35,16 @@ export default async function PairPage({ params }: PageProps) {
 		redirect("/signin");
 	}
 
-	// Fetch only the last 250 items for the given pair
-	const initialData = await getBoxSlices(pair, undefined, 250);
-	console.log("Initial data length:", initialData.length);
+	const initialData = await getBoxSlices(pair, undefined, 1000);
+	const allPairsData = await getLatestBoxSlices();
 
 	return (
 		<div className="w-full">
-			<PairClient initialData={initialData} pair={pair} />
+			<PairClient
+				initialData={initialData}
+				pair={pair}
+				allPairsData={allPairsData}
+			/>
 		</div>
 	);
 }

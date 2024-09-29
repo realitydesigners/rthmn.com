@@ -38,3 +38,17 @@ export interface BoxSlice {
   timestamp: string;
   boxes: Box[];
 }
+
+export interface OHLC {
+  open: number;
+  high: number;
+  low: number;
+  close: number;
+}
+
+export interface PairData {
+  boxes: BoxSlice[];
+  currentOHLC: OHLC;
+}
+
+export type ViewType = 'scaled' | 'even' | 'oscillator';
