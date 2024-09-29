@@ -42,7 +42,13 @@ interface OscillatorProps {
 }
 
 export interface OscillatorRef {
-  getColorAndY: (x: number) => { y: number; color: string };
+  getColorAndY: (x: number) => {
+    y: number;
+    color: string;
+    high: number;
+    low: number;
+    price: number;
+  };
   meetingPoints: { x: number; y: number }[];
   sliceWidth: number;
   visibleBoxesCount: number;
@@ -152,9 +158,24 @@ export const Oscillator = forwardRef<OscillatorRef, OscillatorProps>(
       return meetingPointY;
     };
 
+    const smallestBox = useMemo(() => {
+      return sortedBoxes.reduce((smallest, current) =>
+        Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest
+      );
+    }, [sortedBoxes]);
+
     const getColorAndY = (x: number) => {
       const y = interpolateY(x);
-      return { y: Math.round(y), color: colors.LIGHT };
+      const boxIndex = Math.floor((y / height) * visibleBoxesCount);
+      const box = sortedBoxes[boxIndex];
+      const price = smallestBox.value < 0 ? smallestBox.low : smallestBox.high;
+      return {
+        y: Math.round(y),
+        color: colors.LIGHT,
+        high: box ? box.high : 0,
+        low: box ? box.low : 0,
+        price
+      };
     };
 
     useImperativeHandle(ref, () => ({

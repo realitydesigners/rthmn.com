@@ -105,6 +105,16 @@ const DraggableBorder: React.FC<{
   />
 ));
 
+// Update the HoverInfo type
+type HoverInfo = {
+  x: number;
+  y: number;
+  color: string;
+  high: number;
+  low: number;
+  price: number; // Add price to the HoverInfo type
+} | null;
+
 const HistogramChart: React.FC<{
   data: BoxSlice[];
   framesWithPoints: ReturnType<typeof useHistogramData>['framesWithPoints'];
@@ -121,7 +131,7 @@ const HistogramChart: React.FC<{
   ) => JSX.Element | null;
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseLeave: () => void;
-  hoverInfo: { x: number; y: number; color: string } | null;
+  hoverInfo: HoverInfo;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   onScroll: () => void;
 }> = React.memo(
@@ -192,26 +202,39 @@ const HistogramChart: React.FC<{
         </div>
       </div>
       {hoverInfo && (
-        <div
-          className="pointer-events-none absolute bottom-0 top-0"
-          style={{
-            left: `${hoverInfo.x}px`,
-            width: '1px',
-            background: hoverInfo.color,
-            boxShadow: `0 0 5px ${hoverInfo.color}`,
-            zIndex: 1000
-          }}
-        >
+        <>
           <div
-            className="absolute h-3 w-3 rounded-full"
+            className="pointer-events-none absolute -bottom-2 top-0"
             style={{
+              left: `${hoverInfo.x}px`,
+              width: '1px',
               background: hoverInfo.color,
               boxShadow: `0 0 5px ${hoverInfo.color}`,
-              top: `${hoverInfo.y - 6}px`,
-              left: '-6px'
+              zIndex: 1000
             }}
-          />
-        </div>
+          >
+            <div
+              className="absolute h-3 w-3 rounded-full"
+              style={{
+                background: hoverInfo.color,
+                boxShadow: `0 0 5px ${hoverInfo.color}`,
+                top: `${hoverInfo.y - 6}px`,
+                left: '-6px'
+              }}
+            />
+            <div
+              className="absolute whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white"
+              style={{
+                bottom: '0',
+                left: '50%',
+                transform: 'translateX(-50%) translateY(100%)',
+                zIndex: 1001
+              }}
+            >
+              {hoverInfo.price.toFixed(3)}
+            </div>
+          </div>
+        </>
       )}
     </div>
   )
@@ -247,11 +270,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     );
 
   const oscillatorRefs = useRef<(OscillatorRef | null)[]>([]);
-  const [hoverInfo, setHoverInfo] = useState<{
-    x: number;
-    y: number;
-    color: string;
-  } | null>(null);
+  const [hoverInfo, setHoverInfo] = useState<HoverInfo>(null);
 
   const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {
@@ -271,11 +290,15 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         const oscillator = oscillatorRefs.current[frameIndex];
 
         if (oscillator) {
-          const { y, color } = oscillator.getColorAndY(frameX);
+          const { y, color, high, low, price } =
+            oscillator.getColorAndY(frameX);
           setHoverInfo({
             x: frameIndex * INITIAL_BAR_WIDTH + frameX - scrollLeft,
             y,
-            color
+            color,
+            high,
+            low,
+            price
           });
         }
       }
@@ -358,8 +381,15 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
       const frameX = (hoverInfo.x + scrollLeft) % INITIAL_BAR_WIDTH;
       const oscillator = oscillatorRefs.current[frameIndex];
       if (oscillator) {
-        const { y, color } = oscillator.getColorAndY(frameX);
-        setHoverInfo((prevInfo) => ({ ...prevInfo, y, color }));
+        const { y, color, high, low, price } = oscillator.getColorAndY(frameX);
+        setHoverInfo((prevInfo) => ({
+          ...prevInfo!,
+          y,
+          color,
+          high,
+          low,
+          price
+        }));
       }
     }
   }, [boxOffset, scrollLeft]);
