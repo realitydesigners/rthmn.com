@@ -78,15 +78,18 @@ const PairClient: React.FC<DashboardClientProps> = ({
 			debounce((newOffset: number) => {
 				const params = new URLSearchParams(searchParams.toString());
 				params.set("offset", newOffset.toString());
-				router.push(`?${params.toString()}`, { scroll: false });
+				router.push(`/${pair}?${params.toString()}`, { scroll: false });
 			}, 300),
-		[searchParams, router],
+		[searchParams, router, pair],
 	);
 
 	const handleOffsetChange = useCallback(
 		(newOffset: number) => {
 			setBoxOffset(newOffset);
 			debouncedUpdateURL(newOffset);
+			// Reset selected frame when offset changes
+			setSelectedFrame(null);
+			setSelectedFrameIndex(null);
 		},
 		[debouncedUpdateURL],
 	);

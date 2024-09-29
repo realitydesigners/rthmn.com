@@ -12,6 +12,9 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
 	visibleBoxes,
 	onClose,
 }) => {
+	// Reverse the visibleBoxes array
+	const reversedVisibleBoxes = [...visibleBoxes].reverse();
+
 	return (
 		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-90">
 			<div className="max-h-[70vh] w-[70vw] overflow-auto rounded-lg bg-[#000] p-4 text-gray-300 shadow-xl">
@@ -47,12 +50,14 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
 				<div>
 					<h3 className="mb-2 text-lg font-semibold">Visible Boxes</h3>
 					<div className="grid grid-cols-4 gap-3">
-						{visibleBoxes.map((box, index) => (
+						{reversedVisibleBoxes.map((box, index) => (
 							<div
 								key={index}
 								className="rounded border border-gray-700 bg-gray-800 p-2 text-xs shadow"
 							>
-								<p className="font-semibold">Box {index + 1}</p>
+								<p className="font-semibold">
+									Box {visibleBoxes.length - index}
+								</p>
 								<p className="text-gray-400">Value: {box.value}</p>
 							</div>
 						))}

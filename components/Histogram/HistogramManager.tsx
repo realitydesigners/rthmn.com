@@ -45,9 +45,11 @@ const useHistogramData = (
 	}, [selectedFrame, data]);
 
 	const visibleBoxes = useMemo(() => {
-		return currentFrame
-			? currentFrame.boxes.slice(boxOffset, boxOffset + visibleBoxesCount)
-			: [];
+		if (!currentFrame) return [];
+		const totalBoxes = currentFrame.boxes.length;
+		const start = Math.max(0, boxOffset);
+		const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+		return currentFrame.boxes.slice(start, end);
 	}, [currentFrame, boxOffset, visibleBoxesCount]);
 
 	const maxSize = useMemo(() => {
@@ -61,10 +63,10 @@ const useHistogramData = (
 		const boxHeight = height / visibleBoxesCount;
 		return data.map((slice, index) => {
 			const isSelected = index === selectedFrameIndex;
-			const visibleBoxes = slice.boxes.slice(
-				boxOffset,
-				boxOffset + visibleBoxesCount,
-			);
+			const totalBoxes = slice.boxes.length;
+			const start = Math.max(0, boxOffset);
+			const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+			const visibleBoxes = slice.boxes.slice(start, end);
 			const positiveBoxesCount = visibleBoxes.filter(
 				(box) => box.value > 0,
 			).length;
@@ -262,10 +264,10 @@ const TimeBar: React.FC<{
 		let previousColor: "green" | "red" | null = null;
 
 		data.forEach((slice, index) => {
-			const visibleBoxes = slice.boxes.slice(
-				boxOffset,
-				boxOffset + visibleBoxesCount,
-			);
+			const totalBoxes = slice.boxes.length;
+			const start = Math.max(0, boxOffset);
+			const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+			const visibleBoxes = slice.boxes.slice(start, end);
 			const largestBox = visibleBoxes.reduce((max, box) =>
 				Math.abs(box.value) > Math.abs(max.value) ? box : max,
 			);
@@ -295,10 +297,10 @@ const TimeBar: React.FC<{
 				{significantTimeIndexes.map((index) => {
 					const slice = data[index];
 					const localTime = new Date(slice.timestamp);
-					const visibleBoxes = slice.boxes.slice(
-						boxOffset,
-						boxOffset + visibleBoxesCount,
-					);
+					const totalBoxes = slice.boxes.length;
+					const start = Math.max(0, boxOffset);
+					const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+					const visibleBoxes = slice.boxes.slice(start, end);
 					const largestBox = visibleBoxes.reduce((max, box) =>
 						Math.abs(box.value) > Math.abs(max.value) ? box : max,
 					);
@@ -402,10 +404,10 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 			sliceWidth: number,
 			index: number,
 		): JSX.Element | null => {
-			const visibleBoxArray = boxArray.slice(
-				boxOffset,
-				boxOffset + visibleBoxesCount,
-			);
+			const totalBoxes = boxArray.length;
+			const start = boxOffset;
+			const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+			const visibleBoxArray = boxArray.slice(start, end);
 			switch (viewType) {
 				case "scaled":
 					return (
@@ -485,6 +487,24 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 		}
 	}, [data]);
 
+	const handleFrameClick = useCallback(
+		(frame: BoxSlice, index: number) => {
+			const adjustedIndex = index + boxOffset;
+			onFrameSelect(frame, adjustedIndex);
+		},
+		[onFrameSelect, boxOffset],
+	);
+
+	const getVisibleBoxesForFrame = useCallback(
+		(frame: BoxSlice) => {
+			const totalBoxes = frame.boxes.length;
+			const start = Math.max(0, boxOffset);
+			const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+			return frame.boxes.slice(start, end);
+		},
+		[boxOffset, visibleBoxesCount],
+	);
+
 	return (
 		<div className="relative h-full w-full bg-gray-200">
 			<div
@@ -499,7 +519,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 							data={data}
 							framesWithPoints={framesWithPoints}
 							height={height}
-							onFrameSelect={onFrameSelect}
+							onFrameSelect={handleFrameClick}
 							renderNestedBoxes={renderNestedBoxes}
 							onMouseMove={handleMouseMove}
 							onMouseLeave={handleMouseLeave}
@@ -525,7 +545,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 			{selectedFrame && (
 				<SelectedFrameDetails
 					selectedFrame={selectedFrame}
-					visibleBoxes={visibleBoxes}
+					visibleBoxes={getVisibleBoxesForFrame(selectedFrame)}
 					onClose={() => onFrameSelect(null, null)}
 				/>
 			)}
