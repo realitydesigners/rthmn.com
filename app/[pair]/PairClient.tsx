@@ -27,10 +27,10 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	const [histogramHeight, setHistogramHeight] = useState(200);
 	const [boxOffset, setBoxOffset] = useState(() => {
 		const offsetParam = searchParams.get("offset");
-		return offsetParam ? parseInt(offsetParam, 10) : 0;
+		return offsetParam ? parseInt(offsetParam, 8) : 0;
 	});
 	const [sidebarWidth, setSidebarWidth] = useState(300);
-	const [visibleBoxesCount, setVisibleBoxesCount] = useState(10);
+	const [visibleBoxesCount, setVisibleBoxesCount] = useState(8);
 	const [viewType, setViewType] = useState<ViewType>("oscillator");
 	const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
 	const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
@@ -41,7 +41,7 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	const [startHeight, setStartHeight] = useState(200); // Initial height
 
 	const fetchData = useCallback(async () => {
-		return getBoxSlices(pair, undefined, 250);
+		return getBoxSlices(pair, undefined, 1000);
 	}, [pair]);
 
 	const { data, isLoading, error } = useQuery<BoxSlice[]>({
