@@ -1,94 +1,92 @@
-import React from 'react';
-import { ViewType } from '@/types';
+import React from "react";
+import { ViewType } from "@/types";
 import {
-  ScaledIcon,
-  EvenIcon,
-  OscillatorIcon,
-  MinusIcon,
-  PlusIcon
-} from './Icons';
+	ScaledIcon,
+	EvenIcon,
+	OscillatorIcon,
+	MinusIcon,
+	PlusIcon,
+} from "./Icons";
 
 interface HistogramControlsProps {
-  boxOffset: number;
-  onOffsetChange: (newOffset: number) => void;
-  totalBoxes: number;
-  visibleBoxesCount: number;
-  viewType: ViewType;
-  onViewChange: (newViewType: ViewType) => void;
-  selectedFrame: any | null;
-  height: number;
+	boxOffset: number;
+	onOffsetChange: (newOffset: number) => void;
+	totalBoxes: number;
+	visibleBoxesCount: number;
+	viewType: ViewType;
+	onViewChange: (newViewType: ViewType) => void;
+	selectedFrame: any | null;
+	height: number;
 }
 
 const AdjusterButton: React.FC<{
-  icon: React.ReactNode;
-  onClick: () => void;
-  disabled: boolean;
+	icon: React.ReactNode;
+	onClick: () => void;
+	disabled: boolean;
 }> = ({ icon, onClick, disabled }) => (
-  <button
-    onClick={onClick}
-    className="flex h-8 w-8 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50"
-    disabled={disabled}
-  >
-    {icon}
-  </button>
+	<button
+		onClick={onClick}
+		className="flex h-8 w-8 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50"
+		disabled={disabled}
+	>
+		{icon}
+	</button>
 );
 
 const ViewIcon: React.FC<{ viewType: ViewType }> = ({ viewType }) => {
-  switch (viewType) {
-    case 'scaled':
-      return <ScaledIcon className="h-6 w-6 text-white" />;
-    case 'even':
-      return <EvenIcon className="h-6 w-6 text-white" />;
-    case 'oscillator':
-      return <OscillatorIcon className="h-6 w-6 text-white" />;
-  }
+	switch (viewType) {
+		case "scaled":
+			return <ScaledIcon className="h-6 w-6 text-white" />;
+		case "even":
+			return <EvenIcon className="h-6 w-6 text-white" />;
+		case "oscillator":
+			return <OscillatorIcon className="h-6 w-6 text-white" />;
+	}
 };
 
 const HistogramControls: React.FC<HistogramControlsProps> = ({
-  boxOffset,
-  onOffsetChange,
-  totalBoxes,
-  visibleBoxesCount,
-  viewType,
-  onViewChange
+	boxOffset,
+	onOffsetChange,
+	totalBoxes,
+	visibleBoxesCount,
+	viewType,
+	onViewChange,
 }) => {
-  const cycleViewType = () => {
-    const views: ViewType[] = ['scaled', 'even', 'oscillator'];
-    const currentIndex = views.indexOf(viewType);
-    const nextIndex = (currentIndex + 1) % views.length;
-    onViewChange(views[nextIndex]);
-  };
+	const cycleViewType = () => {
+		const views: ViewType[] = ["scaled", "even", "oscillator"];
+		const currentIndex = views.indexOf(viewType);
+		const nextIndex = (currentIndex + 1) % views.length;
+		onViewChange(views[nextIndex]);
+	};
 
-  return (
-    <div className="flex h-full flex-col items-center justify-between p-2">
-      <div className="flex w-full flex-col space-y-2">
-        <AdjusterButton
-          icon={<MinusIcon />}
-          onClick={() => onOffsetChange(Math.max(0, boxOffset - 1))}
-          disabled={boxOffset === 0}
-        />
-        <AdjusterButton
-          icon={<PlusIcon />}
-          onClick={() =>
-            onOffsetChange(
-              Math.min(totalBoxes - visibleBoxesCount, boxOffset + 1)
-            )
-          }
-          disabled={boxOffset >= totalBoxes - visibleBoxesCount}
-        />
-      </div>
-      <div className="text-center text-white">
-        <div>{boxOffset + 1}</div>
-        <div>{totalBoxes}</div>
-      </div>
-      <button
-        onClick={cycleViewType}
-        className="flex h-10 w-10 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
-      >
-        <ViewIcon viewType={viewType} />
-      </button>
-    </div>
-  );
+	return (
+		<div className="flex h-full flex-col items-center justify-between p-2">
+			<AdjusterButton
+				icon={<PlusIcon />}
+				onClick={() => onOffsetChange(Math.max(0, boxOffset - 1))}
+				disabled={boxOffset === 0}
+			/>
+			<div className="text-center text-white">
+				<div>{boxOffset}</div>
+				<div>{totalBoxes - 1}</div>
+			</div>
+			<AdjusterButton
+				icon={<MinusIcon />}
+				onClick={() =>
+					onOffsetChange(
+						Math.min(totalBoxes - visibleBoxesCount, boxOffset + 1),
+					)
+				}
+				disabled={boxOffset >= totalBoxes - visibleBoxesCount}
+			/>
+			<button
+				onClick={cycleViewType}
+				className="mt-2 flex h-10 w-10 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
+			>
+				<ViewIcon viewType={viewType} />
+			</button>
+		</div>
+	);
 };
 
 export default React.memo(HistogramControls);

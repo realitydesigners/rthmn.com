@@ -24,7 +24,7 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
 				</p>
 				<div className="mb-4">
 					<h3 className="mb-2 text-lg font-semibold">All Boxes</h3>
-					<div className="grid grid-cols-8 gap-3">
+					{/* <div className="grid grid-cols-8 gap-3">
 						{selectedFrame.boxes.map((box, index) => (
 							<div
 								key={index}
@@ -45,7 +45,7 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
 								</div>
 							</div>
 						))}
-					</div>
+					</div> */}
 				</div>
 				<div>
 					<h3 className="mb-2 text-lg font-semibold">Visible Boxes</h3>
