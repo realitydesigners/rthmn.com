@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Box, BoxSlice, OHLC, PairData } from "@/types";
+import { Box, BoxSlice, PairData } from "@/types";
 
 interface PairsSidebarProps {
 	pairs: Record<string, PairData>;
@@ -35,8 +35,6 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [startX, setStartX] = useState(0);
 	const sidebarRef = useRef<HTMLDivElement>(null);
-	const animationFrameRef = useRef<number | null>(null);
-	const [localWidth, setLocalWidth] = useState(width);
 	const [hoveredOffset, setHoveredOffset] = useState<string | null>(null);
 
 	const formatValue = (value: number | undefined) => {
@@ -74,54 +72,38 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 	const handleMouseMove = useCallback(
 		(e: MouseEvent) => {
 			if (!isDragging) return;
-			if (animationFrameRef.current) {
-				cancelAnimationFrame(animationFrameRef.current);
-			}
-			animationFrameRef.current = requestAnimationFrame(() => {
-				const deltaX = startX - e.clientX;
-				const newWidth = Math.min(
-					Math.max(width + deltaX, MIN_SIDEBAR_WIDTH),
-					MAX_SIDEBAR_WIDTH,
-				);
-				setLocalWidth(newWidth);
-				if (sidebarRef.current) {
-					sidebarRef.current.style.width = `${newWidth}px`;
-				}
-			});
+			const deltaX = startX - e.clientX;
+			const newWidth = Math.min(
+				Math.max(width + deltaX, MIN_SIDEBAR_WIDTH),
+				MAX_SIDEBAR_WIDTH,
+			);
+			onWidthChange(newWidth);
 		},
-		[isDragging, startX, width],
+		[isDragging, startX, width, onWidthChange],
 	);
 
 	const handleMouseUp = useCallback(() => {
-		if (isDragging) {
-			setIsDragging(false);
-			if (animationFrameRef.current) {
-				cancelAnimationFrame(animationFrameRef.current);
-			}
-			onWidthChange(localWidth);
-		}
-	}, [isDragging, localWidth, onWidthChange]);
+		setIsDragging(false);
+	}, []);
 
 	useEffect(() => {
 		if (isDragging) {
-			document.addEventListener("mousemove", handleMouseMove);
-			document.addEventListener("mouseup", handleMouseUp);
+			window.addEventListener("mousemove", handleMouseMove);
+			window.addEventListener("mouseup", handleMouseUp);
 		} else {
-			document.removeEventListener("mousemove", handleMouseMove);
-			document.removeEventListener("mouseup", handleMouseUp);
+			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("mouseup", handleMouseUp);
 		}
 		return () => {
-			document.removeEventListener("mousemove", handleMouseMove);
-			document.removeEventListener("mouseup", handleMouseUp);
-			if (animationFrameRef.current) {
-				cancelAnimationFrame(animationFrameRef.current);
-			}
+			window.removeEventListener("mousemove", handleMouseMove);
+			window.removeEventListener("mouseup", handleMouseUp);
 		};
 	}, [isDragging, handleMouseMove, handleMouseUp]);
 
-	useEffect(() => {
-		setLocalWidth(width);
-	}, [width]);
+	const handleDragStart = useCallback((e: React.MouseEvent) => {
+		setIsDragging(true);
+		setStartX(e.clientX);
+	}, []);
 
 	const DraggableBorder = () => {
 		return (
@@ -131,10 +113,7 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 						? "shadow-2xl shadow-blue-500"
 						: "hover:w-[3px] hover:shadow-2xl hover:shadow-blue-500"
 				}`}
-				onMouseDown={(e) => {
-					setIsDragging(true);
-					setStartX(e.clientX);
-				}}
+				onMouseDown={handleDragStart}
 			/>
 		);
 	};
@@ -144,7 +123,7 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 			ref={sidebarRef}
 			className="fixed right-0 h-screen overflow-y-auto border-l border-[#181818] bg-black p-2 pt-24"
 			style={{
-				width: `${localWidth}px`,
+				width: `${width}px`,
 				transition: isDragging ? "none" : "width 0.1s ease-out",
 			}}
 		>

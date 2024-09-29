@@ -50,3 +50,5 @@ export interface PairData {
   boxes: BoxSlice[];
   currentOHLC: OHLC;
 }
+
+export type ViewType = 'scaled' | 'even' | 'oscillator';
