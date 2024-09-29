@@ -154,12 +154,7 @@ export const Oscillator = forwardRef<OscillatorRef, OscillatorProps>(
 
     const getColorAndY = (x: number) => {
       const y = interpolateY(x);
-      console.log('Oscillator getColorAndY called', {
-        x,
-        y,
-        color: colors.LIGHT
-      }); // Debug log
-      return { y: Math.round(y), color: colors.LIGHT }; // Round the y value
+      return { y: Math.round(y), color: colors.LIGHT };
     };
 
     useImperativeHandle(ref, () => ({

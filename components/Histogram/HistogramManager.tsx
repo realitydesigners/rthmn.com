@@ -122,6 +122,8 @@ const HistogramChart: React.FC<{
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseLeave: () => void;
   hoverInfo: { x: number; y: number; color: string } | null;
+  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  onScroll: () => void;
 }> = React.memo(
   ({
     data,
@@ -131,7 +133,9 @@ const HistogramChart: React.FC<{
     renderNestedBoxes,
     onMouseMove,
     onMouseLeave,
-    hoverInfo
+    hoverInfo,
+    scrollContainerRef,
+    onScroll
   }) => (
     <div
       className="relative h-full w-full pr-16"
@@ -139,9 +143,11 @@ const HistogramChart: React.FC<{
       onMouseLeave={onMouseLeave}
     >
       <div
+        ref={scrollContainerRef}
         className="hide-scrollbar flex h-full w-full items-end overflow-x-auto"
         role="region"
         aria-label="Histogram Chart"
+        onScroll={onScroll}
       >
         <div
           style={{
@@ -201,7 +207,7 @@ const HistogramChart: React.FC<{
             style={{
               background: hoverInfo.color,
               boxShadow: `0 0 5px ${hoverInfo.color}`,
-              top: `${hoverInfo.y - 6}px`, // Adjusted to move the dot up
+              top: `${hoverInfo.y - 6}px`,
               left: '-6px'
             }}
           />
@@ -228,6 +234,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   const { currentFrame, visibleBoxes, maxSize, framesWithPoints } =
     useHistogramData(
@@ -246,10 +253,16 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     color: string;
   } | null>(null);
 
+  const handleScroll = useCallback(() => {
+    if (scrollContainerRef.current) {
+      setScrollLeft(scrollContainerRef.current.scrollLeft);
+    }
+  }, []);
+
   const handleMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left;
+      const x = e.clientX - rect.left + scrollLeft;
       const frameIndex = Math.floor(x / INITIAL_BAR_WIDTH);
       const frameX = x % INITIAL_BAR_WIDTH;
 
@@ -260,14 +273,14 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
         if (oscillator) {
           const { y, color } = oscillator.getColorAndY(frameX);
           setHoverInfo({
-            x: frameIndex * INITIAL_BAR_WIDTH + frameX,
+            x: frameIndex * INITIAL_BAR_WIDTH + frameX - scrollLeft,
             y,
             color
           });
         }
       }
     },
-    [framesWithPoints]
+    [framesWithPoints, scrollLeft]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -336,11 +349,27 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
     [viewType, maxSize, height, onFrameSelect, boxOffset, visibleBoxesCount]
   );
 
+  // Update hover info when offset changes
+  useEffect(() => {
+    if (hoverInfo) {
+      const frameIndex = Math.floor(
+        (hoverInfo.x + scrollLeft) / INITIAL_BAR_WIDTH
+      );
+      const frameX = (hoverInfo.x + scrollLeft) % INITIAL_BAR_WIDTH;
+      const oscillator = oscillatorRefs.current[frameIndex];
+      if (oscillator) {
+        const { y, color } = oscillator.getColorAndY(frameX);
+        setHoverInfo((prevInfo) => ({ ...prevInfo, y, color }));
+      }
+    }
+  }, [boxOffset, scrollLeft]);
+
   // Auto-scroll to the right when new data is received
   useEffect(() => {
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollLeft =
         scrollContainerRef.current.scrollWidth;
+      handleScroll();
     }
   }, [data]);
 
@@ -363,6 +392,8 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
               onMouseMove={handleMouseMove}
               onMouseLeave={handleMouseLeave}
               hoverInfo={hoverInfo}
+              scrollContainerRef={scrollContainerRef}
+              onScroll={handleScroll}
             />
             <div className="absolute right-0 top-0 h-full w-16 border-l border-[#181818] bg-black">
               <HistogramControls
