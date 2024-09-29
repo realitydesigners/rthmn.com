@@ -1,27 +1,20 @@
-import React, { useMemo, useRef, useEffect } from "react";
+import React, { useMemo, useRef, useEffect, useState } from "react";
 import type { Box } from "@/types";
 
 const COLORS = {
 	GREEN: {
-		DARK: "#13B8A6",
+		DARK: "#000",
 		MEDIUM: "#116B61",
 		LIGHT: "#22FFE7",
 		DOT: "#116B61",
 		GRID: "#116B61",
 	},
 	RED: {
-		DARK: "#6A142C",
+		DARK: "#000",
 		MEDIUM: "#A01D3E",
 		LIGHT: "#FF6E86",
 		DOT: "#A01D3E",
 		GRID: "#A01D3E",
-	},
-	GRAY: {
-		DARK: "#2B2D42",
-		MEDIUM: "#8D99AE",
-		LIGHT: "#EDF2F4",
-		DOT: "#4A4E69",
-		GRID: "rgba(141, 153, 174, 0.3)",
 	},
 };
 
@@ -44,6 +37,10 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 	nextMeetingPointY,
 	sliceWidth,
 }) => {
+	const [hoverPosition, setHoverPosition] = useState<{
+		x: number;
+		y: number;
+	} | null>(null);
 	const boxHeight = height / visibleBoxesCount;
 	const sortedBoxes = boxArray.slice(0, visibleBoxesCount);
 
@@ -58,6 +55,39 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 	const colors = COLORS[sectionColor.toUpperCase() as keyof typeof COLORS];
 
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const containerRef = useRef<HTMLDivElement>(null);
+
+	const meetingPoints = useMemo(() => {
+		return [
+			{ x: -sliceWidth / 2, y: prevMeetingPointY ?? meetingPointY },
+			{ x: 0, y: prevMeetingPointY ?? meetingPointY },
+			{ x: 0, y: meetingPointY },
+			{ x: sliceWidth / 2, y: meetingPointY },
+			{ x: sliceWidth, y: meetingPointY },
+			{ x: sliceWidth, y: nextMeetingPointY ?? meetingPointY },
+			{ x: sliceWidth * 1.5, y: nextMeetingPointY ?? meetingPointY },
+		];
+	}, [prevMeetingPointY, meetingPointY, nextMeetingPointY, sliceWidth]);
+
+	const interpolateY = (x: number) => {
+		for (let i = 0; i < meetingPoints.length - 1; i++) {
+			const start = meetingPoints[i];
+			const end = meetingPoints[i + 1];
+			if (x >= start.x && x <= end.x) {
+				// If it's a vertical line segment
+				if (start.x === end.x) {
+					return (
+						start.y +
+						((end.y - start.y) * (x - start.x)) / (end.x - start.x + 0.001)
+					);
+				}
+				// For horizontal or sloped segments
+				const t = (x - start.x) / (end.x - start.x);
+				return start.y + t * (end.y - start.y);
+			}
+		}
+		return meetingPointY; // fallback
+	};
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -112,6 +142,28 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 			ctx.fillStyle = colors.DOT;
 			ctx.fill();
 		});
+
+		// Add event listeners for mouse interactions
+		const handleMouseMove = (e: MouseEvent) => {
+			const rect = containerRef.current?.getBoundingClientRect();
+			if (rect) {
+				const x = e.clientX - rect.left;
+				const y = interpolateY(x);
+				setHoverPosition({ x, y });
+			}
+		};
+
+		const handleMouseLeave = () => {
+			setHoverPosition(null);
+		};
+
+		containerRef.current?.addEventListener("mousemove", handleMouseMove);
+		containerRef.current?.addEventListener("mouseleave", handleMouseLeave);
+
+		return () => {
+			containerRef.current?.removeEventListener("mousemove", handleMouseMove);
+			containerRef.current?.removeEventListener("mouseleave", handleMouseLeave);
+		};
 	}, [
 		boxArray,
 		height,
@@ -120,10 +172,12 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 		colors,
 		visibleBoxesCount,
 		sortedBoxes,
+		meetingPoints,
 	]);
 
 	return (
 		<div
+			ref={containerRef}
 			className="relative overflow-hidden"
 			style={{
 				width: sliceWidth,
@@ -184,6 +238,30 @@ export const Oscillator: React.FC<OscillatorProps> = ({
 							repeatCount="indefinite"
 						/>
 					</path>
+				)}
+
+				{hoverPosition && (
+					<>
+						<line
+							x1={hoverPosition.x}
+							y1={0}
+							x2={hoverPosition.x}
+							y2={height}
+							stroke={colors.LIGHT}
+							strokeWidth="1"
+							strokeDasharray="4 4"
+						/>
+						<circle
+							cx={hoverPosition.x}
+							cy={hoverPosition.y}
+							r="4"
+							fill={colors.LIGHT}
+							style={{
+								zIndex: 1000,
+								filter: `drop-shadow(0 0 3px ${colors.LIGHT})`,
+							}}
+						/>
+					</>
 				)}
 			</svg>
 		</div>
