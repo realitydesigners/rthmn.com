@@ -153,8 +153,8 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	}, [searchParams]);
 
 	return (
-		<div className="0 flex min-h-screen w-full">
-			<div className="relative flex-grow bg-black">
+		<div className="flex min-h-screen w-full overflow-y-hidden">
+			<div className="relative flex-grow overflow-y-hidden bg-black">
 				<div
 					className="absolute bottom-0 left-0 right-0"
 					style={{ paddingRight: `${sidebarWidth}px` }}
