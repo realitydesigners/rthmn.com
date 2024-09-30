@@ -60,7 +60,7 @@ const HistogramControls: React.FC<HistogramControlsProps> = ({
 	};
 
 	return (
-		<div className="flex h-full flex-col items-center justify-between p-2">
+		<div className="absolute right-0 top-0 flex h-full w-16 flex-col items-center justify-center border-l border-[#181818] bg-black">
 			<AdjusterButton
 				icon={<PlusIcon />}
 				onClick={() => onOffsetChange(Math.max(0, boxOffset - 1))}
