@@ -41,14 +41,14 @@ const PairClient: React.FC<DashboardClientProps> = ({
   const [startHeight, setStartHeight] = useState(200); // Initial height
 
   const fetchData = useCallback(async () => {
-    return getBoxSlices(pair, undefined, 1000);
+    return getBoxSlices(pair, undefined, 500);
   }, [pair]);
 
   const { data, isLoading, error } = useQuery<BoxSlice[]>({
     queryKey: ['boxSlices', pair],
     queryFn: fetchData,
     initialData: initialData,
-    refetchInterval: 5000
+    refetchInterval: 10000
   });
 
   const filteredData = useMemo(() => {

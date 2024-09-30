@@ -78,12 +78,27 @@ const useHistogramData = (
         totalNegativeHeight +
         (height - totalNegativeHeight - positiveBoxesCount * boxHeight) / 2;
 
+      // Find the smallest box based on absolute value
+      const smallestBox = visibleBoxes.reduce((smallest, current) =>
+        Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest
+      );
+
+      // Calculate price based on the smallest box
+      const price = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
+
+      // Calculate high and low from visible boxes
+      const high = Math.max(...visibleBoxes.map((box) => box.high));
+      const low = Math.min(...visibleBoxes.map((box) => box.low));
+
       return {
         frameData: {
           boxArray: slice.boxes,
           isSelected,
           meetingPointY,
-          sliceWidth: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH
+          sliceWidth: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
+          price,
+          high,
+          low
         },
         meetingPointY,
         sliceWidth: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH
@@ -115,7 +130,7 @@ type HoverInfo = {
   color: string;
   high: number;
   low: number;
-  price: number; // Add price to the HoverInfo type
+  price: number;
 } | null;
 
 const HistogramChart: React.FC<{
@@ -130,11 +145,14 @@ const HistogramChart: React.FC<{
     prevMeetingPointY: number | null,
     nextMeetingPointY: number | null,
     sliceWidth: number,
-    index: number
+    index: number,
+    price: number,
+    high: number,
+    low: number
   ) => JSX.Element | null;
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseLeave: () => void;
-  hoverInfo: HoverInfo;
+  hoverInfo: HoverInfo | null;
   scrollContainerRef: React.RefObject<HTMLDivElement>;
   onScroll: () => void;
 }> = React.memo(
@@ -197,7 +215,10 @@ const HistogramChart: React.FC<{
                   prevMeetingPointY,
                   nextMeetingPointY,
                   sliceWidth,
-                  index
+                  index,
+                  frameData.price,
+                  frameData.high,
+                  frameData.low
                 )}
               </div>
             );
@@ -215,28 +236,19 @@ const HistogramChart: React.FC<{
               boxShadow: `0 0 5px ${hoverInfo.color}`,
               zIndex: 1000
             }}
-          >
-            <div
-              className="absolute h-3 w-3 rounded-full"
-              style={{
-                background: hoverInfo.color,
-                boxShadow: `0 0 5px ${hoverInfo.color}`,
-                top: `${hoverInfo.y - 6}px`,
-                left: '-6px'
-              }}
-            />
-            <div
-              className="absolute whitespace-nowrap rounded bg-black px-2 py-1 text-xs text-white"
-              style={{
-                bottom: '0',
-                left: '50%',
-                transform: 'translateX(-50%) translateY(100%)',
-                zIndex: 1001
-              }}
-            >
-              {hoverInfo.price.toFixed(3)}
-            </div>
-          </div>
+          />
+          <div
+            className="pointer-events-none absolute h-3 w-3 rounded-full"
+            style={{
+              left: `${hoverInfo.x}px`,
+              top: `${hoverInfo.y}px`,
+              transform: 'translate(-50%, -50%)',
+              background: hoverInfo.color,
+              boxShadow: `0 0 5px ${hoverInfo.color}`,
+              zIndex: 1001
+            }}
+          />
+          <HoverInfo {...hoverInfo} />
         </>
       )}
     </div>
@@ -357,6 +369,9 @@ interface OscillatorProps {
   prevMeetingPointY: number | null;
   nextMeetingPointY: number | null;
   sliceWidth: number;
+  price: number;
+  high: number;
+  low: number;
 }
 
 export interface OscillatorRef {
@@ -432,7 +447,10 @@ const Oscillator = forwardRef<OscillatorRef, OscillatorProps>(
       meetingPointY,
       prevMeetingPointY,
       nextMeetingPointY,
-      sliceWidth
+      sliceWidth,
+      price,
+      high,
+      low
     },
     ref
   ) => {
@@ -484,14 +502,11 @@ const Oscillator = forwardRef<OscillatorRef, OscillatorProps>(
 
     const getColorAndY = (x: number) => {
       const y = interpolateY(x);
-      const boxIndex = Math.floor((y / height) * visibleBoxesCount);
-      const box = sortedBoxes[boxIndex];
-      const price = smallestBox.value < 0 ? smallestBox.low : smallestBox.high;
       return {
         y: Math.round(y),
         color: colors.LIGHT,
-        high: box ? box.high : 0,
-        low: box ? box.low : 0,
+        high,
+        low,
         price
       };
     };
@@ -659,6 +674,34 @@ const Oscillator = forwardRef<OscillatorRef, OscillatorProps>(
   }
 );
 
+// Update the HoverInfo component
+const HoverInfo: React.FC<NonNullable<HoverInfo>> = ({
+  x,
+  y,
+  color,
+  price,
+  high,
+  low
+}) => (
+  <div
+    className="pointer-events-none absolute z-50"
+    style={{
+      left: `${x}px`,
+      top: `${y}px`,
+      transform: 'translate(-50%, -100%)'
+    }}
+  >
+    <div
+      className="rounded px-2 py-1 text-xs"
+      style={{ backgroundColor: color, color: '#000' }}
+    >
+      <div>Price: {price.toFixed(3)}</div>
+      <div>High: {high.toFixed(3)}</div>
+      <div>Low: {low.toFixed(3)}</div>
+    </div>
+  </div>
+);
+
 const HistogramManager: React.FC<HistogramManagerProps> = ({
   data,
   height,
@@ -705,9 +748,7 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
       const frameX = x % INITIAL_BAR_WIDTH;
 
       if (frameIndex >= 0 && frameIndex < framesWithPoints.length) {
-        const frame = framesWithPoints[frameIndex];
         const oscillator = oscillatorRefs.current[frameIndex];
-
         if (oscillator) {
           const { y, color, high, low, price } =
             oscillator.getColorAndY(frameX);
@@ -737,7 +778,10 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
       prevMeetingPointY: number | null,
       nextMeetingPointY: number | null,
       sliceWidth: number,
-      index: number
+      index: number,
+      price: number,
+      high: number,
+      low: number
     ): JSX.Element | null => {
       const totalBoxes = boxArray.length;
       const start = boxOffset;
@@ -782,6 +826,9 @@ const HistogramManager: React.FC<HistogramManagerProps> = ({
               prevMeetingPointY={prevMeetingPointY}
               nextMeetingPointY={nextMeetingPointY}
               sliceWidth={sliceWidth}
+              price={price}
+              high={high}
+              low={low}
             />
           );
         default:
