@@ -80,10 +80,7 @@ export const OscillatorIcon: React.FC<{ className: string }> = ({
 		strokeLinejoin="round"
 		className={className}
 	>
-		<path d="M14 3a4 4 0 0 0-4 4v4a4 4 0 0 0-4 4"></path>
-		<path d="M20 3a4 4 0 0 0-4 4v4a4 4 0 0 0-4 4"></path>
-		<path d="M14 17a4 4 0 0 0 4 4h4"></path>
-		<path d="M20 17a4 4 0 0 0 4 4h4"></path>
+		<path d="M2 12h4c1.1 0 2-.9 2-2s.9-2 2-2 2 .9 2 2 .9 2 2 2 2-.9 2-2 .9-2 2-2 2 .9 2 2 .9 2 2 2h4" />
 	</svg>
 );
 

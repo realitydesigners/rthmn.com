@@ -27,10 +27,10 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	const [histogramHeight, setHistogramHeight] = useState(200);
 	const [boxOffset, setBoxOffset] = useState(() => {
 		const offsetParam = searchParams.get("offset");
-		return offsetParam ? parseInt(offsetParam, 8) : 0;
+		return offsetParam ? parseInt(offsetParam, 10) : 0;
 	});
-	const [sidebarWidth, setSidebarWidth] = useState(300);
-	const [visibleBoxesCount, setVisibleBoxesCount] = useState(8);
+	const [sidebarWidth, setSidebarWidth] = useState(350);
+	const [visibleBoxesCount, setVisibleBoxesCount] = useState(16);
 	const [viewType, setViewType] = useState<ViewType>("oscillator");
 	const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
 	const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
@@ -38,17 +38,17 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	);
 	const [isDragging, setIsDragging] = useState(false);
 	const [startY, setStartY] = useState(0);
-	const [startHeight, setStartHeight] = useState(200); // Initial height
+	const [startHeight, setStartHeight] = useState(200);
 
 	const fetchData = useCallback(async () => {
-		return getBoxSlices(pair, undefined, 1000);
+		return getBoxSlices(pair, undefined, 500);
 	}, [pair]);
 
-	const { data, isLoading, error } = useQuery<BoxSlice[]>({
+	const { data } = useQuery<BoxSlice[]>({
 		queryKey: ["boxSlices", pair],
 		queryFn: fetchData,
 		initialData: initialData,
-		refetchInterval: 5000,
+		refetchInterval: 10000,
 	});
 
 	const filteredData = useMemo(() => {
@@ -69,31 +69,26 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		}, []);
 	}, [data, boxOffset, visibleBoxesCount]);
 
-	const handleHistogramResize = useCallback((newHeight: number) => {
-		setHistogramHeight(newHeight);
-	}, []);
-
 	const debouncedUpdateURL = useMemo(
 		() =>
 			debounce((newOffset: number) => {
 				const params = new URLSearchParams(searchParams.toString());
 				params.set("offset", newOffset.toString());
-				router.push(`?${params.toString()}`, { scroll: false });
+				router.push(`/${pair}?${params.toString()}`, { scroll: false });
 			}, 300),
-		[searchParams, router],
+		[searchParams, router, pair],
 	);
 
 	const handleOffsetChange = useCallback(
 		(newOffset: number) => {
 			setBoxOffset(newOffset);
 			debouncedUpdateURL(newOffset);
+			// Reset selected frame when offset changes
+			setSelectedFrame(null);
+			setSelectedFrameIndex(null);
 		},
 		[debouncedUpdateURL],
 	);
-
-	const handleVisibleBoxesCountChange = useCallback((newCount: number) => {
-		setVisibleBoxesCount(newCount);
-	}, []);
 
 	const handleViewChange = useCallback((newViewType: ViewType) => {
 		setViewType(newViewType);
@@ -153,8 +148,8 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	}, [searchParams]);
 
 	return (
-		<div className="0 flex min-h-screen w-full">
-			<div className="relative flex-grow bg-black">
+		<div className="flex min-h-screen w-full overflow-y-hidden">
+			<div className="relative flex-grow overflow-y-hidden bg-black">
 				<div
 					className="absolute bottom-0 left-0 right-0"
 					style={{ paddingRight: `${sidebarWidth}px` }}
@@ -162,7 +157,6 @@ const PairClient: React.FC<DashboardClientProps> = ({
 					<HistogramManager
 						data={filteredData}
 						height={histogramHeight}
-						onResize={handleHistogramResize}
 						boxOffset={boxOffset}
 						onOffsetChange={handleOffsetChange}
 						visibleBoxesCount={visibleBoxesCount}

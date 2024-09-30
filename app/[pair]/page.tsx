@@ -35,7 +35,7 @@ export default async function PairPage({ params }: PageProps) {
 		redirect("/signin");
 	}
 
-	const initialData = await getBoxSlices(pair, undefined, 1000);
+	const initialData = await getBoxSlices(pair, undefined, 500);
 	const allPairsData = await getLatestBoxSlices();
 
 	return (
