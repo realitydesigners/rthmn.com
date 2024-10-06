@@ -13,8 +13,8 @@ import type { BoxSlice, ViewType, Box } from "@/types";
 import { COLORS } from "./Colors";
 import { DraggableBorder } from "../DraggableBorder";
 import { formatTime } from "@/utils/formatTime";
-import { MeetingPoint } from "./Oscillator/MeetingPoint";
-import { PulseWave } from "./Oscillator/PulseWave";
+import { MeetingPoint } from "./oscillator/MeetingPoint";
+import { PulseWave } from "./oscillator/PulseWave";
 
 const ZOOMED_BAR_WIDTH = 0;
 const INITIAL_BAR_WIDTH = 60;
