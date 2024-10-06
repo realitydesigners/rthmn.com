@@ -2,8 +2,8 @@ import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import PairClient from "./PairClient";
-import { getBoxSlices } from "@/app/utils/getBoxSlices";
-import { getLatestBoxSlices } from "@/app/utils/getLatestBoxSlices";
+import { getBoxSlices } from "@/utils/getBoxSlices";
+import { getLatestBoxSlices } from "@/utils/getLatestBoxSlices";
 
 interface PageProps {
 	params: {

@@ -35,7 +35,7 @@ export interface Box {
 }
 
 export interface BoxSlice {
-  timestamp: number;
+  timestamp: string;
   boxes: Box[];
 }
 

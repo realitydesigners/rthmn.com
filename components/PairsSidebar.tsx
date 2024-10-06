@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Box, BoxSlice, PairData } from "@/types";
+import { DraggableBorder } from "./DraggableBorder";
 
 interface PairsSidebarProps {
 	pairs: Record<string, PairData>;
@@ -105,19 +106,6 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 		setStartX(e.clientX);
 	}, []);
 
-	const DraggableBorder = () => {
-		return (
-			<div
-				className={`absolute bottom-0 left-0 top-0 w-[1px] cursor-ew-resize rounded-full bg-[#181818] transition-all duration-200 hover:bg-blue-400 ${
-					isDragging
-						? "shadow-2xl shadow-blue-500"
-						: "hover:w-[3px] hover:shadow-2xl hover:shadow-blue-500"
-				}`}
-				onMouseDown={handleDragStart}
-			/>
-		);
-	};
-
 	return (
 		<div
 			ref={sidebarRef}
@@ -127,7 +115,11 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 				transition: isDragging ? "none" : "width 0.1s ease-out",
 			}}
 		>
-			<DraggableBorder />
+			<DraggableBorder
+				isDragging={isDragging}
+				onDragStart={handleDragStart}
+				direction="left"
+			/>
 			<div className="mb-2 flex text-[10px] tracking-widest text-gray-300/50">
 				<span className="w-24 pl-1">INSTRUMENT</span>
 				<span className="w-24">PRICE</span>

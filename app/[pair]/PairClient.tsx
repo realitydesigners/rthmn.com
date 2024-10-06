@@ -4,10 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { BoxSlice, PairData } from "@/types";
 import HistogramManager from "../../components/Histogram/HistogramManager";
-import { getBoxSlices } from "@/app/utils/getBoxSlices";
+import { getBoxSlices } from "@/utils/getBoxSlices";
 import PairsSidebar from "@/components/PairsSidebar";
-import { getTrendForOffset } from "@/app/utils/getTrendForOffset";
-import { compareSlices } from "@/app/utils/compareSlices";
+import { getTrendForOffset } from "@/utils/getTrendForOffset";
+import { compareSlices } from "@/utils/compareSlices";
 import debounce from "lodash/debounce";
 import { ViewType } from "@/types";
 
