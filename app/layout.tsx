@@ -1,13 +1,13 @@
-import DynamicNavbar from "@/components/DynamicNavbar";
-import { Toaster } from "@/components/ui/Toasts/toaster";
+import DynamicNavbar from "@/components/NavbarDynamic";
+import { Toaster } from "@/components/Toasts/toaster";
 import { getURL } from "@/utils/helpers";
 import type { Metadata } from "next";
 import { type PropsWithChildren, Suspense } from "react";
 import "./main.css";
-import AppProviders from "./AppProviders";
+import AppProviders from "../providers/AppProviders";
 
-const title = "Next.js Subscription Starter";
-const description = "Brought to you by Vercel, Stripe, and Supabase.";
+const title = "RTHMN | Next Generation Forex / Stock Toolkit";
+const description = "RTHMN is a next generation algorithmic trading platform that provides real-time trading signals, 3D pattern recognition, gamified learning, AI-powered predictions, and comprehensive risk management.";
 
 const clarityTrackingCode = process.env.NEXT_PUBLIC_CLARITY_TRACKING_CODE;
 const gtagId = process.env.NEXT_PUBLIC_GTAG_ID;

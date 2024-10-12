@@ -37,6 +37,7 @@ export interface Box {
 export interface BoxSlice {
   timestamp: string;
   boxes: Box[];
+  currentOHLC: OHLC;
 }
 
 export interface OHLC {
@@ -52,3 +53,13 @@ export interface PairData {
 }
 
 export type ViewType = 'scaled' | 'even' | 'oscillator';
+
+export interface Candle {
+
+	time: string;
+	open: number;
+	high: number;
+	low: number;
+	close: number;
+
+}
