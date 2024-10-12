@@ -71,13 +71,11 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	const candleData = useMemo(() => {
 		if (!data) return [];
 		return data.map(slice => ({
-	
 			time: new Date(slice.timestamp).toISOString(),
 			open: slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0,
 			high: slice.currentOHLC?.high ?? Math.max(...slice.boxes.map(box => box.high)),
 			low: slice.currentOHLC?.low ?? Math.min(...slice.boxes.map(box => box.low)),
-			close: slice.currentOHLC?.close ?? slice.boxes[slice.boxes.length - 1]?.low ?? 0,	
-			
+			close: slice.currentOHLC?.close ?? slice.boxes[slice.boxes.length - 1]?.low ?? 0,
 		}));
 	}, [data]);
 
@@ -181,9 +179,9 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	}, [histogramHeight]);
 
 	return (
-		<div ref={containerRef} className="flex flex-col h-screen w-full overflow-hidden bg-black">
+		<div ref={containerRef} className="flex flex-col h-screen w-full overflow-hidden  bg-black">
 			<div 
-				className="flex-grow overflow-hidden pt-[80px] "
+				className="flex-grow overflow-hidden pt-[80px]"
 				style={{ 
 					minHeight: `${rthmnVisionHeight}px`,
 				}}
@@ -192,7 +190,7 @@ const PairClient: React.FC<DashboardClientProps> = ({
 					pair={pair}
 					candles={candleData}
 					width={rthmnVisionDimensions.width}
-					height={rthmnVisionHeight - 60}
+					height={rthmnVisionHeight - 40}
 				/>
 			</div>
 			<div 

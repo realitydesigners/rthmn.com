@@ -1,7 +1,6 @@
 "use client";
-import React, { useCallback, RefObject, useEffect, useRef, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
 import styles from "./styles.module.css";
-
 import { Candle } from "@/types";
 
 const RthmnVision: React.FC<{
@@ -15,17 +14,17 @@ const RthmnVision: React.FC<{
 
 	const svgRef = useRef<SVGSVGElement>(null);
 	const point = 0.00001; 
-	const minY = Math.min(...closingPrices) - point * 50;
-	const maxY = Math.max(...closingPrices) + point * 50;
-	const chartPadding = { top: 20, right: 60, bottom: 40, left: 60 };
+	const visibleDataPoints = 200; 
+	const visibleClosingPrices = closingPrices.slice(-visibleDataPoints);
+	const minY = Math.min(...visibleClosingPrices) - point * 50;
+	const maxY = Math.max(...visibleClosingPrices) + point * 50;
+	const chartPadding = { top: 20, right: 100, bottom: 40, left: 60 };
 	const chartWidth = width - chartPadding.left - chartPadding.right;
 	const chartHeight = height - chartPadding.top - chartPadding.bottom;
 
-	console.log(candles, "candles")
-
 	const PairName: React.FC<{ pair: string }> = ({ pair }) => {
 		const pairName = pair.substring(0, 7).replace(/_/g, "");
-		return <div className="text-white text-2xl font-bold">{pairName}</div>;
+		return <div className="text-gray-200 absolute top-4 left-4 text-2xl font-bold uppercase">{pairName}</div>;
 	};
 	
 	useEffect(() => {
@@ -51,8 +50,9 @@ const RthmnVision: React.FC<{
 			height={chartHeight}
 			pair={pair}
 			candles={candles}
+			visibleDataPoints={visibleDataPoints} 
 		/>
-	), [closingPrices, timeData, minY, maxY, chartWidth, chartHeight, pair, candles]);
+	), [closingPrices, timeData, minY, maxY, chartWidth, chartHeight, pair, candles, visibleDataPoints]);
 
 	if (closingPrices.length === 0) {
 		return <div>Loading...</div>;
@@ -90,7 +90,7 @@ const RthmnVision: React.FC<{
 
 export default RthmnVision;
 
-interface ChartLineProps {
+const ChartLine: React.FC<{
 	closingPrices: number[];
 	timeData: number[];
 	minY: number;
@@ -99,9 +99,8 @@ interface ChartLineProps {
 	height: number;
 	pair: string;
 	candles: { time: string }[];
-}
-
-const ChartLine: React.FC<ChartLineProps> = React.memo(({
+	visibleDataPoints: number;
+}> = React.memo(({
 	closingPrices,
 	timeData,
 	minY,
@@ -110,6 +109,7 @@ const ChartLine: React.FC<ChartLineProps> = React.memo(({
 	height,
 	pair,
 	candles,
+	visibleDataPoints,
 }) => {
 	const svgRef = useRef<SVGSVGElement>(null);
 	const [hoverPrice, setHoverPrice] = useState<number | null>(null);
@@ -120,26 +120,31 @@ const ChartLine: React.FC<ChartLineProps> = React.memo(({
 	} | null>(null);
 	const [hoverTime, setHoverTime] = useState<string | null>(null);
 
-	const calculatePathData = () => {
+	const rightMargin = 200;
+
+	const calculatePathData = useCallback(() => {
 		if (closingPrices.length === 0) return '';
 		
-		const xStep = width / (closingPrices.length - 1);
-		return closingPrices
+		const dataToShow = closingPrices.slice(-visibleDataPoints);
+		const xScale = (width - rightMargin) / (dataToShow.length - 1);
+		const yScale = height / (maxY - minY);
+		
+		return dataToShow
 			.map((price, index) => {
-				const x = index * xStep;
-				const y = height - ((price - minY) / (maxY - minY)) * height;
+				const x = index * xScale;
+				const y = height - (price - minY) * yScale;
 				return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
 			})
 			.join(' ');
-	};
+	}, [closingPrices, minY, maxY, width, height, visibleDataPoints, rightMargin]);
 
-	const calculateCurrentPricePosition = () => {
+	const calculateCurrentPricePosition = useCallback(() => {
 		if (closingPrices.length === 0) return { x: 0, y: 0 };
 		const currentPrice = closingPrices[closingPrices.length - 1];
-		const x = width;
+		const x = width - rightMargin;
 		const y = height - ((currentPrice - minY) / (maxY - minY)) * height;
 		return { x, y };
-	};
+	}, [closingPrices, minY, maxY, width, height, rightMargin]);
 
 	const handleMouseMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
 		const { left, width, top, height } = svgRef.current?.getBoundingClientRect() || {
@@ -199,8 +204,8 @@ const ChartLine: React.FC<ChartLineProps> = React.memo(({
 		>
 			<ChartPath
 				isHoveringLine={isHoveringLine}
-				calculatePathData={calculatePathData}
-				calculateCurrentPricePosition={calculateCurrentPricePosition}
+				pathData={calculatePathData()}
+				currentPricePosition={calculateCurrentPricePosition()}
 				hoverPosition={hoverPosition}
 				hoverPrice={hoverPrice}
 				hoverTime={hoverTime}
@@ -211,16 +216,14 @@ const ChartLine: React.FC<ChartLineProps> = React.memo(({
 	);
 });
 
-interface ChartContainerProps {
-	svgRef: RefObject<SVGSVGElement>;
+const ChartContainer: React.FC<{
+	svgRef: React.RefObject<SVGSVGElement>;
 	chartWidth: number;
 	chartHeight: number;
 	handleMouseMove: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
 	handleMouseLeave: () => void;
 	children: React.ReactNode;
-}
-
-const ChartContainer: React.FC<ChartContainerProps> = ({
+}> = ({
 	svgRef,
 	chartWidth,
 	chartHeight,
@@ -243,14 +246,11 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
 	);
 };
 
-
-interface XAxisProps {
+export const XAxis: React.FC<{
 	timeData: number[];
 	chartWidth: number;
 	chartHeight: number;
-}
-
-export const XAxis: React.FC<XAxisProps> = ({ timeData, chartWidth, chartHeight }) => {
+}> = ({ timeData, chartWidth, chartHeight }) => {
 	const tickCount = 5;
 	const ticks = timeData.filter((_, i) => i % Math.floor(timeData.length / tickCount) === 0);
 
@@ -277,14 +277,12 @@ export const XAxis: React.FC<XAxisProps> = ({ timeData, chartWidth, chartHeight 
 	);
 };
 
-interface YAxisProps {
+export const YAxis: React.FC<{
 	minY: number;
 	maxY: number;
 	point: number;
 	chartHeight: number;
-}
-
-export const YAxis: React.FC<YAxisProps> = ({ minY, maxY, point, chartHeight }) => {
+}> = ({ minY, maxY, point, chartHeight }) => {
 	const steps = 5;
 	const range = maxY - minY;
 	const stepSize = range / steps;
@@ -313,15 +311,12 @@ export const YAxis: React.FC<YAxisProps> = ({ minY, maxY, point, chartHeight }) 
 	);
 };
 
-
-interface HoverIndicatorProps {
+const ChartPathPriceOnHover: React.FC<{
 	hoverPosition: { x: number; y: number };
 	hoverPrice: number;
 	hoverTime: string;
 	chartHeight: number;
-}
-
-const ChartPathPriceOnHover: React.FC<HoverIndicatorProps> = ({ hoverPosition, hoverPrice, hoverTime, chartHeight }) => {
+}> = ({ hoverPosition, hoverPrice, hoverTime, chartHeight }) => {
 	return (
 		<>
 			<line x1={hoverPosition.x} y1={0} x2={hoverPosition.x} y2={chartHeight} className="stroke-[#555]" strokeWidth="1" />
@@ -354,77 +349,76 @@ const ChartPathPriceOnHover: React.FC<HoverIndicatorProps> = ({ hoverPosition, h
 	);
 };
 
-interface ChartPathProps {
+const ChartPath: React.FC<{
 	isHoveringLine: boolean;
-	calculatePathData: () => string;
-	calculateCurrentPricePosition: () => { x: number; y: number };
+	pathData: string;
+	currentPricePosition: { x: number; y: number };
 	hoverPosition: { x: number; y: number } | null;
 	hoverPrice: number | null;
 	hoverTime: string | null;
 	chartHeight: number;
 	chartWidth: number;
-}
-
-const ChartPath: React.FC<ChartPathProps> = ({
+}> = ({
 	isHoveringLine,
-	calculatePathData,
-	calculateCurrentPricePosition,
+	pathData,
+	currentPricePosition,
 	hoverPosition,
 	hoverPrice,
 	hoverTime,
 	chartHeight,
 	chartWidth,
 }) => {
-	const pathData = calculatePathData();
-	const currentPricePosition = calculateCurrentPricePosition();
-
 	return (
 		<g>
-			<path
-				d={pathData}
-				fill="none"
-				stroke="white"
-				strokeWidth={isHoveringLine ? 2 : 1.5}
-				opacity={isHoveringLine ? 0.5 : 1}
-			/>
-			<line
-				x1={currentPricePosition.x}
-				y1={0}
-				x2={currentPricePosition.x}
-				y2={chartHeight}
-				stroke="red"
-				strokeWidth="1"
-				strokeDasharray="5,5"
-			/>
-			<circle
-				cx={currentPricePosition.x}
-				cy={currentPricePosition.y}
-				r="4"
-				fill="red"
-			/>
-			<circle cx={currentPricePosition.x} cy={currentPricePosition.y} r="5" className={styles.chartDot} />
-			<circle
-				cx={currentPricePosition.x}
-				cy={currentPricePosition.y}
-				r="5"
-				className={`${styles.chartDot} ${styles.pulsingCircle}`}
-			/>
-			<circle
-				cx={currentPricePosition.x}
-				cy={currentPricePosition.y}
-				r="5"
-				className={`${styles.chartDot} ${styles.pulsingCircle}`}
-			/>
-
-			{hoverPosition && hoverPrice !== null && hoverTime !== null && (
-				<ChartPathPriceOnHover
-					hoverPosition={hoverPosition}
-					hoverPrice={hoverPrice}
-					hoverTime={hoverTime}
-					chartHeight={chartHeight}
+			<clipPath id="chart-area">
+				<rect x="0" y="0" width={chartWidth} height={chartHeight} />
+			</clipPath>
+			<g clipPath="url(#chart-area)">
+				<path
+					d={pathData}
+					fill="none"
+					stroke="white"
+					strokeWidth={isHoveringLine ? 2 : 1.5}
+					opacity={isHoveringLine ? 0.5 : 1}
 				/>
-			)}
+				<line
+					x1={currentPricePosition.x}
+					y1={0}
+					x2={currentPricePosition.x}
+					y2={chartHeight}
+					stroke="white"
+					strokeWidth="1"
+					strokeDasharray="5,5"
+				/>
+				<circle
+					cx={currentPricePosition.x}
+					cy={currentPricePosition.y}
+					r="4"
+					fill="white"
+				/>
+				<circle cx={currentPricePosition.x} cy={currentPricePosition.y} r="5" className={styles.chartDot} />
+				<circle
+					cx={currentPricePosition.x}
+					cy={currentPricePosition.y}
+					r="5"
+					className={`${styles.chartDot} ${styles.pulsingCircle}`}
+				/>
+				<circle
+					cx={currentPricePosition.x}
+					cy={currentPricePosition.y}
+					r="5"
+					className={`${styles.chartDot} ${styles.pulsingCircle}`}
+				/>
+
+				{hoverPosition && hoverPrice !== null && hoverTime !== null && (
+					<ChartPathPriceOnHover
+						hoverPosition={hoverPosition}
+						hoverPrice={hoverPrice}
+						hoverTime={hoverTime}
+						chartHeight={chartHeight}
+					/>
+				)}
+			</g>
 		</g>
 	);
 };
-
