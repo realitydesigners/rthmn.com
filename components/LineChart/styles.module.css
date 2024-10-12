@@ -1,3 +1,45 @@
+.chartContainer {
+    position: relative;
+    width: 100%;
+    z-index: 10;
+    height: 100%;
+    margin-left: -0.1rem;
+}
+
+.chartLine {
+    fill: none;
+    stroke: #fff;
+    stroke-width: .8;
+}
+
+.chartDot {
+    fill: white;
+    position: relative;
+    z-index: 1000;
+}
+
+.pulsingCircle {
+    fill: rgba(255, 255, 255, 0.5);
+    animation: pulse 4s infinite;
+
+}
+
+.pulsingCircle:nth-of-type(2) {
+    animation-delay: 2s;
+}
+
+
+@keyframes pulse {
+    0% {
+        r: 5;
+        opacity: 1;
+    }
+
+    100% {
+        r: 20;
+        opacity: 0;
+    }
+}
 .button {
     border-radius: 0.25em;
     transition: all 0.2s ease-in-out;
@@ -28,7 +70,6 @@
 .dropdown {
     width: auto;
     position: absolute;
-    margin-top: 8px;
     top: 100%;
     left: 0;
     background-color: #000;

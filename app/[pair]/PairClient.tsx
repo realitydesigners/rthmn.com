@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { BoxSlice, PairData } from "@/types";
 import HistogramManager from "../../components/Histogram/HistogramManager";
-import RthmnVision from "../../components/charts/RthmnVision";
+import RthmnVision from "../../components/LineChart"
 import { getBoxSlices } from "@/utils/getBoxSlices";
 import { compareSlices } from "@/utils/compareSlices";
 import debounce from "lodash/debounce";
@@ -192,7 +192,7 @@ const PairClient: React.FC<DashboardClientProps> = ({
 					pair={pair}
 					candles={candleData}
 					width={rthmnVisionDimensions.width}
-					height={rthmnVisionHeight - 40}
+					height={rthmnVisionHeight - 60}
 				/>
 			</div>
 			<div 
