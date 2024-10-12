@@ -44,9 +44,10 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	const [lineChartHeight, setLineChartHeight] = useState(200);
 	const [lineChartWidth, setLineChartWidth] = useState(0);
 	const lineChartRef = useRef<HTMLDivElement>(null);
-	const [timeInterval, setTimeInterval] = useState<string>("S5");
 	const [closeoutAsk, setCloseoutAsk] = useState<number | null>(null);
 	const [closeoutBid, setCloseoutBid] = useState<number | null>(null);
+	const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({ width: 0, height: 0 });
+	const rthmnVisionRef = useRef<HTMLDivElement>(null);
 
 	const fetchData = useCallback(async () => {
 		return getBoxSlices(pair, undefined, 500);
@@ -214,25 +215,36 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		}
 	}, [candleData]);
 
+	useEffect(() => {
+		const updateRthmnVisionDimensions = () => {
+			if (rthmnVisionRef.current) {
+				const { width, height } = rthmnVisionRef.current.getBoundingClientRect();
+				setRthmnVisionDimensions({ width, height });
+			}
+		};
+
+		updateRthmnVisionDimensions();
+		window.addEventListener('resize', updateRthmnVisionDimensions);
+
+		return () => {
+			window.removeEventListener('resize', updateRthmnVisionDimensions);
+		};
+	}, []);
+
 	return (
 		<div className="flex min-h-screen w-full overflow-y-hidden">
 			<div className="relative flex-grow overflow-y-hidden bg-black">
 				<div
-					ref={lineChartRef}
+					ref={rthmnVisionRef}
 					className="h-[70vh] mt-32"
 					style={{ paddingRight: `${sidebarWidth}px` }}
 				>
 					<RthmnVision
 						pair={pair}
-						timeInterval={timeInterval}
-						setTimeInterval={setTimeInterval}
-						closeoutAsk={closeoutAsk}
-						closeoutBid={closeoutBid}
-						setCloseoutAsk={setCloseoutAsk}
-						setCloseoutBid={setCloseoutBid}
 						candles={candleData}
+						width={rthmnVisionDimensions.width}
+						height={rthmnVisionDimensions.height}
 					/>
-					
 				</div>
 				<div
 					className="absolute bottom-0 left-0 right-0"
