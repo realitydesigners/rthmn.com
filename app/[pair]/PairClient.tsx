@@ -183,7 +183,7 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	return (
 		<div ref={containerRef} className="flex flex-col h-screen w-full overflow-hidden bg-black">
 			<div 
-				className="flex-grow overflow-hidden pt-[80px] pb-[30px]"
+				className="flex-grow overflow-hidden pt-[80px] "
 				style={{ 
 					minHeight: `${rthmnVisionHeight}px`,
 				}}
@@ -192,7 +192,7 @@ const PairClient: React.FC<DashboardClientProps> = ({
 					pair={pair}
 					candles={candleData}
 					width={rthmnVisionDimensions.width}
-					height={rthmnVisionHeight - 30}
+					height={rthmnVisionHeight - 40}
 				/>
 			</div>
 			<div 
