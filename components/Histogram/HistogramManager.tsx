@@ -150,7 +150,7 @@ const HistogramChart: React.FC<{
 				}}
 			>
 				<div
-					className="mb-4 rounded px-2 py-1 shadow-xl  text-xs font-bold text-black"
+					className="mb-4 rounded px-2 py-1 shadow-x  text-xs font-bold text-black"
 					style={{ backgroundColor: color }}
 				>
 					<div>{linePrice.toFixed(3)}</div>

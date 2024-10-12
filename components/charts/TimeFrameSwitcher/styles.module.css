@@ -1,0 +1,46 @@
+.button {
+    border-radius: 0.25em;
+    transition: all 0.2s ease-in-out;
+    border: 1px solid #181818;
+    font-size: .8rem;
+    text-transform: uppercase;
+    padding: .3rem .5rem .3rem .5rem;
+    font-family: 'Oxanium', sans-serif;
+}
+
+.buttonActive {
+    background-color: #919191;
+    color: #000000;
+    font-weight: 800;
+    text-transform: uppercas;
+}
+
+.buttonInactive {
+    background-color: #181818;
+    color: gray;
+    font-weight: 600;
+}
+
+.buttonInactive:hover {
+    color: #BFC0C1;
+}
+
+.dropdown {
+    width: auto;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: #000;
+    border: 1px solid #181818;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: .25rem;
+}
+
+.dropdown button {
+    margin-right: 4px;
+    margin-bottom: 4px;
+    border: 1px solid #181818;
+}

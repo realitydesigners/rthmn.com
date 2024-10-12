@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Russo+One&family=Roboto:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;700&display=swap');
+
+.pairName {
+    font-family: 'Russo One', sans-serif;
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+    font-size: 1.6rem;
+    z-index: 10;
+    padding: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: rgba(255, 255, 255, 0.606);
+    border-radius: 0.5rem;
+}

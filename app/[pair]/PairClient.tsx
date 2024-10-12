@@ -1,16 +1,17 @@
 "use client";
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { BoxSlice, PairData } from "@/types";
 import HistogramManager from "../../components/Histogram/HistogramManager";
+import RthmnVision from "../../components/charts/RthmnVision";
 import { getBoxSlices } from "@/utils/getBoxSlices";
 import PairsSidebar from "@/components/PairsSidebar";
 import { getTrendForOffset } from "@/utils/getTrendForOffset";
 import { compareSlices } from "@/utils/compareSlices";
 import debounce from "lodash/debounce";
 import { ViewType } from "@/types";
-import {TrendHealth} from "@/components/TrendHealth"; // Add this import
+import {TrendHealth} from "@/components/TrendHealth";
 
 interface DashboardClientProps {
 	initialData: BoxSlice[];
@@ -40,6 +41,12 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	const [isDragging, setIsDragging] = useState(false);
 	const [startY, setStartY] = useState(0);
 	const [startHeight, setStartHeight] = useState(200);
+	const [lineChartHeight, setLineChartHeight] = useState(200);
+	const [lineChartWidth, setLineChartWidth] = useState(0);
+	const lineChartRef = useRef<HTMLDivElement>(null);
+	const [timeInterval, setTimeInterval] = useState<string>("S5");
+	const [closeoutAsk, setCloseoutAsk] = useState<number | null>(null);
+	const [closeoutBid, setCloseoutBid] = useState<number | null>(null);
 
 	const fetchData = useCallback(async () => {
 		return getBoxSlices(pair, undefined, 500);
@@ -69,6 +76,42 @@ const PairClient: React.FC<DashboardClientProps> = ({
 			return acc;
 		}, []);
 	}, [data, boxOffset, visibleBoxesCount]);
+
+	const candleData = useMemo(() => {
+		return filteredData.map(slice => ({
+			timestamp: slice.timestamp,
+			time: new Date(slice.timestamp).toISOString(),
+			open: slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0,
+			high: slice.currentOHLC?.high ?? Math.max(...slice.boxes.map(box => box.high)),
+			low: slice.currentOHLC?.low ?? Math.min(...slice.boxes.map(box => box.low)),
+			close: slice.currentOHLC?.close ?? slice.boxes[slice.boxes.length - 1]?.low ?? 0,
+			volume: 0, // Add this if you have volume data
+			currentOHLC: slice.currentOHLC ?? {
+				open: slice.boxes[0]?.high ?? 0,
+				high: Math.max(...slice.boxes.map(box => box.high)),
+				low: Math.min(...slice.boxes.map(box => box.low)),
+				close: slice.boxes[slice.boxes.length - 1]?.low ?? 0,
+			},
+			mid: {
+				o: slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0,
+				h: slice.currentOHLC?.high ?? Math.max(...slice.boxes.map(box => box.high)),
+				l: slice.currentOHLC?.low ?? Math.min(...slice.boxes.map(box => box.low)),
+				c: slice.currentOHLC?.close ?? slice.boxes[slice.boxes.length - 1]?.low ?? 0,
+			},
+			ask: {
+				o: (slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0) + 0.00001, // Slightly higher than mid
+				h: (slice.currentOHLC?.high ?? Math.max(...slice.boxes.map(box => box.high))) + 0.00001,
+				l: (slice.currentOHLC?.low ?? Math.min(...slice.boxes.map(box => box.low))) + 0.00001,
+				c: (slice.currentOHLC?.close ?? slice.boxes[slice.boxes.length - 1]?.low ?? 0) + 0.00001,
+			},
+			bid: {
+				o: (slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0) - 0.00001, // Slightly lower than mid
+				h: (slice.currentOHLC?.high ?? Math.max(...slice.boxes.map(box => box.high))) - 0.00001,
+				l: (slice.currentOHLC?.low ?? Math.min(...slice.boxes.map(box => box.low))) - 0.00001,
+				c: (slice.currentOHLC?.close ?? slice.boxes[slice.boxes.length - 1]?.low ?? 0) - 0.00001,
+			},
+		}));
+	}, [filteredData]);
 
 	const debouncedUpdateURL = useMemo(
 		() =>
@@ -148,30 +191,67 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		}
 	}, [searchParams]);
 
+	useEffect(() => {
+		const updateLineChartWidth = () => {
+			if (lineChartRef.current) {
+				setLineChartWidth(lineChartRef.current.clientWidth);
+			}
+		};
+
+		updateLineChartWidth();
+		window.addEventListener('resize', updateLineChartWidth);
+
+		return () => {
+			window.removeEventListener('resize', updateLineChartWidth);
+		};
+	}, []);
+
+	useEffect(() => {
+		if (candleData.length > 0) {
+			const latestCandle = candleData[candleData.length - 1];
+			setCloseoutAsk(latestCandle.high);
+			setCloseoutBid(latestCandle.low);
+		}
+	}, [candleData]);
+
 	return (
 		<div className="flex min-h-screen w-full overflow-y-hidden">
 			<div className="relative flex-grow overflow-y-hidden bg-black">
-				{/* <div className="absolute bottom-60 p-2" style={{ paddingRight: `${sidebarWidth}px` }}>
-					<TrendHealth trendData={filteredData} />
-				</div> */}
+				<div
+					ref={lineChartRef}
+					className="h-[70vh] mt-32"
+					style={{ paddingRight: `${sidebarWidth}px` }}
+				>
+					<RthmnVision
+						pair={pair}
+						timeInterval={timeInterval}
+						setTimeInterval={setTimeInterval}
+						closeoutAsk={closeoutAsk}
+						closeoutBid={closeoutBid}
+						setCloseoutAsk={setCloseoutAsk}
+						setCloseoutBid={setCloseoutBid}
+						candles={candleData}
+					/>
+					
+				</div>
 				<div
 					className="absolute bottom-0 left-0 right-0"
 					style={{ paddingRight: `${sidebarWidth}px` }}
-				>
-					<HistogramManager
-						data={filteredData}
-						height={histogramHeight}
-						boxOffset={boxOffset}
-						onOffsetChange={handleOffsetChange}
-						visibleBoxesCount={visibleBoxesCount}
-						viewType={viewType}
-						onViewChange={handleViewChange}
-						selectedFrame={selectedFrame}
-						selectedFrameIndex={selectedFrameIndex}
-						onFrameSelect={handleFrameSelect}
-						isDragging={isDragging}
-						onDragStart={handleDragStart}
-					/>
+					>
+						<HistogramManager
+							data={filteredData}
+							height={histogramHeight}
+							boxOffset={boxOffset}
+							onOffsetChange={handleOffsetChange}
+							visibleBoxesCount={visibleBoxesCount}
+							viewType={viewType}
+							onViewChange={handleViewChange}
+							selectedFrame={selectedFrame}
+							selectedFrameIndex={selectedFrameIndex}
+							onFrameSelect={handleFrameSelect}
+							isDragging={isDragging}
+							onDragStart={handleDragStart}
+						/>
 				</div>
 			</div>
 			<PairsSidebar
