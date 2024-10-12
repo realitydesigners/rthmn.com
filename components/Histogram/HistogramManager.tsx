@@ -12,9 +12,9 @@ import SelectedFrameDetails from "./SelectedFrameDetails";
 import type { BoxSlice, ViewType, Box } from "@/types";
 import { COLORS } from "./Colors";
 import { DraggableBorder } from "../DraggableBorder";
-import { formatTime } from "@/app/utils/formatTime";
-import { MeetingPoint } from "./Oscillator/MeetingPoint";
-import { PulseWave } from "./Oscillator/PulseWave";
+import { formatTime } from "@/utils/formatTime";
+import { MeetingPoint } from "./oscillator/MeetingPoint";
+import { PulseWave } from "./oscillator/PulseWave";
 
 const ZOOMED_BAR_WIDTH = 0;
 const INITIAL_BAR_WIDTH = 60;
@@ -142,7 +142,7 @@ const HistogramChart: React.FC<{
 			low: number;
 		}> = ({ x, y, color, linePrice, high, low }) => (
 			<div
-				className="pointer-events-none absolute z-[1000]"
+				className="pointer-events-none  absolute z-[1000]"
 				style={{
 					left: `${x}px`,
 					top: `${y}px`,
@@ -150,7 +150,7 @@ const HistogramChart: React.FC<{
 				}}
 			>
 				<div
-					className="mb-4 rounded px-2 py-1 text-xs font-bold text-black"
+					className="mb-4 rounded px-2 py-1 shadow-xl  text-xs font-bold text-black"
 					style={{ backgroundColor: color }}
 				>
 					<div>{linePrice.toFixed(3)}</div>
@@ -316,18 +316,7 @@ const TimeBar: React.FC<{
 });
 
 const Oscillator = forwardRef<
-	{
-		getColorAndY: (x: number) => {
-			y: number;
-			color: string;
-			high: number;
-			low: number;
-			linePrice: number;
-		};
-		meetingPoints: { x: number; y: number }[];
-		sliceWidth: number;
-		visibleBoxesCount: number;
-	},
+	OscillatorRef,
 	{
 		boxArray: Box[];
 		height: number;
@@ -336,6 +325,9 @@ const Oscillator = forwardRef<
 		prevMeetingPointY: number | null;
 		nextMeetingPointY: number | null;
 		sliceWidth: number;
+		price: number;
+		high: number;
+		low: number;
 	}
 >(
 	(
@@ -347,6 +339,9 @@ const Oscillator = forwardRef<
 			prevMeetingPointY,
 			nextMeetingPointY,
 			sliceWidth,
+			price,
+			high,
+			low,
 		},
 		ref,
 	) => {
@@ -731,7 +726,11 @@ const HistogramManager: React.FC<{
 				style={{ height: `${height}px`, transition: "height 0.1s ease-out" }}
 				ref={containerRef}
 			>
-				<DraggableBorder isDragging={isDragging} onDragStart={onDragStart} />
+				<DraggableBorder
+					isDragging={isDragging}
+					onDragStart={onDragStart}
+					direction="top"
+				/>
 				{data && data.length > 0 && (
 					<div className="flex h-full w-full">
 						<HistogramChart

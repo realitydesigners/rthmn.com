@@ -64,7 +64,7 @@ export const AuthNavbar = ({ user }: { user: any }) => {
 				<div className="flex h-full items-center justify-between">
 					<Link href="/dashboard" className="flex items-center gap-2">
 						<div className="flex h-8 w-8 items-center">{getIcon("logo")}</div>
-						<span className={`text-2xl font-bold ${oxanium.className}`}>
+						<span className={`text-2xl heading-text font-bold ${oxanium.className}`}>
 							RTHMN
 						</span>
 					</Link>

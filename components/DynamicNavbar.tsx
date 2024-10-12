@@ -36,8 +36,8 @@ const DynamicNavbar = async () => {
 			hasSubscription = true;
 		}
 	}
-
-	if (user && hasSubscription) {
+	// if (user && hasSubscription) 
+	if (user) {
 		return <AuthNavbar user={user} />;
 	} else {
 		return <Navbar />;

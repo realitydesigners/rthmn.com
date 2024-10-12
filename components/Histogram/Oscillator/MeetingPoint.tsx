@@ -13,14 +13,18 @@ export const MeetingPoint: React.FC<{
 	sliceWidth,
 	colors,
 }) => {
+	const cornerRadius = sliceWidth / 8; // Adjust this value to control the roundness of corners
+
 	return (
 		<>
 			{prevMeetingPointY !== null && (
 				<path
 					d={`M ${-sliceWidth / 2} ${prevMeetingPointY} 
-            H 0 
-            V ${meetingPointY} 
-            H ${sliceWidth / 2}`}
+                        H ${-cornerRadius}
+                        Q 0 ${prevMeetingPointY}, 0 ${prevMeetingPointY + Math.sign(meetingPointY - prevMeetingPointY) * cornerRadius}
+                        V ${meetingPointY - Math.sign(meetingPointY - prevMeetingPointY) * cornerRadius}
+                        Q 0 ${meetingPointY}, ${cornerRadius} ${meetingPointY}
+                        H ${sliceWidth / 2}`}
 					fill="none"
 					stroke={colors.LIGHT}
 					strokeWidth="3"
@@ -38,9 +42,11 @@ export const MeetingPoint: React.FC<{
 			{nextMeetingPointY !== null ? (
 				<path
 					d={`M ${sliceWidth / 2} ${meetingPointY} 
-            H ${sliceWidth} 
-            V ${nextMeetingPointY} 
-            H ${sliceWidth * 1.5}`}
+                        H ${sliceWidth - cornerRadius}
+                        Q ${sliceWidth} ${meetingPointY}, ${sliceWidth} ${meetingPointY + Math.sign(nextMeetingPointY - meetingPointY) * cornerRadius}
+                        V ${nextMeetingPointY - Math.sign(nextMeetingPointY - meetingPointY) * cornerRadius}
+                        Q ${sliceWidth} ${nextMeetingPointY}, ${sliceWidth + cornerRadius} ${nextMeetingPointY}
+                        H ${sliceWidth * 1.5}`}
 					fill="none"
 					stroke={colors.LIGHT}
 					strokeWidth="3"

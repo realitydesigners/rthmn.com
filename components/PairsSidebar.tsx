@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Box, BoxSlice, PairData } from "@/types";
+import { DraggableBorder } from "./DraggableBorder";
+import {TrendHealth} from "@/components/TrendHealth";
 
 interface PairsSidebarProps {
 	pairs: Record<string, PairData>;
@@ -15,10 +17,10 @@ interface PairsSidebarProps {
 }
 
 const offsets = [
-	{ label: "4H", value: 0 },
-	{ label: "1H", value: 6 },
-	{ label: "15M", value: 12 },
-	{ label: "1M", value: 19 },
+	{ label: "4H", value: 10 },
+	{ label: "1H", value: 20 },
+	{ label: "15M", value: 30 },
+	{ label: "1M", value: 40 },
 ];
 
 const MIN_SIDEBAR_WIDTH = 375;
@@ -36,6 +38,7 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 	const [startX, setStartX] = useState(0);
 	const sidebarRef = useRef<HTMLDivElement>(null);
 	const [hoveredOffset, setHoveredOffset] = useState<string | null>(null);
+	const [selectedPair, setSelectedPair] = useState<string | null>(null);
 
 	const formatValue = (value: number | undefined) => {
 		return value !== undefined ? value.toFixed(5) : "N/A";
@@ -105,17 +108,8 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 		setStartX(e.clientX);
 	}, []);
 
-	const DraggableBorder = () => {
-		return (
-			<div
-				className={`absolute bottom-0 left-0 top-0 w-[1px] cursor-ew-resize rounded-full bg-[#181818] transition-all duration-200 hover:bg-blue-400 ${
-					isDragging
-						? "shadow-2xl shadow-blue-500"
-						: "hover:w-[3px] hover:shadow-2xl hover:shadow-blue-500"
-				}`}
-				onMouseDown={handleDragStart}
-			/>
-		);
+	const handlePairClick = (pair: string) => {
+		setSelectedPair(selectedPair === pair ? null : pair);
 	};
 
 	return (
@@ -127,7 +121,11 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 				transition: isDragging ? "none" : "width 0.1s ease-out",
 			}}
 		>
-			<DraggableBorder />
+			<DraggableBorder
+				isDragging={isDragging}
+				onDragStart={handleDragStart}
+				direction="left"
+			/>
 			<div className="mb-2 flex text-[10px] tracking-widest text-gray-300/50">
 				<span className="w-24 pl-1">INSTRUMENT</span>
 				<span className="w-24">PRICE</span>
@@ -143,16 +141,16 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 					<li
 						key={pair}
 						className={`flex flex-col text-sm ${
-							pair === currentPair ? "bg-[#111]" : ""
-						}`}
+							pair === currentPair ? "bg-[#000]" : ""
+						} ${selectedPair === pair ? "border border-[#222]  overflow-hidden" : ""}`}
 					>
-						<div className="flex items-center justify-between p-1 hover:bg-[#111]">
-							<Link href={`/${pair}`} className="flex items-center">
+						<div className={`flex items-center justify-between py-2 hover:bg-[#111] ${selectedPair === pair ? "border-b border-[#222]" : ""}`}>
+							<button onClick={() => handlePairClick(pair)} className="flex items-center w-full">
 								<span className="w-24 pl-1 font-bold">{pair}</span>
 								<span className="w-24 pl-1 text-[10px] text-gray-300">
 									{formatValue(data.currentOHLC.close)}
 								</span>
-							</Link>
+							</button>
 							<div className="flex space-x-1 pr-1">
 								{offsets.map(({ label, value }) => {
 									const trend = getTrendForOffset(data.boxes, value);
@@ -173,6 +171,11 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
 								})}
 							</div>
 						</div>
+						{selectedPair === pair && (
+							<div className="p-2 bg-[#000]">
+								<TrendHealth trendData={data.boxes} />
+							</div>
+						)}
 					</li>
 				))}
 			</ul>

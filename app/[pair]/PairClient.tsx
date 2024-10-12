@@ -4,12 +4,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useSearchParams, useRouter } from "next/navigation";
 import { BoxSlice, PairData } from "@/types";
 import HistogramManager from "../../components/Histogram/HistogramManager";
-import { getBoxSlices } from "@/app/utils/getBoxSlices";
+import { getBoxSlices } from "@/utils/getBoxSlices";
 import PairsSidebar from "@/components/PairsSidebar";
-import { getTrendForOffset } from "@/app/utils/getTrendForOffset";
-import { compareSlices } from "@/app/utils/compareSlices";
+import { getTrendForOffset } from "@/utils/getTrendForOffset";
+import { compareSlices } from "@/utils/compareSlices";
 import debounce from "lodash/debounce";
 import { ViewType } from "@/types";
+import {TrendHealth} from "@/components/TrendHealth"; // Add this import
 
 interface DashboardClientProps {
 	initialData: BoxSlice[];
@@ -29,8 +30,8 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		const offsetParam = searchParams.get("offset");
 		return offsetParam ? parseInt(offsetParam, 10) : 0;
 	});
-	const [sidebarWidth, setSidebarWidth] = useState(350);
-	const [visibleBoxesCount, setVisibleBoxesCount] = useState(16);
+	const [sidebarWidth, setSidebarWidth] = useState(375);
+	const [visibleBoxesCount, setVisibleBoxesCount] = useState(12);
 	const [viewType, setViewType] = useState<ViewType>("oscillator");
 	const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
 	const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
@@ -150,6 +151,9 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	return (
 		<div className="flex min-h-screen w-full overflow-y-hidden">
 			<div className="relative flex-grow overflow-y-hidden bg-black">
+				{/* <div className="absolute bottom-60 p-2" style={{ paddingRight: `${sidebarWidth}px` }}>
+					<TrendHealth trendData={filteredData} />
+				</div> */}
 				<div
 					className="absolute bottom-0 left-0 right-0"
 					style={{ paddingRight: `${sidebarWidth}px` }}

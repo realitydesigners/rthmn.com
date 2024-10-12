@@ -6,7 +6,7 @@ import {
 	OscillatorIcon,
 	MinusIcon,
 	PlusIcon,
-} from "./Icons";
+} from "@/public/icons/icons";
 
 interface HistogramControlsProps {
 	boxOffset: number;
