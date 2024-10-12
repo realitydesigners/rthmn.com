@@ -540,6 +540,7 @@ const HistogramManager: React.FC<{
 	onFrameSelect: (frame: BoxSlice | null, index: number | null) => void;
 	isDragging: boolean;
 	onDragStart: (e: React.MouseEvent) => void;
+	containerWidth: number; // Add this prop
 }> = ({
 	data,
 	height,
@@ -553,6 +554,7 @@ const HistogramManager: React.FC<{
 	onFrameSelect,
 	isDragging,
 	onDragStart,
+	containerWidth, // Add this prop
 }) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -761,7 +763,7 @@ const HistogramManager: React.FC<{
 			<TimeBar
 				data={data}
 				scrollLeft={scrollLeft}
-				width={containerRef.current?.clientWidth ?? 0}
+				width={containerWidth}
 				visibleBoxesCount={visibleBoxesCount}
 				boxOffset={boxOffset}
 			/>

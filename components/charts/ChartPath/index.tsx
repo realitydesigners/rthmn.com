@@ -60,27 +60,43 @@ const ChartPath: React.FC<ChartPathProps> = ({
 	hoverTime,
 	chartHeight,
 }) => {
+	const pathData = calculatePathData();
+	const currentPricePosition = calculateCurrentPricePosition();
+
 	return (
 		<g>
 			<path
-				d={`M ${calculatePathData()}`}
-				className="stroke-white transition-all duration-200"
-				style={{
-					strokeOpacity: isHoveringLine ? 0.5 : 1,
-					transition: "stroke-opacity 0.3s",
-				}}
+				d={pathData}
+				fill="none"
+				stroke="white"
 				strokeWidth={isHoveringLine ? 2 : 1.5}
+				opacity={isHoveringLine ? 0.5 : 1}
 			/>
-			<circle cx={calculateCurrentPricePosition().x} cy={calculateCurrentPricePosition().y} r="5" className={styles.chartDot} />
+			<line
+				x1={currentPricePosition.x}
+				y1={0}
+				x2={currentPricePosition.x}
+				y2={chartHeight}
+				stroke="red"
+				strokeWidth="1"
+				strokeDasharray="5,5"
+			/>
 			<circle
-				cx={calculateCurrentPricePosition().x}
-				cy={calculateCurrentPricePosition().y}
+				cx={currentPricePosition.x}
+				cy={currentPricePosition.y}
+				r="4"
+				fill="red"
+			/>
+			<circle cx={currentPricePosition.x} cy={currentPricePosition.y} r="5" className={styles.chartDot} />
+			<circle
+				cx={currentPricePosition.x}
+				cy={currentPricePosition.y}
 				r="5"
 				className={`${styles.chartDot} ${styles.pulsingCircle}`}
 			/>
 			<circle
-				cx={calculateCurrentPricePosition().x}
-				cy={calculateCurrentPricePosition().y}
+				cx={currentPricePosition.x}
+				cy={currentPricePosition.y}
 				r="5"
 				className={`${styles.chartDot} ${styles.pulsingCircle}`}
 			/>

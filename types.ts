@@ -55,35 +55,11 @@ export interface PairData {
 export type ViewType = 'scaled' | 'even' | 'oscillator';
 
 export interface Candle {
-	timestamp: string;
+
 	time: string;
 	open: number;
 	high: number;
 	low: number;
 	close: number;
-	mid: {
-		o: number;
-		h: number;
-		l: number;
-		c: number;
-	};
-	ask: {
-		o: number;
-		h: number;
-		l: number;
-		c: number;
-	};
-	bid: {
-		o: number;
-		h: number;
-		l: number;
-		c: number;
-	};
-	volume: number;
-	currentOHLC: {
-		high: number;
-		low: number;
-		open: number;
-		close: number;
-	};
+
 }

@@ -13,15 +13,13 @@ const RthmnVision: React.FC<{
 }> = ({ pair, candles, width, height }) => {
 	const [closingPrices, setClosingPrices] = useState<number[]>([]);
 	const [timeData, setTimeData] = useState<number[]>([]);
+	console.log(candles, "candles")
 
 	const svgRef = useRef<SVGSVGElement>(null);
-
-	const point = 0.00001; // Default point value, adjust as needed
-
+	const point = 0.00001; 
 	const minY = Math.min(...closingPrices) - point * 50;
 	const maxY = Math.max(...closingPrices) + point * 50;
-
-	const chartPadding = { top: 20, right: 50, bottom: 30, left: 50 };
+	const chartPadding = { top: 20, right: 80, bottom: 40, left: 10 };
 	const chartWidth = width - chartPadding.left - chartPadding.right;
 	const chartHeight = height - chartPadding.top - chartPadding.bottom;
 
@@ -32,7 +30,7 @@ const RthmnVision: React.FC<{
 		}
 
 		const newClosingPrices = candles.map((candle) => candle.close);
-		const newTimeData = candles.map((candle) => new Date(candle.timestamp).getTime());
+		const newTimeData = candles.map((candle) => new Date(candle.time).getTime());
 
 		setClosingPrices(newClosingPrices);
 		setTimeData(newTimeData);
@@ -67,8 +65,19 @@ const RthmnVision: React.FC<{
 				>
 					<g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
 						{memoizedChartLine}
-						<XAxis timeData={timeData} chartWidth={chartWidth} chartHeight={chartHeight} />
-						<YAxis minY={minY} maxY={maxY} point={point} chartHeight={chartHeight} />
+						<XAxis 
+							timeData={timeData} 
+							chartWidth={chartWidth} 
+							chartHeight={chartHeight} 
+						/>
+						<g transform={`translate(${chartWidth}, 0)`}>
+							<YAxis 
+								minY={minY} 
+								maxY={maxY} 
+								point={point} 
+								chartHeight={chartHeight} 
+							/>
+						</g>
 					</g>
 				</svg>
 			</div>
@@ -109,16 +118,20 @@ const ChartLine: React.FC<ChartLineProps> = React.memo(({
 	const [hoverTime, setHoverTime] = useState<string | null>(null);
 
 	const calculatePathData = () => {
+		if (closingPrices.length === 0) return '';
+		
+		const xStep = width / (closingPrices.length - 1);
 		return closingPrices
 			.map((price, index) => {
-				const x = (index / (closingPrices.length - 1)) * width;
+				const x = index * xStep;
 				const y = height - ((price - minY) / (maxY - minY)) * height;
-				return `${x.toFixed(3)},${y.toFixed(2)}`;
+				return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
 			})
-			.join(" L ");
+			.join(' ');
 	};
 
 	const calculateCurrentPricePosition = () => {
+		if (closingPrices.length === 0) return { x: 0, y: 0 };
 		const currentPrice = closingPrices[closingPrices.length - 1];
 		const x = width;
 		const y = height - ((currentPrice - minY) / (maxY - minY)) * height;
@@ -214,7 +227,7 @@ const ChartContainer: React.FC<ChartContainerProps> = ({
 	return (
 		<svg
 			ref={svgRef}
-			className="w-full h-full"
+			className="w-full h-full bg-gray-800"
 			viewBox={`0 0 ${chartWidth} ${chartHeight}`}
 			preserveAspectRatio="none"
 			onMouseMove={handleMouseMove}

@@ -9,7 +9,7 @@ export const XAxis: React.FC<XAxisProps> = ({ timeData, chartWidth, chartHeight 
 	const ticks = timeData.filter((_, i) => i % Math.floor(timeData.length / tickCount) === 0);
 
 	return (
-		<g className="x-axis" transform={`translate(0, ${chartHeight})`}>
+		<g className="x-axi" transform={`translate(0, ${chartHeight})`}>
 			<line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#333" />
 			{ticks.map((time, i) => (
 				<g key={time} transform={`translate(${(i / (tickCount - 1)) * chartWidth}, 0)`}>
@@ -50,11 +50,11 @@ export const YAxis: React.FC<YAxisProps> = ({ minY, maxY, point, chartHeight }) 
 				const value = maxY - i * stepSize;
 				return (
 					<g key={i} transform={`translate(0, ${(i / steps) * chartHeight})`}>
-						<line x2={-6} stroke="#333" />
+						<line x2={6} stroke="#333" />
 						<text
-							x={-10}
+							x={10}
 							y={4}
-							textAnchor="end"
+							textAnchor="start"
 							fill="#fff"
 							fontSize="12"
 						>
