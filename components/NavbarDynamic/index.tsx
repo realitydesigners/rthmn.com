@@ -1,8 +1,8 @@
 import React from "react";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import Navbar from "@/components/Navbar/Navbar";
-import { AuthNavbar } from "@/components/AuthNavbar";
+import { NavbarSignedOut } from "@/components/NavbarSignedOut";
+import { NavbarSignedIn } from "@/components/NavbarSignedIn";
 
 const DynamicNavbar = async () => {
 	const cookieStore = cookies();
@@ -38,9 +38,9 @@ const DynamicNavbar = async () => {
 	}
 	// if (user && hasSubscription) 
 	if (user) {
-		return <AuthNavbar user={user} />;
+		return <NavbarSignedIn user={user} />;
 	} else {
-		return <Navbar />;
+		return <NavbarSignedOut />;
 	}
 };
 

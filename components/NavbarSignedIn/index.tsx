@@ -47,7 +47,7 @@ const getIcon = (name: string): JSX.Element => {
 	return icons[name] || <path />;
 };
 
-export const AuthNavbar = ({ user }: { user: any }) => {
+export const NavbarSignedIn = ({ user }: { user: any }) => {
 	const router = getRedirectMethod() === "client" ? useRouter() : null;
 	const buttonClasses = `
     px-6 py-2
