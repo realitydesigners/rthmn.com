@@ -1,15 +1,15 @@
-import { HeroSection } from "@/components/Hero/HeroSection";
-import { FeaturesSection } from "@/components/FeaturesSection";
-import { PricingSection } from "@/components/PricingSection";
-import { RyverSection } from "@/components/RyverSection/RyverSection";
+import { HeroSection } from "@/app/_components/SectionHero";
+import { FeaturesSection } from "@/app/_components/SectionFeatures";
+import { PricingSection } from "@/app/_components/SectionPricing";
+import { RyverSection } from "@/app/_components/SectionRyver";
 import {
 	getProducts,
 	getSubscription,
 	getUser,
 } from "@/utils/supabase/queries";
 import { createClient } from "@/utils/supabase/server";
-import { FAQSection } from "@/components/FAQSection";
-import { ServiceSection } from "@/components/ServiceSection";
+import { FAQSection } from "@/app/_components/SectionFAQ";
+import { ServiceSection } from "@/app/_components/SectionServices"
 
 export default async function PricingPage() {
 	const supabase = createClient();

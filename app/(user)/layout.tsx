@@ -1,4 +1,4 @@
-import { SignalProvider } from "@/contexts/SignalProvider";
+import { SignalProvider } from "@/providers/SignalProvider";
 
 export default function UserLayout({
 	children,

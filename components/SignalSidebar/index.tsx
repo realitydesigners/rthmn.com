@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Signal } from "@/types";
-import { useSignals } from "@/contexts/SignalProviderClient";
+import { useSignals } from "@/providers/SignalProviderClient";
 import { getTimeAgo } from "@/utils/getTimeAgo";
 import { CondensedIcon, DetailedIcon } from "@/public/icons/icons";
-import { oxanium, russo } from "@/app/fonts";
+import { oxanium, russo } from "@/fonts";
 
 export function SignalSidebar() {
 	const { signalsData, hasSubscription } = useSignals();

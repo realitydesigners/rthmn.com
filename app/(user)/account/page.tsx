@@ -1,6 +1,6 @@
-import CustomerPortalForm from "@/components/ui/AccountForms/CustomerPortalForm";
-import EmailForm from "@/components/ui/AccountForms/EmailForm";
-import NameForm from "@/components/ui/AccountForms/NameForm";
+import CustomerPortalForm from "@/components/AccountForms/CustomerPortalForm";
+import EmailForm from "@/components/AccountForms/EmailForm";
+import NameForm from "@/components/AccountForms/NameForm";
 import {
 	getSubscription,
 	getUser,
