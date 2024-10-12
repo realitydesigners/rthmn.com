@@ -84,7 +84,6 @@ export const TrendHealth: React.FC<EmotionGaugeProps> = ({ trendData }) => {
       }}>
         Positive: {positivePercentage.toFixed(2)}%
       </div>
-     
     </div>
   );
 };

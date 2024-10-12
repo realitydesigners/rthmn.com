@@ -31,7 +31,7 @@ const PairClient: React.FC<DashboardClientProps> = ({
 		return offsetParam ? parseInt(offsetParam, 10) : 0;
 	});
 	const [sidebarWidth, setSidebarWidth] = useState(375);
-	const [visibleBoxesCount, setVisibleBoxesCount] = useState(16);
+	const [visibleBoxesCount, setVisibleBoxesCount] = useState(12);
 	const [viewType, setViewType] = useState<ViewType>("oscillator");
 	const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);
 	const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
