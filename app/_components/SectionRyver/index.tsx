@@ -71,19 +71,19 @@ export function RyverSection() {
 							<path
 								d="M314 1L399 123"
 								stroke="#ABBECD"
-								stroke-dasharray="2 2"
+								strokeDasharray="2 2"
 							/>
 							<path
 								d="M272 2L327 125"
 								stroke="#ABBECD"
-								stroke-dasharray="2 2"
+								strokeDasharray="2 2"
 							/>
 							<path
 								d="M202 1L147 123"
 								stroke="#ABBECD"
-								stroke-dasharray="2 2"
+								strokeDasharray="2 2"
 							/>
-							<path d="M161 1L76 123" stroke="#ABBECD" stroke-dasharray="2 2" />
+							<path d="M161 1L76 123" stroke="#ABBECD" strokeDasharray="2 2" />
 							<path d="M109 1L1 124" stroke="#545F68" />
 						</svg>
 					</motion.div>

@@ -1,5 +1,4 @@
-// @ts-ignore
-import Spline from "@splinetool/react-spline/next";
+import Spline from "@splinetool/react-spline";
 
 interface SceneProps {
 	scene: string;
