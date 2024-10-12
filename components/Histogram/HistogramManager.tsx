@@ -142,7 +142,7 @@ const HistogramChart: React.FC<{
 			low: number;
 		}> = ({ x, y, color, linePrice, high, low }) => (
 			<div
-				className="pointer-events-none absolute z-[1000]"
+				className="pointer-events-none  absolute z-[1000]"
 				style={{
 					left: `${x}px`,
 					top: `${y}px`,
@@ -150,7 +150,7 @@ const HistogramChart: React.FC<{
 				}}
 			>
 				<div
-					className="mb-4 rounded px-2 py-1 text-xs font-bold text-black"
+					className="mb-4 rounded px-2 py-1 shadow-xl  text-xs font-bold text-black"
 					style={{ backgroundColor: color }}
 				>
 					<div>{linePrice.toFixed(3)}</div>
