@@ -1,17 +1,13 @@
-import { SignalProvider } from '@/contexts/SignalProvider';
-import { SignalSidebar } from '@/components/SignalSidebar';
+import { SignalProvider } from "@/providers/SignalProvider";
 
 export default function UserLayout({
-  children
+	children,
 }: {
-  children: React.ReactNode;
+	children: React.ReactNode;
 }) {
-  return (
-    <SignalProvider>
-      <div className="flex">
-        <SignalSidebar />
-        <main className="ml-[300px] flex-1">{children}</main>
-      </div>
-    </SignalProvider>
-  );
+	return (
+		<SignalProvider>
+			<div className="h-screen w-full">{children}</div>
+		</SignalProvider>
+	);
 }
