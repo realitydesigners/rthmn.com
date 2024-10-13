@@ -22,17 +22,17 @@ export default async function PricingPage() {
 	return (
 		<div>
 			<HeroSection />
-			<FeaturesSection />
+			{/* <FeaturesSection />
 			<FAQSection />
-			<ServiceSection />
+			<ServiceSection /> */}
 			{/* <PricingSection
         user={user}
         products={products ?? []}
         subscription={subscription}
       /> */}
-			<div className="h-screen"></div>
+			{/* <div className="h-screen"></div>
 			<RyverSection />
-			<div className="h-screen"></div>
+			<div className="h-screen"></div> */}
 		</div>
 	);
 }

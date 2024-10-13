@@ -5,8 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { BoxSlice, PairData } from "@/types";
 import HistogramManager from "../../../components/Histogram/HistogramManager";
 import RthmnVision from "../../../components/LineChart"
-import { getBoxSlices } from "@/utils/getBoxSlices";
-import { compareSlices } from "@/utils/compareSlices";
+import { getBoxSlices, compareSlices } from "@/utils/boxSlices";
 import debounce from "lodash/debounce";
 import { ViewType } from "@/types";
 
