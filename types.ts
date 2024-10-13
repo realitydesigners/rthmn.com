@@ -37,7 +37,7 @@ export interface Box {
 export interface BoxSlice {
   timestamp: string;
   boxes: Box[];
-  currentOHLC: OHLC;
+  currentOHLC?: OHLC;
 }
 
 export interface OHLC {

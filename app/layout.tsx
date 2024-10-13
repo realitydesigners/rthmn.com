@@ -6,7 +6,7 @@ import { type PropsWithChildren, Suspense } from "react";
 import "./main.css";
 import AppProviders from "../providers/AppProviders";
 
-const title = "RTHMN | Next Generation Forex / Stock Toolkit";
+const title = "RTHMN | Next Generation Forex / Stocks Toolkit";
 const description = "RTHMN is a next generation algorithmic trading platform that provides real-time trading signals, 3D pattern recognition, gamified learning, AI-powered predictions, and comprehensive risk management.";
 
 const clarityTrackingCode = process.env.NEXT_PUBLIC_CLARITY_TRACKING_CODE;
