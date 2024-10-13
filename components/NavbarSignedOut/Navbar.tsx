@@ -167,7 +167,7 @@ const MenuIcon = ({ isOpen }: { isOpen: boolean }) => (
 	</svg>
 );
 
-export function Navlinks({ user }: NavlinksProps) {
+export function Navbar({ user }: NavlinksProps) {
 	const router = getRedirectMethod() === "client" ? useRouter() : null;
 	const [isNavOpen, setIsNavOpen] = useState(false);
 

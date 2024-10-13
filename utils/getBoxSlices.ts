@@ -1,4 +1,4 @@
-import { BoxSlice } from "@/types";
+import { BoxSlice, OHLC } from "@/types";
 
 interface ApiResponse {
 	status: string;
@@ -9,6 +9,7 @@ interface ApiResponse {
 			low: number;
 			value: number;
 		}>;
+		currentOHLC: OHLC;
 	}>;
 }
 

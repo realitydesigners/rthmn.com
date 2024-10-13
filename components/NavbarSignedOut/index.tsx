@@ -1,12 +1,12 @@
 import { createClient } from "@/utils/supabase/server";
-import { Navlinks } from "./Navlinks";
+import { Navbar } from "./Navbar";
 
-export default async function Navbar() {
+export async function NavbarSignedOut() {
 	const supabase = createClient();
 
 	const {
 		data: { user },
 	} = await supabase.auth.getUser();
 
-	return <Navlinks user={user} />;
+	return <Navbar user={user} />;
 }
