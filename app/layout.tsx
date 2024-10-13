@@ -4,7 +4,6 @@ import { getURL } from "@/utils/helpers";
 import type { Metadata } from "next";
 import { type PropsWithChildren, Suspense } from "react";
 import "./main.css";
-import AppProviders from "../providers/AppProviders";
 
 const title = "RTHMN | Next Generation Forex / Stocks Toolkit";
 const description = "RTHMN is a next generation algorithmic trading platform that provides real-time trading signals, 3D pattern recognition, gamified learning, AI-powered predictions, and comprehensive risk management.";
@@ -26,18 +25,14 @@ export default async function RootLayout({ children }: PropsWithChildren) {
 	return (
 		<html lang="en">
 			<body className="bg-black">
-				<AppProviders>
 					<DynamicNavbar />
-					<main
-						id="skip"
-						className="md:min-h[calc(100dvh-5rem)] min-h-[calc(100dvh-4rem)]"
+					<main className="md:min-h[calc(100dvh-5rem)] min-h-[calc(100dvh-4rem)]"
 					>
 						{children}
 					</main>
 					<Suspense>
 						<Toaster />
 					</Suspense>
-				</AppProviders>
 				{/* {clarityTrackingCode && (
           <Script id="microsoft-clarity" strategy="afterInteractive">
             {`

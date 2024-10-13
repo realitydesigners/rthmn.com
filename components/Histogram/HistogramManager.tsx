@@ -12,7 +12,7 @@ import SelectedFrameDetails from "./SelectedFrameDetails";
 import type { BoxSlice, ViewType, Box } from "@/types";
 import { COLORS } from "./Colors";
 import { DraggableBorder } from "../DraggableBorder";
-import { formatTime } from "@/utils/formatTime";
+import { formatTime } from "@/utils/dateUtils";
 import { MeetingPoint } from "./Oscillator/MeetingPoint";
 import { PulseWave } from "./Oscillator/PulseWave";
 

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Signal } from "@/types";
 import { useSignals } from "@/providers/SignalProviderClient";
-import { getTimeAgo } from "@/utils/getTimeAgo";
+import { getTimeAgo } from "@/utils/dateUtils";
 import { CondensedIcon, DetailedIcon } from "@/public/icons/icons";
 import { oxanium, russo } from "@/fonts";
 

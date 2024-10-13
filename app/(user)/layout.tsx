@@ -1,3 +1,4 @@
+import { AppProviders } from "@/providers/AppProviders";
 import { SignalProvider } from "@/providers/SignalProvider";
 
 export default function UserLayout({
@@ -6,8 +7,10 @@ export default function UserLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<SignalProvider>
+		<AppProviders>
+			<SignalProvider>
 			<div className="h-screen w-full">{children}</div>
-		</SignalProvider>
+			</SignalProvider>
+		</AppProviders>
 	);
 }
