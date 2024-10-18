@@ -29,7 +29,8 @@ export async function handleRequest(
 export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
   const supabase = createClient();
-  const redirectURL = getURL('/auth/callback');
+  const redirectURL = getURL('/auth/v1/callback');
+  console.log('Redirect URL:', redirectURL); // For debugging
   await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {

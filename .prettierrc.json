@@ -3,5 +3,10 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "none",
-  "plugins": ["prettier-plugin-tailwindcss"]
+  "plugins": ["prettier-plugin-tailwindcss"],
+  "semi": true,
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "jsxBracketSameLine": false,
+  "parser": "typescript"
 }
