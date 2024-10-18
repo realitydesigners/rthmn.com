@@ -1,108 +1,35 @@
-import EmailSignIn from "@/components/AuthForms/EmailSignIn";
-import ForgotPassword from "@/components/AuthForms/ForgotPassword";
-import OauthSignIn from "@/components/AuthForms/OauthSignIn";
-import PasswordSignIn from "@/components/AuthForms/PasswordSignIn";
-import Separator from "@/components/AuthForms/Separator";
-import SignUp from "@/components/AuthForms/Signup";
-import UpdatePassword from "@/components/AuthForms/UpdatePassword";
-import Card from "@/components/Card";
+import OauthSignIn from '@/components/AuthForms/OauthSignIn';
+import Card from '@/components/Card';
 import {
-	getAuthTypes,
-	getDefaultSignInView,
-	getRedirectMethod,
-	getViewTypes,
-} from "@/utils/auth-helpers/settings";
-import { createClient } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+  getAuthTypes,
+  getDefaultSignInView
+} from '@/utils/auth-helpers/settings';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default async function SignIn({
-	params,
-	searchParams,
-}: {
-	params: { id: string };
-	searchParams: { disable_button: boolean };
-}) {
-	const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
-	const viewTypes = getViewTypes();
-	const redirectMethod = getRedirectMethod();
+export default async function SignIn({ params }: { params: { id: string } }) {
+  const { allowOauth } = getAuthTypes();
 
-	// Declare 'viewProp' and initialize with the default value
-	let viewProp: string;
+  // Check if the user is already logged in and redirect to the account page if so
+  const supabase = createClient();
 
-	// Assign url id to 'viewProp' if it's a valid string and ViewTypes includes it
-	if (typeof params.id === "string" && viewTypes.includes(params.id)) {
-		viewProp = params.id;
-	} else {
-		const preferredSignInView =
-			cookies().get("preferredSignInView")?.value || null;
-		viewProp = getDefaultSignInView(preferredSignInView);
-		return redirect(`/signin/${viewProp}`);
-	}
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
 
-	// Check if the user is already logged in and redirect to the account page if so
-	const supabase = createClient();
+  if (user) {
+    return redirect('/');
+  }
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+  if (params.id !== 'signin') {
+    return redirect('/signin/signin');
+  }
 
-	if (user && viewProp !== "update_password") {
-		return redirect("/");
-	} else if (!user && viewProp === "update_password") {
-		return redirect("/signin");
-	}
-
-	return (
-		<div className="flex justify-center height-screen-helper">
-			<div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
-				<Card
-					title={
-						viewProp === "forgot_password"
-							? "Reset Password"
-							: viewProp === "update_password"
-								? "Update Password"
-								: viewProp === "signup"
-									? "Sign Up"
-									: "Sign In"
-					}
-				>
-					{viewProp === "password_signin" && (
-						<PasswordSignIn
-							allowEmail={allowEmail}
-							redirectMethod={redirectMethod}
-						/>
-					)}
-					{viewProp === "email_signin" && (
-						<EmailSignIn
-							allowPassword={allowPassword}
-							redirectMethod={redirectMethod}
-							disableButton={searchParams.disable_button}
-						/>
-					)}
-					{viewProp === "forgot_password" && (
-						<ForgotPassword
-							allowEmail={allowEmail}
-							redirectMethod={redirectMethod}
-							disableButton={searchParams.disable_button}
-						/>
-					)}
-					{viewProp === "update_password" && (
-						<UpdatePassword redirectMethod={redirectMethod} />
-					)}
-					{viewProp === "signup" && (
-						<SignUp allowEmail={allowEmail} redirectMethod={redirectMethod} />
-					)}
-					{viewProp !== "update_password" &&
-						viewProp !== "signup" &&
-						allowOauth && (
-							<>
-								<Separator text="Third-party sign-in" />
-								<OauthSignIn />
-							</>
-						)}
-				</Card>
-			</div>
-		</div>
-	);
+  return (
+    <div className="height-screen-helper flex justify-center">
+      <div className="m-auto flex w-80 max-w-lg flex-col justify-between p-3">
+        <Card title="Sign In">{allowOauth && <OauthSignIn />}</Card>
+      </div>
+    </div>
+  );
 }
