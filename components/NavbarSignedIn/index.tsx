@@ -76,7 +76,9 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     };
   }, []);
 
-  const userInitial = user?.email?.[0].toUpperCase() || '?';
+  const userInitial = user?.user_metadata?.full_name?.[0].toUpperCase() || 
+                      user?.email?.[0].toUpperCase() || 
+                      '?';
 
   return (
     <nav className="fixed left-0 right-0 top-0 z-[1001] h-16 lg:h-20">
