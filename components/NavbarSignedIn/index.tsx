@@ -1,5 +1,5 @@
 'use client';
-import { oxanium } from '@/fonts';
+import { russo } from '@/fonts';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
@@ -87,7 +87,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center">{getIcon('logo')}</div>
             <span
-              className={`text-2xl font-bold ${oxanium.className}`}
+              className={`text-2xl tracking-wide font-bold ${russo.className}`}
             >
               RTHMN
             </span>
