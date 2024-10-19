@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import PairClient from './PairClient';
+import Client from './client';
 import { getBoxSlices, getLatestBoxSlices } from '@/utils/boxSlices';
 import { getURL } from '@/utils/helpers';
 import { getServerClient } from '@/utils/supabase/server';
@@ -34,7 +34,7 @@ export default async function PairPage({ params }: PageProps) {
 
   return (
     <div className="w-full">
-      <PairClient
+      <Client
         initialData={initialData}
         pair={pair}
         allPairsData={allPairsData}
