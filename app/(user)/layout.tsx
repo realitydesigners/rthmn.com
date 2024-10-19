@@ -1,16 +1,19 @@
-import { AppProviders } from "@/providers/AppProviders";
-import { SignalProvider } from "@/providers/SignalProvider";
+import { AppProviders } from '@/providers/AppProviders';
+import { SignalProvider } from '@/providers/SignalProvider';
+import { WebSocketProvider } from '@/providers/WebSocketProvider';
 
 export default function UserLayout({
-	children,
+  children
 }: {
-	children: React.ReactNode;
+  children: React.ReactNode;
 }) {
-	return (
-		<AppProviders>
-			<SignalProvider>
-			<div className="h-screen w-full">{children}</div>
-			</SignalProvider>
-		</AppProviders>
-	);
+  return (
+    <AppProviders>
+      <SignalProvider>
+        <WebSocketProvider>
+          <div className="h-screen w-full">{children}</div>
+        </WebSocketProvider>
+      </SignalProvider>
+    </AppProviders>
+  );
 }

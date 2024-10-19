@@ -1,50 +1,59 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import PairClient from "./PairClient";
-import { getBoxSlices } from "@/utils/boxSlices";
-import { getLatestBoxSlices } from "@/utils/boxSlices";
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import PairClient from './PairClient';
+import { getBoxSlices, getLatestBoxSlices } from '@/utils/boxSlices';
+import {
+  getBoxSlicesSocket,
+  getLatestBoxSlicesSocket
+} from '@/utils/boxSlicesSocket';
+import { getURL } from '@/utils/helpers';
 
 interface PageProps {
-	params: {
-		pair: string;
-	};
+  params: {
+    pair: string;
+  };
 }
 
 export default async function PairPage({ params }: PageProps) {
-	const { pair } = params;
-	const cookieStore = cookies();
+  const { pair } = params;
+  const cookieStore = cookies();
 
-	const supabase = createServerClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			cookies: {
-				get(name: string) {
-					return cookieStore.get(name)?.value;
-				},
-			},
-		},
-	);
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value;
+        }
+      }
+    }
+  );
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+  const {
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
 
-	if (!user) {
-		redirect("/signin");
-	}
+  console.log('User:', user);
+  console.log('Auth error:', error);
 
-	const initialData = await getBoxSlices(pair, undefined, 500);
-	const allPairsData = await getLatestBoxSlices();
+  if (error || !user) {
+    console.log('Redirecting to signin');
+    return redirect(getURL('signin'));
+  }
 
-	return (
-		<div className="w-full">
-			<PairClient
-				initialData={initialData}
-				pair={pair}
-				allPairsData={allPairsData}
-			/>
-		</div>
-	);
+  const initialData = await getBoxSlicesSocket(pair, undefined, 500);
+  const allPairsData = await getLatestBoxSlicesSocket();
+
+  return (
+    <div className="w-full">
+      <PairClient
+        initialData={initialData}
+        pair={pair}
+        allPairsData={allPairsData}
+      />
+    </div>
+  );
 }

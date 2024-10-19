@@ -4,6 +4,8 @@ class WebSocketClient {
   private socket: WebSocket | null = null;
   private subscriptions: Set<string> = new Set();
   private messageHandlers: Map<string, (data: any) => void> = new Map();
+  private openHandlers: Set<() => void> = new Set();
+  private closeHandlers: Set<() => void> = new Set();
 
   constructor() {
     this.connect();
@@ -17,6 +19,7 @@ class WebSocketClient {
     this.socket.onopen = () => {
       console.log('WebSocket connected');
       this.resubscribe();
+      this.openHandlers.forEach((handler) => handler());
     };
 
     this.socket.onmessage = (event) => {
@@ -31,6 +34,7 @@ class WebSocketClient {
 
     this.socket.onclose = () => {
       console.log('WebSocket disconnected. Reconnecting...');
+      this.closeHandlers.forEach((handler) => handler());
       setTimeout(() => this.connect(), 5000);
     };
   }
@@ -60,6 +64,22 @@ class WebSocketClient {
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ type: 'unsubscribe', pairs: [pair] }));
     }
+  }
+
+  public onOpen(handler: () => void) {
+    this.openHandlers.add(handler);
+  }
+
+  public offOpen(handler: () => void) {
+    this.openHandlers.delete(handler);
+  }
+
+  public onClose(handler: () => void) {
+    this.closeHandlers.add(handler);
+  }
+
+  public offClose(handler: () => void) {
+    this.closeHandlers.delete(handler);
   }
 }
 
