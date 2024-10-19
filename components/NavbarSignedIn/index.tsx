@@ -1,7 +1,7 @@
 'use client';
 import { oxanium } from '@/fonts';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { User } from '@supabase/supabase-js';
 
@@ -52,7 +52,14 @@ const getIcon = (name: string): JSX.Element => {
 
 export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [buttonContent, setButtonContent] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut } = useAuth();
+
+  useEffect(() => {
+    setButtonContent(user?.email?.[0].toUpperCase() || '?');
+  }, [user]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -67,14 +74,18 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     }
   };
 
-  const buttonClasses = `
-		px-6 py-2
-		gradient-border-button
-		text-white font-medium
-		${oxanium.className}
-		transition-all duration-300
-		hover:shadow-lg
-	`;
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="fixed left-0 right-0 top-0 z-[1001] h-16 lg:h-20">
@@ -89,18 +100,29 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
             </span>
           </Link>
 
-          <div className="flex items-center space-x-4">
-            <Link href="/account" className={`${oxanium.className} text-white`}>
-              Account
-            </Link>
-
+          <div className="relative" ref={dropdownRef}>
             <button
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-              className={`${oxanium.className} text-white`}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center text-white"
             >
-              {isSigningOut ? 'Signing out...' : 'Sign out'}
+              {buttonContent}
             </button>
+            {isDropdownOpen && (
+              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-black border border-[#181818] ring-1 ring-black ring-opacity-5">
+                <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
+                  <Link href="/account" className="block px-4 py-2 text-sm text-gray-100" role="menuitem">Account</Link>
+                  <Link href="/settings" className="block px-4 py-2 text-sm text-gray-100" role="menuitem">Settings</Link>
+                  <button
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-100"
+                    role="menuitem"
+                  >
+                    {isSigningOut ? 'Signing out...' : 'Sign out'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
