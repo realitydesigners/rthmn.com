@@ -4,14 +4,10 @@ import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';
 import { type PropsWithChildren, Suspense } from 'react';
 import './main.css';
-import { getServerClient } from '@/utils/supabase/server';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
   'RTHMN is a next generation algorithmic trading platform that provides real-time trading signals, 3D pattern recognition, gamified learning, AI-powered predictions, and comprehensive risk management.';
-
-const clarityTrackingCode = process.env.NEXT_PUBLIC_CLARITY_TRACKING_CODE;
-const gtagId = process.env.NEXT_PUBLIC_GTAG_ID;
 
 export const metadata: Metadata = {
   metadataBase: new URL(getURL()),
@@ -23,17 +19,7 @@ export const metadata: Metadata = {
   }
 };
 
-export default async function RootLayout({ children }: PropsWithChildren) {
-  const supabase = getServerClient();
-  const {
-    data: { session }
-  } = await supabase.auth.getSession();
-
-  console.log(
-    'Current session state:',
-    session ? 'Authenticated' : 'Not authenticated'
-  );
-
+export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
       <body className="bg-black">

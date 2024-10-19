@@ -10,7 +10,7 @@ import {
 import { redirect } from 'next/navigation';
 
 export default async function Account() {
-  const supabase = getServerClient();
+  const supabase = await getServerClient();
   const [user, userDetails, subscription] = await Promise.all([
     getUser(supabase),
     getUserDetails(supabase),

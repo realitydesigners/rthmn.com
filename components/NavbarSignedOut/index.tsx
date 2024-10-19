@@ -1,17 +1,16 @@
-import { getServerClient } from '@/utils/supabase/server';
-import { Navbar } from './Navbar';
+'use client';
 
-export async function NavbarSignedOut() {
-  const supabase = getServerClient();
+import React from 'react';
+import {Navbar} from './Navbar';
+import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+export const NavbarSignedOut: React.FC = () => {
+  const { user, loading } = useAuth();
 
-  console.log(
-    'NavbarSignedOut - User state:',
-    user ? 'Authenticated' : 'Not authenticated'
-  );
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return <Navbar user={user} />;
-}
+};

@@ -168,7 +168,7 @@ const MenuIcon = ({ isOpen }: { isOpen: boolean }) => (
 );
 
 export function Navbar({ user }: NavlinksProps) {
-	const router = getRedirectMethod() === "client" ? useRouter() : null;
+	const router = useRouter(); // Always get the router
 	const [isNavOpen, setIsNavOpen] = useState(false);
 
 	useEffect(() => {
@@ -217,6 +217,14 @@ export function Navbar({ user }: NavlinksProps) {
 		}),
 	};
 
+	const handleSignOut = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const redirectPath = await SignOut();
+		if (typeof window !== 'undefined') {
+			window.location.href = redirectPath; // Use window.location for navigation
+		}
+	};
+
 	return (
 		<>
 			{isNavOpen && (
@@ -260,7 +268,7 @@ export function Navbar({ user }: NavlinksProps) {
 							custom={3}
 						>
 							{user ? (
-								<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
+								<form onSubmit={handleSignOut}>
 									<input type="hidden" name="pathName" value={usePathname()} />
 									<button type="submit" className={buttonClasses}>
 										Sign out
@@ -300,7 +308,7 @@ export function Navbar({ user }: NavlinksProps) {
 							<MobileMenuContent />
 							<div className="mt-8">
 								{user ? (
-									<form onSubmit={(e) => handleRequest(e, SignOut, router)}>
+									<form onSubmit={handleSignOut}>
 										<input
 											type="hidden"
 											name="pathName"
@@ -308,7 +316,7 @@ export function Navbar({ user }: NavlinksProps) {
 										/>
 										<button type="submit" className={`${buttonClasses} w-full`}>
 											Sign out
-										</button>
+											</button>
 									</form>
 								) : (
 									<Link

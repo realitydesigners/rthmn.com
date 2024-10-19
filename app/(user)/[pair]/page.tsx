@@ -12,7 +12,7 @@ interface PageProps {
 
 export default async function PairPage({ params }: PageProps) {
   const { pair } = params;
-  const supabase = getServerClient();
+  const supabase = await getServerClient();
 
   const {
     data: { user },

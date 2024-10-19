@@ -2,10 +2,13 @@
 import { oxanium } from '@/fonts';
 import Link from 'next/link';
 import { SignOut } from '@/utils/auth-helpers/server';
-import { handleRequest } from '@/utils/auth-helpers/client';
-import { usePathname, useRouter } from 'next/navigation';
-import { getRedirectMethod } from '@/utils/auth-helpers/settings';
-import { useState, useEffect, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { User } from '@supabase/supabase-js';
+
+interface NavbarSignedInProps {
+  user: User;
+}
 
 const getIcon = (name: string): JSX.Element => {
   const icons: { [key: string]: JSX.Element } = {
@@ -48,27 +51,19 @@ const getIcon = (name: string): JSX.Element => {
   return icons[name] || <path />;
 };
 
-export const NavbarSignedIn = ({ user }: { user: any }) => {
+export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   const router = useRouter();
-  const pathname = usePathname();
-  const [isClient, setIsClient] = useState(false);
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  const handleSignOut = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
     try {
-      await handleRequest(
-        e as FormEvent<HTMLFormElement>,
-        SignOut,
-        getRedirectMethod() === 'client' ? router : null
-      );
-      // Optionally, you can add a success message or additional logic here
+      const redirectPath = await SignOut();
+      router.push(redirectPath);
+      router.refresh();
     } catch (error) {
-      console.error('Sign out error:', error);
-      // Optionally, you can show an error message to the user
+      console.error('Error signing out:', error);
+      setIsSigningOut(false);
     }
   };
 
@@ -99,17 +94,13 @@ export const NavbarSignedIn = ({ user }: { user: any }) => {
               Account
             </Link>
 
-            {isClient && (
-              <form onSubmit={handleSignOut}>
-                <input type="hidden" name="pathName" value={pathname} />
-                <button
-                  type="submit"
-                  className={`${oxanium.className} text-white`}
-                >
-                  Sign out
-                </button>
-              </form>
-            )}
+            <button
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className={`${oxanium.className} text-white`}
+            >
+              {isSigningOut ? 'Signing out...' : 'Sign out'}
+            </button>
           </div>
         </div>
       </div>

@@ -8,10 +8,7 @@ import { getServerClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
 export default async function SignIn() {
-  const { allowOauth } = getAuthTypes();
-
-  // Check if the user is already logged in and redirect to the account page if so
-  const supabase = getServerClient();
+  const supabase = await getServerClient();
 
   const {
     data: { user }
@@ -21,10 +18,19 @@ export default async function SignIn() {
     return redirect('/');
   }
 
+  const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
+  const defaultSignInView = getDefaultSignInView();
+
   return (
-    <div className="height-screen-helper flex justify-center">
-      <div className="m-auto flex w-80 max-w-lg flex-col justify-between p-3">
-        <Card title="Sign In">{allowOauth && <OauthSignIn />}</Card>
+    <div className="flex justify-center height-screen-helper">
+      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
+        <Card
+          title="Sign In"
+          description="Choose your preferred sign in method"
+        >
+          {allowOauth && <OauthSignIn />}
+          {/* Add other sign-in components as needed */}
+        </Card>
       </div>
     </div>
   );

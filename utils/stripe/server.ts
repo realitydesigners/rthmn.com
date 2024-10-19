@@ -19,10 +19,13 @@ type CheckoutResponse = {
 
 export async function checkoutWithStripe(
   price: Price,
-  redirectPath = '/account'
+  isSubscription: boolean,
+  successPath: string,
+  cancelPath: string
 ): Promise<CheckoutResponse> {
   try {
-    const supabase = getServerClient();
+    const supabase = await getServerClient();
+
     const {
       error,
       data: { user }
@@ -30,7 +33,13 @@ export async function checkoutWithStripe(
 
     if (error || !user) {
       console.error(error);
-      throw new Error('Could not get user session.');
+      return {
+        errorRedirect: getErrorRedirect(
+          cancelPath,
+          'Auth error',
+          'Please log in and try again.'
+        )
+      };
     }
 
     // Retrieve or create the customer in Stripe
@@ -59,7 +68,7 @@ export async function checkoutWithStripe(
         }
       ],
       cancel_url: getURL(),
-      success_url: getURL(redirectPath)
+      success_url: getURL(successPath)
     };
 
     console.log(
@@ -96,31 +105,22 @@ export async function checkoutWithStripe(
     } else {
       throw new Error('Unable to create checkout session.');
     }
-  } catch (error) {
-    if (error instanceof Error) {
-      return {
-        errorRedirect: getErrorRedirect(
-          redirectPath,
-          error.message,
-          'Please try again later or contact a system administrator.'
-        )
-      };
-    } else {
-      return {
-        errorRedirect: getErrorRedirect(
-          redirectPath,
-          'An unknown error occurred.',
-          'Please try again later or contact a system administrator.'
-        )
-      };
-    }
+  } catch (e) {
+    console.error(e);
+    return {
+      errorRedirect: getErrorRedirect(
+        cancelPath,
+        'Unexpected error',
+        'Please try again later.'
+      )
+    };
   }
 }
 
 export async function createStripePortal(currentPath: string) {
   try {
     // Use the singleton Supabase client
-    const supabase = getServerClient();
+    const supabase = await getServerClient();
     const {
       error,
       data: { user }

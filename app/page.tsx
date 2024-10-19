@@ -1,6 +1,6 @@
 import { HeroSection } from '@/app/_components/SectionHero';
 import { FeaturesSection } from '@/app/_components/SectionFeatures';
-import { PricingSection } from '@/app/_components/SectionPricing';
+import { SectionPricing } from '@/app/_components/SectionPricing';
 import { RyverSection } from '@/app/_components/SectionRyver';
 import {
   getProducts,
@@ -13,7 +13,7 @@ import { getServerClient } from '@/utils/supabase/server';
 import { AuthStatus } from '@/components/AuthStatus';
 
 export default async function PricingPage() {
-  const supabase = getServerClient();
+  const supabase = await getServerClient();
   const [user, products, subscription] = await Promise.all([
     getUser(supabase),
     getProducts(supabase),
@@ -32,7 +32,7 @@ export default async function PricingPage() {
       {/* <FeaturesSection />
 			<FAQSection />
 			<ServiceSection /> */}
-      {/* <PricingSection
+      {/* <SectionPricing
         user={user}
         products={products ?? []}
         subscription={subscription}

@@ -9,7 +9,7 @@ export const getUser = cache(async (supabase: SupabaseClient) => {
 });
 
 export const getSubscription = cache(async (supabase: SupabaseClient) => {
-	const { data: subscription, error } = await supabase
+	const { data: subscription } = await supabase
 		.from("subscriptions")
 		.select("*, prices(*, products(*))")
 		.in("status", ["trialing", "active"])
