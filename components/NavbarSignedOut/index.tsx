@@ -10,6 +10,7 @@ import styles from './styles.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { FaArrowRight } from 'react-icons/fa'; // Add this import for the arrow icon
 
 interface NavbarSignedOutProps {
   user: User | null;
@@ -69,10 +70,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('plans')}
         >
-          <Link
-            href="/"
-            className={`${innerLinkStyle} ${oxanium.className}`}
-          >
+          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
             <span className="text-sm font-semibold">Plans</span>
           </Link>
         </div>
@@ -80,10 +78,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('how-it-works')}
         >
-          <Link
-            href="/"
-            className={`${innerLinkStyle} ${oxanium.className}`}
-          >
+          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
             <span className="text-sm font-semibold">How it works</span>
           </Link>
         </div>
@@ -91,10 +86,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('tools')}
         >
-          <Link
-            href="/"
-            className={`${innerLinkStyle} ${oxanium.className}`}
-          >
+          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
             <span className="text-sm font-semibold">Tools</span>
           </Link>
         </div>
@@ -102,10 +94,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('features')}
         >
-          <Link
-            href="/"
-            className={`${innerLinkStyle} ${oxanium.className}`}
-          >
+          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
             <span className="text-sm font-semibold">Features</span>
           </Link>
         </div>
@@ -113,14 +102,12 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('community')}
         >
-          <Link
-            href="/"
-            className={`${innerLinkStyle} ${oxanium.className}`}
-          >
+          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
             <span className="text-sm font-semibold">Community</span>
           </Link>
         </div>
       </div>
+
       <DesktopMenuContent
         activeDropdown={activeDropdown}
         onClose={handleCloseDropdown}
@@ -267,19 +254,28 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             >
               <div className="flex h-8 w-8 items-center">{getIcon('logo')}</div>
               <div
-                className={`pt-1 text-2xl tracking-wide font-bold ${russo.className}`}
+                className={`pt-1 text-2xl font-bold tracking-wide ${russo.className}`}
               >
                 RTHMN
               </div>
             </Link>
 
-            <nav className="hidden space-x-4 lg:flex">
-              <Links />
-            </nav>
+            <div className="flex items-center space-x-4">
+              <nav className="hidden space-x-4 lg:flex">
+                <Links />
+              </nav>
+            </div>
+            <div className='flex items-center space-x-4'> 
+            <Link
+              href="/start"
+               className="flex items-center space-x-3 text-black font-bold rounded-md p-[1px] transition-all duration-200 bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] hover:from-[#fff] hover:to-[#98FFF5]"
+            >
+              <span  className="flex items-center space-x-2 bg-gradient-to-b from-[#3CFFBE] to-[#5EF1E7] rounded-md px-3 py-2"><span>Start Now</span><FaArrowRight /></span>
+            </Link>
 
             {/* Desktop sign-in/sign-out button */}
             <motion.div
-              className="hidden lg:block"
+              className="flex hidden lg:block"
               variants={linkVariants}
               custom={3}
             >
@@ -296,6 +292,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 </Link>
               )}
             </motion.div>
+            </div>
 
             <motion.button
               onClick={toggleNav}
