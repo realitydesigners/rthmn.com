@@ -26,7 +26,10 @@ export async function handleRequest(
   }
 }
 
-export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
+export async function signInWithOAuth(
+  e: React.FormEvent<HTMLFormElement>,
+  provider: Provider
+) {
   e.preventDefault();
   const supabase = createClient();
   const redirectURL =
@@ -37,7 +40,7 @@ export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   console.log('Redirect URL:', redirectURL);
 
   await supabase.auth.signInWithOAuth({
-    provider: 'google',
+    provider,
     options: {
       redirectTo: redirectURL
     }
