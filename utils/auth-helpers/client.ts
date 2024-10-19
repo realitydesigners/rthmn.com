@@ -1,10 +1,10 @@
 'use client';
 
-import { getURL } from '@/utils/helpers';
-import { createClient } from '@/utils/supabase/client';
-import type { Provider } from '@supabase/supabase-js';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { redirectToPath } from './server';
+import { getURL } from '@/utils/helpers';
+import type { Provider } from '@supabase/supabase-js';
+import { getBrowserClient } from '../supabase/client';
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
@@ -28,7 +28,7 @@ export async function handleRequest(
 
 export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
   e.preventDefault();
-  const supabase = createClient();
+  const supabase = getBrowserClient();
   const redirectURL =
     process.env.NODE_ENV === 'development'
       ? 'http://localhost:3000'

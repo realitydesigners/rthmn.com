@@ -1,13 +1,11 @@
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import PairClient from './PairClient';
-import { getBoxSlices, getLatestBoxSlices } from '@/utils/boxSlices';
 import {
   getBoxSlicesSocket,
   getLatestBoxSlicesSocket
 } from '@/utils/boxSlicesSocket';
 import { getURL } from '@/utils/helpers';
+import { getServerClient } from '@/utils/supabase/server';
 
 interface PageProps {
   params: {
@@ -17,19 +15,7 @@ interface PageProps {
 
 export default async function PairPage({ params }: PageProps) {
   const { pair } = params;
-  const cookieStore = cookies();
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
-        }
-      }
-    }
-  );
+  const supabase = getServerClient();
 
   const {
     data: { user },
