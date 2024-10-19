@@ -1,9 +1,6 @@
 import { redirect } from 'next/navigation';
 import PairClient from './PairClient';
-import {
-  getBoxSlicesSocket,
-  getLatestBoxSlicesSocket
-} from '@/utils/boxSlicesSocket';
+import { getBoxSlices, getLatestBoxSlices } from '@/utils/boxSlices';
 import { getURL } from '@/utils/helpers';
 import { getServerClient } from '@/utils/supabase/server';
 
@@ -22,16 +19,18 @@ export default async function PairPage({ params }: PageProps) {
     error
   } = await supabase.auth.getUser();
 
-  console.log('User:', user);
-  console.log('Auth error:', error);
-
   if (error || !user) {
-    console.log('Redirecting to signin');
     return redirect(getURL('signin'));
   }
 
-  const initialData = await getBoxSlicesSocket(pair, undefined, 500);
-  const allPairsData = await getLatestBoxSlicesSocket();
+  const initialData = await getBoxSlices(pair, undefined, 500);
+
+  if (initialData.length === 0) {
+    console.error(`No data received for ${pair}`);
+    return <div>Error: No data available for {pair}</div>;
+  }
+
+  const allPairsData = await getLatestBoxSlices();
 
   return (
     <div className="w-full">
