@@ -52,41 +52,72 @@ const Links = () => {
     setActiveDropdown(null);
   };
 
+  const linkStyle = `
+    flex items-center space-x-3 text-white rounded-full p-[2px] transition-all duration-200 
+    bg-gradient-to-b from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]
+  `;
+
+  const innerLinkStyle = `
+    flex items-center space-x-3 bg-gradient-to-b from-[#0A0A0A] to-[#181818] rounded-full 
+    py-2 px-4 w-full
+  `;
+
   return (
     <div className="group relative">
-      <div className="flex space-x-0">
+      <div className="flex space-x-4">
         <div
-          className="px-4 py-4"
-          onMouseEnter={() => setActiveDropdown('pricing')}
+          className={linkStyle}
+          onMouseEnter={() => setActiveDropdown('plans')}
         >
           <Link
             href="/"
-            className={`heading-text font-bold ${oxanium.className}`}
+            className={`${innerLinkStyle} ${oxanium.className}`}
           >
-            Pricing
+            <span className="text-sm font-semibold">Plans</span>
           </Link>
         </div>
         <div
-          className="px-4 py-4"
-          onMouseEnter={() => setActiveDropdown('resources')}
+          className={linkStyle}
+          onMouseEnter={() => setActiveDropdown('how-it-works')}
         >
           <Link
-            href="/resources"
-            className={`heading-text font-bold ${oxanium.className}`}
+            href="/"
+            className={`${innerLinkStyle} ${oxanium.className}`}
           >
-            Resources
+            <span className="text-sm font-semibold">How it works</span>
           </Link>
         </div>
-
         <div
-          className="px-4 py-4"
-          onMouseEnter={() => setActiveDropdown('account')}
+          className={linkStyle}
+          onMouseEnter={() => setActiveDropdown('tools')}
         >
           <Link
-            href="/account"
-            className={`heading-text font-bold ${oxanium.className}`}
+            href="/"
+            className={`${innerLinkStyle} ${oxanium.className}`}
           >
-            Account
+            <span className="text-sm font-semibold">Tools</span>
+          </Link>
+        </div>
+        <div
+          className={linkStyle}
+          onMouseEnter={() => setActiveDropdown('features')}
+        >
+          <Link
+            href="/"
+            className={`${innerLinkStyle} ${oxanium.className}`}
+          >
+            <span className="text-sm font-semibold">Features</span>
+          </Link>
+        </div>
+        <div
+          className={linkStyle}
+          onMouseEnter={() => setActiveDropdown('community')}
+        >
+          <Link
+            href="/"
+            className={`${innerLinkStyle} ${oxanium.className}`}
+          >
+            <span className="text-sm font-semibold">Community</span>
           </Link>
         </div>
       </div>
@@ -411,7 +442,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             </div>
           </div>
         );
-      case 'pricing':
+      case 'plans':
         return (
           <div
             className={`${styles.dropdownContent} ${styles.dropdownPricing}`}
