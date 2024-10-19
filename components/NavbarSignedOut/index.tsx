@@ -8,5 +8,10 @@ export async function NavbarSignedOut() {
     data: { user }
   } = await supabase.auth.getUser();
 
+  console.log(
+    'NavbarSignedOut - User state:',
+    user ? 'Authenticated' : 'Not authenticated'
+  );
+
   return <Navbar user={user} />;
 }

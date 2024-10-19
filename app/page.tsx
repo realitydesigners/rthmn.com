@@ -10,6 +10,7 @@ import {
 import { FAQSection } from '@/app/_components/SectionFAQ';
 import { ServiceSection } from '@/app/_components/SectionServices';
 import { getServerClient } from '@/utils/supabase/server';
+import { AuthStatus } from '@/components/AuthStatus';
 
 export default async function PricingPage() {
   const supabase = getServerClient();
@@ -19,8 +20,14 @@ export default async function PricingPage() {
     getSubscription(supabase)
   ]);
 
+  console.log(
+    'Main page - User state:',
+    user ? 'Authenticated' : 'Not authenticated'
+  );
+
   return (
     <div>
+      <AuthStatus />
       <HeroSection />
       {/* <FeaturesSection />
 			<FAQSection />
@@ -33,6 +40,12 @@ export default async function PricingPage() {
       {/* <div className="h-screen"></div>
 			<RyverSection />
 			<div className="h-screen"></div> */}
+      {user && (
+        <div>
+          <p>Welcome, {user.email}</p>
+          {/* Add more user details as needed */}
+        </div>
+      )}
     </div>
   );
 }

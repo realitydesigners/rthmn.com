@@ -1,47 +1,39 @@
-import React from "react";
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { NavbarSignedOut } from "@/components/NavbarSignedOut";
-import { NavbarSignedIn } from "@/components/NavbarSignedIn";
+import React from 'react';
+import { NavbarSignedOut } from '@/components/NavbarSignedOut';
+import { NavbarSignedIn } from '@/components/NavbarSignedIn';
+import { getServerClient } from '@/utils/supabase/server';
 
 const DynamicNavbar = async () => {
-	const cookieStore = cookies();
+  const supabase = getServerClient();
 
-	const supabase = createServerClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			cookies: {
-				get(name: string) {
-					return cookieStore.get(name)?.value;
-				},
-			},
-		},
-	);
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+  console.log(
+    'DynamicNavbar - User state:',
+    user ? 'Authenticated' : 'Not authenticated'
+  );
 
-	let hasSubscription = false;
-	if (user) {
-		const { data: subscriptionData, error } = await supabase
-			.from("subscriptions")
-			.select("*")
-			.eq("user_id", user.id)
-			.eq("status", "active")
-			.single();
+  let hasSubscription = false;
+  if (user) {
+    const { data: subscriptionData, error } = await supabase
+      .from('subscriptions')
+      .select('*')
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .single();
 
-		if (subscriptionData && !error) {
-			hasSubscription = true;
-		}
-	}
-	// if (user && hasSubscription) 
-	if (user) {
-		return <NavbarSignedIn user={user} />;
-	} else {
-		return <NavbarSignedOut />;
-	}
+    if (subscriptionData && !error) {
+      hasSubscription = true;
+    }
+  }
+
+  if (user) {
+    return <NavbarSignedIn user={user} />;
+  } else {
+    return <NavbarSignedOut />;
+  }
 };
 
 export default DynamicNavbar;
