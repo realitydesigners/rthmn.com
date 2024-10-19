@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import OauthSignIn from '@/components/AuthForms/OauthSignIn';
 import { Scene } from "@/components/Scene/Scene";
 import Link from 'next/link';
-import { FaDiscord, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { russo, oxanium } from '@/fonts';
 import {
   getAuthTypes,
@@ -51,6 +51,9 @@ export default function SignIn() {
             </Link>
             <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
               <FaTwitter size={32} />
+            </Link>
+            <Link href="#" className="text-gray-400 hover:text-white transition-colors duration-200">
+              <FaYoutube size={32} />
             </Link>
           </div>
         </div>
