@@ -53,13 +53,8 @@ const getIcon = (name: string): JSX.Element => {
 export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [buttonContent, setButtonContent] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut } = useAuth();
-
-  useEffect(() => {
-    setButtonContent(user?.email?.[0].toUpperCase() || '?');
-  }, [user]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -87,6 +82,8 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     };
   }, []);
 
+  const userInitial = user?.email?.[0].toUpperCase() || '?';
+
   return (
     <nav className="fixed left-0 right-0 top-0 z-[1001] h-16 lg:h-20">
       <div className="h-full w-full px-6">
@@ -103,19 +100,27 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
           <div className="relative" ref={dropdownRef}>
             <button
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="h-10 w-10 rounded-full bg-gray-500 flex items-center justify-center text-white"
+              className="flex items-center space-x-3 text-white rounded-full p-[2px] transition-all duration-200 bg-gradient-to-b from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]"
             >
-              {buttonContent}
+              <div className="flex items-center space-x-3 bg-gradient-to-b from-[#0A0A0A] to-[#181818] rounded-full py-1 pl-4 pr-1">
+                <div className="text-left">
+                  <p className="text-[12px] font-semibold">{user?.user_metadata?.full_name || 'User'}</p>
+                  <p className="text-[10px]  text-gray-300">{user?.email}</p>
+                </div>
+                <div className="h-10 w-10 rounded-full bg-black flex items-center justify-center">
+                  <span className="text-lg font-bold">{userInitial}</span>
+                </div>
+              </div>
             </button>
             {isDropdownOpen && (
-              <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-black border border-[#181818] ring-1 ring-black ring-opacity-5">
+              <div className="absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-black border border-[#181818] ring-1 ring-black ring-opacity-5">
                 <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                  <Link href="/account" className="block px-4 py-2 text-sm text-gray-100" role="menuitem">Account</Link>
-                  <Link href="/settings" className="block px-4 py-2 text-sm text-gray-100" role="menuitem">Settings</Link>
+                  <Link href="/account" className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]" role="menuitem">Account</Link>
+                  <Link href="/settings" className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]" role="menuitem">Settings</Link>
                   <button
                     onClick={handleSignOut}
                     disabled={isSigningOut}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-100"
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]"
                     role="menuitem"
                   >
                     {isSigningOut ? 'Signing out...' : 'Sign out'}
