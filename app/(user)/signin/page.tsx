@@ -1,29 +1,29 @@
+'use client';
+
+import { useSession } from '@supabase/auth-helpers-react';
+import { useRouter } from 'next/navigation';
 import OauthSignIn from '@/components/AuthForms/OauthSignIn';
 import Card from '@/components/Card';
 import {
   getAuthTypes,
   getDefaultSignInView
 } from '@/utils/auth-helpers/settings';
-import { getServerClient } from '@/utils/supabase/server';
-import { redirect } from 'next/navigation';
 
-export default async function SignIn() {
-  const supabase = await getServerClient();
+export default function SignIn() {
+  const session = useSession();
+  const router = useRouter();
 
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
-
-  if (user) {
-    return redirect('/');
+  if (session) {
+    router.push('/');
+    return null;
   }
 
   const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
   const defaultSignInView = getDefaultSignInView();
 
   return (
-    <div className="flex justify-center height-screen-helper">
-      <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
+    <div className="height-screen-helper flex justify-center">
+      <div className="m-auto flex w-80 max-w-lg flex-col justify-between p-3">
         <Card
           title="Sign In"
           description="Choose your preferred sign in method"

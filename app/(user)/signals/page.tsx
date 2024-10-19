@@ -1,41 +1,34 @@
 'use client';
 
 import type { Signal } from '@/types';
-import { getBrowserClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 
 export default function SignalsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const session = useSession();
+  const supabase = useSupabaseClient();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
-  const supabase = getBrowserClient();
 
   useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
-      setUser(user);
-      if (!user) {
-        router.push('/signin');
-      }
-    };
-    getUser();
-  }, [router]);
+    if (!session) {
+      router.push('/signin');
+    }
+  }, [session, router]);
 
   useEffect(() => {
     const checkSubscriptionAndFetchSignals = async () => {
-      if (!user) return;
+      if (!session?.user) return;
 
       const { data: subscriptionData, error: subscriptionError } =
         await supabase
           .from('subscriptions')
           .select('*')
-          .eq('user_id', user.id)
+          .eq('user_id', session.user.id)
           .eq('status', 'active')
           .single();
 
@@ -60,9 +53,9 @@ export default function SignalsPage() {
     };
 
     checkSubscriptionAndFetchSignals();
-  }, [user]);
+  }, [session, supabase]);
 
-  if (!user || hasSubscription === null) {
+  if (!session || hasSubscription === null) {
     return <div>Loading...</div>;
   }
 

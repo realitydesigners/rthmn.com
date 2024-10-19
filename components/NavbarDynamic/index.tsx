@@ -1,18 +1,18 @@
 'use client';
 
 import React from 'react';
-import { NavbarSignedOut } from '@/components/NavbarSignedOut'
+import { NavbarSignedOut } from '@/components/NavbarSignedOut';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 const DynamicNavbar = () => {
-  const { user, loading } = useAuth();
+  const { session } = useAuth();
 
-  if (loading) {
-    return <div>Loading...</div>; 
-  }
-
-  return user ? <NavbarSignedIn user={user} /> : <NavbarSignedOut user={null} />;
+  return session ? (
+    <NavbarSignedIn user={session.user} />
+  ) : (
+    <NavbarSignedOut user={null} />
+  );
 };
 
 export default DynamicNavbar;

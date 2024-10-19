@@ -1,13 +1,12 @@
 'use client';
 import { oxanium } from '@/fonts';
 import Link from 'next/link';
-import { SignOut } from '@/utils/auth-helpers/server';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useAuth } from '@/providers/SupabaseProvider';
 import { User } from '@supabase/supabase-js';
 
 interface NavbarSignedInProps {
-  user: User;
+  user: User | null;
 }
 
 const getIcon = (name: string): JSX.Element => {
@@ -52,17 +51,18 @@ const getIcon = (name: string): JSX.Element => {
 };
 
 export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
-  const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
+  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
     try {
-      const redirectPath = await SignOut();
-      router.push(redirectPath);
-      router.refresh();
+      console.log('Starting sign out process');
+      await signOut();
+      console.log('Sign out successful');
     } catch (error) {
-      console.error('Error signing out:', error);
+      console.error('Error during sign out:', error);
+    } finally {
       setIsSigningOut(false);
     }
   };

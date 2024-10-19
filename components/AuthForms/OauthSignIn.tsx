@@ -1,13 +1,15 @@
 'use client';
 
-import { signInWithOAuth } from '@/utils/auth-helpers/client';
+import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
 import { FcGoogle } from 'react-icons/fc';
 import { useEffect } from 'react';
-import { getBrowserClient } from '@/utils/supabase/client';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
 export default function OAuthSignIn() {
+  const supabase = useSupabaseClient();
+  const signInWithOAuth = useSignInWithOAuth();
+
   useEffect(() => {
-    const supabase = getBrowserClient();
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session);
@@ -30,7 +32,7 @@ export default function OAuthSignIn() {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [supabase.auth]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

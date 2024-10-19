@@ -4,6 +4,11 @@ import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';
 import { type PropsWithChildren, Suspense } from 'react';
 import './main.css';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { Database } from '@/types/supabase';
+import SupabaseProvider from '@/providers/SupabaseProvider';
+import { getServerClient } from '@/utils/supabase/server';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -19,17 +24,29 @@ export const metadata: Metadata = {
   }
 };
 
-export default function RootLayout({ children }: PropsWithChildren) {
+export default async function RootLayout({
+  children
+}: {
+  children: React.ReactNode;
+}) {
+  const supabase = await getServerClient();
+
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
   return (
     <html lang="en">
       <body className="bg-black">
-        <DynamicNavbar />
-        <main className="md:min-h[calc(100dvh-5rem)] min-h-[calc(100dvh-4rem)]">
-          {children}
-        </main>
-        <Suspense>
-          <Toaster />
-        </Suspense>
+        <SupabaseProvider initialSession={session}>
+          <DynamicNavbar />
+          <main className="md:min-h[calc(100dvh-5rem)] min-h-[calc(100dvh-4rem)]">
+            {children}
+          </main>
+          <Suspense>
+            <Toaster />
+          </Suspense>
+        </SupabaseProvider>
       </body>
     </html>
   );
