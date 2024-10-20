@@ -15,7 +15,7 @@ interface DashboardClientProps {
 	allPairsData: Record<string, PairData>;
 }
 
-const PairClient: React.FC<DashboardClientProps> = ({
+const Client: React.FC<DashboardClientProps> = ({
 	initialData,
 	pair,
 	allPairsData,
@@ -218,4 +218,4 @@ const PairClient: React.FC<DashboardClientProps> = ({
 	);
 };
 
-export default React.memo(PairClient);
+export default React.memo(Client);
