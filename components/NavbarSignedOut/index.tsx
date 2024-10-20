@@ -195,7 +195,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
   };
 
   const buttonClasses = `
-        px-6 py-2
+        px-6 py-3
         gradient-border-button
         text-white font-medium
         ${oxanium.className}
@@ -293,7 +293,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                   </form>
                 ) : (
                   <Link href="/signin" className={buttonClasses}>
-                    Sign In
+                    Sign-in
                   </Link>
                 )}
               </motion.div>
