@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import Client from './client';
 import { getBoxSlices, getLatestBoxSlices } from '@/utils/boxSlices';
 import { getURL } from '@/utils/helpers';
-import { getServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 
 interface PageProps {
   params: {
@@ -12,7 +12,7 @@ interface PageProps {
 
 export default async function PairPage({ params }: PageProps) {
   const { pair } = params;
-  const supabase = await getServerClient();
+  const supabase = await createClient();
 
   const {
     data: { user },
