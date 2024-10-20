@@ -1,13 +1,9 @@
 'use client';
 
-import {
-  createClientComponentClient,
-  Session
-} from '@supabase/auth-helpers-nextjs';
-import { SessionContextProvider } from '@supabase/auth-helpers-react';
+import { Session } from '@supabase/supabase-js';
 import { useState, useEffect, createContext, useContext } from 'react';
-import { Database } from '@/types/supabase';
 import { useRouter } from 'next/navigation';
+import { createClient } from '@/utils/supabase/client';
 
 type AuthContextType = {
   session: Session | null;
@@ -31,12 +27,7 @@ export default function SupabaseProvider({
   children: React.ReactNode;
   initialSession: Session | null;
 }) {
-  const [supabaseClient] = useState(() =>
-    createClientComponentClient<Database>({
-      supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    })
-  );
+  const [supabaseClient] = useState(() => createClient());
   const [session, setSession] = useState<Session | null>(initialSession);
   const router = useRouter();
 
@@ -62,13 +53,8 @@ export default function SupabaseProvider({
   };
 
   return (
-    <SessionContextProvider
-      supabaseClient={supabaseClient}
-      initialSession={session}
-    >
-      <AuthContext.Provider value={{ session, signOut }}>
-        {children}
-      </AuthContext.Provider>
-    </SessionContextProvider>
+    <AuthContext.Provider value={{ session, signOut }}>
+      {children}
+    </AuthContext.Provider>
   );
 }

@@ -1,4 +1,4 @@
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   console.log('Callback route hit, code:', code);
 
   if (code) {
-    const supabase = createRouteHandlerClient({ cookies });
+    const supabase = createClient();
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       console.log('Session exchange result:', {
@@ -18,11 +18,7 @@ export async function GET(request: Request) {
       });
       if (error) throw error;
 
-      // Explicitly set the session
-      await supabase.auth.setSession({
-        access_token: data.session.access_token,
-        refresh_token: data.session.refresh_token
-      });
+      // No need to explicitly set the session, as it's handled by the middleware
     } catch (error) {
       console.error('Error exchanging code for session:', error);
       return NextResponse.redirect(

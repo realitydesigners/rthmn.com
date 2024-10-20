@@ -1,7 +1,5 @@
 'use client';
-import { handleRequest } from '@/utils/auth-helpers/client';
-import { SignOut } from '@/utils/auth-helpers/server';
-import { getRedirectMethod } from '@/utils/auth-helpers/settings';
+
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -265,33 +263,40 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 <Links />
               </nav>
             </div>
-            <div className='flex items-center space-x-4'> 
-            <Link
-              href="/start"
-               className="flex items-center space-x-3 text-black font-bold rounded-md p-[1px] transition-all duration-200 bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] hover:from-[#fff] hover:to-[#98FFF5]"
-            >
-              <span  className="flex items-center space-x-2 bg-gradient-to-b from-[#3CFFBE] to-[#5EF1E7] rounded-md px-3 py-2"><span>Start Now</span><FaArrowRight /></span>
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link
+                href="/start"
+                className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] p-[1px] font-bold text-black transition-all duration-200 hover:from-[#fff] hover:to-[#98FFF5]"
+              >
+                <span className="flex items-center space-x-2 rounded-md bg-gradient-to-b from-[#3CFFBE] to-[#5EF1E7] px-3 py-2">
+                  <span>Start Now</span>
+                  <FaArrowRight />
+                </span>
+              </Link>
 
-            {/* Desktop sign-in/sign-out button */}
-            <motion.div
-              className="flex hidden lg:block"
-              variants={linkVariants}
-              custom={3}
-            >
-              {user ? (
-                <form onSubmit={handleSignOut}>
-                  <input type="hidden" name="pathName" value={usePathname()} />
-                  <button type="submit" className={buttonClasses}>
-                    Sign out
-                  </button>
-                </form>
-              ) : (
-                <Link href="/signin" className={buttonClasses}>
-                  Sign In
-                </Link>
-              )}
-            </motion.div>
+              {/* Desktop sign-in/sign-out button */}
+              <motion.div
+                className="flex hidden lg:block"
+                variants={linkVariants}
+                custom={3}
+              >
+                {user ? (
+                  <form onSubmit={handleSignOut}>
+                    <input
+                      type="hidden"
+                      name="pathName"
+                      value={usePathname()}
+                    />
+                    <button type="submit" className={buttonClasses}>
+                      Sign out
+                    </button>
+                  </form>
+                ) : (
+                  <Link href="/signin" className={buttonClasses}>
+                    Sign In
+                  </Link>
+                )}
+              </motion.div>
             </div>
 
             <motion.button

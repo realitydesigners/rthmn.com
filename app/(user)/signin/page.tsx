@@ -1,5 +1,4 @@
 'use client';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import { useRouter } from 'next/navigation';
 import { Scene } from '@/components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
@@ -10,14 +9,16 @@ import { russo, oxanium } from '@/fonts';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 import type { Provider } from '@supabase/supabase-js';
+import { useAuth } from '@/providers/SupabaseProvider';
+import { createClient } from '@/utils/supabase/client';
 
 export default function SignIn() {
-  const session = useSession();
+  const { session } = useAuth();
   const router = useRouter();
-  const supabase = useSupabaseClient();
   const signInWithOAuth = useSignInWithOAuth();
 
   useEffect(() => {
+    const supabase = createClient();
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log('Auth state changed:', event, session);
@@ -39,7 +40,7 @@ export default function SignIn() {
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [supabase.auth]);
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
