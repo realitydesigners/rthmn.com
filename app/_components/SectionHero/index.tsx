@@ -1,6 +1,6 @@
 "use client";
 import { oxanium } from "@/fonts";
-import { Scene } from "../../../components/Scene/Scene";
+import { Scene } from "@/components/Scene/Scene";
 import React from "react";
 import { motion } from "framer-motion";
 import styles from "./styles.module.css";

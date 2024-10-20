@@ -1,36 +1,36 @@
-import { getErrorRedirect, getStatusRedirect } from "@/utils/helpers";
-import { createClient } from "@/utils/supabase/server";
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
-	// The `/auth/callback` route is required for the server-side auth flow implemented
-	// by the `@supabase/ssr` package. It exchanges an auth code for the user's session.
-	const requestUrl = new URL(request.url);
-	const code = requestUrl.searchParams.get("code");
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get('code');
 
-	if (code) {
-		const supabase = createClient();
+  console.log('Callback route hit, code:', code);
 
-		const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (code) {
+    const supabase = createRouteHandlerClient({ cookies });
+    try {
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+      console.log('Session exchange result:', {
+        data: data ? 'Data exists' : 'No data',
+        error
+      });
+      if (error) throw error;
 
-		if (error) {
-			return NextResponse.redirect(
-				getErrorRedirect(
-					`${requestUrl.origin}/signin`,
-					error.name,
-					"Sorry, we weren't able to log you in. Please try again.",
-				),
-			);
-		}
-	}
+      // Explicitly set the session
+      await supabase.auth.setSession({
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token
+      });
+    } catch (error) {
+      console.error('Error exchanging code for session:', error);
+      return NextResponse.redirect(
+        `${requestUrl.origin}/auth-error?error=${encodeURIComponent(JSON.stringify(error))}`
+      );
+    }
+  }
 
-	// URL to redirect to after sign in process completes
-	return NextResponse.redirect(
-		getStatusRedirect(
-			`${requestUrl.origin}/account`,
-			"Success!",
-			"You are now signed in.",
-		),
-	);
+  // Redirect to a specific page after successful authentication
+  return NextResponse.redirect(`${requestUrl.origin}/dashboard`);
 }

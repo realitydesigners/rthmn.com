@@ -1,50 +1,44 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import PairClient from "./PairClient";
-import { getBoxSlices } from "@/utils/boxSlices";
-import { getLatestBoxSlices } from "@/utils/boxSlices";
+import { redirect } from 'next/navigation';
+import Client from './client';
+import { getBoxSlices, getLatestBoxSlices } from '@/utils/boxSlices';
+import { getURL } from '@/utils/helpers';
+import { getServerClient } from '@/utils/supabase/server';
 
 interface PageProps {
-	params: {
-		pair: string;
-	};
+  params: {
+    pair: string;
+  };
 }
 
 export default async function PairPage({ params }: PageProps) {
-	const { pair } = params;
-	const cookieStore = cookies();
+  const { pair } = params;
+  const supabase = await getServerClient();
 
-	const supabase = createServerClient(
-		process.env.NEXT_PUBLIC_SUPABASE_URL!,
-		process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-		{
-			cookies: {
-				get(name: string) {
-					return cookieStore.get(name)?.value;
-				},
-			},
-		},
-	);
+  const {
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
 
-	const {
-		data: { user },
-	} = await supabase.auth.getUser();
+  if (error || !user) {
+    return redirect(getURL('signin'));
+  }
 
-	if (!user) {
-		redirect("/signin");
-	}
+  const initialData = await getBoxSlices(pair, undefined, 500);
 
-	const initialData = await getBoxSlices(pair, undefined, 500);
-	const allPairsData = await getLatestBoxSlices();
+  if (initialData.length === 0) {
+    console.error(`No data received for ${pair}`);
+    return <div>Error: No data available for {pair}</div>;
+  }
 
-	return (
-		<div className="w-full">
-			<PairClient
-				initialData={initialData}
-				pair={pair}
-				allPairsData={allPairsData}
-			/>
-		</div>
-	);
+  const allPairsData = await getLatestBoxSlices();
+
+  return (
+    <div className="w-full">
+      <Client
+        initialData={initialData}
+        pair={pair}
+        allPairsData={allPairsData}
+      />
+    </div>
+  );
 }

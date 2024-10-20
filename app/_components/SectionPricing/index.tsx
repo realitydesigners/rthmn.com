@@ -29,7 +29,7 @@ interface Props {
 
 type BillingInterval = "lifetime" | "year" | "month";
 
-export function PricingSection({ user, products, subscription }: Props) {
+export function SectionPricing({ user, products, subscription }: Props) {
 	const intervals = Array.from(
 		new Set(
 			products.flatMap((product) =>
@@ -53,7 +53,9 @@ export function PricingSection({ user, products, subscription }: Props) {
 
 		const { errorRedirect, sessionId } = await checkoutWithStripe(
 			price,
-			currentPath,
+			price.type === 'recurring', // isSubscription
+			'/account', // successPath
+			currentPath // cancelPath
 		);
 
 		if (errorRedirect) {
@@ -67,8 +69,8 @@ export function PricingSection({ user, products, subscription }: Props) {
 				getErrorRedirect(
 					currentPath,
 					"An unknown error occurred.",
-					"Please try again later or contact a system administrator.",
-				),
+					"Please try again later or contact a system administrator."
+				)
 			);
 		}
 

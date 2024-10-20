@@ -1,10 +1,10 @@
 'use client';
 
-import { getURL } from '@/utils/helpers';
-import { createClient } from '@/utils/supabase/client';
-import type { Provider } from '@supabase/supabase-js';
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { redirectToPath } from './server';
+import { getURL } from '@/utils/helpers';
+import type { Provider } from '@supabase/supabase-js';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
@@ -26,15 +26,23 @@ export async function handleRequest(
   }
 }
 
-export async function signInWithOAuth(e: React.FormEvent<HTMLFormElement>) {
-  e.preventDefault();
-  const supabase = createClient();
-  const redirectURL = getURL('/auth/v1/callback');
-  console.log('Redirect URL:', redirectURL); // For debugging
-  await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: {
-      redirectTo: redirectURL
-    }
-  });
+export function useSignInWithOAuth() {
+  const supabase = useSupabaseClient();
+
+  return async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const redirectURL =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://www.rthmn.com';
+
+    console.log('Redirect URL:', redirectURL);
+
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectURL
+      }
+    });
+  };
 }
