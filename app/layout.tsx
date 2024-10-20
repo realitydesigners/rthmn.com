@@ -37,13 +37,14 @@ export default async function RootLayout({
   const supabase = await createClient();
 
   const {
-    data: { session }
-  } = await supabase.auth.getSession();
+    data: { user },
+    error
+  } = await supabase.auth.getUser();
 
   return (
     <html lang="en">
       <body className="bg-black">
-        <SupabaseProvider initialSession={session}>
+        <SupabaseProvider initialUser={user}>
           <DynamicNavbar />
           {children}
           <Suspense>
