@@ -9,6 +9,7 @@ import { FaDiscord } from 'react-icons/fa';
 import { russo, oxanium } from '@/fonts';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
+import type { Provider } from '@supabase/supabase-js';
 
 export default function SignIn() {
   const session = useSession();
@@ -42,10 +43,11 @@ export default function SignIn() {
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('Initiating OAuth sign-in');
+    const provider = e.currentTarget.provider.value as Provider;
+    console.log('Initiating OAuth sign-in with provider:', provider);
     localStorage.setItem('signInAttempt', new Date().toISOString());
     try {
-      await signInWithOAuth(e);
+      await signInWithOAuth(e, provider);
     } catch (error) {
       console.error('OAuth sign-in error:', error);
       localStorage.setItem('signInError', JSON.stringify(error));
@@ -77,7 +79,7 @@ export default function SignIn() {
           </p>
           {allowOauth && (
             <div className="space-y-4">
-              <form onSubmit={handleSignIn}>
+              <form onSubmit={(e) => handleSignIn(e)}>
                 <button
                   className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200"
                   type="submit"
@@ -88,7 +90,7 @@ export default function SignIn() {
                   Sign in with Google
                 </button>
               </form>
-              <form onSubmit={handleSignIn}>
+              <form onSubmit={(e) => handleSignIn(e)}>
                 <button
                   className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-[#5865F2] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#4752C4]"
                   type="submit"

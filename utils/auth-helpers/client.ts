@@ -29,7 +29,7 @@ export async function handleRequest(
 export function useSignInWithOAuth() {
   const supabase = useSupabaseClient();
 
-  return async (e: React.FormEvent<HTMLFormElement>) => {
+  return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
     e.preventDefault();
     const redirectURL =
       process.env.NODE_ENV === 'development'
@@ -37,9 +37,10 @@ export function useSignInWithOAuth() {
         : 'https://www.rthmn.com';
 
     console.log('Redirect URL:', redirectURL);
+    console.log('Provider:', provider);
 
     await supabase.auth.signInWithOAuth({
-      provider: 'google',
+      provider,
       options: {
         redirectTo: redirectURL
       }
