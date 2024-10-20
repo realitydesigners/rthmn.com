@@ -1,16 +1,15 @@
 'use client';
 
 import type { Signal } from '@/types';
-import type { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useAuth } from '@/providers/SupabaseProvider';
+import { createClient } from '@/utils/supabase/client';
 
 export default function SignalsPage() {
   const router = useRouter();
-  const session = useSession();
-  const supabase = useSupabaseClient();
+  const { session } = useAuth();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
 
@@ -23,6 +22,8 @@ export default function SignalsPage() {
   useEffect(() => {
     const checkSubscriptionAndFetchSignals = async () => {
       if (!session?.user) return;
+
+      const supabase = createClient();
 
       const { data: subscriptionData, error: subscriptionError } =
         await supabase
@@ -53,7 +54,7 @@ export default function SignalsPage() {
     };
 
     checkSubscriptionAndFetchSignals();
-  }, [session, supabase]);
+  }, [session]);
 
   if (!session || hasSubscription === null) {
     return <div>Loading...</div>;

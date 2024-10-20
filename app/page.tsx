@@ -11,22 +11,22 @@ import {
 } from '@/utils/supabase/queries';
 import { FAQSection } from '@/app/_components/SectionFAQ';
 import { ServiceSection } from '@/app/_components/SectionServices';
-import { getServerClient } from '@/utils/supabase/server';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useAuth } from '@/providers/SupabaseProvider';
 import { useEffect, useState } from 'react';
+import { createClient } from '@/utils/supabase/client';
 
 export default function PricingPage() {
-  const session = useSession();
-  const supabase = useSupabaseClient();
+  const { session } = useAuth();
   const [products, setProducts] = useState<any[] | null>(null);
   const [subscription, setSubscription] = useState<any | null>(null);
 
   useEffect(() => {
+    const supabase = createClient();
     if (session) {
       getProducts(supabase).then((result) => result && setProducts(result));
       getSubscription(supabase).then(setSubscription);
     }
-  }, [session, supabase]);
+  }, [session]);
 
   if (session === undefined) return <div>Loading...</div>;
 

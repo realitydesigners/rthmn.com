@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getAuthTypes } from 'utils/auth-helpers/settings';
 import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
-import { getServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 
 function isValidEmail(email: string) {
   var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
@@ -16,7 +16,7 @@ export async function redirectToPath(path: string) {
 }
 
 export async function SignOut() {
-  const supabase = await getServerClient();
+  const supabase = await createClient();
   const { error } = await supabase.auth.signOut();
 
   if (error) {
@@ -42,7 +42,7 @@ export async function signInWithEmail(formData: FormData) {
     );
   }
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
   const options = {
     emailRedirectTo: callbackURL,
     shouldCreateUser: true
@@ -95,7 +95,7 @@ export async function requestPasswordUpdate(formData: FormData) {
     );
   }
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
 
   const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: callbackURL
@@ -131,7 +131,7 @@ export async function signInWithPassword(formData: FormData) {
   const password = String(formData.get('password')).trim();
   let redirectPath: string;
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
   const { error, data } = await supabase.auth.signInWithPassword({
     email,
     password
@@ -172,7 +172,7 @@ export async function signUp(formData: FormData) {
     );
   }
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
   const { error, data } = await supabase.auth.signUp({
     email,
     password,
@@ -230,7 +230,7 @@ export async function updatePassword(formData: FormData) {
     );
   }
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
   const { error, data } = await supabase.auth.updateUser({
     password
   });
@@ -271,7 +271,7 @@ export async function updateEmail(formData: FormData) {
     );
   }
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
 
   const callbackUrl = getURL(
     getStatusRedirect('/account', 'Success!', `Your email has been updated.`)
@@ -303,7 +303,7 @@ export async function updateName(formData: FormData) {
   // Get form data
   const fullName = String(formData.get('fullName')).trim();
 
-  const supabase = await getServerClient();
+  const supabase = await createClient();
   const { error, data } = await supabase.auth.updateUser({
     data: { full_name: fullName }
   });

@@ -7,7 +7,7 @@ import {
 } from '@/utils/helpers';
 import { stripe } from '@/utils/stripe/config';
 import { createOrRetrieveCustomer } from '@/utils/supabase/admin';
-import { getServerClient } from '@/utils/supabase/server';
+import { createClient } from '@/utils/supabase/server';
 import type Stripe from 'stripe';
 
 type Price = any;
@@ -24,7 +24,7 @@ export async function checkoutWithStripe(
   cancelPath: string
 ): Promise<CheckoutResponse> {
   try {
-    const supabase = await getServerClient();
+    const supabase = await createClient();
 
     const {
       error,
@@ -120,7 +120,7 @@ export async function checkoutWithStripe(
 export async function createStripePortal(currentPath: string) {
   try {
     // Use the singleton Supabase client
-    const supabase = await getServerClient();
+    const supabase = await createClient();
     const {
       error,
       data: { user }

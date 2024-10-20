@@ -4,7 +4,7 @@ import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.
 import { redirectToPath } from './server';
 import { getURL } from '@/utils/helpers';
 import type { Provider } from '@supabase/supabase-js';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { createClient } from '@/utils/supabase/client';
 
 export async function handleRequest(
   e: React.FormEvent<HTMLFormElement>,
@@ -27,7 +27,7 @@ export async function handleRequest(
 }
 
 export function useSignInWithOAuth() {
-  const supabase = useSupabaseClient();
+  const supabase = createClient();
 
   return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
     e.preventDefault();
