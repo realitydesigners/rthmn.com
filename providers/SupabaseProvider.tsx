@@ -1,6 +1,6 @@
 'use client';
 
-import { Session } from '@supabase/supabase-js';
+import { Session, User } from '@supabase/supabase-js';
 import { useState, useEffect, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
@@ -22,16 +22,21 @@ export const useAuth = () => {
 
 export default function SupabaseProvider({
   children,
-  initialSession
+  initialUser
 }: {
   children: React.ReactNode;
-  initialSession: Session | null;
+  initialUser: User | null;
 }) {
   const [supabaseClient] = useState(() => createClient());
-  const [session, setSession] = useState<Session | null>(initialSession);
+  const [session, setSession] = useState<Session | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    // Set initial session if user exists
+    if (initialUser) {
+      setSession({ user: initialUser } as Session);
+    }
+
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       async (event, currentSession) => {
         console.log(`Supabase auth event: ${event}`);
@@ -45,7 +50,7 @@ export default function SupabaseProvider({
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, [supabaseClient, router]);
+  }, [supabaseClient, router, initialUser]);
 
   const signOut = async () => {
     await supabaseClient.auth.signOut();

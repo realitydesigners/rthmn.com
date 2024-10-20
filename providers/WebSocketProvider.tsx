@@ -20,8 +20,14 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const handleOpen = () => setIsConnected(true);
-    const handleClose = () => setIsConnected(false);
+    const handleOpen = () => {
+      setIsConnected(true);
+      console.log('WebSocket connected');
+    };
+    const handleClose = () => {
+      setIsConnected(false);
+      console.log('WebSocket disconnected');
+    };
 
     wsClient.onOpen(handleOpen);
     wsClient.onClose(handleClose);

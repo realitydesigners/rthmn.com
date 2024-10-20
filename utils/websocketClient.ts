@@ -12,24 +12,49 @@ class WebSocketClient {
   }
 
   private connect() {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8081';
-    const wsUrl = baseUrl.replace(/^http/, 'ws');
+    const isDevelopment = process.env.NODE_ENV === 'development';
+    const wsUrl = isDevelopment
+      ? process.env.NEXT_PUBLIC_WS_URL_DEV
+      : process.env.NEXT_PUBLIC_WS_URL_PROD;
+
+    if (!wsUrl) {
+      console.error('WebSocket URL is not defined in environment variables');
+      return;
+    }
+
+    console.log('Attempting to connect WebSocket to:', wsUrl);
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onopen = () => {
-      console.log('WebSocket connected');
+      console.log('WebSocket connected successfully');
       this.resubscribe();
       this.openHandlers.forEach((handler) => handler());
     };
 
     this.socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === 'boxSlice') {
-        const handler = this.messageHandlers.get(message.pair);
-        if (handler) {
-          handler(message.data);
+      console.log('WebSocket message received:', event.data);
+      try {
+        const message = JSON.parse(event.data);
+        console.log('Parsed WebSocket message:', message);
+        if (message.type === 'boxSlice') {
+          console.log(
+            `WebSocket boxSlice update for ${message.pair}:`,
+            message.data
+          );
+          const handler = this.messageHandlers.get(message.pair);
+          if (handler) {
+            handler(message.data);
+          } else {
+            console.warn(`No handler found for pair ${message.pair}`);
+          }
         }
+      } catch (error) {
+        console.error('Error parsing WebSocket message:', error);
       }
+    };
+
+    this.socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
     };
 
     this.socket.onclose = () => {
@@ -51,9 +76,11 @@ class WebSocketClient {
   }
 
   public subscribe(pair: string, handler: (data: BoxSlice) => void) {
+    console.log(`Subscribing to WebSocket updates for ${pair}`);
     this.subscriptions.add(pair);
     this.messageHandlers.set(pair, handler);
     if (this.socket?.readyState === WebSocket.OPEN) {
+      console.log(`Sending WebSocket subscription message for ${pair}`);
       this.socket.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
     }
   }
