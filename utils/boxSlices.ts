@@ -44,7 +44,6 @@ export async function getBoxSlices(
       return [];
     }
     const apiResponse: ApiResponse = await response.json();
-    console.log('Received data:', apiResponse);
 
     if (apiResponse.status !== 'success' || !Array.isArray(apiResponse.data)) {
       console.error('Invalid API response:', apiResponse);
@@ -82,7 +81,6 @@ export async function getLatestBoxSlices(): Promise<Record<string, PairData>> {
       return {};
     }
     const apiResponse = await response.json();
-    console.log('Received latest box slices data:', apiResponse);
 
     if (
       apiResponse.status !== 'success' ||
