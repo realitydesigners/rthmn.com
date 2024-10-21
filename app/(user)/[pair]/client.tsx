@@ -14,7 +14,6 @@ import RthmnVision from '../../../components/LineChart';
 import { getBoxSlices, compareSlices } from '@/utils/boxSlices';
 import debounce from 'lodash/debounce';
 import { ViewType } from '@/types';
-import { useWebSocket } from '@/providers/WebSocketProvider';
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
@@ -49,8 +48,6 @@ const Client: React.FC<DashboardClientProps> = ({
   });
   const containerRef = useRef<HTMLDivElement>(null);
   const [rthmnVisionHeight, setRthmnVisionHeight] = useState(400);
-  const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices } =
-    useWebSocket();
 
   const fetchData = useCallback(async () => {
     return getBoxSlices(pair, undefined, 500);
@@ -197,19 +194,6 @@ const Client: React.FC<DashboardClientProps> = ({
       window.removeEventListener('resize', updateDimensions);
     };
   }, [histogramHeight]);
-
-  useEffect(() => {
-    const handleBoxSlice = (data: any) => {
-      console.log(`Received data for ${pair}:`, data);
-      // Process the data as needed
-    };
-
-    subscribeToBoxSlices(pair, handleBoxSlice);
-
-    return () => {
-      unsubscribeFromBoxSlices(pair);
-    };
-  }, [pair, subscribeToBoxSlices, unsubscribeFromBoxSlices]);
 
   return (
     <div

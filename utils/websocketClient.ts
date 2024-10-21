@@ -10,12 +10,8 @@ class WebSocketClient {
   constructor() {
     this.connect();
   }
-
   private connect() {
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    const wsUrl = isDevelopment
-      ? process.env.NEXT_PUBLIC_WS_URL_DEV
-      : process.env.NEXT_PUBLIC_WS_URL_PROD;
+    const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
 
     if (!wsUrl) {
       console.error('WebSocket URL is not defined in environment variables');
