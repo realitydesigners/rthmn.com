@@ -23,7 +23,8 @@ const BASE_URL =
 export async function getBoxSlices(
   pair: string,
   lastTimestamp?: string,
-  count?: number
+  count?: number,
+  serverToken?: string
 ): Promise<BoxSlice[]> {
   let url = `${BASE_URL}/boxslices/${pair}`;
 
@@ -35,8 +36,18 @@ export async function getBoxSlices(
   if (params.toString()) url += `?${params.toString()}`;
 
   try {
-    console.log(`Fetching from: ${url}`);
-    const response = await fetch(url);
+    const token = serverToken;
+
+    if (!token) {
+      console.error('No token available for request');
+      return [];
+    }
+
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+
+    const response = await fetch(url, { headers });
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       const errorText = await response.text();
@@ -60,7 +71,6 @@ export async function getBoxSlices(
       currentOHLC: item.currentOHLC
     }));
 
-    console.log(`Returning ${transformedData.length} items from getBoxSlices`);
     return transformedData;
   } catch (error) {
     console.error('Fetch error:', error);
@@ -68,12 +78,24 @@ export async function getBoxSlices(
   }
 }
 
-export async function getLatestBoxSlices(): Promise<Record<string, PairData>> {
+export async function getLatestBoxSlices(
+  serverToken?: string
+): Promise<Record<string, PairData>> {
   const url = `${BASE_URL}/latest-boxslices`;
 
   try {
-    console.log(`Fetching latest box slices from: ${url}`);
-    const response = await fetch(url);
+    const token = serverToken;
+
+    if (!token) {
+      console.error('No token available for request');
+      return {};
+    }
+
+    const headers = {
+      Authorization: `Bearer ${token}`
+    };
+
+    const response = await fetch(url, { headers });
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       const errorText = await response.text();
@@ -90,7 +112,6 @@ export async function getLatestBoxSlices(): Promise<Record<string, PairData>> {
       return {};
     }
 
-    // Convert the API response to match the PairData type from @/types
     const convertedData: Record<string, PairData> = {};
     for (const [pair, data] of Object.entries(apiResponse.data)) {
       if (

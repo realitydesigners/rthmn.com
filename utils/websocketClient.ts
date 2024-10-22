@@ -18,25 +18,18 @@ class WebSocketClient {
       return;
     }
 
-    console.log('Attempting to connect WebSocket to:', wsUrl);
     this.socket = new WebSocket(wsUrl);
 
     this.socket.onopen = () => {
-      console.log('WebSocket connected successfully');
       this.resubscribe();
       this.openHandlers.forEach((handler) => handler());
     };
 
     this.socket.onmessage = (event) => {
-      console.log('WebSocket message received:', event.data);
       try {
         const message = JSON.parse(event.data);
-        console.log('Parsed WebSocket message:', message);
+
         if (message.type === 'boxSlice') {
-          console.log(
-            `WebSocket boxSlice update for ${message.pair}:`,
-            message.data
-          );
           const handler = this.messageHandlers.get(message.pair);
           if (handler) {
             handler(message.data);
@@ -54,7 +47,6 @@ class WebSocketClient {
     };
 
     this.socket.onclose = () => {
-      console.log('WebSocket disconnected. Reconnecting...');
       this.closeHandlers.forEach((handler) => handler());
       setTimeout(() => this.connect(), 5000);
     };
@@ -72,11 +64,9 @@ class WebSocketClient {
   }
 
   public subscribe(pair: string, handler: (data: BoxSlice) => void) {
-    console.log(`Subscribing to WebSocket updates for ${pair}`);
     this.subscriptions.add(pair);
     this.messageHandlers.set(pair, handler);
     if (this.socket?.readyState === WebSocket.OPEN) {
-      console.log(`Sending WebSocket subscription message for ${pair}`);
       this.socket.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
     }
   }

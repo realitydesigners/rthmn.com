@@ -14,6 +14,7 @@ import RthmnVision from '../../../components/LineChart';
 import { getBoxSlices, compareSlices } from '@/utils/boxSlices';
 import debounce from 'lodash/debounce';
 import { ViewType } from '@/types';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
@@ -49,9 +50,15 @@ const Client: React.FC<DashboardClientProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [rthmnVisionHeight, setRthmnVisionHeight] = useState(400);
 
+  const { session } = useAuth();
+
   const fetchData = useCallback(async () => {
-    return getBoxSlices(pair, undefined, 500);
-  }, [pair]);
+    if (!session?.access_token) {
+      console.error('No token available in the session');
+      return [];
+    }
+    return getBoxSlices(pair, undefined, 500, session.access_token);
+  }, [pair, session]);
 
   const { data } = useQuery<BoxSlice[]>({
     queryKey: ['boxSlices', pair],
