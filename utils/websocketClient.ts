@@ -6,11 +6,17 @@ class WebSocketClient {
   private messageHandlers: Map<string, (data: any) => void> = new Map();
   private openHandlers: Set<() => void> = new Set();
   private closeHandlers: Set<() => void> = new Set();
+  private accessToken: string | null = null;
 
   constructor() {
-    this.connect();
+    // Remove the automatic connection from the constructor
   }
-  private connect() {
+
+  public setAccessToken(token: string) {
+    this.accessToken = token;
+  }
+
+  public connect() {
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
 
     if (!wsUrl) {
@@ -18,9 +24,19 @@ class WebSocketClient {
       return;
     }
 
+    if (!this.accessToken) {
+      console.error('Access token not set. Cannot connect to WebSocket.');
+      return;
+    }
+
+    // Use WSS protocol
     this.socket = new WebSocket(wsUrl);
 
+    // Send the token immediately after connection is established
     this.socket.onopen = () => {
+      this.socket?.send(
+        JSON.stringify({ type: 'auth', token: this.accessToken })
+      );
       this.resubscribe();
       this.openHandlers.forEach((handler) => handler());
     };
@@ -50,6 +66,13 @@ class WebSocketClient {
       this.closeHandlers.forEach((handler) => handler());
       setTimeout(() => this.connect(), 5000);
     };
+  }
+
+  public disconnect() {
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
   }
 
   private resubscribe() {
