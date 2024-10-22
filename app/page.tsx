@@ -1,14 +1,10 @@
 'use client';
 
-import { HeroSection } from '@/app/_components/SectionHero';
-import { FeaturesSection } from '@/app/_components/SectionFeatures';
+import { SectionHero } from '@/app/_components/SectionHero';
+import { SectionFeatures } from '@/app/_components/SectionFeatures';
 import { SectionPricing } from '@/app/_components/SectionPricing';
 import { RyverSection } from '@/app/_components/SectionRyver';
-import {
-  getProducts,
-  getSubscription,
-  getUser
-} from '@/utils/supabase/queries';
+import { getProducts, getSubscription } from '@/utils/supabase/queries';
 import { FAQSection } from '@/app/_components/SectionFAQ';
 import { ServiceSection } from '@/app/_components/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
@@ -31,10 +27,10 @@ export default function PricingPage() {
   if (session === undefined) return <div>Loading...</div>;
 
   return (
-    <div>
-      <HeroSection />
-      {/* <FeaturesSection />
-			<FAQSection />
+    <div className="min-h-screen">
+      <SectionHero />
+      <SectionFeatures />
+      {/* 	<FAQSection />
 				<ServiceSection /> */}
       {/* <SectionPricing
         user={session.user}
