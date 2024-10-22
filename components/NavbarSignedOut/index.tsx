@@ -195,7 +195,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
   };
 
   const buttonClasses = `
-        px-6 py-2
+        px-6 py-3
         gradient-border-button
         text-white font-medium
         ${oxanium.className}
@@ -266,7 +266,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             <div className="flex items-center space-x-4">
               <Link
                 href="/start"
-                className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] p-[1px] font-bold text-black transition-all duration-200 hover:from-[#fff] hover:to-[#98FFF5]"
+                className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] p-[1px] font-bold text-black transition-all duration-200 hover:from-[#3CFFBE] hover:to-[#98FFF5]"
               >
                 <span className="flex items-center space-x-2 rounded-md bg-gradient-to-b from-[#3CFFBE] to-[#5EF1E7] px-3 py-2">
                   <span>Start Now</span>
@@ -293,7 +293,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                   </form>
                 ) : (
                   <Link href="/signin" className={buttonClasses}>
-                    Sign In
+                    Sign-in
                   </Link>
                 )}
               </motion.div>
