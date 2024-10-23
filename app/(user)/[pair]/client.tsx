@@ -113,6 +113,7 @@ const Client: React.FC<DashboardClientProps> = ({
 
   const candleData = useMemo(() => {
     if (!data || data.length === 0) {
+      console.warn('No data available for candles');
       return [];
     }
     const result = data.map((slice) => ({
@@ -242,12 +243,16 @@ const Client: React.FC<DashboardClientProps> = ({
           minHeight: `${rthmnVisionHeight}px`
         }}
       >
-        <RthmnVision
-          pair={pair}
-          candles={candleData}
-          width={rthmnVisionDimensions.width}
-          height={rthmnVisionHeight - 40}
-        />
+        {candleData.length > 0 ? (
+          <RthmnVision
+            pair={pair}
+            candles={candleData}
+            width={rthmnVisionDimensions.width}
+            height={rthmnVisionHeight - 40}
+          />
+        ) : (
+          <div>No candle data available</div>
+        )}
       </div>
       <div
         className="flex-shrink-0"

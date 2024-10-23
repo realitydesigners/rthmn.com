@@ -68,15 +68,22 @@ export async function getBoxSlices(
       apiResponse = JSON.parse(responseText);
     } catch (parseError) {
       console.error('Failed to parse API response:', parseError);
+      console.error('Problematic response text:', responseText);
       return [];
     }
 
-    if (apiResponse.status === 'error') {
+    if (typeof apiResponse !== 'object' || apiResponse === null) {
+      console.error('API response is not an object:', apiResponse);
+      return [];
+    }
+
+    if ('status' in apiResponse && apiResponse.status === 'error') {
       console.error('API returned an error:', apiResponse.message);
+      console.error('Full error response:', apiResponse);
       return [];
     }
 
-    if (!Array.isArray(apiResponse.data)) {
+    if (!('data' in apiResponse) || !Array.isArray(apiResponse.data)) {
       console.error('Invalid API response structure:', apiResponse);
       return [];
     }
