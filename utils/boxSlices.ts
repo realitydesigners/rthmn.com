@@ -2,6 +2,7 @@ import { PairData, Box, OHLC, BoxSlice } from '@/types';
 
 interface ApiResponse {
   status: string;
+  message?: string;
   data: Array<{
     timestamp: string;
     boxes: Array<{
@@ -36,28 +37,47 @@ export async function getBoxSlices(
   if (params.toString()) url += `?${params.toString()}`;
 
   try {
-    const token = serverToken;
-
-    if (!token) {
-      console.error('No token available for request');
+    if (!serverToken) {
+      console.error('No server token provided');
       return [];
     }
 
     const headers = {
-      Authorization: `Bearer ${token}`
+      Authorization: `Bearer ${serverToken}`
     };
 
     const response = await fetch(url, { headers });
+
     if (!response.ok) {
       console.error(`HTTP error! status: ${response.status}`);
       const errorText = await response.text();
       console.error(`Error response: ${errorText}`);
       return [];
     }
-    const apiResponse: ApiResponse = await response.json();
 
-    if (apiResponse.status !== 'success' || !Array.isArray(apiResponse.data)) {
-      console.error('Invalid API response:', apiResponse);
+    const responseText = await response.text();
+
+    if (!responseText.trim()) {
+      console.error('API returned an empty response');
+      return [];
+    }
+
+    let apiResponse: ApiResponse;
+
+    try {
+      apiResponse = JSON.parse(responseText);
+    } catch (parseError) {
+      console.error('Failed to parse API response:', parseError);
+      return [];
+    }
+
+    if (apiResponse.status === 'error') {
+      console.error('API returned an error:', apiResponse.message);
+      return [];
+    }
+
+    if (!Array.isArray(apiResponse.data)) {
+      console.error('Invalid API response structure:', apiResponse);
       return [];
     }
 
