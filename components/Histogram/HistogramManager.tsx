@@ -17,7 +17,7 @@ import { MeetingPoint } from './Oscillator/MeetingPoint';
 import { PulseWave } from './Oscillator/PulseWave';
 
 const ZOOMED_BAR_WIDTH = 0;
-const INITIAL_BAR_WIDTH = 60;
+const INITIAL_BAR_WIDTH = 20;
 
 type OscillatorRef = {
   getColorAndY: any;
