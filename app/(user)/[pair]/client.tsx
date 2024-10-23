@@ -15,6 +15,7 @@ import { getBoxSlices, compareSlices } from '@/utils/boxSlices';
 import debounce from 'lodash/debounce';
 import { ViewType } from '@/types';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 
 interface DashboardClientProps {
   initialData: BoxSlice[];
@@ -29,7 +30,7 @@ const Client: React.FC<DashboardClientProps> = ({
 }) => {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [histogramHeight, setHistogramHeight] = useState(200);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [boxOffset, setBoxOffset] = useState(() => {
     const offsetParam = searchParams.get('offset');
     return offsetParam ? parseInt(offsetParam, 10) : 0;
@@ -40,14 +41,20 @@ const Client: React.FC<DashboardClientProps> = ({
   const [selectedFrameIndex, setSelectedFrameIndex] = useState<number | null>(
     null
   );
-  const [isDragging, setIsDragging] = useState(false);
-  const [startY, setStartY] = useState(0);
-  const [startHeight, setStartHeight] = useState(200);
+  const {
+    height: histogramHeight,
+    isDragging,
+    handleDragStart
+  } = useDraggableHeight({
+    initialHeight: 200,
+    minHeight: 100,
+    maxHeight: 350
+  });
+
   const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({
     width: 0,
     height: 0
   });
-  const containerRef = useRef<HTMLDivElement>(null);
   const [rthmnVisionHeight, setRthmnVisionHeight] = useState(400);
 
   const { session } = useAuth();
@@ -165,51 +172,6 @@ const Client: React.FC<DashboardClientProps> = ({
     []
   );
 
-  const handleDragStart = useCallback(
-    (e: React.MouseEvent) => {
-      setIsDragging(true);
-      setStartY(e.clientY);
-      setStartHeight(histogramHeight);
-    },
-    [histogramHeight]
-  );
-
-  const handleDragEnd = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  const handleDrag = useCallback(
-    (e: MouseEvent) => {
-      if (!isDragging) return;
-      const deltaY = startY - e.clientY;
-      const newHeight = Math.min(Math.max(startHeight + deltaY, 100), 350);
-      setHistogramHeight(newHeight);
-    },
-    [isDragging, startY, startHeight]
-  );
-
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleDrag);
-      document.addEventListener('mouseup', handleDragEnd);
-    } else {
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', handleDragEnd);
-    }
-    return () => {
-      document.removeEventListener('mousemove', handleDrag);
-      document.removeEventListener('mouseup', handleDragEnd);
-    };
-  }, [isDragging, handleDrag, handleDragEnd]);
-
-  useEffect(() => {
-    const offsetParam = searchParams.get('offset');
-    if (offsetParam) {
-      const newOffset = parseInt(offsetParam, 10);
-      setBoxOffset(newOffset);
-    }
-  }, [searchParams]);
-
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -243,16 +205,12 @@ const Client: React.FC<DashboardClientProps> = ({
           minHeight: `${rthmnVisionHeight}px`
         }}
       >
-        {candleData.length > 0 ? (
-          <RthmnVision
-            pair={pair}
-            candles={candleData}
-            width={rthmnVisionDimensions.width}
-            height={rthmnVisionHeight - 40}
-          />
-        ) : (
-          <div>No candle data available</div>
-        )}
+        <RthmnVision
+          pair={pair}
+          candles={candleData}
+          width={rthmnVisionDimensions.width}
+          height={rthmnVisionHeight - 40}
+        />
       </div>
       <div
         className="flex-shrink-0"
