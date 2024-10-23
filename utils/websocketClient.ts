@@ -6,11 +6,19 @@ class WebSocketClient {
   private messageHandlers: Map<string, (data: any) => void> = new Map();
   private openHandlers: Set<() => void> = new Set();
   private closeHandlers: Set<() => void> = new Set();
+  private accessToken: string | null = null;
+  private isAuthenticated: boolean = false;
+  private pendingOperations: (() => void)[] = [];
 
   constructor() {
-    this.connect();
+    // Remove the automatic connection from the constructor
   }
-  private connect() {
+
+  public setAccessToken(token: string) {
+    this.accessToken = token;
+  }
+
+  public connect() {
     const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
 
     if (!wsUrl) {
@@ -18,24 +26,42 @@ class WebSocketClient {
       return;
     }
 
-    this.socket = new WebSocket(wsUrl);
+    if (!this.accessToken) {
+      console.error('Access token not set. Cannot connect to WebSocket.');
+      return;
+    }
+
+    console.log(`Attempting to connect to WebSocket at ${wsUrl}`);
+
+    try {
+      this.socket = new WebSocket(wsUrl);
+    } catch (error) {
+      console.error('Failed to create WebSocket connection:', error);
+      return;
+    }
 
     this.socket.onopen = () => {
-      this.resubscribe();
-      this.openHandlers.forEach((handler) => handler());
+      console.log('WebSocket connection opened');
+      this.authenticate();
     };
 
     this.socket.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
+        console.log('Received WebSocket message:', message);
 
-        if (message.type === 'boxSlice') {
+        if (message.type === 'welcome') {
+          this.isAuthenticated = true;
+          this.processPendingOperations();
+        } else if (message.type === 'boxSlice') {
           const handler = this.messageHandlers.get(message.pair);
           if (handler) {
             handler(message.data);
           } else {
             console.warn(`No handler found for pair ${message.pair}`);
           }
+        } else if (message.type === 'error') {
+          console.error('Received error message from server:', message.message);
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -46,28 +72,62 @@ class WebSocketClient {
       console.error('WebSocket error:', error);
     };
 
-    this.socket.onclose = () => {
+    this.socket.onclose = (event) => {
+      console.log(
+        `WebSocket connection closed. Code: ${event.code}, Reason: ${event.reason}`
+      );
+      this.isAuthenticated = false;
       this.closeHandlers.forEach((handler) => handler());
+      console.log('Attempting to reconnect in 5 seconds...');
       setTimeout(() => this.connect(), 5000);
     };
   }
 
+  private authenticate() {
+    if (this.socket?.readyState === WebSocket.OPEN && this.accessToken) {
+      this.socket.send(
+        JSON.stringify({ type: 'auth', token: this.accessToken })
+      );
+      console.log('Authentication message sent');
+    }
+  }
+
+  private processPendingOperations() {
+    while (this.pendingOperations.length > 0) {
+      const operation = this.pendingOperations.shift();
+      if (operation) {
+        operation();
+      }
+    }
+  }
+
+  public disconnect() {
+    if (this.socket) {
+      this.socket.close();
+      this.socket = null;
+    }
+  }
+
   private resubscribe() {
-    if (this.socket?.readyState === WebSocket.OPEN) {
+    if (this.isAuthenticated && this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(
         JSON.stringify({
           type: 'subscribe',
           pairs: Array.from(this.subscriptions)
         })
       );
+    } else {
+      this.pendingOperations.push(() => this.resubscribe());
     }
   }
 
   public subscribe(pair: string, handler: (data: BoxSlice) => void) {
     this.subscriptions.add(pair);
     this.messageHandlers.set(pair, handler);
-    if (this.socket?.readyState === WebSocket.OPEN) {
+    if (this.isAuthenticated && this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
+    } else {
+      this.pendingOperations.push(() => this.subscribe(pair, handler));
     }
   }
 

@@ -1,5 +1,6 @@
 import { QueryProvider } from '@/providers/QueryProvider';
 import { SignalProvider } from '@/providers/SignalProvider';
+import { WebSocketProvider } from '@/providers/WebSocketProvider';
 
 export default function UserLayout({
   children
@@ -8,7 +9,9 @@ export default function UserLayout({
 }) {
   return (
     <QueryProvider>
-      <SignalProvider>{children}</SignalProvider>
+      <SignalProvider>
+        <WebSocketProvider>{children}</WebSocketProvider>
+      </SignalProvider>
     </QueryProvider>
   );
 }

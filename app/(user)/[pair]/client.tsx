@@ -52,20 +52,46 @@ const Client: React.FC<DashboardClientProps> = ({
 
   const { session } = useAuth();
 
+  useEffect(() => {
+    if (!session) {
+      return;
+    }
+  }, [session]);
+
   const fetchData = useCallback(async () => {
     if (!session?.access_token) {
       console.error('No token available in the session');
       return [];
     }
-    return getBoxSlices(pair, undefined, 500, session.access_token);
+    try {
+      const data = await getBoxSlices(
+        pair,
+        undefined,
+        500,
+        session.access_token
+      );
+      return data;
+    } catch (error) {
+      console.error('Error fetching box slices:', error);
+      return [];
+    }
   }, [pair, session]);
 
-  const { data } = useQuery<BoxSlice[]>({
-    queryKey: ['boxSlices', pair],
+  const { data, error, isLoading } = useQuery<BoxSlice[]>({
+    queryKey: ['boxSlices', pair, session?.access_token],
     queryFn: fetchData,
     initialData: initialData,
-    refetchInterval: 10000
+    refetchInterval: 10000,
+    enabled: !!session?.access_token
   });
+
+  useEffect(() => {
+    if (isLoading) {
+    }
+    if (error) {
+      console.error('Error fetching data:', error);
+    }
+  }, [isLoading, error]);
 
   const filteredData = useMemo(() => {
     if (!data) return [];
@@ -86,8 +112,11 @@ const Client: React.FC<DashboardClientProps> = ({
   }, [data, boxOffset, visibleBoxesCount]);
 
   const candleData = useMemo(() => {
-    if (!data) return [];
-    return data.map((slice) => ({
+    if (!data || data.length === 0) {
+      console.warn('No data available for candles');
+      return [];
+    }
+    const result = data.map((slice) => ({
       time: new Date(slice.timestamp).toISOString(),
       open: slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0,
       high:
@@ -101,6 +130,7 @@ const Client: React.FC<DashboardClientProps> = ({
         slice.boxes[slice.boxes.length - 1]?.low ??
         0
     }));
+    return result;
   }, [data]);
 
   const debouncedUpdateURL = useMemo(
@@ -213,12 +243,16 @@ const Client: React.FC<DashboardClientProps> = ({
           minHeight: `${rthmnVisionHeight}px`
         }}
       >
-        <RthmnVision
-          pair={pair}
-          candles={candleData}
-          width={rthmnVisionDimensions.width}
-          height={rthmnVisionHeight - 40}
-        />
+        {candleData.length > 0 ? (
+          <RthmnVision
+            pair={pair}
+            candles={candleData}
+            width={rthmnVisionDimensions.width}
+            height={rthmnVisionHeight - 40}
+          />
+        ) : (
+          <div>No candle data available</div>
+        )}
       </div>
       <div
         className="flex-shrink-0"
