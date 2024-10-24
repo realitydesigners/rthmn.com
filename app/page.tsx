@@ -1,51 +1,38 @@
-'use client';
-
-import { SectionHero } from '@/app/_components/SectionHero';
-import { SectionFeatures } from '@/app/_components/SectionFeatures';
-import { SectionPricing } from '@/app/_components/SectionPricing';
-import { RyverSection } from '@/app/_components/SectionRyver';
+import { client } from '@/sanity/lib/client';
+import { postsQuery } from '@/sanity/lib/queries';
+import ClientPage from './client';
 import { getProducts, getSubscription } from '@/utils/supabase/queries';
-import { FAQSection } from '@/app/_components/SectionFAQ';
-import { ServiceSection } from '@/app/_components/SectionServices';
-import { useAuth } from '@/providers/SupabaseProvider';
-import { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/utils/supabase/server';
 
-export default function PricingPage() {
-  const { session } = useAuth();
-  const [products, setProducts] = useState<any[] | null>(null);
-  const [subscription, setSubscription] = useState<any | null>(null);
+export default async function Page() {
+  const posts = await client.fetch(postsQuery);
 
-  useEffect(() => {
-    const supabase = createClient();
-    if (session) {
-      getProducts(supabase).then((result) => result && setProducts(result));
-      getSubscription(supabase).then(setSubscription);
-    }
-  }, [session]);
+  const supabase = await createClient();
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
 
-  if (session === undefined) return <div>Loading...</div>;
+  let products = null;
+  let subscription = null;
+
+  if (session) {
+    [products, subscription] = await Promise.all([
+      getProducts(supabase),
+      getSubscription(supabase)
+    ]);
+  }
+  console.log(session);
+
+  if (!session) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="min-h-screen">
-      <SectionHero />
-      <SectionFeatures />
-      {/* 	<FAQSection />
-				<ServiceSection /> */}
-      {/* <SectionPricing
-        user={session.user}
-        products={products ?? []}
-        subscription={subscription}
-      /> */}
-      {/* <div className="h-screen"></div>
-			<RyverSection />
-			<div className="h-screen"></div> */}
-      {session && (
-        <div>
-          <p>Welcome, {session.user.email}</p>
-          {/* Add more user details as needed */}
-        </div>
-      )}
-    </div>
+    <ClientPage
+      posts={posts}
+      products={products}
+      subscription={subscription}
+      session={session}
+    />
   );
 }

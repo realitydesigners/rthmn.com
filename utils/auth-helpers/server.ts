@@ -2,8 +2,12 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getAuthTypes } from 'utils/auth-helpers/settings';
-import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+import { getAuthTypes } from '../auth-helpers/settings';
+import {
+  getErrorRedirect,
+  getStatusRedirect,
+  getURL
+} from '../../utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 
 function isValidEmail(email: string) {
