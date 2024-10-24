@@ -8,7 +8,6 @@
     "prettier-fix": "prettier --write .",
     "stripe:login": "stripe login",
     "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks",
-    "stripe:fixtures": "stripe fixtures fixtures/stripe-fixtures.json",
     "supabase:start": "npx supabase start",
     "supabase:stop": "npx supabase stop",
     "supabase:status": "npx supabase status",
