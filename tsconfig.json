@@ -16,7 +16,6 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "ignoreDeprecations": "5.0",

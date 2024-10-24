@@ -53,8 +53,8 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
           <Image
             src={block.imageRef.imageUrl}
             alt={block.imageRef.imageAlt || 'Post image'}
-            layout="fill"
-            objectFit="cover"
+            width={500}
+            height={500}
             className="transition-transform duration-300 group-hover:scale-110"
           />
         </div>
