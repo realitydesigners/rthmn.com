@@ -2,8 +2,8 @@
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getAuthTypes } from 'utils/auth-helpers/settings';
-import { getErrorRedirect, getStatusRedirect, getURL } from 'utils/helpers';
+import { getAuthTypes } from '@/utils/auth-helpers/settings';
+import { getErrorRedirect, getStatusRedirect, getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 
 function isValidEmail(email: string) {
@@ -28,7 +28,7 @@ export async function SignOut() {
 }
 
 export async function signInWithEmail(formData: FormData) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const callbackURL = getURL('/auth/callback');
 
   const email = String(formData.get('email')).trim();
@@ -126,7 +126,7 @@ export async function requestPasswordUpdate(formData: FormData) {
 }
 
 export async function signInWithPassword(formData: FormData) {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const email = String(formData.get('email')).trim();
   const password = String(formData.get('password')).trim();
   let redirectPath: string;

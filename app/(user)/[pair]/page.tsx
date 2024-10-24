@@ -5,14 +5,14 @@ import { getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     pair: string;
-  };
+  }>;
 }
 
 export default async function PairPage({ params }: PageProps) {
-  const { pair } = params;
-  const supabase = createClient();
+  const { pair } = await params;
+  const supabase = await createClient();
 
   const {
     data: { session },

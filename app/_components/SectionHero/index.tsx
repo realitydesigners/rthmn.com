@@ -3,7 +3,6 @@ import { oxanium, outfit, kodeMono } from '@/fonts';
 import Link from 'next/link';
 import { Scene } from '@/components/Scene/Scene';
 import React from 'react';
-import styles from './styles.module.css';
 import { FaArrowRight } from 'react-icons/fa';
 
 export const SectionHero = () => (

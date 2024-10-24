@@ -11,20 +11,28 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/utils/supabase/client';
 
-export default function PricingPage() {
+export default function RootPage() {
   const { session } = useAuth();
   const [products, setProducts] = useState<any[] | null>(null);
   const [subscription, setSubscription] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const supabase = createClient();
-    if (session) {
-      getProducts(supabase).then((result) => result && setProducts(result));
-      getSubscription(supabase).then(setSubscription);
-    }
+    const fetchData = async () => {
+      if (session) {
+        const supabase = createClient();
+        const productsResult = await getProducts(supabase);
+        if (productsResult) setProducts(productsResult);
+        const subscriptionResult = await getSubscription(supabase);
+        setSubscription(subscriptionResult);
+      }
+      setLoading(false);
+    };
+
+    fetchData();
   }, [session]);
 
-  if (session === undefined) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen">
@@ -33,7 +41,7 @@ export default function PricingPage() {
       {/* 	<FAQSection />
 				<ServiceSection /> */}
       {/* <SectionPricing
-        user={session.user}
+        user={session?.user}
         products={products ?? []}
         subscription={subscription}
       /> */}
