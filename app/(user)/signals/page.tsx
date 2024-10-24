@@ -2,27 +2,28 @@
 
 import type { Signal } from '@/types';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/providers/SupabaseProvider';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
 import { getSubscription, getSignals } from '@/utils/supabase/queries';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignalsPage() {
-  const router = useRouter();
-  const { session } = useAuth();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+  const { user, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    const checkSessionAndSubscription = async () => {
-      if (!session) {
+    async function fetchData() {
+      if (authLoading) return;
+
+      if (!user) {
         router.push('/signin');
         return;
       }
-
-      const supabase = createClient();
 
       try {
         const subscription = await getSubscription(supabase);
@@ -37,20 +38,21 @@ export default function SignalsPage() {
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
-    checkSessionAndSubscription();
-  }, [session, router]);
+    fetchData();
+  }, [user, authLoading, router, supabase]);
 
-  if (isLoading) {
+  if (authLoading || isLoading) {
     return <div>Loading...</div>;
   }
 
-  if (!session) {
-    return null; // This will prevent any flickering while redirecting
+  if (!user) {
+    return null;
   }
 
   function SubscriptionPrompt() {
+    console.log('Rendering SubscriptionPrompt');
     return (
       <div className="mt-10 text-center">
         <h2 className="mb-4 text-2xl font-bold">Subscription Required</h2>

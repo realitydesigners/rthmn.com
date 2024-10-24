@@ -14,7 +14,6 @@ export const getUser = cache(async (supabase: SupabaseClient) => {
 });
 
 export const getSubscription = async (supabase: SupabaseClient) => {
-  console.log('getSubscription: Starting to fetch subscription');
   const { data: subscription, error } = await supabase
     .from('subscriptions')
     .select('*, prices(*)')
@@ -24,15 +23,12 @@ export const getSubscription = async (supabase: SupabaseClient) => {
   if (error) {
     console.error('getSubscription: Error fetching subscription:', error);
   } else {
-    console.log('getSubscription: Subscription fetched successfully');
-    console.log('getSubscription: Subscription data:', subscription);
   }
   return subscription;
 };
 
 export const getProducts = cache(async (supabase: SupabaseClient) => {
   try {
-    console.log('getProducts: Starting to fetch products');
     // Fetch products
     const { data: products, error: productsError } = await supabase
       .from('products')
@@ -41,11 +37,6 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
       .order('metadata->index', { ascending: true });
 
     if (productsError) throw productsError;
-
-    console.log('getProducts: Products fetched successfully');
-    console.log('getProducts: Products data:', products);
-
-    console.log('getProducts: Starting to fetch prices');
     // Fetch prices
     const { data: prices, error: pricesError } = await supabase
       .from('prices')
@@ -54,17 +45,11 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
 
     if (pricesError) throw pricesError;
 
-    console.log('getProducts: Prices fetched successfully');
-    console.log('getProducts: Prices data:', prices);
-
     // Combine products with their prices
     const productsWithPrices = products.map((product) => ({
       ...product,
       prices: prices.filter((price) => price.product_id === product.id)
     }));
-
-    console.log('getProducts: Products with prices combined successfully');
-    console.log('getProducts: Products with prices data:', productsWithPrices);
 
     return productsWithPrices;
   } catch (error) {
