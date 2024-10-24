@@ -37,6 +37,7 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
       .order('metadata->index', { ascending: true });
 
     if (productsError) throw productsError;
+
     // Fetch prices
     const { data: prices, error: pricesError } = await supabase
       .from('prices')
@@ -50,6 +51,8 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
       ...product,
       prices: prices.filter((price) => price.product_id === product.id)
     }));
+
+    console.log('Fetched products:', productsWithPrices); // Add logging here
 
     return productsWithPrices;
   } catch (error) {

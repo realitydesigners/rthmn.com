@@ -10,17 +10,15 @@ import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
 
 interface DashboardClientProps {
-  initialData: BoxSlice[];
   pair: string;
-  allPairsData: Record<string, PairData>;
 }
 
-const Client: React.FC<DashboardClientProps> = ({
-  initialData,
-  pair,
-  allPairsData
-}) => {
+const Client: React.FC<DashboardClientProps> = ({ pair }) => {
   const { session } = useAuth();
+  const [initialData, setInitialData] = useState<BoxSlice[]>([]);
+  const [allPairsData, setAllPairsData] = useState<Record<string, PairData>>(
+    {}
+  );
   const { boxOffset, handleOffsetChange } = useUrlParams(pair);
   const { selectedFrame, selectedFrameIndex, handleFrameSelect } =
     useSelectedFrame();
@@ -32,6 +30,26 @@ const Client: React.FC<DashboardClientProps> = ({
     boxOffset,
     visibleBoxesCount
   );
+
+  useEffect(() => {
+    if (session && session.access_token) {
+      const token = session.access_token;
+
+      // Fetch initial data
+      fetch(`/api/getBoxSlices?pair=${pair}&token=${token}`)
+        .then((response) => response.json())
+        .then((data) => setInitialData(data))
+        .catch((error) => console.error('Error fetching initial data:', error));
+
+      // Fetch all pairs data
+      fetch(`/api/getLatestBoxSlices?token=${token}`)
+        .then((response) => response.json())
+        .then((data) => setAllPairsData(data))
+        .catch((error) =>
+          console.error('Error fetching all pairs data:', error)
+        );
+    }
+  }, [session, pair]);
 
   const [viewType, setViewType] = useState<ViewType>('oscillator');
   const containerRef = useRef<HTMLDivElement>(null);
