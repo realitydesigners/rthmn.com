@@ -8,20 +8,21 @@ import { FAQSection } from '@/app/_components/SectionFAQ';
 import { ServiceSection } from '@/app/_components/SectionServices';
 import { PostList, Post } from '@/app/_components/PostList';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { Session } from '@supabase/supabase-js';
 
 interface ClientPageProps {
-  posts: Post[];
-  products: any[];
-  subscription: any;
+  posts: any[];
+  products: any[] | null;
+  subscription: any | null;
+  session: Session | null;
 }
 
 export default function ClientPage({
   posts,
   products,
-  subscription
+  subscription,
+  session
 }: ClientPageProps) {
-  const { session } = useAuth();
-
   return (
     <div className="min-h-screen bg-black text-white">
       <SectionHero />

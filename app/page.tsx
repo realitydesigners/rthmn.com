@@ -8,12 +8,31 @@ export default async function Page() {
   const posts = await client.fetch(postsQuery);
 
   const supabase = await createClient();
-  const [products, subscription] = await Promise.all([
-    getProducts(supabase),
-    getSubscription(supabase)
-  ]);
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+
+  let products = null;
+  let subscription = null;
+
+  if (session) {
+    [products, subscription] = await Promise.all([
+      getProducts(supabase),
+      getSubscription(supabase)
+    ]);
+  }
+  console.log(session);
+
+  if (!session) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <ClientPage posts={posts} products={products} subscription={subscription} />
+    <ClientPage
+      posts={posts}
+      products={products}
+      subscription={subscription}
+      session={session}
+    />
   );
 }
