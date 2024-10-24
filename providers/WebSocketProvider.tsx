@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { BoxSlice, PairData } from '@/types';
 import { wsClient } from '@/utils/websocketClient';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 type WebSocketContextType = {
   subscribeToBoxSlices: (
@@ -10,6 +11,8 @@ type WebSocketContextType = {
   ) => void;
   unsubscribeFromBoxSlices: (pair: string) => void;
   isConnected: boolean;
+  connect: () => void;
+  disconnect: () => void;
 };
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
@@ -18,6 +21,15 @@ const WebSocketContext = createContext<WebSocketContextType | undefined>(
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const [isConnected, setIsConnected] = useState(false);
+  const { session } = useAuth();
+
+  useEffect(() => {
+    if (session?.access_token) {
+      wsClient.setAccessToken(session.access_token);
+      // Optionally connect here if you want to connect automatically when the token is available
+      // wsClient.connect();
+    }
+  }, [session]);
 
   useEffect(() => {
     const handleOpen = () => {
@@ -38,6 +50,18 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  const connect = () => {
+    if (session?.access_token) {
+      wsClient.connect();
+    } else {
+      console.error('Cannot connect: No access token available');
+    }
+  };
+
+  const disconnect = () => {
+    wsClient.disconnect();
+  };
+
   const subscribeToBoxSlices = (
     pair: string,
     handler: (data: BoxSlice) => void
@@ -51,7 +75,13 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <WebSocketContext.Provider
-      value={{ subscribeToBoxSlices, unsubscribeFromBoxSlices, isConnected }}
+      value={{
+        subscribeToBoxSlices,
+        unsubscribeFromBoxSlices,
+        isConnected,
+        connect,
+        disconnect
+      }}
     >
       {children}
     </WebSocketContext.Provider>

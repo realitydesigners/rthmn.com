@@ -32,14 +32,12 @@ export default function SupabaseProvider({
   const router = useRouter();
 
   useEffect(() => {
-    // Set initial session if user exists
     if (initialUser) {
       setSession({ user: initialUser } as Session);
     }
 
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       async (event, currentSession) => {
-        console.log(`Supabase auth event: ${event}`);
         setSession(currentSession);
         if (event === 'SIGNED_OUT') {
           router.push('/');

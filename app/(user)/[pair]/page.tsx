@@ -12,25 +12,26 @@ interface PageProps {
 
 export default async function PairPage({ params }: PageProps) {
   const { pair } = params;
-  const supabase = await createClient();
+  const supabase = createClient();
 
   const {
-    data: { user },
+    data: { session },
     error
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getSession();
 
-  if (error || !user) {
+  if (error || !session) {
     return redirect(getURL('signin'));
   }
 
-  const initialData = await getBoxSlices(pair, undefined, 500);
+  const token = session.access_token;
 
-  if (initialData.length === 0) {
-    console.error(`No data received for ${pair}`);
-    return <div>Error: No data available for {pair}</div>;
+  if (!token) {
+    console.error('No token available for server-side request');
+    return <div>Error: No token available</div>;
   }
 
-  const allPairsData = await getLatestBoxSlices();
+  const initialData = await getBoxSlices(pair, undefined, 500, token);
+  const allPairsData = await getLatestBoxSlices(token);
 
   return (
     <div className="w-full">

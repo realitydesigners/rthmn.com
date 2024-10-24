@@ -80,14 +80,7 @@ const Links = () => {
             <span className="text-sm font-semibold">How it works</span>
           </Link>
         </div>
-        <div
-          className={linkStyle}
-          onMouseEnter={() => setActiveDropdown('tools')}
-        >
-          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
-            <span className="text-sm font-semibold">Tools</span>
-          </Link>
-        </div>
+
         <div
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('features')}
@@ -244,7 +237,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         animate="visible"
         variants={navVariants}
       >
-        <div className="mx-auto h-full w-full lg:w-10/12">
+        <div className="mx-auto h-full w-full lg:w-11/12">
           <div className="flex h-full items-center justify-between">
             <Link
               href="/"
@@ -263,7 +256,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 <Links />
               </nav>
             </div>
-            <div className="flex items-center space-x-4">
+            <div className="hidden items-center space-x-4 pr-2 lg:flex">
               <Link
                 href="/start"
                 className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] p-[1px] font-bold text-black transition-all duration-200 hover:from-[#3CFFBE] hover:to-[#98FFF5]"
