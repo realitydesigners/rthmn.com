@@ -6,58 +6,48 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
+import { getSubscription, getSignals } from '@/utils/supabase/queries';
 
 export default function SignalsPage() {
   const router = useRouter();
   const { session } = useAuth();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!session) {
-      router.push('/signin');
-    }
-  }, [session, router]);
-
-  useEffect(() => {
-    const checkSubscriptionAndFetchSignals = async () => {
-      if (!session?.user) return;
-
-      const supabase = createClient();
-
-      const { data: subscriptionData, error: subscriptionError } =
-        await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .eq('status', 'active')
-          .single();
-
-      if (subscriptionError) {
-        console.error('Error checking subscription:', subscriptionError);
-        setHasSubscription(false);
+    const checkSessionAndSubscription = async () => {
+      if (!session) {
+        router.push('/signin');
         return;
       }
 
-      setHasSubscription(!!subscriptionData);
+      const supabase = createClient();
 
-      // Fetch signals data regardless of subscription status
-      const { data: signalsData, error: signalsError } = await supabase
-        .from('signals')
-        .select('*');
+      try {
+        const subscription = await getSubscription(supabase);
+        setHasSubscription(!!subscription);
 
-      if (signalsError) {
-        console.error('Error fetching signals:', signalsError);
-      } else {
-        setSignalsData(signalsData);
+        if (subscription) {
+          const signals = await getSignals(supabase);
+          setSignalsData(signals);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    checkSubscriptionAndFetchSignals();
-  }, [session]);
+    checkSessionAndSubscription();
+  }, [session, router]);
 
-  if (!session || hasSubscription === null) {
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (!session) {
+    return null; // This will prevent any flickering while redirecting
   }
 
   function SubscriptionPrompt() {
