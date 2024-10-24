@@ -7,7 +7,6 @@ import {
   contentBlock,
   headingBlock,
   headingSplineBlock,
-  imageCanvasBlock,
   teamBlock
 } from '@/sanity/blocks/index';
 import { apiVersion, dataset, projectId, studioUrl } from '@/sanity/lib/api';
@@ -16,10 +15,7 @@ import {
   category,
   glossary,
   img,
-  library,
-  model,
   posts,
-  quote,
   team,
   video
 } from '@/sanity/schemas';
@@ -43,17 +39,13 @@ export default defineConfig({
       img,
       audio,
       video,
-      quote,
       team,
       category,
-      library,
-      model,
       glossary,
       headingBlock,
       headingSplineBlock,
       contentBlock,
-      teamBlock,
-      imageCanvasBlock
+      teamBlock
     ]
   },
   form: {
@@ -64,7 +56,6 @@ export default defineConfig({
   },
   plugins: [
     structureTool({}),
-
     visionTool({ defaultApiVersion: apiVersion }),
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     vercelDeployTool() as any
