@@ -1,11 +1,9 @@
-import { UploadIcon } from '@sanity/icons';
 import { defineField, defineType } from 'sanity';
 
 export default defineType({
   type: 'document',
   name: 'glossary',
   title: 'Glossary',
-  icon: UploadIcon,
   fields: [
     defineField({
       type: 'string',

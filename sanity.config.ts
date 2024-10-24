@@ -2,7 +2,6 @@
 import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-
 import {
   contentBlock,
   headingBlock,
@@ -22,8 +21,6 @@ import {
 
 import CustomItem from '@/sanity/ui/CustomItem';
 import CustomField from './sanity/ui/CustomField';
-
-import { vercelDeployTool } from 'sanity-plugin-vercel-deploy';
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Reality Designers';
@@ -54,10 +51,5 @@ export default defineConfig({
       field: CustomField
     }
   },
-  plugins: [
-    structureTool({}),
-    visionTool({ defaultApiVersion: apiVersion }),
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    vercelDeployTool() as any
-  ]
+  plugins: [structureTool({}), visionTool({ defaultApiVersion: apiVersion })]
 });
