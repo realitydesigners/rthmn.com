@@ -9,12 +9,19 @@ export const getUser = async (supabase: SupabaseClient) => {
 };
 
 export const getSubscription = async (supabase: SupabaseClient) => {
-  const { data: subscription } = await supabase
+  console.log('getSubscription: Starting to fetch subscription');
+  const { data: subscription, error } = await supabase
     .from('subscriptions')
-    .select('*, prices(*, products(*))')
+    .select('*, prices(*)')
     .in('status', ['trialing', 'active'])
     .maybeSingle();
 
+  if (error) {
+    console.error('getSubscription: Error fetching subscription:', error);
+  } else {
+    console.log('getSubscription: Subscription fetched successfully');
+    console.log('getSubscription: Subscription data:', subscription);
+  }
   return subscription;
 };
 
