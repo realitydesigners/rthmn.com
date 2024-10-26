@@ -1,7 +1,7 @@
 'use client';
 import { russo } from '@/fonts';
 import Link from 'next/link';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type JSX } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { User } from '@supabase/supabase-js';
 

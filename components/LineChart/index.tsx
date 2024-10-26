@@ -217,7 +217,7 @@ const ChartLine: React.FC<{
 });
 
 const ChartContainer: React.FC<{
-	svgRef: React.RefObject<SVGSVGElement>;
+	svgRef: React.RefObject<SVGSVGElement | null>;
 	chartWidth: number;
 	chartHeight: number;
 	handleMouseMove: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;

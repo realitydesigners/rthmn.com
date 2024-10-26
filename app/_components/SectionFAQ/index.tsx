@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useState } from "react";
+import { useState, type JSX } from "react";
 import { oxanium } from "@/fonts";
 
 type FAQItem = {

@@ -5,7 +5,8 @@ import React, {
   useRef,
   useState,
   forwardRef,
-  useImperativeHandle
+  useImperativeHandle,
+  type JSX,
 } from 'react';
 import HistogramControls from './HistogramControls';
 import SelectedFrameDetails from './SelectedFrameDetails';
@@ -118,7 +119,7 @@ const HistogramChart: React.FC<{
   onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
   onMouseLeave: () => void;
   hoverInfo: HoverInfo;
-  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   onScroll: () => void;
 }> = React.memo(
   ({

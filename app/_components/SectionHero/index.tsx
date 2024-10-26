@@ -8,11 +8,31 @@ import {
   AiOutlineAreaChart,
   AiOutlineFundProjectionScreen
 } from 'react-icons/ai';
-import { motion, useAnimation } from 'framer-motion';
+import {
+  motion,
+  HTMLMotionProps,
+  AnimationControls,
+  useAnimation
+} from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { TypeAnimation } from 'react-type-animation';
 
-export const SectionHero = () => {
+// Add these interfaces
+interface CustomMotionDivProps extends HTMLMotionProps<'div'> {
+  animate?: AnimationControls;
+  ref?: React.Ref<HTMLDivElement>;
+  className?: string;
+}
+
+interface CustomMotionButtonProps extends HTMLMotionProps<'button'> {
+  className?: string;
+}
+
+// Create custom motion components
+const CustomMotionDiv = motion.div as React.FC<CustomMotionDivProps>;
+const CustomMotionButton = motion.button as React.FC<CustomMotionButtonProps>;
+
+export const SectionHero: React.FC = () => {
   const controls = useAnimation();
   const [ref, inView] = useInView();
 
@@ -26,7 +46,7 @@ export const SectionHero = () => {
     <div
       className={`relative flex h-screen w-full flex-col justify-center ${oxanium.className} overflow-hidden bg-black`}
     >
-      <motion.div
+      <CustomMotionDiv
         ref={ref}
         animate={controls}
         initial="hidden"
@@ -98,7 +118,14 @@ export const SectionHero = () => {
           </div>
         </div>
         <div className="mt-[10vw] flex flex-col items-center space-y-[4vw] lg:mt-[8vw] lg:flex-row lg:space-x-[4vw] lg:space-y-0">
-          <motion.div
+          <CustomMotionButton
+            className={`${russo.className} group mt-8 rounded-full bg-gradient-to-r from-[#5A97FF] to-[#61A3FF] px-6 py-3 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:shadow-lg`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            {/* ... button content */}
+          </CustomMotionButton>
+          <CustomMotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -109,8 +136,8 @@ export const SectionHero = () => {
             >
               Advanced Chart Pattern Recognition
             </span>
-          </motion.div>
-          <motion.div
+          </CustomMotionDiv>
+          <CustomMotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -121,8 +148,8 @@ export const SectionHero = () => {
             >
               Real-time Market Trend Analysis
             </span>
-          </motion.div>
-          <motion.div
+          </CustomMotionDiv>
+          <CustomMotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -133,9 +160,9 @@ export const SectionHero = () => {
             >
               Algorithmic Technical Indicators
             </span>
-          </motion.div>
+          </CustomMotionDiv>
         </div>
-      </motion.div>
+      </CustomMotionDiv>
     </div>
   );
 };
