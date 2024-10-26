@@ -8,7 +8,7 @@ import styles from './styles.module.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { FaArrowRight } from 'react-icons/fa'; // Add this import for the arrow icon
+import { FaArrowRight } from 'react-icons/fa';
 
 interface NavbarSignedOutProps {
   user: User | null;

@@ -8,7 +8,7 @@ export default async function Page() {
   const posts = await client.fetch(postsQuery);
 
   const supabase = await createClient();
-  let products = await getProducts(supabase);
+  const products = await getProducts(supabase);
 
   return <ClientPage posts={posts} products={products} />;
 }
