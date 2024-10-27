@@ -51,6 +51,8 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
     }
   }, [session, pair]);
 
+  console.log(candleData);
+
   const [viewType, setViewType] = useState<ViewType>('oscillator');
   const containerRef = useRef<HTMLDivElement>(null);
   const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({
@@ -94,27 +96,17 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
   }, [histogramHeight]);
 
   return (
-    <div
-      ref={containerRef}
-      className="flex h-screen w-full flex-col overflow-hidden bg-black"
-    >
-      <div
-        className="flex-grow overflow-hidden pt-[80px]"
-        style={{
-          minHeight: `${rthmnVisionDimensions.height}px`
-        }}
-      >
+    <div className="flex h-screen w-full flex-col overflow-hidden bg-black">
+      <div className="min-h-[400px] flex-grow overflow-hidden">
         {candleData.length > 0 ? (
-          <RthmnVision
-            pair={pair}
-            candles={candleData}
-            width={rthmnVisionDimensions.width}
-            height={rthmnVisionDimensions.height - 40}
-          />
+          <RthmnVision pair={pair} candles={candleData} />
         ) : (
           <div>No candle data available</div>
         )}
       </div>
+      {/* 
+      
+      KEEP THIS
       <div
         className="flex-shrink-0"
         style={{
@@ -136,7 +128,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
           onDragStart={handleDragStart}
           containerWidth={rthmnVisionDimensions.width}
         />
-      </div>
+      </div> */}
     </div>
   );
 };
