@@ -158,15 +158,10 @@ const RthmnVision: React.FC<{
   const priceBufferRef = useRef(new PriceBuffer(1000));
   const animatedScale = useAnimatedScale(yAxisScale);
 
-  const chartPadding = { top: 100, right: 100, bottom: 100, left: 50 };
-  const chartWidth = Math.max(
-    dimensions.width - chartPadding.left - chartPadding.right,
-    0
-  );
-  const chartHeight = Math.max(
-    dimensions.height - chartPadding.top - chartPadding.bottom,
-    0
-  );
+  const chartPadding = { top: 20, right: 60, bottom: 30, left: 10 };
+  const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
+  const chartHeight =
+    dimensions.height - chartPadding.top - chartPadding.bottom;
 
   const [hoverInfo, setHoverInfo] = useState<{
     x: number;
@@ -213,18 +208,19 @@ const RthmnVision: React.FC<{
     const prices = visibleData.map((d) => d.price);
     const minY = Math.min(...prices);
     const maxY = Math.max(...prices);
-    const yScale = chartHeight / (maxY - minY) / animatedScale;
+    const yScale = chartHeight / (maxY - minY);
     return { minY, maxY, yScale };
-  }, [visibleData, chartHeight, animatedScale]);
+  }, [visibleData, chartHeight]);
 
   const scaledData = useMemo(() => {
+    const midPrice = (maxY + minY) / 2;
     return visibleData.map((point, index) => ({
       ...point,
       scaledX: index * (chartWidth / (visibleData.length - 1)),
       scaledY:
-        chartHeight - ((point.price - minY) * chartHeight) / (maxY - minY)
+        chartHeight / 2 - ((point.price - midPrice) * yScale) / animatedScale
     }));
-  }, [visibleData, chartWidth, chartHeight, minY, maxY]);
+  }, [visibleData, chartWidth, chartHeight, minY, maxY, yScale, animatedScale]);
 
   const pathData = useMemo(() => {
     return PathGenerator.generate(scaledData, chartWidth, chartHeight);
@@ -232,7 +228,7 @@ const RthmnVision: React.FC<{
 
   const handleYAxisDrag = useCallback((deltaY: number) => {
     setYAxisScale((prev) =>
-      Math.max(0.1, Math.min(10, prev * (1 + deltaY * 0.01)))
+      Math.max(0.1, Math.min(10, prev * (1 - deltaY * 0.01)))
     );
   }, []);
 
@@ -480,8 +476,13 @@ const YAxis: React.FC<{
       [onScale]
     );
 
+    const visibleRange = maxY - minY;
+    const midPrice = (maxY + minY) / 2;
+    const scaledVisibleRange = visibleRange * yAxisScale;
+    const visibleMin = midPrice - scaledVisibleRange / 2;
+    const visibleMax = midPrice + scaledVisibleRange / 2;
     const steps = Math.max(2, Math.round(10 * yAxisScale));
-    const stepSize = (maxY - minY) / steps;
+    const stepSize = scaledVisibleRange / steps;
 
     return (
       <g
@@ -500,7 +501,7 @@ const YAxis: React.FC<{
         />
         <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#333" />
         {Array.from({ length: steps + 1 }, (_, i) => {
-          const value = maxY - i * stepSize;
+          const value = visibleMax - i * stepSize;
           const y = (i / steps) * chartHeight;
           return (
             <g key={i} transform={`translate(0, ${y})`}>
@@ -522,7 +523,9 @@ const YAxis: React.FC<{
         })}
         {hoverPrice !== null && (
           <g
-            transform={`translate(0, ${chartHeight - ((hoverPrice - minY) / (maxY - minY)) * chartHeight})`}
+            transform={`translate(0, ${
+              chartHeight * (1 - (hoverPrice - visibleMin) / scaledVisibleRange)
+            })`}
           >
             <rect x={10} y={-10} width={50} height={20} fill="#d1d5db" rx={4} />
             <text
