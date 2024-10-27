@@ -9,7 +9,7 @@ import React, {
 import styles from './styles.module.css';
 import { Candle } from '@/types';
 
-const VISIBLE_POINTS = 1000;
+const VISIBLE_POINTS = 500;
 
 interface ChartDataPoint {
   price: number;
@@ -319,7 +319,7 @@ const RthmnVision: React.FC<{
             height={chartHeight}
           />
           <XAxis
-            data={scaledData}
+            data={visibleData}
             chartWidth={chartWidth}
             chartHeight={chartHeight}
           />
@@ -383,27 +383,31 @@ const XAxis: React.FC<{
     const intervalMs = 10 * 60 * 1000; // 10 minutes
     const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
     const endTime = data[data.length - 1].timestamp;
-    const intervals = [];
+    const result = [];
+
     for (let time = startTime; time <= endTime; time += intervalMs) {
-      intervals.push(time);
+      const closestPoint = data.reduce((prev, curr) =>
+        Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time)
+          ? curr
+          : prev
+      );
+      result.push(closestPoint);
     }
-    return intervals;
+
+    return result;
   }, [data]);
 
   if (data.length === 0) {
     return null;
   }
 
-  const timeFormat = new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false
-  });
-
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
-    const [hours, minutes] = timeFormat.format(date).split(':');
-    return `${hours}:${minutes}`;
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
   };
 
   const timeRange = data[data.length - 1].timestamp - data[0].timestamp;
@@ -411,13 +415,14 @@ const XAxis: React.FC<{
   return (
     <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
       <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#333" />
-      {intervals.map((time) => {
-        const xPosition = ((time - data[0].timestamp) / timeRange) * chartWidth;
+      {intervals.map((point) => {
+        const xPosition =
+          ((point.timestamp - data[0].timestamp) / timeRange) * chartWidth;
         return (
-          <g key={time} transform={`translate(${xPosition}, 0)`}>
+          <g key={point.timestamp} transform={`translate(${xPosition}, 0)`}>
             <line y2={6} stroke="#333" />
             <text y={20} textAnchor="middle" fill="#fff" fontSize="12">
-              {formatTime(time)}
+              {formatTime(point.timestamp)}
             </text>
             <line
               y1={-chartHeight}
