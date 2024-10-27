@@ -116,8 +116,6 @@ const useAnimatedScale = (scale: number) => {
 interface HoverInfoProps {
   x: number;
   y: number;
-  price: number;
-  time: string;
   chartHeight: number;
   chartWidth: number;
 }
@@ -125,8 +123,6 @@ interface HoverInfoProps {
 const HoverInfo: React.FC<HoverInfoProps> = ({
   x,
   y,
-  price,
-  time,
   chartHeight,
   chartWidth
 }) => (
@@ -148,19 +144,6 @@ const HoverInfo: React.FC<HoverInfoProps> = ({
       strokeWidth="1"
     />
     <circle cx={x} cy={y} r="4" fill="white" />
-    <text
-      x={chartWidth / 2}
-      y={y - 10}
-      fill="white"
-      fontSize="12"
-      textAnchor="middle"
-      dominantBaseline="auto"
-    >
-      {price.toFixed(3)}
-    </text>
-    <text x={x + 10} y={chartHeight - 10} fill="white" fontSize="12">
-      {time}
-    </text>
   </g>
 );
 
@@ -175,7 +158,7 @@ const RthmnVision: React.FC<{
   const priceBufferRef = useRef(new PriceBuffer(1000));
   const animatedScale = useAnimatedScale(yAxisScale);
 
-  const chartPadding = { top: 20, right: 100, bottom: 40, left: 60 };
+  const chartPadding = { top: 100, right: 100, bottom: 100, left: 50 };
   const chartWidth = Math.max(
     dimensions.width - chartPadding.left - chartPadding.right,
     0
@@ -257,13 +240,6 @@ const RthmnVision: React.FC<{
     setYAxisScale((prev) => Math.max(0.1, Math.min(10, prev * scaleFactor)));
   }, []);
 
-  const timeFormat = new Intl.DateTimeFormat(undefined, {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit', // Add seconds
-    hour12: false
-  });
-
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, '0');
@@ -324,6 +300,8 @@ const RthmnVision: React.FC<{
             data={visibleData}
             chartWidth={chartWidth}
             chartHeight={chartHeight}
+            hoverTime={hoverInfo?.time ?? null}
+            hoverX={hoverInfo?.x ?? null}
           />
           <YAxis
             minY={minY}
@@ -333,13 +311,12 @@ const RthmnVision: React.FC<{
             onDrag={handleYAxisDrag}
             onScale={handleYAxisScale}
             yAxisScale={animatedScale}
+            hoverPrice={hoverInfo?.price ?? null}
           />
           {hoverInfo && (
             <HoverInfo
               x={hoverInfo.x}
               y={hoverInfo.y}
-              price={hoverInfo.price}
-              time={hoverInfo.time}
               chartHeight={chartHeight}
               chartWidth={chartWidth}
             />
@@ -378,7 +355,9 @@ const XAxis: React.FC<{
   data: ChartDataPoint[];
   chartWidth: number;
   chartHeight: number;
-}> = React.memo(({ data, chartWidth, chartHeight }) => {
+  hoverTime: string | null;
+  hoverX: number | null;
+}> = React.memo(({ data, chartWidth, chartHeight, hoverTime, hoverX }) => {
   const intervals = useMemo(() => {
     if (data.length === 0) return [];
 
@@ -436,6 +415,21 @@ const XAxis: React.FC<{
           </g>
         );
       })}
+      {hoverTime !== null && hoverX !== null && (
+        <g transform={`translate(${hoverX}, 0)`}>
+          <rect x={-25} y={10} width={50} height={20} fill="#d1d5db" rx={4} />
+          <text
+            x={0}
+            y={24}
+            textAnchor="middle"
+            fill="#000"
+            fontSize="12"
+            fontWeight="bold"
+          >
+            {hoverTime}
+          </text>
+        </g>
+      )}
     </g>
   );
 });
@@ -448,8 +442,18 @@ const YAxis: React.FC<{
   onDrag: (deltaY: number) => void;
   onScale: (scaleFactor: number) => void;
   yAxisScale: number;
+  hoverPrice: number | null;
 }> = React.memo(
-  ({ minY, maxY, chartHeight, chartWidth, onDrag, onScale, yAxisScale }) => {
+  ({
+    minY,
+    maxY,
+    chartHeight,
+    chartWidth,
+    onDrag,
+    onScale,
+    yAxisScale,
+    hoverPrice
+  }) => {
     const handleMouseDown = useCallback(
       (event: React.MouseEvent) => {
         const startY = event.clientY;
@@ -516,6 +520,23 @@ const YAxis: React.FC<{
             </g>
           );
         })}
+        {hoverPrice !== null && (
+          <g
+            transform={`translate(0, ${chartHeight - ((hoverPrice - minY) / (maxY - minY)) * chartHeight})`}
+          >
+            <rect x={10} y={-10} width={50} height={20} fill="#d1d5db" rx={4} />
+            <text
+              x={35}
+              y={4}
+              textAnchor="middle"
+              fill="#000"
+              fontSize="12"
+              fontWeight="bold"
+            >
+              {hoverPrice.toFixed(3)}
+            </text>
+          </g>
+        )}
       </g>
     );
   }
