@@ -260,6 +260,7 @@ const RthmnVision: React.FC<{
   const timeFormat = new Intl.DateTimeFormat(undefined, {
     hour: '2-digit',
     minute: '2-digit',
+    second: '2-digit', // Add seconds
     hour12: false
   });
 
@@ -267,7 +268,8 @@ const RthmnVision: React.FC<{
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+    const seconds = date.getSeconds().toString().padStart(2, '0'); // Add seconds
+    return `${hours}:${minutes}:${seconds}`; // Include seconds in the returned string
   };
 
   const handleMouseMove = useCallback(
