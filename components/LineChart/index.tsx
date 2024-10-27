@@ -18,8 +18,8 @@ interface ChartDataPoint {
   scaledY: number;
 }
 
-class CircularBuffer<T> {
-  private buffer: T[];
+class OptimizedPriceBuffer {
+  private buffer: ChartDataPoint[];
   private start = 0;
   private size = 0;
 
@@ -27,42 +27,31 @@ class CircularBuffer<T> {
     this.buffer = new Array(capacity);
   }
 
-  push(item: T): void {
+  push(point: ChartDataPoint): void {
     if (this.size < this.capacity) {
-      this.buffer[(this.start + this.size) % this.capacity] = item;
+      this.buffer[(this.start + this.size) % this.capacity] = point;
       this.size++;
     } else {
-      this.buffer[this.start] = item;
+      this.buffer[this.start] = point;
       this.start = (this.start + 1) % this.capacity;
     }
   }
 
-  get(index: number): T {
-    return this.buffer[(this.start + index) % this.capacity];
-  }
+  getVisiblePoints(startIndex: number, endIndex: number): ChartDataPoint[] {
+    const result: ChartDataPoint[] = [];
+    const actualStart = Math.max(0, this.size - this.capacity + startIndex);
+    const actualEnd = Math.min(this.size, actualStart + endIndex - startIndex);
 
-  slice(startIndex: number, endIndex: number): T[] {
-    const result: T[] = [];
-    for (let i = startIndex; i < endIndex && i < this.size; i++) {
-      result.push(this.get(i));
+    for (let i = actualStart; i < actualEnd; i++) {
+      result.push(this.buffer[(this.start + i) % this.capacity]);
     }
+
     return result;
   }
-}
 
-class PriceBuffer {
-  private buffer: CircularBuffer<ChartDataPoint>;
-
-  constructor(capacity: number) {
-    this.buffer = new CircularBuffer<ChartDataPoint>(capacity);
-  }
-
-  push(point: ChartDataPoint): void {
-    this.buffer.push(point);
-  }
-
-  getVisiblePoints(startIndex: number, endIndex: number): ChartDataPoint[] {
-    return this.buffer.slice(startIndex, endIndex);
+  clear(): void {
+    this.start = 0;
+    this.size = 0;
   }
 }
 
@@ -155,7 +144,7 @@ const RthmnVision: React.FC<{
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [yAxisScale, setYAxisScale] = useState(1);
   const [scrollLeft, setScrollLeft] = useState(0);
-  const priceBufferRef = useRef(new PriceBuffer(1000));
+  const priceBufferRef = useRef(new OptimizedPriceBuffer(1000));
   const animatedScale = useAnimatedScale(yAxisScale);
 
   const chartPadding = { top: 20, right: 60, bottom: 30, left: 10 };
@@ -187,6 +176,7 @@ const RthmnVision: React.FC<{
   }, []);
 
   useEffect(() => {
+    priceBufferRef.current.clear();
     candles.forEach((candle) => {
       priceBufferRef.current.push({
         price: candle.close,
@@ -236,13 +226,13 @@ const RthmnVision: React.FC<{
     setYAxisScale((prev) => Math.max(0.1, Math.min(10, prev * scaleFactor)));
   }, []);
 
-  const formatTime = (timestamp: number) => {
+  const formatTime = useCallback((timestamp: number) => {
     const date = new Date(timestamp);
     const hours = date.getHours().toString().padStart(2, '0');
     const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0'); // Add seconds
-    return `${hours}:${minutes}:${seconds}`; // Include seconds in the returned string
-  };
+    const seconds = date.getSeconds().toString().padStart(2, '0');
+    return `${hours}:${minutes}:${seconds}`;
+  }, []);
 
   const handleMouseMove = useCallback(
     (event: React.MouseEvent<SVGSVGElement>) => {
@@ -293,11 +283,11 @@ const RthmnVision: React.FC<{
             height={chartHeight}
           />
           <XAxis
-            data={visibleData}
+            data={scaledData}
             chartWidth={chartWidth}
             chartHeight={chartHeight}
-            hoverTime={hoverInfo?.time ?? null}
-            hoverX={hoverInfo?.x ?? null}
+            hoverInfo={hoverInfo}
+            formatTime={formatTime}
           />
           <YAxis
             minY={minY}
@@ -307,7 +297,7 @@ const RthmnVision: React.FC<{
             onDrag={handleYAxisDrag}
             onScale={handleYAxisScale}
             yAxisScale={animatedScale}
-            hoverPrice={hoverInfo?.price ?? null}
+            hoverInfo={hoverInfo}
           />
           {hoverInfo && (
             <HoverInfo
@@ -351,9 +341,9 @@ const XAxis: React.FC<{
   data: ChartDataPoint[];
   chartWidth: number;
   chartHeight: number;
-  hoverTime: string | null;
-  hoverX: number | null;
-}> = React.memo(({ data, chartWidth, chartHeight, hoverTime, hoverX }) => {
+  hoverInfo: { time: string; x: number } | null;
+  formatTime: (timestamp: number) => string;
+}> = React.memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
   const intervals = useMemo(() => {
     if (data.length === 0) return [];
 
@@ -378,23 +368,14 @@ const XAxis: React.FC<{
     return null;
   }
 
-  const formatTime = (timestamp: number) => {
-    const date = new Date(timestamp);
-    return date.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    });
-  };
-
-  const timeRange = data[data.length - 1].timestamp - data[0].timestamp;
-
   return (
     <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
       <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#333" />
       {intervals.map((point) => {
         const xPosition =
-          ((point.timestamp - data[0].timestamp) / timeRange) * chartWidth;
+          ((point.timestamp - data[0].timestamp) /
+            (data[data.length - 1].timestamp - data[0].timestamp)) *
+          chartWidth;
         return (
           <g key={point.timestamp} transform={`translate(${xPosition}, 0)`}>
             <line y2={6} stroke="#333" />
@@ -411,8 +392,8 @@ const XAxis: React.FC<{
           </g>
         );
       })}
-      {hoverTime !== null && hoverX !== null && (
-        <g transform={`translate(${hoverX}, 0)`}>
+      {hoverInfo && (
+        <g transform={`translate(${hoverInfo.x}, 0)`}>
           <rect x={-25} y={10} width={50} height={20} fill="#d1d5db" rx={4} />
           <text
             x={0}
@@ -422,7 +403,7 @@ const XAxis: React.FC<{
             fontSize="12"
             fontWeight="bold"
           >
-            {hoverTime}
+            {hoverInfo.time}
           </text>
         </g>
       )}
@@ -438,7 +419,7 @@ const YAxis: React.FC<{
   onDrag: (deltaY: number) => void;
   onScale: (scaleFactor: number) => void;
   yAxisScale: number;
-  hoverPrice: number | null;
+  hoverInfo: { price: number; y: number } | null;
 }> = React.memo(
   ({
     minY,
@@ -448,7 +429,7 @@ const YAxis: React.FC<{
     onDrag,
     onScale,
     yAxisScale,
-    hoverPrice
+    hoverInfo
   }) => {
     const handleMouseDown = useCallback(
       (event: React.MouseEvent) => {
@@ -521,10 +502,11 @@ const YAxis: React.FC<{
             </g>
           );
         })}
-        {hoverPrice !== null && (
+        {hoverInfo && (
           <g
             transform={`translate(0, ${
-              chartHeight * (1 - (hoverPrice - visibleMin) / scaledVisibleRange)
+              chartHeight *
+              (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
             })`}
           >
             <rect x={10} y={-10} width={50} height={20} fill="#d1d5db" rx={4} />
@@ -536,7 +518,7 @@ const YAxis: React.FC<{
               fontSize="12"
               fontWeight="bold"
             >
-              {hoverPrice.toFixed(3)}
+              {hoverInfo.price.toFixed(3)}
             </text>
           </g>
         )}
