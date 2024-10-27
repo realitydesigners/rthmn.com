@@ -16,6 +16,7 @@ const RthmnVision: React.FC<{
   const [closingPrices, setClosingPrices] = useState<number[]>([]);
   const [timeData, setTimeData] = useState<number[]>([]);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [yAxisScale, setYAxisScale] = useState(1);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const point = 0.00001;
@@ -33,14 +34,33 @@ const RthmnVision: React.FC<{
     0
   );
 
-  const PairName: React.FC<{ pair: string }> = ({ pair }) => {
-    const pairName = pair.substring(0, 7).replace(/_/g, '');
-    return (
-      <div className="absolute left-4 top-4 text-2xl font-bold uppercase text-gray-200">
-        {pairName}
-      </div>
-    );
-  };
+  // Y-axis calculations
+  const pipSize = 0.01;
+  const roundToPip = (value: number) => Math.round(value / pipSize) * pipSize;
+  const range = maxY - minY;
+  const visibleRange = range / yAxisScale;
+  const midPrice = (maxY + minY) / 2;
+  const adjustedMinY = midPrice - visibleRange / 2;
+  const adjustedMaxY = midPrice + visibleRange / 2;
+  const minYRounded = roundToPip(Math.floor(adjustedMinY / pipSize) * pipSize);
+  const maxYRounded = roundToPip(Math.ceil(adjustedMaxY / pipSize) * pipSize);
+  const baseSteps = 20;
+  const steps = Math.max(2, Math.round(baseSteps * yAxisScale));
+  const stepSize = (maxYRounded - minYRounded) / steps;
+
+  // X-axis calculations
+  const visibleTimeData = timeData.slice(-visibleDataPoints);
+  const startTime = new Date(visibleTimeData[0]);
+  const endTime = new Date(visibleTimeData[visibleTimeData.length - 1]);
+  const intervalMs = 10 * 60 * 1000;
+  const intervals = [];
+  let currentTime = new Date(
+    Math.ceil(startTime.getTime() / intervalMs) * intervalMs
+  );
+  while (currentTime <= endTime) {
+    intervals.push(currentTime.getTime());
+    currentTime = new Date(currentTime.getTime() + intervalMs);
+  }
 
   useEffect(() => {
     if (candles.length === 0) {
@@ -73,30 +93,42 @@ const RthmnVision: React.FC<{
     };
   }, []);
 
+  const handleYAxisDrag = useCallback((deltaY: number) => {
+    setYAxisScale((prev) =>
+      Math.max(0.1, Math.min(10, prev * (1 + deltaY * 0.01)))
+    );
+  }, []);
+
+  const handleYAxisScale = useCallback((scaleFactor: number) => {
+    setYAxisScale((prev) => Math.max(0.1, Math.min(10, prev * scaleFactor)));
+  }, []);
+
   const memoizedChartLine = useMemo(
     () => (
       <ChartLine
         closingPrices={closingPrices}
         timeData={timeData}
-        minY={minY}
-        maxY={maxY}
+        minY={minYRounded}
+        maxY={maxYRounded}
         width={chartWidth}
         height={chartHeight}
         pair={pair}
         candles={candles}
         visibleDataPoints={visibleDataPoints}
+        yAxisScale={yAxisScale}
       />
     ),
     [
       closingPrices,
       timeData,
-      minY,
-      maxY,
+      minYRounded,
+      maxYRounded,
       chartWidth,
       chartHeight,
       pair,
       candles,
-      visibleDataPoints
+      visibleDataPoints,
+      yAxisScale
     ]
   );
 
@@ -115,16 +147,23 @@ const RthmnVision: React.FC<{
         <g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
           {memoizedChartLine}
           <XAxis
-            timeData={timeData}
+            intervals={intervals}
+            startTime={startTime}
+            endTime={endTime}
             chartWidth={chartWidth}
             chartHeight={chartHeight}
           />
           <g transform={`translate(${chartWidth}, 0)`}>
             <YAxis
-              minY={minY}
-              maxY={maxY}
-              point={point}
+              minY={minYRounded}
+              maxY={maxYRounded}
               chartHeight={chartHeight}
+              chartWidth={chartWidth}
+              onDrag={handleYAxisDrag}
+              onScale={handleYAxisScale}
+              yAxisScale={yAxisScale}
+              steps={steps}
+              stepSize={stepSize}
             />
           </g>
         </g>
@@ -145,6 +184,7 @@ const ChartLine: React.FC<{
   pair: string;
   candles: Candle[];
   visibleDataPoints: number;
+  yAxisScale: number;
 }> = React.memo(
   ({
     closingPrices,
@@ -155,7 +195,8 @@ const ChartLine: React.FC<{
     height,
     pair,
     candles,
-    visibleDataPoints
+    visibleDataPoints,
+    yAxisScale
   }) => {
     const svgRef = useRef<SVGSVGElement>(null);
     const [hoverInfo, setHoverInfo] = useState<{
@@ -166,18 +207,20 @@ const ChartLine: React.FC<{
     } | null>(null);
 
     const rightMargin = 200;
+    const chartWidth = Math.max(width - rightMargin, 0);
 
     const calculatePathData = useCallback(() => {
       if (closingPrices.length === 0) return '';
 
       const dataToShow = closingPrices.slice(-visibleDataPoints);
-      const xScale = (width - rightMargin) / (dataToShow.length - 1);
-      const yScale = height / (maxY - minY);
+      const xScale = chartWidth / (dataToShow.length - 1);
+      const midPrice = (maxY + minY) / 2;
+      const yScale = height / yAxisScale / (maxY - minY);
 
       return dataToShow
         .map((price, index) => {
           const x = index * xScale;
-          const y = height - (price - minY) * yScale;
+          const y = height / 2 - (price - midPrice) * yScale;
           return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
         })
         .join(' ');
@@ -185,10 +228,10 @@ const ChartLine: React.FC<{
       closingPrices,
       minY,
       maxY,
-      width,
+      chartWidth,
       height,
       visibleDataPoints,
-      rightMargin
+      yAxisScale
     ]);
 
     const handleMouseMove = useCallback(
@@ -199,8 +242,8 @@ const ChartLine: React.FC<{
         const rect = svg.getBoundingClientRect();
         const x = event.clientX - rect.left;
 
-        if (x >= 0 && x <= width - rightMargin) {
-          const xRatio = x / (width - rightMargin);
+        if (x >= 0 && x <= chartWidth) {
+          const xRatio = x / chartWidth;
           const dataIndex = Math.floor(xRatio * (visibleDataPoints - 1));
 
           if (dataIndex >= 0 && dataIndex < visibleDataPoints) {
@@ -211,7 +254,9 @@ const ChartLine: React.FC<{
             const time = new Date(
               timeData[timeData.length - visibleDataPoints + dataIndex]
             );
-            const yPos = height - ((price - minY) / (maxY - minY)) * height;
+            const midPrice = (maxY + minY) / 2;
+            const yScale = height / yAxisScale / (maxY - minY);
+            const yPos = height / 2 - (price - midPrice) * yScale;
 
             setHoverInfo({
               price,
@@ -232,10 +277,10 @@ const ChartLine: React.FC<{
         timeData,
         minY,
         maxY,
-        width,
+        chartWidth,
         height,
         visibleDataPoints,
-        rightMargin
+        yAxisScale
       ]
     );
 
@@ -254,7 +299,7 @@ const ChartLine: React.FC<{
       >
         <defs>
           <clipPath id="chart-area">
-            <rect x="0" y="0" width={width - rightMargin} height={height} />
+            <rect x="0" y="0" width={chartWidth} height={height} />
           </clipPath>
         </defs>
         <g clipPath="url(#chart-area)">
@@ -262,7 +307,7 @@ const ChartLine: React.FC<{
           <rect
             x="0"
             y="0"
-            width={width - rightMargin}
+            width={chartWidth}
             height={height}
             fill="transparent"
             pointerEvents="all"
@@ -284,7 +329,7 @@ const ChartLine: React.FC<{
               />
               <foreignObject x={hoverInfo.x + 5} y={10} width="80" height="20">
                 <div className={styles.priceLabel}>
-                  {hoverInfo.price.toFixed(5)}
+                  {hoverInfo.price.toFixed(2)}
                 </div>
               </foreignObject>
               <foreignObject
@@ -304,30 +349,16 @@ const ChartLine: React.FC<{
 );
 
 export const XAxis: React.FC<{
-  timeData: number[];
+  intervals: number[];
+  startTime: Date;
+  endTime: Date;
   chartWidth: number;
   chartHeight: number;
-}> = ({ timeData, chartWidth, chartHeight }) => {
-  const visibleTimeData = timeData.slice(-200); // Show last 200 data points
-  const startTime = new Date(visibleTimeData[0]);
-  const endTime = new Date(visibleTimeData[visibleTimeData.length - 1]);
-
-  // Calculate 10-minute intervals
-  const intervalMs = 10 * 60 * 1000; // 10 minutes in milliseconds
-  const intervals = [];
-  let currentTime = new Date(
-    Math.ceil(startTime.getTime() / intervalMs) * intervalMs
-  );
-
-  while (currentTime <= endTime) {
-    intervals.push(currentTime.getTime());
-    currentTime = new Date(currentTime.getTime() + intervalMs);
-  }
-
+}> = ({ intervals, startTime, endTime, chartWidth, chartHeight }) => {
   return (
     <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
       <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#333" />
-      {intervals.map((time, i) => {
+      {intervals.map((time) => {
         const xPosition =
           ((time - startTime.getTime()) /
             (endTime.getTime() - startTime.getTime())) *
@@ -358,27 +389,90 @@ export const XAxis: React.FC<{
 export const YAxis: React.FC<{
   minY: number;
   maxY: number;
-  point: number;
   chartHeight: number;
-}> = ({ minY, maxY, point, chartHeight }) => {
-  const steps = 5;
-  const range = maxY - minY;
-  const stepSize = range / steps;
+  chartWidth: number;
+  onDrag: (deltaY: number) => void;
+  onScale: (scaleFactor: number) => void;
+  yAxisScale: number;
+  steps: number;
+  stepSize: number;
+}> = ({
+  minY,
+  maxY,
+  chartHeight,
+  chartWidth,
+  onDrag,
+  onScale,
+  yAxisScale,
+  steps,
+  stepSize
+}) => {
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent) => {
+      const startY = event.clientY;
+      const handleMouseMove = (e: MouseEvent) => {
+        const deltaY = (e.clientY - startY) / chartHeight;
+        onDrag(deltaY);
+      };
+      const handleMouseUp = () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    },
+    [onDrag, chartHeight]
+  );
+
+  const handleWheel = useCallback(
+    (event: React.WheelEvent) => {
+      const scaleFactor = event.deltaY > 0 ? 1.1 : 0.9;
+      onScale(scaleFactor);
+    },
+    [onScale]
+  );
 
   return (
-    <g className="y-axis">
+    <g className="y-axis" onMouseDown={handleMouseDown} onWheel={handleWheel}>
+      <rect
+        x={-10}
+        y={0}
+        width={60}
+        height={chartHeight}
+        fill="transparent"
+        cursor="ns-resize"
+      />
       <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#333" />
       {Array.from({ length: steps + 1 }, (_, i) => {
         const value = maxY - i * stepSize;
+        const y = (i / steps) * chartHeight;
         return (
-          <g key={i} transform={`translate(0, ${(i / steps) * chartHeight})`}>
+          <g key={i} transform={`translate(0, ${y})`}>
             <line x2={6} stroke="#333" />
             <text x={10} y={4} textAnchor="start" fill="#fff" fontSize="12">
-              {value.toFixed(point < 0.01 ? 5 : 2)}
+              {value.toFixed(3)}
             </text>
+            <line
+              x1={0}
+              y1={0}
+              x2={-chartWidth}
+              y2={0}
+              stroke="#333"
+              strokeOpacity="0.2"
+              strokeDasharray="4 4"
+            />
           </g>
         );
       })}
     </g>
+  );
+};
+
+const PairName: React.FC<{ pair: string }> = ({ pair }) => {
+  const pairName = pair.substring(0, 7).replace(/_/g, '');
+  return (
+    <div className="absolute left-6 top-20 font-mono text-2xl font-bold uppercase text-gray-200">
+      {pairName}
+    </div>
   );
 };
