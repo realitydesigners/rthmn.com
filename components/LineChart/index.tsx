@@ -8,6 +8,7 @@ import React, {
 } from 'react';
 import styles from './styles.module.css';
 import { Candle } from '@/types';
+import { formatTime } from '@/utils/dateUtils';
 
 const VISIBLE_POINTS = 500;
 
@@ -81,8 +82,8 @@ const useAnimatedScale = (scale: number) => {
 
   useEffect(() => {
     const animate = () => {
-      const delta = (scale - currentScale) * 0.1;
-      if (Math.abs(delta) < 0.001) {
+      const delta = scale - currentScale;
+      if (Math.abs(delta) < 0.01) {
         setCurrentScale(scale);
         return;
       }
@@ -136,7 +137,7 @@ const HoverInfo: React.FC<HoverInfoProps> = ({
   </g>
 );
 
-const RthmnVision: React.FC<{
+export const LineChart: React.FC<{
   pair: string;
   candles: Candle[];
 }> = ({ pair, candles }) => {
@@ -218,20 +219,13 @@ const RthmnVision: React.FC<{
 
   const handleYAxisDrag = useCallback((deltaY: number) => {
     setYAxisScale((prev) =>
-      Math.max(0.1, Math.min(10, prev * (1 - deltaY * 0.01)))
+      // Increase the multiplier from 0.01 to 0.03 to make it more sensitive
+      Math.max(0.1, Math.min(10, prev * (1 - deltaY * 0.05)))
     );
   }, []);
 
   const handleYAxisScale = useCallback((scaleFactor: number) => {
     setYAxisScale((prev) => Math.max(0.1, Math.min(10, prev * scaleFactor)));
-  }, []);
-
-  const formatTime = useCallback((timestamp: number) => {
-    const date = new Date(timestamp);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    const seconds = date.getSeconds().toString().padStart(2, '0');
-    return `${hours}:${minutes}:${seconds}`;
   }, []);
 
   const handleMouseMove = useCallback(
@@ -248,14 +242,14 @@ const RthmnVision: React.FC<{
             x: point.scaledX,
             y: point.scaledY,
             price: point.price,
-            time: formatTime(point.timestamp)
+            time: formatTime(new Date(point.timestamp)) // This is now correct as formatTime expects a Date
           });
         }
       } else {
         setHoverInfo(null);
       }
     },
-    [scaledData, chartWidth, chartPadding.left, formatTime]
+    [scaledData, chartWidth, chartPadding.left]
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -265,7 +259,7 @@ const RthmnVision: React.FC<{
   return (
     <div
       ref={containerRef}
-      className="relative h-full w-full overflow-hidden border border-[#181818] bg-black"
+      className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${styles.chartContainer}`}
     >
       <PairName pair={pair} />
       <svg
@@ -281,6 +275,7 @@ const RthmnVision: React.FC<{
             pathData={pathData}
             width={chartWidth}
             height={chartHeight}
+            yAxisScale={animatedScale}
           />
           <XAxis
             data={scaledData}
@@ -317,6 +312,7 @@ const ChartLine: React.FC<{
   pathData: string;
   width: number;
   height: number;
+  yAxisScale: number;
 }> = React.memo(({ pathData, width, height }) => {
   const pathRef = useRef<SVGPathElement>(null);
 
@@ -342,7 +338,7 @@ const XAxis: React.FC<{
   chartWidth: number;
   chartHeight: number;
   hoverInfo: { time: string; x: number } | null;
-  formatTime: (timestamp: number) => string;
+  formatTime: (date: Date) => string; // Update this type
 }> = React.memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
   const intervals = useMemo(() => {
     if (data.length === 0) return [];
@@ -380,7 +376,7 @@ const XAxis: React.FC<{
           <g key={point.timestamp} transform={`translate(${xPosition}, 0)`}>
             <line y2={6} stroke="#333" />
             <text y={20} textAnchor="middle" fill="#fff" fontSize="12">
-              {formatTime(point.timestamp)}
+              {formatTime(new Date(point.timestamp))}
             </text>
             <line
               y1={-chartHeight}
@@ -394,10 +390,10 @@ const XAxis: React.FC<{
       })}
       {hoverInfo && (
         <g transform={`translate(${hoverInfo.x}, 0)`}>
-          <rect x={-25} y={10} width={50} height={20} fill="#d1d5db" rx={4} />
+          <rect x={-40} y={5} width={80} height={20} fill="#d1d5db" rx={4} />
           <text
             x={0}
-            y={24}
+            y={20}
             textAnchor="middle"
             fill="#000"
             fontSize="12"
@@ -471,6 +467,12 @@ const YAxis: React.FC<{
         transform={`translate(${chartWidth}, 0)`}
         onMouseDown={handleMouseDown}
         onWheel={handleWheel}
+        style={{
+          userSelect: 'none',
+          WebkitUserSelect: 'none', // For Safari
+          MozUserSelect: 'none', // For Firefox
+          msUserSelect: 'none' // For IE/Edge
+        }}
       >
         <rect
           x={0}
@@ -509,9 +511,9 @@ const YAxis: React.FC<{
               (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
             })`}
           >
-            <rect x={10} y={-10} width={50} height={20} fill="#d1d5db" rx={4} />
+            <rect x={3} y={-10} width={55} height={20} fill="#d1d5db" rx={4} />
             <text
-              x={35}
+              x={30}
               y={4}
               textAnchor="middle"
               fill="#000"
@@ -535,5 +537,3 @@ const PairName: React.FC<{ pair: string }> = React.memo(({ pair }) => {
     </div>
   );
 });
-
-export default RthmnVision;
