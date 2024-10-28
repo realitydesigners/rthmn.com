@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import ShiftedBox from '@/components/Reso/Shifted'; // Import the ShiftedBox component
+import Sidebar from '@/components/Sidebar';
+import BoxGrid from '@/components/BoxGrid';
 
-const Dashboard: React.FC = () => {
+// Separate layout component that handles the collapsible sidebar
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
 
   return (
     <div
@@ -21,44 +19,25 @@ const Dashboard: React.FC = () => {
         gridTemplateColumns: `${isMenuOpen ? '200px' : '50px'} 1fr`
       }}
     >
-      {/* Sidebar container */}
-      <div
-        className={`side-menu ${isMenuOpen ? 'open' : 'collapsed'}`}
-        style={{
-          position: 'sticky',
-          top: 0,
-          height: '100vh',
-          overflow: 'hidden',
-          width: isMenuOpen ? '200px' : '50px'
-        }}
-      >
-        <button onClick={toggleMenu}>
-          {isMenuOpen ? 'Collapse' : 'Expand'}
-        </button>
-        <div
-          className="menu-content"
-          style={{ display: isMenuOpen ? 'block' : 'none' }}
-        >
-          {/* Add your settings menu items here */}
-          <p>Settings Item 1</p>
-          <p>Settings Item 2</p>
-        </div>
-      </div>
+      <Sidebar
+        isOpen={isMenuOpen}
+        onToggle={() => setIsMenuOpen(!isMenuOpen)}
+      />
+      {children}
+    </div>
+  );
+};
 
-      {/* Content container */}
+// Main content component that won't re-render when sidebar state changes
+const Dashboard: React.FC = () => {
+  return (
+    <DashboardLayout>
       <div className="content-container" style={{ overflowY: 'auto' }}>
-        {/* Main content goes here */}
         <h1>Main Content</h1>
         <p>This is the main content area.</p>
-
-        {/* Add a grid of ShiftedBox components */}
-        <div className="grid grid-cols-3 gap-4">
-          {[...Array(9)].map((_, index) => (
-            <ShiftedBox key={index} slice={null} isLoading={false} />
-          ))}
-        </div>
+        <BoxGrid />
       </div>
-    </div>
+    </DashboardLayout>
   );
 };
 
