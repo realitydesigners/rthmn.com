@@ -100,32 +100,43 @@ interface HoverInfoProps {
   chartWidth: number;
 }
 
+const ensureNumber = (value: number) => {
+  return isNaN(value) || !isFinite(value) ? 0 : value;
+};
+
 const HoverInfo: React.FC<HoverInfoProps> = ({
   x,
   y,
   chartHeight,
   chartWidth
-}) => (
-  <g>
-    <line
-      x1={x}
-      y1={0}
-      x2={x}
-      y2={chartHeight}
-      stroke="rgba(255,255,255,0.5)"
-      strokeWidth="1"
-    />
-    <line
-      x1={0}
-      y1={y}
-      x2={chartWidth}
-      y2={y}
-      stroke="rgba(255,255,255,0.5)"
-      strokeWidth="1"
-    />
-    <circle cx={x} cy={y} r="4" fill="white" />
-  </g>
-);
+}) => {
+  const safeX = ensureNumber(x);
+  const safeY = ensureNumber(y);
+
+  if (isNaN(safeX) || isNaN(safeY)) return null;
+
+  return (
+    <g>
+      <line
+        x1={safeX}
+        y1={0}
+        x2={safeX}
+        y2={chartHeight}
+        stroke="rgba(255,255,255,0.5)"
+        strokeWidth="1"
+      />
+      <line
+        x1={0}
+        y1={safeY}
+        x2={chartWidth}
+        y2={safeY}
+        stroke="rgba(255,255,255,0.5)"
+        strokeWidth="1"
+      />
+      <circle cx={safeX} cy={safeY} r="4" fill="white" />
+    </g>
+  );
+};
 
 export const LineChart: React.FC<{
   pair: string;
@@ -224,20 +235,24 @@ export const LineChart: React.FC<{
       if (isDragging) {
         const zoomDirection = event.deltaY > 0 ? -1 : 1;
         const zoomFactor = Math.pow(1.1, zoomDirection);
+        const newScale = yAxisScale * zoomFactor;
 
-        setYAxisScale((prev) => {
-          const newScale = prev * zoomFactor;
-          return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newScale));
-        });
+        // Add extra validation before setting the scale
+        if (isFinite(newScale) && !isNaN(newScale)) {
+          setYAxisScale((prev) =>
+            Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newScale))
+          );
+        }
       } else {
         const delta = event.deltaX || event.deltaY;
-        setScrollLeft((prev) => Math.max(0, prev + delta));
+        const newScrollLeft = Math.max(0, scrollLeft + delta);
+        setScrollLeft(newScrollLeft);
       }
     };
 
     container.addEventListener('wheel', handleWheelEvent, { passive: false });
     return () => container.removeEventListener('wheel', handleWheelEvent);
-  }, [isDragging]);
+  }, [isDragging, yAxisScale, scrollLeft]);
 
   // Keep mouse handlers for dragging
   const handleMouseDown = (event: React.MouseEvent) => {
@@ -286,14 +301,22 @@ export const LineChart: React.FC<{
     return { minY, maxY, yScale };
   }, [visibleData, chartHeight]);
 
+  // Update the scaledData calculation
   const scaledData = useMemo(() => {
     const midPrice = (maxY + minY) / 2;
-    return visibleData.map((point, index) => ({
-      ...point,
-      scaledX: index * (chartWidth / (visibleData.length - 1)),
-      scaledY:
+    return visibleData.map((point, index) => {
+      const scaledX = ensureNumber(
+        index * (chartWidth / (visibleData.length - 1))
+      );
+      const scaledY = ensureNumber(
         chartHeight / 2 - ((point.price - midPrice) * yScale) / animatedScale
-    }));
+      );
+      return {
+        ...point,
+        scaledX,
+        scaledY
+      };
+    });
   }, [visibleData, chartWidth, chartHeight, minY, maxY, yScale, animatedScale]);
 
   const pathData = useMemo(() => {
@@ -452,7 +475,7 @@ const XAxis: React.FC<{
 
   return (
     <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
-      <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#333" />
+      <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#777" />
       {intervals.map((point) => {
         const xPosition =
           ((point.timestamp - data[0].timestamp) /
@@ -460,14 +483,14 @@ const XAxis: React.FC<{
           chartWidth;
         return (
           <g key={point.timestamp} transform={`translate(${xPosition}, 0)`}>
-            <line y2={6} stroke="#333" />
+            <line y2={6} stroke="#777" />
             <text y={20} textAnchor="middle" fill="#fff" fontSize="12">
               {formatTime(new Date(point.timestamp))}
             </text>
             <line
               y1={-chartHeight}
               y2={0}
-              stroke="#333"
+              stroke="#777"
               strokeOpacity="0.2"
               strokeDasharray="4 4"
             />
@@ -575,13 +598,13 @@ const YAxis: React.FC<{
           fill="transparent"
           cursor="ns-resize"
         />
-        <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#333" />
+        <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#777" />
         {Array.from({ length: steps + 1 }, (_, i) => {
           const value = visibleMax - i * stepSize;
           const y = (i / steps) * chartHeight;
           return (
             <g key={i} transform={`translate(0, ${y})`}>
-              <line x2={6} stroke="#333" />
+              <line x2={6} stroke="#777" />
               <text x={10} y={4} textAnchor="start" fill="#fff" fontSize="12">
                 {value.toFixed(3)}
               </text>
@@ -590,7 +613,7 @@ const YAxis: React.FC<{
                 y1={0}
                 x2={-chartWidth}
                 y2={0}
-                stroke="#333"
+                stroke="#777"
                 strokeOpacity="0.2"
                 strokeDasharray="4 4"
               />
@@ -599,10 +622,10 @@ const YAxis: React.FC<{
         })}
         {hoverInfo && (
           <g
-            transform={`translate(0, ${
+            transform={`translate(0, ${ensureNumber(
               chartHeight *
-              (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
-            })`}
+                (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
+            )})`}
           >
             <rect
               x={3}
