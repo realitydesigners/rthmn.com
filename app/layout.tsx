@@ -1,4 +1,5 @@
 import DynamicNavbar from '@/components/NavbarDynamic';
+import Footer from './_components/Footer';
 import { Toaster } from '@/components/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';
@@ -47,6 +48,7 @@ export default async function RootLayout({
         <SupabaseProvider initialUser={user}>
           <DynamicNavbar />
           {children}
+          {/* <Footer /> */}
           <Suspense>
             <Toaster />
           </Suspense>

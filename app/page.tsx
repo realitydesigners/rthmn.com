@@ -1,51 +1,14 @@
-'use client';
+import { client } from '@/sanity/lib/client';
+import { postsQuery } from '@/sanity/lib/queries';
+import ClientPage from './client';
+import { getProducts } from '@/utils/supabase/queries';
+import { createClient } from '@/utils/supabase/server';
 
-import { SectionHero } from '@/app/_components/SectionHero';
-import { SectionFeatures } from '@/app/_components/SectionFeatures';
-import { SectionPricing } from '@/app/_components/SectionPricing';
-import { RyverSection } from '@/app/_components/SectionRyver';
-import { getProducts, getSubscription } from '@/utils/supabase/queries';
-import { FAQSection } from '@/app/_components/SectionFAQ';
-import { ServiceSection } from '@/app/_components/SectionServices';
-import { useAuth } from '@/providers/SupabaseProvider';
-import { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
+export default async function Page() {
+  const posts = await client.fetch(postsQuery);
 
-export default function PricingPage() {
-  const { session } = useAuth();
-  const [products, setProducts] = useState<any[] | null>(null);
-  const [subscription, setSubscription] = useState<any | null>(null);
+  const supabase = await createClient();
+  const products = await getProducts(supabase);
 
-  useEffect(() => {
-    const supabase = createClient();
-    if (session) {
-      getProducts(supabase).then((result) => result && setProducts(result));
-      getSubscription(supabase).then(setSubscription);
-    }
-  }, [session]);
-
-  if (session === undefined) return <div>Loading...</div>;
-
-  return (
-    <div className="min-h-screen">
-      <SectionHero />
-      <SectionFeatures />
-      {/* 	<FAQSection />
-				<ServiceSection /> */}
-      {/* <SectionPricing
-        user={session.user}
-        products={products ?? []}
-        subscription={subscription}
-      /> */}
-      {/* <div className="h-screen"></div>
-			<RyverSection />
-			<div className="h-screen"></div> */}
-      {session && (
-        <div>
-          <p>Welcome, {session.user.email}</p>
-          {/* Add more user details as needed */}
-        </div>
-      )}
-    </div>
-  );
+  return <ClientPage posts={posts} products={products} />;
 }

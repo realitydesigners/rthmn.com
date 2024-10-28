@@ -1,424 +1,662 @@
-"use client";
-import React, { useCallback, useEffect, useRef, useState, useMemo } from "react";
-import styles from "./styles.module.css";
-import { Candle } from "@/types";
+'use client';
+import React, {
+  useRef,
+  useState,
+  useEffect,
+  useMemo,
+  useCallback
+} from 'react';
+import styles from './styles.module.css';
+import { Candle } from '@/types';
+import { formatTime } from '@/utils/dateUtils';
 
-const RthmnVision: React.FC<{
-	pair: string;
-	candles: Candle[];
-	width: number;
-	height: number;
-}> = ({ pair, candles, width, height }) => {
-	const [closingPrices, setClosingPrices] = useState<number[]>([]);
-	const [timeData, setTimeData] = useState<number[]>([]);
+// Add these constants at the top with other constants
+const VISIBLE_POINTS = 1000;
+const MIN_ZOOM = 0.1; // Most zoomed out
+const MAX_ZOOM = 5; // Most zoomed in
 
-	const svgRef = useRef<SVGSVGElement>(null);
-	const point = 0.00001; 
-	const visibleDataPoints = 200; 
-	const visibleClosingPrices = closingPrices.slice(-visibleDataPoints);
-	const minY = Math.min(...visibleClosingPrices) - point * 50;
-	const maxY = Math.max(...visibleClosingPrices) + point * 50;
-	const chartPadding = { top: 20, right: 100, bottom: 40, left: 60 };
-	const chartWidth = width - chartPadding.left - chartPadding.right;
-	const chartHeight = height - chartPadding.top - chartPadding.bottom;
+interface ChartDataPoint {
+  price: number;
+  timestamp: number;
+  scaledX: number;
+  scaledY: number;
+}
 
-	const PairName: React.FC<{ pair: string }> = ({ pair }) => {
-		const pairName = pair.substring(0, 7).replace(/_/g, "");
-		return <div className="text-gray-200 absolute top-4 left-4 text-2xl font-bold uppercase">{pairName}</div>;
-	};
-	
-	useEffect(() => {
-		if (candles.length === 0) {
-			console.error("Invalid candles data:", candles);
-			return;
-		}
+class OptimizedPriceBuffer {
+  private buffer: ChartDataPoint[];
+  private start = 0;
+  private size = 0;
 
-		const newClosingPrices = candles.map((candle) => candle.close);
-		const newTimeData = candles.map((candle) => new Date(candle.time).getTime());
+  constructor(private capacity: number) {
+    this.buffer = new Array(capacity);
+  }
 
-		setClosingPrices(newClosingPrices);
-		setTimeData(newTimeData);
-	}, [candles]);
+  push(point: ChartDataPoint): void {
+    if (this.size < this.capacity) {
+      this.buffer[(this.start + this.size) % this.capacity] = point;
+      this.size++;
+    } else {
+      this.buffer[this.start] = point;
+      this.start = (this.start + 1) % this.capacity;
+    }
+  }
 
-	const memoizedChartLine = useMemo(() => (
-		<ChartLine
-			closingPrices={closingPrices}
-			timeData={timeData}
-			minY={minY}
-			maxY={maxY}
-			width={chartWidth}
-			height={chartHeight}
-			pair={pair}
-			candles={candles}
-			visibleDataPoints={visibleDataPoints} 
-		/>
-	), [closingPrices, timeData, minY, maxY, chartWidth, chartHeight, pair, candles, visibleDataPoints]);
+  getVisiblePoints(startIndex: number, endIndex: number): ChartDataPoint[] {
+    const result: ChartDataPoint[] = [];
+    const actualStart = Math.max(0, this.size - this.capacity + startIndex);
+    const actualEnd = Math.min(this.size, actualStart + endIndex - startIndex);
 
-	if (closingPrices.length === 0) {
-		return <div>Loading...</div>;
-	}
+    for (let i = actualStart; i < actualEnd; i++) {
+      result.push(this.buffer[(this.start + i) % this.capacity]);
+    }
 
-	return (
-		<div className="h-full bg-black overflow-hidden border border-[#181818] relative w-full">
-			<PairName pair={pair} />
-			<svg
-				ref={svgRef}
-				width={width}
-				height={height}
-				viewBox={`0 0 ${width} ${height}`}
-			>
-				<g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
-					{memoizedChartLine}
-					<XAxis 
-						timeData={timeData} 
-						chartWidth={chartWidth} 
-						chartHeight={chartHeight} 
-					/>
-					<g transform={`translate(${chartWidth}, 0)`}>
-						<YAxis 
-							minY={minY} 
-							maxY={maxY} 
-							point={point} 
-							chartHeight={chartHeight} 
-						/>
-					</g>
-				</g>
-			</svg>
-		</div>
-	);
+    return result;
+  }
+
+  clear(): void {
+    this.start = 0;
+    this.size = 0;
+  }
+}
+
+const PathGenerator = {
+  batchSize: 1000,
+  generate(points: ChartDataPoint[], width: number, height: number) {
+    return this.getPathString(points, width, height);
+  },
+  getPathString(points: ChartDataPoint[], width: number, height: number) {
+    let path = '';
+    for (let i = 0; i < points.length; i += this.batchSize) {
+      const batch = points.slice(i, i + this.batchSize);
+      path += batch
+        .map(
+          (p, index) =>
+            `${index === 0 && i === 0 ? 'M' : 'L'} ${p.scaledX} ${p.scaledY}`
+        )
+        .join(' ');
+    }
+    return path;
+  }
 };
 
-export default RthmnVision;
+// Add this memoized function at the top level
+const processCandles = (candles: Candle[], buffer: OptimizedPriceBuffer) => {
+  buffer.clear();
+  candles.forEach((candle) => {
+    buffer.push({
+      price: candle.close,
+      timestamp: new Date(candle.time).getTime(),
+      scaledX: 0,
+      scaledY: 0
+    });
+  });
+};
+
+// Add HoverInfo component definition at the top with other components
+interface HoverInfoProps {
+  x: number;
+  y: number;
+  chartHeight: number;
+  chartWidth: number;
+}
+
+const ensureNumber = (value: number) => {
+  return isNaN(value) || !isFinite(value) ? 0 : value;
+};
+
+const HoverInfo: React.FC<HoverInfoProps> = ({
+  x,
+  y,
+  chartHeight,
+  chartWidth
+}) => {
+  const safeX = ensureNumber(x);
+  const safeY = ensureNumber(y);
+
+  if (isNaN(safeX) || isNaN(safeY)) return null;
+
+  return (
+    <g>
+      <line
+        x1={safeX}
+        y1={0}
+        x2={safeX}
+        y2={chartHeight}
+        stroke="rgba(255,255,255,0.5)"
+        strokeWidth="1"
+      />
+      <line
+        x1={0}
+        y1={safeY}
+        x2={chartWidth}
+        y2={safeY}
+        stroke="rgba(255,255,255,0.5)"
+        strokeWidth="1"
+      />
+      <circle cx={safeX} cy={safeY} r="4" fill="white" />
+    </g>
+  );
+};
+
+export const LineChart: React.FC<{
+  pair: string;
+  candles: Candle[];
+}> = ({ pair, candles }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [yAxisScale, setYAxisScale] = useState(1);
+  const [scrollLeft, setScrollLeft] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const [scrollStart, setScrollStart] = useState(0);
+  const [dragStartY, setDragStartY] = useState(0); // Add this for Y-axis drag
+
+  // Fix the buffer initialization
+  const priceBufferRef = useRef(new OptimizedPriceBuffer(1000));
+
+  // Then in useEffect, initialize the buffer
+  useEffect(() => {
+    processCandles(candles, priceBufferRef.current);
+  }, [candles]);
+
+  // Optimize the animation scale hook
+  const useAnimatedScale = (scale: number) => {
+    const [currentScale, setCurrentScale] = useState(scale);
+    const prevScaleRef = useRef(scale);
+    const animationFrame = useRef<number | null>(null);
+
+    useEffect(() => {
+      if (prevScaleRef.current === scale) return;
+      prevScaleRef.current = scale;
+
+      const animate = () => {
+        setCurrentScale((prev) => {
+          const delta = (scale - prev) * 0.3; // Faster animation
+          if (Math.abs(delta) < 0.001) return scale;
+          return prev + delta;
+        });
+        animationFrame.current = requestAnimationFrame(animate);
+      };
+
+      animationFrame.current = requestAnimationFrame(animate);
+      return () => {
+        if (animationFrame.current !== null) {
+          cancelAnimationFrame(animationFrame.current);
+        }
+      };
+    }, [scale]);
+
+    return currentScale;
+  };
+
+  const animatedScale = useAnimatedScale(yAxisScale);
+
+  const chartPadding = { top: 20, right: 60, bottom: 30, left: 10 };
+  const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
+  const chartHeight =
+    dimensions.height - chartPadding.top - chartPadding.bottom;
+
+  const [hoverInfo, setHoverInfo] = useState<{
+    x: number;
+    y: number;
+    price: number;
+    time: string;
+  } | null>(null);
+
+  // Keep dimension update effect
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
+
+  // Optimize wheel event handler
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let lastWheelTime = 0;
+    const THROTTLE_MS = 16; // ~60fps
+
+    const handleWheelEvent = (event: WheelEvent) => {
+      event.preventDefault();
+
+      const now = Date.now();
+      if (now - lastWheelTime < THROTTLE_MS) return;
+      lastWheelTime = now;
+
+      if (isDragging) {
+        const zoomDirection = event.deltaY > 0 ? -1 : 1;
+        const zoomFactor = Math.pow(1.1, zoomDirection);
+        const newScale = yAxisScale * zoomFactor;
+
+        // Add extra validation before setting the scale
+        if (isFinite(newScale) && !isNaN(newScale)) {
+          setYAxisScale((prev) =>
+            Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newScale))
+          );
+        }
+      } else {
+        const delta = event.deltaX || event.deltaY;
+        const newScrollLeft = Math.max(0, scrollLeft + delta);
+        setScrollLeft(newScrollLeft);
+      }
+    };
+
+    container.addEventListener('wheel', handleWheelEvent, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheelEvent);
+  }, [isDragging, yAxisScale, scrollLeft]);
+
+  // Keep mouse handlers for dragging
+  const handleMouseDown = (event: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart(event.clientX);
+    setScrollStart(scrollLeft);
+
+    // Add cursor style to indicate dragging state
+    if (containerRef.current) {
+      containerRef.current.style.cursor = 'grabbing';
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    if (containerRef.current) {
+      containerRef.current.style.cursor = 'grab';
+    }
+  };
+
+  const handleContainerMouseMove = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (isDragging) {
+      // Handle horizontal movement
+      const deltaX = event.clientX - dragStart;
+      const newScrollLeft = Math.max(0, scrollStart - deltaX);
+      setScrollLeft(newScrollLeft);
+    }
+  };
+
+  // Optimize visible data calculation
+  const visibleData = useMemo(() => {
+    if (chartWidth === 0) return [];
+    const pixelsPerPoint = chartWidth / VISIBLE_POINTS;
+    const startIndex = Math.floor(scrollLeft / pixelsPerPoint);
+    const endIndex = Math.ceil((scrollLeft + chartWidth) / pixelsPerPoint);
+    return priceBufferRef.current.getVisiblePoints(startIndex, endIndex);
+  }, [scrollLeft, chartWidth]);
+
+  const { minY, maxY, yScale } = useMemo(() => {
+    const prices = visibleData.map((d) => d.price);
+    const minY = Math.min(...prices);
+    const maxY = Math.max(...prices);
+    const yScale = chartHeight / (maxY - minY);
+    return { minY, maxY, yScale };
+  }, [visibleData, chartHeight]);
+
+  // Update the scaledData calculation
+  const scaledData = useMemo(() => {
+    const midPrice = (maxY + minY) / 2;
+    return visibleData.map((point, index) => {
+      const scaledX = ensureNumber(
+        index * (chartWidth / (visibleData.length - 1))
+      );
+      const scaledY = ensureNumber(
+        chartHeight / 2 - ((point.price - midPrice) * yScale) / animatedScale
+      );
+      return {
+        ...point,
+        scaledX,
+        scaledY
+      };
+    });
+  }, [visibleData, chartWidth, chartHeight, minY, maxY, yScale, animatedScale]);
+
+  const pathData = useMemo(() => {
+    return PathGenerator.generate(scaledData, chartWidth, chartHeight);
+  }, [scaledData, chartWidth, chartHeight]);
+
+  const handleYAxisDrag = useCallback((deltaY: number) => {
+    setYAxisScale((prev) =>
+      Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev * (1 - deltaY * 0.05)))
+    );
+  }, []);
+
+  const handleYAxisScale = useCallback((scaleFactor: number) => {
+    setYAxisScale((prev) =>
+      Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev * scaleFactor))
+    );
+  }, []);
+
+  const handleSvgMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    const svgRect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - svgRect.left - chartPadding.left;
+
+    if (x >= 0 && x <= chartWidth) {
+      const xRatio = x / chartWidth;
+      const index = Math.floor(xRatio * (scaledData.length - 1));
+      if (index >= 0 && index < scaledData.length) {
+        const point = scaledData[index];
+        setHoverInfo({
+          x: point.scaledX,
+          y: point.scaledY,
+          price: point.price,
+          time: formatTime(new Date(point.timestamp))
+        });
+      }
+    } else {
+      setHoverInfo(null);
+    }
+  };
+
+  const handleMouseLeave = useCallback(() => {
+    setHoverInfo(null);
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${styles.chartContainer}`}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleContainerMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
+    >
+      <PairName pair={pair} />
+      <svg
+        width="100%"
+        height="100%"
+        viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
+        preserveAspectRatio="none"
+        onMouseMove={handleSvgMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+      >
+        <g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
+          <ChartLine
+            pathData={pathData}
+            width={chartWidth}
+            height={chartHeight}
+            yAxisScale={animatedScale}
+          />
+          <XAxis
+            data={scaledData}
+            chartWidth={chartWidth}
+            chartHeight={chartHeight}
+            hoverInfo={hoverInfo}
+            formatTime={formatTime}
+          />
+          <YAxis
+            minY={minY}
+            maxY={maxY}
+            chartHeight={chartHeight}
+            chartWidth={chartWidth}
+            onDrag={handleYAxisDrag}
+            onScale={handleYAxisScale}
+            yAxisScale={animatedScale}
+            hoverInfo={hoverInfo}
+          />
+          {hoverInfo && (
+            <HoverInfo
+              x={hoverInfo.x}
+              y={hoverInfo.y}
+              chartHeight={chartHeight}
+              chartWidth={chartWidth}
+            />
+          )}
+        </g>
+      </svg>
+    </div>
+  );
+};
 
 const ChartLine: React.FC<{
-	closingPrices: number[];
-	timeData: number[];
-	minY: number;
-	maxY: number;
-	width: number;
-	height: number;
-	pair: string;
-	candles: { time: string }[];
-	visibleDataPoints: number;
-}> = React.memo(({
-	closingPrices,
-	timeData,
-	minY,
-	maxY,
-	width,
-	height,
-	pair,
-	candles,
-	visibleDataPoints,
-}) => {
-	const svgRef = useRef<SVGSVGElement>(null);
-	const [hoverPrice, setHoverPrice] = useState<number | null>(null);
-	const [isHoveringLine, setIsHoveringLine] = useState(false);
-	const [hoverPosition, setHoverPosition] = useState<{
-		x: number;
-		y: number;
-	} | null>(null);
-	const [hoverTime, setHoverTime] = useState<string | null>(null);
+  pathData: string;
+  width: number;
+  height: number;
+  yAxisScale: number;
+}> = React.memo(({ pathData, width, height }) => {
+  const pathRef = useRef<SVGPathElement>(null);
 
-	const rightMargin = 200;
+  useEffect(() => {
+    if (pathRef.current) {
+      pathRef.current.setAttribute('d', pathData);
+    }
+  }, [pathData]);
 
-	const calculatePathData = useCallback(() => {
-		if (closingPrices.length === 0) return '';
-		
-		const dataToShow = closingPrices.slice(-visibleDataPoints);
-		const xScale = (width - rightMargin) / (dataToShow.length - 1);
-		const yScale = height / (maxY - minY);
-		
-		return dataToShow
-			.map((price, index) => {
-				const x = index * xScale;
-				const y = height - (price - minY) * yScale;
-				return `${index === 0 ? 'M' : 'L'} ${x.toFixed(2)} ${y.toFixed(2)}`;
-			})
-			.join(' ');
-	}, [closingPrices, minY, maxY, width, height, visibleDataPoints, rightMargin]);
-
-	const calculateCurrentPricePosition = useCallback(() => {
-		if (closingPrices.length === 0) return { x: 0, y: 0 };
-		const currentPrice = closingPrices[closingPrices.length - 1];
-		const x = width - rightMargin;
-		const y = height - ((currentPrice - minY) / (maxY - minY)) * height;
-		return { x, y };
-	}, [closingPrices, minY, maxY, width, height, rightMargin]);
-
-	const handleMouseMove = (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-		const { left, width, top, height } = svgRef.current?.getBoundingClientRect() || {
-			left: 0,
-			width: 1,
-			top: 0,
-			height: 1,
-		};
-		const x = event.clientX - left;
-		const y = event.clientY - top;
-		const xRatio = x / width;
-		const yRatio = 1 - y / height;
-
-		const priceIndex = Math.round(xRatio * (closingPrices.length - 1));
-		const hoverYPrice = minY + yRatio * (maxY - minY);
-
-		if (priceIndex >= 0 && priceIndex < closingPrices.length) {
-			const price = closingPrices[priceIndex];
-			setHoverPrice(price);
-
-			const tolerance = (maxY - minY) / 20;
-			if (Math.abs(price - hoverYPrice) < tolerance) {
-				setIsHoveringLine(true);
-				setHoverPosition({ x, y });
-				const hoverTime = new Date(candles[priceIndex].time).toLocaleTimeString([], {
-					hour: "2-digit",
-					minute: "2-digit",
-				});
-				setHoverTime(hoverTime);
-			} else {
-				setIsHoveringLine(false);
-				setHoverPosition(null);
-				setHoverTime(null);
-			}
-		} else {
-			setHoverPrice(null);
-			setIsHoveringLine(false);
-			setHoverPosition(null);
-			setHoverTime(null);
-		}
-	};
-
-	const handleMouseLeave = () => {
-		setHoverPrice(null);
-		setIsHoveringLine(false);
-		setHoverPosition(null);
-		setHoverTime(null);
-	};
-
-	return (
-		<ChartContainer
-			svgRef={svgRef}
-			chartWidth={width}
-			chartHeight={height}
-			handleMouseMove={handleMouseMove}
-			handleMouseLeave={handleMouseLeave}
-		>
-			<ChartPath
-				isHoveringLine={isHoveringLine}
-				pathData={calculatePathData()}
-				currentPricePosition={calculateCurrentPricePosition()}
-				hoverPosition={hoverPosition}
-				hoverPrice={hoverPrice}
-				hoverTime={hoverTime}
-				chartHeight={height}
-				chartWidth={width}
-			/>
-		</ChartContainer>
-	);
+  return (
+    <path
+      ref={pathRef}
+      stroke="white"
+      strokeWidth="1.5"
+      fill="none"
+      className={styles.chartLine}
+    />
+  );
 });
 
-const ChartContainer: React.FC<{
-	svgRef: React.RefObject<SVGSVGElement>;
-	chartWidth: number;
-	chartHeight: number;
-	handleMouseMove: (event: React.MouseEvent<SVGSVGElement, MouseEvent>) => void;
-	handleMouseLeave: () => void;
-	children: React.ReactNode;
-}> = ({
-	svgRef,
-	chartWidth,
-	chartHeight,
-	handleMouseMove,
-	handleMouseLeave,
-	children,
-}) => {
-	return (
-		<svg
-			ref={svgRef}
-			className="w-full h-full bg-gray-800"
-			viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-			preserveAspectRatio="none"
-			onMouseMove={handleMouseMove}
-			onMouseLeave={handleMouseLeave}
-		>
-			<title>Rthmn Vision</title>
-			{children}
-		</svg>
-	);
-};
+const XAxis: React.FC<{
+  data: ChartDataPoint[];
+  chartWidth: number;
+  chartHeight: number;
+  hoverInfo: { time: string; x: number } | null;
+  formatTime: (date: Date) => string; // Update this type
+}> = React.memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
+  const intervals = useMemo(() => {
+    if (data.length === 0) return [];
 
-export const XAxis: React.FC<{
-	timeData: number[];
-	chartWidth: number;
-	chartHeight: number;
-}> = ({ timeData, chartWidth, chartHeight }) => {
-	const tickCount = 5;
-	const ticks = timeData.filter((_, i) => i % Math.floor(timeData.length / tickCount) === 0);
+    const intervalMs = 10 * 60 * 1000; // 10 minutes
+    const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
+    const endTime = data[data.length - 1].timestamp;
+    const result = [];
 
-	return (
-		<g className="x-axi" transform={`translate(0, ${chartHeight})`}>
-			<line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#333" />
-			{ticks.map((time, i) => (
-				<g key={time} transform={`translate(${(i / (tickCount - 1)) * chartWidth}, 0)`}>
-					<line y2={6} stroke="#333" />
-					<text
-						y={20}
-						textAnchor="middle"
-						fill="#fff"
-						fontSize="12"
-					>
-						{new Date(time).toLocaleTimeString([], {
-							hour: "2-digit",
-							minute: "2-digit",
-						})}
-					</text>
-				</g>
-			))}
-		</g>
-	);
-};
+    for (let time = startTime; time <= endTime; time += intervalMs) {
+      const closestPoint = data.reduce((prev, curr) =>
+        Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time)
+          ? curr
+          : prev
+      );
+      result.push(closestPoint);
+    }
 
-export const YAxis: React.FC<{
-	minY: number;
-	maxY: number;
-	point: number;
-	chartHeight: number;
-}> = ({ minY, maxY, point, chartHeight }) => {
-	const steps = 5;
-	const range = maxY - minY;
-	const stepSize = range / steps;
+    return result;
+  }, [data]);
 
-	return (
-		<g className="y-axis">
-			<line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#333" />
-			{Array.from({ length: steps + 1 }, (_, i) => {
-				const value = maxY - i * stepSize;
-				return (
-					<g key={i} transform={`translate(0, ${(i / steps) * chartHeight})`}>
-						<line x2={6} stroke="#333" />
-						<text
-							x={10}
-							y={4}
-							textAnchor="start"
-							fill="#fff"
-							fontSize="12"
-						>
-							{value.toFixed(point < 0.01 ? 5 : 2)}
-						</text>
-					</g>
-				);
-			})}
-		</g>
-	);
-};
+  if (data.length === 0) {
+    return null;
+  }
 
-const ChartPathPriceOnHover: React.FC<{
-	hoverPosition: { x: number; y: number };
-	hoverPrice: number;
-	hoverTime: string;
-	chartHeight: number;
-}> = ({ hoverPosition, hoverPrice, hoverTime, chartHeight }) => {
-	return (
-		<>
-			<line x1={hoverPosition.x} y1={0} x2={hoverPosition.x} y2={chartHeight} className="stroke-[#555]" strokeWidth="1" />
-			<line
-				x1={hoverPosition.x}
-				y1={hoverPosition.y}
-				x2={hoverPosition.x}
-				y2={hoverPosition.y - 15}
-				className="stroke-[#222]"
-				strokeWidth="2"
-			/>
-			<foreignObject
-				x={hoverPosition.x - 40}
-				y={hoverPosition.y - 55}
-				width="80"
-				height="40"
-				className="transition-opacity duration-300"
-			>
-				<div className="bg-[#181818] border border-[#222] py-2 rounded-[.25rem] text-white text-sm font-bold shadow-lg flex justify-center items-center">
-					{hoverPrice.toFixed(5)}
-				</div>
-			</foreignObject>
-			<circle cx={hoverPosition.x} cy={hoverPosition.y} r="5" className="fill-white z-[1000]" />
-			<foreignObject x={hoverPosition.x - 30} y={chartHeight - 30} width="60" height="20" className="transition-opacity duration-300">
-				<div className="bg-[#181818] border border-[#222] py-1 rounded-[.25rem] text-white text-xs font-bold shadow-lg flex justify-center items-center">
-					{hoverTime}
-				</div>
-			</foreignObject>
-		</>
-	);
-};
+  return (
+    <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
+      <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#777" />
+      {intervals.map((point) => {
+        const xPosition =
+          ((point.timestamp - data[0].timestamp) /
+            (data[data.length - 1].timestamp - data[0].timestamp)) *
+          chartWidth;
+        return (
+          <g key={point.timestamp} transform={`translate(${xPosition}, 0)`}>
+            <line y2={6} stroke="#777" />
+            <text y={20} textAnchor="middle" fill="#fff" fontSize="12">
+              {formatTime(new Date(point.timestamp))}
+            </text>
+            <line
+              y1={-chartHeight}
+              y2={0}
+              stroke="#777"
+              strokeOpacity="0.2"
+              strokeDasharray="4 4"
+            />
+          </g>
+        );
+      })}
+      {hoverInfo && (
+        <g transform={`translate(${hoverInfo.x}, 0)`}>
+          <rect
+            x={-40}
+            y={5}
+            width={80}
+            height={Math.max(20, 0)} // Ensure positive height
+            fill="#d1d5db"
+            rx={4}
+          />
+          <text
+            x={0}
+            y={20}
+            textAnchor="middle"
+            fill="#000"
+            fontSize="12"
+            fontWeight="bold"
+          >
+            {hoverInfo.time}
+          </text>
+        </g>
+      )}
+    </g>
+  );
+});
 
-const ChartPath: React.FC<{
-	isHoveringLine: boolean;
-	pathData: string;
-	currentPricePosition: { x: number; y: number };
-	hoverPosition: { x: number; y: number } | null;
-	hoverPrice: number | null;
-	hoverTime: string | null;
-	chartHeight: number;
-	chartWidth: number;
-}> = ({
-	isHoveringLine,
-	pathData,
-	currentPricePosition,
-	hoverPosition,
-	hoverPrice,
-	hoverTime,
-	chartHeight,
-	chartWidth,
-}) => {
-	return (
-		<g>
-			<clipPath id="chart-area">
-				<rect x="0" y="0" width={chartWidth} height={chartHeight} />
-			</clipPath>
-			<g clipPath="url(#chart-area)">
-				<path
-					d={pathData}
-					fill="none"
-					stroke="white"
-					strokeWidth={isHoveringLine ? 2 : 1.5}
-					opacity={isHoveringLine ? 0.5 : 1}
-				/>
-				<line
-					x1={currentPricePosition.x}
-					y1={0}
-					x2={currentPricePosition.x}
-					y2={chartHeight}
-					stroke="white"
-					strokeWidth="1"
-					strokeDasharray="5,5"
-				/>
-				<circle
-					cx={currentPricePosition.x}
-					cy={currentPricePosition.y}
-					r="4"
-					fill="white"
-				/>
-				<circle cx={currentPricePosition.x} cy={currentPricePosition.y} r="5" className={styles.chartDot} />
-				<circle
-					cx={currentPricePosition.x}
-					cy={currentPricePosition.y}
-					r="5"
-					className={`${styles.chartDot} ${styles.pulsingCircle}`}
-				/>
-				<circle
-					cx={currentPricePosition.x}
-					cy={currentPricePosition.y}
-					r="5"
-					className={`${styles.chartDot} ${styles.pulsingCircle}`}
-				/>
+const YAxis: React.FC<{
+  minY: number;
+  maxY: number;
+  chartHeight: number;
+  chartWidth: number;
+  onDrag: (deltaY: number) => void;
+  onScale: (scaleFactor: number) => void;
+  yAxisScale: number;
+  hoverInfo: { price: number; y: number } | null;
+}> = React.memo(
+  ({
+    minY,
+    maxY,
+    chartHeight,
+    chartWidth,
+    onDrag,
+    onScale,
+    yAxisScale,
+    hoverInfo
+  }) => {
+    const handleMouseDown = useCallback(
+      (event: React.MouseEvent) => {
+        const startY = event.clientY;
+        const handleMouseMove = (e: MouseEvent) => {
+          const deltaY = (e.clientY - startY) / chartHeight;
+          onDrag(deltaY);
+        };
+        const handleMouseUp = () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mouseup', handleMouseUp);
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+      },
+      [onDrag, chartHeight]
+    );
 
-				{hoverPosition && hoverPrice !== null && hoverTime !== null && (
-					<ChartPathPriceOnHover
-						hoverPosition={hoverPosition}
-						hoverPrice={hoverPrice}
-						hoverTime={hoverTime}
-						chartHeight={chartHeight}
-					/>
-				)}
-			</g>
-		</g>
-	);
-};
+    const handleWheel = useCallback(
+      (event: React.WheelEvent) => {
+        event.preventDefault();
+        const scaleFactor = event.deltaY > 0 ? 1.1 : 0.9;
+        onScale(scaleFactor);
+      },
+      [onScale]
+    );
+
+    const visibleRange = maxY - minY;
+    const midPrice = (maxY + minY) / 2;
+    const scaledVisibleRange = visibleRange * yAxisScale;
+    const visibleMin = midPrice - scaledVisibleRange / 2;
+    const visibleMax = midPrice + scaledVisibleRange / 2;
+    const steps = Math.max(2, Math.round(10 * yAxisScale));
+    const stepSize = scaledVisibleRange / steps;
+
+    return (
+      <g
+        className="y-axis"
+        transform={`translate(${chartWidth}, 0)`}
+        onMouseDown={handleMouseDown}
+        onWheel={handleWheel}
+        style={{
+          userSelect: 'none',
+          WebkitUserSelect: 'none', // For Safari
+          MozUserSelect: 'none', // For Firefox
+          msUserSelect: 'none' // For IE/Edge
+        }}
+      >
+        <rect
+          x={0}
+          y={0}
+          width={60}
+          height={chartHeight}
+          fill="transparent"
+          cursor="ns-resize"
+        />
+        <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#777" />
+        {Array.from({ length: steps + 1 }, (_, i) => {
+          const value = visibleMax - i * stepSize;
+          const y = (i / steps) * chartHeight;
+          return (
+            <g key={i} transform={`translate(0, ${y})`}>
+              <line x2={6} stroke="#777" />
+              <text x={10} y={4} textAnchor="start" fill="#fff" fontSize="12">
+                {value.toFixed(3)}
+              </text>
+              <line
+                x1={0}
+                y1={0}
+                x2={-chartWidth}
+                y2={0}
+                stroke="#777"
+                strokeOpacity="0.2"
+                strokeDasharray="4 4"
+              />
+            </g>
+          );
+        })}
+        {hoverInfo && (
+          <g
+            transform={`translate(0, ${ensureNumber(
+              chartHeight *
+                (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
+            )})`}
+          >
+            <rect
+              x={3}
+              y={-10}
+              width={55}
+              height={Math.max(20, 0)} // Ensure positive height
+              fill="#d1d5db"
+              rx={4}
+            />
+            <text
+              x={30}
+              y={4}
+              textAnchor="middle"
+              fill="#000"
+              fontSize="12"
+              fontWeight="bold"
+            >
+              {hoverInfo.price.toFixed(3)}
+            </text>
+          </g>
+        )}
+      </g>
+    );
+  }
+);
+
+const PairName: React.FC<{ pair: string }> = React.memo(({ pair }) => {
+  const pairName = pair.substring(0, 7).replace(/_/g, '');
+  return (
+    <div className="absolute left-6 top-20 font-mono text-2xl font-bold uppercase text-gray-200">
+      {pairName}
+    </div>
+  );
+});

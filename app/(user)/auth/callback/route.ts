@@ -9,7 +9,7 @@ export async function GET(request: Request) {
   console.log('Callback route hit, code:', code);
 
   if (code) {
-    const supabase = createClient();
+    const supabase = await createClient();
     try {
       const { data, error } = await supabase.auth.exchangeCodeForSession(code);
       console.log('Session exchange result:', {

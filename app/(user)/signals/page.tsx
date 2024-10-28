@@ -2,65 +2,57 @@
 
 import type { Signal } from '@/types';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { useAuth } from '@/providers/SupabaseProvider';
+import { useRouter } from 'next/navigation';
 import { createClient } from '@/utils/supabase/client';
+import { getSubscription, getSignals } from '@/utils/supabase/queries';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignalsPage() {
-  const router = useRouter();
-  const { session } = useAuth();
   const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);
   const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+  const { user, isLoading: authLoading } = useAuth();
 
   useEffect(() => {
-    if (!session) {
-      router.push('/signin');
-    }
-  }, [session, router]);
+    async function fetchData() {
+      if (authLoading) return;
 
-  useEffect(() => {
-    const checkSubscriptionAndFetchSignals = async () => {
-      if (!session?.user) return;
-
-      const supabase = createClient();
-
-      const { data: subscriptionData, error: subscriptionError } =
-        await supabase
-          .from('subscriptions')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .eq('status', 'active')
-          .single();
-
-      if (subscriptionError) {
-        console.error('Error checking subscription:', subscriptionError);
-        setHasSubscription(false);
+      if (!user) {
+        router.push('/signin');
         return;
       }
 
-      setHasSubscription(!!subscriptionData);
+      try {
+        const subscription = await getSubscription(supabase);
+        setHasSubscription(!!subscription);
 
-      // Fetch signals data regardless of subscription status
-      const { data: signalsData, error: signalsError } = await supabase
-        .from('signals')
-        .select('*');
-
-      if (signalsError) {
-        console.error('Error fetching signals:', signalsError);
-      } else {
-        setSignalsData(signalsData);
+        if (subscription) {
+          const signals = await getSignals(supabase);
+          setSignalsData(signals);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
       }
-    };
+    }
 
-    checkSubscriptionAndFetchSignals();
-  }, [session]);
+    fetchData();
+  }, [user, authLoading, router, supabase]);
 
-  if (!session || hasSubscription === null) {
+  if (authLoading || isLoading) {
     return <div>Loading...</div>;
   }
 
+  if (!user) {
+    return null;
+  }
+
   function SubscriptionPrompt() {
+    console.log('Rendering SubscriptionPrompt');
     return (
       <div className="mt-10 text-center">
         <h2 className="mb-4 text-2xl font-bold">Subscription Required</h2>
