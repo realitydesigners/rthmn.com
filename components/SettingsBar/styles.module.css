@@ -1,0 +1,81 @@
+.sidebar {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  height: 100vh;
+  overflow: hidden;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  background-color: #333;
+}
+
+.open {
+  width: 300px;
+  transition: width 0.3s ease;
+}
+
+.collapsed {
+  width: 30px;
+  transition: width 0.3s ease;
+}
+
+.menuContent {
+  display: none;
+  padding: 1rem;
+}
+
+.visible {
+  display: block;
+}
+
+.toggleButton {
+  width: 100%;
+  padding: 0.5rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  text-align: left;
+}
+
+.toggleButton:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.rotate {
+  animation: spin 0.5s linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .collapsed {
+    width: 100%;
+    height: 30px;
+    top: auto;
+    bottom: 0;
+    transition: height 0.3s ease, bottom 0.3s ease;
+  }
+
+  .open {
+    width: 100%;
+    height: calc(100vh - 100px);
+    top: auto;
+    bottom: 0;
+    transition: height 0.3s ease, bottom 0.3s ease;
+  }
+
+  .toggleButton {
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+}

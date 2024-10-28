@@ -1,0 +1,27 @@
+/* app/(user)/dashboard/Dashboard.module.css */
+.dashboard {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  padding-top: 100px;
+  padding-left: 100px;
+  border: 1px solid black;
+  border-top: 1px solid white;
+  position: relative;
+}
+
+.contentContainer {
+  overflow-y: scroll;
+  flex: 1;
+  border: 1px solid black;
+  scrollbar-width: none;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .dashboard {
+    padding-top: 50px;
+    padding-left: 0px;
+  }
+}
+

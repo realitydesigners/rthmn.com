@@ -1,18 +1,19 @@
 import React from 'react';
+import { FaCog } from 'react-icons/fa';
 import styles from './styles.module.css';
 
-interface SidebarProps {
+interface SettingsBarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
+const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
   return (
     <div
       className={`${styles.sidebar} ${isOpen ? styles.open : styles.collapsed}`}
     >
       <button onClick={onToggle} className={styles.toggleButton}>
-        {isOpen ? 'Collapse' : 'Expand'}
+        <FaCog className={isOpen ? styles.rotate : ''} />
       </button>
       <div className={`${styles.menuContent} ${isOpen ? styles.visible : ''}`}>
         <p>Settings Item 1</p>
@@ -22,4 +23,4 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   );
 };
 
-export default Sidebar;
+export default SettingsBar;

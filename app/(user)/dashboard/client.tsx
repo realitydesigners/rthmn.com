@@ -1,40 +1,28 @@
 'use client';
 
 import React, { useState } from 'react';
-import Sidebar from '@/components/Sidebar';
+import SettingsBar from '@/components/SettingsBar';
 import BoxGrid from '@/components/BoxGrid';
+import styles from './Dashboard.module.css';
 
-// Separate layout component that handles the collapsible sidebar
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
 
   return (
-    <div
-      className="dashboard"
-      style={{
-        marginTop: '100px',
-        marginBottom: '100px',
-        height: '100vh',
-        display: 'grid',
-        gridTemplateColumns: `${isMenuOpen ? '200px' : '50px'} 1fr`
-      }}
-    >
-      <Sidebar
+    <div className={styles.dashboard}>
+      <SettingsBar
         isOpen={isMenuOpen}
         onToggle={() => setIsMenuOpen(!isMenuOpen)}
       />
-      {children}
+      <div className={styles.contentContainer}>{children}</div>
     </div>
   );
 };
 
-// Main content component that won't re-render when sidebar state changes
 const Dashboard: React.FC = () => {
   return (
     <DashboardLayout>
-      <div className="content-container" style={{ overflowY: 'auto' }}>
-        <h1>Main Content</h1>
-        <p>This is the main content area.</p>
+      <div className={styles.contentContainer}>
         <BoxGrid />
       </div>
     </DashboardLayout>
