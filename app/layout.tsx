@@ -48,7 +48,7 @@ export default async function RootLayout({
         <SupabaseProvider initialUser={user}>
           <DynamicNavbar />
           {children}
-          <Footer />
+          {/* <Footer /> */}
           <Suspense>
             <Toaster />
           </Suspense>

@@ -1,6 +1,6 @@
 "use client";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { oxanium } from "@/fonts";
 
 const Services = [

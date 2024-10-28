@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { FaTwitter, FaInstagram, FaGithub } from 'react-icons/fa';
 import { oxanium, russo, outfit, kodeMono } from '@/fonts';
 
+import type { JSX } from "react";
+
 const getIcon = (name: string): JSX.Element => {
   const icons: { [key: string]: JSX.Element } = {
     logo: (

@@ -2,12 +2,13 @@ import Client from './client';
 import { getLatestBoxSlices } from '@/utils/boxSlices';
 
 interface PageProps {
-  params: {
+  params: Promise<{
     pair: string;
-  };
+  }>;
 }
 
-export default async function PairPage({ params }: PageProps) {
+export default async function PairPage(props: PageProps) {
+  const params = await props.params;
   const { pair } = params;
 
   return (
