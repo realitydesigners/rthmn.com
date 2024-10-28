@@ -10,7 +10,10 @@ import styles from './styles.module.css';
 import { Candle } from '@/types';
 import { formatTime } from '@/utils/dateUtils';
 
-const VISIBLE_POINTS = 500;
+// Add these constants at the top with other constants
+const VISIBLE_POINTS = 1000;
+const MIN_ZOOM = 0.1; // Most zoomed out
+const MAX_ZOOM = 5; // Most zoomed in
 
 interface ChartDataPoint {
   price: number;
@@ -76,33 +79,20 @@ const PathGenerator = {
   }
 };
 
-const useAnimatedScale = (scale: number) => {
-  const [currentScale, setCurrentScale] = useState(scale);
-  const animationFrame = useRef<number | null>(null);
-
-  useEffect(() => {
-    const animate = () => {
-      const delta = scale - currentScale;
-      if (Math.abs(delta) < 0.01) {
-        setCurrentScale(scale);
-        return;
-      }
-
-      setCurrentScale((prev) => prev + delta);
-      animationFrame.current = requestAnimationFrame(animate);
-    };
-
-    animationFrame.current = requestAnimationFrame(animate);
-    return () => {
-      if (animationFrame.current !== null) {
-        cancelAnimationFrame(animationFrame.current);
-      }
-    };
-  }, [scale, currentScale]);
-
-  return currentScale;
+// Add this memoized function at the top level
+const processCandles = (candles: Candle[], buffer: OptimizedPriceBuffer) => {
+  buffer.clear();
+  candles.forEach((candle) => {
+    buffer.push({
+      price: candle.close,
+      timestamp: new Date(candle.time).getTime(),
+      scaledX: 0,
+      scaledY: 0
+    });
+  });
 };
 
+// Add HoverInfo component definition at the top with other components
 interface HoverInfoProps {
   x: number;
   y: number;
@@ -145,7 +135,49 @@ export const LineChart: React.FC<{
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [yAxisScale, setYAxisScale] = useState(1);
   const [scrollLeft, setScrollLeft] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState(0);
+  const [scrollStart, setScrollStart] = useState(0);
+  const [dragStartY, setDragStartY] = useState(0); // Add this for Y-axis drag
+
+  // Fix the buffer initialization
   const priceBufferRef = useRef(new OptimizedPriceBuffer(1000));
+
+  // Then in useEffect, initialize the buffer
+  useEffect(() => {
+    processCandles(candles, priceBufferRef.current);
+  }, [candles]);
+
+  // Optimize the animation scale hook
+  const useAnimatedScale = (scale: number) => {
+    const [currentScale, setCurrentScale] = useState(scale);
+    const prevScaleRef = useRef(scale);
+    const animationFrame = useRef<number | null>(null);
+
+    useEffect(() => {
+      if (prevScaleRef.current === scale) return;
+      prevScaleRef.current = scale;
+
+      const animate = () => {
+        setCurrentScale((prev) => {
+          const delta = (scale - prev) * 0.3; // Faster animation
+          if (Math.abs(delta) < 0.001) return scale;
+          return prev + delta;
+        });
+        animationFrame.current = requestAnimationFrame(animate);
+      };
+
+      animationFrame.current = requestAnimationFrame(animate);
+      return () => {
+        if (animationFrame.current !== null) {
+          cancelAnimationFrame(animationFrame.current);
+        }
+      };
+    }, [scale]);
+
+    return currentScale;
+  };
+
   const animatedScale = useAnimatedScale(yAxisScale);
 
   const chartPadding = { top: 20, right: 60, bottom: 30, left: 10 };
@@ -160,6 +192,7 @@ export const LineChart: React.FC<{
     time: string;
   } | null>(null);
 
+  // Keep dimension update effect
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
@@ -170,25 +203,75 @@ export const LineChart: React.FC<{
 
     updateDimensions();
     window.addEventListener('resize', updateDimensions);
-
-    return () => {
-      window.removeEventListener('resize', updateDimensions);
-    };
+    return () => window.removeEventListener('resize', updateDimensions);
   }, []);
 
+  // Optimize wheel event handler
   useEffect(() => {
-    priceBufferRef.current.clear();
-    candles.forEach((candle) => {
-      priceBufferRef.current.push({
-        price: candle.close,
-        timestamp: new Date(candle.time).getTime(),
-        scaledX: 0,
-        scaledY: 0
-      });
-    });
-  }, [candles]);
+    const container = containerRef.current;
+    if (!container) return;
 
+    let lastWheelTime = 0;
+    const THROTTLE_MS = 16; // ~60fps
+
+    const handleWheelEvent = (event: WheelEvent) => {
+      event.preventDefault();
+
+      const now = Date.now();
+      if (now - lastWheelTime < THROTTLE_MS) return;
+      lastWheelTime = now;
+
+      if (isDragging) {
+        const zoomDirection = event.deltaY > 0 ? -1 : 1;
+        const zoomFactor = Math.pow(1.1, zoomDirection);
+
+        setYAxisScale((prev) => {
+          const newScale = prev * zoomFactor;
+          return Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newScale));
+        });
+      } else {
+        const delta = event.deltaX || event.deltaY;
+        setScrollLeft((prev) => Math.max(0, prev + delta));
+      }
+    };
+
+    container.addEventListener('wheel', handleWheelEvent, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheelEvent);
+  }, [isDragging]);
+
+  // Keep mouse handlers for dragging
+  const handleMouseDown = (event: React.MouseEvent) => {
+    setIsDragging(true);
+    setDragStart(event.clientX);
+    setScrollStart(scrollLeft);
+
+    // Add cursor style to indicate dragging state
+    if (containerRef.current) {
+      containerRef.current.style.cursor = 'grabbing';
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    if (containerRef.current) {
+      containerRef.current.style.cursor = 'grab';
+    }
+  };
+
+  const handleContainerMouseMove = (
+    event: React.MouseEvent<HTMLDivElement>
+  ) => {
+    if (isDragging) {
+      // Handle horizontal movement
+      const deltaX = event.clientX - dragStart;
+      const newScrollLeft = Math.max(0, scrollStart - deltaX);
+      setScrollLeft(newScrollLeft);
+    }
+  };
+
+  // Optimize visible data calculation
   const visibleData = useMemo(() => {
+    if (chartWidth === 0) return [];
     const pixelsPerPoint = chartWidth / VISIBLE_POINTS;
     const startIndex = Math.floor(scrollLeft / pixelsPerPoint);
     const endIndex = Math.ceil((scrollLeft + chartWidth) / pixelsPerPoint);
@@ -219,38 +302,36 @@ export const LineChart: React.FC<{
 
   const handleYAxisDrag = useCallback((deltaY: number) => {
     setYAxisScale((prev) =>
-      // Increase the multiplier from 0.01 to 0.03 to make it more sensitive
-      Math.max(0.1, Math.min(10, prev * (1 - deltaY * 0.05)))
+      Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev * (1 - deltaY * 0.05)))
     );
   }, []);
 
   const handleYAxisScale = useCallback((scaleFactor: number) => {
-    setYAxisScale((prev) => Math.max(0.1, Math.min(10, prev * scaleFactor)));
+    setYAxisScale((prev) =>
+      Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev * scaleFactor))
+    );
   }, []);
 
-  const handleMouseMove = useCallback(
-    (event: React.MouseEvent<SVGSVGElement>) => {
-      const svgRect = event.currentTarget.getBoundingClientRect();
-      const x = event.clientX - svgRect.left - chartPadding.left;
+  const handleSvgMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
+    const svgRect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - svgRect.left - chartPadding.left;
 
-      if (x >= 0 && x <= chartWidth) {
-        const xRatio = x / chartWidth;
-        const index = Math.floor(xRatio * (scaledData.length - 1));
-        if (index >= 0 && index < scaledData.length) {
-          const point = scaledData[index];
-          setHoverInfo({
-            x: point.scaledX,
-            y: point.scaledY,
-            price: point.price,
-            time: formatTime(new Date(point.timestamp)) // This is now correct as formatTime expects a Date
-          });
-        }
-      } else {
-        setHoverInfo(null);
+    if (x >= 0 && x <= chartWidth) {
+      const xRatio = x / chartWidth;
+      const index = Math.floor(xRatio * (scaledData.length - 1));
+      if (index >= 0 && index < scaledData.length) {
+        const point = scaledData[index];
+        setHoverInfo({
+          x: point.scaledX,
+          y: point.scaledY,
+          price: point.price,
+          time: formatTime(new Date(point.timestamp))
+        });
       }
-    },
-    [scaledData, chartWidth, chartPadding.left]
-  );
+    } else {
+      setHoverInfo(null);
+    }
+  };
 
   const handleMouseLeave = useCallback(() => {
     setHoverInfo(null);
@@ -260,6 +341,10 @@ export const LineChart: React.FC<{
     <div
       ref={containerRef}
       className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${styles.chartContainer}`}
+      onMouseDown={handleMouseDown}
+      onMouseMove={handleContainerMouseMove}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={handleMouseUp}
     >
       <PairName pair={pair} />
       <svg
@@ -267,8 +352,9 @@ export const LineChart: React.FC<{
         height="100%"
         viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
         preserveAspectRatio="none"
-        onMouseMove={handleMouseMove}
+        onMouseMove={handleSvgMouseMove}
         onMouseLeave={handleMouseLeave}
+        style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
       >
         <g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
           <ChartLine
@@ -390,7 +476,14 @@ const XAxis: React.FC<{
       })}
       {hoverInfo && (
         <g transform={`translate(${hoverInfo.x}, 0)`}>
-          <rect x={-40} y={5} width={80} height={20} fill="#d1d5db" rx={4} />
+          <rect
+            x={-40}
+            y={5}
+            width={80}
+            height={Math.max(20, 0)} // Ensure positive height
+            fill="#d1d5db"
+            rx={4}
+          />
           <text
             x={0}
             y={20}
@@ -511,7 +604,14 @@ const YAxis: React.FC<{
               (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
             })`}
           >
-            <rect x={3} y={-10} width={55} height={20} fill="#d1d5db" rx={4} />
+            <rect
+              x={3}
+              y={-10}
+              width={55}
+              height={Math.max(20, 0)} // Ensure positive height
+              fill="#d1d5db"
+              rx={4}
+            />
             <text
               x={30}
               y={4}
