@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import {
   DarkTemplate,
   LightTemplate,
@@ -11,8 +12,8 @@ import {
   LayoutTheme,
   TemplateTheme
 } from '@/components/blocks/Blocks';
-import { PortableText, PortableTextComponents } from '@portabletext/react';
-import React from 'react';
+import { PortableText } from '@portabletext/react';
+import type { PortableTextComponents } from '@portabletext/react';
 
 const templateStyles: Record<TemplateTheme, string> = {
   dark: 'w-full bg-black',
@@ -21,23 +22,21 @@ const templateStyles: Record<TemplateTheme, string> = {
 };
 
 const templateComponents: Record<LayoutTheme, PortableTextComponents> = {
-  dark: DarkTemplate as PortableTextComponents,
-  light: LightTemplate as PortableTextComponents,
-  transparent: TransparentTemplate as PortableTextComponents,
-  team: TeamTemplate as PortableTextComponents,
-  video: VideoTemplate as PortableTextComponents
+  dark: DarkTemplate as unknown as PortableTextComponents,
+  light: LightTemplate as unknown as PortableTextComponents,
+  transparent: TransparentTemplate as unknown as PortableTextComponents,
+  team: TeamTemplate as unknown as PortableTextComponents,
+  video: VideoTemplate as unknown as PortableTextComponents
 };
 
 const ContentBlock: React.FC<ContentBlockProps> = ({ block }) => {
   const { content, layout } = block;
-  const theme = layout || 'light';
+  const theme = layout || 'dark';
   const styles = templateStyles[theme];
+
   return (
-    <div className={`h-auto min-h-screen ${styles} relative w-full`}>
-      <PortableText
-        value={content}
-        components={templateComponents[theme] || templateComponents.light}
-      />
+    <div className={`relative w-full ${styles}`}>
+      <PortableText value={content} components={templateComponents[theme]} />
     </div>
   );
 };

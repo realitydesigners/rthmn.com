@@ -7,6 +7,7 @@ import SplineRefBlock from '../nested/SplineRefBlock';
 import VideoRefBlock from '../nested/VideoRefBlock';
 import { outfit } from '@/fonts';
 import React from 'react';
+import { generateHeadingId } from '@/components/learn/TableOfContents';
 
 export type TemplateTheme = 'dark' | 'light' | 'transparent';
 
@@ -28,66 +29,91 @@ const normalTextStyles: Record<TemplateTheme, string> = {
   transparent: `${outfit.className} text-gray-400 leading-[1.5em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`
 };
 
-const Heading: React.FC<{
-  level: number;
+interface ChildProps {
+  props: {
+    children: string | string[];
+  };
+}
+
+const NormalText: React.FC<{
   children: React.ReactNode;
   theme: TemplateTheme;
-}> = React.memo(({ level, children, theme }) => {
-  const className = headingStyles[theme];
-  const id =
-    typeof children === 'string'
-      ? children.toLowerCase().replace(/\s+/g, '-')
-      : '';
+  value?: any;
+}> = React.memo(({ children, theme, value }) => {
+  const className = normalTextStyles[theme];
 
-  const renderHeading = () => {
-    switch (level) {
-      case 1:
-        return (
-          <h1 className={className} id={id}>
-            {children}
-          </h1>
-        );
-      case 2:
-        return (
-          <h2 className={className} id={id}>
-            {children}
-          </h2>
-        );
-      case 3:
-        return (
-          <h3 className={className} id={id}>
-            {children}
-          </h3>
-        );
-      case 4:
-        return (
-          <h4 className={className} id={id}>
-            {children}
-          </h4>
-        );
-      case 5:
-        return (
-          <h5 className={className} id={id}>
-            {children}
-          </h5>
-        );
-      case 6:
-        return (
-          <h6 className={className} id={id}>
-            {children}
-          </h6>
-        );
-      default:
-        return (
-          <h2 className={className} id={id}>
-            {children}
-          </h2>
-        );
-    }
-  };
+  if (value?.style?.match(/^h[1-6]$/)) {
+    const level = parseInt(value.style[1]);
+    const textContent = React.Children.toArray(children)
+      .map((child) => {
+        if (typeof child === 'string') return child;
+        if (typeof child === 'object' && 'props' in child) {
+          const props = child.props as { children?: string | string[] };
+          if (typeof props.children === 'string') return props.children;
+          if (Array.isArray(props.children)) return props.children.join('');
+        }
+        return '';
+      })
+      .join('')
+      .trim();
+
+    const id = generateHeadingId(textContent);
+    console.log('Templates - Generated ID:', id, 'for text:', textContent);
+
+    const renderHeading = () => {
+      const commonClasses = `${headingStyles[theme]} scroll-mt-24`;
+
+      switch (level) {
+        case 1:
+          return (
+            <h1 id={id} className={commonClasses}>
+              {children}
+            </h1>
+          );
+        case 2:
+          return (
+            <h2 id={id} className={commonClasses}>
+              {children}
+            </h2>
+          );
+        case 3:
+          return (
+            <h3 id={id} className={commonClasses}>
+              {children}
+            </h3>
+          );
+        case 4:
+          return (
+            <h4 id={id} className={commonClasses}>
+              {children}
+            </h4>
+          );
+        case 5:
+          return (
+            <h5 id={id} className={commonClasses}>
+              {children}
+            </h5>
+          );
+        case 6:
+          return (
+            <h6 id={id} className={commonClasses}>
+              {children}
+            </h6>
+          );
+        default:
+          return <p className={className}>{children}</p>;
+      }
+    };
+
+    return (
+      <div className="flex w-full justify-center p-3">{renderHeading()}</div>
+    );
+  }
 
   return (
-    <div className="flex w-full justify-center p-3">{renderHeading()}</div>
+    <div className="flex w-full justify-center p-3">
+      <div className={className}>{children}</div>
+    </div>
   );
 });
 
@@ -105,24 +131,89 @@ const List: React.FC<{
   );
 });
 
-const NormalText: React.FC<{
+interface HeadingComponentProps {
   children: React.ReactNode;
-  theme: TemplateTheme;
-}> = React.memo(({ children, theme }) => {
-  const className = normalTextStyles[theme];
-  return (
-    <div className="flex w-full justify-center p-3">
-      <div className={className}>{children}</div>
-    </div>
-  );
-});
+}
 
 const DarkTemplate = {
   block: {
-    normal: (props) => <NormalText {...props} theme="dark" />,
-    h1: (props) => <Heading level={1} {...props} theme="dark" />,
-    h2: (props) => <Heading level={2} {...props} theme="dark" />,
-    h3: (props) => <Heading level={3} {...props} theme="dark" />
+    normal: ({ children, value }: any) => (
+      <NormalText theme="dark" value={value}>
+        {children}
+      </NormalText>
+    ),
+    h1: ({ children }: HeadingComponentProps) => {
+      const text = React.Children.toArray(children)
+        .map((child) => (typeof child === 'string' ? child : ''))
+        .join('')
+        .trim();
+
+      const id = generateHeadingId(text);
+      return (
+        <div className="flex w-full justify-center p-3">
+          <h1
+            id={id}
+            className={`${headingStyles.dark} scroll-mt-32 text-4xl font-bold`}
+          >
+            {children}
+          </h1>
+        </div>
+      );
+    },
+    h2: ({ children }: HeadingComponentProps) => {
+      const text = React.Children.toArray(children)
+        .map((child) => (typeof child === 'string' ? child : ''))
+        .join('')
+        .trim();
+
+      const id = generateHeadingId(text);
+      return (
+        <div className="flex w-full justify-center p-3">
+          <h2
+            id={id}
+            className={`${headingStyles.dark} scroll-mt-32 text-3xl font-bold`}
+          >
+            {children}
+          </h2>
+        </div>
+      );
+    },
+    h3: ({ children }: HeadingComponentProps) => {
+      const text = React.Children.toArray(children)
+        .map((child) => (typeof child === 'string' ? child : ''))
+        .join('')
+        .trim();
+
+      const id = generateHeadingId(text);
+      return (
+        <div className="flex w-full justify-center p-3">
+          <h3
+            id={id}
+            className={`${headingStyles.dark} scroll-mt-32 text-2xl font-bold`}
+          >
+            {children}
+          </h3>
+        </div>
+      );
+    },
+    h4: ({ children }: HeadingComponentProps) => {
+      const text = React.Children.toArray(children)
+        .map((child) => (typeof child === 'string' ? child : ''))
+        .join('')
+        .trim();
+
+      const id = generateHeadingId(text);
+      return (
+        <div className="flex w-full justify-center p-3">
+          <h4
+            id={id}
+            className={`${headingStyles.dark} scroll-mt-32 text-xl font-bold`}
+          >
+            {children}
+          </h4>
+        </div>
+      );
+    }
   },
   list: {
     bullet: (props) => <List type="bullet" {...props} theme="dark" />,
@@ -193,9 +284,9 @@ const DarkTemplate = {
 const LightTemplate = {
   block: {
     normal: (props) => <NormalText {...props} theme="light" />,
-    h1: (props) => <Heading level={1} {...props} theme="light" />,
-    h2: (props) => <Heading level={2} {...props} theme="light" />,
-    h3: (props) => <Heading level={3} {...props} theme="light" />
+    h1: (props) => <NormalText {...props} theme="light" />,
+    h2: (props) => <NormalText {...props} theme="light" />,
+    h3: (props) => <NormalText {...props} theme="light" />
   },
   list: {
     bullet: (props) => <List type="bullet" {...props} theme="light" />,
@@ -260,9 +351,9 @@ const LightTemplate = {
 const TransparentTemplate = {
   block: {
     normal: (props) => <NormalText {...props} theme="transparent" />,
-    h1: (props) => <Heading level={1} {...props} theme="transparent" />,
-    h2: (props) => <Heading level={2} {...props} theme="transparent" />,
-    h3: (props) => <Heading level={3} {...props} theme="transparent" />
+    h1: (props) => <NormalText {...props} theme="transparent" />,
+    h2: (props) => <NormalText {...props} theme="transparent" />,
+    h3: (props) => <NormalText {...props} theme="transparent" />
   },
   list: {
     bullet: (props) => <List type="bullet" {...props} theme="transparent" />,
@@ -329,9 +420,9 @@ const TransparentTemplate = {
 const VideoTemplate = {
   block: {
     normal: (props) => <NormalText {...props} theme="light" />,
-    h1: (props) => <Heading level={1} {...props} theme="light" />,
-    h2: (props) => <Heading level={2} {...props} theme="light" />,
-    h3: (props) => <Heading level={3} {...props} theme="light" />
+    h1: (props) => <NormalText {...props} theme="light" />,
+    h2: (props) => <NormalText {...props} theme="light" />,
+    h3: (props) => <NormalText {...props} theme="light" />
   },
   list: {
     bullet: (props) => <List type="bullet" {...props} theme="light" />,
@@ -342,9 +433,9 @@ const VideoTemplate = {
 const TeamTemplate = {
   block: {
     normal: (props) => <NormalText {...props} theme="dark" />,
-    h1: (props) => <Heading level={1} {...props} theme="dark" />,
-    h2: (props) => <Heading level={2} {...props} theme="dark" />,
-    h3: (props) => <Heading level={3} {...props} theme="dark" />
+    h1: (props) => <NormalText {...props} theme="dark" />,
+    h2: (props) => <NormalText {...props} theme="dark" />,
+    h3: (props) => <NormalText {...props} theme="dark" />
   },
   list: {
     bullet: (props) => <List type="bullet" {...props} theme="dark" />,
