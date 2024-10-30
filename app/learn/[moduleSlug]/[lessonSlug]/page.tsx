@@ -23,7 +23,7 @@ export default async function LessonPage({ params }: PageProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 py-16">
+    <div className="container px-4 py-16">
       <div className="mb-8 space-y-2">
         <Link href="/learn" className="text-primary hover:underline">
           ← Back to Guides
@@ -36,18 +36,12 @@ export default async function LessonPage({ params }: PageProps) {
       </div>
 
       <div className="flex gap-8">
-        <article className="min-w-0 flex-1">
-          <h1 className="mb-4 text-4xl font-bold">{lesson.title}</h1>
-          {lesson.description && (
-            <p className="text-muted-foreground mb-8 text-xl">
-              {lesson.description}
-            </p>
-          )}
-
-          {lesson.content?.map((block, index) => (
-            <Blocks key={index} block={block as BlockProps} />
-          ))}
-
+        <article className="w-full">
+          <div className="w-full bg-red-400">
+            {lesson.content?.map((block, index) => (
+              <Blocks key={index} block={block as BlockProps} />
+            ))}
+          </div>
           {lesson.relatedLessons && lesson.relatedLessons.length > 0 && (
             <div className="mt-16">
               <h2 className="mb-4 text-2xl font-semibold">Related Lessons</h2>

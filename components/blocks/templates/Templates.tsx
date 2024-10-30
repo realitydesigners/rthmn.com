@@ -11,19 +11,19 @@ import React from 'react';
 export type TemplateTheme = 'dark' | 'light' | 'transparent';
 
 const headingStyles: Record<TemplateTheme, string> = {
-  dark: `${outfit.className} my-3  w-full  bg-gradient-to-r from-blue-100/90 to-blue-100/80 text-transparent bg-clip-text text-3xl font-bold uppercase leading-none tracking-wide md:w-3/4 lg:w-1/2 lg:text-5xl`,
-  light: `${outfit.className} my-3 w-11/12 text-black text-4xl font-bold uppercase leading-none tracking-wide md:w-3/4 lg:w-1/2 lg:text-5xl`,
-  transparent: `${outfit.className} my-3 w-11/12 text-gray-200 text-4xl font-bold uppercase leading-none tracking-wide md:w-3/4 lg:w-1/2 lg:text-5xl`
+  dark: `${outfit.className} my-3  w-full  text-white text-3xl font-bold  leading-none tracking-wide md:w-3/4 lg:w-1/2 lg:text-5xl`,
+  light: `${outfit.className} my-3 w-11/12 text-black text-4xl font-bold  leading-none tracking-wide md:w-3/4 lg:w-1/2 lg:text-5xl`,
+  transparent: `${outfit.className} my-3 w-11/12 text-gray-200 text-4xl font-bold  leading-none tracking-wide md:w-3/4 lg:w-1/2 lg:text-5xl`
 };
 
 const listStyles: Record<TemplateTheme, string> = {
-  dark: `${outfit.className} w-full bg-gradient-to-r from-blue-100/75 to-blue-100/60 text-transparent bg-clip-text leading-7 md:w-3/4 lg:w-1/2 text-xl list-decimal list-inside outfit-y-6 mb-6`,
+  dark: `${outfit.className} w-full text-white  leading-7 md:w-3/4 lg:w-1/2 text-xl list-decimal list-inside outfit-y-6 mb-6`,
   light: `${outfit.className} w-11/12 text-black leading-7 md:w-3/4 text-xl lg:w-1/2  list-decimal list-inside outfit-y-6 mb-6`,
   transparent: `${outfit.className} w-11/12 text-gray-400 leading-7 md:w-3/4 text-xl lg:w-1/2  list-decimal list-inside outfit-y-6 mb-6`
 };
 
 const normalTextStyles: Record<TemplateTheme, string> = {
-  dark: `${outfit.className} w-full  bg-gradient-to-r from-blue-100/80 to-blue-100/70 text-transparent bg-clip-text leading-[1.4em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`,
+  dark: `${outfit.className} w-full text-white   bg-clip-text leading-[1.4em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`,
   light: `${outfit.className} text-black leading-[1.5em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`,
   transparent: `${outfit.className} text-gray-400 leading-[1.5em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`
 };
