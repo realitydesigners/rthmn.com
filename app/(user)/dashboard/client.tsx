@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import SettingsBar from '@/components/SettingsBar';
 import BoxGrid from '@/components/BoxGrid';
+import PatternModal from '@/components/PatternModal';
 import styles from './Dashboard.module.css';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
@@ -24,6 +25,7 @@ const Dashboard: React.FC = () => {
     <DashboardLayout>
       <div className={styles.contentContainer}>
         <BoxGrid />
+        <PatternModal />
       </div>
     </DashboardLayout>
   );

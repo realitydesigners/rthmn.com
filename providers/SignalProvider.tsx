@@ -32,7 +32,9 @@ async function fetchSignalsServer() {
 
   const { data: signalsData, error: signalsError } = await supabase
     .from('signals')
-    .select('*');
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
 
   if (signalsError) {
     console.error('Error fetching signals:', signalsError);

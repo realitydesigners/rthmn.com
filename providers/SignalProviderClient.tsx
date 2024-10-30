@@ -4,6 +4,8 @@ import { Signal } from '@/types';
 
 type SignalContextType = {
   signalsData: Signal[] | null;
+  selectedSignal: Signal | null;
+  setSelectedSignal: (signal: Signal | null) => void;
 };
 
 const SignalContext = createContext<SignalContextType | undefined>(undefined);
@@ -20,9 +22,12 @@ export function SignalProviderClient({
   const [signalsData, setSignalsData] = useState<Signal[] | null>(
     initialSignalsData
   );
+  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
 
   return (
-    <SignalContext.Provider value={{ signalsData }}>
+    <SignalContext.Provider
+      value={{ signalsData, selectedSignal, setSelectedSignal }}
+    >
       {children}
     </SignalContext.Provider>
   );
