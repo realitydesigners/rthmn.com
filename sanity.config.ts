@@ -18,6 +18,7 @@ import {
   team,
   video
 } from '@/sanity/schemas';
+import { module, lesson } from '@/sanity/schemas';
 
 import CustomItem from '@/sanity/ui/CustomItem';
 import CustomField from './sanity/ui/CustomField';
@@ -42,7 +43,9 @@ export default defineConfig({
       headingBlock,
       headingSplineBlock,
       contentBlock,
-      teamBlock
+      teamBlock,
+      module,
+      lesson
     ]
   },
   form: {
