@@ -1,6 +1,7 @@
 import { getLesson, getModule } from '@/sanity/lib/queries';
-import { PortableText } from '@portabletext/react';
 import Link from 'next/link';
+import Blocks from '@/components/blocks/Blocks';
+import type { BlockProps } from '@/components/blocks/Blocks';
 
 export const revalidate = 60;
 
@@ -33,7 +34,7 @@ export default async function LessonPage({ params }: PageProps) {
         )}
       </div>
 
-      <article className="prose prose-invert max-w-none">
+      <article>
         <h1 className="mb-4 text-4xl font-bold">{lesson.title}</h1>
         {lesson.description && (
           <p className="text-muted-foreground mb-8 text-xl">
@@ -41,7 +42,9 @@ export default async function LessonPage({ params }: PageProps) {
           </p>
         )}
 
-        {lesson.content && <PortableText value={lesson.content} />}
+        {lesson.content?.map((block, index) => (
+          <Blocks key={index} block={block as BlockProps} />
+        ))}
 
         {lesson.relatedLessons && lesson.relatedLessons.length > 0 && (
           <div className="mt-16">
