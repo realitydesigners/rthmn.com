@@ -22,13 +22,6 @@ const themeClasses: Record<TemplateTheme, ThemeProps> = {
     topBackgroundColor: 'bg-blue-200/5 ',
     buttonTextColor: 'text-blue-100',
     buttonBackgroundColor: 'bg-blue-200/10 hover:bg-blue-200/20'
-  },
-  transparent: {
-    textColor: 'text-gray-200',
-    backgroundColor: 'bg-[#111]',
-    topBackgroundColor: 'bg-[#222]',
-    buttonTextColor: 'text-black',
-    buttonBackgroundColor: 'bg-gray-200 hover:bg-gray-200/80'
   }
 };
 

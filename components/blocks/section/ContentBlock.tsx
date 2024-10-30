@@ -3,8 +3,6 @@ import React from 'react';
 import {
   DarkTemplate,
   LightTemplate,
-  TeamTemplate,
-  TransparentTemplate,
   VideoTemplate
 } from '@/components/blocks/templates/Templates';
 import {
@@ -17,15 +15,12 @@ import type { PortableTextComponents } from '@portabletext/react';
 
 const templateStyles: Record<TemplateTheme, string> = {
   dark: 'w-full bg-black',
-  light: 'w-full bg-gray-200',
-  transparent: 'w-11/12 bg-transparent'
+  light: 'w-full bg-gray-200'
 };
 
 const templateComponents: Record<LayoutTheme, PortableTextComponents> = {
   dark: DarkTemplate as unknown as PortableTextComponents,
   light: LightTemplate as unknown as PortableTextComponents,
-  transparent: TransparentTemplate as unknown as PortableTextComponents,
-  team: TeamTemplate as unknown as PortableTextComponents,
   video: VideoTemplate as unknown as PortableTextComponents
 };
 
