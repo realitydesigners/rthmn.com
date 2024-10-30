@@ -29,7 +29,12 @@ export default defineType({
       name: 'content',
       title: 'Content',
       type: 'array',
-      of: [{ type: 'contentBlock' }, { type: 'headingBlock' }]
+      of: [
+        { type: 'headingBlock' },
+        { type: 'headingSplineBlock' },
+        { type: 'contentBlock' },
+        { type: 'teamBlock' }
+      ]
     }),
     defineField({
       name: 'relatedLessons',
