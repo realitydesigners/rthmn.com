@@ -118,13 +118,6 @@ export const SectionHero: React.FC = () => {
           </div>
         </div>
         <div className="mt-[10vw] flex flex-col items-center space-y-[4vw] lg:mt-[8vw] lg:flex-row lg:space-x-[4vw] lg:space-y-0">
-          <CustomMotionButton
-            className={`${russo.className} group mt-8 rounded-full bg-gradient-to-r from-[#5A97FF] to-[#61A3FF] px-6 py-3 text-lg font-semibold text-white shadow-xl transition-all duration-300 hover:shadow-lg`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {/* ... button content */}
-          </CustomMotionButton>
           <CustomMotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
