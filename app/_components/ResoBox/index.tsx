@@ -3,6 +3,7 @@ import type React from 'react';
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import type { Box, BoxSlice } from '@/types';
 import { useState, useEffect, useRef } from 'react';
+import { sequences } from './sequences';
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
@@ -10,91 +11,18 @@ interface BoxComponentProps {
 }
 
 const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
-  const [boxCount, setBoxCount] = useState(20);
+  const [boxCount, setBoxCount] = useState(8);
   const [demoStep, setDemoStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
-  const baseValues = [
-    2000, 1732, 1500, 1299, 1125, 974, 843, 730, 632, 548, 474, 411, 356, 308,
-    267, 231, 200, 173, 150, 130
-  ];
+  const baseValues = [2000, 1732, 1500, 1299, 1125, 974, 843, 730];
 
-  // Basic wave sequence
-  const sequences = [
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, -1],
-    [1, 1, 1, 1, 1, 1, -1, -1],
-    [1, 1, 1, 1, 1, -1, -1, -1],
-    [1, 1, 1, 1, -1, -1, -1, -1],
-    [1, 1, 1, 1, -1, -1, -1, 1],
-    [1, 1, 1, 1, -1, -1, 1, 1],
-    [1, 1, 1, 1, -1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, -1],
-    [1, 1, 1, 1, 1, 1, -1, -1],
-    [1, 1, 1, 1, 1, -1, -1, -1],
-    [1, 1, 1, 1, -1, -1, -1, -1],
-    [1, 1, 1, -1, -1, -1, -1, -1],
-    [1, 1, 1, -1, -1, -1, -1, 1],
-    [1, 1, 1, -1, -1, -1, 1, 1],
-    [1, 1, 1, -1, -1, 1, 1, 1],
-    [1, 1, 1, -1, 1, 1, 1, 1],
-    [1, 1, 1, -1, 1, 1, 1, -1],
-    [1, 1, 1, -1, 1, -1, -1, -1],
-    [1, 1, 1, -1, -1, -1, -1, -1],
-    [1, 1, -1, -1, -1, -1, -1, -1],
-    [1, -1, -1, -1, -1, -1, -1, -1],
-    [1, -1, -1, -1, -1, -1, -1, 1],
-    [1, -1, -1, -1, -1, -1, 1, 1],
-    [1, -1, -1, -1, -1, 1, 1, 1],
-    [1, -1, -1, -1, -1, 1, 1, -1],
-    [1, -1, -1, -1, -1, 1, -1, -1],
-    [1, -1, -1, -1, -1, 1, 1, 1],
-    [1, -1, -1, -1, 1, 1, 1, 1],
-    [1, -1, -1, 1, 1, 1, 1, 1],
-    [1, -1, 1, 1, 1, 1, 1, 1],
-    [1, 1, 1, 1, 1, 1, 1, 1]
-  ];
-
-  const generatePatterns = () => {
-    const size = 20;
-    const patterns: number[][] = [];
-    const createPattern = (arr: number[]) => patterns.push([...arr]);
-
-    // Start with all up
-    let current = Array(size).fill(1);
-    createPattern(current);
-
-    // Always start changes from the smallest (rightmost) box
-    for (let step = 0; step < size * 2; step++) {
-      // Copy previous pattern
-      let newPattern = [...patterns[patterns.length - 1]];
-
-      // Smallest box alternates every step
-      newPattern[size - 1] = step % 2 === 0 ? -1 : 1;
-
-      // Changes ripple through to larger boxes
-      for (let i = size - 2; i >= 0; i--) {
-        // A box can only change if the box to its right has changed
-        if (newPattern[i + 1] !== current[i + 1]) {
-          newPattern[i] = current[i] * -1;
-        }
-      }
-
-      // Update current state and create pattern
-      current = [...newPattern];
-      createPattern(current);
-    }
-
-    return patterns;
-  };
-
-  const patterns = generatePatterns();
-  const stepsPerPattern = 2;
-  const totalStepsRef = useRef(patterns.length * stepsPerPattern);
+  const patterns = sequences;
+  const totalStepsRef = useRef(patterns.length);
 
   const createDemoStep = (step: number) => {
-    const patternIndex = Math.floor(step / stepsPerPattern) % patterns.length;
+    const patternIndex = Math.floor(step / 1) % patterns.length;
     const pattern = patterns[patternIndex];
 
     return baseValues.slice(0, boxCount).map((value, index) => {
@@ -106,12 +34,28 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
   useEffect(() => {
     if (isPlaying) {
       const interval = setInterval(() => {
-        setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
-      }, 300);
+        const currentPatternIndex = Math.floor(demoStep / 1) % patterns.length;
+
+        // Check if we're at the point of change
+        if (currentPatternIndex === POINT_OF_CHANGE_INDEX && !isPaused) {
+          setIsPaused(true);
+
+          // Resume after 5 seconds
+          setTimeout(() => {
+            setIsPaused(false);
+          }, PAUSE_DURATION);
+
+          return;
+        }
+
+        if (!isPaused) {
+          setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
+        }
+      }, 200);
 
       return () => clearInterval(interval);
     }
-  }, [isPlaying]);
+  }, [isPlaying, isPaused, patterns.length]);
 
   const currentValues = createDemoStep(demoStep);
   const mockBoxData: Box[] = currentValues.map((value) => ({
@@ -127,10 +71,15 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
 
   const currentSlice = slice || mockSlice;
 
+  const POINT_OF_CHANGE_INDEX = 28; // Index of the special sequence
+  const PAUSE_DURATION = 5000; // 5 seconds in milliseconds
+
   const renderShiftedBoxes = (boxArray: Box[]) => {
     if (!boxArray || boxArray.length === 0) return null;
 
     const maxSize = Math.abs(boxArray[0].value);
+    const isPointOfChange =
+      Math.floor(demoStep / 1) % patterns.length === POINT_OF_CHANGE_INDEX;
 
     const renderBox = (
       box: Box,
@@ -138,6 +87,10 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
       prevColor: string | null = null
     ) => {
       const boxColor = box.value > 0 ? 'bg-[#555]' : 'bg-[#212121]';
+      const borderColor =
+        isPointOfChange && box.value > 0 ? 'border-green-500' : 'border-black';
+      const borderWidth =
+        isPointOfChange && box.value > 0 ? 'border-2' : 'border';
       const size = (Math.abs(box.value) / maxSize) * 250;
 
       let positionStyle: React.CSSProperties = { top: 0, right: 0 };
@@ -157,7 +110,7 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
       return (
         <div
           key={`box-${index}-${box.value}-${demoStep}`}
-          className={`absolute ${boxColor} border border-black`}
+          className={`absolute ${boxColor} ${borderColor} ${borderWidth} transition-colors duration-200`}
           style={{
             width: `${size}px`,
             height: `${size}px`,
@@ -200,19 +153,17 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
             >
               {isPlaying ? 'Stop' : 'Play Demo'}
             </button>
-            <button
-              onClick={() => setDemoStep(0)}
-              className="rounded bg-gray-600 px-4 py-1 text-white hover:bg-gray-700"
-            >
-              Reset
-            </button>
           </div>
         </div>
       </div>
 
       <div className="text-sm text-gray-400">
-        Pattern {Math.floor(demoStep / stepsPerPattern) + 1} of{' '}
-        {patterns.length}
+        Pattern {Math.floor(demoStep / 1) + 1} of {patterns.length}
+        {isPaused && (
+          <span className="ml-2 text-green-500">
+            (Paused at point of change)
+          </span>
+        )}
       </div>
 
       <div className="relative min-h-[250px] w-[250px] overflow-hidden border border-[#181818] bg-black">
