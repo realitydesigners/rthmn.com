@@ -10,57 +10,83 @@ interface BoxComponentProps {
 }
 
 const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
-  const [boxCount, setBoxCount] = useState(8);
+  const [boxCount, setBoxCount] = useState(20);
   const [demoStep, setDemoStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
 
   const baseValues = [
     2000, 1732, 1500, 1299, 1125, 974, 843, 730, 632, 548, 474, 411, 356, 308,
-    267, 231
+    267, 231, 200, 173, 150, 130
+  ];
+
+  // Basic wave sequence
+  const sequences = [
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, -1],
+    [1, 1, 1, 1, 1, 1, -1, -1],
+    [1, 1, 1, 1, 1, -1, -1, -1],
+    [1, 1, 1, 1, -1, -1, -1, -1],
+    [1, 1, 1, 1, -1, -1, -1, 1],
+    [1, 1, 1, 1, -1, -1, 1, 1],
+    [1, 1, 1, 1, -1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, -1],
+    [1, 1, 1, 1, 1, 1, -1, -1],
+    [1, 1, 1, 1, 1, -1, -1, -1],
+    [1, 1, 1, 1, -1, -1, -1, -1],
+    [1, 1, 1, -1, -1, -1, -1, -1],
+    [1, 1, 1, -1, -1, -1, -1, 1],
+    [1, 1, 1, -1, -1, -1, 1, 1],
+    [1, 1, 1, -1, -1, 1, 1, 1],
+    [1, 1, 1, -1, 1, 1, 1, 1],
+    [1, 1, 1, -1, 1, 1, 1, -1],
+    [1, 1, 1, -1, 1, -1, -1, -1],
+    [1, 1, 1, -1, -1, -1, -1, -1],
+    [1, 1, -1, -1, -1, -1, -1, -1],
+    [1, -1, -1, -1, -1, -1, -1, -1],
+    [1, -1, -1, -1, -1, -1, -1, 1],
+    [1, -1, -1, -1, -1, -1, 1, 1],
+    [1, -1, -1, -1, -1, 1, 1, 1],
+    [1, -1, -1, -1, -1, 1, 1, -1],
+    [1, -1, -1, -1, -1, 1, -1, -1],
+    [1, -1, -1, -1, -1, 1, 1, 1],
+    [1, -1, -1, -1, 1, 1, 1, 1],
+    [1, -1, -1, 1, 1, 1, 1, 1],
+    [1, -1, 1, 1, 1, 1, 1, 1],
+    [1, 1, 1, 1, 1, 1, 1, 1]
   ];
 
   const generatePatterns = () => {
+    const size = 20;
     const patterns: number[][] = [];
-    const size = 8;
+    const createPattern = (arr: number[]) => patterns.push([...arr]);
 
     // Start with all up
-    let currentPattern = Array(size).fill(1);
-    patterns.push([...currentPattern]);
+    let current = Array(size).fill(1);
+    createPattern(current);
 
-    // Basic wave sequence
-    const sequences = [
-      [1, 1, 1, 1, 1, 1, 1, 1],
-      [1, 1, 1, 1, 1, 1, 1, -1], // Last one down
-      [1, 1, 1, 1, 1, 1, -1, -1], // Last two down
-      [1, 1, 1, 1, 1, -1, -1, -1], // Last three down
-      [1, 1, 1, 1, -1, -1, -1, -1], // Last four down
-      [1, 1, 1, 1, -1, -1, -1, 1], // Last one up
-      [1, 1, 1, 1, -1, -1, 1, 1], // Last one up
-      [1, 1, 1, 1, -1, 1, 1, 1], // Last one up
-      [1, 1, 1, 1, 1, 1, 1, 1], // Last one up
-      [1, 1, 1, 1, 1, 1, 1, -1],
-      [1, 1, 1, 1, 1, 1, -1, -1], // Last one up
-      [1, 1, 1, 1, 1, -1, -1, -1],
-      [1, 1, 1, 1, -1, -1, -1, -1],
-      [1, 1, 1, -1, -1, -1, -1, -1],
-      [1, 1, 1, -1, -1, -1, -1, 1],
-      [1, 1, 1, -1, -1, -1, 1, 1],
-      [1, 1, 1, -1, -1, 1, 1, 1],
-      [1, 1, 1, -1, 1, 1, 1, 1],
-      [1, 1, 1, -1, 1, 1, 1, -1],
-      [1, 1, 1, -1, 1, -1, -1, -1],
-      [1, 1, 1, -1, -1, -1, -1, -1],
-      [1, 1, -1, -1, -1, -1, -1, -1],
-      [1, -1, -1, -1, -1, -1, -1, -1],
-      [1, -1, -1, -1, -1, -1, -1, 1],
-      [1, -1, -1, -1, -1, -1, 1, 1],
-      [1, -1, -1, -1, -1, 1, 1, 1],
-      [1, -1, -1, -1, -1, 1, 1, -1],
-      [1, -1, -1, -1, -1, 1, -1, -1],
-      [1, -1, -1, -1, -1, 1, 1, 1]
-    ];
+    // Always start changes from the smallest (rightmost) box
+    for (let step = 0; step < size * 2; step++) {
+      // Copy previous pattern
+      let newPattern = [...patterns[patterns.length - 1]];
 
-    return sequences;
+      // Smallest box alternates every step
+      newPattern[size - 1] = step % 2 === 0 ? -1 : 1;
+
+      // Changes ripple through to larger boxes
+      for (let i = size - 2; i >= 0; i--) {
+        // A box can only change if the box to its right has changed
+        if (newPattern[i + 1] !== current[i + 1]) {
+          newPattern[i] = current[i] * -1;
+        }
+      }
+
+      // Update current state and create pattern
+      current = [...newPattern];
+      createPattern(current);
+    }
+
+    return patterns;
   };
 
   const patterns = generatePatterns();
