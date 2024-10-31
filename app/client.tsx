@@ -8,6 +8,7 @@ import { FAQSection } from '@/app/_components/SectionFAQ';
 import { ServiceSection } from '@/app/_components/SectionServices';
 import { PostList } from '@/app/_components/PostList';
 import { useAuth } from '@/providers/SupabaseProvider';
+import ResoBox from '@/app/_components/ResoBox';
 
 interface ClientPageProps {
   posts: any[];
@@ -21,11 +22,12 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
     <div className="min-h-screen bg-black text-white">
       <SectionHero />
       <SectionFeatures />
+      <div className="flex justify-center py-12">
+        <ResoBox slice={null} isLoading={false} />
+      </div>
       <div className="container mx-auto px-4">
         <PostList initialPosts={posts} />
       </div>
-      {/* <FAQSection />
-      <ServiceSection /> */}
       {session && (
         <div>
           <p>Welcome, {session.user.email}</p>
@@ -35,8 +37,9 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
       <SectionPricing
         user={session?.user}
         products={products ?? []}
-        subscription={null} // Assuming subscription is not needed for now
+        subscription={null}
       />
+
       {/* <div className="h-screen"></div>
       <RyverSection />
       <div className="h-screen"></div> */}
