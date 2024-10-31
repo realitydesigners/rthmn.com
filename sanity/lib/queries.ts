@@ -365,3 +365,35 @@ export async function getLesson(lessonSlug: string) {
     { lessonSlug }
   );
 }
+
+export async function getChangeLog() {
+  return client.fetch(
+    groq`*[_type == "changelog"] | order(releaseDate desc) {
+      _id,
+      title,
+      description,
+      version,
+      releaseDate,
+      type,
+      content[] {
+        ...,
+        _type,
+        style,
+        children,
+        markDefs[] {
+          ...,
+        }
+      },
+      status,
+      contributors[]->{
+        _id,
+        name,
+        "image": {
+          "asset": {
+            "url": image.asset->url
+          }
+        }
+      }
+    }`
+  );
+}

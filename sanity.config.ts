@@ -16,9 +16,11 @@ import {
   img,
   posts,
   team,
-  video
+  video,
+  changelog,
+  module,
+  lesson
 } from '@/sanity/schemas';
-import { module, lesson } from '@/sanity/schemas';
 
 import CustomItem from '@/sanity/ui/CustomItem';
 import CustomField from './sanity/ui/CustomField';
@@ -45,7 +47,8 @@ export default defineConfig({
       contentBlock,
       teamBlock,
       module,
-      lesson
+      lesson,
+      changelog
     ]
   },
   form: {

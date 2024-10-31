@@ -7,3 +7,4 @@ export { default as audio } from '@/sanity/schemas/audio';
 export { default as glossary } from '@/sanity/schemas/glossary';
 export { default as module } from '@/sanity/schemas/module';
 export { default as lesson } from '@/sanity/schemas/lesson';
+export { default as changelog } from '@/sanity/schemas/changelog';
