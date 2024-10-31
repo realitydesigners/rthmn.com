@@ -1,4 +1,5 @@
 import { groq } from 'next-sanity';
+import { client } from './client';
 
 export const settingsQuery = groq`
   *[_type == "settings"][0] {
@@ -308,3 +309,91 @@ export const glossaryBySlugQuery = groq`
     tiktok,
   }
 `;
+
+export async function getModules() {
+  return client.fetch(
+    groq`*[_type == "module"] | order(order asc) {
+      _id,
+      title,
+      description,
+      slug,
+      "lessons": lessons[]-> {
+        _id,
+        title,
+        description,
+        slug,
+        order
+      } | order(order asc)
+    }`
+  );
+}
+
+export async function getModule(moduleSlug: string) {
+  return client.fetch(
+    groq`*[_type == "module" && slug.current == $moduleSlug][0] {
+      _id,
+      title,
+      description,
+      slug,
+      "lessons": lessons[]-> {
+        _id,
+        title,
+        description,
+        slug,
+        content,
+        order
+      } | order(order asc)
+    }`,
+    { moduleSlug }
+  );
+}
+
+export async function getLesson(lessonSlug: string) {
+  return client.fetch(
+    groq`*[_type == "lesson" && slug.current == $lessonSlug][0] {
+      _id,
+      title,
+      description,
+      content,
+      "relatedLessons": relatedLessons[]-> {
+        _id,
+        title,
+        description,
+        slug
+      }
+    }`,
+    { lessonSlug }
+  );
+}
+
+export async function getChangeLog() {
+  return client.fetch(
+    groq`*[_type == "changelog"] | order(releaseDate desc) {
+      _id,
+      title,
+      description,
+      version,
+      releaseDate,
+      type,
+      content[] {
+        ...,
+        _type,
+        style,
+        children,
+        markDefs[] {
+          ...,
+        }
+      },
+      status,
+      contributors[]->{
+        _id,
+        name,
+        "image": {
+          "asset": {
+            "url": image.asset->url
+          }
+        }
+      }
+    }`
+  );
+}
