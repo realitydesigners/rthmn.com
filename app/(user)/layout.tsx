@@ -9,12 +9,12 @@ export default async function UserLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const supabase = await createClient();
+  // const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data?.user) {
-    redirect('/signin');
-  }
+  // const { data, error } = await supabase.auth.getUser();
+  // if (error || !data?.user) {
+  //   redirect('/signin');
+  // }
 
   return (
     <QueryProvider>
