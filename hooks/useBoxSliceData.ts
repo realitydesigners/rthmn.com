@@ -34,7 +34,14 @@ export const useBoxSliceData = (
       return [];
     }
     try {
-      return await getBoxSlices(pair, undefined, 500, session.access_token);
+      const data = await getBoxSlices(
+        pair,
+        undefined,
+        500,
+        session.access_token
+      );
+      console.log('Fetched data:', data);
+      return data;
     } catch (error) {
       console.error('Error fetching box slices:', error);
       return [];
@@ -48,6 +55,10 @@ export const useBoxSliceData = (
     refetchInterval: 10000,
     enabled: !!session?.access_token
   });
+
+  console.log('Query data:', data);
+  console.log('Query error:', error);
+  console.log('Query isLoading:', isLoading);
 
   const filteredData = useMemo(() => {
     if (!data) return [];
@@ -72,6 +83,7 @@ export const useBoxSliceData = (
       console.warn('No data available for candles');
       return [];
     }
+    console.log('Data for candleData:', data);
     return data.map((slice) => ({
       time: new Date(slice.timestamp).toISOString(),
       open: slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0,
