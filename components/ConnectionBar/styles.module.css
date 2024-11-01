@@ -1,0 +1,44 @@
+.connectionBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #121212;
+  padding: 8px 24px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 2000;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.statusDot {
+  font-size: 10px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.statusText {
+  font-size: 12px;
+  font-family: "Courier New", Courier, monospace;
+}
+
+.connected {
+  color: #44FBC7;
+}
+
+.disconnected {
+  color: #ff4444;
+}
+
+@media (max-width: 768px) {
+  .connectionBar {
+    display: none;
+  }
+} 

@@ -11,7 +11,6 @@ type WebSocketContextType = {
   ) => void;
   unsubscribeFromBoxSlices: (pair: string) => void;
   isConnected: boolean;
-  connect: () => void;
   disconnect: () => void;
 };
 
@@ -24,12 +23,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
   const { session } = useAuth();
 
   useEffect(() => {
-    if (session?.access_token) {
+    if (session?.access_token && !isConnected) {
       wsClient.setAccessToken(session.access_token);
-      // Optionally connect here if you want to connect automatically when the token is available
-      // wsClient.connect();
+      wsClient.connect();
     }
-  }, [session]);
+  }, [session, isConnected]);
 
   useEffect(() => {
     const handleOpen = () => {
@@ -49,14 +47,6 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
       wsClient.offClose(handleClose);
     };
   }, []);
-
-  const connect = () => {
-    if (session?.access_token) {
-      wsClient.connect();
-    } else {
-      console.error('Cannot connect: No access token available');
-    }
-  };
 
   const disconnect = () => {
     wsClient.disconnect();
@@ -79,7 +69,6 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         subscribeToBoxSlices,
         unsubscribeFromBoxSlices,
         isConnected,
-        connect,
         disconnect
       }}
     >

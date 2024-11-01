@@ -209,3 +209,10 @@ interface PostItemProps {
   };
   dateString?: string;
 }
+
+export interface BoxData {
+  high: number;
+  low: number;
+  value: number;
+  changeToTime?: string;
+}

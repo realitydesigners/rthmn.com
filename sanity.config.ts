@@ -16,7 +16,10 @@ import {
   img,
   posts,
   team,
-  video
+  video,
+  changelog,
+  module,
+  lesson
 } from '@/sanity/schemas';
 
 import CustomItem from '@/sanity/ui/CustomItem';
@@ -42,7 +45,10 @@ export default defineConfig({
       headingBlock,
       headingSplineBlock,
       contentBlock,
-      teamBlock
+      teamBlock,
+      module,
+      lesson,
+      changelog
     ]
   },
   form: {

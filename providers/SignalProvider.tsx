@@ -27,33 +27,21 @@ async function fetchSignalsServer() {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return { signalsData: null, hasSubscription: false };
+    return { signalsData: null };
   }
-
-  const { data: subscriptionData, error: subscriptionError } = await supabase
-    .from('subscriptions')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('status', 'active')
-    .single();
-
-  if (subscriptionError) {
-    console.error('Error checking subscription:', subscriptionError);
-    return { signalsData: null, hasSubscription: false };
-  }
-
-  const hasSubscription = !!subscriptionData;
 
   const { data: signalsData, error: signalsError } = await supabase
     .from('signals')
-    .select('*');
+    .select('*')
+    .order('created_at', { ascending: false })
+    .limit(20);
 
   if (signalsError) {
     console.error('Error fetching signals:', signalsError);
-    return { signalsData: null, hasSubscription };
+    return { signalsData: null };
   }
 
-  return { signalsData, hasSubscription };
+  return { signalsData };
 }
 
 export async function SignalProvider({
@@ -61,13 +49,10 @@ export async function SignalProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const { signalsData, hasSubscription } = await fetchSignalsServer();
+  const { signalsData } = await fetchSignalsServer();
 
   return (
-    <SignalProviderClient
-      initialSignalsData={signalsData}
-      initialHasSubscription={hasSubscription}
-    >
+    <SignalProviderClient initialSignalsData={signalsData}>
       {children}
     </SignalProviderClient>
   );

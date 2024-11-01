@@ -7,7 +7,7 @@ import { Suspense } from 'react';
 import ogImage from '@/public/opengraph-image.png';
 import SupabaseProvider from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/server';
-import '@/styles/main.css';
+import './main.css';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =

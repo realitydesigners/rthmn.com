@@ -4,7 +4,8 @@ import { Signal } from '@/types';
 
 type SignalContextType = {
   signalsData: Signal[] | null;
-  hasSubscription: boolean | null;
+  selectedSignal: Signal | null;
+  setSelectedSignal: (signal: Signal | null) => void;
 };
 
 const SignalContext = createContext<SignalContextType | undefined>(undefined);
@@ -12,23 +13,21 @@ const SignalContext = createContext<SignalContextType | undefined>(undefined);
 type SignalProviderProps = {
   children: React.ReactNode;
   initialSignalsData: Signal[] | null;
-  initialHasSubscription: boolean | null;
 };
 
 export function SignalProviderClient({
   children,
-  initialSignalsData,
-  initialHasSubscription
+  initialSignalsData
 }: SignalProviderProps) {
   const [signalsData, setSignalsData] = useState<Signal[] | null>(
     initialSignalsData
   );
-  const [hasSubscription, setHasSubscription] = useState<boolean | null>(
-    initialHasSubscription
-  );
+  const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
 
   return (
-    <SignalContext.Provider value={{ signalsData, hasSubscription }}>
+    <SignalContext.Provider
+      value={{ signalsData, selectedSignal, setSelectedSignal }}
+    >
       {children}
     </SignalContext.Provider>
   );
