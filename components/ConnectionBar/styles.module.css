@@ -35,4 +35,10 @@
 
 .disconnected {
   color: #ff4444;
+}
+
+@media (max-width: 768px) {
+  .connectionBar {
+    display: none;
+  }
 } 
