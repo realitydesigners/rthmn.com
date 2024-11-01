@@ -52,8 +52,6 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
       prices: prices.filter((price) => price.product_id === product.id)
     }));
 
-    console.log('Fetched products:', productsWithPrices); // Add logging here
-
     return productsWithPrices;
   } catch (error) {
     console.error('getProducts: Error fetching products:', error);

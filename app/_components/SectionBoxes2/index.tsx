@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from 'react';
 import { getAnimationSequence, sequences } from './sequences';
 
 // Constants
-const POINT_OF_CHANGE_INDEX = 28;
+const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
 const BOX_COUNT = 8;
 const BASE_VALUES = [2000, 1732, 1500, 1299, 1125, 974, 843, 730];
@@ -317,7 +317,7 @@ export const SectionBoxes2: React.FC<BoxComponentProps> = ({
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
 
-  // Updated box rendering logic for more dramatic effect
+  // Updated box rendering logic
   const renderShiftedBoxes = (boxArray: Box[]) => {
     if (!boxArray || boxArray.length === 0) return null;
 
@@ -325,11 +325,7 @@ export const SectionBoxes2: React.FC<BoxComponentProps> = ({
     const isPointOfChange =
       Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX;
 
-    const renderBox = (
-      box: Box,
-      index: number,
-      prevColor: string | null = null
-    ) => {
+    const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
       const boxColor =
         box.value > 0
           ? 'bg-gradient-to-br from-white/10 to-white/5'
@@ -339,14 +335,21 @@ export const SectionBoxes2: React.FC<BoxComponentProps> = ({
       const borderWidth = 'border rounded-lg';
       const size = (Math.abs(box.value) / maxSize) * 400;
 
+      // Determine if this is the first box with a different direction
+      const isFirstDifferent =
+        prevBox &&
+        ((prevBox.value > 0 && box.value < 0) ||
+          (prevBox.value < 0 && box.value > 0));
+
       let basePosition: PositionStyle = { top: 0, right: 0 };
-      if (prevColor !== null) {
-        if (prevColor !== boxColor) {
+
+      if (prevBox) {
+        if (isFirstDifferent) {
+          // For first different box, maintain previous position
           basePosition =
-            prevColor === 'bg-[#212121]'
-              ? { bottom: 0, right: 0 }
-              : { top: 0, right: 0 };
+            prevBox.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
         } else {
+          // For other boxes, position based on their own value
           basePosition =
             box.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
         }
@@ -382,7 +385,7 @@ export const SectionBoxes2: React.FC<BoxComponentProps> = ({
           }}
         >
           {index < boxArray.length - 1 &&
-            renderBox(boxArray[index + 1], index + 1, boxColor)}
+            renderBox(boxArray[index + 1], index + 1, box)}
         </div>
       );
     };
