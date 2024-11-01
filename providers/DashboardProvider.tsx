@@ -56,6 +56,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!isConnected) return;
 
+    // Subscribe to all initial pairs
     selectedPairs.forEach((pair) => {
       subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
         setPairData((prev) => ({
@@ -68,17 +69,13 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     });
 
+    // Cleanup function now only unsubscribes from removed pairs
     return () => {
       selectedPairs.forEach((pair) => {
         unsubscribeFromBoxSlices(pair);
       });
     };
-  }, [
-    isConnected,
-    selectedPairs,
-    subscribeToBoxSlices,
-    unsubscribeFromBoxSlices
-  ]);
+  }, [isConnected]); // Only re-run when connection status changes
 
   const togglePair = (pair: string) => {
     const wasSelected = selectedPairs.includes(pair);
@@ -89,11 +86,23 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     setSelected(newSelected);
     setSelectedPairs(newSelected);
 
+    // Handle subscription/unsubscription for just the toggled pair
     if (wasSelected) {
+      unsubscribeFromBoxSlices(pair);
       setPairData((prev) => {
         const newData = { ...prev };
         delete newData[pair];
         return newData;
+      });
+    } else if (isConnected) {
+      subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
+        setPairData((prev) => ({
+          ...prev,
+          [pair]: {
+            boxes: [wsData],
+            currentOHLC: wsData.currentOHLC
+          }
+        }));
       });
     }
   };
