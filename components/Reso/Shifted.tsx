@@ -2,6 +2,7 @@
 import type React from 'react';
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
 import type { Box, BoxSlice } from '@/types';
+import { useDashboard } from '@/providers/DashboardProvider';
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
@@ -9,6 +10,8 @@ interface BoxComponentProps {
 }
 
 const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
+  const { boxColors } = useDashboard();
+
   const renderShiftedBoxes = (boxArray: Box[]) => {
     if (!boxArray?.length) return null;
 
@@ -22,15 +25,15 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
       const intensity = Math.floor((Math.abs(box.value) / maxSize) * 255);
       const boxColor =
         box.value > 0
-          ? `rgba(88, 255, 160, ${intensity / 255})`
-          : `rgba(214, 29, 97, ${intensity / 255})`;
+          ? `${boxColors.positive}, ${intensity / 255})`
+          : `${boxColors.negative}, ${intensity / 255})`;
 
       const size = (Math.abs(box.value) / maxSize) * 250;
 
       let positionStyle: React.CSSProperties = { top: 0, right: 0 };
 
       if (prevColor !== null) {
-        if (prevColor.includes('rgba(214, 29, 97')) {
+        if (prevColor.includes(boxColors.negative.split(',')[0])) {
           positionStyle = { bottom: 0, right: 0 };
         } else {
           positionStyle = { top: 0, right: 0 };

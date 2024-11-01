@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaCog } from 'react-icons/fa';
 import { useDashboard, AVAILABLE_PAIRS } from '@/providers/DashboardProvider';
 import styles from './styles.module.css';
+import { colorPresets } from '@/utils/colorPresets';
 
 interface SettingsBarProps {
   isOpen: boolean;
@@ -9,7 +10,8 @@ interface SettingsBarProps {
 }
 
 const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
-  const { selectedPairs, togglePair } = useDashboard();
+  const { selectedPairs, togglePair, boxColors, updateBoxColors } =
+    useDashboard();
   const [activeAsset, setActiveAsset] = useState<string | null>('FOREX');
 
   const toggleAsset = (asset: string) => {
@@ -18,6 +20,41 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
 
   // Helper function to format pair names
   const formatPairName = (pair: string) => pair.toUpperCase();
+
+  // Convert rgba to hex
+  const rgbaToHex = (rgba: string) => {
+    const values = rgba.replace('rgba(', '').split(',');
+    const r = parseInt(values[0].trim());
+    const g = parseInt(values[1].trim());
+    const b = parseInt(values[2].trim());
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
+  // Convert hex to rgba
+  const hexToRgba = (hex: string) => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, 1)`;
+  };
+
+  const handleColorChange = (type: 'positive' | 'negative', color: string) => {
+    const newColors = {
+      ...boxColors,
+      [type]: hexToRgba(color)
+    };
+    updateBoxColors(newColors);
+  };
+
+  const handlePresetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const preset = colorPresets.find((p) => p.name === e.target.value);
+    if (preset) {
+      updateBoxColors({
+        positive: preset.positive,
+        negative: preset.negative
+      });
+    }
+  };
 
   return (
     <div
@@ -69,29 +106,57 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
           ))}
         </div>
 
-        {/* Pattern Settings Container */}
-        <div className={styles.patternSettings}>
-          <h3>Pattern Settings</h3>
-          <div className={styles.levels}>
-            <h4>Levels</h4>
-            <div className={styles.flexContainer}>
-              <div>Descriptor</div>
-              <div>Value</div>
+        {/* Color Settings Container */}
+        <div className={styles.assetSelection}>
+          <h3>Box Colors</h3>
+          <div className={styles.assetContent}>
+            <div className={styles.presetSelector}>
+              <select
+                onChange={handlePresetChange}
+                className={styles.searchInput}
+                value={
+                  colorPresets.find(
+                    (p) =>
+                      p.positive === boxColors.positive &&
+                      p.negative === boxColors.negative
+                  )?.name || ''
+                }
+              >
+                <option value="" disabled>
+                  Select a preset
+                </option>
+                {colorPresets.map((preset) => (
+                  <option key={preset.name} value={preset.name}>
+                    {preset.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.colorPicker}>
+              <label className={styles.colorLabel}>
+                <span>Positive</span>
+                <input
+                  type="color"
+                  value={rgbaToHex(boxColors.positive)}
+                  onChange={(e) =>
+                    handleColorChange('positive', e.target.value)
+                  }
+                  className={styles.colorInput}
+                />
+              </label>
+              <label className={styles.colorLabel}>
+                <span>Negative</span>
+                <input
+                  type="color"
+                  value={rgbaToHex(boxColors.negative)}
+                  onChange={(e) =>
+                    handleColorChange('negative', e.target.value)
+                  }
+                  className={styles.colorInput}
+                />
+              </label>
             </div>
           </div>
-          <div className={styles.timeframe}>
-            <h4>Timeframe</h4>
-            <div className={styles.flexContainer}>
-              <div>Descriptor</div>
-              <div>Value</div>
-            </div>
-          </div>
-        </div>
-
-        {/* R:R Container */}
-        <div className={styles.riskReward}>
-          <h3>R:R Risk Reward</h3>
-          {/* Add content for risk/reward settings */}
         </div>
       </div>
     </div>

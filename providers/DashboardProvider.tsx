@@ -1,7 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BoxSlice, PairData } from '@/types';
 import { useWebSocket } from '@/providers/WebSocketProvider';
-import { getSelectedPairs, setSelectedPairs } from '@/utils/localStorage';
+import {
+  getSelectedPairs,
+  setSelectedPairs,
+  getBoxColors,
+  setBoxColors,
+  BoxColors
+} from '@/utils/localStorage';
 
 interface DashboardContextType {
   pairData: Record<string, PairData>;
@@ -9,6 +15,8 @@ interface DashboardContextType {
   isLoading: boolean;
   togglePair: (pair: string) => void;
   isConnected: boolean;
+  boxColors: BoxColors;
+  updateBoxColors: (colors: BoxColors) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(
@@ -35,6 +43,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   const [pairData, setPairData] = useState<Record<string, PairData>>({});
   const [selectedPairs, setSelected] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [boxColors, setBoxColorsState] = useState<BoxColors>(getBoxColors());
 
   const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices } =
     useWebSocket();
@@ -50,6 +59,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       setSelectedPairs(initialPairs);
     }
     setIsLoading(false);
+  }, []);
+
+  // Load colors from localStorage on mount
+  useEffect(() => {
+    const savedColors = getBoxColors();
+    setBoxColorsState(savedColors);
   }, []);
 
   // WebSocket subscription management
@@ -107,12 +122,19 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const updateBoxColors = (colors: BoxColors) => {
+    setBoxColorsState(colors);
+    setBoxColors(colors); // This saves to localStorage
+  };
+
   const value = {
     pairData,
     selectedPairs,
     isLoading,
     togglePair,
-    isConnected
+    isConnected,
+    boxColors,
+    updateBoxColors
   };
 
   return (

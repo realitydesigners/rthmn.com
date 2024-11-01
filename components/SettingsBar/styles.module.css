@@ -287,3 +287,74 @@
   margin-bottom: 12px;
   border: 1px solid #222;
 }
+
+.colorSettings {
+  padding: 1rem;
+  border-top: 1px solid #2a2a2a;
+}
+
+.colorPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.colorLabel {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  background: #1a1a1a;
+  border: 1px solid #222;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.colorLabel:hover {
+  background: #2a2a2a;
+  border-color: #333;
+}
+
+.colorLabel span {
+  font-family: "Kode Mono";
+  font-weight: 500;
+  color: #fff;
+}
+
+.colorInput {
+  width: 50px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.colorInput:hover {
+  transform: scale(1.05);
+}
+
+.presetSelector {
+  margin-bottom: 1rem;
+}
+
+.presetSelect {
+  width: 100%;
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.presetSelect:hover {
+  border-color: #444;
+}
+
+.presetSelect option {
+  background-color: #1a1a1a;
+  color: #fff;
+}
