@@ -11,6 +11,7 @@ import {
   FaMicrochip,
   FaServer
 } from 'react-icons/fa';
+import { NestedBoxes } from '@/components/NestedBoxes';
 
 // Constants
 const POINT_OF_CHANGE_INDEX = 28;
@@ -37,12 +38,6 @@ interface BoxComponentProps {
   isLoading: boolean;
 }
 
-interface PositionStyle {
-  top?: number;
-  bottom?: number;
-  right: number;
-}
-
 // Helper Functions
 const createDemoStep = (
   step: number,
@@ -65,33 +60,6 @@ const createMockBoxData = (values: number[]): Box[] => {
     value: value
   }));
 };
-
-// UI Components
-const Title = () => (
-  <div className="flex flex-col gap-4">
-    <div className="flex items-center gap-4">
-      <h1
-        className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
-      >
-        Intelligent
-      </h1>
-    </div>
-    <div className="flex items-center gap-4">
-      <h2
-        className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
-      >
-        Market Analysis
-      </h2>
-    </div>
-    <div className="flex items-center gap-4">
-      <h2
-        className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
-      >
-        System
-      </h2>
-    </div>
-  </div>
-);
 
 const StatsGrid = () => (
   <div className="mb-6 grid grid-cols-4 gap-4">
@@ -180,67 +148,25 @@ const PatternTable = ({ tableRef, demoStep, patterns }) => (
   </div>
 );
 
-const BoxVisualization = ({ currentSlice, renderShiftedBoxes }) => (
+const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => (
   <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-black/50 backdrop-blur-sm">
     {currentSlice && currentSlice.boxes.length > 0 && (
       <div className="relative h-full w-full">
-        {renderShiftedBoxes(
-          currentSlice.boxes.sort(
+        <NestedBoxes
+          boxes={currentSlice.boxes.sort(
             (a, b) => Math.abs(b.value) - Math.abs(a.value)
-          )
-        )}
+          )}
+          demoStep={demoStep}
+          isPaused={isPaused}
+          isPointOfChange={
+            Math.floor(demoStep / 1) % sequences.length ===
+            POINT_OF_CHANGE_INDEX
+          }
+          baseSize={250}
+          colorScheme="green-red"
+        />
       </div>
     )}
-  </div>
-);
-
-const LeftSide = () => (
-  <div className="flex w-1/2 flex-col gap-8 pl-16">
-    <Title />
-    <div className={`${kodeMono.className} flex flex-col gap-6`}>
-      <p className="text-lg leading-relaxed text-gray-300">
-        Advanced pattern recognition algorithms combined with real-time market
-        data processing. Designed to identify emerging trends and market
-        behaviors through statistical analysis and machine learning techniques.
-      </p>
-      <StatsGrid />
-      <FeatureTags />
-    </div>
-  </div>
-);
-
-const RightSide = ({
-  tableRef,
-  demoStep,
-  patterns,
-  currentSlice,
-  renderShiftedBoxes
-}) => (
-  <div className="flex w-1/2 flex-col items-center justify-center gap-6">
-    <div className="flex w-full max-w-[700px] flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="h-1 w-1 rounded-full bg-white" />
-        <span
-          className={`${kodeMono.className} text-xs uppercase tracking-wider text-white`}
-        >
-          System Visualization
-        </span>
-      </div>
-
-      <div className="grid grid-cols-[1fr_250px] gap-4">
-        <PatternTable
-          tableRef={tableRef}
-          demoStep={demoStep}
-          patterns={patterns}
-        />
-        <div className="flex flex-col gap-4">
-          <BoxVisualization
-            currentSlice={currentSlice}
-            renderShiftedBoxes={renderShiftedBoxes}
-          />
-        </div>
-      </div>
-    </div>
   </div>
 );
 
@@ -288,82 +214,6 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
 
-  // Box rendering logic
-  const renderShiftedBoxes = (boxArray: Box[]) => {
-    if (!boxArray || boxArray.length === 0) return null;
-
-    const maxSize = Math.abs(boxArray[0].value);
-    const isPointOfChange =
-      Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX;
-
-    const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
-      const boxColor = box.value > 0 ? 'bg-green-900/50' : 'bg-red-900/50';
-      const borderColor =
-        isPointOfChange && box.value > 0 ? 'border-green-500' : 'border-black';
-      const borderWidth =
-        isPointOfChange && box.value > 0
-          ? 'border rounded-lg'
-          : 'border rounded-lg';
-      const size = (Math.abs(box.value) / maxSize) * 250;
-
-      // Determine if this is the first box with a different direction
-      const isFirstDifferent =
-        prevBox &&
-        ((prevBox.value > 0 && box.value < 0) ||
-          (prevBox.value < 0 && box.value > 0));
-
-      let basePosition: PositionStyle = { top: 0, right: 0 };
-
-      if (prevBox) {
-        if (isFirstDifferent) {
-          // For first different box, maintain previous position
-          basePosition =
-            prevBox.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
-        } else {
-          // For other boxes, position based on their own value
-          basePosition =
-            box.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
-        }
-      }
-
-      const pauseTransform = isPaused
-        ? {
-            transform: `
-              translateX(${index * 3}px)
-              translateY(${index * 0}px)
-            `,
-            transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)'
-          }
-        : {};
-
-      const positionStyle: React.CSSProperties = {
-        ...basePosition,
-        ...pauseTransform
-      };
-
-      return (
-        <div
-          key={`box-${index}-${box.value}-${demoStep}`}
-          className={`absolute ${boxColor} ${borderColor} ${borderWidth} duration-800 transition-all ease-out`}
-          style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            ...positionStyle,
-            margin: '-1px',
-            boxShadow: isPaused
-              ? `${index * 2}px ${index * 2}px ${index * 3}px rgba(0,0,0,0.2)`
-              : 'none'
-          }}
-        >
-          {index < boxArray.length - 1 &&
-            renderBox(boxArray[index + 1], index + 1, box)}
-        </div>
-      );
-    };
-
-    return <div className="relative">{renderBox(boxArray[0], 0)}</div>;
-  };
-
   // Data preparation
   const currentValues = createDemoStep(demoStep, sequences, BASE_VALUES);
   const mockBoxData = createMockBoxData(currentValues);
@@ -373,15 +223,68 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({
   };
 
   return (
-    <div className="flex h-screen items-center justify-center px-12">
-      <LeftSide />
-      <RightSide
-        tableRef={tableRef}
-        demoStep={demoStep}
-        patterns={sequences}
-        currentSlice={currentSlice}
-        renderShiftedBoxes={renderShiftedBoxes}
-      />
-    </div>
+    <section className="flex h-screen items-center justify-center px-12">
+      {/* Left Column */}
+      <div className="flex w-1/2 flex-col gap-8 pl-16">
+        <div className="flex items-center gap-4">
+          <h1
+            className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
+          >
+            Intelligent
+          </h1>
+        </div>
+        <div className="flex items-center gap-4">
+          <h2
+            className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
+          >
+            Market Analysis
+          </h2>
+        </div>
+        <div className="flex items-center gap-4">
+          <h2
+            className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
+          >
+            System
+          </h2>
+        </div>
+        <div className={`${kodeMono.className} flex flex-col gap-6`}>
+          <p className="text-lg leading-relaxed text-gray-300">
+            Advanced pattern recognition algorithms combined with real-time
+            market data processing. Designed to identify emerging trends and
+            market behaviors through statistical analysis and machine learning
+            techniques.
+          </p>
+          <StatsGrid />
+          <FeatureTags />
+        </div>
+      </div>
+      <div className="flex w-1/2 flex-col items-center justify-center gap-6">
+        <div className="flex w-full max-w-[700px] flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <div className="h-1 w-1 rounded-full bg-white" />
+            <span
+              className={`${kodeMono.className} text-xs uppercase tracking-wider text-white`}
+            >
+              System Visualization
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[1fr_250px] gap-4">
+            <PatternTable
+              tableRef={tableRef}
+              demoStep={demoStep}
+              patterns={sequences}
+            />
+            <div className="flex flex-col gap-4">
+              <BoxVisualization
+                currentSlice={currentSlice}
+                demoStep={demoStep}
+                isPaused={isPaused}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   );
 };

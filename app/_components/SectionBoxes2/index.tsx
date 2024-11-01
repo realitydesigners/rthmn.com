@@ -4,6 +4,7 @@ import { outfit, kodeMono } from '@/fonts';
 import type { Box, BoxSlice } from '@/types';
 import { useState, useEffect, useRef } from 'react';
 import { getAnimationSequence, sequences } from './sequences';
+import { NestedBoxes } from '@/components/NestedBoxes';
 
 // Constants
 const POINT_OF_CHANGE_INDEX = 29;
@@ -146,7 +147,7 @@ const InnovationPoint = ({ point, index }) => (
   </div>
 );
 
-const VisualizationSection = ({ currentSlice, renderShiftedBoxes }) => (
+const VisualizationSection = ({ currentSlice, demoStep, isPaused }) => (
   <div className="relative aspect-square w-full">
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="relative h-[600px] w-[600px]">
@@ -154,11 +155,18 @@ const VisualizationSection = ({ currentSlice, renderShiftedBoxes }) => (
         <div className="animate-pulse-slow bg-white/2 absolute inset-0 -z-10 rounded-full blur-2xl"></div>
         {currentSlice && currentSlice.boxes.length > 0 && (
           <div className="relative h-full w-full">
-            {renderShiftedBoxes(
-              currentSlice.boxes.sort(
+            <NestedBoxes
+              boxes={currentSlice.boxes.sort(
                 (a, b) => Math.abs(b.value) - Math.abs(a.value)
-              )
-            )}
+              )}
+              demoStep={demoStep}
+              isPaused={isPaused}
+              isPointOfChange={
+                Math.floor(demoStep / 1) % sequences.length ===
+                POINT_OF_CHANGE_INDEX
+              }
+              baseSize={400}
+            />
           </div>
         )}
       </div>
@@ -317,82 +325,6 @@ export const SectionBoxes2: React.FC<BoxComponentProps> = ({
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
 
-  // Updated box rendering logic
-  const renderShiftedBoxes = (boxArray: Box[]) => {
-    if (!boxArray || boxArray.length === 0) return null;
-
-    const maxSize = Math.abs(boxArray[0].value);
-    const isPointOfChange =
-      Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX;
-
-    const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
-      const boxColor =
-        box.value > 0
-          ? 'bg-gradient-to-br from-white/10 to-white/5'
-          : 'bg-gradient-to-br from-white/5 to-transparent';
-      const borderColor =
-        isPointOfChange && box.value > 0 ? 'border-white/20' : 'border-white/5';
-      const borderWidth = 'border rounded-lg';
-      const size = (Math.abs(box.value) / maxSize) * 400;
-
-      // Determine if this is the first box with a different direction
-      const isFirstDifferent =
-        prevBox &&
-        ((prevBox.value > 0 && box.value < 0) ||
-          (prevBox.value < 0 && box.value > 0));
-
-      let basePosition: PositionStyle = { top: 0, right: 0 };
-
-      if (prevBox) {
-        if (isFirstDifferent) {
-          // For first different box, maintain previous position
-          basePosition =
-            prevBox.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
-        } else {
-          // For other boxes, position based on their own value
-          basePosition =
-            box.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
-        }
-      }
-
-      const pauseTransform = isPaused
-        ? {
-            transform: `
-              translateX(${index * 3}px)
-              translateY(${index * 0}px)
-            `,
-            transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)'
-          }
-        : {};
-
-      const positionStyle: React.CSSProperties = {
-        ...basePosition,
-        ...pauseTransform
-      };
-
-      return (
-        <div
-          key={`box-${index}-${box.value}-${demoStep}`}
-          className={`absolute ${boxColor} ${borderColor} ${borderWidth} duration-800 transition-all ease-out`}
-          style={{
-            width: `${size}px`,
-            height: `${size}px`,
-            ...positionStyle,
-            margin: '-1px',
-            boxShadow: isPaused
-              ? `${index * 2}px ${index * 2}px ${index * 3}px rgba(0,0,0,0.2)`
-              : 'none'
-          }}
-        >
-          {index < boxArray.length - 1 &&
-            renderBox(boxArray[index + 1], index + 1, box)}
-        </div>
-      );
-    };
-
-    return <div className="relative">{renderBox(boxArray[0], 0)}</div>;
-  };
-
   // Data preparation
   const currentValues = createDemoStep(demoStep, sequences, BASE_VALUES);
   const mockBoxData = createMockBoxData(currentValues);
@@ -420,7 +352,8 @@ export const SectionBoxes2: React.FC<BoxComponentProps> = ({
           <div className="flex flex-col gap-8">
             <VisualizationSection
               currentSlice={currentSlice}
-              renderShiftedBoxes={renderShiftedBoxes}
+              demoStep={demoStep}
+              isPaused={isPaused}
             />
           </div>
         </div>
