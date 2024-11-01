@@ -8,6 +8,8 @@ import ogImage from '@/public/opengraph-image.png';
 import SupabaseProvider from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/server';
 import './main.css';
+import { GoogleTagManager } from '@next/third-parties/google';
+import Script from 'next/script';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -44,6 +46,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <GoogleTagManager gtmId="GTM-XYZ" />
       <body className="bg-black">
         <SupabaseProvider initialUser={user}>
           <DynamicNavbar />
@@ -53,6 +56,21 @@ export default async function RootLayout({
             <Toaster />
           </Suspense>
         </SupabaseProvider>
+        {/* Google Analytics */}
+        <script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-0PXQE0RL1G"
+        ></script>
+        {/* Microsoft Clarity */}
+        <Script strategy="lazyOnload" id="clarity-script">
+          {`
+            (function(c,l,a,r,i,t,y){
+              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "o3awwft96h");
+          `}
+        </Script>
       </body>
     </html>
   );
