@@ -10,6 +10,7 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { SectionBoxes } from '@/app/_components/SectionBoxes';
 import { SectionBlogPosts } from '@/app/_components/SectionBlogPosts';
 import { SectionFooter } from '@/app/_components/SectionFooter';
+import { SectionBoxes2 } from '@/app/_components/SectionBoxes2';
 
 interface ClientPageProps {
   posts: any[];
@@ -23,6 +24,7 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
     <div className="min-h-screen">
       <SectionHero />
       <SectionBoxes slice={null} isLoading={false} />
+      <SectionBoxes2 slice={null} isLoading={false} />
       <SectionBlogPosts initialPosts={posts} />
       <SectionPricing
         user={session?.user}
