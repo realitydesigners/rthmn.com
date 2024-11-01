@@ -1,12 +1,21 @@
 import React from 'react';
 import ShiftedBox from '@/components/Reso/Shifted';
 import { Signal, BoxSlice } from '@/types';
+import { useSignals } from '@/providers/SignalProviderClient';
 
 type PatternCardProps = {
   signal: Signal;
 };
 
 const PatternCard: React.FC<PatternCardProps> = ({ signal }) => {
+  const { setSelectedSignal } = useSignals();
+
+  // Function to open modal
+  const openModal = () => {
+    // Logic to open modal goes here
+    console.log('Modal opened');
+  };
+
   // Parse boxes from string to object
   const boxes = signal.boxes ? JSON.parse(signal.boxes) : [];
 
@@ -35,7 +44,13 @@ const PatternCard: React.FC<PatternCardProps> = ({ signal }) => {
   };
 
   return (
-    <div className="m-auto max-w-[300px] rounded-lg border border-[#181818] bg-black p-4 text-center text-white">
+    <div
+      className="m-auto max-w-[300px] rounded-lg border border-[#181818] bg-black p-4 text-center text-white"
+      onClick={() => {
+        setSelectedSignal(signal);
+        openModal(); // Open modal on click
+      }}
+    >
       {/* Top Container */}
       <div className="mb-2 flex justify-between text-sm">
         <div>{signal.pair}</div>
@@ -50,6 +65,7 @@ const PatternCard: React.FC<PatternCardProps> = ({ signal }) => {
       {/* Bottom Container */}
       <div className="flex justify-between text-xs text-gray-400">
         <div>{new Date(signal.start_time || '').toLocaleTimeString()}</div>
+        <div>{new Date(signal.start_time || '').toLocaleDateString()}</div>
         <div>Time Left: {formatTimeLeft(timeLeft)}</div>
       </div>
     </div>

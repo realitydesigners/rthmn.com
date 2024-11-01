@@ -132,6 +132,7 @@ export async function getLatestBoxSlices(
     const apiResponse = await response.json();
 
     if (
+      !apiResponse ||
       apiResponse.status !== 'success' ||
       typeof apiResponse.data !== 'object'
     ) {

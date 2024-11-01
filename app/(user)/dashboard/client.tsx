@@ -2,11 +2,14 @@
 
 import React, { useState } from 'react';
 import SettingsBar from '@/components/SettingsBar';
-import BoxGrid from '@/components/BoxGrid';
+import PairGrid from '@/components/PairGrid';
+import { useAuth } from '@/providers/SupabaseProvider';
+import { DashboardProvider } from '@/providers/DashboardProvider';
+import ConnectionBar from '@/components/ConnectionBar';
 import styles from './Dashboard.module.css';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className={styles.dashboard}>
@@ -15,17 +18,22 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
         onToggle={() => setIsMenuOpen(!isMenuOpen)}
       />
       <div className={styles.contentContainer}>{children}</div>
+      <ConnectionBar />
     </div>
   );
 };
 
 const Dashboard: React.FC = () => {
+  const { session } = useAuth();
+
   return (
-    <DashboardLayout>
-      <div className={styles.contentContainer}>
-        <BoxGrid />
-      </div>
-    </DashboardLayout>
+    <DashboardProvider>
+      <DashboardLayout>
+        <div className={styles.contentContainer}>
+          {session?.access_token ? <PairGrid /> : <p>Loading session...</p>}
+        </div>
+      </DashboardLayout>
+    </DashboardProvider>
   );
 };
 

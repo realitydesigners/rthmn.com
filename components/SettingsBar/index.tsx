@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FaCog } from 'react-icons/fa';
+import { useDashboard, AVAILABLE_PAIRS } from '@/providers/DashboardProvider';
 import styles from './styles.module.css';
 
 interface SettingsBarProps {
@@ -8,11 +9,15 @@ interface SettingsBarProps {
 }
 
 const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
-  const [activeAsset, setActiveAsset] = useState<string | null>(null);
+  const { selectedPairs, togglePair } = useDashboard();
+  const [activeAsset, setActiveAsset] = useState<string | null>('FOREX');
 
   const toggleAsset = (asset: string) => {
     setActiveAsset(activeAsset === asset ? null : asset);
   };
+
+  // Helper function to format pair names
+  const formatPairName = (pair: string) => pair.toUpperCase();
 
   return (
     <div
@@ -27,17 +32,37 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
           <h3>Asset Selection</h3>
           {['FOREX', 'Stocks', 'Crypto', 'Commodities'].map((asset) => (
             <div key={asset}>
-              <button onClick={() => toggleAsset(asset)}>{asset}</button>
+              <button
+                onClick={() => toggleAsset(asset)}
+                className={`${styles.assetButton} ${activeAsset === asset ? styles.activeAsset : ''}`}
+              >
+                {asset}
+              </button>
               {activeAsset === asset && (
                 <div className={styles.assetContent}>
-                  <input type="text" placeholder={`Search ${asset}`} />
-                  {/* Grid of asset pairs/names */}
-                  <div className={styles.assetGrid}>
-                    {/* Example grid items */}
-                    <div>Asset 1</div>
-                    <div>Asset 2</div>
-                    {/* Add more items as needed */}
-                  </div>
+                  <input
+                    type="text"
+                    placeholder={`Search ${asset}`}
+                    className={styles.searchInput}
+                  />
+                  {/* Grid of pairs - currently only showing FOREX pairs */}
+                  {asset === 'FOREX' && (
+                    <div className={styles.pairGrid}>
+                      {AVAILABLE_PAIRS.map((pair) => (
+                        <button
+                          key={pair}
+                          onClick={() => togglePair(pair)}
+                          className={`${styles.pairButton} ${
+                            selectedPairs.includes(pair)
+                              ? styles.selectedPair
+                              : ''
+                          }`}
+                        >
+                          {formatPairName(pair)}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

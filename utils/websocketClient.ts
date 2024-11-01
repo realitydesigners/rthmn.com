@@ -50,8 +50,12 @@ class WebSocketClient {
         const message = JSON.parse(event.data);
         console.log('Received WebSocket message:', message);
 
-        if (message.type === 'welcome') {
+        if (
+          message.type === 'ack' &&
+          message.message === 'auth operation successful'
+        ) {
           this.isAuthenticated = true;
+          this.openHandlers.forEach((handler) => handler());
           this.processPendingOperations();
         } else if (message.type === 'boxSlice') {
           const handler = this.messageHandlers.get(message.pair);
