@@ -1,0 +1,43 @@
+.card {
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #222;
+  background: linear-gradient(180deg, #121314 0%, #0B0C0D 100%);
+  padding: 1rem;
+  text-align: center;
+  color: white;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+
+}
+
+.header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.pairName {
+  font-family: "Kode Mono", monospace;
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.price {
+  font-family: "Kode Mono", monospace;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #44FBC7;
+}
+
+.boxContainer {
+  margin-bottom: 0.5rem;
+  width: 100%;
+} 

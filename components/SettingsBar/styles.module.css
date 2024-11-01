@@ -200,3 +200,94 @@
   font-weight: 700;
   line-height: normal;
 }
+
+.pairGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pairButton {
+  padding: 8px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: center;
+  cursor: pointer;
+  font-family: "Kode Mono";
+  font-weight: 500;
+}
+
+.pairButton:hover {
+  background: #2a2a2a;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.selectedPair {
+  background: linear-gradient(180deg, #4CF291 0%, #45D984 100%);
+  color: #0a0a0a;
+  border-color: #45D984;
+  box-shadow: 0 2px 4px rgba(76, 242, 145, 0.2);
+  font-weight: 700;
+}
+
+.selectedPair:hover {
+  background: linear-gradient(180deg, #4CF291 0%, #45D984 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 6px rgba(76, 242, 145, 0.3);
+}
+
+.assetButton {
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #222;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-family: "Kode Mono";
+  font-weight: 500;
+}
+
+.activeAsset {
+  background: #2a2a2a;
+  border-color: #4CF291;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #222;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  background: #1a1a1a;
+  color: #fff;
+  outline: none;
+  font-family: "Kode Mono";
+}
+
+.searchInput:focus {
+  border-color: #4CF291;
+  background: #2a2a2a;
+}
+
+.searchInput::placeholder {
+  color: #666;
+}
+
+.assetContent {
+  padding: 8px;
+  background: #121314;
+  border-radius: 4px;
+  margin-bottom: 12px;
+  border: 1px solid #222;
+}
