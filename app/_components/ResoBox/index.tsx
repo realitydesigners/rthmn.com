@@ -179,38 +179,76 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
             <h1
               className={`${outfit.className} text-7xl font-bold tracking-tight text-white`}
             >
-              A Next Generation
+              Intelligent
             </h1>
           </div>
           <div className="flex items-center gap-4">
             <h2
               className={`${outfit.className} text-7xl font-bold tracking-tight text-white`}
             >
-              Algorithmic Trading
+              Market Analysis
             </h2>
           </div>
           <div className="flex items-center gap-4">
             <h2
               className={`${outfit.className} text-7xl font-bold tracking-tight text-white`}
             >
-              Platform
+              System
             </h2>
           </div>
         </div>
 
         <div className={`${kodeMono.className} flex flex-col gap-6`}>
           <p className="text-lg leading-relaxed text-gray-300">
-            Advanced quantum computing principles merged with neural network
-            analysis for precise market pattern recognition and predictive
-            modeling. Utilizing cutting-edge wave mechanics to decode complex
-            market behaviors in microsecond intervals.
+            Advanced pattern recognition algorithms combined with real-time
+            market data processing. Designed to identify emerging trends and
+            market behaviors through statistical analysis and machine learning
+            techniques.
           </p>
+
+          {/* Update the stats cards */}
           <div className="mb-6 grid grid-cols-4 gap-4">
             {[
-              { icon: FaMicrochip, label: 'Neural Processing', value: '98.2%' },
-              { icon: FaAtom, label: 'Quantum State', value: 'Active' },
-              { icon: FaCode, label: 'Algorithms', value: '1.2M+' },
-              { icon: FaServer, label: 'Response Time', value: '0.3ms' }
+              {
+                icon: FaChartLine,
+                label: 'Markets',
+                value: '50+'
+              },
+              {
+                icon: FaServer,
+                label: 'Time Frames',
+                value: '1s-1d'
+              },
+              {
+                icon: FaCode,
+                label: 'Indicators',
+                value: '125+'
+              },
+              {
+                icon: FaWaveSquare,
+                label: 'Updates',
+                value: 'Live'
+              },
+              {
+                icon: FaBrain,
+                label: 'Signals',
+                value: '24/7'
+              },
+              {
+                icon: FaMicrochip,
+                label: 'Data Points',
+                value: '1M+/s'
+              },
+              {
+                icon: FaAtom,
+                label: 'Accuracy',
+                value: '99.9%'
+              },
+              {
+                icon: FaServer,
+                label: 'Exchanges',
+                value: '15+'
+              }
             ].map((item, index) => (
               <div
                 key={index}
@@ -224,13 +262,15 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
               </div>
             ))}
           </div>
+
+          {/* Update the feature tags */}
           <div className="flex gap-8 text-sm">
             <div className="group flex cursor-pointer items-center gap-3">
               <div className="relative flex items-center gap-2">
                 <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-[#22c55e]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100"></div>
                 <FaChartLine className="relative h-4 w-4 animate-pulse text-white" />
                 <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
-                  Real-time Analysis
+                  Pattern Analysis
                 </span>
               </div>
             </div>
@@ -240,7 +280,7 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
                 <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-[#3b82f6]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100"></div>
                 <FaWaveSquare className="relative h-4 w-4 animate-pulse text-white" />
                 <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
-                  Quantum Wave
+                  Market Trends
                 </span>
               </div>
             </div>
@@ -250,7 +290,7 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
                 <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-[#8b5cf6]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100"></div>
                 <FaRobot className="relative h-4 w-4 animate-pulse text-white" />
                 <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
-                  AI Predictions
+                  Smart Alerts
                 </span>
               </div>
             </div>
