@@ -240,16 +240,18 @@ export function SectionPricing({ user, products, subscription }: Props) {
                       <span className="text-gray-300">/{billingInterval}</span>
                     </p>
                     <div className="group relative mt-8">
+                      <div className="relative flex">
+                        <Button
+                          variant="slim"
+                          type="button"
+                          loading={priceIdLoading === price.id}
+                          onClick={() => handleStripeCheckout(price)}
+                          className={`${kodeMono.className} w-full rounded-lg border border-white/10 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20`}
+                        >
+                          {subscription ? 'Manage Access' : 'Get Early Access'}
+                        </Button>
+                      </div>
                       <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-blue-500/50 to-purple-500/50 opacity-0 blur transition-all duration-500 group-hover:opacity-100" />
-                      <Button
-                        variant="slim"
-                        type="button"
-                        loading={priceIdLoading === price.id}
-                        onClick={() => handleStripeCheckout(price)}
-                        className={`${kodeMono.className} relative w-full rounded-md bg-white/10 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/20`}
-                      >
-                        {subscription ? 'Manage Access' : 'Get Early Access'}
-                      </Button>
                     </div>
                   </div>
                 </div>

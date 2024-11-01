@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, RefObject, type JSX } from 'react';
-import { oxanium, russo } from '@/fonts';
+import { kodeMono, russo } from '@/fonts';
 import styles from './styles.module.css';
 import {
   motion,
@@ -95,7 +95,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('plans')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
+          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
             <span className="text-sm font-semibold">Plans</span>
           </Link>
         </div>
@@ -103,7 +103,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('how-it-works')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
+          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
             <span className="text-sm font-semibold">How it works</span>
           </Link>
         </div>
@@ -112,7 +112,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('features')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
+          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
             <span className="text-sm font-semibold">Features</span>
           </Link>
         </div>
@@ -120,7 +120,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('community')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${oxanium.className}`}>
+          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
             <span className="text-sm font-semibold">Community</span>
           </Link>
         </div>
@@ -218,7 +218,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         px-6 py-3
         gradient-border-button
         text-white font-medium
-        ${oxanium.className}
+        ${kodeMono.className}
         transition-all duration-300
         hover:shadow-lg
     `;
@@ -259,7 +259,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       )}
 
       <CustomMotionDiv
-        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent lg:h-20 ${oxanium.className}`}
+        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent lg:h-20 ${kodeMono.className}`}
         initial="hidden"
         animate="visible"
         variants={navVariants}
@@ -336,7 +336,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       <AnimatePresence>
         {isNavOpen && (
           <CustomMotionDiv
-            className={`fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 backdrop-blur-sm lg:hidden ${oxanium.className}`}
+            className={`fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 backdrop-blur-sm lg:hidden ${kodeMono.className}`}
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -100 }}
@@ -538,7 +538,7 @@ export const MobileMenuContent = () => {
       {allLinks.map((item) => (
         <div key={item.title} className="flex flex-col">
           <h2
-            className={`mb-2 text-lg font-bold text-[#555] ${oxanium.className}`}
+            className={`mb-2 text-lg font-bold text-[#555] ${kodeMono.className}`}
           >
             {item.title}
           </h2>
@@ -546,7 +546,7 @@ export const MobileMenuContent = () => {
             <Link
               key={link.title}
               href="/"
-              className={`heading-text py-2 text-base font-bold ${oxanium.className}`}
+              className={`heading-text py-2 text-base font-bold ${kodeMono.className}`}
             >
               {link.title}
             </Link>
