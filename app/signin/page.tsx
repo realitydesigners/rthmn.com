@@ -9,11 +9,9 @@ import { russo, oxanium } from '@/fonts';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 import type { Provider } from '@supabase/supabase-js';
-import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
 
 export default function SignIn() {
-  const { session } = useAuth();
   const router = useRouter();
   const signInWithOAuth = useSignInWithOAuth();
 
@@ -29,18 +27,17 @@ export default function SignIn() {
             session: session ? 'Session exists' : 'No session'
           })
         );
+
+        if (session) {
+          router.push('/dashboard');
+        }
       }
     );
-
-    const lastAuthEvent = localStorage.getItem('lastAuthEvent');
-    if (lastAuthEvent) {
-      console.log('Previous auth event:', JSON.parse(lastAuthEvent));
-    }
 
     return () => {
       authListener.subscription.unsubscribe();
     };
-  }, []);
+  }, [router]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -55,12 +52,7 @@ export default function SignIn() {
     }
   };
 
-  if (session) {
-    router.push('/');
-    return null;
-  }
-
-  const { allowOauth, allowEmail, allowPassword } = getAuthTypes();
+  const { allowOauth } = getAuthTypes();
 
   return (
     <div className="flex h-screen">

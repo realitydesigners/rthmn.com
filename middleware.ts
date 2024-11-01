@@ -7,13 +7,10 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    // Match all routes within the @(user) folder
+    '/(user)/(.*)', // This will match all routes under the @(user) folder
     /*
-     * Match all request paths except:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - images - .svg, .png, .jpg, .jpeg, .gif, .webp
-     * Feel free to modify this pattern to include more paths.
+     * Exclude static files and images
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'
   ]
