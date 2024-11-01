@@ -21,10 +21,10 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
   return (
     <div className="min-h-screen bg-black text-white">
       <SectionHero />
-      <SectionFeatures />
-      <div className="flex justify-center py-12">
-        <ResoBox slice={null} isLoading={false} />
-      </div>
+      {/* <SectionFeatures /> */}
+
+      <ResoBox slice={null} isLoading={false} />
+
       <div className="container mx-auto px-4">
         <PostList initialPosts={posts} />
       </div>
