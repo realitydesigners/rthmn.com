@@ -109,7 +109,7 @@ export function SectionBlogPosts({ initialPosts }: PostListProps) {
 
   return (
     <div
-      className={`mt-16 flex w-full flex-col px-4 lg:px-32 ${kodeMono.className}`}
+      className={`mt-16 flex w-full flex-col px-4 py-8 sm:px-6 sm:py-24 lg:px-32 ${kodeMono.className}`}
     >
       <h2
         className={`mb-12 text-center text-4xl font-bold text-white lg:text-left ${outfit.className}`}

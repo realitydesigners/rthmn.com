@@ -8,7 +8,15 @@ import { outfit, kodeMono } from '@/fonts';
 import cn from 'classnames';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FaServer, FaRocket, FaBolt, FaShieldAlt } from 'react-icons/fa';
+import {
+  FaServer,
+  FaRocket,
+  FaBolt,
+  FaShieldAlt,
+  FaChartLine,
+  FaWaveSquare,
+  FaRobot
+} from 'react-icons/fa';
 
 type Subscription = any;
 type Product = any;
@@ -30,6 +38,13 @@ interface Props {
 }
 
 type BillingInterval = 'lifetime' | 'year' | 'month';
+
+const PRICING_FEATURES = [
+  { icon: FaChartLine, text: 'Real-time market analysis', color: '#22c55e' },
+  { icon: FaWaveSquare, text: 'Advanced pattern detection', color: '#3b82f6' },
+  { icon: FaRobot, text: 'Early access to new features', color: '#8b5cf6' },
+  { icon: FaBolt, text: 'Priority support', color: '#f59e0b' }
+];
 
 export function SectionPricing({ user, products, subscription }: Props) {
   const intervals = Array.from(
@@ -105,21 +120,21 @@ export function SectionPricing({ user, products, subscription }: Props) {
   }
 
   return (
-    <section className="bg-black px-4 lg:px-32">
-      <div className="px-4 py-8 sm:px-6 sm:py-24 lg:px-8">
-        <div className="flex flex-col gap-8">
+    <section className="bg-black">
+      <div className="px-4 py-8 sm:px-6 sm:py-24 lg:px-32">
+        <div className="flex flex-col gap-6">
           {/* Title Section */}
           <div className="flex flex-col gap-4">
             <h1
               className={`${outfit.className} text-5xl font-bold tracking-tight text-white lg:text-7xl`}
             >
-              Pricing Plans
+              Early Access
             </h1>
             <p
               className={`${kodeMono.className} max-w-2xl text-sm leading-relaxed text-gray-300 lg:text-lg`}
             >
-              Start building for free, then add a site plan to go live. Account
-              plans unlock additional features.
+              Join the first wave of traders using our advanced pattern
+              recognition system. Limited spots available during our beta phase.
             </p>
           </div>
 
@@ -135,9 +150,9 @@ export function SectionPricing({ user, products, subscription }: Props) {
                   billingInterval === 'month'
                     ? 'bg-white/10 text-white'
                     : 'text-gray-400'
-                } m-1 rounded-md px-8 py-2 text-sm font-medium transition-colors duration-200`}
+                } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
               >
-                Monthly billing
+                Monthly access
               </button>
             )}
             {intervals.includes('year') && (
@@ -148,15 +163,15 @@ export function SectionPricing({ user, products, subscription }: Props) {
                   billingInterval === 'year'
                     ? 'bg-white/10 text-white'
                     : 'text-gray-400'
-                } m-1 rounded-md px-8 py-2 text-sm font-medium transition-colors duration-200`}
+                } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
               >
-                Yearly billing
+                Yearly access
               </button>
             )}
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid gap-6 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             {products.map((product) => {
               const price = product?.prices?.find(
                 (price) => price.interval === billingInterval
@@ -172,16 +187,18 @@ export function SectionPricing({ user, products, subscription }: Props) {
                 <div
                   key={product.id}
                   className={cn(
-                    'rounded-lg border backdrop-blur-sm transition-colors duration-300',
+                    'rounded-lg border backdrop-blur-sm transition-all duration-300',
                     {
-                      'border-blue-500/50 bg-blue-500/5': subscription
-                        ? product.name === subscription?.prices?.products?.name
-                        : product.name === 'Freelancer',
-                      'border-white/10 bg-white/5 hover:border-white/20':
+                      'border-blue-500/50 bg-blue-500/5 hover:shadow-lg hover:shadow-blue-500/20':
+                        subscription
+                          ? product.name ===
+                            subscription?.prices?.products?.name
+                          : product.name === 'Beta Access',
+                      'border-white/10 bg-white/5 hover:border-white/20 hover:shadow-lg hover:shadow-white/10':
                         !(subscription
                           ? product.name ===
                             subscription?.prices?.products?.name
-                          : product.name === 'Freelancer')
+                          : product.name === 'Beta Access')
                     }
                   )}
                 >
@@ -189,9 +206,31 @@ export function SectionPricing({ user, products, subscription }: Props) {
                     <h2
                       className={`${kodeMono.className} text-2xl font-semibold text-white`}
                     >
-                      {product.name}
+                      Beta Access
                     </h2>
-                    <p className="mt-4 text-gray-300">{product.description}</p>
+                    <div className="mt-4 space-y-4">
+                      <p className="text-gray-300">
+                        Full access to our pattern recognition system including:
+                      </p>
+                      <ul className="space-y-3">
+                        {PRICING_FEATURES.map((feature, index) => (
+                          <li
+                            key={index}
+                            className="group flex cursor-pointer items-center gap-3"
+                          >
+                            <div className="relative flex items-center gap-2">
+                              <div
+                                className={`absolute -inset-0.5 rounded-full bg-gradient-to-r from-[${feature.color}]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100`}
+                              />
+                              <feature.icon className="relative h-4 w-4 text-white" />
+                              <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
+                                {feature.text}
+                              </span>
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
                     <p className="mt-8">
                       <span
                         className={`${outfit.className} text-5xl font-bold text-white`}
@@ -200,15 +239,18 @@ export function SectionPricing({ user, products, subscription }: Props) {
                       </span>
                       <span className="text-gray-300">/{billingInterval}</span>
                     </p>
-                    <Button
-                      variant="slim"
-                      type="button"
-                      loading={priceIdLoading === price.id}
-                      onClick={() => handleStripeCheckout(price)}
-                      className={`${kodeMono.className} mt-8 w-full rounded-md bg-white/10 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/20`}
-                    >
-                      {subscription ? 'Manage' : 'Subscribe'}
-                    </Button>
+                    <div className="group relative mt-8">
+                      <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-blue-500/50 to-purple-500/50 opacity-0 blur transition-all duration-500 group-hover:opacity-100" />
+                      <Button
+                        variant="slim"
+                        type="button"
+                        loading={priceIdLoading === price.id}
+                        onClick={() => handleStripeCheckout(price)}
+                        className={`${kodeMono.className} relative w-full rounded-md bg-white/10 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/20`}
+                      >
+                        {subscription ? 'Manage Access' : 'Get Early Access'}
+                      </Button>
+                    </div>
                   </div>
                 </div>
               );
