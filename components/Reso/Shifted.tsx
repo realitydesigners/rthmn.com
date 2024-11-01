@@ -10,7 +10,7 @@ interface BoxComponentProps {
 
 const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
   const renderShiftedBoxes = (boxArray: Box[]) => {
-    if (!boxArray || boxArray.length === 0) return null;
+    if (!boxArray?.length) return null;
 
     const maxSize = Math.abs(boxArray[0].value);
 
@@ -75,7 +75,7 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
       transition={{ duration: 0 }}
     >
       <AnimatePresence>
-        {(!slice || slice.boxes.length === 0) && !isLoading && (
+        {(!slice || !slice.boxes || slice.boxes.length === 0) && !isLoading && (
           <MotionDiv
             key="initial-state"
             initial={{ opacity: 1 }}
@@ -93,7 +93,7 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
             transition={{ duration: 0 }}
           ></MotionDiv>
         )}
-        {slice && slice.boxes.length > 0 && (
+        {slice?.boxes && slice.boxes.length > 0 && (
           <MotionDiv
             key="box-container"
             className="relative h-full w-full"
