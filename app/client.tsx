@@ -11,6 +11,7 @@ import { SectionBoxes } from '@/app/_components/SectionBoxes';
 import { SectionBlogPosts } from '@/app/_components/SectionBlogPosts';
 import { SectionFooter } from '@/app/_components/SectionFooter';
 import { SectionBoxes2 } from '@/app/_components/SectionBoxes2';
+import { SectionAlgorithm } from '@/app/_components/SectionAlgorithm';
 
 interface ClientPageProps {
   posts: any[];
@@ -25,6 +26,7 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
       <SectionHero />
       <SectionBoxes slice={null} isLoading={false} />
       <SectionBoxes2 slice={null} isLoading={false} />
+      <SectionAlgorithm />
       <SectionBlogPosts initialPosts={posts} />
       <SectionPricing
         user={session?.user}
