@@ -4,6 +4,16 @@ import { oxanium, outfit, kodeMono, russo } from '@/fonts';
 import type { Box, BoxSlice } from '@/types';
 import { useState, useEffect, useRef } from 'react';
 import { sequences } from './sequences';
+import {
+  FaRobot,
+  FaBrain,
+  FaWaveSquare,
+  FaChartLine,
+  FaMicrochip,
+  FaAtom,
+  FaCode,
+  FaServer
+} from 'react-icons/fa';
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
@@ -58,7 +68,7 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
       if (!isPaused) {
         setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
       }
-    }, 200);
+    }, 500);
 
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
@@ -161,80 +171,186 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
   };
 
   return (
-    <div className="flex h-screen items-center justify-center gap-12">
-      <div className="items- flex flex-col">
-        <h1
-          className={`${outfit.className} text-6xl font-bold tracking-tight text-white`}
-        >
-          A Next Generation
-        </h1>
-        <h2
-          className={`${outfit.className} text-5xl font-bold tracking-tight text-transparent text-white`}
-        >
-          Algorithmic Trading Platform
-        </h2>
-      </div>
-      <div className="flex w-auto flex-col items-center justify-center gap-4">
-        <div className={`${kodeMono.className} text-sm text-gray-500`}>
-          {isPaused && (
-            <span className="text-green-500">System State Analysis</span>
-          )}
+    <div className="flex h-screen items-center justify-center px-12">
+      {/* Left Side - Title and Description */}
+      <div className="flex w-1/2 flex-col gap-8 pl-16">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center gap-4">
+            <h1
+              className={`${outfit.className} text-7xl font-bold tracking-tight text-white`}
+            >
+              A Next Generation
+            </h1>
+          </div>
+          <div className="flex items-center gap-4">
+            <h2
+              className={`${outfit.className} text-7xl font-bold tracking-tight text-white`}
+            >
+              Algorithmic Trading
+            </h2>
+          </div>
+          <div className="flex items-center gap-4">
+            <h2
+              className={`${outfit.className} text-7xl font-bold tracking-tight text-white`}
+            >
+              Platform
+            </h2>
+          </div>
         </div>
-        <div className="relative min-h-[250px] w-[250px] bg-black">
-          {currentSlice && currentSlice.boxes.length > 0 && (
-            <div className="relative h-full w-full">
-              {renderShiftedBoxes(
-                currentSlice.boxes.sort(
-                  (a, b) => Math.abs(b.value) - Math.abs(a.value)
-                )
-              )}
+
+        <div className={`${kodeMono.className} flex flex-col gap-6`}>
+          <p className="text-lg leading-relaxed text-gray-300">
+            Advanced quantum computing principles merged with neural network
+            analysis for precise market pattern recognition and predictive
+            modeling. Utilizing cutting-edge wave mechanics to decode complex
+            market behaviors in microsecond intervals.
+          </p>
+          <div className="mb-6 grid grid-cols-4 gap-4">
+            {[
+              { icon: FaMicrochip, label: 'Neural Processing', value: '98.2%' },
+              { icon: FaAtom, label: 'Quantum State', value: 'Active' },
+              { icon: FaCode, label: 'Algorithms', value: '1.2M+' },
+              { icon: FaServer, label: 'Response Time', value: '0.3ms' }
+            ].map((item, index) => (
+              <div
+                key={index}
+                className="rounded-lg border border-white/10 bg-white/5 p-3 backdrop-blur-sm transition-colors duration-300 hover:border-white/20"
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <item.icon className="h-4 w-4 text-white" />
+                  <span className="text-xs text-gray-400">{item.label}</span>
+                </div>
+                <div className="text-lg font-bold text-white">{item.value}</div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-8 text-sm">
+            <div className="group flex cursor-pointer items-center gap-3">
+              <div className="relative flex items-center gap-2">
+                <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-[#22c55e]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100"></div>
+                <FaChartLine className="relative h-4 w-4 animate-pulse text-white" />
+                <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
+                  Real-time Analysis
+                </span>
+              </div>
             </div>
-          )}
-        </div>
 
-        <div className={`${kodeMono.className} mb-2 text-gray-400`}>
-          Sequence History: Pattern {Math.floor(demoStep / 1) + 1} of{' '}
-          {patterns.length}
-        </div>
+            <div className="group flex cursor-pointer items-center gap-3">
+              <div className="relative flex items-center gap-2">
+                <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-[#3b82f6]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100"></div>
+                <FaWaveSquare className="relative h-4 w-4 animate-pulse text-white" />
+                <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
+                  Quantum Wave
+                </span>
+              </div>
+            </div>
 
-        <div
-          ref={tableRef}
-          className={`${kodeMono.className} scrollbar-thin scrollbar-track-gray-900 scrollbar-thumb-gray-800 h-[200px] overflow-y-auto text-xs`}
-        >
-          <table className="w-full border-collapse">
-            <tbody>
-              {patterns
-                .slice(0, (Math.floor(demoStep / 1) % patterns.length) + 1)
-                .map((pattern, patternIndex) => {
-                  const isCurrentPattern =
-                    patternIndex === Math.floor(demoStep / 1) % patterns.length;
-                  return (
-                    <tr
-                      key={patternIndex}
-                      className={`${
-                        isCurrentPattern
-                          ? 'current-pattern-row bg-gray-900/30'
-                          : ''
-                      } transition-colors duration-200`}
-                    >
-                      <td className="sticky left-0 bg-black pr-4 text-right text-gray-500">
-                        {`Pattern ${patternIndex + 1}`}
-                      </td>
-                      {pattern.map((value, boxIndex) => (
-                        <td
-                          key={boxIndex}
-                          className={`px-2 ${
-                            value === 1 ? 'text-green-500' : 'text-red-500'
-                          }`}
-                        >
-                          {value === 1 ? '↑' : '↓'}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-            </tbody>
-          </table>
+            <div className="group flex cursor-pointer items-center gap-3">
+              <div className="relative flex items-center gap-2">
+                <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-[#8b5cf6]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100"></div>
+                <FaRobot className="relative h-4 w-4 animate-pulse text-white" />
+                <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
+                  AI Predictions
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Side - Visualization and Analysis */}
+      <div className="flex w-1/2 flex-col items-center justify-center gap-6">
+        {/* Main Container */}
+        <div className="flex w-full max-w-[700px] flex-col gap-4">
+          <div className="flex items-center gap-2">
+            <div className="h-1 w-1 rounded-full bg-white" />
+            <span
+              className={`${kodeMono.className} text-xs uppercase tracking-wider text-white`}
+            >
+              System Visualization
+            </span>
+          </div>
+
+          <div className="grid grid-cols-[1fr_250px] gap-4">
+            {/* Left Column - Pattern Table */}
+            <div
+              className={`${kodeMono.className} rounded-lg border border-white/10 bg-black/50 p-4 backdrop-blur-sm`}
+            >
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-400">
+                    Sequence History
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    Pattern {Math.floor(demoStep / 1) + 1} of {patterns.length}
+                  </span>
+                </div>
+
+                <div
+                  ref={tableRef}
+                  className="scrollbar-none h-[400px] overflow-y-auto"
+                >
+                  <table className="w-full border-separate border-spacing-1">
+                    <tbody>
+                      {patterns
+                        .slice(
+                          0,
+                          (Math.floor(demoStep / 1) % patterns.length) + 1
+                        )
+                        .map((pattern, patternIndex) => {
+                          const isCurrentPattern =
+                            patternIndex ===
+                            Math.floor(demoStep / 1) % patterns.length;
+                          return (
+                            <tr
+                              key={patternIndex}
+                              className={`${
+                                isCurrentPattern
+                                  ? 'bg-white/10'
+                                  : 'hover:bg-white/5'
+                              } rounded-lg transition-colors duration-200`}
+                            >
+                              <td className="rounded-l-lg bg-black/40 px-3 py-2 text-left text-xs text-gray-400">
+                                {`Pattern ${patternIndex + 1}`}
+                              </td>
+                              {pattern.map((value, boxIndex) => (
+                                <td
+                                  key={boxIndex}
+                                  className={`rounded-sm px-2 py-1 text-center ${
+                                    value === 1
+                                      ? 'bg-green-500/10 text-green-400'
+                                      : 'bg-red-500/10 text-red-400'
+                                  }`}
+                                >
+                                  {value === 1 ? '↑' : '↓'}
+                                </td>
+                              ))}
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Box Visualization */}
+            <div className="flex flex-col gap-4">
+              <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-black/50 backdrop-blur-sm">
+                {currentSlice && currentSlice.boxes.length > 0 && (
+                  <div className="relative h-full w-full">
+                    {renderShiftedBoxes(
+                      currentSlice.boxes.sort(
+                        (a, b) => Math.abs(b.value) - Math.abs(a.value)
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Analysis Indicators */}
+            </div>
+          </div>
         </div>
       </div>
     </div>
