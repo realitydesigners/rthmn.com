@@ -6,10 +6,10 @@ import { SectionPricing } from '@/app/_components/SectionPricing';
 import { RyverSection } from '@/app/_components/SectionRyver';
 import { FAQSection } from '@/app/_components/SectionFAQ';
 import { ServiceSection } from '@/app/_components/SectionServices';
-import { PostList } from '@/app/_components/PostList';
-import { useAuth } from '@/providers/SupabaseProvider';
-import ResoBox from '@/app/_components/ResoBox';
 
+import { useAuth } from '@/providers/SupabaseProvider';
+import { SectionBoxes } from '@/app/_components/SectionBoxes';
+import { SectionBlogPosts } from '@/app/_components/SectionBlogPosts';
 interface ClientPageProps {
   posts: any[];
   products: any[] | null;
@@ -21,19 +21,8 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
   return (
     <div className="min-h-screen bg-black text-white">
       <SectionHero />
-      {/* <SectionFeatures /> */}
-
-      <ResoBox slice={null} isLoading={false} />
-
-      <div className="container mx-auto px-4">
-        <PostList initialPosts={posts} />
-      </div>
-      {session && (
-        <div>
-          <p>Welcome, {session.user.email}</p>
-          {/* Add more user details as needed */}
-        </div>
-      )}
+      <SectionBoxes slice={null} isLoading={false} />
+      <SectionBlogPosts initialPosts={posts} />
       <SectionPricing
         user={session?.user}
         products={products ?? []}
