@@ -1,7 +1,3 @@
-:root {
-  --icon-color: #FFF;
-}
-
 .sidebar {
   position: fixed;
   top: 100px;
@@ -52,7 +48,7 @@
   background: #333;
   width: 100%;
   padding: 0.5rem;
-  color: var(--icon-color);
+  color: #FFF;
   cursor: pointer;
   text-align: center;
 }
