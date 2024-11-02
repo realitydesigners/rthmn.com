@@ -16,21 +16,8 @@ import {
 } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { TypeAnimation } from 'react-type-animation';
-
-// Add these interfaces
-interface CustomMotionDivProps extends HTMLMotionProps<'div'> {
-  animate?: AnimationControls;
-  ref?: React.Ref<HTMLDivElement>;
-  className?: string;
-}
-
-interface CustomMotionButtonProps extends HTMLMotionProps<'button'> {
-  className?: string;
-}
-
-// Create custom motion components
-const CustomMotionDiv = motion.div as React.FC<CustomMotionDivProps>;
-const CustomMotionButton = motion.button as React.FC<CustomMotionButtonProps>;
+import { MotionButton } from '../MotionButtton';
+import { MotionDiv } from '../MotionDiv';
 
 export const SectionHero: React.FC = () => {
   const controls = useAnimation();
@@ -46,7 +33,7 @@ export const SectionHero: React.FC = () => {
     <div
       className={`relative flex h-screen w-full flex-col justify-center ${oxanium.className} overflow-hidden bg-black`}
     >
-      <CustomMotionDiv
+      <MotionDiv
         ref={ref}
         animate={controls}
         initial="hidden"
@@ -118,7 +105,7 @@ export const SectionHero: React.FC = () => {
           </div>
         </div>
         <div className="mt-[10vw] flex flex-col items-center space-y-[4vw] lg:mt-[8vw] lg:flex-row lg:space-x-[4vw] lg:space-y-0">
-          <CustomMotionDiv
+          <MotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -129,8 +116,8 @@ export const SectionHero: React.FC = () => {
             >
               Advanced Chart Pattern Recognition
             </span>
-          </CustomMotionDiv>
-          <CustomMotionDiv
+          </MotionDiv>
+          <MotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -141,8 +128,8 @@ export const SectionHero: React.FC = () => {
             >
               Real-time Market Trend Analysis
             </span>
-          </CustomMotionDiv>
-          <CustomMotionDiv
+          </MotionDiv>
+          <MotionDiv
             className="flex w-[50vw] items-center space-x-[1vw]"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -153,9 +140,9 @@ export const SectionHero: React.FC = () => {
             >
               Algorithmic Technical Indicators
             </span>
-          </CustomMotionDiv>
+          </MotionDiv>
         </div>
-      </CustomMotionDiv>
+      </MotionDiv>
     </div>
   );
 };

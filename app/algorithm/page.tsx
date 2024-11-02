@@ -8,6 +8,7 @@ import {
   FaLayerGroup,
   FaChartLine
 } from 'react-icons/fa';
+import { MotionDiv } from '@/app/_components/MotionDiv';
 
 interface Step {
   step: string;
@@ -77,7 +78,7 @@ const AlgorithmPage = () => {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-8">
           <div className="flex flex-col items-center text-center">
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -95,18 +96,15 @@ const AlgorithmPage = () => {
               >
                 The Algorithm
               </h1>
-            </motion.div>
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+            </MotionDiv>
+            <p
               className={`${kodeMono.className} mx-auto max-w-3xl text-lg leading-relaxed text-white/60`}
             >
               At the heart of Rthmn lies a revolutionary approach to market
               analysis. Our algorithm decodes market structure through the lens
               of position-based mathematics, revealing patterns that emerge from
               the complex interaction of 8 distinct market positions.
-            </motion.p>
+            </p>
           </div>
         </div>
       </section>
@@ -159,7 +157,7 @@ const AlgorithmPage = () => {
               </h2>
               <div className="grid gap-6">
                 {CORE_CONCEPTS.map((concept, index) => (
-                  <motion.div
+                  <MotionDiv
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -179,7 +177,7 @@ const AlgorithmPage = () => {
                         <p className="text-white/60">{concept.description}</p>
                       </div>
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 ))}
               </div>
             </div>
@@ -226,7 +224,7 @@ const AlgorithmPage = () => {
                   'Eight-dimensional market structure analysis for complete coverage'
               }
             ].map((item, index) => (
-              <motion.div
+              <MotionDiv
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -246,7 +244,7 @@ const AlgorithmPage = () => {
                   </div>
                 </div>
                 <p className="text-white/60">{item.description}</p>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
@@ -257,7 +255,7 @@ const AlgorithmPage = () => {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-8">
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -290,7 +288,7 @@ const AlgorithmPage = () => {
                       'Analyzes multiple wave patterns simultaneously to identify high-probability trade setups'
                   }
                 ].map((item, index) => (
-                  <motion.div
+                  <MotionDiv
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -303,12 +301,12 @@ const AlgorithmPage = () => {
                       {item.title}
                     </h3>
                     <p className="text-white/60">{item.description}</p>
-                  </motion.div>
+                  </MotionDiv>
                 ))}
               </div>
-            </motion.div>
+            </MotionDiv>
 
-            <motion.div
+            <MotionDiv
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -322,7 +320,7 @@ const AlgorithmPage = () => {
                   [Wave Visualization Placeholder]
                 </div>
               </div>
-            </motion.div>
+            </MotionDiv>
           </div>
         </div>
       </section>
@@ -388,7 +386,7 @@ const AlgorithmPage = () => {
                 description: 'Return to neutral positioning'
               }
             ].map((item, index) => (
-              <motion.div
+              <MotionDiv
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -410,7 +408,7 @@ const AlgorithmPage = () => {
                   </h3>
                 </div>
                 <p className="text-sm text-white/60">{item.description}</p>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>
@@ -793,8 +791,7 @@ const AlgorithmPage = () => {
 
               <div className="space-y-8">
                 {STEPS.map((item, index) => (
-                  <motion.div
-                    as="div"
+                  <MotionDiv
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -818,7 +815,7 @@ const AlgorithmPage = () => {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
+                  </MotionDiv>
                 ))}
               </div>
             </div>

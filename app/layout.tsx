@@ -1,5 +1,4 @@
 import DynamicNavbar from '@/components/NavbarDynamic';
-import Footer from './_components/Footer';
 import { Toaster } from '@/components/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';

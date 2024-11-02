@@ -15,31 +15,12 @@ import {
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { FaArrowRight } from 'react-icons/fa';
+import { MotionDiv } from '@/app/_components/MotionDiv';
+import { MotionButton } from '@/app/_components/MotionButtton';
 
 interface NavbarSignedOutProps {
   user: User | null;
 }
-
-interface CustomMotionDivProps extends HTMLMotionProps<'div'> {
-  className?: string;
-  onClick?: () => void;
-  onMouseLeave?: () => void;
-  ref?: RefObject<HTMLDivElement>;
-  style?: {
-    opacity?: any;
-    scale?: any;
-    y?: any;
-  };
-}
-interface CustomMotionButtonProps extends HTMLMotionProps<'div'> {
-  className?: string;
-  onClick?: () => void;
-  onMouseLeave?: () => void;
-  type?: 'button' | 'submit' | 'reset';
-}
-
-const CustomMotionButton = motion.button as React.FC<CustomMotionButtonProps>;
-const CustomMotionDiv = motion.div as React.FC<CustomMotionDivProps>;
 
 const getIcon = (name: string): JSX.Element => {
   const icons: { [key: string]: JSX.Element } = {
@@ -258,7 +239,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         />
       )}
 
-      <CustomMotionDiv
+      <MotionDiv
         className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent lg:h-20 ${kodeMono.className}`}
         initial="hidden"
         animate="visible"
@@ -295,7 +276,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               </Link>
 
               {/* Desktop sign-in/sign-out button */}
-              <CustomMotionDiv
+              <MotionDiv
                 className="flex hidden lg:block"
                 variants={linkVariants}
                 custom={3}
@@ -316,26 +297,25 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     Sign-in
                   </Link>
                 )}
-              </CustomMotionDiv>
+              </MotionDiv>
             </div>
 
-            <CustomMotionButton
+            <MotionButton
               onClick={toggleNav}
               className="menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden"
-              type="button"
               aria-label="Toggle navigation"
               whileTap={{ scale: 0.95 }}
             >
               <MenuIcon isOpen={isNavOpen} />
-            </CustomMotionButton>
+            </MotionButton>
           </div>
         </div>
-      </CustomMotionDiv>
+      </MotionDiv>
 
       {/* Mobile Navigation Menu */}
       <AnimatePresence>
         {isNavOpen && (
-          <CustomMotionDiv
+          <MotionDiv
             className={`fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 backdrop-blur-sm lg:hidden ${kodeMono.className}`}
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
@@ -367,7 +347,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 )}
               </div>
             </div>
-          </CustomMotionDiv>
+          </MotionDiv>
         )}
       </AnimatePresence>
     </>
@@ -446,18 +426,18 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
           <div
             className={`${styles.dropdownContent} ${styles.dropdownResources}`}
           >
-            <CustomMotionDiv
+            <MotionDiv
               className="flex w-1/2 flex-col gap-2"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
             >
               {group.links.map((item, index) => (
-                <CustomMotionDiv key={item.title} variants={itemVariants}>
+                <MotionDiv key={item.title} variants={itemVariants}>
                   <DropdownLink {...item} className={styles.dropdownItem} />
-                </CustomMotionDiv>
+                </MotionDiv>
               ))}
-            </CustomMotionDiv>
+            </MotionDiv>
             <div className="flex w-1/2 flex-col gap-2">
               <div className="h-full w-full bg-[#181818]" />
               <div className="h-full w-full bg-[#181818]" />
@@ -469,18 +449,18 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
           <div
             className={`${styles.dropdownContent} ${styles.dropdownPricing}`}
           >
-            <CustomMotionDiv
+            <MotionDiv
               className="flex w-1/2 flex-col gap-2"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
             >
               {group.links.map((item, index) => (
-                <CustomMotionDiv key={item.title} variants={itemVariants}>
+                <MotionDiv key={item.title} variants={itemVariants}>
                   <DropdownLink {...item} className={styles.dropdownItem} />
-                </CustomMotionDiv>
+                </MotionDiv>
               ))}
-            </CustomMotionDiv>
+            </MotionDiv>
             <div className="flex w-1/2 flex-row gap-2">
               <div className="h-full w-1/2 bg-[#181818]" />
               <div className="h-full w-1/2 bg-[#181818]" />
@@ -493,18 +473,18 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             className={`${styles.dropdownContent} ${styles.dropdownAccount}`}
           >
             <div className="w-1/3 bg-[#181818]" />
-            <CustomMotionDiv
+            <MotionDiv
               className="flex w-2/3 flex-col gap-2"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
             >
               {group.links.map((item, index) => (
-                <CustomMotionDiv key={item.title} variants={itemVariants}>
+                <MotionDiv key={item.title} variants={itemVariants}>
                   <DropdownLink {...item} className={styles.dropdownItem} />
-                </CustomMotionDiv>
+                </MotionDiv>
               ))}
-            </CustomMotionDiv>
+            </MotionDiv>
           </div>
         );
       default:
@@ -515,7 +495,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
   return (
     <AnimatePresence>
       {isVisible && (
-        <CustomMotionDiv
+        <MotionDiv
           className={`${styles.dropdownContainer} ${activeDropdown ? styles.active : styles.inactive}`}
           onMouseLeave={onClose}
           variants={dropdownVariants}
@@ -526,7 +506,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
           <div className={styles.dropdownWrapper}>
             {renderDropdownContent()}
           </div>
-        </CustomMotionDiv>
+        </MotionDiv>
       )}
     </AnimatePresence>
   );

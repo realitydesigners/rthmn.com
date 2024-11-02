@@ -24,6 +24,8 @@ import {
 import { useRef, useState, useEffect } from 'react';
 import type { HTMLMotionProps } from 'framer-motion';
 import { getAnimationSequence } from '../SectionBoxes2/sequences';
+import { MotionDiv } from '../MotionDiv';
+import { MotionButton } from '../MotionButtton';
 
 const ALGORITHM_FEATURES = [
   {
@@ -113,7 +115,7 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => (
-  <motion.div
+  <MotionDiv
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -146,7 +148,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ feature }) => (
         </li>
       ))}
     </ul>
-  </motion.div>
+  </MotionDiv>
 );
 
 const TechnicalSpec = ({ spec }) => (
@@ -167,7 +169,7 @@ const TechnicalSpec = ({ spec }) => (
 
 const WaveformAnimation = () => (
   <div className="relative h-40 w-full overflow-hidden">
-    <motion.div
+    <MotionDiv
       initial={{ x: '-100%' }}
       animate={{ x: '100%' }}
       transition={{
@@ -234,7 +236,7 @@ const POSITION_DYNAMICS = [
 ];
 
 const WaveMechanicsCard = ({ mechanic, index }) => (
-  <motion.div
+  <MotionDiv
     initial={{ opacity: 0, x: -20 }}
     whileInView={{ opacity: 1, x: 0 }}
     transition={{ delay: index * 0.1 }}
@@ -254,7 +256,7 @@ const WaveMechanicsCard = ({ mechanic, index }) => (
         </li>
       ))}
     </ul>
-  </motion.div>
+  </MotionDiv>
 );
 
 const PositionDynamicsTable = () => (
@@ -304,18 +306,18 @@ const InteractiveWaveform = () => {
 
   return (
     <div ref={containerRef} className="relative h-[400px] overflow-hidden">
-      <motion.div
+      <MotionDiv
         style={{ y: y1 }}
         className="absolute left-0 top-0 h-full w-full"
       >
         {/* Add wave animation elements */}
-      </motion.div>
-      <motion.div
+      </MotionDiv>
+      <MotionDiv
         style={{ y: y2 }}
         className="absolute left-0 top-0 h-full w-full"
       >
         {/* Add counter wave animation elements */}
-      </motion.div>
+      </MotionDiv>
     </div>
   );
 };
@@ -373,11 +375,11 @@ const PatternSimulator = () => {
         Pattern Simulator
       </h3>
       <div className="relative h-[300px]">
-        <motion.div style={{ opacity }} className="grid grid-cols-8 gap-2">
+        <MotionDiv style={{ opacity }} className="grid grid-cols-8 gap-2">
           {Array(8)
             .fill(0)
             .map((_, i) => (
-              <motion.div
+              <MotionDiv
                 key={i}
                 className="relative h-full w-full"
                 animate={{
@@ -386,9 +388,9 @@ const PatternSimulator = () => {
                 transition={{ duration: 0.5, delay: i * 0.1 }}
               >
                 <div className="absolute inset-0 rounded-lg border border-white/10 bg-white/5" />
-              </motion.div>
+              </MotionDiv>
             ))}
-        </motion.div>
+        </MotionDiv>
       </div>
     </div>
   );
@@ -406,7 +408,7 @@ const PatternAnalysis = () => {
         </h3>
         <div className="space-y-4">
           {PATTERN_MECHANICS.map((section, i) => (
-            <motion.div
+            <MotionDiv
               key={i}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -433,7 +435,7 @@ const PatternAnalysis = () => {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
       </div>
@@ -488,7 +490,7 @@ const WaveMechanicsViz = () => {
   return (
     <div ref={containerRef} className="relative h-[400px] overflow-hidden">
       {animationSequence[currentStep].positions.map((pos) => (
-        <motion.div
+        <MotionDiv
           key={pos.boxNumber}
           style={{
             position: 'absolute',
@@ -513,7 +515,7 @@ const WaveMechanicsViz = () => {
           <div className="flex h-full items-center justify-center text-white/60">
             {pos.boxNumber}
           </div>
-        </motion.div>
+        </MotionDiv>
       ))}
     </div>
   );
@@ -541,7 +543,7 @@ const StateTransitionViz = () => {
       <div className="rounded-xl border border-white/5 bg-black/30 p-8">
         <div className="relative h-[400px]">
           {states[activeState].positions.map((pos, i) => (
-            <motion.div
+            <MotionDiv
               key={i}
               className={`absolute h-8 w-8 rounded-lg border border-white/10 ${
                 pos === 1 ? 'bg-white/20' : 'bg-white/5'
@@ -559,7 +561,7 @@ const StateTransitionViz = () => {
               <div className="flex h-full items-center justify-center text-xs text-white/60">
                 {i + 1}
               </div>
-            </motion.div>
+            </MotionDiv>
           ))}
         </div>
         <div className="mt-4 text-center text-sm text-white/60">
@@ -605,7 +607,7 @@ const StateTransitionViz = () => {
 };
 
 const PhilosophicalInsight = ({ insight }) => (
-  <motion.div
+  <MotionDiv
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -624,7 +626,7 @@ const PhilosophicalInsight = ({ insight }) => (
         "{insight.insight}"
       </p>
     </div>
-  </motion.div>
+  </MotionDiv>
 );
 
 // Parallax Wave Background
@@ -637,7 +639,7 @@ const ParallaxWaveBackground = () => {
   return (
     <div className="absolute inset-0 overflow-hidden">
       {[y1, y2, y3].map((y, i) => (
-        <motion.div
+        <MotionDiv
           key={i}
           style={{ y }}
           className="absolute inset-0 opacity-[0.02]"
@@ -649,7 +651,7 @@ const ParallaxWaveBackground = () => {
               opacity: 0.1 - i * 0.02
             }}
           />
-        </motion.div>
+        </MotionDiv>
       ))}
     </div>
   );
@@ -681,7 +683,7 @@ const PatternExplorer = () => {
       <div className="grid grid-cols-[1fr_2fr] gap-8">
         <div className="space-y-6">
           {phases.map((phase, i) => (
-            <motion.button
+            <MotionButton
               key={i}
               className={`w-full rounded-lg border border-white/5 p-4 text-left transition-all ${
                 activePhase === i ? 'bg-white/10' : 'bg-black/20'
@@ -696,11 +698,11 @@ const PatternExplorer = () => {
                 {phase.title}
               </h4>
               <p className="text-sm text-white/60">{phase.description}</p>
-            </motion.button>
+            </MotionButton>
           ))}
         </div>
         <div className="relative rounded-lg border border-white/5 bg-black/20 p-6">
-          <motion.div
+          <MotionDiv
             key={activePhase}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -708,7 +710,7 @@ const PatternExplorer = () => {
             className="relative h-full"
           >
             {/* Add visualization here */}
-          </motion.div>
+          </MotionDiv>
         </div>
       </div>
     </div>
@@ -739,7 +741,7 @@ const PatternInsightsCarousel = () => {
   return (
     <div className="relative overflow-hidden rounded-xl border border-white/5 bg-black/30 p-12">
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.02] to-transparent" />
-      <motion.div
+      <MotionDiv
         className="relative flex gap-8"
         animate={{ x: -activeInsight * 100 + '%' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
@@ -759,7 +761,7 @@ const PatternInsightsCarousel = () => {
             </p>
           </div>
         ))}
-      </motion.div>
+      </MotionDiv>
       <div className="mt-8 flex justify-center gap-2">
         {insights.map((_, i) => (
           <button
@@ -846,7 +848,7 @@ export const SectionAlgorithm = () => {
           </h3>
           <div className="grid grid-cols-3 gap-12">
             {PATTERN_PRINCIPLES.map((principle, i) => (
-              <motion.div
+              <MotionDiv
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -870,7 +872,7 @@ export const SectionAlgorithm = () => {
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </MotionDiv>
             ))}
           </div>
         </div>

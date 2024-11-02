@@ -43,12 +43,6 @@ interface BoxComponentProps {
   isLoading: boolean;
 }
 
-interface PositionStyle {
-  top?: number;
-  bottom?: number;
-  right: number;
-}
-
 // Helper Functions
 const createDemoStep = (
   step: number,

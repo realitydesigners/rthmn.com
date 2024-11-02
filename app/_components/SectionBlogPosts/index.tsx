@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { oxanium, russo, outfit, kodeMono } from '@/fonts';
 import Image from 'next/image';
 import Link from 'next/link';
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { MotionDiv } from '../MotionDiv';
 
 export interface Post {
   slug: { current: string };
@@ -38,25 +38,11 @@ const FormattedDate: React.FC<{ date?: string; className?: string }> = ({
   return <span className={className}>{formattedDate}</span>;
 };
 
-interface CustomMotionDivProps extends HTMLMotionProps<'div'> {
-  className?: string; // Add this line
-}
-
-const CustomMotionDiv: React.FC<CustomMotionDivProps> = motion.div;
-
 const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
   const block = post.block[0];
 
-  const motionProps: CustomMotionDivProps = {
-    className:
-      'group flex h-full flex-col overflow-hidden rounded-lg border border-[#181818] shadow-lg transition-all duration-300 hover:scale-105',
-    initial: { opacity: 0, y: 20 },
-    animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.5, delay: index * 0.1 }
-  };
-
   return (
-    <CustomMotionDiv {...motionProps}>
+    <MotionDiv className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#181818] shadow-lg transition-all duration-300 hover:scale-105">
       {block?.imageRef && (
         <div className="relative h-48 w-full overflow-hidden">
           <Image
@@ -92,7 +78,7 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
           Read More
         </Link>
       </div>
-    </CustomMotionDiv>
+    </MotionDiv>
   );
 };
 
