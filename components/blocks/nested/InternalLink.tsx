@@ -166,7 +166,7 @@ const InternalLink: React.FC<{
           {children}
         </span>
         <span
-          className={`${russo.className} ml-2 rounded-full bg-[#c4b5fd] pb-[5px] pl-2 pr-2 pt-[5px] text-[16px] text-black`}
+          className={`text-russo ml-2 rounded-full bg-[#c4b5fd] pb-[5px] pl-2 pr-2 pt-[5px] text-[16px] text-black`}
         >
           POST
         </span>

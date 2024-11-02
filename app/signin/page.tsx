@@ -61,13 +61,13 @@ export default function SignIn() {
       </div>
       <div className="flex w-1/2 flex-col items-center justify-center bg-black">
         <div className="w-96 max-w-xl">
-          <h1 className={`mb-6 text-5xl text-white ${russo.className}`}>
+          <h1 className={`text-russo mb-6 text-5xl text-white`}>
             Ready to use RTHMN?
           </h1>
-          <p className={`mb-10 text-xl text-gray-300 ${oxanium.className}`}>
+          <p className={`text-oxanium mb-10 text-xl text-gray-300`}>
             Sign in to get started
           </p>
-          <p className={`mb-6 text-lg text-gray-400 ${oxanium.className}`}>
+          <p className={`text-oxanium mb-6 text-lg text-gray-400`}>
             Choose your preferred sign in method
           </p>
           {allowOauth && (

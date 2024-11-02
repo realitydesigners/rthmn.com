@@ -116,3 +116,46 @@ export const FEATURE_TAGS = [
   { icon: FaWaveSquare, text: 'Market Trends', color: '#3b82f6' },
   { icon: FaRobot, text: 'Smart Alerts', color: '#8b5cf6' }
 ];
+
+export const POSITION_STATES = [
+  {
+    state: 'P1',
+    name: 'Accumulation Base',
+    description: 'Initial position building phase'
+  },
+  {
+    state: 'P2',
+    name: 'Early Momentum',
+    description: 'First signs of directional bias'
+  },
+  {
+    state: 'P3',
+    name: 'Momentum Acceleration',
+    description: 'Increased position commitment'
+  },
+  {
+    state: 'P4',
+    name: 'Peak Extension',
+    description: 'Maximum position extension'
+  },
+  {
+    state: 'P5',
+    name: 'Initial Reversal',
+    description: 'First signs of position unwinding'
+  },
+  {
+    state: 'P6',
+    name: 'Momentum Shift',
+    description: 'Clear change in position bias'
+  },
+  {
+    state: 'P7',
+    name: 'Distribution Phase',
+    description: 'Advanced position unwinding'
+  },
+  {
+    state: 'P8',
+    name: 'Reset State',
+    description: 'Return to neutral positioning'
+  }
+];

@@ -1,5 +1,4 @@
 'use client';
-import { oxanium, outfit, kodeMono } from '@/fonts';
 import Link from 'next/link';
 import React from 'react';
 import { FaArrowRight } from 'react-icons/fa';
@@ -22,7 +21,7 @@ export const SectionHero: React.FC = () => {
 
   return (
     <div
-      className={`relative flex h-screen w-full flex-col justify-center ${oxanium.className} overflow-hidden bg-black`}
+      className={`text-oxanium relative flex h-screen w-full flex-col justify-center overflow-hidden bg-black`}
     >
       <MotionDiv
         ref={ref}

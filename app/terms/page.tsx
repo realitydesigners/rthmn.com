@@ -5,7 +5,7 @@ export default function TermsPage() {
     <div className="min-h-screen pt-24">
       <div className="container mx-auto px-4 md:px-8">
         <h1
-          className={`${russo.className} my-12 text-center text-4xl text-white lg:text-5xl`}
+          className={`text-russo my-12 text-center text-4xl text-white lg:text-5xl`}
         >
           Terms of Service
         </h1>

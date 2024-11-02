@@ -129,7 +129,7 @@ const HeadingBlock = ({ block }) => {
                 </div>
                 <Heading
                   heading={block.heading}
-                  className={`${russo.className} cursor-pointer bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
+                  className={`text-russo cursor-pointer bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
                 />
                 <SubHeading
                   heading={block.subheading}

@@ -4,7 +4,6 @@ import { getErrorRedirect } from '@/utils/helpers';
 import { getStripe } from '@/utils/stripe/client';
 import { checkoutWithStripe } from '@/utils/stripe/server';
 import type { User } from '@supabase/supabase-js';
-import { outfit, kodeMono } from '@/fonts';
 import cn from 'classnames';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';

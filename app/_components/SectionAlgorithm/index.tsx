@@ -1,6 +1,4 @@
 'use client';
-import { outfit, kodeMono } from '@/fonts';
-
 import { MotionDiv } from '../../../components/MotionDiv';
 import {
   ALGORITHM_FEATURES,

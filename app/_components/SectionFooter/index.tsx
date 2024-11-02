@@ -1,5 +1,4 @@
 'use client';
-import { outfit, kodeMono, russo } from '@/fonts';
 import Link from 'next/link';
 import { useState, type JSX } from 'react';
 import { FaGithub, FaTwitter, FaDiscord, FaInstagram } from 'react-icons/fa';
@@ -85,7 +84,7 @@ export function SectionFooter() {
                   {getIcon('logo')}
                 </div>
                 <div
-                  className={`pt-1 text-2xl font-bold tracking-wide ${russo.className}`}
+                  className={`text-russo pt-1 text-2xl font-bold tracking-wide`}
                 >
                   RTHMN
                 </div>
@@ -133,7 +132,7 @@ export function SectionFooter() {
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-3">
             {/* Links Sections */}
             {Object.entries(FOOTER_LINKS).map(([category, links]) => (
-              <div key={category} className={kodeMono.className}>
+              <div key={category} className="text-kodemono">
                 <h3 className="text-sm font-semibold uppercase text-white">
                   {category}
                 </h3>

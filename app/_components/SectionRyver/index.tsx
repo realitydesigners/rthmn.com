@@ -1,6 +1,5 @@
 'use client';
 import Spline from '@splinetool/react-spline';
-import { russo, oxanium } from '@/fonts';
 import {
   motion,
   HTMLMotionProps,
@@ -58,7 +57,7 @@ export function RyverSection() {
                 RTHMN
               </h1>
               <h1
-                className={`heading-text text-6xl font-bold leading-none tracking-wide lg:text-8xl ${russo.className}`}
+                className={`heading-text text-russo text-6xl font-bold leading-none tracking-wide lg:text-8xl`}
               >
                 RYVER
               </h1>
@@ -93,7 +92,7 @@ export function RyverSection() {
             </svg>
           </CustomMotionDiv>
           <div
-            className={`heading-text w-3/4 pt-12 text-center text-2xl lg:w-1/2 lg:text-4xl ${oxanium.className}`}
+            className={`heading-text text-oxanium w-3/4 pt-12 text-center text-2xl lg:w-1/2 lg:text-4xl`}
           >
             With RYVER Charts, you don't just watch the market— you see how it
             flows.

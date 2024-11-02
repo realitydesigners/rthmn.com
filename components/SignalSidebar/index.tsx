@@ -66,28 +66,22 @@ export function SignalSidebar() {
         <div className="flex flex-1 flex-col p-2 text-xs uppercase">
           <div className="flex gap-2">
             <p
-              className={`heading-text mb-2 inline-block rounded px-1.5 py-0.5 text-xs ${oxanium.className}`}
+              className={`heading-text text-oxanium mb-2 inline-block rounded px-1.5 py-0.5 text-xs`}
             >
               {signal.pattern_type === 'defaultType'
                 ? 'BUY'
                 : signal.pattern_type}
             </p>
-            <p
-              className={`text-base font-bold text-white/70 ${oxanium.className}`}
-            >
+            <p className={`text-oxanium text-base font-bold text-white/70`}>
               {signal.start_price}
             </p>
           </div>
-          <div
-            className={`text-2xl font-bold text-white/50 ${russo.className}`}
-          >
+          <div className={`text-russo text-2xl font-bold text-white/50`}>
             {pairName}
           </div>
         </div>
         <div className="ml-auto flex items-center p-3.5">
-          <div
-            className={`text-right text-xs text-[#828385] ${oxanium.className}`}
-          >
+          <div className={`text-oxanium text-right text-xs text-[#828385]`}>
             {getTimeAgo(signal.start_time || '')}
             <StatusCircle status={signal.status} />
           </div>
@@ -113,19 +107,19 @@ export function SignalSidebar() {
       >
         <div className="flex flex-1 flex-row items-center justify-between p-2 text-xs">
           <div
-            className={`mr-2.5 w-[70px] text-base font-bold text-white/50 ${russo.className}`}
+            className={`text-russo mr-2.5 w-[70px] text-base font-bold text-white/50`}
           >
             {pairName}
           </div>
           <p
-            className={`heading-text inline-block w-[50px] rounded border-[#747578] px-1.5 py-0.5 text-center text-xs ${oxanium.className}`}
+            className={`heading-text text-oxanium inline-block w-[50px] rounded border-[#747578] px-1.5 py-0.5 text-center text-xs`}
           >
             {signal.pattern_type === 'defaultType'
               ? 'BUY'
               : signal.pattern_type}
           </p>
           <p
-            className={`w-[70px] text-left text-sm font-bold text-white/70 ${oxanium.className}`}
+            className={`text-oxanium w-[70px] text-left text-sm font-bold text-white/70`}
           >
             {signal.start_price}
           </p>
@@ -137,7 +131,7 @@ export function SignalSidebar() {
 
   return (
     <div
-      className={`fixed bottom-0 right-0 top-20 z-[1000] w-[300px] overflow-y-auto border border-[#181818] bg-black p-2 shadow-md ${oxanium.className}`}
+      className={`text-oxanium fixed bottom-0 right-0 top-20 z-[1000] w-[300px] overflow-y-auto border border-[#181818] bg-black p-2 shadow-md`}
     >
       <div className="mb-2 flex justify-between">
         <button
@@ -185,7 +179,7 @@ const StatusCircle: React.FC<{ status: string }> = ({ status }) => {
 
   return (
     <div
-      className={`mt-4 flex items-center justify-center rounded px-1.5 py-0.5 font-bold uppercase ${getStatusColor} ${oxanium.className}`}
+      className={`mt-4 flex items-center justify-center rounded px-1.5 py-0.5 font-bold uppercase ${getStatusColor} text-oxanium`}
     >
       {status === 'active' && (
         <div className="mr-1 h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-200" />

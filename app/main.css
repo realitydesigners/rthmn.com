@@ -184,24 +184,36 @@ p a {
 
 
 @layer components {
-
-  .text-gradient {
+  .text-gray-gradient {
     @apply bg-gradient-to-b from-white via-white to-white/50 bg-clip-text text-transparent;
   }
 
   .text-gray {
-    @apply bg-gradient-to-b from-white via-gray-200 to-gray-200/50 bg-clip-text text-transparent;
+    @apply bg-gradient-to-b from-white to-gray-200/50 bg-clip-text text-transparent;
   }
 
   .text-dark-gray {
-    @apply bg-gradient-to-b from-white via-gray-500 to-gray-500/50 bg-clip-text text-transparent;
+    @apply bg-gradient-to-b from-gray-200/75 to-gray-200/50 bg-clip-text text-transparent;
   }
+
   .text-kodemono {
     @apply font-kodemono;
   }
 
   .text-outfit {
     @apply font-outfit;
+  }
+
+  .text-oxanium {
+    @apply font-oxanium;
+  }
+
+  .text-russo {
+    @apply font-russo;
+  }
+
+  .border-gray {
+    @apply border border-[#181818];
   }
 }
 

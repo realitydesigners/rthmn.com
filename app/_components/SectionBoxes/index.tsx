@@ -1,6 +1,5 @@
 'use client';
 import type React from 'react';
-import { outfit, kodeMono } from '@/fonts';
 import type { BoxSlice } from '@/types';
 import { useState, useEffect, useRef } from 'react';
 import {

@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import { oxanium, outfit, russo } from '@/fonts';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { FaCube, FaChartLine, FaGamepad, FaRobot } from 'react-icons/fa';
 

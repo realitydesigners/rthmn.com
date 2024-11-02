@@ -10,6 +10,7 @@ import {
   createMockBoxData
 } from '@/app/_components/constants';
 import { motion, AnimatePresence } from 'framer-motion';
+import { MotionDiv } from '@/components/MotionDiv';
 
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
@@ -27,35 +28,6 @@ interface ScanningBlock {
   value: number;
   isActive: boolean;
 }
-
-const Block = ({ x, y, z, value, isActive }) => (
-  <motion.div
-    className="absolute"
-    style={{
-      transform: `translate3d(${x}px, ${y}px, ${z}px)`,
-      transformStyle: 'preserve-3d',
-      perspective: '1000px'
-    }}
-    initial={{ opacity: 0, scale: 0 }}
-    animate={{
-      opacity: isActive ? 1 : 0.3,
-      scale: isActive ? 1 : 0.8,
-      rotateX: isActive ? [0, 15, 0] : 0,
-      rotateY: isActive ? [0, -15, 0] : 0
-    }}
-    transition={{ duration: 0.5 }}
-  >
-    <div
-      className={`h-8 w-8 rounded-lg border border-white/10 backdrop-blur-sm ${isActive ? 'bg-emerald-500/20' : 'bg-white/5'} `}
-    >
-      <div className="absolute inset-0 flex items-center justify-center font-mono text-xs">
-        <span className={isActive ? 'text-emerald-400' : 'text-white/40'}>
-          {value.toFixed(0)}
-        </span>
-      </div>
-    </div>
-  </motion.div>
-);
 
 const ScanningGrid = ({ sequence, currentIndex }) => {
   const gridSize = 8;
@@ -82,7 +54,7 @@ const ScanningGrid = ({ sequence, currentIndex }) => {
       {/* 3D Scene Container */}
       <div className="relative h-full w-full overflow-hidden" style={{}}>
         {/* Scanning Effect */}
-        <motion.div
+        <MotionDiv
           className="absolute inset-0 bg-gradient-to-b from-emerald-500/0 via-emerald-500/10 to-emerald-500/0"
           animate={{
             y: ['0%', '100%', '0%']

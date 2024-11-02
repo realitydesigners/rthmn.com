@@ -1,7 +1,5 @@
 'use client';
-
 import { useState, useEffect } from 'react';
-import { oxanium, russo, outfit, kodeMono } from '@/fonts';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MotionDiv } from '../../../components/MotionDiv';
