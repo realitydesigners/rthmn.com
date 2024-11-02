@@ -8,15 +8,7 @@ import { outfit, kodeMono } from '@/fonts';
 import cn from 'classnames';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import {
-  FaServer,
-  FaRocket,
-  FaBolt,
-  FaShieldAlt,
-  FaChartLine,
-  FaWaveSquare,
-  FaRobot
-} from 'react-icons/fa';
+import { FaBolt, FaChartLine, FaWaveSquare, FaRobot } from 'react-icons/fa';
 
 type Subscription = any;
 type Product = any;
@@ -102,7 +94,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
       <section className="bg-black">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-24 lg:px-8">
           <div className="sm:align-center sm:flex sm:flex-col" />
-          <p className={`${kodeMono.className} text-lg text-gray-300`}>
+          <p className={`text-kodemono text-lg text-gray-300`}>
             No subscription pricing plans found. Create them in your{' '}
             <a
               className="text-blue-500 underline hover:text-blue-400"
@@ -126,12 +118,12 @@ export function SectionPricing({ user, products, subscription }: Props) {
           {/* Title Section */}
           <div className="flex flex-col gap-4">
             <h1
-              className={`${outfit.className} text-5xl font-bold tracking-tight text-white lg:text-7xl`}
+              className={`text-outfit text-5xl font-bold tracking-tight text-white lg:text-7xl`}
             >
               Early Access
             </h1>
             <p
-              className={`${kodeMono.className} max-w-2xl text-sm leading-relaxed text-gray-300 lg:text-lg`}
+              className={`text-kodemono max-w-2xl text-sm leading-relaxed text-gray-300 lg:text-lg`}
             >
               Join the first wave of traders using our advanced pattern
               recognition system. Limited spots available during our beta phase.
@@ -140,7 +132,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
           {/* Interval Toggle */}
           <div
-            className={`${kodeMono.className} relative flex self-start rounded-lg border border-white/10 bg-black/50 p-0.5 backdrop-blur-sm`}
+            className={`text-kodemono relative flex self-start rounded-lg border border-white/10 bg-black/50 p-0.5 backdrop-blur-sm`}
           >
             {intervals.includes('month') && (
               <button
@@ -204,7 +196,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
                 >
                   <div className="p-6">
                     <h2
-                      className={`${kodeMono.className} text-2xl font-semibold text-white`}
+                      className={`text-kodemono text-2xl font-semibold text-white`}
                     >
                       Beta Access
                     </h2>
@@ -233,7 +225,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
                     </div>
                     <p className="mt-8">
                       <span
-                        className={`${outfit.className} text-5xl font-bold text-white`}
+                        className={`text-outfit text-5xl font-bold text-white`}
                       >
                         {priceString}
                       </span>
@@ -246,7 +238,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
                           type="button"
                           loading={priceIdLoading === price.id}
                           onClick={() => handleStripeCheckout(price)}
-                          className={`${kodeMono.className} w-full rounded-lg border border-white/10 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20`}
+                          className={`text-kodemono w-full rounded-lg border border-white/10 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20`}
                         >
                           {subscription ? 'Manage Access' : 'Get Early Access'}
                         </Button>

@@ -3,11 +3,12 @@ module.exports = {
   content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
-      // Overriding fontFamily to use @next/font loaded families
       fontFamily: {
         mono: 'var(--font-mono)',
         sans: 'var(--font-sans)',
-        serif: 'var(--font-serif)'
+        serif: 'var(--font-serif)',
+        kodemono: 'var(--font-kodemono)',
+        outfit: 'var(--font-outfit)'
       },
       colors: {
         black: '#000'

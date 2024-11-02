@@ -9,6 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 import './main.css';
 import { GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
+import { kodeMono, outfit } from '@/fonts';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -44,7 +45,10 @@ export default async function RootLayout({
   } = await supabase.auth.getUser();
 
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      className={`${kodeMono.variable} ${outfit.variable} bg-black`}
+    >
       <GoogleTagManager gtmId="GTM-XYZ" />
       <body className="bg-black">
         <SupabaseProvider initialUser={user}>

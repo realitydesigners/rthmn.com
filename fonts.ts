@@ -14,11 +14,13 @@ export const russo = Russo_One({
 export const outfit = Outfit({
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600', '700']
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-outfit'
 });
 
 export const kodeMono = Kode_Mono({
   subsets: ['latin'],
   display: 'swap',
-  weight: ['400', '500', '600', '700']
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-kodemono'
 });

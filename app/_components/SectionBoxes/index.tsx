@@ -1,65 +1,23 @@
 'use client';
 import type React from 'react';
-import { oxanium, outfit, kodeMono, russo } from '@/fonts';
-import type { Box, BoxSlice } from '@/types';
+import { outfit, kodeMono } from '@/fonts';
+import type { BoxSlice } from '@/types';
 import { useState, useEffect, useRef } from 'react';
-import { sequences } from './sequences';
 import {
-  FaRobot,
-  FaWaveSquare,
-  FaChartLine,
-  FaMicrochip,
-  FaServer
-} from 'react-icons/fa';
+  sequences,
+  createDemoStep,
+  createMockBoxData
+} from '@/app/_components/constants';
 import { NestedBoxes } from '@/components/NestedBoxes';
+import { STATS_DATA, FEATURE_TAGS } from '@/app/_components/text';
 
-// Constants
-const POINT_OF_CHANGE_INDEX = 28;
+const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
-const BOX_COUNT = 8;
 const BASE_VALUES = [2000, 1732, 1500, 1299, 1125, 974, 843, 730];
 
-const STATS_DATA = [
-  { icon: FaChartLine, label: 'Markets', value: 'FX' },
-  { icon: FaServer, label: 'Time Frames', value: '1s-1d' },
-  { icon: FaWaveSquare, label: 'Updates', value: 'Live' },
-  { icon: FaMicrochip, label: 'Data Points', value: '100k+/s' }
-];
-
-const FEATURE_TAGS = [
-  { icon: FaChartLine, text: 'Pattern Analysis', color: '#22c55e' },
-  { icon: FaWaveSquare, text: 'Market Trends', color: '#3b82f6' },
-  { icon: FaRobot, text: 'Smart Alerts', color: '#8b5cf6' }
-];
-
-// Types
 interface BoxComponentProps {
   slice: BoxSlice | null;
-  isLoading: boolean;
 }
-
-// Helper Functions
-const createDemoStep = (
-  step: number,
-  patterns: number[][],
-  baseValues: number[]
-) => {
-  const patternIndex = Math.floor(step / 1) % patterns.length;
-  const pattern = patterns[patternIndex];
-
-  return baseValues.slice(0, BOX_COUNT).map((value, index) => {
-    if (index >= pattern.length) return value;
-    return value * pattern[index];
-  });
-};
-
-const createMockBoxData = (values: number[]): Box[] => {
-  return values.map((value) => ({
-    high: Math.abs(value) + 200,
-    low: Math.abs(value) - 200,
-    value: value
-  }));
-};
 
 const StatsGrid = () => (
   <div className="mb-6 grid grid-cols-4 gap-4">
@@ -96,58 +54,6 @@ const FeatureTags = () => (
   </div>
 );
 
-const PatternTable = ({ tableRef, demoStep, patterns }) => (
-  <div
-    className={`${kodeMono.className} rounded-lg border border-white/10 bg-black/50 p-4 backdrop-blur-sm`}
-  >
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <span className="text-xs text-gray-400">Sequence History</span>
-        <span className="text-xs text-gray-400">
-          Pattern {Math.floor(demoStep / 1) + 1} of {patterns.length}
-        </span>
-      </div>
-
-      <div ref={tableRef} className="scrollbar-none h-[400px] overflow-y-auto">
-        <table className="w-full border-separate border-spacing-1">
-          <tbody>
-            {patterns
-              .slice(0, (Math.floor(demoStep / 1) % patterns.length) + 1)
-              .map((pattern, patternIndex) => {
-                const isCurrentPattern =
-                  patternIndex === Math.floor(demoStep / 1) % patterns.length;
-                return (
-                  <tr
-                    key={patternIndex}
-                    className={`${
-                      isCurrentPattern ? 'bg-white/10' : 'hover:bg-white/5'
-                    } rounded-lg transition-colors duration-200`}
-                  >
-                    <td className="rounded-l-lg bg-black/40 px-3 py-2 text-left text-xs text-gray-400">
-                      {`Pattern ${patternIndex + 1}`}
-                    </td>
-                    {pattern.map((value, boxIndex) => (
-                      <td
-                        key={boxIndex}
-                        className={`rounded-sm px-2 py-1 text-center ${
-                          value === 1
-                            ? 'bg-green-500/10 text-green-400'
-                            : 'bg-red-500/10 text-red-400'
-                        }`}
-                      >
-                        {value === 1 ? '↑' : '↓'}
-                      </td>
-                    ))}
-                  </tr>
-                );
-              })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-);
-
 const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => (
   <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-black/50 backdrop-blur-sm">
     {currentSlice && currentSlice.boxes.length > 0 && (
@@ -171,10 +77,7 @@ const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => (
 );
 
 // Main Component
-export const SectionBoxes: React.FC<BoxComponentProps> = ({
-  slice,
-  isLoading
-}) => {
+export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
   // State
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -228,26 +131,26 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({
       <div className="flex w-1/2 flex-col gap-8 pl-16">
         <div className="flex items-center gap-4">
           <h1
-            className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
+            className={`text-outfit text-7xl font-bold leading-[.75em] tracking-tight text-white`}
           >
             Intelligent
           </h1>
         </div>
         <div className="flex items-center gap-4">
           <h2
-            className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
+            className={`text-outfit text-7xl font-bold leading-[.75em] tracking-tight text-white`}
           >
             Market Analysis
           </h2>
         </div>
         <div className="flex items-center gap-4">
           <h2
-            className={`${outfit.className} text-7xl font-bold leading-[.75em] tracking-tight text-white`}
+            className={`text-outfit text-7xl font-bold leading-[.75em] tracking-tight text-white`}
           >
             System
           </h2>
         </div>
-        <div className={`${kodeMono.className} flex flex-col gap-6`}>
+        <div className={`text-kodemono flex flex-col gap-6`}>
           <p className="text-lg leading-relaxed text-gray-300">
             Advanced pattern recognition algorithms combined with real-time
             market data processing. Designed to identify emerging trends and
@@ -263,18 +166,13 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({
           <div className="flex items-center gap-2">
             <div className="h-1 w-1 rounded-full bg-white" />
             <span
-              className={`${kodeMono.className} text-xs uppercase tracking-wider text-white`}
+              className={`text-kodemono text-xs uppercase tracking-wider text-white`}
             >
               System Visualization
             </span>
           </div>
 
           <div className="grid grid-cols-[1fr_250px] gap-4">
-            <PatternTable
-              tableRef={tableRef}
-              demoStep={demoStep}
-              patterns={sequences}
-            />
             <div className="flex flex-col gap-4">
               <BoxVisualization
                 currentSlice={currentSlice}

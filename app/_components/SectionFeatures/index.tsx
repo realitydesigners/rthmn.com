@@ -45,7 +45,7 @@ export const SectionFeatures: React.FC = () => {
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className={`${outfit.className} w-full text-center text-4xl font-bold leading-[1.25em] md:text-5xl lg:w-1/3 lg:leading-[1.25em]`}
+          className={`text-outfit w-full text-center text-4xl font-bold leading-[1.25em] md:text-5xl lg:w-1/3 lg:leading-[1.25em]`}
         >
           A Next Generation Algorithmic Trading Platform
         </CustomMotionH2>

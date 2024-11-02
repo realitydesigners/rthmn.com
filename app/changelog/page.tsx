@@ -59,13 +59,11 @@ function ChangelogCard({
       <div className="relative z-[1000] mb-16 flex w-full flex-1 flex-col rounded-lg border border-gray-900 bg-gray-900/25 p-4 lg:p-8">
         <div className="mb-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <h2
-            className={`${outfit.className} text-xl font-bold text-white md:text-2xl lg:text-3xl`}
+            className={`text-outfit text-xl font-bold text-white md:text-2xl lg:text-3xl`}
           >
             {entry.title}
           </h2>
-          <div
-            className={`${outfit.className} flex flex-wrap items-center gap-4`}
-          >
+          <div className={`text-outfit flex flex-wrap items-center gap-4`}>
             <span className="text-sm text-gray-400">
               {new Date(entry.releaseDate).toLocaleDateString('en-US', {
                 year: 'numeric',
@@ -92,17 +90,13 @@ function ChangelogCard({
           </span>
           <span className="text-sm text-gray-400">Version {entry.version}</span>
         </div>
-        <p className={`${outfit.className} mb-6 text-gray-400`}>
-          {entry.description}
-        </p>
+        <p className={`text-outfit mb-6 text-gray-400`}>{entry.description}</p>
         <div className="prose prose-invert max-w-none">
           <PortableText value={entry.content} components={ChangelogTemplate} />
         </div>
         {entry.contributors && entry.contributors.length > 0 && (
           <div className="mt-6 border-t border-gray-900 pt-4">
-            <h3 className={`${outfit.className} mb-2 text-gray-400`}>
-              Contributors:
-            </h3>
+            <h3 className={`text-outfit mb-2 text-gray-400`}>Contributors:</h3>
             <div className="flex flex-wrap items-center gap-3">
               {entry.contributors.map((contributor) => (
                 <div

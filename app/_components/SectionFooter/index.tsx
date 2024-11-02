@@ -7,9 +7,7 @@ import { FaGithub, FaTwitter, FaDiscord, FaInstagram } from 'react-icons/fa';
 const FOOTER_LINKS = {
   product: [
     { name: 'Features', href: '#' },
-    { name: 'Pricing', href: '#' },
-    { name: 'Documentation', href: '#' },
-    { name: 'API', href: '#' }
+    { name: 'Pricing', href: '#' }
   ],
   company: [
     { name: 'About', href: '#' },
@@ -19,8 +17,7 @@ const FOOTER_LINKS = {
   ],
   legal: [
     { name: 'Privacy', href: '#' },
-    { name: 'Terms', href: '#' },
-    { name: 'License', href: '#' }
+    { name: 'Terms', href: '/terms' }
   ]
 };
 
@@ -94,7 +91,7 @@ export function SectionFooter() {
                 </div>
               </Link>
               <p
-                className={`${kodeMono.className} mt-4 max-w-md text-sm text-gray-400`}
+                className={`text-kodemono mt-4 max-w-md text-sm text-gray-400`}
               >
                 Advanced pattern recognition for algorithmic trading. Built by
                 traders, for traders.
@@ -102,7 +99,7 @@ export function SectionFooter() {
             </div>
 
             {/* Newsletter */}
-            <div className={`${kodeMono.className}`}>
+            <div className={`text-kodemono`}>
               <h3 className="text-sm font-semibold text-white">
                 Subscribe to our newsletter
               </h3>
@@ -162,7 +159,7 @@ export function SectionFooter() {
 
         {/* Bottom Section */}
         <div
-          className={`${kodeMono.className} mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 lg:flex-row`}
+          className={`text-kodemono mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 lg:flex-row`}
         >
           <p className="text-xs text-gray-400">
             © 2024 Rthmn. All rights reserved.

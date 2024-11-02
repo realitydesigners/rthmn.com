@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { oxanium, russo, outfit, kodeMono } from '@/fonts';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MotionDiv } from '../MotionDiv';
+import { MotionDiv } from '../../../components/MotionDiv';
 
 export interface Post {
   slug: { current: string };
@@ -57,23 +57,23 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
       <div className="flex flex-grow flex-col p-4">
         <FormattedDate
           date={block?.publicationDate}
-          className={`${kodeMono.className} mb-2 text-xs font-semibold text-gray-500`}
+          className={`text-kodemono mb-2 text-xs font-semibold text-gray-500`}
         />
         <Link href={`/posts/${post.slug.current}`}>
           <h2
-            className={`${outfit.className} mb-3 text-2xl font-bold text-white transition-colors duration-200 hover:text-[#76FFD6]`}
+            className={`text-outfit mb-3 text-2xl font-bold text-white transition-colors duration-200 hover:text-[#76FFD6]`}
           >
             {block?.heading || 'No title'}
           </h2>
         </Link>
         <p
-          className={`${kodeMono.className} mb-4 line-clamp-3 flex-grow text-sm text-gray-400`}
+          className={`text-kodemono mb-4 line-clamp-3 flex-grow text-sm text-gray-400`}
         >
           {block?.subheading || 'No subheading'}
         </p>
         <Link
           href={`/posts/${post.slug.current}`}
-          className={` ${kodeMono.className} self-start rounded-full bg-gradient-to-b from-[#333333] to-[#181818] px-4 py-2 pb-3 text-sm font-semibold text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]`}
+          className={`text-kodemono self-start rounded-full bg-gradient-to-b from-[#333333] to-[#181818] px-4 py-2 pb-3 text-sm font-semibold text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]`}
         >
           Read More
         </Link>
@@ -95,10 +95,10 @@ export function SectionBlogPosts({ initialPosts }: PostListProps) {
 
   return (
     <div
-      className={`mt-16 flex w-full flex-col px-4 py-8 sm:px-6 sm:py-24 lg:px-32 ${kodeMono.className}`}
+      className={`text-kodemono mt-16 flex w-full flex-col px-4 py-8 sm:px-6 sm:py-24 lg:px-32`}
     >
       <h2
-        className={`mb-12 text-center text-4xl font-bold text-white lg:text-left ${outfit.className}`}
+        className={`text-outfit mb-12 text-center text-4xl font-bold text-white lg:text-left`}
       >
         Latest Posts
       </h2>

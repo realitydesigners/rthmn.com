@@ -1,5 +1,4 @@
 'use client';
-
 import { SectionHero } from '@/app/_components/SectionHero';
 import { SectionFeatures } from '@/app/_components/SectionFeatures';
 import { SectionPricing } from '@/app/_components/SectionPricing';
@@ -10,8 +9,9 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { SectionBoxes } from '@/app/_components/SectionBoxes';
 import { SectionBlogPosts } from '@/app/_components/SectionBlogPosts';
 import { SectionFooter } from '@/app/_components/SectionFooter';
-import { SectionBoxes2 } from '@/app/_components/SectionBoxes2';
+import { SectionHistogram } from '@/app/_components/SectionHistogram';
 import { SectionAlgorithm } from '@/app/_components/SectionAlgorithm';
+import { SectionTransformer } from '@/app/_components/SectionTransformer';
 
 interface ClientPageProps {
   posts: any[];
@@ -24,8 +24,9 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
   return (
     <div className="min-h-screen">
       <SectionHero />
-      <SectionBoxes slice={null} isLoading={false} />
-      <SectionBoxes2 slice={null} isLoading={false} />
+      <SectionHistogram slice={null} />
+      <SectionBoxes slice={null} />
+      <SectionTransformer slice={null} />
       <SectionAlgorithm />
       <SectionBlogPosts initialPosts={posts} />
       <SectionPricing

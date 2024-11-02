@@ -15,8 +15,8 @@ import {
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { FaArrowRight } from 'react-icons/fa';
-import { MotionDiv } from '@/app/_components/MotionDiv';
-import { MotionButton } from '@/app/_components/MotionButtton';
+import { MotionDiv } from '@/components/MotionDiv';
+import { MotionButton } from '@/components/MotionButtton';
 
 interface NavbarSignedOutProps {
   user: User | null;
@@ -76,7 +76,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('plans')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
+          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
             <span className="text-sm font-semibold">Plans</span>
           </Link>
         </div>
@@ -84,7 +84,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('how-it-works')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
+          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
             <span className="text-sm font-semibold">How it works</span>
           </Link>
         </div>
@@ -93,7 +93,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('features')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
+          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
             <span className="text-sm font-semibold">Features</span>
           </Link>
         </div>
@@ -101,7 +101,7 @@ const Links = () => {
           className={linkStyle}
           onMouseEnter={() => setActiveDropdown('community')}
         >
-          <Link href="/" className={`${innerLinkStyle} ${kodeMono.className}`}>
+          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
             <span className="text-sm font-semibold">Community</span>
           </Link>
         </div>
@@ -199,7 +199,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         px-6 py-3
         gradient-border-button
         text-white font-medium
-        ${kodeMono.className}
+        text-kodemono
         transition-all duration-300
         hover:shadow-lg
     `;
@@ -240,7 +240,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       )}
 
       <MotionDiv
-        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent lg:h-20 ${kodeMono.className}`}
+        className={`text-kodemono fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent lg:h-20`}
         initial="hidden"
         animate="visible"
         variants={navVariants}
@@ -267,9 +267,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             <div className="hidden items-center space-x-4 pr-2 lg:flex">
               <Link
                 href="/start"
-                className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#76FFD6] to-[#98FFF5] p-[1px] font-bold text-black transition-all duration-200 hover:from-[#3CFFBE] hover:to-[#98FFF5]"
+                className="flex items-center space-x-3 rounded-md bg-gradient-to-r from-blue-500/50 to-purple-500/50 p-[1px] font-bold text-black transition-all duration-200 hover:from-[#3CFFBE] hover:to-[#98FFF5]"
               >
-                <span className="flex items-center space-x-2 rounded-md bg-gradient-to-b from-[#3CFFBE] to-[#5EF1E7] px-3 py-2">
+                <span className="flex items-center space-x-2 rounded-md bg-gradient-to-r from-blue-500/50 to-purple-500/50 px-3 py-2 text-white">
                   <span>Start Now</span>
                   <FaArrowRight />
                 </span>
@@ -316,7 +316,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       <AnimatePresence>
         {isNavOpen && (
           <MotionDiv
-            className={`fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 backdrop-blur-sm lg:hidden ${kodeMono.className}`}
+            className={`text-kodemono fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 backdrop-blur-sm lg:hidden`}
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -100 }}
@@ -517,16 +517,14 @@ export const MobileMenuContent = () => {
     <div className="relative z-[100] grid grid-cols-2 gap-8 pt-8">
       {allLinks.map((item) => (
         <div key={item.title} className="flex flex-col">
-          <h2
-            className={`mb-2 text-lg font-bold text-[#555] ${kodeMono.className}`}
-          >
+          <h2 className={`text-kodemono mb-2 text-lg font-bold text-[#555]`}>
             {item.title}
           </h2>
           {item.links.map((link) => (
             <Link
               key={link.title}
               href="/"
-              className={`heading-text py-2 text-base font-bold ${kodeMono.className}`}
+              className={`heading-text text-kodemono py-2 text-base font-bold`}
             >
               {link.title}
             </Link>
