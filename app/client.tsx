@@ -59,6 +59,7 @@ export default function ClientPage({
   return (
     <GridBackground>
       <SectionHistogram slice={null} />
+      <SectionMarketDisplay marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
       <SectionPricing
@@ -67,7 +68,6 @@ export default function ClientPage({
         subscription={null}
       />
       <SectionBlogPosts initialPosts={posts} />
-      <SectionMarketDisplay marketData={marketData} />
       <SectionFooter />
     </GridBackground>
   );
