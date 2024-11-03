@@ -9,6 +9,8 @@ import {
 } from '@/app/_components/constants';
 import { NestedBoxes } from '@/components/NestedBoxes';
 import { STATS_DATA, FEATURE_TAGS } from '@/app/_components/text';
+import { MotionDiv } from '@/components/MotionDiv';
+import { TypeAnimation } from 'react-type-animation';
 
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
@@ -21,16 +23,38 @@ interface BoxComponentProps {
 const StatsGrid = () => (
   <div className="mb-6 grid grid-cols-4 gap-4">
     {STATS_DATA.map((item, index) => (
-      <div
+      <MotionDiv
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
         key={index}
-        className="rounded-lg border border-white/10 bg-white/5 p-3 backdrop-blur-sm transition-colors duration-300 hover:border-white/20"
+        className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] p-4 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.05]"
       >
-        <div className="mb-2 flex items-center gap-2">
-          <item.icon className="h-4 w-4 text-white" />
-          <span className="text-xs text-gray-400">{item.label}</span>
+        {/* Flowing Radial Effect */}
+        <MotionDiv
+          className="absolute inset-0"
+          animate={{
+            background: [
+              'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
+              'radial-gradient(circle at 100% 100%, #22c55e15 0%, transparent 50%)',
+              'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)'
+            ]
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
+        />
+
+        <div className="relative z-10">
+          <div className="mb-2 flex items-center gap-2">
+            <item.icon className="h-4 w-4 text-white" />
+            <span className="text-kodemono text-xs text-white/60">
+              {item.label}
+            </span>
+          </div>
+          <div className="text-outfit text-lg font-bold text-white/90">
+            {item.value}
+          </div>
         </div>
-        <div className="text-lg font-bold text-white">{item.value}</div>
-      </div>
+      </MotionDiv>
     ))}
   </div>
 );
@@ -38,23 +62,39 @@ const StatsGrid = () => (
 const FeatureTags = () => (
   <div className="flex gap-8 text-sm">
     {FEATURE_TAGS.map((feature, index) => (
-      <div key={index} className="group flex cursor-pointer items-center gap-3">
+      <MotionDiv
+        initial={{ opacity: 0, x: -20 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        key={index}
+        className="group flex cursor-pointer items-center gap-3"
+      >
         <div className="relative flex items-center gap-2">
-          <div
-            className={`absolute -inset-0.5 rounded-full bg-gradient-to-r from-[${feature.color}]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100`}
-          ></div>
-          <feature.icon className="relative h-4 w-4 animate-pulse text-white" />
-          <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
+          <div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur transition-opacity duration-500 group-hover:opacity-100" />
+          <feature.icon className="relative h-4 w-4 text-white" />
+          <span className="text-kodemono text-white/60 transition-colors duration-300 group-hover:text-white">
             {feature.text}
           </span>
         </div>
-      </div>
+      </MotionDiv>
     ))}
   </div>
 );
 
 const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => (
-  <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-black/50 backdrop-blur-sm">
+  <div className="relative h-[400px] w-[400px] rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm">
+    <MotionDiv
+      className="absolute inset-0"
+      animate={{
+        background: [
+          'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
+          'radial-gradient(circle at 100% 100%, #22c55e15 0%, transparent 50%)',
+          'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)'
+        ]
+      }}
+      transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+    />
+
     {currentSlice && currentSlice.boxes.length > 0 && (
       <div className="relative h-full w-full">
         <NestedBoxes
@@ -67,7 +107,7 @@ const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => (
             Math.floor(demoStep / 1) % sequences.length ===
             POINT_OF_CHANGE_INDEX
           }
-          baseSize={250}
+          baseSize={400}
           colorScheme="green-red"
         />
       </div>
@@ -75,7 +115,6 @@ const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => (
   </div>
 );
 
-// Main Component
 export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
   // State
   const [demoStep, setDemoStep] = useState(0);
@@ -111,7 +150,7 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
       if (!isPaused) {
         setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
       }
-    }, 500);
+    }, 150);
 
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
@@ -125,61 +164,51 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
   };
 
   return (
-    <section className="flex h-screen items-center justify-center px-12">
-      {/* Left Column */}
-      <div className="flex w-1/2 flex-col gap-8 pl-16">
-        <div className="flex items-center gap-4">
-          <h1
-            className={`text-outfit text-7xl font-bold leading-[.75em] tracking-tight text-white`}
-          >
-            Intelligent
-          </h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <h2
-            className={`text-outfit text-7xl font-bold leading-[.75em] tracking-tight text-white`}
-          >
-            Market Analysis
+    <section className="relative h-full w-full py-60">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#22c55e]/[0.03] via-transparent to-transparent blur-xl" />
+      </div>
+
+      <div className="mx-auto grid max-w-7xl grid-cols-2 gap-24 px-8">
+        <div className="flex flex-col justify-center">
+          <div className="text-kodemono mb-6 flex items-center gap-3 text-sm tracking-wider text-white/60">
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            MARKET INTELLIGENCE SYSTEM
+            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+          </div>
+
+          <h2 className="text-outfit text-gray-gradient mb-8 text-7xl font-bold leading-tight tracking-tight">
+            Natural Pattern
+            <br />
+            Recognition
           </h2>
-        </div>
-        <div className="flex items-center gap-4">
-          <h2
-            className={`text-outfit text-7xl font-bold leading-[.75em] tracking-tight text-white`}
-          >
-            System
-          </h2>
-        </div>
-        <div className={`text-kodemono flex flex-col gap-6`}>
-          <p className="text-lg leading-relaxed text-gray-300">
-            Advanced pattern recognition algorithms combined with real-time
-            market data processing. Designed to identify emerging trends and
-            market behaviors through statistical analysis and machine learning
-            techniques.
-          </p>
+
+          <TypeAnimation
+            sequence={[
+              'Discover hidden market patterns through advanced mathematics.',
+              1000,
+              'Transform complexity into clear trading signals.',
+              1000,
+              'Trade with the natural flow of the markets.',
+              1000
+            ]}
+            wrapper="p"
+            speed={50}
+            className="text-kodemono mb-12 text-lg leading-relaxed text-white/60"
+            repeat={Infinity}
+          />
+
           <StatsGrid />
           <FeatureTags />
         </div>
-      </div>
-      <div className="flex w-1/2 flex-col items-center justify-center gap-6">
-        <div className="flex w-full max-w-[700px] flex-col gap-4">
-          <div className="flex items-center gap-2">
-            <div className="h-1 w-1 rounded-full bg-white" />
-            <span
-              className={`text-kodemono text-xs uppercase tracking-wider text-white`}
-            >
-              System Visualization
-            </span>
-          </div>
 
-          <div className="grid grid-cols-[1fr_250px] gap-4">
-            <div className="flex flex-col gap-4">
-              <BoxVisualization
-                currentSlice={currentSlice}
-                demoStep={demoStep}
-                isPaused={isPaused}
-              />
-            </div>
-          </div>
+        <div className="flex items-center justify-center">
+          <BoxVisualization
+            currentSlice={currentSlice}
+            demoStep={demoStep}
+            isPaused={isPaused}
+          />
         </div>
       </div>
     </section>

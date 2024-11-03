@@ -52,9 +52,6 @@ body.no-scroll {
 
 a {
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-p a {
   @apply hover:underline;
 }
 
@@ -185,7 +182,7 @@ p a {
 
 @layer components {
   .text-gray-gradient {
-    @apply bg-gradient-to-b from-white via-white to-white/50 bg-clip-text text-transparent;
+    @apply bg-gradient-to-b py-2 from-white via-white to-white/50 bg-clip-text text-transparent;
   }
 
   .text-gray {
@@ -193,7 +190,7 @@ p a {
   }
 
   .text-dark-gray {
-    @apply bg-gradient-to-b from-gray-200/75 to-gray-200/50 bg-clip-text text-transparent;
+    @apply bg-gradient-to-b from-gray-200/50 to-gray-200/40 bg-clip-text text-transparent;
   }
 
   .text-kodemono {

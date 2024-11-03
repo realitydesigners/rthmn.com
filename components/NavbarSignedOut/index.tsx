@@ -265,16 +265,6 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               </nav>
             </div>
             <div className="hidden items-center space-x-4 pr-2 lg:flex">
-              <Link
-                href="/start"
-                className="flex items-center space-x-3 rounded-md bg-gradient-to-r from-blue-500/50 to-purple-500/50 p-[1px] font-bold text-black transition-all duration-200 hover:from-[#3CFFBE] hover:to-[#98FFF5]"
-              >
-                <span className="flex items-center space-x-2 rounded-md bg-gradient-to-r from-blue-500/50 to-purple-500/50 px-3 py-2 text-white">
-                  <span>Start Now</span>
-                  <FaArrowRight />
-                </span>
-              </Link>
-
               {/* Desktop sign-in/sign-out button */}
               <MotionDiv
                 className="flex hidden lg:block"

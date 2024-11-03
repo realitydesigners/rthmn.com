@@ -1,4 +1,5 @@
 'use client';
+
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -40,15 +41,15 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
   const block = post.block[0];
 
   return (
-    <MotionDiv className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#181818] shadow-lg transition-all duration-300 hover:scale-105">
+    <MotionDiv className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#181818] bg-black shadow-lg transition-all duration-300 hover:scale-105">
       {block?.imageRef && (
-        <div className="relative h-48 w-full overflow-hidden">
+        <div className="relative h-80 w-full overflow-hidden">
           <Image
             src={block.imageRef.imageUrl}
             alt={block.imageRef.imageAlt || 'Post image'}
-            width={500}
-            height={500}
-            className="transition-transform duration-300 group-hover:scale-110"
+            width={1000}
+            height={1000}
+            className="object-contain object-cover transition-transform duration-300 group-hover:scale-110"
           />
         </div>
       )}
@@ -93,14 +94,14 @@ export function SectionBlogPosts({ initialPosts }: PostListProps) {
 
   return (
     <div
-      className={`text-kodemono mt-16 flex w-full flex-col px-4 py-8 sm:px-6 sm:py-24 lg:px-32`}
+      className={`mt-16 flex w-full flex-col px-4 py-8 sm:px-6 sm:py-24 lg:px-32`}
     >
       <h2
-        className={`text-outfit mb-12 text-center text-4xl font-bold text-white lg:text-left`}
+        className={`text-outfit text-gray-gradient mb-12 text-center text-4xl font-bold text-white lg:text-left`}
       >
         Latest Posts
       </h2>
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 items-center justify-center gap-8 md:grid-cols-3">
         {posts.map((post, index) => (
           <PostItem key={post.slug.current} post={post} index={index} />
         ))}

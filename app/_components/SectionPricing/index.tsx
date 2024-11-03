@@ -115,54 +115,53 @@ export function SectionPricing({ user, products, subscription }: Props) {
       <div className="px-4 py-8 sm:px-6 sm:py-24 lg:px-32">
         <div className="flex flex-col gap-6">
           {/* Title Section */}
-          <div className="flex flex-col gap-4">
+          <div className="flex w-full flex-col items-center justify-center">
             <h1
-              className={`text-outfit text-5xl font-bold tracking-tight text-white lg:text-7xl`}
+              className={`text-outfit text-gray-gradient text-5xl font-bold tracking-tight text-white lg:text-7xl`}
             >
               Early Access
             </h1>
             <p
-              className={`text-kodemono max-w-2xl text-sm leading-relaxed text-gray-300 lg:text-lg`}
+              className={`text-kodemono text-dark-gray my-6 max-w-2xl text-sm leading-relaxed lg:text-lg`}
             >
               Join the first wave of traders using our advanced pattern
               recognition system. Limited spots available during our beta phase.
             </p>
-          </div>
-
-          {/* Interval Toggle */}
-          <div
-            className={`text-kodemono relative flex self-start rounded-lg border border-white/10 bg-black/50 p-0.5 backdrop-blur-sm`}
-          >
-            {intervals.includes('month') && (
-              <button
-                onClick={() => setBillingInterval('month')}
-                type="button"
-                className={`${
-                  billingInterval === 'month'
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-400'
-                } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
-              >
-                Monthly access
-              </button>
-            )}
-            {intervals.includes('year') && (
-              <button
-                onClick={() => setBillingInterval('year')}
-                type="button"
-                className={`${
-                  billingInterval === 'year'
-                    ? 'bg-white/10 text-white'
-                    : 'text-gray-400'
-                } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
-              >
-                Yearly access
-              </button>
-            )}
+            {/* Interval Toggle */}
+            <div
+              className={`text-kodemono my-6 flex rounded-lg border border-white/10 bg-black/50 p-0.5 backdrop-blur-sm`}
+            >
+              {intervals.includes('month') && (
+                <button
+                  onClick={() => setBillingInterval('month')}
+                  type="button"
+                  className={`${
+                    billingInterval === 'month'
+                      ? 'bg-white/10 text-white'
+                      : 'text-gray-400'
+                  } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
+                >
+                  Monthly access
+                </button>
+              )}
+              {intervals.includes('year') && (
+                <button
+                  onClick={() => setBillingInterval('year')}
+                  type="button"
+                  className={`${
+                    billingInterval === 'year'
+                      ? 'bg-white/10 text-white'
+                      : 'text-gray-400'
+                  } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
+                >
+                  Yearly access
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Pricing Cards */}
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="flex w-full items-center justify-center">
             {products.map((product) => {
               const price = product?.prices?.find(
                 (price) => price.interval === billingInterval

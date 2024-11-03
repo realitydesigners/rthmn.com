@@ -31,9 +31,21 @@ export const NestedBoxes = ({
   const maxSize = providedMaxSize || Math.abs(boxes[0].value);
 
   const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
+    const isFirstDifferent =
+      prevBox &&
+      ((prevBox.value > 0 && box.value < 0) ||
+        (prevBox.value < 0 && box.value > 0));
+
     const getBoxColor = () => {
       if (colorScheme === 'green-red') {
-        return box.value > 0 ? 'bg-green-900/50' : 'bg-red-900/50';
+        if (isFirstDifferent) {
+          return box.value > 0
+            ? 'bg-gradient-to-br from-[#22c55e40] to-[#22c55e20]' // Softer green gradient
+            : 'bg-gradient-to-br from-[#ef444440] to-[#ef444420]'; // Softer red gradient
+        }
+        return box.value > 0
+          ? 'bg-gradient-to-br from-[#22c55e20] to-[#22c55e10]' // Very subtle green
+          : 'bg-gradient-to-br from-[#ef444420] to-[#ef444410]'; // Very subtle red
       }
       return box.value > 0
         ? 'bg-gradient-to-br from-white/10 to-white/5'
@@ -42,25 +54,43 @@ export const NestedBoxes = ({
 
     const getBorderColor = () => {
       if (colorScheme === 'green-red') {
-        return isPointOfChange && box.value > 0
-          ? 'border-green-500'
-          : 'border-black';
+        if (isFirstDifferent) {
+          return box.value > 0
+            ? 'border-[#22c55e60]' // Softer borders
+            : 'border-[#ef444460]';
+        }
+        return box.value > 0 ? 'border-[#22c55e30]' : 'border-[#ef444430]';
       }
-      return isPointOfChange && box.value > 0
-        ? 'border-white/20'
-        : 'border-white/5';
+      return 'border-white/5';
+    };
+
+    const getBoxShadow = () => {
+      if (colorScheme === 'green-red') {
+        if (isFirstDifferent) {
+          return box.value > 0
+            ? '0 0 15px #22c55e20, inset 0 0 10px #22c55e30' // Softer glow
+            : '0 0 15px #ef444420, inset 0 0 10px #ef444430';
+        }
+        return box.value > 0
+          ? '0 0 10px #22c55e15, inset 0 0 5px #22c55e20'
+          : '0 0 10px #ef444415, inset 0 0 5px #ef444420';
+      }
+      return 'none';
+    };
+
+    const getBackdropFilter = () => {
+      if (isFirstDifferent) {
+        return box.value > 0
+          ? 'brightness(1.5) contrast(1.2)'
+          : 'brightness(1.3) contrast(1.1)';
+      }
+      return box.value > 0 ? 'brightness(1.2)' : 'none';
     };
 
     const boxColor = getBoxColor();
     const borderColor = getBorderColor();
     const borderWidth = 'border rounded-lg';
     const size = (Math.abs(box.value) / maxSize) * baseSize;
-
-    // Determine if this is the first box with a different direction
-    const isFirstDifferent =
-      prevBox &&
-      ((prevBox.value > 0 && box.value < 0) ||
-        (prevBox.value < 0 && box.value > 0));
 
     let basePosition: PositionStyle = { top: 0, right: 0 };
 
@@ -88,7 +118,8 @@ export const NestedBoxes = ({
 
     const positionStyle: CSSProperties = {
       ...basePosition,
-      ...pauseTransform
+      ...pauseTransform,
+      boxShadow: getBoxShadow()
     };
 
     return (
@@ -100,11 +131,28 @@ export const NestedBoxes = ({
           height: `${size}px`,
           ...positionStyle,
           margin: '-1px',
-          boxShadow: isPaused
-            ? `${index * 2}px ${index * 2}px ${index * 3}px rgba(0,0,0,0.2)`
-            : 'none'
+          background: isFirstDifferent
+            ? box.value > 0
+              ? 'radial-gradient(circle at center, #22c55e30, #22c55e10)'
+              : 'radial-gradient(circle at center, #ef444430, #ef444410)'
+            : undefined
         }}
       >
+        {/* Removed backdrop blur and simplified inner effects */}
+        {isFirstDifferent && (
+          <div
+            className="absolute inset-0 rounded-lg"
+            style={{
+              animation: 'pulse 2s ease-in-out infinite',
+              background:
+                box.value > 0
+                  ? 'radial-gradient(circle at center, #22c55e20, transparent)'
+                  : 'radial-gradient(circle at center, #ef444420, transparent)',
+              opacity: 0.3
+            }}
+          />
+        )}
+
         {index < boxes.length - 1 &&
           renderBox(boxes[index + 1], index + 1, box)}
       </div>
