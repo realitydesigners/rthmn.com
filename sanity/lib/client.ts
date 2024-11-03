@@ -1,23 +1,12 @@
-import {
-  apiVersion,
-  dataset,
-  hookSecret,
-  projectId,
-  token
-} from '@/sanity/lib/api';
+import { apiVersion, dataset, projectId, token } from '@/sanity/lib/api';
+import { createClient } from '@sanity/client';
 
-import {
-  type ClientConfig,
-  type QueryParams,
-  createClient
-} from '@sanity/client';
-
-const config: ClientConfig = {
+const config = {
   projectId,
   dataset,
   apiVersion,
-  useCdn: hookSecret ? false : true,
-  token
+  token: process.env.SANITY_API_WRITE_TOKEN,
+  useCdn: false
 };
 
 export const client = createClient(config);
@@ -28,11 +17,10 @@ export async function sanityFetch<QueryResponse>({
   tags
 }: {
   query: string;
-  qParams?: QueryParams;
+  qParams?: any;
   tags: string[];
 }): Promise<QueryResponse> {
   return client.fetch<QueryResponse>(query, qParams, {
-    // cache: hookSecret ? "no-cache" : "default",
     next: { revalidate: 60, tags }
   });
 }

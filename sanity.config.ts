@@ -19,7 +19,8 @@ import {
   video,
   changelog,
   module,
-  lesson
+  lesson,
+  marketData
 } from '@/sanity/schemas';
 
 import CustomItem from '@/sanity/ui/CustomItem';
@@ -48,7 +49,8 @@ export default defineConfig({
       teamBlock,
       module,
       lesson,
-      changelog
+      changelog,
+      marketData
     ]
   },
   form: {
