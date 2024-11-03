@@ -7,8 +7,6 @@ interface HistoricalPatternViewProps {
   patterns: any[];
   dimensions: {
     totalHeight: number;
-    headerHeight: number;
-    footerHeight: number;
     availableHeight: number;
     boxSize: number;
     patternWidth: number;
@@ -32,20 +30,18 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
 
   return (
     <div
-      className={`text-kodemono border-gray relative flex w-full items-center justify-center overflow-hidden rounded-lg`}
+      className={`text-kodemono border-gray flex w-full items-center justify-center overflow-hidden rounded-lg`}
       style={{
-        height: `${availableHeight + 35}px`,
+        height: `${availableHeight + 25}px`,
         padding: '0px'
       }}
     >
-      <div className="relative z-10 h-full items-center justify-center overflow-x-auto px-4">
+      <div className="relative z-10 h-full items-center justify-center overflow-x-auto">
         <div
           ref={tableRef}
-          className="relative flex"
+          className="relative flex h-full"
           style={{
-            height: '100%',
-            width: `${patternWidth * animationSequence.length}px`,
-            transform: 'translateY(0px)'
+            width: `${patternWidth * animationSequence.length}px`
           }}
         >
           {animationSequence
@@ -63,8 +59,7 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
                   } hover:scale-105 hover:opacity-100`}
                   style={{
                     width: `${patternWidth}px`,
-                    height: 'calc(100% - 16px)',
-                    transformOrigin: 'center center'
+                    height: 'calc(100% - 12px)'
                   }}
                 >
                   <div className="relative h-full">
@@ -76,26 +71,29 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
                           width: `${boxSize}px`,
                           height: `${boxSize}px`,
                           bottom: `${position * boxSize}px`,
-                          background: isUp ? '#22c55e10 ' : '#ef444433',
+                          background: isUp
+                            ? 'linear-gradient(to right, rgba(16,185,129,0.15), rgba(52,211,153,0.15), rgba(110,231,183,0.15))'
+                            : 'linear-gradient(to right, rgba(239,68,68,0.15), rgba(239,68,68,0.18), rgba(248,113,113,0.15))',
                           boxShadow: isUp
-                            ? '0 0 25px #22c55e50 , inset 0 0 0px #22c55e33'
-                            : '0 0 25px #ef444466, inset 0 0 0px #ef444433',
+                            ? '0 0 20px rgba(16,185,129,0.2), inset 0 0 2px rgba(52,211,153,0.3)'
+                            : '0 0 20px rgba(239,68,68,0.25), inset 0 0 2px rgba(248,113,113,0.3)',
                           border: isUp
-                            ? '1px solid #22c55e15 '
-                            : '1px solid #ef444499',
+                            ? '1px solid rgba(52,211,153,0.3)'
+                            : '1px solid rgba(248,113,113,0.3)',
                           left: '0px',
                           zIndex: 10,
                           transform: `scale(${isUp ? 1.05 : 1})`,
-                          opacity: isUp ? 1 : 1,
+                          opacity: isUp ? 1 : 0.95,
                           willChange: 'transform, opacity'
                         }}
                       >
                         <div
                           className="h-full w-full"
                           style={{
-                            background: isUp ? '#22c55e50 ' : '#ef44441a',
-                            animation: 'pulse 2s ease-in-out infinite',
-                            willChange: 'opacity, transform'
+                            background: isUp
+                              ? 'linear-gradient(to right, rgba(16,185,129,0.25), rgba(52,211,153,0.25), rgba(110,231,183,0.25))'
+                              : 'linear-gradient(to right, rgba(239,68,68,0.25), rgba(248,113,113,0.25), rgba(239,68,68,0.25))',
+                            animation: 'pulse 2s ease-in-out infinite'
                           }}
                         />
                       </div>

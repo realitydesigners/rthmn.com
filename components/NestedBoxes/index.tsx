@@ -109,8 +109,8 @@ export const NestedBoxes = ({
     const pauseTransform = isPaused
       ? {
           transform: `
-            translateX(${index * 4}px)
-            translateY(${index * 3}px)
+            translateX(${index * 3}px)
+            translateY(${index * 2}px)
           `,
           transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)'
         }

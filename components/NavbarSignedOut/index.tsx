@@ -252,11 +252,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               className="z-50 flex items-center gap-2 pl-4 xl:pl-0"
             >
               <div className="flex h-8 w-8 items-center">{getIcon('logo')}</div>
-              <div
-                className={`text-russo pt-1 text-2xl font-bold tracking-wide`}
-              >
-                RTHMN
-              </div>
+              <div className={`text-oxanium text-2xl font-bold`}>RTHMN</div>
             </Link>
 
             <div className="flex items-center space-x-4">

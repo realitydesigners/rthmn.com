@@ -50,8 +50,7 @@ body.no-scroll {
   display: none;
 }
 
-a {
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+ p a {
   @apply hover:underline;
 }
 

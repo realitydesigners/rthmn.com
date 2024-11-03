@@ -43,7 +43,7 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
   return (
     <MotionDiv className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#181818] bg-black shadow-lg transition-all duration-300 hover:scale-105">
       {block?.imageRef && (
-        <div className="relative h-80 w-full overflow-hidden">
+        <div className="relative h-80 w-full overflow-hidden lg:h-40">
           <Image
             src={block.imageRef.imageUrl}
             alt={block.imageRef.imageAlt || 'Post image'}

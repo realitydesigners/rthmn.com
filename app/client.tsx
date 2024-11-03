@@ -10,7 +10,6 @@ import { SectionBoxes } from '@/app/_components/SectionBoxes';
 import { SectionBlogPosts } from '@/app/_components/SectionBlogPosts';
 import { SectionFooter } from '@/app/_components/SectionFooter';
 import { SectionHistogram } from '@/app/_components/SectionHistogram';
-import { SectionAlgorithm } from '@/app/_components/SectionAlgorithm';
 import { SectionAboutAlgorithm } from '@/app/_components/SectionAboutAlgorithm';
 
 interface GridBackgroundProps {
@@ -55,13 +54,12 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
       <SectionHistogram slice={null} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
-      <SectionAlgorithm />
-      <SectionBlogPosts initialPosts={posts} />
       <SectionPricing
         user={session?.user}
         products={products ?? []}
         subscription={null}
       />
+      <SectionBlogPosts initialPosts={posts} />
       <SectionFooter />
     </GridBackground>
   );

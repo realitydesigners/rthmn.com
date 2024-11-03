@@ -1,32 +1,33 @@
 'use client';
 import { MotionDiv } from '@/components/MotionDiv';
 import { TypeAnimation } from 'react-type-animation';
+import { FaWaveSquare, FaCube, FaFingerprint, FaAtom } from 'react-icons/fa';
 import {
   ALGORITHM_CONCEPTS,
   NATURE_EXAMPLE,
-  PRACTICAL_APPLICATIONS
+  PRACTICAL_APPLICATIONS,
+  POSITION_STATES
 } from '../text';
-import { motion } from 'framer-motion';
 
 export function SectionAboutAlgorithm() {
   return (
-    <section className="relative py-32">
+    <section className="relative w-full px-2 py-32 lg:px-[10vw]">
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#22c55e]/[0.03] via-transparent to-transparent blur-xl" />
       </div>
       <div className="mx-auto max-w-7xl px-8">
         <div className="relative flex flex-col items-center text-center">
-          <div className="text-kodemono mb-6 flex items-center gap-3 text-sm tracking-wider text-white/60">
+          <div className="text-kodemono mb-6 flex items-center gap-3 text-sm tracking-wider text-white/60 lg:text-sm">
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
             NEXT GENERATION INDICATORS
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
           </div>
           <h2
-            className={`text-outfit text-gray-gradient relative z-10 text-[6em] font-bold leading-tight tracking-tight`}
+            className={`text-outfit text-gray-gradient relative z-10 text-[3em] font-bold leading-tight tracking-tight lg:text-[6em]`}
           >
             See What Others
             <br />
-            Cannot See
+            Can't See
           </h2>
           <TypeAnimation
             sequence={[
@@ -52,8 +53,8 @@ export function SectionAboutAlgorithm() {
         </div>
 
         {/* Core Features */}
-        <div className="mt-24 space-y-16">
-          <div className="grid gap-8 lg:grid-cols-3">
+        <div className="my-20">
+          <div className="mb-16 grid gap-8 lg:grid-cols-3">
             {ALGORITHM_CONCEPTS.map((concept, index) => (
               <MotionDiv
                 key={index}
@@ -108,7 +109,7 @@ export function SectionAboutAlgorithm() {
 
                 {/* Content */}
                 <div className="relative z-10">
-                  <div className="mb-4 flex items-center gap-3">
+                  <div className="mb-4 flex items-center gap-2">
                     <div className="rounded-xl bg-white/5 p-3 backdrop-blur-sm">
                       <concept.icon className="h-6 w-6 text-white transition-colors group-hover:text-white" />
                     </div>
@@ -128,11 +129,11 @@ export function SectionAboutAlgorithm() {
               </MotionDiv>
             ))}
           </div>
-          <div className="relative flex flex-col justify-center px-32 py-20">
+          <div className="relative my-20 flex flex-col justify-center px-4 lg:px-[10vw]">
             <h3 className="text-outfit mb-8 text-3xl font-semibold text-white/90">
               {NATURE_EXAMPLE.title}
             </h3>
-            <div className="space-y-6">
+            <div className="mx-auto max-w-4xl space-y-8">
               {NATURE_EXAMPLE.paragraphs.map((paragraph, index) => (
                 <p
                   key={index}

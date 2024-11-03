@@ -6,9 +6,9 @@ import {
   FaServer,
   FaMicrochip,
   FaRobot,
-  FaCompress,
   FaCube,
-  FaVectorSquare
+  FaVectorSquare,
+  FaAtom
 } from 'react-icons/fa';
 
 export const ALGORITHM_FEATURES = [
@@ -115,9 +115,10 @@ export const STATS_DATA = [
 ];
 
 export const FEATURE_TAGS = [
-  { icon: FaChartLine, text: 'Pattern Analysis', color: '#22c55e' },
-  { icon: FaWaveSquare, text: 'Market Trends', color: '#3b82f6' },
-  { icon: FaRobot, text: 'Smart Alerts', color: '#8b5cf6' }
+  { icon: FaChartLine, text: 'Self Similar Patterns', color: '#22c55e' },
+  { icon: FaWaveSquare, text: 'Multi Trend Analysis', color: '#3b82f6' },
+  { icon: FaRobot, text: 'Smart Alerts', color: '#8b5cf6' },
+  { icon: FaFingerprint, text: 'Real-time updates', color: '#ef4444' }
 ];
 
 export const POSITION_STATES = [
@@ -172,22 +173,22 @@ export const STEPS = [
 
 export const ALGORITHM_CONCEPTS = [
   {
-    icon: FaCompress,
-    title: 'Market Frequencies',
+    icon: FaWaveSquare,
+    title: 'Frequency Detection',
     description:
-      'Markets pulse with natural rhythms, just like waves in the ocean. Our algorithm detects these hidden frequencies to anticipate major market moves before they happen.'
-  },
-  {
-    icon: FaVectorSquare,
-    title: 'Energy Flow',
-    description:
-      'Market energy flows like water, always seeking the path of least resistance. By tracking these energy flows, we can predict where price is most likely to move next.'
+      'Measures the natural pulse of markets using our state of the art spatial positioning algorithm.'
   },
   {
     icon: FaCube,
-    title: 'Pattern Recognition',
+    title: 'Fractal Analysis',
     description:
-      'The same patterns that appear in nature - from seashells to galaxies - also appear in markets. Our algorithm identifies these natural patterns across all timeframes.'
+      'Identifies self-similar patterns across multiple timeframes, revealing deeper market structure at every scale.'
+  },
+  {
+    icon: FaFingerprint,
+    title: 'Pattern Evolution',
+    description:
+      'Automatically tracks how fractal patterns develop and transform in real-time across all markets.'
   }
 ];
 
@@ -222,71 +223,10 @@ export const NATURE_EXAMPLE = {
   title: 'The Natural Order of Markets',
   paragraphs: [
     'Just as rivers flow downhill and lightning takes the path of least resistance, markets follow natural laws. Our algorithm reveals these hidden patterns that govern all price movement.',
-    'Traditional indicators lag behind the market because they only look at price. We look deeper - at the natural forces that drive price movement. This gives us the ability to anticipate moves before they happen.',
-    'Think of it like weather forecasting. By understanding the underlying patterns of pressure and temperature, meteorologists can predict storms before they form. Similarly, our algorithm detects the market conditions that lead to major moves.'
-  ]
-};
-
-export const WAVE_MECHANICS = {
-  title: 'Understanding Wave Mechanics',
-  sections: [
-    {
-      title: 'Natural Frequency',
-      description:
-        'Markets pulse with natural rhythms, just like the heartbeat of a living organism. Each position state represents a specific frequency in this complex waveform.',
-      example:
-        'Think of throwing multiple stones in a pond - the way the ripples interact is similar to how our position states combine to create market patterns.'
-    },
-    {
-      title: 'Energy Transfer',
-      description:
-        'Market energy flows between positions like heat moving through metal. Understanding these energy transfers is key to predicting future market states.',
-      example:
-        'Just as electricity follows the path of least resistance, market energy flows through positions in predictable patterns.'
-    },
-    {
-      title: 'Pattern Formation',
-      description:
-        'Complex market patterns emerge from simple position interactions, similar to how snowflakes form from basic molecular principles.',
-      example:
-        'The Fibonacci sequence in nature mirrors how our position patterns build upon themselves.'
-    }
-  ]
-};
-
-export const MATHEMATICAL_PRINCIPLES = {
-  title: 'Core Mathematical Concepts',
-  concepts: [
-    {
-      title: 'Position State Vectors',
-      formula: 'P(t) = ∑[Wi × Si] + ε',
-      explanation:
-        'Each market state is represented as a vector in 8-dimensional space, where:',
-      variables: [
-        'P(t) = Position state at time t',
-        'Wi = Weight of state i',
-        'Si = State vector i',
-        'ε = Market noise factor'
-      ]
-    },
-    {
-      title: 'Wave Propagation',
-      formula: 'ψ(p,t) = A·sin(kp - ωt + φ)',
-      explanation:
-        'Market waves propagate through position space according to:',
-      variables: [
-        'A = Wave amplitude',
-        'k = Position wavenumber',
-        'ω = Angular frequency',
-        'φ = Phase offset'
-      ]
-    },
-    {
-      title: 'Energy Conservation',
-      formula: 'E = ∑[Pi²] = constant',
-      explanation:
-        'Total position energy remains constant, only redistributing between states'
-    }
+    'Traditional indicators lag behind the market because they only look at price after an event has occurred. We look deeper - at the natural forces that drive price movement. This gives us the ability to anticipate moves before they happen and as they are developing.',
+    'Think of it like weather forecasting. By understanding the underlying patterns of pressure and temperature, meteorologists can predict storms before they form. Similarly, our algorithm detects the market conditions that lead to major moves.',
+    'Our algorithms are built on a revolutionary discovery: markets move in natural sequences of positions, like the phases of the moon or the seasons of the year. These positions flow from one to the next in a predictable pattern.',
+    'By understanding this sequence, we can anticipate market movements before they occur. What you see above is this sequence in action - each column represents a moment in time, and the colored boxes show the market`s position state using our algorithm'
   ]
 };
 

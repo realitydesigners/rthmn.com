@@ -111,8 +111,8 @@ export function SectionPricing({ user, products, subscription }: Props) {
   }
 
   return (
-    <section className="bg-black">
-      <div className="px-4 py-8 sm:px-6 sm:py-24 lg:px-32">
+    <section id="pricing">
+      <div className="px-4 py-8 sm:px-2 sm:py-12 lg:px-[10vw]">
         <div className="flex flex-col gap-6">
           {/* Title Section */}
           <div className="flex w-full flex-col items-center justify-center">
@@ -125,7 +125,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
               className={`text-kodemono text-dark-gray my-6 max-w-2xl text-sm leading-relaxed lg:text-lg`}
             >
               Join the first wave of traders using our advanced pattern
-              recognition system. Limited spots available during our beta phase.
+              recognition system.
             </p>
             {/* Interval Toggle */}
             <div

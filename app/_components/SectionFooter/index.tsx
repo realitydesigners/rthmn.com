@@ -76,10 +76,7 @@ export function SectionFooter() {
           {/* Left Side */}
           <div className="flex flex-col gap-8">
             <div>
-              <Link
-                href="/"
-                className="z-50 flex items-center gap-2 pl-4 xl:pl-0"
-              >
+              <Link href="/" className="z-50 flex items-center gap-2">
                 <div className="flex h-8 w-8 items-center">
                   {getIcon('logo')}
                 </div>
