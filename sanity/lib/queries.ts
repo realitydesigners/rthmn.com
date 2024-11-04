@@ -397,3 +397,25 @@ export async function getChangeLog() {
     }`
   );
 }
+
+export const marketDataQuery = groq`
+  *[_type == "marketData" && pair == $pair][0] {
+    pair,
+    lastUpdated,
+    candles[] {
+      timestamp,
+      open,
+      high,
+      low,
+      close
+    }
+  }
+`;
+
+export const allMarketDataQuery = groq`
+  *[_type == "marketData"] {
+    pair,
+    lastUpdated,
+    candleData
+  }
+`;
