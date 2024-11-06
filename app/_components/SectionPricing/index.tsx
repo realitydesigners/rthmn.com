@@ -7,7 +7,6 @@ import type { User } from '@supabase/supabase-js';
 import cn from 'classnames';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { FaBolt, FaChartLine, FaWaveSquare, FaRobot } from 'react-icons/fa';
 
 type Subscription = any;
 type Product = any;
@@ -30,13 +29,6 @@ interface Props {
 
 type BillingInterval = 'lifetime' | 'year' | 'month';
 
-const PRICING_FEATURES = [
-  { icon: FaChartLine, text: 'Real-time market analysis', color: '#22c55e' },
-  { icon: FaWaveSquare, text: 'Advanced pattern detection', color: '#3b82f6' },
-  { icon: FaRobot, text: 'Early access to new features', color: '#8b5cf6' },
-  { icon: FaBolt, text: 'Priority support', color: '#f59e0b' }
-];
-
 export function SectionPricing({ user, products, subscription }: Props) {
   const intervals = Array.from(
     new Set(
@@ -56,7 +48,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
     if (!user) {
       setPriceIdLoading(undefined);
-      return router.push('/signin/signup');
+      return router.push('/signin');
     }
 
     const { errorRedirect, sessionId } = await checkoutWithStripe(
@@ -93,10 +85,10 @@ export function SectionPricing({ user, products, subscription }: Props) {
       <section className="bg-black">
         <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-24 lg:px-8">
           <div className="sm:align-center sm:flex sm:flex-col" />
-          <p className={`text-kodemono text-lg text-gray-300`}>
+          <p className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
             No subscription pricing plans found. Create them in your{' '}
             <a
-              className="text-blue-500 underline hover:text-blue-400"
+              className="text-pink-500 underline"
               href="https://dashboard.stripe.com/products"
               rel="noopener noreferrer"
               target="_blank"
@@ -109,145 +101,98 @@ export function SectionPricing({ user, products, subscription }: Props) {
       </section>
     );
   }
-
   return (
-    <section id="pricing">
-      <div className="px-4 py-8 sm:px-2 sm:py-12 lg:px-[10vw]">
-        <div className="flex flex-col gap-6">
-          {/* Title Section */}
-          <div className="flex w-full flex-col items-center justify-center">
-            <h1
-              className={`text-outfit text-gray-gradient text-5xl font-bold tracking-tight text-white lg:text-7xl`}
-            >
-              Early Access
-            </h1>
-            <p
-              className={`text-kodemono text-dark-gray my-6 max-w-2xl text-sm leading-relaxed lg:text-lg`}
-            >
-              Join the first wave of traders using our advanced pattern
-              recognition system.
-            </p>
-            {/* Interval Toggle */}
-            <div
-              className={`text-kodemono my-6 flex rounded-lg border border-white/10 bg-black/50 p-0.5 backdrop-blur-sm`}
-            >
-              {intervals.includes('month') && (
-                <button
-                  onClick={() => setBillingInterval('month')}
-                  type="button"
-                  className={`${
-                    billingInterval === 'month'
-                      ? 'bg-white/10 text-white'
-                      : 'text-gray-400'
-                  } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
-                >
-                  Monthly access
-                </button>
-              )}
-              {intervals.includes('year') && (
-                <button
-                  onClick={() => setBillingInterval('year')}
-                  type="button"
-                  className={`${
-                    billingInterval === 'year'
-                      ? 'bg-white/10 text-white'
-                      : 'text-gray-400'
-                  } m-1 rounded-md px-4 py-2 text-sm font-medium transition-colors duration-200 lg:px-8`}
-                >
-                  Yearly access
-                </button>
-              )}
-            </div>
+    <section className="relative bg-black">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-24 lg:px-8">
+        <div className="sm:align-center sm:flex sm:flex-col">
+          <h1 className="text-4xl font-extrabold text-white sm:text-center sm:text-6xl">
+            Pricing Plans
+          </h1>
+          <p className="m-auto mt-5 max-w-2xl text-xl text-zinc-200 sm:text-center sm:text-2xl">
+            Start building for free, then add a site plan to go live. Account
+            plans unlock additional features.
+          </p>
+          <div className="relative mt-6 flex self-center rounded-lg border border-zinc-800 bg-zinc-900 p-0.5 sm:mt-8">
+            {intervals.includes('month') && (
+              <button
+                onClick={() => setBillingInterval('month')}
+                type="button"
+                className={`${
+                  billingInterval === 'month'
+                    ? 'relative w-1/2 border-zinc-800 bg-zinc-700 text-white shadow-sm'
+                    : 'relative ml-0.5 w-1/2 border border-transparent text-zinc-400'
+                } m-1 whitespace-nowrap rounded-md py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 sm:w-auto sm:px-8`}
+              >
+                Monthly billing
+              </button>
+            )}
+            {intervals.includes('year') && (
+              <button
+                onClick={() => setBillingInterval('year')}
+                type="button"
+                className={`${
+                  billingInterval === 'year'
+                    ? 'relative w-1/2 border-zinc-800 bg-zinc-700 text-white shadow-sm'
+                    : 'relative ml-0.5 w-1/2 border border-transparent text-zinc-400'
+                } m-1 whitespace-nowrap rounded-md py-2 text-sm font-medium focus:z-10 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-opacity-50 sm:w-auto sm:px-8`}
+              >
+                Yearly billing
+              </button>
+            )}
           </div>
-
-          {/* Pricing Cards */}
-          <div className="flex w-full items-center justify-center">
-            {products.map((product) => {
-              const price = product?.prices?.find(
-                (price) => price.interval === billingInterval
-              );
-              if (!price) return null;
-              const priceString = new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: price.currency ?? 'USD',
-                minimumFractionDigits: 0
-              }).format((price.unit_amount ?? 0) / 100);
-
-              return (
-                <div
-                  key={product.id}
-                  className={cn(
-                    'rounded-lg border backdrop-blur-sm transition-all duration-300',
-                    {
-                      'border-blue-500/50 bg-blue-500/5 hover:shadow-lg hover:shadow-blue-500/20':
-                        subscription
-                          ? product.name ===
-                            subscription?.prices?.products?.name
-                          : product.name === 'Beta Access',
-                      'border-white/10 bg-white/5 hover:border-white/20 hover:shadow-lg hover:shadow-white/10':
-                        !(subscription
-                          ? product.name ===
-                            subscription?.prices?.products?.name
-                          : product.name === 'Beta Access')
-                    }
-                  )}
-                >
-                  <div className="p-6">
-                    <h2
-                      className={`text-kodemono text-2xl font-semibold text-white`}
-                    >
-                      Beta Access
-                    </h2>
-                    <div className="mt-4 space-y-4">
-                      <p className="text-gray-300">
-                        Full access to our pattern recognition system including:
-                      </p>
-                      <ul className="space-y-3">
-                        {PRICING_FEATURES.map((feature, index) => (
-                          <li
-                            key={index}
-                            className="group flex cursor-pointer items-center gap-3"
-                          >
-                            <div className="relative flex items-center gap-2">
-                              <div
-                                className={`absolute -inset-0.5 rounded-full bg-gradient-to-r from-[${feature.color}]/20 to-transparent opacity-0 blur transition-opacity duration-500 group-hover:opacity-100`}
-                              />
-                              <feature.icon className="relative h-4 w-4 text-white" />
-                              <span className="text-gray-300 transition-colors duration-300 group-hover:text-white">
-                                {feature.text}
-                              </span>
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    <p className="mt-8">
-                      <span
-                        className={`text-outfit text-5xl font-bold text-white`}
-                      >
-                        {priceString}
-                      </span>
-                      <span className="text-gray-300">/{billingInterval}</span>
-                    </p>
-                    <div className="group relative mt-8">
-                      <div className="relative flex">
-                        <Button
-                          variant="slim"
-                          type="button"
-                          loading={priceIdLoading === price.id}
-                          onClick={() => handleStripeCheckout(price)}
-                          className={`text-kodemono w-full rounded-lg border border-white/10 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20`}
-                        >
-                          {subscription ? 'Manage Access' : 'Get Early Access'}
-                        </Button>
-                      </div>
-                      <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-blue-500/50 to-purple-500/50 opacity-0 blur transition-all duration-500 group-hover:opacity-100" />
-                    </div>
-                  </div>
+        </div>
+        <div className="mt-12 flex flex-wrap justify-center gap-6 space-y-0 sm:mt-16 lg:mx-auto lg:max-w-4xl xl:mx-0 xl:max-w-none">
+          {products.map((product) => {
+            const price = product?.prices?.find(
+              (price) => price.interval === billingInterval
+            );
+            if (!price) return null;
+            const priceString = new Intl.NumberFormat('en-US', {
+              style: 'currency',
+              currency: price.currency ?? 'USD',
+              minimumFractionDigits: 0
+            }).format((price.unit_amount ?? 0) / 100);
+            return (
+              <div
+                key={product.id}
+                className={cn(
+                  'flex flex-col divide-y divide-zinc-600 rounded-lg bg-zinc-900 shadow-sm',
+                  {
+                    'border border-pink-500': subscription
+                      ? product.name === subscription?.prices?.products?.name
+                      : product.name === 'Freelancer'
+                  },
+                  'flex-1', // This makes the flex item grow to fill the space
+                  'basis-1/3', // Assuming you want each card to take up roughly a third of the container's width
+                  'max-w-xs' // Sets a maximum width to the cards to prevent them from getting too large
+                )}
+              >
+                <div className="p-6">
+                  <h2 className="text-2xl font-semibold leading-6 text-white">
+                    {product.name}
+                  </h2>
+                  <p className="mt-4 text-zinc-300">{product.description}</p>
+                  <p className="mt-8">
+                    <span className="white text-5xl font-extrabold">
+                      {priceString}
+                    </span>
+                    <span className="text-base font-medium text-zinc-100">
+                      /{billingInterval}
+                    </span>
+                  </p>
+                  <Button
+                    variant="slim"
+                    type="button"
+                    loading={priceIdLoading === price.id}
+                    onClick={() => handleStripeCheckout(price)}
+                    className="mt-8 block w-full rounded-md py-2 text-center text-sm font-semibold text-white hover:bg-zinc-900"
+                  >
+                    {subscription ? 'Manage' : 'Subscribe'}
+                  </Button>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
