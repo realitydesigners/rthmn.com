@@ -47,10 +47,16 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
     if (pricesError) throw pricesError;
 
     // Combine products with their prices
-    const productsWithPrices = products.map((product) => ({
-      ...product,
-      prices: prices.filter((price) => price.product_id === product.id)
-    }));
+    const productsWithPrices = products.map((product) => {
+      const productPrices = prices.filter(
+        (price) => price.product_id === product.id
+      );
+      console.log(`Product ID: ${product.id}, Prices: ${productPrices.length}`);
+      return {
+        ...product,
+        prices: productPrices
+      };
+    });
 
     return productsWithPrices;
   } catch (error) {
