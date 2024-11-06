@@ -48,7 +48,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
     if (!user) {
       setPriceIdLoading(undefined);
-      return router.push('/signin/signup');
+      return router.push('/signin');
     }
 
     const { errorRedirect, sessionId } = await checkoutWithStripe(
