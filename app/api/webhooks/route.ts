@@ -27,7 +27,8 @@ const relevantEvents = new Set([
   'checkout.session.completed',
   'customer.subscription.created',
   'customer.subscription.updated',
-  'customer.subscription.deleted'
+  'customer.subscription.deleted',
+  'billing_portal.session.created'
 ]);
 
 export async function POST(request: Request) {
@@ -90,6 +91,11 @@ export async function POST(request: Request) {
             // Add Discord access for new subscribers
             await manageDiscordAccess(checkoutSession.customer as string, true);
           }
+          break;
+        case 'billing_portal.session.created':
+          const portalSession = event.data
+            .object as Stripe.BillingPortal.Session;
+          console.log('Billing portal session created:', portalSession.id);
           break;
         default:
           throw new Error('Unhandled relevant event!');
