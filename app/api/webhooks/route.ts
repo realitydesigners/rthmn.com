@@ -1,5 +1,5 @@
 import {
-  deleteProductRecord, // Add this function
+  deleteProductRecord,
   manageSubscriptionStatusChange,
   upsertPriceRecord,
   upsertProductRecord
@@ -7,6 +7,8 @@ import {
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createClient } from '@/utils/supabase/server';
+import { manageDiscordAccess } from '@/utils/discord/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
   apiVersion: '2023-10-16',
@@ -19,7 +21,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
 const relevantEvents = new Set([
   'product.created',
   'product.updated',
-  'product.deleted', // Add this event
+  'product.deleted',
   'price.created',
   'price.updated',
   'checkout.session.completed',
@@ -62,11 +64,18 @@ export async function POST(request: Request) {
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted':
           const subscription = event.data.object as Stripe.Subscription;
+          const isActive =
+            event.type !== 'customer.subscription.deleted' &&
+            subscription.status === 'active';
+
           await manageSubscriptionStatusChange(
             subscription.id,
             subscription.customer as string,
             event.type === 'customer.subscription.created'
           );
+
+          // Manage Discord access
+          await manageDiscordAccess(subscription.customer as string, isActive);
           break;
         case 'checkout.session.completed':
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
@@ -77,6 +86,9 @@ export async function POST(request: Request) {
               checkoutSession.customer as string,
               true
             );
+
+            // Add Discord access for new subscribers
+            await manageDiscordAccess(checkoutSession.customer as string, true);
           }
           break;
         default:

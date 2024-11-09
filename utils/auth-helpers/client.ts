@@ -36,14 +36,22 @@ export function useSignInWithOAuth() {
         ? 'http://localhost:3000'
         : 'https://www.rthmn.com';
 
-    console.log('Redirect URL:', redirectURL);
-    console.log('Provider:', provider);
-
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: redirectURL
-      }
-    });
+    if (provider === 'discord') {
+      // Add discord-specific scopes
+      await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectURL,
+          scopes: 'identify' // Add any additional scopes you need
+        }
+      });
+    } else {
+      await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectURL
+        }
+      });
+    }
   };
 }

@@ -1,21 +1,25 @@
 import CustomerPortalForm from '@/components/AccountForms/CustomerPortalForm';
 import EmailForm from '@/components/AccountForms/EmailForm';
 import NameForm from '@/components/AccountForms/NameForm';
+import DiscordConnectionForm from '@/components/AccountForms/DiscordConnectionForm';
 import { createClient } from '@/utils/supabase/server';
 import {
   getSubscription,
   getUser,
-  getUserDetails
+  getUserDetails,
+  getDiscordConnection
 } from '@/utils/supabase/queries';
 import { redirect } from 'next/navigation';
 
 export default async function Account() {
   const supabase = await createClient();
-  const [user, userDetails, subscription] = await Promise.all([
-    getUser(supabase),
-    getUserDetails(supabase),
-    getSubscription(supabase)
-  ]);
+  const [user, userDetails, subscription, discordConnection] =
+    await Promise.all([
+      getUser(supabase),
+      getUserDetails(supabase),
+      getSubscription(supabase),
+      getDiscordConnection(supabase)
+    ]);
 
   if (!user) {
     return redirect('/signin');
@@ -32,6 +36,10 @@ export default async function Account() {
       </div>
       <div className="p-4">
         <CustomerPortalForm subscription={subscription} />
+        <DiscordConnectionForm
+          discordConnection={discordConnection}
+          subscription={subscription}
+        />
         <NameForm userName={userDetails?.full_name ?? ''} />
         <EmailForm userEmail={user.email} />
       </div>
