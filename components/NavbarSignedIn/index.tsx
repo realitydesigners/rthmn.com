@@ -1,9 +1,11 @@
 'use client';
 import { russo } from '@/fonts';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState, useRef, useEffect, type JSX } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { User } from '@supabase/supabase-js';
+import { createClient } from '@/utils/supabase/client';
 
 interface NavbarSignedInProps {
   user: User | null;
@@ -58,8 +60,28 @@ const getIcon = (name: string): JSX.Element => {
 export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   const [isSigningOut, setIsSigningOut] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut } = useAuth();
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!user) return;
+
+      const supabase = createClient();
+      const { data: userDetails } = await supabase
+        .from('users')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (userDetails?.avatar_url) {
+        setAvatarUrl(userDetails.avatar_url);
+      }
+    };
+
+    fetchUserDetails();
+  }, [user]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -130,8 +152,18 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                     </p>
                     <p className="text-[10px] text-gray-300">{user?.email}</p>
                   </div>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black">
-                    <span className="text-lg font-bold">{userInitial}</span>
+                  <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black">
+                    {avatarUrl ? (
+                      <Image
+                        src={avatarUrl}
+                        alt="Profile"
+                        className="object-cover"
+                        width={80}
+                        height={80}
+                      />
+                    ) : (
+                      <span className="text-lg font-bold">{userInitial}</span>
+                    )}
                   </div>
                 </div>
               </button>

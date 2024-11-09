@@ -2,6 +2,7 @@ import CustomerPortalForm from '@/components/AccountForms/CustomerPortalForm';
 import EmailForm from '@/components/AccountForms/EmailForm';
 import NameForm from '@/components/AccountForms/NameForm';
 import DiscordConnectionForm from '@/components/AccountForms/DiscordConnectionForm';
+import ProfilePhotoForm from '@/components/AccountForms/ProfilePhotoForm';
 import { createClient } from '@/utils/supabase/server';
 import {
   getSubscription,
@@ -35,6 +36,10 @@ export default async function Account() {
         </div>
       </div>
       <div className="p-4">
+        <ProfilePhotoForm
+          avatarUrl={userDetails?.avatar_url}
+          userId={user.id}
+        />
         <CustomerPortalForm subscription={subscription} />
         <DiscordConnectionForm
           discordConnection={discordConnection}
