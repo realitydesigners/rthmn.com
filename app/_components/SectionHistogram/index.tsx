@@ -82,14 +82,9 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden pt-40">
+    <section className="relative min-h-screen overflow-hidden pt-60">
       <div className="relative flex w-full flex-col gap-24">
         <div className="relative flex flex-col items-center text-center">
-          <div className="text-kodemono mb-6 flex items-center gap-3 text-xs tracking-wider text-white/60 lg:text-sm">
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-            DESIGNED SPECIFICALLY FOR TRADING
-            <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-          </div>
           <h2
             className={`text-outfit text-gray-gradient relative z-10 text-[3em] font-bold leading-[1em] tracking-tight lg:text-[7em] lg:leading-[1em]`}
           >

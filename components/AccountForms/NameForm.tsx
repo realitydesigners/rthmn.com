@@ -1,20 +1,16 @@
 'use client';
 
-import Card from '@/components/Card';
-import { handleRequest } from '@/utils/auth-helpers/client';
-import { updateName } from '@/utils/auth-helpers/server';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-
 export default function NameForm({ userName }: { userName: string }) {
   return (
-    <Card
-      title="Your Name"
-      description="This is the name displayed on your account."
-    >
-      <div className="mb-4 mt-8 text-xl font-semibold">
-        <p>{userName}</p>
+    <div className="rounded-lg border border-[#333] bg-gradient-to-b from-[#0A0A0A] to-[#181818] p-6">
+      <div>
+        <h3 className="font-russo text-sm uppercase tracking-wider text-zinc-400">
+          Name
+        </h3>
+        <p className="mt-1 font-outfit text-lg font-medium text-zinc-100">
+          {userName || 'No name set'}
+        </p>
       </div>
-    </Card>
+    </div>
   );
 }

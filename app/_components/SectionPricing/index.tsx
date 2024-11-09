@@ -143,15 +143,6 @@ export function SectionPricing({ user, products, subscription }: Props) {
         </div>
         <div className="mt-12 flex flex-wrap justify-center gap-6 space-y-0 sm:mt-16 lg:mx-auto lg:max-w-4xl xl:mx-0 xl:max-w-none">
           {products.map((product) => {
-            const price = product?.prices?.find(
-              (price) => price.interval === billingInterval
-            );
-            if (!price) return null;
-            const priceString = new Intl.NumberFormat('en-US', {
-              style: 'currency',
-              currency: price.currency ?? 'USD',
-              minimumFractionDigits: 0
-            }).format((price.unit_amount ?? 0) / 100);
             return (
               <div
                 key={product.id}
@@ -162,9 +153,9 @@ export function SectionPricing({ user, products, subscription }: Props) {
                       ? product.name === subscription?.prices?.products?.name
                       : product.name === 'Freelancer'
                   },
-                  'flex-1', // This makes the flex item grow to fill the space
-                  'basis-1/3', // Assuming you want each card to take up roughly a third of the container's width
-                  'max-w-xs' // Sets a maximum width to the cards to prevent them from getting too large
+                  'flex-1',
+                  'basis-1/3',
+                  'max-w-xs'
                 )}
               >
                 <div className="p-6">
@@ -172,23 +163,34 @@ export function SectionPricing({ user, products, subscription }: Props) {
                     {product.name}
                   </h2>
                   <p className="mt-4 text-zinc-300">{product.description}</p>
-                  <p className="mt-8">
-                    <span className="white text-5xl font-extrabold">
-                      {priceString}
-                    </span>
-                    <span className="text-base font-medium text-zinc-100">
-                      /{billingInterval}
-                    </span>
-                  </p>
-                  <Button
-                    variant="slim"
-                    type="button"
-                    loading={priceIdLoading === price.id}
-                    onClick={() => handleStripeCheckout(price)}
-                    className="mt-8 block w-full rounded-md py-2 text-center text-sm font-semibold text-white hover:bg-zinc-900"
-                  >
-                    {subscription ? 'Manage' : 'Subscribe'}
-                  </Button>
+                  <div className="mt-8">
+                    {product.prices.map((price) => {
+                      const priceString = new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: price.currency ?? 'USD',
+                        minimumFractionDigits: 0
+                      }).format((price.unit_amount ?? 0) / 100);
+                      return (
+                        <div key={price.id} className="mb-4">
+                          <span className="white text-5xl font-extrabold">
+                            {priceString}
+                          </span>
+                          <span className="text-base font-medium text-zinc-100">
+                            /{price.interval}
+                          </span>
+                          <Button
+                            variant="slim"
+                            type="button"
+                            loading={priceIdLoading === price.id}
+                            onClick={() => handleStripeCheckout(price)}
+                            className="mt-2 block w-full rounded-md py-2 text-center text-sm font-semibold text-white hover:bg-zinc-900"
+                          >
+                            {subscription ? 'Manage' : 'Subscribe'}
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             );

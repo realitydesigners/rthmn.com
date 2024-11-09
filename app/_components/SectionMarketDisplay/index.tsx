@@ -122,7 +122,7 @@ export function SectionMarketDisplay({
   };
 
   return (
-    <section className="relative z-[10000] py-24">
+    <section className="relative z-[100] py-24">
       <div className="container mx-auto px-4">
         <h2 className="mb-8 text-3xl font-bold text-white">Market Overview</h2>
 
