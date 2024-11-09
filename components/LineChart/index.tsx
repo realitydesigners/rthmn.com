@@ -7,7 +7,7 @@ import React, {
   useCallback
 } from 'react';
 import styles from './styles.module.css';
-import { Candle } from '@/types';
+import { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
 
 // Add these constants at the top with other constants

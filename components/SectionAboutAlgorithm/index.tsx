@@ -7,7 +7,7 @@ import {
   NATURE_EXAMPLE,
   PRACTICAL_APPLICATIONS,
   POSITION_STATES
-} from '../text';
+} from '@/app/constants/text';
 
 export function SectionAboutAlgorithm() {
   return (

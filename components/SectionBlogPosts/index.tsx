@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MotionDiv } from '../../../components/MotionDiv';
+import { MotionDiv } from '../../components/MotionDiv';
 
 export interface Post {
   slug: { current: string };

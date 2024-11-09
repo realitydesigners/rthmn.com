@@ -1,6 +1,6 @@
 import React from 'react';
 import ShiftedBox from '@/components/Reso/Shifted';
-import { BoxSlice, OHLC } from '@/types';
+import { BoxSlice, OHLC } from '@/types/types';
 import styles from './styles.module.css';
 
 type PairCardProps = {

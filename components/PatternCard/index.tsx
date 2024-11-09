@@ -1,6 +1,6 @@
 import React from 'react';
 import ShiftedBox from '@/components/Reso/Shifted';
-import { Signal, BoxSlice } from '@/types';
+import { Signal, BoxSlice } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 
 type PatternCardProps = {

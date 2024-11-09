@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { BoxSlice, PairData, ViewType } from '@/types';
+import { BoxSlice, PairData, ViewType } from '@/types/types';
 import HistogramManager from '../../../components/Histogram/HistogramManager';
 import { LineChart } from '../../../components/LineChart';
 import { useAuth } from '@/providers/SupabaseProvider';

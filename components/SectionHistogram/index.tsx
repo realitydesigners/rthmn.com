@@ -1,11 +1,11 @@
 'use client';
 import type React from 'react';
-import type { BoxSlice } from '@/types';
+import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
-import { sequences } from '@/app/_components/constants';
+import { sequences } from '@/app/constants/constants';
 import { MotionDiv } from '@/components/MotionDiv';
 import { TypeAnimation } from 'react-type-animation';
-import { POSITION_STATES } from '@/app/_components/text';
+import { POSITION_STATES } from '@/app/constants/text';
 import { HistoricalPatternView } from './HistoricalPatternView';
 import { FaWaveSquare, FaCube, FaFingerprint, FaAtom } from 'react-icons/fa';
 import Link from 'next/link';

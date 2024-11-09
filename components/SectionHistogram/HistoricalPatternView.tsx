@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { getAnimationSequence } from '@/app/_components/constants';
+import { getAnimationSequence } from '@/app/constants/constants';
 
 interface HistoricalPatternViewProps {
   tableRef: React.RefObject<HTMLDivElement>;

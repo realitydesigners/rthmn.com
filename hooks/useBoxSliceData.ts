@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
-import { BoxSlice } from '@/types';
+import { BoxSlice } from '@/types/types';
 import { getBoxSlices } from '@/utils/boxSlices';
 
 function compareSlices(

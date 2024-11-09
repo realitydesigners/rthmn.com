@@ -1,18 +1,18 @@
 'use client';
 
-import { SectionFeatures } from '@/app/_components/SectionFeatures';
-import { SectionPricing } from '@/app/_components/SectionPricing';
-import { RyverSection } from '@/app/_components/SectionRyver';
-import { FAQSection } from '@/app/_components/SectionFAQ';
-import { ServiceSection } from '@/app/_components/SectionServices';
+import { SectionFeatures } from '@/components/SectionFeatures';
+import { SectionPricing } from '@/components/SectionPricing';
+import { RyverSection } from '@/components/SectionRyver';
+import { FAQSection } from '@/components/SectionFAQ';
+import { ServiceSection } from '@/components/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { SectionBoxes } from '@/app/_components/SectionBoxes';
-import { SectionBlogPosts } from '@/app/_components/SectionBlogPosts';
-import { SectionFooter } from '@/app/_components/SectionFooter';
-import { SectionHistogram } from '@/app/_components/SectionHistogram';
-import { SectionAboutAlgorithm } from '@/app/_components/SectionAboutAlgorithm';
-import { SectionMarketDisplay } from '@/app/_components/SectionMarketDisplay';
-import { SectionMarketTicker } from '@/app/_components/SectionMarketTicker';
+import { SectionBoxes } from '@/components/SectionBoxes';
+import { SectionBlogPosts } from '@/components/SectionBlogPosts';
+import { SectionFooter } from '@/components/SectionFooter';
+import { SectionHistogram } from '@/components/SectionHistogram';
+import { SectionAboutAlgorithm } from '@/components/SectionAboutAlgorithm';
+import { SectionMarketDisplay } from '@/components/SectionMarketDisplay';
+import { SectionMarketTicker } from '@/components/SectionMarketTicker';
 
 interface MarketData {
   pair: string;
@@ -61,7 +61,6 @@ export default function ClientPage({
     <GridBackground>
       <SectionMarketTicker marketData={marketData} />
       <SectionHistogram slice={null} />
-
       <SectionMarketDisplay marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />

@@ -1,4 +1,4 @@
-import type { Box } from '@/types';
+import type { Box } from '@/types/types';
 
 const BOX_COUNT = 8;
 
