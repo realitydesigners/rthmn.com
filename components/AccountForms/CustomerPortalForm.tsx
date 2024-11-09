@@ -48,20 +48,11 @@ export default function CustomerPortalForm({ subscription }: Props) {
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-<<<<<<< HEAD
             <h3 className="font-russo text-base font-medium text-white">
               Subscription Plan
             </h3>
           </div>
           <p className="mt-1 font-outfit text-sm text-zinc-400">
-=======
-            <FaCreditCard className="h-5 w-5 text-zinc-400" />
-            <h3 className="font-outfit text-lg font-medium text-white">
-              Subscription Plan
-            </h3>
-          </div>
-          <p className="mt-1 text-sm text-zinc-400">
->>>>>>> 1293c3e (reimagined)
             {subscription
               ? `${subscription?.prices?.products?.name} Plan`
               : 'No active subscription'}
@@ -94,11 +85,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
         >
           <div className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
             <FaCreditCard className="h-4 w-4" />
-<<<<<<< HEAD
             <span className="font-outfit text-sm">
-=======
-            <span className="font-outfit">
->>>>>>> 1293c3e (reimagined)
               {isSubmitting ? 'Loading...' : 'Manage Plan'}
             </span>
           </div>
