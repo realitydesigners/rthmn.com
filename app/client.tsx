@@ -28,7 +28,7 @@ interface ClientPageProps {
 
 const GridBackground = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen overflow-y-hidden">
       <div className="absolute inset-0 h-full w-full">
         {[...Array(8 + 1)].map((_, i) => (
           <div
@@ -59,8 +59,9 @@ export default function ClientPage({
 
   return (
     <GridBackground>
-      <SectionHistogram slice={null} />
       <SectionMarketTicker marketData={marketData} />
+      <SectionHistogram slice={null} />
+
       <SectionMarketDisplay marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
