@@ -12,6 +12,7 @@ import { SectionFooter } from '@/app/_components/SectionFooter';
 import { SectionHistogram } from '@/app/_components/SectionHistogram';
 import { SectionAboutAlgorithm } from '@/app/_components/SectionAboutAlgorithm';
 import { SectionMarketDisplay } from '@/app/_components/SectionMarketDisplay';
+import { SectionMarketTicker } from '@/app/_components/SectionMarketTicker';
 
 interface MarketData {
   pair: string;
@@ -59,6 +60,7 @@ export default function ClientPage({
   return (
     <GridBackground>
       <SectionHistogram slice={null} />
+      <SectionMarketTicker marketData={marketData} />
       <SectionMarketDisplay marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
