@@ -1,11 +1,9 @@
 'use client';
 
 import { createClient } from '@/utils/supabase/client';
-import { FaDiscord } from 'react-icons/fa';
+import { FaDiscord, FaLink, FaUnlink } from 'react-icons/fa';
 import { useState } from 'react';
 import { Database } from '@/types/supabase';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
 
 type DiscordConnection =
   Database['public']['Tables']['discord_connections']['Row'];
@@ -47,50 +45,48 @@ export default function DiscordConnectionForm({
   };
 
   return (
-    <Card
-      title="Discord Connection"
-      description={
-        discordConnection
-          ? `Connected as ${discordConnection.discord_username}`
-          : 'Connect your Discord account to access the community.'
-      }
-      footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">
-            {subscription && !discordConnection
-              ? 'Please connect Discord to access community channels.'
-              : 'Manage your Discord connection.'}
+    <div className="rounded-lg border border-[#333] bg-gradient-to-b from-[#0A0A0A] to-[#181818] p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="flex items-center gap-2">
+            <FaDiscord className="h-5 w-5 text-[#5865F2]" />
+            <h3 className="font-russo text-base font-medium text-white">
+              Discord Connection
+            </h3>
+          </div>
+          <p className="mt-1 font-outfit text-sm text-zinc-400">
+            {discordConnection
+              ? `Connected as ${discordConnection.discord_username}`
+              : 'Connect your Discord account'}
           </p>
+        </div>
+        <div>
           {discordConnection ? (
-            <Button
-              variant="slim"
+            <button
               onClick={handleDisconnect}
-              loading={isLoading}
-              className="bg-red-600 hover:bg-red-700"
+              disabled={isLoading}
+              className="flex items-center gap-2 rounded-full bg-gradient-to-b from-red-600 to-red-700 p-[2px] text-white transition-all duration-200 hover:from-red-500 hover:to-red-600 disabled:opacity-50"
             >
-              Disconnect Discord
-            </Button>
-          ) : (
-            <Button
-              variant="slim"
-              onClick={() => (window.location.href = DISCORD_OAUTH_URL)}
-            >
-              <div className="flex items-center gap-2">
-                <FaDiscord className="h-5 w-5" />
-                Connect Discord
+              <div className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
+                <FaUnlink className="h-4 w-4" />
+                <span className="font-outfit text-sm">
+                  {isLoading ? 'Disconnecting...' : 'Disconnect'}
+                </span>
               </div>
-            </Button>
+            </button>
+          ) : (
+            <button
+              onClick={() => (window.location.href = DISCORD_OAUTH_URL)}
+              className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#5865F2] to-[#4752C4] p-[2px] text-white transition-all duration-200 hover:from-[#4752C4] hover:to-[#3442A8]"
+            >
+              <div className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
+                <FaDiscord className="h-4 w-4" />
+                <span className="font-outfit text-sm">Connect</span>
+              </div>
+            </button>
           )}
         </div>
-      }
-    >
-      <div className="mb-4 mt-8 text-xl font-semibold">
-        {subscription
-          ? discordConnection
-            ? 'Discord Connected'
-            : 'Discord Not Connected'
-          : 'Subscribe to access Discord community'}
       </div>
-    </Card>
+    </div>
   );
 }

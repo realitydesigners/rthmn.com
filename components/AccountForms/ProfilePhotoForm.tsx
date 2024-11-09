@@ -1,8 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import Card from '@/components/Card';
-import Button from '@/components/Button';
+import { useState, useRef } from 'react';
 import { createClient } from '@/utils/supabase/client';
 import Image from 'next/image';
 
@@ -14,6 +12,7 @@ interface Props {
 export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(avatarUrl);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const supabase = createClient();
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,12 +35,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
       const objectUrl = URL.createObjectURL(file);
       setPreview(objectUrl);
 
-      // Upload to Supabase Storage
-      const fileExt = file.name.split('.').pop();
-      const fileName = `avatar-${Date.now()}.${fileExt}`; // Add timestamp to prevent caching issues
-      const filePath = `${userId}/${fileName}`;
-
-      // First, try to delete the old avatar if it exists
+      // Delete old avatar if exists
       if (avatarUrl) {
         try {
           const oldPath = new URL(avatarUrl).pathname.split('/').pop();
@@ -52,29 +46,29 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
           }
         } catch (error) {
           console.warn('Failed to delete old avatar:', error);
-          // Continue with upload even if delete fails
         }
       }
 
       // Upload new file
-      const { error: uploadError, data: uploadData } = await supabase.storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `avatar-${Date.now()}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
         .from('avatars')
         .upload(filePath, file, {
           upsert: true,
-          contentType: file.type // Explicitly set content type
+          contentType: file.type
         });
 
-      if (uploadError) {
-        console.error('Upload error details:', uploadError);
-        throw new Error(`Upload failed: ${uploadError.message}`);
-      }
+      if (uploadError) throw uploadError;
 
       // Get public URL
       const {
         data: { publicUrl }
       } = supabase.storage.from('avatars').getPublicUrl(filePath);
 
-      // Update user profile with new avatar URL
+      // Update user profile
       const { error: updateError } = await supabase
         .from('users')
         .update({
@@ -83,120 +77,78 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
         })
         .eq('id', userId);
 
-      if (updateError) {
-        console.error('Profile update error:', updateError);
-        throw new Error(`Profile update failed: ${updateError.message}`);
-      }
+      if (updateError) throw updateError;
 
-      // Force refresh the preview with the new URL
       setPreview(publicUrl + '?v=' + Date.now());
     } catch (error) {
       console.error('Error uploading photo:', error);
-      setPreview(avatarUrl); // Reset preview on error
-      alert(
-        error instanceof Error
-          ? error.message
-          : 'Error uploading photo. Please try again.'
-      );
+      setPreview(avatarUrl);
+      alert(error instanceof Error ? error.message : 'Error uploading photo');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Add delete functionality
-  const handleDelete = async () => {
-    try {
-      setIsLoading(true);
-
-      if (avatarUrl) {
-        const oldFilePath = new URL(avatarUrl).pathname.split('/').pop();
-        if (oldFilePath) {
-          await supabase.storage
-            .from('avatars')
-            .remove([`${userId}/${oldFilePath}`]);
-        }
-      }
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          avatar_url: null,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (updateError) throw updateError;
-
-      setPreview(null);
-    } catch (error) {
-      console.error('Error deleting photo:', error);
-      alert('Error deleting photo. Please try again.');
-    } finally {
-      setIsLoading(false);
+  const handleClick = () => {
+    if (!isLoading) {
+      fileInputRef.current?.click();
     }
   };
 
   return (
-    <Card
-      title="Profile Photo"
-      description="Upload or update your profile photo."
-      footer={
-        <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
-          <p className="pb-4 sm:pb-0">
-            Supported formats: JPG, PNG, GIF (max 2MB)
-          </p>
-          <div className="flex gap-2">
-            {preview && (
-              <Button
-                variant="slim"
-                onClick={handleDelete}
-                loading={isLoading}
-                className="bg-red-600 hover:bg-red-700"
-                disabled={isLoading}
-              >
-                Remove
-              </Button>
-            )}
-            <label className="relative">
-              <Button
-                variant="slim"
-                loading={isLoading}
-                className="cursor-pointer"
-                disabled={isLoading}
-              >
-                {preview ? 'Change Photo' : 'Upload Photo'}
-              </Button>
-              <input
-                type="file"
-                accept="image/*"
-                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                onChange={handleFileUpload}
-                disabled={isLoading}
-              />
-            </label>
-          </div>
-        </div>
-      }
-    >
-      <div className="mb-4 mt-8">
+    <div className="relative font-outfit">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileUpload}
+        disabled={isLoading}
+      />
+
+      {/* Profile Image */}
+      <button
+        onClick={handleClick}
+        className="group relative h-40 w-40 overflow-hidden rounded-full border-4 border-[#222] bg-[#222] shadow-xl transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        disabled={isLoading}
+      >
         {preview ? (
-          <div className="relative h-32 w-32 overflow-hidden rounded-full">
-            <Image
-              src={preview}
-              alt="Profile"
-              fill
-              className="object-cover"
-              sizes="128px"
-            />
-          </div>
+          <Image
+            src={preview}
+            alt="Profile"
+            fill
+            className="object-cover transition-opacity duration-200 group-hover:opacity-75"
+            sizes="160px"
+            priority
+          />
         ) : (
-          <div className="flex h-32 w-32 items-center justify-center rounded-full bg-zinc-800">
-            <span className="text-4xl text-zinc-400">
+          <div className="flex h-full w-full items-center justify-center bg-[#333] transition-colors duration-200 group-hover:bg-[#444]">
+            <span className="text-4xl font-bold text-zinc-500">
               {userId.charAt(0).toUpperCase()}
             </span>
           </div>
         )}
+
+        {/* Simple hover text */}
+        <div className="absolute inset-0 flex items-center justify-center font-outfit opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+          <span className="rounded-full bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
+            Change Photo
+          </span>
+        </div>
+      </button>
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-white"></div>
+        </div>
+      )}
+
+      {/* Help Text */}
+      <div className="mt-2 text-center font-outfit text-xs text-zinc-500">
+        Click to change • Max 2MB
       </div>
-    </Card>
+    </div>
   );
 }
