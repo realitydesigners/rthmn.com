@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { BoxSlice, PairData } from '@/types';
+import { BoxSlice, PairData } from '@/types/types';
 import { useWebSocket } from '@/providers/WebSocketProvider';
 import {
   getSelectedPairs,

@@ -2,19 +2,11 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState, useEffect, RefObject, type JSX } from 'react';
-import { kodeMono, russo } from '@/fonts';
+import { useState, useEffect, type JSX } from 'react';
 import styles from './styles.module.css';
-import {
-  motion,
-  AnimatePresence,
-  HTMLMotionProps,
-  useScroll,
-  useTransform
-} from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { FaArrowRight } from 'react-icons/fa';
 import { MotionDiv } from '@/components/MotionDiv';
 import { MotionButton } from '@/components/MotionButtton';
 

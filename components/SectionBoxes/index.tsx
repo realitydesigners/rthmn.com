@@ -1,14 +1,14 @@
 'use client';
 import type React from 'react';
-import type { BoxSlice } from '@/types';
+import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import {
   sequences,
   createDemoStep,
   createMockBoxData
-} from '@/app/_components/constants';
+} from '@/app/constants/constants';
 import { NestedBoxes } from '@/components/NestedBoxes';
-import { FEATURE_TAGS } from '@/app/_components/text';
+import { FEATURE_TAGS } from '@/app/constants/text';
 import { MotionDiv } from '@/components/MotionDiv';
 import { TypeAnimation } from 'react-type-animation';
 

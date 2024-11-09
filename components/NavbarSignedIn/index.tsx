@@ -1,5 +1,4 @@
 'use client';
-import { russo } from '@/fonts';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useRef, useEffect, type JSX } from 'react';

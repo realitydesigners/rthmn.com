@@ -1,7 +1,7 @@
 'use client';
 import type React from 'react';
 import { motion, AnimatePresence, HTMLMotionProps } from 'framer-motion';
-import type { Box, BoxSlice } from '@/types';
+import type { Box, BoxSlice } from '@/types/types';
 import { useDashboard } from '@/providers/DashboardProvider';
 
 interface BoxComponentProps {

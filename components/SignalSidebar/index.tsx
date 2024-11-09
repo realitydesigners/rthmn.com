@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Signal } from '@/types';
+import { Signal } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 import { getTimeAgo } from '@/utils/dateUtils';
 import { CondensedIcon, DetailedIcon } from '@/public/icons/icons';

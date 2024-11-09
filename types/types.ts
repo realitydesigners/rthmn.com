@@ -1,3 +1,5 @@
+import type { PortableTextBlock } from '@portabletext/types';
+
 export interface Signal {
   id: string;
   pair: string;
@@ -61,8 +63,6 @@ export interface Candle {
   low: number;
   close: number;
 }
-
-import type { PortableTextBlock } from '@portabletext/types';
 
 interface BaseItem {
   _id: string;
@@ -200,14 +200,6 @@ export interface TeamPayload extends BaseItem {
 }
 export interface GlossaryPayload extends BaseItem {
   content?: PortableTextBlock[];
-}
-
-interface PostItemProps {
-  block: BlockItem;
-  slug?: {
-    current?: string;
-  };
-  dateString?: string;
 }
 
 export interface BoxData {

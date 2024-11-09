@@ -1,4 +1,4 @@
-import { PairData, Box, OHLC, BoxSlice } from '@/types';
+import { PairData, Box, OHLC, BoxSlice } from '@/types/types';
 
 interface ApiResponse {
   status: string;

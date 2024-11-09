@@ -6,11 +6,11 @@ import React, {
   useState,
   forwardRef,
   useImperativeHandle,
-  type JSX,
+  type JSX
 } from 'react';
 import HistogramControls from './HistogramControls';
 import SelectedFrameDetails from './SelectedFrameDetails';
-import type { BoxSlice, ViewType, Box } from '@/types';
+import type { BoxSlice, ViewType, Box } from '@/types/types';
 import { COLORS } from './Colors';
 import { DraggableBorder } from '../DraggableBorder';
 import { formatTime } from '@/utils/dateUtils';

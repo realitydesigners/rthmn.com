@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState } from 'react';
-import { Signal } from '@/types';
+import { Signal } from '@/types/types';
 
 type SignalContextType = {
   signalsData: Signal[] | null;

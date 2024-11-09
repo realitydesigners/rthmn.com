@@ -1,5 +1,4 @@
 'use client';
-
 import React from 'react';
 import { NavbarSignedOut } from '@/components/NavbarSignedOut';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';

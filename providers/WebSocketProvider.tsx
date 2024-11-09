@@ -1,6 +1,6 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { BoxSlice, PairData } from '@/types';
+import { BoxSlice, PairData } from '@/types/types';
 import { wsClient } from '@/utils/websocketClient';
 import { useAuth } from '@/providers/SupabaseProvider';
 

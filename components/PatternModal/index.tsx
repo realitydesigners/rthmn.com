@@ -3,7 +3,7 @@ import { useSignals } from '@/providers/SignalProviderClient';
 import styles from './PatternModal.module.css';
 import ShiftedBox from '@/components/Reso/Shifted';
 import { LineChart } from '../LineChart';
-import { BoxSlice } from '@/types';
+import { BoxSlice } from '@/types/types';
 
 const PatternModal: React.FC = () => {
   const { selectedSignal, setSelectedSignal } = useSignals();

@@ -1,4 +1,4 @@
-import type { Box } from '@/types';
+import type { Box } from '@/types/types';
 import type { CSSProperties } from 'react';
 
 interface PositionStyle {

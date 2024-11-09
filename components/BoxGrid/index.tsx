@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternCard from '@/components/PatternCard';
 import styles from './styles.module.css';
-import { Signal } from '@/types';
+import { Signal } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 
 const BoxGrid: React.FC = () => {

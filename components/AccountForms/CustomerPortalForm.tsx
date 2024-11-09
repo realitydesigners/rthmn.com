@@ -1,6 +1,4 @@
 'use client';
-
-import Card from '@/components/Card';
 import { createStripePortal } from '@/utils/stripe/server';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
