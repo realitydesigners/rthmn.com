@@ -91,3 +91,21 @@ export const getSignals = cache(async (supabase: SupabaseClient) => {
     return null;
   }
 });
+
+export const getDiscordConnection = cache(async (supabase: SupabaseClient) => {
+  try {
+    const { data: discord, error } = await supabase
+      .from('discord_connections')
+      .select('*')
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') {
+      throw error;
+    }
+
+    return discord;
+  } catch (error) {
+    console.error('Error fetching discord connection:', error);
+    return null;
+  }
+});
