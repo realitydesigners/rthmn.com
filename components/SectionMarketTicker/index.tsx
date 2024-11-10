@@ -123,7 +123,7 @@ export function SectionMarketTicker({ marketData }: SectionMarketTickerProps) {
   );
 
   return (
-    <section className="absolute left-0 right-0 z-[1000] mt-20 w-full overflow-hidden bg-black/20 backdrop-blur-[2px]">
+    <section className="absolute left-0 right-0 z-[100] mt-20 w-full overflow-hidden bg-black/20 backdrop-blur-[2px]">
       <div className="animate-marquee flex gap-2 p-1.5">
         {/* First set of cards */}
         {sortedPairs.map((item) => (
