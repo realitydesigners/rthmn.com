@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useCallback
 } from 'react';
-import styles from './styles.module.css';
+import styles from './stykes.module.css';
 import { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
 
@@ -369,7 +369,6 @@ export const LineChart: React.FC<{
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
     >
-      <PairName pair={pair} />
       <svg
         width="100%"
         height="100%"
@@ -452,7 +451,7 @@ const XAxis: React.FC<{
   const intervals = useMemo(() => {
     if (data.length === 0) return [];
 
-    const intervalMs = 10 * 60 * 1000; // 10 minutes
+    const intervalMs = 60 * 60 * 1000; // 1 hour
     const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
     const endTime = data[data.length - 1].timestamp;
     const result = [];
@@ -648,12 +647,3 @@ const YAxis: React.FC<{
     );
   }
 );
-
-const PairName: React.FC<{ pair: string }> = React.memo(({ pair }) => {
-  const pairName = pair.substring(0, 7).replace(/_/g, '');
-  return (
-    <div className="absolute left-6 top-20 font-mono text-2xl font-bold uppercase text-gray-200">
-      {pairName}
-    </div>
-  );
-});
