@@ -52,7 +52,7 @@ const Links = () => {
   };
 
   const linkStyle = `
-    flex items-center space-x-3 text-white rounded-full p-[2px] transition-all duration-200 
+    flex items-center space-x-3 text-white rounded-full p-[1px] transition-all duration-200 
     bg-gradient-to-b from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]
   `;
 
@@ -186,15 +186,6 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     setIsNavOpen(!isNavOpen);
   };
 
-  const buttonClasses = `
-        px-6 py-3
-        gradient-border-button
-        text-white font-medium
-        text-kodemono
-        transition-all duration-300
-        hover:shadow-lg
-    `;
-
   const navVariants = {
     hidden: { opacity: 0, y: -50 },
     visible: {
@@ -265,17 +256,22 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                       name="pathName"
                       value={usePathname()}
                     />
-                    <button type="submit" className={buttonClasses}>
-                      Sign out
+                    <button
+                      type="submit"
+                      className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                    >
+                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-base font-medium">
+                        Sign out
+                      </span>
                     </button>
                   </form>
                 ) : (
                   <Link
                     href="/signin"
-                    className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+                    className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
-                    <span className="flex w-full items-center space-x-3 rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2">
-                      Sign-in
+                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-base font-medium">
+                      Sign in
                     </span>
                   </Link>
                 )}
@@ -314,17 +310,23 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                       name="pathName"
                       value={usePathname()}
                     />
-                    <button type="submit" className={`${buttonClasses} w-full`}>
-                      Sign out
+                    <button
+                      type="submit"
+                      className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                    >
+                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-base font-medium">
+                        Sign out
+                      </span>
                     </button>
                   </form>
                 ) : (
                   <Link
                     href="/signin"
-                    className={`${buttonClasses} block w-full text-center`}
-                    // onClick={() => setIsNavOpen(false)}
+                    className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
-                    Sign In
+                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-base font-medium">
+                      Sign in
+                    </span>
                   </Link>
                 )}
               </div>
