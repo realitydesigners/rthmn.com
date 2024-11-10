@@ -37,12 +37,16 @@ export function useSignInWithOAuth() {
         : 'https://www.rthmn.com';
 
     if (provider === 'discord') {
-      // Add discord-specific scopes
+      // Add both auth and connection scopes for Discord
       await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: redirectURL,
-          scopes: 'identify' // Add any additional scopes you need
+          scopes: 'identify guilds.join', // Added guilds.join for server management
+          queryParams: {
+            // Add a flag to identify this as a sign-in flow
+            'discord-sign-in': 'true'
+          }
         }
       });
     } else {
