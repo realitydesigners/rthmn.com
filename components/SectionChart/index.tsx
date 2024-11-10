@@ -84,6 +84,43 @@ const MarketCard = ({
   );
 };
 
+const Navigation = ({
+  activeTab,
+  setActiveTab
+}: {
+  activeTab: 'chart' | 'grid';
+  setActiveTab: (tab: 'chart' | 'grid') => void;
+}) => (
+  <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-2">
+    <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
+        {['chart', 'grid'].map((tab) => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab as 'chart' | 'grid')}
+            className={`flex items-center gap-1.5 rounded-md bg-gradient-to-b p-[1px] transition-all duration-200 ${
+              activeTab === tab
+                ? 'from-emerald-500/50 to-emerald-500/20 hover:from-emerald-500/60 hover:to-emerald-500/30'
+                : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
+            } `}
+          >
+            <span
+              className={`flex w-full items-center gap-1.5 rounded-md bg-gradient-to-b from-black to-black/80 px-3 py-1.5 text-sm font-medium ${activeTab === tab ? 'text-emerald-400' : 'text-white/70'} `}
+            >
+              {tab === 'chart' ? (
+                <FaChartArea className="h-3.5 w-3.5" />
+              ) : (
+                <FaTable className="h-3.5 w-3.5" />
+              )}
+              {tab === 'chart' ? 'Chart View' : 'Market Grid'}
+            </span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 export function SectionChart({ marketData }: { marketData: MarketData[] }) {
   const [selectedPair, setSelectedPair] = useState<string>(
     marketData[0]?.pair || ''
@@ -140,41 +177,17 @@ export function SectionChart({ marketData }: { marketData: MarketData[] }) {
           transform: `perspective(1000px) rotateX(${mousePosition.y * 2}deg) rotateY(${mousePosition.x * 2}deg)`
         }}
       >
-        <div className="relative rounded-md border border-white/10 bg-black p-6 backdrop-blur-md [transform-style:preserve-3d] [transform:translateZ(50px)]">
-          {/* Glow Effect */}
-          <div className="pointer-events-none absolute inset-0 rounded-md bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.05),transparent_50%)]" />
+        <div className="relative rounded-xl border border-white/10 bg-black/90 p-6 backdrop-blur-md [transform-style:preserve-3d] [transform:translateZ(50px)]">
+          {/* Simplified, elegant effects */}
+          <div className="pointer-events-none absolute inset-0">
+            {/* Main gradient overlay */}
+            <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
 
-          {/* Tab Navigation */}
-          <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-2">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setActiveTab('chart')}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-all ${
-                    activeTab === 'chart'
-                      ? 'bg-emerald-500/20 text-emerald-400'
-                      : 'text-white/70 hover:bg-white/5'
-                  }`}
-                >
-                  <FaChartArea className="h-3.5 w-3.5" />
-                  Chart View
-                </button>
-                <button
-                  onClick={() => setActiveTab('grid')}
-                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-all ${
-                    activeTab === 'grid'
-                      ? 'bg-emerald-500/20 text-emerald-400'
-                      : 'text-white/70 hover:bg-white/5'
-                  }`}
-                >
-                  <FaTable className="h-3.5 w-3.5" />
-                  Market Grid
-                </button>
-              </div>
-            </div>
+            {/* Subtle top highlight */}
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
           </div>
 
-          {/* Content Area */}
+          <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
           <MotionDiv
             key={activeTab}
             initial={{ opacity: 0, y: 20 }}
@@ -184,24 +197,18 @@ export function SectionChart({ marketData }: { marketData: MarketData[] }) {
             className="relative z-10 h-full [transform:translateZ(20px)]"
           >
             {activeTab === 'chart' ? (
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-4 lg:flex-row">
                 {/* Main Chart Area */}
                 <div className="relative z-[100] flex-1 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <h2 className="text-lg font-bold text-white">
-                      {selectedPair.replace('_', '/')}
-                    </h2>
-                  </div>
-                  <div className="relative h-[500px] overflow-hidden">
+                  <div className="relative h-[400px] overflow-hidden rounded-lg border border-white/5 bg-black/20 backdrop-blur-sm lg:h-[500px]">
                     <LineChart pair={selectedPair} candles={candles} />
                   </div>
                 </div>
 
-                {/* Right Sidebar */}
-                <div className="w-[220px] flex-shrink-0 space-y-3">
-                  {/* Market Overview */}
-                  <div className="rounded-lg border border-white/5 bg-black/40 p-2">
-                    <div className="scrollbar-thin scrollbar-track-white/5 max-h-[500px] space-y-1.5 overflow-y-auto pr-1">
+                {/* Market Cards - Side on desktop, bottom on mobile */}
+                <div className="w-full flex-shrink-0 space-y-3 lg:w-[220px]">
+                  <div className="rounded-lg border border-white/5 bg-black/20 p-2 backdrop-blur-sm">
+                    <div className="scrollbar-thin scrollbar-track-white/5 grid max-h-[200px] grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3 lg:max-h-[500px] lg:grid-cols-1">
                       {marketData.map((marketItem) => (
                         <MarketCard
                           key={marketItem.pair}
