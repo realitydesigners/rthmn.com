@@ -35,6 +35,24 @@ export default function SupabaseProvider({
   const [isLoading, setIsLoading] = useState(!initialUser);
   const router = useRouter();
 
+  const signOut = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+
+      if (error) {
+        console.error('Error during sign out:', error);
+        return;
+      }
+
+      // The onAuthStateChange listener will handle:
+      // - Setting user to null
+      // - Setting session to null
+      // - Redirecting to home page
+    } catch (error) {
+      console.error('Unexpected error during sign out:', error);
+    }
+  };
+
   useEffect(() => {
     if (initialUser) {
       setSession({ user: initialUser } as Session);
@@ -46,8 +64,11 @@ export default function SupabaseProvider({
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         setIsLoading(false);
+
         if (event === 'SIGNED_OUT') {
+          // Handle sign out in one place
           router.push('/');
+          router.refresh();
         }
       }
     );
@@ -64,11 +85,6 @@ export default function SupabaseProvider({
       authListener.subscription.unsubscribe();
     };
   }, [supabaseClient, router, initialUser]);
-
-  const signOut = async () => {
-    await supabaseClient.auth.signOut();
-    router.push('/');
-  };
 
   return (
     <AuthContext.Provider value={{ session, user, isLoading, signOut }}>
