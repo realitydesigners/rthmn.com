@@ -2,19 +2,8 @@
 import { useState } from 'react';
 import { LineChart } from './LineChart';
 import { MotionDiv } from '@/components/MotionDiv';
-import styles from './stykes.module.css';
-
-interface CandleData {
-  complete: boolean;
-  volume: number;
-  time: string;
-  mid: {
-    o: string;
-    h: string;
-    l: string;
-    c: string;
-  };
-}
+import { CandleData } from '@/types/types';
+import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 
 interface MarketData {
   pair: string;
@@ -64,7 +53,7 @@ const MarketCard = ({
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.99 }}
       onClick={onClick}
-      className={`group relative flex h-[52px] w-full cursor-pointer items-center justify-between rounded-md border px-3 backdrop-blur-sm transition-all duration-200 ${
+      className={`group relative flex h-[40px] cursor-pointer items-center justify-between rounded-md border px-3 backdrop-blur-sm transition-all duration-200 ${
         isSelected
           ? 'border-[#22c55e]/50 bg-[#22c55e]/10'
           : 'border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60'
@@ -75,26 +64,24 @@ const MarketCard = ({
         <div className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#22c55e]" />
       )}
 
-      <div className="flex flex-col gap-[2px]">
-        <div className="flex items-center gap-2">
-          <h4 className="text-xs font-medium text-white/90">
-            {item.pair.replace('_', '/')}
-          </h4>
-          <span
-            className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${
-              priceChange >= 0
-                ? 'bg-green-500/10 text-green-400'
-                : 'bg-red-500/10 text-red-400'
-            }`}
-          >
-            {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}
-          </span>
-        </div>
-        <div className="text-sm font-bold tracking-tight text-white group-hover:text-white/90">
+      <div className="flex w-full items-center justify-between">
+        <span className="text-xs font-medium text-white/90">
+          {item.pair.replace('_', '/')}
+        </span>
+        <span className="text-xs font-medium text-white/90">
           {latestPrice
             ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5)
             : 'N/A'}
-        </div>
+        </span>
+        <span
+          className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${
+            priceChange >= 0
+              ? 'bg-green-500/10 text-green-400'
+              : 'bg-red-500/10 text-red-400'
+          }`}
+        >
+          {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}
+        </span>
       </div>
     </MotionDiv>
   );
@@ -122,12 +109,51 @@ const MarketStructure = () => (
   </div>
 );
 
+const MarketStats = ({ candles }: { candles: any[] }) => {
+  const getStats = () => {
+    if (candles.length === 0) return { high: 0, low: 0, range: 0 };
+    const high = Math.max(...candles.map((c) => c.high));
+    const low = Math.min(...candles.map((c) => c.low));
+    return {
+      high: high.toFixed(5),
+      low: low.toFixed(5),
+      range: (((high - low) / low) * 100).toFixed(2)
+    };
+  };
+
+  const stats = getStats();
+
+  return (
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2">
+        <TrendingUp className="h-4 w-4 text-green-500" />
+        <div className="flex flex-col">
+          <span className="text-[10px] text-white/50">High</span>
+          <span className="font-mono text-xs text-white">{stats.high}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <TrendingDown className="h-4 w-4 text-red-500" />
+        <div className="flex flex-col">
+          <span className="text-[10px] text-white/50">Low</span>
+          <span className="font-mono text-xs text-white">{stats.low}</span>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <Clock className="h-4 w-4 text-blue-500" />
+        <div className="flex flex-col">
+          <span className="text-[10px] text-white/50">Range</span>
+          <span className="font-mono text-xs text-white">{stats.range}%</span>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export function SectionChart({ marketData }: SectionChartProps) {
   const [selectedPair, setSelectedPair] = useState<string>(
     marketData[0]?.pair || ''
   );
-  const [selectedTimeframe, setSelectedTimeframe] = useState('1H');
-  const [selectedTab, setSelectedTab] = useState('market');
 
   // Convert candleData string to Candle array format required by LineChart
   const processCandles = (candleDataString: string) => {
@@ -158,84 +184,93 @@ export function SectionChart({ marketData }: SectionChartProps) {
     ? processCandles(selectedMarketData.candleData)
     : [];
 
+  // Add a helper function at the component level to avoid duplication
+  const getPriceInfo = (candleData: string) => {
+    try {
+      const data = JSON.parse(candleData) as CandleData[];
+      const firstPrice = parseFloat(data[0].mid.o);
+      const lastPrice = parseFloat(data[data.length - 1].mid.c);
+      const change = ((lastPrice - firstPrice) / firstPrice) * 100;
+      return {
+        price: lastPrice,
+        change: change
+      };
+    } catch (e) {
+      return { price: null, change: null };
+    }
+  };
+
   return (
-    <section className="relative z-[100] bg-gradient-to-b from-black/40 to-black/20 py-24">
-      <div className="container mx-auto px-4">
+    <section className="relative z-[100] px-16 py-24 xl:px-32">
+      <div className="rounded-md border border-white/5 bg-black/90 p-4 backdrop-blur-sm">
         <div className="flex gap-4">
-          {/* Updated Left Sidebar */}
-          <div className="flex w-64 flex-col gap-4">
-            <div className="rounded-xl border border-white/5 bg-black/40 p-3 backdrop-blur-sm">
-              <h3 className="mb-3 text-sm font-medium text-white/80">
-                Market Analysis
-              </h3>
-              <div className="flex flex-col gap-4">
-                <MarketStructure />
+          {/* Main Chart Area */}
+          <div className="flex-1">
+            {/* Chart Header */}
+            <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-3">
+                  <h2 className="text-xl font-bold text-white">
+                    {selectedPair.replace('_', '/')}
+                  </h2>
+                  {selectedMarketData && (
+                    <>
+                      <span className="font-mono text-lg text-white">
+                        {getPriceInfo(
+                          selectedMarketData.candleData
+                        ).price?.toFixed(selectedPair.includes('JPY') ? 3 : 5)}
+                      </span>
+                      <span
+                        className={`rounded-sm px-2 py-1 text-xs font-semibold ${
+                          getPriceInfo(selectedMarketData.candleData).change >=
+                          0
+                            ? 'bg-green-500/10 text-green-400'
+                            : 'bg-red-500/10 text-red-400'
+                        }`}
+                      >
+                        {getPriceInfo(
+                          selectedMarketData.candleData
+                        ).change?.toFixed(1)}
+                        %
+                      </span>
+                    </>
+                  )}
+                </div>
+                <MarketStats candles={candles} />
               </div>
+            </div>
+
+            {/* Chart Container */}
+            <div className="relative overflow-hidden rounded-lg border border-white/5 bg-black/40 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent" />
+              {candles.length > 0 && (
+                <div className="h-[600px]">
+                  <LineChart pair={selectedPair} candles={candles} />
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Main Chart Area - keep existing code but update styling */}
-          <div className="flex-1">
-            {/* Chart Controls */}
-            <div className="mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <h2 className="text-2xl font-bold text-white">
-                  {selectedPair.replace('_', '/')}
-                </h2>
-                <div className="flex items-center rounded-lg border border-white/10 bg-black/20 p-1">
-                  {['5M', '15M', '1H', '4H', '1D'].map((timeframe) => (
-                    <button
-                      key={timeframe}
-                      onClick={() => setSelectedTimeframe(timeframe)}
-                      className={`px-3 py-1.5 text-xs font-medium transition-all ${
-                        selectedTimeframe === timeframe
-                          ? 'rounded-md bg-[#22c55e] text-black'
-                          : 'text-white/60 hover:text-white'
-                      }`}
-                    >
-                      {timeframe}
-                    </button>
+          {/* Right Sidebar */}
+          <div className="w-[250px] flex-shrink-0 space-y-4">
+            <div className="rounded-lg border border-white/5 bg-black/40 p-3 backdrop-blur-sm">
+              <h3 className="mb-3 text-sm font-medium text-white/70">
+                Market Overview
+              </h3>
+              <div className="max-h-[500px] overflow-y-auto">
+                <div className="flex flex-col gap-2">
+                  {sortedPairs.map((item) => (
+                    <MarketCard
+                      key={item.pair}
+                      item={item}
+                      isSelected={selectedPair === item.pair}
+                      onClick={() => setSelectedPair(item.pair)}
+                    />
                   ))}
                 </div>
               </div>
             </div>
-
-            {/* Updated Chart Container */}
-            <div className="relative h-[600px] overflow-hidden rounded-xl border border-white/5 bg-black/40 shadow-2xl backdrop-blur-sm">
-              <div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] to-transparent" />
-              {candles.length > 0 && (
-                <LineChart pair={selectedPair} candles={candles} />
-              )}
-            </div>
-
-            {/* Updated Bottom Panel */}
-          </div>
-
-          {/* Right Sidebar - Market Data */}
-          <div className="flex w-52 flex-col rounded-xl border border-white/5 bg-black/40 shadow-2xl backdrop-blur-sm">
-            <div className="border-b border-white/5 p-3">
-              <h3 className="mb-2 text-sm font-medium text-white/80">
-                Markets
-              </h3>
-              <input
-                type="text"
-                placeholder="Search pairs..."
-                className="w-full rounded-md border border-white/10 bg-white/5 px-3 py-2 text-sm text-white placeholder-white/40 outline-none focus:border-[#22c55e]/50 focus:ring-1 focus:ring-[#22c55e]/50"
-              />
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-2">
-              <div className="flex flex-col gap-2">
-                {sortedPairs.map((item) => (
-                  <MarketCard
-                    key={item.pair}
-                    item={item}
-                    isSelected={selectedPair === item.pair}
-                    onClick={() => setSelectedPair(item.pair)}
-                  />
-                ))}
-              </div>
-            </div>
+            <MarketStructure />
           </div>
         </div>
       </div>

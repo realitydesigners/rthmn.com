@@ -363,7 +363,7 @@ export const LineChart: React.FC<{
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${styles.chartContainer}`}
+      className={`relative h-full w-full overflow-hidden bg-black ${styles.chartContainer}`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleContainerMouseMove}
       onMouseUp={handleMouseUp}
