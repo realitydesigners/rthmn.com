@@ -6,11 +6,12 @@ import React, {
   useMemo,
   useCallback
 } from 'react';
+
 import { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
 
 // Add these constants at the top with other constants
-const VISIBLE_POINTS = 100;
+const VISIBLE_POINTS = 1000;
 const MIN_ZOOM = 0.1; // Most zoomed out
 const MAX_ZOOM = 5; // Most zoomed in
 
@@ -121,7 +122,7 @@ const HoverInfo: React.FC<HoverInfoProps> = ({
         y1={0}
         x2={safeX}
         y2={chartHeight}
-        stroke="rgba(255, 255, 255, 0.5)"
+        stroke="rgba(255,255,255,0.5)"
         strokeWidth="1"
       />
       <line
@@ -129,7 +130,7 @@ const HoverInfo: React.FC<HoverInfoProps> = ({
         y1={safeY}
         x2={chartWidth}
         y2={safeY}
-        stroke="rgba(255, 255, 255, 0.5)"
+        stroke="rgba(255,255,255,0.5)"
         strokeWidth="1"
       />
       <circle cx={safeX} cy={safeY} r="4" fill="white" />
@@ -190,7 +191,7 @@ export const LineChart: React.FC<{
 
   const animatedScale = useAnimatedScale(yAxisScale);
 
-  const chartPadding = { top: 5, right: 60, bottom: 30, left: 0 };
+  const chartPadding = { top: 20, right: 60, bottom: 30, left: 10 };
   const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
   const chartHeight =
     dimensions.height - chartPadding.top - chartPadding.bottom;
@@ -362,7 +363,7 @@ export const LineChart: React.FC<{
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full overflow-hidden`}
+      className={`relative h-full w-full overflow-hidden bg-black`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleContainerMouseMove}
       onMouseUp={handleMouseUp}
@@ -429,7 +430,15 @@ const ChartLine: React.FC<{
     }
   }, [pathData]);
 
-  return <path ref={pathRef} stroke="white" strokeWidth="1.5" fill="none" />;
+  return (
+    <path
+      ref={pathRef}
+      stroke="white"
+      strokeWidth="1.5"
+      fill="none"
+      className="bg-white"
+    />
+  );
 });
 
 const XAxis: React.FC<{
@@ -465,13 +474,7 @@ const XAxis: React.FC<{
 
   return (
     <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
-      <line
-        x1={0}
-        y1={0}
-        x2={chartWidth}
-        y2={0}
-        stroke="rgba(255, 255, 255, 0.5)"
-      />
+      <line x1={0} y1={0} x2={chartWidth} y2={0} stroke="#777" />
       {intervals.map((point, index) => {
         const xPosition =
           ((point.timestamp - data[0].timestamp) /
@@ -483,39 +486,28 @@ const XAxis: React.FC<{
 
         return (
           <g key={uniqueKey} transform={`translate(${xPosition}, 0)`}>
-            <text
-              y={20}
-              textAnchor="middle"
-              fill="rgba(255, 255, 255, 0.5)"
-              fontSize="12"
-            >
+            <line y2={6} stroke="#777" />
+            <text y={20} textAnchor="middle" fill="#fff" fontSize="12">
               {formatTime(new Date(point.timestamp))}
             </text>
             <line
               y1={-chartHeight}
               y2={0}
-              stroke="rgba(255, 255, 255, 0.5)"
+              stroke="#777"
               strokeOpacity="0.2"
-              strokeDasharray="1 4"
+              strokeDasharray="4 4"
             />
           </g>
         );
       })}
       {hoverInfo && (
         <g transform={`translate(${hoverInfo.x}, 0)`}>
-          <rect
-            x={-40}
-            y={5}
-            width={80}
-            height={20}
-            fill="rgba(255, 255, 255, 0.5)"
-            rx={4}
-          />
+          <rect x={-40} y={5} width={80} height={20} fill="#d1d5db" rx={4} />
           <text
             x={0}
             y={20}
             textAnchor="middle"
-            fill="white"
+            fill="#000"
             fontSize="12"
             fontWeight="bold"
           >
@@ -589,32 +581,38 @@ const YAxis: React.FC<{
         onWheel={handleWheel}
         style={{
           userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none'
+          WebkitUserSelect: 'none', // For Safari
+          MozUserSelect: 'none', // For Firefox
+          msUserSelect: 'none' // For IE/Edge
         }}
       >
-        <line
-          x1={0}
-          y1={0}
-          x2={0}
-          y2={chartHeight}
-          stroke="rgba(255, 255, 255, 0.5)"
+        <rect
+          x={0}
+          y={0}
+          width={60}
+          height={chartHeight}
+          fill="transparent"
+          cursor="ns-resize"
         />
+        <line x1={0} y1={0} x2={0} y2={chartHeight} stroke="#777" />
         {Array.from({ length: steps + 1 }, (_, i) => {
           const value = visibleMax - i * stepSize;
           const y = (i / steps) * chartHeight;
           return (
             <g key={i} transform={`translate(0, ${y})`}>
-              <text
-                x={10}
-                y={4}
-                textAnchor="start"
-                fill="rgba(255, 255, 255, 0.5)"
-                fontSize="12"
-              >
+              <line x2={6} stroke="#777" />
+              <text x={10} y={4} textAnchor="start" fill="#fff" fontSize="12">
                 {value.toFixed(3)}
               </text>
+              <line
+                x1={0}
+                y1={0}
+                x2={-chartWidth}
+                y2={0}
+                stroke="#777"
+                strokeOpacity="0.2"
+                strokeDasharray="4 4"
+              />
             </g>
           );
         })}
@@ -629,15 +627,15 @@ const YAxis: React.FC<{
               x={3}
               y={-10}
               width={55}
-              height={Math.max(20, 0)}
-              fill="rgba(255, 255, 255, 0.5)"
+              height={Math.max(20, 0)} // Ensure positive height
+              fill="#d1d5db"
               rx={4}
             />
             <text
               x={30}
               y={4}
               textAnchor="middle"
-              fill="white"
+              fill="#000"
               fontSize="12"
               fontWeight="bold"
             >
