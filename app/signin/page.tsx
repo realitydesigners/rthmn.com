@@ -4,10 +4,8 @@ import { Scene } from '@/components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
 import { FcGoogle } from 'react-icons/fc';
 import { useEffect, useState } from 'react';
-import { FaDiscord } from 'react-icons/fa';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
-import type { Provider } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignIn() {
@@ -25,10 +23,9 @@ export default function SignIn() {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    const provider = e.currentTarget.provider.value as Provider;
 
     try {
-      await signInWithOAuth(e, provider);
+      await signInWithOAuth(e, 'google');
     } catch (error) {
       console.error('OAuth sign-in error:', error);
     } finally {
@@ -62,36 +59,20 @@ export default function SignIn() {
             Ready to use RTHMN?
           </h1>
           <p className={`mb-10 font-kodemono text-xl text-gray-300`}>
-            Sign in to get started
+            Sign in with Google to get started
           </p>
 
           {allowOauth && (
             <div className="space-y-4">
-              <form onSubmit={(e) => handleSignIn(e)}>
+              <form onSubmit={handleSignIn}>
                 <button
                   className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-gray-100 to-gray-300 p-[2px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-gray-200 hover:to-gray-400"
                   type="submit"
-                  name="provider"
-                  value="google"
                   disabled={isLoading}
                 >
                   <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-white to-gray-50 px-6 py-3 text-base font-medium text-gray-700">
                     <FcGoogle className="mr-3 h-6 w-6" />
                     {isLoading ? 'Signing in...' : 'Sign in with Google'}
-                  </span>
-                </button>
-              </form>
-              <form onSubmit={(e) => handleSignIn(e)}>
-                <button
-                  className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#5865F2] to-[#4752C4] p-[2px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#6B77FF] hover:to-[#5865F2]"
-                  type="submit"
-                  name="provider"
-                  value="discord"
-                  disabled={isLoading}
-                >
-                  <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#4752C4] to-[#3C45A5] px-6 py-3 text-base font-medium text-white">
-                    <FaDiscord className="mr-3 h-6 w-6" />
-                    {isLoading ? 'Signing in...' : 'Sign in with Discord'}
                   </span>
                 </button>
               </form>
