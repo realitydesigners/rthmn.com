@@ -5,11 +5,9 @@ import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
 import { FcGoogle } from 'react-icons/fc';
 import { useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
-import { russo, oxanium } from '@/fonts';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 import type { Provider } from '@supabase/supabase-js';
-import { createClient } from '@/utils/supabase/client';
 import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignIn() {
@@ -55,49 +53,53 @@ export default function SignIn() {
 
   return (
     <div className="flex h-screen">
-      <div className="relative w-1/2">
+      <div className="relative hidden h-full w-1/2 lg:block">
         <Scene scene="https://prod.spline.design/0PMxshYRA0EskOl3/scene.splinecode" />
       </div>
-      <div className="flex w-1/2 flex-col items-center justify-center bg-black">
+      <div className="flex w-full flex-col items-center justify-center bg-black lg:w-1/2">
         <div className="w-96 max-w-xl">
-          <h1 className={`text-russo mb-6 text-5xl text-white`}>
+          <h1 className={`mb-6 font-outfit text-5xl font-bold text-white`}>
             Ready to use RTHMN?
           </h1>
-          <p className={`text-oxanium mb-10 text-xl text-gray-300`}>
+          <p className={`mb-10 font-kodemono text-xl text-gray-300`}>
             Sign in to get started
           </p>
-          <p className={`text-oxanium mb-6 text-lg text-gray-400`}>
-            Choose your preferred sign in method
-          </p>
+
           {allowOauth && (
             <div className="space-y-4">
               <form onSubmit={(e) => handleSignIn(e)}>
                 <button
-                  className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200 disabled:opacity-50"
+                  className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-gray-100 to-gray-300 p-[2px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-gray-200 hover:to-gray-400"
                   type="submit"
                   name="provider"
                   value="google"
                   disabled={isLoading}
                 >
-                  <FcGoogle className="mr-2 h-5 w-5" />
-                  {isLoading ? 'Signing in...' : 'Sign in with Google'}
+                  <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-white to-gray-50 px-6 py-3 text-base font-medium text-gray-700">
+                    <FcGoogle className="mr-3 h-6 w-6" />
+                    {isLoading ? 'Signing in...' : 'Sign in with Google'}
+                  </span>
                 </button>
               </form>
               <form onSubmit={(e) => handleSignIn(e)}>
                 <button
-                  className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-[#5865F2] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#4752C4] disabled:opacity-50"
+                  className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#5865F2] to-[#4752C4] p-[2px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#6B77FF] hover:to-[#5865F2]"
                   type="submit"
                   name="provider"
                   value="discord"
                   disabled={isLoading}
                 >
-                  <FaDiscord className="mr-2 h-5 w-5" />
-                  {isLoading ? 'Signing in...' : 'Sign in with Discord'}
+                  <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#4752C4] to-[#3C45A5] px-6 py-3 text-base font-medium text-white">
+                    <FaDiscord className="mr-3 h-6 w-6" />
+                    {isLoading ? 'Signing in...' : 'Sign in with Discord'}
+                  </span>
                 </button>
               </form>
             </div>
           )}
-          <SocialMediaLinks />
+          <div className="mt-8">
+            <SocialMediaLinks />
+          </div>
         </div>
       </div>
     </div>

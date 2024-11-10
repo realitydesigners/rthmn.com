@@ -1,17 +1,6 @@
 'use client';
 import { MotionDiv } from '@/components/MotionDiv';
-
-interface CandleData {
-  complete: boolean;
-  volume: number;
-  time: string;
-  mid: {
-    o: string;
-    h: string;
-    l: string;
-    c: string;
-  };
-}
+import { CandleData } from '@/types/types';
 
 interface MarketData {
   pair: string;
