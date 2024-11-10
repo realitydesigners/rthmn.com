@@ -164,7 +164,6 @@ const MenuIcon = ({ isOpen }: { isOpen: boolean }) => (
 );
 
 export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
-  const router = useRouter(); // Always get the router
   const [isNavOpen, setIsNavOpen] = useState(false);
   const { session, signOut } = useAuth();
 
@@ -271,8 +270,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     </button>
                   </form>
                 ) : (
-                  <Link href="/signin" className={buttonClasses}>
-                    Sign-in
+                  <Link
+                    href="/signin"
+                    className="flex items-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+                  >
+                    <span className="flex w-full items-center space-x-3 rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2">
+                      Sign-in
+                    </span>
                   </Link>
                 )}
               </MotionDiv>

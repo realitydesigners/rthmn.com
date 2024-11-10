@@ -18,6 +18,8 @@ export interface Signal {
 
 export type CandleData = {
   timestamp: string;
+  time?: string;
+  volume?: number;
   open: number;
   mid: {
     o: string;
