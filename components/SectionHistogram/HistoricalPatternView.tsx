@@ -72,11 +72,11 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
                           height: `${boxSize}px`,
                           bottom: `${position * boxSize}px`,
                           background: isUp
-                            ? 'linear-gradient(to right, rgba(16,185,129,0.15), rgba(52,211,153,0.15), rgba(110,231,183,0.15))'
-                            : 'linear-gradient(to right, rgba(239,68,68,0.15), rgba(239,68,68,0.18), rgba(248,113,113,0.15))',
+                            ? 'linear-gradient(to right, rgba(16,185,129,0.4), rgba(52,211,153,0.3), rgba(110,231,183,0.4))'
+                            : 'linear-gradient(to right, rgba(239,68,68,0.2), rgba(239,68,68,0.1), rgba(248,113,113,0.2))',
                           boxShadow: isUp
-                            ? '0 0 20px rgba(16,185,129,0.2), inset 0 0 2px rgba(52,211,153,0.3)'
-                            : '0 0 20px rgba(239,68,68,0.25), inset 0 0 2px rgba(248,113,113,0.3)',
+                            ? '0 0 4px rgba(16,185,129,0.2), inset 0 0 1px rgba(52,211,153,0.3)'
+                            : '0 0 4px rgba(239,68,68,0.25), inset 0 0 1px rgba(248,113,113,0.3)',
                           border: isUp
                             ? '1px solid rgba(52,211,153,0.3)'
                             : '1px solid rgba(248,113,113,0.3)',
@@ -87,15 +87,7 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
                           willChange: 'transform, opacity'
                         }}
                       >
-                        <div
-                          className="h-full w-full"
-                          style={{
-                            background: isUp
-                              ? 'linear-gradient(to right, rgba(16,185,129,0.25), rgba(52,211,153,0.25), rgba(110,231,183,0.25))'
-                              : 'linear-gradient(to right, rgba(239,68,68,0.25), rgba(248,113,113,0.25), rgba(239,68,68,0.25))',
-                            animation: 'pulse 2s ease-in-out infinite'
-                          }}
-                        />
+                        <div className="h-full w-full" />
                       </div>
                     ))}
                   </div>

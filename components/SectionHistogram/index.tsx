@@ -61,7 +61,7 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
       if (!isPaused) {
         setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
       }
-    }, 250);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
