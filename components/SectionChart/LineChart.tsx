@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useCallback
 } from 'react';
-import styles from './stykes.module.css';
+
 import { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
 
@@ -363,7 +363,7 @@ export const LineChart: React.FC<{
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full overflow-hidden bg-black ${styles.chartContainer}`}
+      className={`relative h-full w-full overflow-hidden bg-black`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleContainerMouseMove}
       onMouseUp={handleMouseUp}
@@ -436,7 +436,7 @@ const ChartLine: React.FC<{
       stroke="white"
       strokeWidth="1.5"
       fill="none"
-      className={styles.chartLine}
+      className="bg-white"
     />
   );
 });

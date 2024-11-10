@@ -1,18 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { MotionDiv } from '@/components/MotionDiv';
-
-interface CandleData {
-  complete: boolean;
-  volume: number;
-  time: string;
-  mid: {
-    o: string;
-    h: string;
-    l: string;
-    c: string;
-  };
-}
+import { FaWaveSquare, FaCube, FaFingerprint } from 'react-icons/fa';
+import TypeAnimation from 'react-type-animation';
 
 interface MarketData {
   pair: string;
@@ -20,198 +10,320 @@ interface MarketData {
   candleData: string;
 }
 
-interface SectionMarketDisplayProps {
-  marketData: MarketData[];
+interface CandleData {
+  mid: { c: string; o: string };
+  volume: number;
 }
 
 export function SectionMarketDisplay({
   marketData
-}: SectionMarketDisplayProps) {
-  const [selectedPair, setSelectedPair] = useState<string | null>(null);
+}: {
+  marketData: MarketData[];
+}) {
+  // Refined card positions for better visual balance
+  const getCardPosition = (index: number) => {
+    const positions = [
+      { x: -250, y: -180, z: 20 }, // Top row - wider spread
+      { x: 0, y: -220, z: 30 }, // Higher center top
+      { x: 250, y: -180, z: 20 },
+      { x: -300, y: 10, z: 25 }, // Middle row - wider
+      { x: 100, y: -50, z: 35 }, // Center card
+      { x: 300, y: 0, z: 25 },
+      { x: -250, y: 180, z: 15 }, // Bottom row
+      { x: 0, y: 220, z: 25 },
+      { x: 250, y: 180, z: 15 },
+      { x: 20, y: 300, z: 45 } // Last card lower
+    ];
 
-  // Sort pairs alphabetically
-  const sortedPairs = [...marketData].sort((a, b) =>
-    a.pair.localeCompare(b.pair)
-  );
-
-  const getLatestPrice = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      return parseFloat(data[data.length - 1].mid.c);
-    } catch (e) {
-      return null;
-    }
+    return positions[index] || { x: 0, y: 0, z: 0 };
   };
 
-  const getPriceChange = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      const firstPrice = parseFloat(data[0].mid.o);
-      const lastPrice = parseFloat(data[data.length - 1].mid.c);
-      const change = ((lastPrice - firstPrice) / firstPrice) * 100;
-      return change;
-    } catch (e) {
-      return null;
-    }
-  };
+  // Add state for animation progress
+  const [progress, setProgress] = useState(0);
 
-  const getVolume = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      return data[data.length - 1].volume;
-    } catch (e) {
-      return null;
-    }
-  };
+  // Animation effect
+  useEffect(() => {
+    const duration = 10000; // 60 seconds
+    const startTime = Date.now();
 
-  const getDayHighLow = (candleData: string) => {
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const currentProgress = Math.min(elapsed / duration, 1);
+      setProgress(currentProgress);
+
+      if (currentProgress < 1) {
+        requestAnimationFrame(animate);
+      }
+    };
+
+    requestAnimationFrame(animate);
+  }, []);
+
+  // Modified data processing to include animation
+  const processMarketData = (candleData: string, animationProgress: number) => {
     try {
       const data = JSON.parse(candleData) as CandleData[];
-      const highPrices = data.map((candle) => parseFloat(candle.mid.h));
-      const lowPrices = data.map((candle) => parseFloat(candle.mid.l));
+      const dataPoints = Math.floor(data.length * animationProgress);
+      const animatedData = data.slice(0, dataPoints + 1);
+
+      const latest = animatedData[animatedData.length - 1];
+      const first = data[0];
+      const change =
+        ((parseFloat(latest.mid.c) - parseFloat(first.mid.o)) /
+          parseFloat(first.mid.o)) *
+        100;
+
       return {
-        high: Math.max(...highPrices),
-        low: Math.min(...lowPrices)
+        price: parseFloat(latest.mid.c),
+        change,
+        volume: latest.volume,
+        points: animatedData.map((d) => parseFloat(d.mid.c))
       };
-    } catch (e) {
+    } catch {
       return null;
     }
-  };
-
-  const getTotalVolume = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      return data.reduce((sum, candle) => sum + candle.volume, 0);
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const getSparklinePoints = (
-    candleData: string,
-    width: number,
-    height: number
-  ) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      const prices = data.map((d) => parseFloat(d.mid.c));
-      const min = Math.min(...prices);
-      const max = Math.max(...prices);
-      const range = max - min;
-
-      // Prevent division by zero
-      if (range === 0) return null;
-
-      // Create points for the sparkline
-      return prices
-        .map((price, i) => {
-          const x = (i / (prices.length - 1)) * width;
-          const y = height - ((price - min) / range) * height;
-          return `${x},${y}`;
-        })
-        .join(' ');
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const isMarketActive = (lastUpdated: string) => {
-    const lastUpdate = new Date(lastUpdated);
-    const now = new Date();
-    return now.getTime() - lastUpdate.getTime() < 5 * 60 * 1000; // 5 minutes
   };
 
   return (
-    <section className="relative z-[100] py-24">
-      <div className="container mx-auto px-4">
-        <h2 className="mb-8 text-3xl font-bold text-white">Market Overview</h2>
+    <section className="relative z-[100] flex min-h-screen">
+      {/* 3D Cards Container */}
+      <div className="relative w-1/2">
+        <div className="relative h-[800px] [perspective:2500px]">
+          {marketData.map((item, index) => {
+            const data = processMarketData(item.candleData, progress);
+            if (!data) return null;
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {sortedPairs.map((item) => {
-            const latestPrice = getLatestPrice(item.candleData);
-            const priceChange = getPriceChange(item.candleData);
-            const volume = getVolume(item.candleData);
+            const position = getCardPosition(index);
 
             return (
               <MotionDiv
                 key={item.pair}
-                className="border-gray cursor-pointer rounded-lg bg-black/50 p-4 transition-colors hover:bg-[#101010]"
-                whileHover={{ scale: 1.02 }}
-                onClick={() => setSelectedPair(item.pair)}
+                className="absolute left-1/2 top-1/2 h-[175px] w-[200px] -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+                initial={{
+                  x: position.x,
+                  y: position.y,
+                  z: position.z,
+                  scale: 0.8,
+                  rotateX: 15,
+                  rotateY: -15
+                }}
+                animate={{
+                  y: position.y + Math.sin(index * 0.5) * 12,
+                  transition: {
+                    y: {
+                      duration: 3.5,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                      delay: index * 0.2
+                    }
+                  }
+                }}
+                whileHover={{
+                  scale: 0.9,
+                  z: position.z + 50,
+                  rotateX: 0,
+                  rotateY: 0,
+                  transition: { duration: 0.3 }
+                }}
+                style={{
+                  transformStyle: 'preserve-3d',
+                  filter: 'drop-shadow(0 0 10px rgba(0,0,0,0.3))'
+                }}
               >
-                <div className="mb-2 flex items-start justify-between">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-lg font-medium text-white">
-                      {item.pair.replace('_', '/')}
-                    </h4>
-                  </div>
-                  <span
-                    className={`text-sm ${
-                      priceChange && priceChange >= 0
-                        ? 'text-green-400'
-                        : 'text-red-400'
+                {/* Enhanced Glass Card Effect */}
+                <div className="relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-5 backdrop-blur-md">
+                  {/* Improved Gradient Overlay */}
+                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-black/30" />
+
+                  {/* Subtle glow effect based on price change */}
+                  <div
+                    className={`absolute inset-0 rounded-xl opacity-20 blur-xl ${
+                      data.change >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'
                     }`}
-                  >
-                    {priceChange ? `${priceChange.toFixed(2)}%` : 'N/A'}
-                  </span>
-                </div>
-                <div className="mb-2 text-2xl font-bold text-white">
-                  {latestPrice
-                    ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5)
-                    : 'N/A'}
-                </div>
-                {getDayHighLow(item.candleData) && (
-                  <div className="mb-2 flex justify-between text-xs text-white/60">
-                    <span>
-                      H:{' '}
-                      {getDayHighLow(item.candleData)?.high.toFixed(
-                        item.pair.includes('JPY') ? 3 : 5
-                      )}
-                    </span>
-                    <span>
-                      L:{' '}
-                      {getDayHighLow(item.candleData)?.low.toFixed(
-                        item.pair.includes('JPY') ? 3 : 5
-                      )}
-                    </span>
-                  </div>
-                )}
-                <div className="mb-2 h-16 w-full">
-                  {getSparklinePoints(item.candleData, 200, 60) && (
-                    <svg
-                      width="100%"
-                      height="100%"
-                      viewBox="0 0 200 60"
-                      preserveAspectRatio="none"
-                      className="overflow-visible"
+                  />
+
+                  {/* Content */}
+                  <div className="relative z-10">
+                    <div className="mb-2 flex items-start justify-between">
+                      <h4 className="text-sm font-medium text-white/90">
+                        {item.pair.replace('_', '/')}
+                      </h4>
+                      <MotionDiv
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className={`rounded-full px-2 py-0.5 text-xs ${
+                          data.change >= 0
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-red-500/20 text-red-400'
+                        }`}
+                      >
+                        {data.change.toFixed(2)}%
+                      </MotionDiv>
+                    </div>
+
+                    <MotionDiv
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="mb-3 text-xl font-bold text-white"
                     >
-                      <polyline
-                        points={
-                          getSparklinePoints(item.candleData, 200, 60) || ''
-                        }
-                        fill="none"
-                        stroke={
-                          getPriceChange(item.candleData) >= 0
-                            ? '#4ade80'
-                            : '#f87171'
-                        }
-                        strokeWidth="1.5"
-                        vectorEffect="non-scaling-stroke"
-                      />
-                    </svg>
-                  )}
-                </div>
-                <div className="flex justify-between text-xs text-white/60">
-                  <span>
-                    Vol: {volume?.toLocaleString() || 'N/A'}
-                    {getTotalVolume(item.candleData) &&
-                      ` (${getTotalVolume(item.candleData)?.toLocaleString()} total)`}
-                  </span>
+                      {data.price.toFixed(item.pair.includes('JPY') ? 3 : 5)}
+                    </MotionDiv>
+
+                    {/* Enhanced Sparkline with Animation */}
+                    <div className="h-12 w-full">
+                      <svg
+                        width="100%"
+                        height="100%"
+                        viewBox="0 0 200 60"
+                        preserveAspectRatio="none"
+                        className="overflow-visible"
+                      >
+                        <defs>
+                          <linearGradient
+                            id={`gradient-${index}`}
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="0%"
+                              stopColor={
+                                data.change >= 0 ? '#4ade80' : '#f87171'
+                              }
+                              stopOpacity="0.8"
+                            />
+                            <stop
+                              offset="100%"
+                              stopColor={
+                                data.change >= 0 ? '#4ade80' : '#f87171'
+                              }
+                              stopOpacity="0.2"
+                            />
+                          </linearGradient>
+                        </defs>
+                        {/* Draw the full path with low opacity as background */}
+                        <path
+                          d={`M ${data.points
+                            .map(
+                              (p, i) =>
+                                `${(i / (data.points.length - 1)) * 200} ${
+                                  60 -
+                                  ((p - Math.min(...data.points)) /
+                                    (Math.max(...data.points) -
+                                      Math.min(...data.points))) *
+                                    60
+                                }`
+                            )
+                            .join(' L ')}`}
+                          fill="none"
+                          stroke={`url(#gradient-${index})`}
+                          strokeWidth="2"
+                          vectorEffect="non-scaling-stroke"
+                          opacity="0.1"
+                        />
+                        {/* Draw the animated path on top */}
+                        <path
+                          d={`M ${data.points
+                            .slice(
+                              0,
+                              Math.max(
+                                2,
+                                Math.floor(data.points.length * progress)
+                              )
+                            )
+                            .map(
+                              (p, i, arr) =>
+                                `${(i / (data.points.length - 1)) * 200} ${
+                                  60 -
+                                  ((p - Math.min(...data.points)) /
+                                    (Math.max(...data.points) -
+                                      Math.min(...data.points))) *
+                                    60
+                                }`
+                            )
+                            .join(' L ')}`}
+                          fill="none"
+                          stroke={`url(#gradient-${index})`}
+                          strokeWidth="2"
+                          vectorEffect="non-scaling-stroke"
+                        />
+                        {/* Animated dot following the line */}
+                        {progress > 0 && data.points.length > 0 && (
+                          <>
+                            {(() => {
+                              const currentIndex = Math.min(
+                                Math.floor(data.points.length * progress),
+                                data.points.length - 1
+                              );
+                              const minValue = Math.min(...data.points);
+                              const maxValue = Math.max(...data.points);
+                              const range = maxValue - minValue;
+
+                              // Only render if we have valid values
+                              if (range === 0 || !data.points[currentIndex])
+                                return null;
+
+                              const cx =
+                                (currentIndex / (data.points.length - 1)) * 200;
+                              const cy =
+                                60 -
+                                ((data.points[currentIndex] - minValue) /
+                                  range) *
+                                  60;
+
+                              // Check for valid numbers before rendering
+                              if (isNaN(cx) || isNaN(cy)) return null;
+
+                              return (
+                                <circle
+                                  cx={cx.toString()}
+                                  cy={cy.toString()}
+                                  r="3"
+                                  fill={
+                                    data.change >= 0 ? '#4ade80' : '#f87171'
+                                  }
+                                  className="animate-pulse"
+                                />
+                              );
+                            })()}
+                          </>
+                        )}
+                      </svg>
+                    </div>
+
+                    <div className="mt-2 flex items-center justify-between">
+                      <MotionDiv
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-[11px] font-medium text-white/60"
+                      >
+                        Vol: {data.volume.toLocaleString()}
+                      </MotionDiv>
+                      <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></div>
+                    </div>
+                  </div>
                 </div>
               </MotionDiv>
             );
           })}
         </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="relative flex h-screen w-1/2 items-center justify-center pr-16">
+        <MotionDiv
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h2 className="text-outfit relative z-10 bg-gradient-to-r from-white to-white/60 bg-clip-text text-[3em] font-bold leading-[1em] tracking-tight text-transparent lg:text-[7em] lg:leading-[1em]">
+            Trading
+            <br />
+            Simplified
+          </h2>
+        </MotionDiv>
       </div>
     </section>
   );

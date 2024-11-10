@@ -1,5 +1,5 @@
 'use client';
-
+import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { SectionFeatures } from '@/components/SectionFeatures';
 import { SectionPricing } from '@/components/SectionPricing';
 import { RyverSection } from '@/components/SectionRyver';
@@ -27,30 +27,6 @@ interface ClientPageProps {
   marketData: MarketData[];
 }
 
-const GridBackground = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="relative min-h-screen overflow-y-hidden">
-      <div className="absolute inset-0 h-full w-full">
-        {[...Array(8 + 1)].map((_, i) => (
-          <div
-            key={`grid-x-${i}`}
-            className="absolute left-0 h-px w-full bg-white/5"
-            style={{ top: `${(i * 100) / 8}%` }}
-          />
-        ))}
-        {[...Array(8 + 1)].map((_, i) => (
-          <div
-            key={`grid-y-${i}`}
-            className="absolute top-0 h-full w-px bg-white/5"
-            style={{ left: `${(i * 100) / 8}%` }}
-          />
-        ))}
-      </div>
-      {children}
-    </div>
-  );
-};
-
 export default function ClientPage({
   posts,
   products,
@@ -59,7 +35,7 @@ export default function ClientPage({
   const { session } = useAuth();
 
   return (
-    <GridBackground>
+    <BackgroundGrid>
       <SectionMarketTicker marketData={marketData} />
       <SectionHistogram slice={null} />
       <SectionMarketDisplay marketData={marketData} />
@@ -73,6 +49,6 @@ export default function ClientPage({
       />
       <SectionBlogPosts initialPosts={posts} />
       <SectionFooter />
-    </GridBackground>
+    </BackgroundGrid>
   );
 }
