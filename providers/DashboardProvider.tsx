@@ -53,8 +53,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     const stored = getSelectedPairs();
     const initialPairs =
       stored.length > 0 ? stored : ['GBPUSD', 'USDJPY', 'AUDUSD'];
-
     setSelected(initialPairs);
+
+    // Always save the initial pairs to localStorage if none exist
     if (stored.length === 0) {
       setSelectedPairs(initialPairs);
     }
@@ -69,9 +70,9 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
 
   // WebSocket subscription management
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected || selectedPairs.length === 0) return;
 
-    // Subscribe to all initial pairs
+    // Subscribe to all pairs
     selectedPairs.forEach((pair) => {
       subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
         setPairData((prev) => ({
@@ -84,13 +85,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     });
 
-    // Cleanup function now only unsubscribes from removed pairs
     return () => {
       selectedPairs.forEach((pair) => {
         unsubscribeFromBoxSlices(pair);
       });
     };
-  }, [isConnected]); // Only re-run when connection status changes
+  }, [isConnected, selectedPairs]); // Add selectedPairs as dependency
 
   const togglePair = (pair: string) => {
     const wasSelected = selectedPairs.includes(pair);
