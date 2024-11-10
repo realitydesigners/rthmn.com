@@ -100,12 +100,12 @@ const Navigation = ({
             onClick={() => setActiveTab(tab as 'chart' | 'grid')}
             className={`flex items-center gap-1.5 rounded-md bg-gradient-to-b p-[1px] transition-all duration-200 ${
               activeTab === tab
-                ? 'from-emerald-500/50 to-emerald-500/20 hover:from-emerald-500/60 hover:to-emerald-500/30'
+                ? 'from-green-500/50 to-green-500/20 hover:from-green-500/60 hover:to-green-500/30'
                 : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
             } `}
           >
             <span
-              className={`flex w-full items-center gap-1.5 rounded-md bg-gradient-to-b from-black to-black/80 px-3 py-1.5 text-sm font-medium ${activeTab === tab ? 'text-emerald-400' : 'text-white/70'} `}
+              className={`flex w-full items-center gap-1.5 rounded-md bg-gradient-to-b from-black to-black/80 px-3 py-1.5 text-sm font-medium ${activeTab === tab ? 'text-green-400' : 'text-white/70'} `}
             >
               {tab === 'chart' ? (
                 <FaChartArea className="h-3.5 w-3.5" />

@@ -137,18 +137,196 @@ const HoverInfo: React.FC<HoverInfoProps> = ({
   );
 };
 
+interface ResponsiveSettings {
+  yAxisLabelWidth: number;
+  fontSize: string;
+  tickCount: number;
+  xAxisSkip: number;
+}
+
+const XAxis: React.FC<{
+  data: ChartDataPoint[];
+  chartWidth: number;
+  chartHeight: number;
+  hoverInfo: { time: string; x: number } | null;
+  formatTime: (date: Date) => string;
+  responsiveSettings: ResponsiveSettings;
+  dimensions: { width: number; height: number };
+}> = React.memo(
+  ({
+    data,
+    chartWidth,
+    chartHeight,
+    hoverInfo,
+    formatTime,
+    responsiveSettings,
+    dimensions
+  }) => {
+    const intervals = useMemo(() => {
+      if (data.length === 0) return [];
+
+      const intervalMs = 60 * 60 * 1000; // 1 hour
+      const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
+      const endTime = data[data.length - 1].timestamp;
+      const result = [];
+
+      for (let time = startTime; time <= endTime; time += intervalMs) {
+        const closestPoint = data.reduce((prev, curr) =>
+          Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time)
+            ? curr
+            : prev
+        );
+        result.push(closestPoint);
+      }
+
+      // Filter labels based on screen size
+      return result.filter(
+        (_, index) => index % responsiveSettings.xAxisSkip === 0
+      );
+    }, [data, responsiveSettings.xAxisSkip]);
+
+    return (
+      <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
+        <line
+          x1={0}
+          y1={0}
+          x2={chartWidth}
+          y2={0}
+          stroke="rgba(255, 255, 255, 0.5)"
+        />
+        {intervals.map((point, index) => {
+          const xPosition =
+            ((point.timestamp - data[0].timestamp) /
+              (data[data.length - 1].timestamp - data[0].timestamp)) *
+            chartWidth;
+
+          return (
+            <g
+              key={`time-${point.timestamp}-${index}`}
+              transform={`translate(${xPosition}, 0)`}
+            >
+              <text
+                y={20}
+                textAnchor="middle"
+                fill="rgba(255, 255, 255, 0.5)"
+                fontSize={responsiveSettings.fontSize}
+                transform={
+                  dimensions.width < 768 ? 'rotate(-45) translate(-20, 0)' : ''
+                }
+              >
+                {formatTime(new Date(point.timestamp))}
+              </text>
+            </g>
+          );
+        })}
+      </g>
+    );
+  }
+);
+
+const YAxis: React.FC<{
+  minY: number;
+  maxY: number;
+  chartHeight: number;
+  chartWidth: number;
+  onDrag: (deltaY: number) => void;
+  onScale: (scaleFactor: number) => void;
+  yAxisScale: number;
+  hoverInfo: { price: number; y: number } | null;
+  responsiveSettings: ResponsiveSettings;
+}> = React.memo(
+  ({
+    minY,
+    maxY,
+    chartHeight,
+    chartWidth,
+    yAxisScale,
+    hoverInfo,
+    responsiveSettings
+  }) => {
+    const visibleRange = maxY - minY;
+    const midPrice = (maxY + minY) / 2;
+    const scaledVisibleRange = visibleRange * yAxisScale;
+    const visibleMin = midPrice - scaledVisibleRange / 2;
+    const visibleMax = midPrice + scaledVisibleRange / 2;
+    const steps = Math.min(
+      responsiveSettings.tickCount,
+      Math.round(10 * yAxisScale)
+    );
+
+    return (
+      <g className="y-axis" transform={`translate(${chartWidth}, 0)`}>
+        <line
+          x1={0}
+          y1={0}
+          x2={0}
+          y2={chartHeight}
+          stroke="rgba(255, 255, 255, 0.5)"
+        />
+        {Array.from({ length: steps + 1 }, (_, i) => {
+          const value = visibleMax - (i * scaledVisibleRange) / steps;
+          const y = (i / steps) * chartHeight;
+          return (
+            <g key={i} transform={`translate(0, ${y})`}>
+              <text
+                x={10}
+                y={4}
+                textAnchor="start"
+                fill="rgba(255, 255, 255, 0.5)"
+                fontSize={responsiveSettings.fontSize}
+                className="font-mono"
+              >
+                {value.toFixed(5)}
+              </text>
+            </g>
+          );
+        })}
+        {hoverInfo && (
+          <g transform={`translate(0, ${hoverInfo.y})`}>
+            <rect
+              x={3}
+              y={-10}
+              width={responsiveSettings.yAxisLabelWidth}
+              height={20}
+              fill="rgba(255, 255, 255, 0.5)"
+              rx={4}
+            />
+            <text
+              x={responsiveSettings.yAxisLabelWidth / 2}
+              y={4}
+              textAnchor="middle"
+              fill="white"
+              fontSize={responsiveSettings.fontSize}
+              fontWeight="bold"
+              className="font-mono"
+            >
+              {hoverInfo.price.toFixed(5)}
+            </text>
+          </g>
+        )}
+      </g>
+    );
+  }
+);
+
 export const LineChart: React.FC<{
   pair: string;
   candles: Candle[];
 }> = ({ pair, candles }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const [dimensions, setDimensions] = useState({ width: 800, height: 400 });
   const [yAxisScale, setYAxisScale] = useState(1);
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState(0);
   const [scrollStart, setScrollStart] = useState(0);
-  const [dragStartY, setDragStartY] = useState(0); // Add this for Y-axis drag
+  const [dragStartY, setDragStartY] = useState(0);
+  const [hoverInfo, setHoverInfo] = useState<{
+    x: number;
+    y: number;
+    price: number;
+    time: string;
+  } | null>(null);
 
   // Fix the buffer initialization
   const priceBufferRef = useRef(new OptimizedPriceBuffer(1000));
@@ -190,31 +368,16 @@ export const LineChart: React.FC<{
 
   const animatedScale = useAnimatedScale(yAxisScale);
 
-  const chartPadding = { top: 5, right: 60, bottom: 30, left: 0 };
+  const chartPadding = {
+    top: 20,
+    right: 80,
+    bottom: 40,
+    left: 20
+  };
+
   const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
   const chartHeight =
     dimensions.height - chartPadding.top - chartPadding.bottom;
-
-  const [hoverInfo, setHoverInfo] = useState<{
-    x: number;
-    y: number;
-    price: number;
-    time: string;
-  } | null>(null);
-
-  // Keep dimension update effect
-  useEffect(() => {
-    const updateDimensions = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
-      }
-    };
-
-    updateDimensions();
-    window.addEventListener('resize', updateDimensions);
-    return () => window.removeEventListener('resize', updateDimensions);
-  }, []);
 
   // Optimize wheel event handler
   useEffect(() => {
@@ -360,14 +523,7 @@ export const LineChart: React.FC<{
   }, []);
 
   return (
-    <div
-      ref={containerRef}
-      className={`relative h-full w-full overflow-hidden`}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleContainerMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-    >
+    <div ref={containerRef} className="relative h-full w-full">
       <svg
         width="100%"
         height="100%"
@@ -390,6 +546,8 @@ export const LineChart: React.FC<{
             chartHeight={chartHeight}
             hoverInfo={hoverInfo}
             formatTime={formatTime}
+            responsiveSettings={responsiveSettings}
+            dimensions={dimensions}
           />
           <YAxis
             minY={minY}
@@ -400,6 +558,7 @@ export const LineChart: React.FC<{
             onScale={handleYAxisScale}
             yAxisScale={animatedScale}
             hoverInfo={hoverInfo}
+            responsiveSettings={responsiveSettings}
           />
           {hoverInfo && (
             <HoverInfo
@@ -431,221 +590,3 @@ const ChartLine: React.FC<{
 
   return <path ref={pathRef} stroke="white" strokeWidth="1.5" fill="none" />;
 });
-
-const XAxis: React.FC<{
-  data: ChartDataPoint[];
-  chartWidth: number;
-  chartHeight: number;
-  hoverInfo: { time: string; x: number } | null;
-  formatTime: (date: Date) => string;
-}> = React.memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
-  const intervals = useMemo(() => {
-    if (data.length === 0) return [];
-
-    const intervalMs = 60 * 60 * 1000; // 1 hour
-    const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
-    const endTime = data[data.length - 1].timestamp;
-    const result = [];
-
-    for (let time = startTime; time <= endTime; time += intervalMs) {
-      const closestPoint = data.reduce((prev, curr) =>
-        Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time)
-          ? curr
-          : prev
-      );
-      result.push(closestPoint);
-    }
-
-    return result;
-  }, [data]);
-
-  if (data.length === 0) {
-    return null;
-  }
-
-  return (
-    <g className="x-axis" transform={`translate(0, ${chartHeight})`}>
-      <line
-        x1={0}
-        y1={0}
-        x2={chartWidth}
-        y2={0}
-        stroke="rgba(255, 255, 255, 0.5)"
-      />
-      {intervals.map((point, index) => {
-        const xPosition =
-          ((point.timestamp - data[0].timestamp) /
-            (data[data.length - 1].timestamp - data[0].timestamp)) *
-          chartWidth;
-
-        // Create a unique key using both timestamp and index
-        const uniqueKey = `time-${point.timestamp}-${index}`;
-
-        return (
-          <g key={uniqueKey} transform={`translate(${xPosition}, 0)`}>
-            <text
-              y={20}
-              textAnchor="middle"
-              fill="rgba(255, 255, 255, 0.5)"
-              fontSize="12"
-            >
-              {formatTime(new Date(point.timestamp))}
-            </text>
-            <line
-              y1={-chartHeight}
-              y2={0}
-              stroke="rgba(255, 255, 255, 0.5)"
-              strokeOpacity="0.2"
-              strokeDasharray="1 4"
-            />
-          </g>
-        );
-      })}
-      {hoverInfo && (
-        <g transform={`translate(${hoverInfo.x}, 0)`}>
-          <rect
-            x={-40}
-            y={5}
-            width={80}
-            height={20}
-            fill="rgba(255, 255, 255, 0.5)"
-            rx={4}
-          />
-          <text
-            x={0}
-            y={20}
-            textAnchor="middle"
-            fill="white"
-            fontSize="12"
-            fontWeight="bold"
-          >
-            {hoverInfo.time}
-          </text>
-        </g>
-      )}
-    </g>
-  );
-});
-
-const YAxis: React.FC<{
-  minY: number;
-  maxY: number;
-  chartHeight: number;
-  chartWidth: number;
-  onDrag: (deltaY: number) => void;
-  onScale: (scaleFactor: number) => void;
-  yAxisScale: number;
-  hoverInfo: { price: number; y: number } | null;
-}> = React.memo(
-  ({
-    minY,
-    maxY,
-    chartHeight,
-    chartWidth,
-    onDrag,
-    onScale,
-    yAxisScale,
-    hoverInfo
-  }) => {
-    const handleMouseDown = useCallback(
-      (event: React.MouseEvent) => {
-        const startY = event.clientY;
-        const handleMouseMove = (e: MouseEvent) => {
-          const deltaY = (e.clientY - startY) / chartHeight;
-          onDrag(deltaY);
-        };
-        const handleMouseUp = () => {
-          window.removeEventListener('mousemove', handleMouseMove);
-          window.removeEventListener('mouseup', handleMouseUp);
-        };
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-      },
-      [onDrag, chartHeight]
-    );
-
-    const handleWheel = useCallback(
-      (event: React.WheelEvent) => {
-        event.preventDefault();
-        const scaleFactor = event.deltaY > 0 ? 1.1 : 0.9;
-        onScale(scaleFactor);
-      },
-      [onScale]
-    );
-
-    const visibleRange = maxY - minY;
-    const midPrice = (maxY + minY) / 2;
-    const scaledVisibleRange = visibleRange * yAxisScale;
-    const visibleMin = midPrice - scaledVisibleRange / 2;
-    const visibleMax = midPrice + scaledVisibleRange / 2;
-    const steps = Math.max(2, Math.round(10 * yAxisScale));
-    const stepSize = scaledVisibleRange / steps;
-
-    return (
-      <g
-        className="y-axis"
-        transform={`translate(${chartWidth}, 0)`}
-        onMouseDown={handleMouseDown}
-        onWheel={handleWheel}
-        style={{
-          userSelect: 'none',
-          WebkitUserSelect: 'none',
-          MozUserSelect: 'none',
-          msUserSelect: 'none'
-        }}
-      >
-        <line
-          x1={0}
-          y1={0}
-          x2={0}
-          y2={chartHeight}
-          stroke="rgba(255, 255, 255, 0.5)"
-        />
-        {Array.from({ length: steps + 1 }, (_, i) => {
-          const value = visibleMax - i * stepSize;
-          const y = (i / steps) * chartHeight;
-          return (
-            <g key={i} transform={`translate(0, ${y})`}>
-              <text
-                x={10}
-                y={4}
-                textAnchor="start"
-                fill="rgba(255, 255, 255, 0.5)"
-                fontSize="12"
-              >
-                {value.toFixed(3)}
-              </text>
-            </g>
-          );
-        })}
-        {hoverInfo && (
-          <g
-            transform={`translate(0, ${ensureNumber(
-              chartHeight *
-                (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange)
-            )})`}
-          >
-            <rect
-              x={3}
-              y={-10}
-              width={55}
-              height={Math.max(20, 0)}
-              fill="rgba(255, 255, 255, 0.5)"
-              rx={4}
-            />
-            <text
-              x={30}
-              y={4}
-              textAnchor="middle"
-              fill="white"
-              fontSize="12"
-              fontWeight="bold"
-            >
-              {hoverInfo.price.toFixed(3)}
-            </text>
-          </g>
-        )}
-      </g>
-    );
-  }
-);
