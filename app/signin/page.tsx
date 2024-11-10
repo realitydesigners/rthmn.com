@@ -3,56 +3,55 @@ import { useRouter } from 'next/navigation';
 import { Scene } from '@/components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
 import { FcGoogle } from 'react-icons/fc';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { russo, oxanium } from '@/fonts';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 import { SocialMediaLinks } from '@/components/SocialMediaLinks';
 import type { Provider } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignIn() {
   const router = useRouter();
   const signInWithOAuth = useSignInWithOAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { session } = useAuth();
 
   useEffect(() => {
-    const supabase = createClient();
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state changed:', event, session);
-        localStorage.setItem(
-          'lastAuthEvent',
-          JSON.stringify({
-            event,
-            session: session ? 'Session exists' : 'No session'
-          })
-        );
-
-        if (session) {
-          router.push('/dashboard');
-        }
-      }
-    );
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, [router]);
+    if (session) {
+      router.replace('/dashboard');
+    }
+  }, [session, router]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     const provider = e.currentTarget.provider.value as Provider;
-    console.log('Initiating OAuth sign-in with provider:', provider);
-    localStorage.setItem('signInAttempt', new Date().toISOString());
+
     try {
       await signInWithOAuth(e, provider);
     } catch (error) {
       console.error('OAuth sign-in error:', error);
-      localStorage.setItem('signInError', JSON.stringify(error));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const { allowOauth } = getAuthTypes();
+
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-black">
+        <div className="text-center">
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
+          <p className={`text-oxanium text-lg text-gray-300`}>
+            Signing you in...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen">
@@ -74,24 +73,26 @@ export default function SignIn() {
             <div className="space-y-4">
               <form onSubmit={(e) => handleSignIn(e)}>
                 <button
-                  className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200"
+                  className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-200 disabled:opacity-50"
                   type="submit"
                   name="provider"
                   value="google"
+                  disabled={isLoading}
                 >
                   <FcGoogle className="mr-2 h-5 w-5" />
-                  Sign in with Google
+                  {isLoading ? 'Signing in...' : 'Sign in with Google'}
                 </button>
               </form>
               <form onSubmit={(e) => handleSignIn(e)}>
                 <button
-                  className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-[#5865F2] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#4752C4]"
+                  className="flex w-full items-center justify-center rounded-md border border-gray-500 bg-[#5865F2] px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#4752C4] disabled:opacity-50"
                   type="submit"
                   name="provider"
                   value="discord"
+                  disabled={isLoading}
                 >
                   <FaDiscord className="mr-2 h-5 w-5" />
-                  Sign in with Discord
+                  {isLoading ? 'Signing in...' : 'Sign in with Discord'}
                 </button>
               </form>
             </div>
