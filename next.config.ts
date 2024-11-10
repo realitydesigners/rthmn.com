@@ -1,7 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['cdn.sanity.io', 'mcyjrazlwwmqjyhwzhcm.supabase.co'],
+    domains: [
+      'cdn.sanity.io',
+      'mcyjrazlwwmqjyhwzhcm.supabase.co',
+      'lh3.googleusercontent.com'
+    ],
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,6 +16,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'mcyjrazlwwmqjyhwzhcm.supabase.co',
         pathname: '/storage/v1/object/public/**'
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/a/**'
       }
     ]
   }
