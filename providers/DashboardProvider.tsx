@@ -24,17 +24,17 @@ const DashboardContext = createContext<DashboardContextType | undefined>(
 );
 
 export const AVAILABLE_PAIRS = [
-  'usdjpy',
-  'gbpusd',
-  'audusd',
-  'eurusd',
-  'usdcad',
-  'usdchf',
-  'nzdusd',
-  'gbpaud',
-  'gbpcad',
-  'gbpnzd',
-  'eurjpy'
+  'USDJPY',
+  'GBPUSD',
+  'AUDUSD',
+  'EURUSD',
+  'USDCAD',
+  'USDCHF',
+  'NZDUSD',
+  'GBPAUD',
+  'GBPCAD',
+  'GBPNZD',
+  'EURJPY'
 ];
 
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -52,7 +52,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const stored = getSelectedPairs();
     const initialPairs =
-      stored.length > 0 ? stored : ['gbpusd', 'usdjpy', 'audusd'];
+      stored.length > 0 ? stored : ['GBPUSD', 'USDJPY', 'AUDUSD'];
 
     setSelected(initialPairs);
     if (stored.length === 0) {
