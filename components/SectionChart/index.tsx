@@ -3,73 +3,14 @@ import { useState, useRef, useEffect } from 'react';
 import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
 import { MotionDiv } from '@/components/MotionDiv';
-import {
-  FaChartArea,
-  FaTable,
-  FaChartLine,
-  FaArrowUp,
-  FaArrowDown,
-  FaClock,
-  FaChartBar
-} from 'react-icons/fa';
+import { CandleData } from '@/types/types';
+import { FaChartArea, FaTable } from 'react-icons/fa';
 
 interface MarketData {
   pair: string;
   lastUpdated: string;
   candleData: string;
 }
-
-interface CandleData {
-  time: string;
-  volume: number;
-  mid: {
-    o: string;
-    h: string;
-    l: string;
-    c: string;
-  };
-}
-
-const MarketStats = ({ candles }: { candles: any[] }) => {
-  const getStats = () => {
-    if (candles.length === 0) return { high: 0, low: 0, range: 0 };
-    const high = Math.max(...candles.map((c) => c.high));
-    const low = Math.min(...candles.map((c) => c.low));
-    return {
-      high: high.toFixed(5),
-      low: low.toFixed(5),
-      range: (((high - low) / low) * 100).toFixed(2)
-    };
-  };
-
-  const stats = getStats();
-
-  return (
-    <div className="flex items-center gap-6">
-      <div className="flex items-center gap-2">
-        <FaArrowUp className="h-4 w-4 text-green-500" />
-        <div className="flex flex-col">
-          <span className="text-[10px] text-white/50">High</span>
-          <span className="font-mono text-xs text-white">{stats.high}</span>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <FaArrowDown className="h-4 w-4 text-red-500" />
-        <div className="flex flex-col">
-          <span className="text-[10px] text-white/50">Low</span>
-          <span className="font-mono text-xs text-white">{stats.low}</span>
-        </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <FaClock className="h-4 w-4 text-blue-500" />
-        <div className="flex flex-col">
-          <span className="text-[10px] text-white/50">Range</span>
-          <span className="font-mono text-xs text-white">{stats.range}%</span>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 const MarketCard = ({
   item,
@@ -245,12 +186,11 @@ export function SectionChart({ marketData }: { marketData: MarketData[] }) {
             {activeTab === 'chart' ? (
               <div className="flex gap-4">
                 {/* Main Chart Area */}
-                <div className="flex-1 space-y-3">
+                <div className="relative z-[100] flex-1 space-y-3">
                   <div className="flex items-center justify-between">
                     <h2 className="text-lg font-bold text-white">
                       {selectedPair.replace('_', '/')}
                     </h2>
-                    <MarketStats candles={candles} />
                   </div>
                   <div className="relative h-[500px] overflow-hidden">
                     <LineChart pair={selectedPair} candles={candles} />
@@ -275,7 +215,7 @@ export function SectionChart({ marketData }: { marketData: MarketData[] }) {
                 </div>
               </div>
             ) : (
-              <div className="scrollbar-thin scrollbar-track-white/5 h-[calc(100vh-220px)] overflow-y-auto">
+              <div className="overflow-y-auto">
                 <MarketDisplay marketData={marketData} />
               </div>
             )}
