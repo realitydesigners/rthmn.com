@@ -1,4 +1,4 @@
-import { getModule } from '@/sanity/lib/queries';
+import { getModule } from '@/utils/sanity/lib/queries';
 import Link from 'next/link';
 
 export const revalidate = 60;

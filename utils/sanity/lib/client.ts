@@ -1,4 +1,4 @@
-import { apiVersion, dataset, projectId, token } from '@/sanity/lib/api';
+import { apiVersion, dataset, projectId, token } from '@/utils/sanity/lib/api';
 import { createClient } from '@sanity/client';
 
 const config = {
