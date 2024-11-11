@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Spline from '@splinetool/react-spline';
 import Link from 'next/link';
 import React from 'react';
-import { russo } from '@/fonts';
 
 const HeadingSplineBlock = ({ block }) => {
   const { className, url } = block;
@@ -112,4 +111,4 @@ const HeadingSplineBlock = ({ block }) => {
   }
 };
 
-export default React.memo(HeadingSplineBlock);
+export default HeadingSplineBlock;

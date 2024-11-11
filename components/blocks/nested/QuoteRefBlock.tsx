@@ -1,6 +1,5 @@
-import Image from 'next/image';
-import { russo } from '@/fonts';
 import React from 'react';
+import Image from 'next/image';
 
 const QuoteRefBlock = ({ quote, className, image }) => {
   if (!quote) {
@@ -95,4 +94,4 @@ const QuoteCard = ({ quote, image, className }) => {
   }
 };
 
-export default React.memo(QuoteRefBlock);
+export default QuoteRefBlock;

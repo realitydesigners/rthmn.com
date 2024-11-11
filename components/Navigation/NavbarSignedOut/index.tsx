@@ -8,7 +8,7 @@ import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { MotionDiv } from '@/components/MotionDiv';
 import { NavButton } from '@/components/Buttons/NavButton';
-import { LogoIcon, MenuIcon } from '@/public/icons/icons';
+import { LogoIcon, MenuIcon } from '@/components/Icons/icons';
 
 interface NavbarSignedOutProps {
   user: User | null;

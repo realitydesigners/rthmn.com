@@ -1,9 +1,6 @@
 import { getChangeLog } from '@/utils/sanity/lib/queries';
 import { PortableText } from '@portabletext/react';
 import { ChangelogTemplate } from '@/components/blocks/templates/ChangelogTemplate';
-import { outfit, russo } from '@/fonts';
-
-export const revalidate = 60;
 
 function ChangelogCard({
   entry,

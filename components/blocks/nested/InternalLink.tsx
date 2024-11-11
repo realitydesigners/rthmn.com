@@ -3,9 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import React, { useState } from 'react';
-
 import { TemplateTheme, ThemeProps } from '@/components/blocks/Blocks';
-import { russo } from '@/fonts';
 
 const themeClasses: Record<TemplateTheme, ThemeProps> = {
   light: {

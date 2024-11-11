@@ -1,13 +1,5 @@
 'use client';
-import { outfit, kodeMono } from '@/fonts';
-import { motion } from 'framer-motion';
-import {
-  FaWaveSquare,
-  FaBrain,
-  FaFingerprint,
-  FaLayerGroup,
-  FaChartLine
-} from 'react-icons/fa';
+import { FaWaveSquare, FaLayerGroup, FaChartLine } from 'react-icons/fa';
 import { MotionDiv } from '@/components/MotionDiv';
 
 interface Step {
