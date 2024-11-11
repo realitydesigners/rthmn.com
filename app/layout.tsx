@@ -1,4 +1,4 @@
-import DynamicNavbar from '@/components/Navigation/NavbarDynamic';
+import { Navbar } from '@/components/Navigation/Navbar';
 import { Toaster } from '@/components/Accessibility/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';
@@ -57,7 +57,7 @@ export default async function RootLayout({
       <GoogleTagManager gtmId="GTM-XYZ" />
       <body className="bg-black">
         <SupabaseProvider initialUser={user}>
-          <DynamicNavbar />
+          <Navbar />
           {children}
           {/* <Footer /> */}
           <Suspense>

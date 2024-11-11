@@ -144,13 +144,13 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-3 rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
               >
-                <div className="flex items-center space-x-3 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] py-1 pl-4 pr-1">
-                  <div className="text-left">
+                <div className="flex items-center space-x-3 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+                  {/* <div className="py-1 pl-4 pr-1 text-left">
                     <p className="text-[12px] font-semibold">
                       {user?.user_metadata?.full_name || 'User'}
                     </p>
                     <p className="text-[10px] text-gray-300">{user?.email}</p>
-                  </div>
+                  </div> */}
                   <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black">
                     {avatarUrl ? (
                       <Image

@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, type JSX } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import { AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
