@@ -1,5 +1,5 @@
 import React from 'react';
-import ShiftedBox from '@/components/Reso/Shifted';
+import ShiftedBox from '@/components/Charts/Reso/Shifted';
 import { Signal, BoxSlice } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 

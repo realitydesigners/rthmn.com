@@ -1,6 +1,4 @@
 'use client';
-
-import { russo, outfit } from '@/fonts';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';

@@ -107,11 +107,6 @@ export interface TeamMember extends BaseItem {
   shortBio: string;
 }
 
-export interface MediaRef {
-  layout?: string;
-  image?: Image;
-}
-
 export interface BlockItem extends BaseItem {
   _key: string;
   heading?: string;
@@ -129,7 +124,7 @@ export interface BlockItem extends BaseItem {
     _key?: string;
     _type?: string;
     quote: string;
-    mediaRef?: MediaRef;
+    mediaRef?: any;
   };
   markDefs?: any;
   postsRef?: any;

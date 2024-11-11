@@ -5,9 +5,8 @@ import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
 import SplineRefBlock from '../nested/SplineRefBlock';
 import VideoRefBlock from '../nested/VideoRefBlock';
-import { outfit } from '@/fonts';
 import React from 'react';
-import { generateHeadingId } from '@/components/learn/TableOfContents';
+import { generateHeadingId } from '@/components/Accessibility/TOC';
 
 export type TemplateTheme = 'dark' | 'light';
 
