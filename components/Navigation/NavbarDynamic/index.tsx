@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { NavbarSignedOut } from '@/components/NavbarSignedOut';
-import { NavbarSignedIn } from '@/components/NavbarSignedIn';
+import { NavbarSignedOut } from '@/components/Navigation/NavbarSignedOut';
+import { NavbarSignedIn } from '@/components/Navigation/NavbarSignedIn';
 import { useAuth } from '@/providers/SupabaseProvider';
 
 const DynamicNavbar = () => {

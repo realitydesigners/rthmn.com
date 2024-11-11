@@ -1,4 +1,4 @@
-import DynamicNavbar from '@/components/NavbarDynamic';
+import DynamicNavbar from '@/components/Navigation/NavbarDynamic';
 import { Toaster } from '@/components/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';

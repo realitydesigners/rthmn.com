@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import SettingsBar from '@/components/SettingsBar';
+import SettingsBar from '@/components/Navigation/SettingsBar';
 import PairGrid from '@/components/PairGrid';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { DashboardProvider } from '@/providers/DashboardProvider';

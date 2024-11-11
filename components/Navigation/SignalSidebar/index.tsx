@@ -4,7 +4,6 @@ import { Signal } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 import { getTimeAgo } from '@/utils/dateUtils';
 import { CondensedIcon, DetailedIcon } from '@/public/icons/icons';
-import { oxanium, russo } from '@/fonts';
 
 export function SignalSidebar() {
   const { signalsData } = useSignals();

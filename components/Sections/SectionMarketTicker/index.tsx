@@ -77,7 +77,7 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
           </h4>
           <span
             className={`text-[8px] ${
-              priceChange >= 0 ? 'text-green-400' : 'text-red-400'
+              priceChange >= 0 ? 'text-emerald-400' : 'text-red-400'
             }`}
           >
             {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}

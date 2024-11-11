@@ -4,7 +4,7 @@ import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import { sequences } from '@/app/constants/constants';
 import { HistoricalPatternView } from './HistoricalPatternView';
-import Link from 'next/link';
+import { StartButton } from '@/components/Buttons/StartNowButton';
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
@@ -91,18 +91,11 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
           <p
             className={`text-kodemono text-dark-gray mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
           >
-            Discover market rhythms that mirror natural fractal patterns.
+            The universal pattern recognition toolkit designed for trading.
           </p>
 
           <div className="mt-6 flex gap-6">
-            <Link
-              href="#pricing"
-              className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-r from-green-600 to-emerald-600 p-[2px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-green-500 hover:to-emerald-500"
-            >
-              <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-r from-green-400 to-emerald-400 px-5 py-4 text-2xl font-bold text-black lg:text-3xl">
-                Start Now
-              </span>
-            </Link>
+            <StartButton href="#pricing" />
           </div>
         </div>
 

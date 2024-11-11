@@ -2,8 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Box, BoxSlice, PairData } from '@/types/types';
-import { DraggableBorder } from '../DraggableBorder';
-import { TrendHealth } from '@/components/TrendHealth';
+import { DraggableBorder } from '../../DraggableBorder';
+import { TrendHealth } from '@/components/Charts/TrendHealth';
 
 interface PairsSidebarProps {
   pairs: Record<string, PairData>;

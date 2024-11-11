@@ -10,7 +10,7 @@
 
 .dropdownWrapper {
   border-radius: 0.75rem;
-  overflow: hidden;
+  overflow: block;
   box-shadow: 0 25px 50px -12px rgb(0, 0, 0);
   transition: all 0.3s ease;
   transform-style: preserve-3d;

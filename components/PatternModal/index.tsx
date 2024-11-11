@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSignals } from '@/providers/SignalProviderClient';
 import styles from './PatternModal.module.css';
-import ShiftedBox from '@/components/Reso/Shifted';
+import ShiftedBox from '@/components/Charts/Reso/Shifted';
 import { LineChart } from '../LineChart';
 import { BoxSlice } from '@/types/types';
 

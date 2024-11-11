@@ -78,15 +78,6 @@ export const NestedBoxes = ({
       return 'none';
     };
 
-    const getBackdropFilter = () => {
-      if (isFirstDifferent) {
-        return box.value > 0
-          ? 'brightness(1.5) contrast(1.2)'
-          : 'brightness(1.3) contrast(1.1)';
-      }
-      return box.value > 0 ? 'brightness(1.2)' : 'none';
-    };
-
     const boxColor = getBoxColor();
     const borderColor = getBorderColor();
     const borderWidth = 'border rounded-lg';

@@ -203,7 +203,7 @@ const MarketCard = ({
         <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-black/30" />
         <div
           className={`absolute inset-0 rounded-xl opacity-20 blur-xl ${
-            data.change >= 0 ? 'bg-green-500/20' : 'bg-red-500/20'
+            data.change >= 0 ? 'bg-emerald-500/20' : 'bg-red-500/20'
           }`}
         />
         <CardContent item={item} data={data} />
@@ -229,7 +229,7 @@ const CardContent = ({
         animate={{ opacity: 1 }}
         className={`rounded-full px-2 py-0.5 text-xs ${
           data.change >= 0
-            ? 'bg-green-500/20 text-green-400'
+            ? 'bg-emerald-500/20 text-emerald-400'
             : 'bg-red-500/20 text-red-400'
         }`}
       >

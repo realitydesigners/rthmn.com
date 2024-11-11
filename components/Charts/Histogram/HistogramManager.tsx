@@ -12,7 +12,7 @@ import HistogramControls from './HistogramControls';
 import SelectedFrameDetails from './SelectedFrameDetails';
 import type { BoxSlice, ViewType, Box } from '@/types/types';
 import { COLORS } from './Colors';
-import { DraggableBorder } from '../DraggableBorder';
+import { DraggableBorder } from '@/components/DraggableBorder';
 import { formatTime } from '@/utils/dateUtils';
 import { MeetingPoint } from './Oscillator/MeetingPoint';
 import { PulseWave } from './Oscillator/PulseWave';

@@ -1,48 +1,18 @@
 'use client';
-
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect, type JSX } from 'react';
 import styles from './styles.module.css';
 import { AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { MotionDiv } from '@/components/MotionDiv';
-import { MotionButton } from '@/components/MotionButtton';
+import { NavButton } from '@/components/Buttons/NavButton';
+import { LogoIcon, MenuIcon } from '@/public/icons/icons';
 
 interface NavbarSignedOutProps {
   user: User | null;
 }
-
-const getIcon = (name: string): JSX.Element => {
-  const icons: { [key: string]: JSX.Element } = {
-    logo: (
-      <svg
-        width="40"
-        height="40"
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-labelledby="logoTitle"
-      >
-        <title id="logoTitle">Logo</title>
-        <g clipPath="url(#clip0_1208_27417)">
-          <path
-            d="M27.512 73.5372L27.512 28.512C27.512 27.9597 27.9597 27.512 28.512 27.512L70.4597 27.512C71.0229 27.512 71.475 27.9769 71.4593 28.54L70.8613 49.9176C70.8462 50.4588 70.4031 50.8896 69.8617 50.8896L50.7968 50.8896C49.891 50.8896 49.4519 51.9975 50.1117 52.618L92.25 92.25M92.25 92.25L48.2739 92.25L7.75002 92.25C7.19773 92.25 6.75002 91.8023 6.75002 91.25L6.75 7.75C6.75 7.19771 7.19772 6.75 7.75 6.75L91.25 6.75003C91.8023 6.75003 92.25 7.19775 92.25 7.75003L92.25 92.25Z"
-            stroke="white"
-            strokeWidth="8"
-          />
-        </g>
-        <defs>
-          <clipPath id="clip0_1208_27417">
-            <rect width="100" height="100" fill="white" />
-          </clipPath>
-        </defs>
-      </svg>
-    )
-  };
-  return icons[name] || <path />;
-};
 
 const Links = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -51,54 +21,26 @@ const Links = () => {
     setActiveDropdown(null);
   };
 
-  const linkStyle = `
-    flex items-center space-x-3 text-white rounded-full p-[1px] transition-all duration-200 
-    bg-gradient-to-b from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]
-  `;
-
-  const innerLinkStyle = `
-    flex items-center space-x-3 bg-gradient-to-b from-[#0A0A0A] to-[#181818] rounded-full 
-    py-2 px-4 w-full
-  `;
-
   return (
     <div className="group relative">
-      <div className="flex space-x-4">
-        <div
-          className={linkStyle}
-          onMouseEnter={() => setActiveDropdown('plans')}
-        >
-          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
-            <span className="text-sm font-semibold">Plans</span>
-          </Link>
-        </div>
-        <div
-          className={linkStyle}
+      <div className="flex">
+        <NavButton href="/" onMouseEnter={() => setActiveDropdown('plans')}>
+          Plans
+        </NavButton>
+        <NavButton
+          href="/"
           onMouseEnter={() => setActiveDropdown('how-it-works')}
         >
-          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
-            <span className="text-sm font-semibold">How it works</span>
-          </Link>
-        </div>
+          How it works
+        </NavButton>
+        <NavButton href="/" onMouseEnter={() => setActiveDropdown('features')}>
+          Features
+        </NavButton>
 
-        <div
-          className={linkStyle}
-          onMouseEnter={() => setActiveDropdown('features')}
-        >
-          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
-            <span className="text-sm font-semibold">Features</span>
-          </Link>
-        </div>
-        <div
-          className={linkStyle}
-          onMouseEnter={() => setActiveDropdown('community')}
-        >
-          <Link href="/" className={`${innerLinkStyle} text-kodemono`}>
-            <span className="text-sm font-semibold">Community</span>
-          </Link>
-        </div>
+        <NavButton href="/" onMouseEnter={() => setActiveDropdown('community')}>
+          Community
+        </NavButton>
       </div>
-
       <DesktopMenuContent
         activeDropdown={activeDropdown}
         onClose={handleCloseDropdown}
@@ -106,62 +48,6 @@ const Links = () => {
     </div>
   );
 };
-
-const MenuIcon = ({ isOpen }: { isOpen: boolean }) => (
-  <svg
-    width="28"
-    height="28"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-labelledby="menuIconTitle"
-  >
-    <title id="menuIconTitle">{isOpen ? 'Close Menu' : 'Open Menu'}</title>
-    {isOpen ? (
-      // Close icon (X)
-      <>
-        <line x1="18" y1="6" x2="6" y2="18" />
-        <line x1="6" y1="6" x2="18" y2="18" />
-      </>
-    ) : (
-      // Open icon (Three lines with slower expanding animation)
-      <>
-        <line x1="3" y1="12" x2="21" y2="12" />
-        <line x1="3" y1="6" x2="21" y2="6">
-          <animate
-            attributeName="x1"
-            values="3;6;3"
-            dur="3s"
-            repeatCount="indefinite"
-          />
-          <animate
-            attributeName="x2"
-            values="21;18;21"
-            dur="3s"
-            repeatCount="indefinite"
-          />
-        </line>
-        <line x1="3" y1="18" x2="21" y2="18">
-          <animate
-            attributeName="x1"
-            values="3;6;3"
-            dur="3s"
-            repeatCount="indefinite"
-          />
-          <animate
-            attributeName="x2"
-            values="21;18;21"
-            dur="3s"
-            repeatCount="indefinite"
-          />
-        </line>
-      </>
-    )}
-  </svg>
-);
 
 export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -233,7 +119,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               href="/"
               className="z-50 flex items-center gap-2 pl-4 xl:pl-0"
             >
-              <div className="flex h-8 w-8 items-center">{getIcon('logo')}</div>
+              <div className="flex h-8 w-8 items-center">
+                <LogoIcon />
+              </div>
               <div className={`text-oxanium text-2xl font-bold`}>RTHMN</div>
             </Link>
 
@@ -278,14 +166,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               </MotionDiv>
             </div>
 
-            <MotionButton
+            <button
               onClick={toggleNav}
               className="menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden"
               aria-label="Toggle navigation"
-              whileTap={{ scale: 0.95 }}
             >
               <MenuIcon isOpen={isNavOpen} />
-            </MotionButton>
+            </button>
           </div>
         </div>
       </MotionDiv>

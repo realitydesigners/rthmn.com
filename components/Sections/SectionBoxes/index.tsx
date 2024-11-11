@@ -7,7 +7,7 @@ import {
   createDemoStep,
   createMockBoxData
 } from '@/app/constants/constants';
-import { NestedBoxes } from '@/components/NestedBoxes';
+import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { FEATURE_TAGS } from '@/app/constants/text';
 import { MotionDiv } from '@/components/MotionDiv';
 
