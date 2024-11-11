@@ -2,7 +2,7 @@ import { getLesson, getModule } from '@/utils/sanity/lib/queries';
 import Link from 'next/link';
 import Blocks from '@/components/blocks/Blocks';
 import type { BlockProps } from '@/components/blocks/Blocks';
-import { TableOfContents } from '@/components/learn/TableOfContents';
+import { TableOfContents } from '@/components/Accessibility/TOC';
 
 export const revalidate = 60;
 

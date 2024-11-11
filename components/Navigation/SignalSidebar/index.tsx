@@ -3,7 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { Signal } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 import { getTimeAgo } from '@/utils/dateUtils';
-import { CondensedIcon, DetailedIcon } from '@/components/Icons/icons';
+import {
+  CondensedIcon,
+  DetailedIcon
+} from '@/components/Accessibility/Icons/icons';
 
 export function SignalSidebar() {
   const { signalsData } = useSignals();

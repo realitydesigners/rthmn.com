@@ -1,5 +1,5 @@
 import DynamicNavbar from '@/components/Navigation/NavbarDynamic';
-import { Toaster } from '@/components/Toasts/toaster';
+import { Toaster } from '@/components/Accessibility/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
@@ -9,7 +9,11 @@ import { createClient } from '@/utils/supabase/server';
 import './main.css';
 import { GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
-import { kodeMono, outfit, oxanium } from '@/components/Fonts/fonts';
+import {
+  kodeMono,
+  outfit,
+  oxanium
+} from '@/components/Accessibility/Fonts/fonts';
 import { Analytics } from '@vercel/analytics/react';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';

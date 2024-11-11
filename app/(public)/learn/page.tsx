@@ -1,5 +1,4 @@
 import { getModules } from '@/utils/sanity/lib/queries';
-import { PortableText } from '@portabletext/react';
 import Link from 'next/link';
 
 export const revalidate = 60;

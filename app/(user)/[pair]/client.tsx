@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BoxSlice, PairData, ViewType } from '@/types/types';
 import HistogramManager from '@/components/Charts/Histogram/HistogramManager';
-import { LineChart } from '../../../components/LineChart';
+import { LineChart } from '../../../components/Charts/LineChart';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useBoxSliceData } from '@/hooks/useBoxSliceData';

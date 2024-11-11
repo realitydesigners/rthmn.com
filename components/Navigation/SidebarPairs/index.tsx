@@ -1,9 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Box, BoxSlice, PairData } from '@/types/types';
-import { DraggableBorder } from '../../DraggableBorder';
-import { TrendHealth } from '@/components/Charts/TrendHealth';
+import { DraggableBorder } from '../../Accessibility/DraggableBorder';
 
 interface PairsSidebarProps {
   pairs: Record<string, PairData>;
@@ -176,11 +174,6 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
                 })}
               </div>
             </div>
-            {selectedPair === pair && (
-              <div className="bg-[#000] p-2">
-                <TrendHealth trendData={data.boxes} />
-              </div>
-            )}
           </li>
         ))}
       </ul>
