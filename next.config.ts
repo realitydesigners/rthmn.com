@@ -1,11 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: [
-      'cdn.sanity.io',
-      'mcyjrazlwwmqjyhwzhcm.supabase.co',
-      'lh3.googleusercontent.com'
-    ],
     remotePatterns: [
       {
         protocol: 'https',

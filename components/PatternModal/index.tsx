@@ -1,8 +1,8 @@
 import React from 'react';
 import { useSignals } from '@/providers/SignalProviderClient';
 import styles from './PatternModal.module.css';
-import ShiftedBox from '@/components/Reso/Shifted';
-import { LineChart } from '../LineChart';
+import ShiftedBox from '@/components/Charts/Reso/Shifted';
+import { LineChart } from '../Charts/LineChart';
 import { BoxSlice } from '@/types/types';
 
 const PatternModal: React.FC = () => {

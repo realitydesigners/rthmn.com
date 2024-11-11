@@ -1,5 +1,4 @@
 import React from 'react';
-import { outfit } from '@/fonts';
 import type { PortableTextComponents } from '@portabletext/react';
 
 export const ChangelogTemplate: PortableTextComponents = {
