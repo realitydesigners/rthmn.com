@@ -10,7 +10,6 @@ import {
 import { NestedBoxes } from '@/components/NestedBoxes';
 import { FEATURE_TAGS } from '@/app/constants/text';
 import { MotionDiv } from '@/components/MotionDiv';
-import { TypeAnimation } from 'react-type-animation';
 
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
@@ -171,20 +170,9 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
               Recognition
             </h2>
 
-            <TypeAnimation
-              sequence={[
-                'Discover hidden market patterns through advanced mathematics.',
-                1000,
-                'Transform complexity into clear trading signals.',
-                1000,
-                'Trade with the natural flow of the markets.',
-                1000
-              ]}
-              wrapper="p"
-              speed={50}
-              className="text-kodemono mb-8 text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg"
-              repeat={Infinity}
-            />
+            <p className="text-kodemono mb-8 text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
+              Discover hidden market patterns through advanced mathematics.
+            </p>
 
             {/* Box Visualization for mobile only - appears after title */}
             <div className="my-12 flex items-center justify-center lg:hidden">

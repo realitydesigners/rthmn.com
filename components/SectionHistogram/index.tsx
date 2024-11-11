@@ -4,7 +4,6 @@ import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import { sequences } from '@/app/constants/constants';
 import { MotionDiv } from '@/components/MotionDiv';
-import { TypeAnimation } from 'react-type-animation';
 import { POSITION_STATES } from '@/app/constants/text';
 import { HistoricalPatternView } from './HistoricalPatternView';
 import { FaWaveSquare, FaCube, FaFingerprint, FaAtom } from 'react-icons/fa';
@@ -61,14 +60,14 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
       if (!isPaused) {
         setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
       }
-    }, 1000);
+    }, 50);
 
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
 
   useEffect(() => {
     const handleResize = () => {
-      setContainerHeight(window.innerWidth >= 1024 ? 200 : 175);
+      setContainerHeight(window.innerWidth >= 1024 ? 150 : 100);
     };
 
     // Set initial height
@@ -92,27 +91,11 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
             <br />
             Market Analysis
           </h2>
-          <TypeAnimation
-            sequence={[
-              'Discover market rhythms that mirror natural fractal patterns.',
-              1000,
-              '',
-              1000,
-              'Detect harmonic frequencies hidden in typical time based charts.',
-              1000,
-              '',
-              1000,
-              'Harness the hidden order to technical analysis.',
-              1000,
-              '',
-              1000
-            ]}
-            wrapper="h2"
-            speed={50}
-            deletionSpeed={80}
-            className={`text-kodemono text-dark-gray lg;text-3xl mb-6 w-11/12 pt-6 text-lg`}
-            repeat={Infinity}
-          />
+          <p
+            className={`text-kodemono text-dark-gray mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
+          >
+            Discover market rhythms that mirror natural fractal patterns.
+          </p>
 
           <div className="mt-6 flex gap-6">
             <Link

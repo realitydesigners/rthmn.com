@@ -169,7 +169,7 @@ export function SectionChart({ marketData }: { marketData: MarketData[] }) {
     : [];
 
   return (
-    <section className="relative z-[100] px-8 px-[5vw] py-12 xl:px-[10vw] 2xl:px-[15vw]">
+    <section className="relative z-[100] px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
       <div
         ref={containerRef}
         className="relative transition-transform duration-300 ease-out [transform-style:preserve-3d]"

@@ -1,6 +1,5 @@
 'use client';
 import { MotionDiv } from '@/components/MotionDiv';
-import { TypeAnimation } from 'react-type-animation';
 import { FaWaveSquare, FaCube, FaFingerprint, FaAtom } from 'react-icons/fa';
 import {
   ALGORITHM_CONCEPTS,
@@ -29,27 +28,9 @@ export function SectionAboutAlgorithm() {
             <br />
             Can't See
           </h2>
-          <TypeAnimation
-            sequence={[
-              'Detect market reversals before they happen.',
-              1000,
-              '',
-              100,
-              'Spot high-probability setups automatically.',
-              1000,
-              '',
-              100,
-              'Trade with nature, not against it.',
-              1000,
-              '',
-              100
-            ]}
-            wrapper="h2"
-            speed={50}
-            deletionSpeed={80}
-            className={`text-kodemono text-dark-gray w-11/12 pt-6 text-xl`}
-            repeat={Infinity}
-          />
+          <p className={`text-kodemono text-dark-gray w-11/12 pt-6 text-xl`}>
+            Detect market reversals before they happen.
+          </p>
         </div>
 
         {/* Core Features */}
