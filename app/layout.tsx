@@ -1,4 +1,4 @@
-import { Navbar } from '@/components/Navigation/Navbar';
+import { Navbar } from '@/components/Accessibility/Navbar';
 import { Toaster } from '@/components/Accessibility/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata } from 'next';

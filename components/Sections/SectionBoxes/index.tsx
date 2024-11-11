@@ -6,9 +6,9 @@ import {
   sequences,
   createDemoStep,
   createMockBoxData
-} from '@/app/constants/constants';
+} from '@/components/Constants/constants';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
-import { FEATURE_TAGS } from '@/app/constants/text';
+import { FEATURE_TAGS } from '@/components/Constants/text';
 import { MotionDiv } from '@/components/MotionDiv';
 
 const POINT_OF_CHANGE_INDEX = 29;

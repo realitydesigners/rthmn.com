@@ -2,7 +2,7 @@
 import type React from 'react';
 import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
-import { sequences } from '@/app/constants/constants';
+import { sequences } from '@/components/Constants/constants';
 import { HistoricalPatternView } from './HistoricalPatternView';
 import { StartButton } from '@/components/Buttons/StartNowButton';
 

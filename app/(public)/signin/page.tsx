@@ -1,11 +1,13 @@
 'use client';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Scene } from '@/components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
 import { FcGoogle } from 'react-icons/fc';
 import { useEffect, useState } from 'react';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
-import { SocialMediaLinks } from '@/components/SocialMediaLinks';
+import { IconType } from 'react-icons';
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignIn() {
@@ -83,6 +85,29 @@ export default function SignIn() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+const socialMediaLinks: { icon: IconType; href: string }[] = [
+  { icon: FaDiscord, href: '#' },
+  { icon: FaInstagram, href: '#' },
+  { icon: FaTwitter, href: '#' },
+  { icon: FaYoutube, href: '#' }
+];
+
+function SocialMediaLinks() {
+  return (
+    <div className="mt-12 flex justify-center space-x-8">
+      {socialMediaLinks.map((social, index) => (
+        <Link
+          key={index}
+          href={social.href}
+          className="text-gray-400 transition-colors duration-200 hover:text-white"
+        >
+          <social.icon size={32} />
+        </Link>
+      ))}
     </div>
   );
 }
