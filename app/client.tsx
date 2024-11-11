@@ -1,19 +1,19 @@
 'use client';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
-import { SectionFeatures } from '@/components/SectionFeatures';
-import { SectionPricing } from '@/components/SectionPricing';
-import { RyverSection } from '@/components/SectionRyver';
-import { FAQSection } from '@/components/SectionFAQ';
-import { ServiceSection } from '@/components/SectionServices';
+import { SectionFeatures } from '@/components/Sections/SectionFeatures';
+import { SectionPricing } from '@/components/Sections/SectionPricing';
+import { RyverSection } from '@/components/Sections/SectionRyver';
+import { FAQSection } from '@/components/Sections/SectionFAQ';
+import { ServiceSection } from '@/components/Sections/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { SectionBoxes } from '@/components/SectionBoxes';
-import { SectionBlogPosts } from '@/components/SectionBlogPosts';
-import { SectionFooter } from '@/components/SectionFooter';
-import { SectionHistogram } from '@/components/SectionHistogram';
-import { SectionAboutAlgorithm } from '@/components/SectionAboutAlgorithm';
-import { SectionMarketDisplay } from '@/components/SectionMarketDisplay';
-import { SectionMarketTicker } from '@/components/SectionMarketTicker';
-import { SectionChart } from '@/components/SectionChart';
+import { SectionBoxes } from '@/components/Sections/SectionBoxes';
+import { SectionBlogPosts } from '@/components/Sections/SectionBlogPosts';
+import { SectionFooter } from '@/components/Sections/SectionFooter';
+import { SectionHistogram } from '@/components/Sections/SectionHistogram';
+import { SectionAboutAlgorithm } from '@/components/Sections/SectionAboutAlgorithm';
+import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
+import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
+import { SectionChart } from '@/components/Sections/SectionChart';
 
 interface MarketData {
   pair: string;

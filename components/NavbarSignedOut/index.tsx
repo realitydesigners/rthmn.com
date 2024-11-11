@@ -260,7 +260,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                       type="submit"
                       className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
-                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-base font-medium">
+                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                         Sign out
                       </span>
                     </button>
@@ -270,7 +270,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     href="/signin"
                     className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
-                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-base font-medium">
+                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium">
                       Sign in
                     </span>
                   </Link>
@@ -314,7 +314,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                       type="submit"
                       className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
-                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-base font-medium">
+                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                         Sign out
                       </span>
                     </button>
@@ -324,7 +324,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     href="/signin"
                     className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
-                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-base font-medium">
+                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                       Sign in
                     </span>
                   </Link>

@@ -3,10 +3,7 @@ import type React from 'react';
 import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import { sequences } from '@/app/constants/constants';
-import { MotionDiv } from '@/components/MotionDiv';
-import { POSITION_STATES } from '@/app/constants/text';
 import { HistoricalPatternView } from './HistoricalPatternView';
-import { FaWaveSquare, FaCube, FaFingerprint, FaAtom } from 'react-icons/fa';
 import Link from 'next/link';
 
 interface BoxComponentProps {
@@ -25,7 +22,7 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
   const BOX_COUNT = 8;
   const AVAILABLE_HEIGHT = containerHeight;
   const BOX_SIZE = Math.floor(AVAILABLE_HEIGHT / BOX_COUNT);
-  const PATTERN_WIDTH = BOX_SIZE + 4;
+  const PATTERN_WIDTH = BOX_SIZE;
 
   const dimensions = {
     totalHeight: containerHeight,
@@ -100,20 +97,16 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
           <div className="mt-6 flex gap-6">
             <Link
               href="#pricing"
-              className="text-kodemono group relative flex items-center justify-center overflow-hidden rounded-lg bg-gradient-to-r from-[#10B981] via-[#34D399] to-[#6EE7B7] px-4 py-2 text-lg text-xl font-bold text-black transition-all duration-500 hover:scale-[1.02] lg:px-8 lg:py-4 lg:text-2xl"
+              className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-r from-green-600 to-emerald-600 p-[2px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-green-500 hover:to-emerald-500"
             >
-              Start Now
-            </Link>
-            <Link
-              href="/algorithm"
-              className="text-kodemono border-gray group relative flex items-center justify-center overflow-hidden rounded-lg border px-4 py-2 text-sm font-semibold text-white/90 backdrop-blur-sm transition-all duration-500 hover:scale-[1.02] hover:border-[#34D399]/30 lg:px-8 lg:py-4 lg:text-lg"
-            >
-              Learn More
+              <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-r from-green-400 to-emerald-400 px-5 py-4 text-2xl font-bold text-black lg:text-3xl">
+                Start Now
+              </span>
             </Link>
           </div>
         </div>
 
-        <div className="w-full bg-black/75 px-[10vw] px-[5vw]">
+        <div className="w-full bg-black/75 px-[0vw] lg:px-[10vw]">
           <HistoricalPatternView
             tableRef={tableRef}
             demoStep={demoStep}

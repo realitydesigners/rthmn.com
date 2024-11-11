@@ -30,7 +30,7 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
 
   return (
     <div
-      className={`text-kodemono border-gray flex w-full items-center justify-center overflow-hidden rounded-lg`}
+      className="text-kodemono border-gray flex w-full items-center justify-center overflow-hidden rounded-lg"
       style={{
         height: `${availableHeight + 25}px`,
         padding: '0px'
@@ -66,28 +66,23 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
                     {sequence.positions.map(({ boxNumber, position, isUp }) => (
                       <div
                         key={boxNumber}
-                        className="group absolute left-0 cursor-pointer transition-all duration-500"
+                        className={`group absolute left-0 cursor-pointer transition-all duration-300 ${
+                          isUp
+                            ? 'border-emerald-500/50 bg-emerald-500/40 shadow-emerald-500/30'
+                            : 'border-red-500/40 bg-red-500/30 shadow-red-500/30'
+                        } border shadow-[0_0_4px]`}
                         style={{
                           width: `${boxSize}px`,
                           height: `${boxSize}px`,
                           bottom: `${position * boxSize}px`,
-                          background: isUp
-                            ? 'linear-gradient(to right, rgba(16,185,129,0.4), rgba(52,211,153,0.3), rgba(110,231,183,0.4))'
-                            : 'linear-gradient(to right, rgba(239,68,68,0.2), rgba(239,68,68,0.1), rgba(248,113,113,0.2))',
-                          boxShadow: isUp
-                            ? '0 0 4px rgba(16,185,129,0.2), inset 0 0 1px rgba(52,211,153,0.3)'
-                            : '0 0 4px rgba(239,68,68,0.25), inset 0 0 1px rgba(248,113,113,0.3)',
-                          border: isUp
-                            ? '1px solid rgba(52,211,153,0.3)'
-                            : '1px solid rgba(248,113,113,0.3)',
                           left: '0px',
                           zIndex: 10,
-                          transform: `scale(${isUp ? 1.05 : 1})`,
-                          opacity: isUp ? 1 : 0.95,
+                          transform: `scale(${isUp ? 1.02 : 1})`,
+                          opacity: isUp ? 1 : 0.9,
                           willChange: 'transform, opacity'
                         }}
                       >
-                        <div className="h-full w-full" />
+                        <div className="h-full w-full transition-opacity hover:opacity-80" />
                       </div>
                     ))}
                   </div>
