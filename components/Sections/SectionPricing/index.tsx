@@ -92,7 +92,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
             <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
           </div>
           <h1 className="text-outfit text-gray-gradient mb-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Signal Plan
+            Box Seat
           </h1>
           <p className="text-kodemono mt-4 text-lg text-white/60">
             Discord Community Access with a fully integrated Rthmn Dashboard

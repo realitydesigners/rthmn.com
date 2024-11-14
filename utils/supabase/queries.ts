@@ -118,7 +118,17 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
 
 export const getSignals = cache(async (supabase: SupabaseClient) => {
   try {
-    const { data: signals, error } = await supabase.from('signals').select('*');
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    if (!user) throw new Error('No authenticated user');
+
+    const { data: signals, error } = await supabase
+      .from('signals')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return signals;
