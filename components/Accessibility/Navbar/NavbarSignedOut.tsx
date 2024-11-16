@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './styles.module.css';
 import { AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
@@ -18,29 +18,33 @@ interface NavbarSignedOutProps {
 const Links = () => {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
-  const handleCloseDropdown = () => {
+  const handleMouseEnter = (dropdown: string) => {
+    setActiveDropdown(dropdown);
+  };
+
+  const handleMouseLeave = () => {
     setActiveDropdown(null);
   };
 
   return (
     <div className="group relative">
-      <div className="flex">
-        <NavButton href="/" onMouseEnter={() => setActiveDropdown('pricing')}>
-          Plans
+      <div className="flex font-outfit">
+        <NavButton href="/" onMouseEnter={() => handleMouseEnter('pricing')}>
+          Pricing
         </NavButton>
-        <NavButton href="/" onMouseEnter={() => setActiveDropdown('company')}>
+        <NavButton href="/" onMouseEnter={() => handleMouseEnter('company')}>
           Company
         </NavButton>
-        <NavButton href="/" onMouseEnter={() => setActiveDropdown('features')}>
+        <NavButton href="/" onMouseEnter={() => handleMouseEnter('features')}>
           Features
         </NavButton>
-        <NavButton href="/" onMouseEnter={() => setActiveDropdown('resources')}>
+        <NavButton href="/" onMouseEnter={() => handleMouseEnter('resources')}>
           Resources
         </NavButton>
       </div>
       <DesktopMenuContent
         activeDropdown={activeDropdown}
-        onClose={handleCloseDropdown}
+        onMouseLeave={handleMouseLeave}
       />
     </div>
   );
@@ -224,7 +228,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 
 interface MenuModalProps {
   activeDropdown: string | null;
-  onClose: () => void;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
 }
 
 const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
@@ -251,7 +256,8 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
 
 export const DesktopMenuContent: React.FC<MenuModalProps> = ({
   activeDropdown,
-  onClose
+  onMouseEnter,
+  onMouseLeave
 }) => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -290,33 +296,12 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
     if (!group) return null;
 
     switch (activeDropdown) {
-      case 'resources':
-        return (
-          <div
-            className={`${styles.dropdownContent} ${styles.dropdownResources}`}
-          >
-            <MotionDiv
-              className="flex w-1/2 flex-col gap-2"
-              variants={contentVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {group.links.map((item, index) => (
-                <MotionDiv key={item.title} variants={itemVariants}>
-                  <DropdownLink {...item} className={styles.dropdownItem} />
-                </MotionDiv>
-              ))}
-            </MotionDiv>
-            <div className="flex w-1/2 flex-col gap-2">
-              <div className="h-full w-full bg-[#181818]" />
-              <div className="h-full w-full bg-[#181818]" />
-            </div>
-          </div>
-        );
       case 'pricing':
         return (
           <div
-            className={`${styles.dropdownContent} ${styles.dropdownPricing}`}
+            className={`${styles.dropdownContent} ${styles.dropdownPricing} font-outfit`}
+            onMouseEnter={() => {}}
+            onMouseLeave={onMouseLeave}
           >
             <MotionDiv
               className="flex w-1/2 flex-col gap-2"
@@ -339,7 +324,9 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
       case 'company':
         return (
           <div
-            className={`${styles.dropdownContent} ${styles.dropdownAccount}`}
+            className={`${styles.dropdownContent} ${styles.dropdownAccount} font-outfit`}
+            onMouseEnter={() => {}}
+            onMouseLeave={onMouseLeave}
           >
             <div className="w-1/3 bg-[#181818]" />
             <MotionDiv
@@ -356,6 +343,56 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             </MotionDiv>
           </div>
         );
+      case 'features':
+        return (
+          <div
+            className={`${styles.dropdownContent} ${styles.dropdownResources} font-outfit`}
+            onMouseEnter={() => {}}
+            onMouseLeave={onMouseLeave}
+          >
+            <MotionDiv
+              className="flex w-1/2 flex-col gap-2"
+              variants={contentVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {group.links.map((item, index) => (
+                <MotionDiv key={item.title} variants={itemVariants}>
+                  <DropdownLink {...item} className={styles.dropdownItem} />
+                </MotionDiv>
+              ))}
+            </MotionDiv>
+            <div className="flex w-1/2 flex-col gap-2">
+              <div className="h-full w-full bg-[#181818]" />
+              <div className="h-full w-full bg-[#181818]" />
+            </div>
+          </div>
+        );
+      case 'resources':
+        return (
+          <div
+            className={`${styles.dropdownContent} ${styles.dropdownResources} font-outfit`}
+            onMouseEnter={() => {}}
+            onMouseLeave={onMouseLeave}
+          >
+            <MotionDiv
+              className="flex w-1/2 flex-col gap-2"
+              variants={contentVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {group.links.map((item, index) => (
+                <MotionDiv key={item.title} variants={itemVariants}>
+                  <DropdownLink {...item} className={styles.dropdownItem} />
+                </MotionDiv>
+              ))}
+            </MotionDiv>
+            <div className="flex w-1/2 flex-col gap-2">
+              <div className="h-full w-full bg-[#181818]" />
+              <div className="h-full w-full bg-[#181818]" />
+            </div>
+          </div>
+        );
       default:
         return null;
     }
@@ -366,7 +403,8 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
       {isVisible && (
         <MotionDiv
           className={`${styles.dropdownContainer} ${activeDropdown ? styles.active : styles.inactive}`}
-          onMouseLeave={onClose}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
           variants={dropdownVariants}
           initial="hidden"
           animate="visible"

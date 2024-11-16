@@ -16,19 +16,19 @@ export function SectionAboutAlgorithm() {
       </div>
       <div className="mx-auto max-w-7xl px-8">
         <div className="relative flex flex-col items-center text-center">
-          <div className="text-kodemono mb-6 flex items-center gap-3 text-sm tracking-wider text-white/60 lg:text-sm">
+          <div className="mb-6 flex items-center gap-3 font-kodemono text-sm tracking-wider text-white/60 lg:text-sm">
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
             NEXT GENERATION INDICATORS
             <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
           </div>
           <h2
-            className={`text-outfit text-gray-gradient relative z-10 text-[3em] font-bold leading-tight tracking-tight lg:text-[6em]`}
+            className={`text-gray-gradient relative z-10 font-outfit text-[3em] font-bold leading-tight tracking-tight lg:text-[6em]`}
           >
             See What Others
             <br />
             Can't See
           </h2>
-          <p className={`text-kodemono text-dark-gray w-11/12 pt-6 text-xl`}>
+          <p className={`text-dark-gray w-11/12 pt-6 font-kodemono text-xl`}>
             Detect market reversals before they happen.
           </p>
         </div>
@@ -94,11 +94,11 @@ export function SectionAboutAlgorithm() {
                     <div className="rounded-xl bg-white/5 p-3 backdrop-blur-sm">
                       <concept.icon className="h-6 w-6 text-white transition-colors group-hover:text-white" />
                     </div>
-                    <h3 className="text-outfit text-2xl font-semibold text-white/90">
+                    <h3 className="font-outfit text-2xl font-semibold text-white/90">
                       {concept.title}
                     </h3>
                   </div>
-                  <p className="text-kodemono text-white/60">
+                  <p className="font-kodemono text-white/60">
                     {concept.description}
                   </p>
                 </div>
@@ -111,14 +111,14 @@ export function SectionAboutAlgorithm() {
             ))}
           </div>
           <div className="relative my-20 flex flex-col justify-center px-4 lg:px-[10vw]">
-            <h3 className="text-outfit mb-8 text-3xl font-semibold text-white/90">
+            <h3 className="mb-8 font-outfit text-3xl font-semibold text-white/90">
               {NATURE_EXAMPLE.title}
             </h3>
             <div className="mx-auto max-w-4xl space-y-8">
               {NATURE_EXAMPLE.paragraphs.map((paragraph, index) => (
                 <p
                   key={index}
-                  className="text-kodemono text-lg leading-relaxed text-white/60"
+                  className="font-kodemono text-lg leading-relaxed text-white/60"
                 >
                   {paragraph}
                 </p>
@@ -182,14 +182,14 @@ export function SectionAboutAlgorithm() {
 
                 {/* Content */}
                 <div className="relative z-10">
-                  <h3 className="text-outfit mb-4 text-2xl font-semibold text-white/90">
+                  <h3 className="mb-4 font-outfit text-2xl font-semibold text-white/90">
                     {example.scenario}
                   </h3>
-                  <p className="text-kodemono mb-4 text-white/60">
+                  <p className="mb-4 font-kodemono text-white/60">
                     {example.description}
                   </p>
                   <div className="mt-4 rounded-lg bg-white/5 p-4">
-                    <p className="text-kodemono text-sm text-[#22c55e]">
+                    <p className="font-kodemono text-sm text-[#22c55e]">
                       {example.application}
                     </p>
                   </div>

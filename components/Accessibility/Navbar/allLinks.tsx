@@ -67,45 +67,17 @@ export const allLinks: LinkGroup[] = [
         href: '/',
         icon: FaUsers
       },
-      {
-        title: 'Blog',
-        desc: 'Latest insights and trading strategies',
-        href: '/',
-        icon: FaBlog
-      },
+
       {
         title: 'Contact',
         desc: 'Get in touch with our support team',
         href: '/',
         icon: FaEnvelope
-      },
-      {
-        title: 'Careers',
-        desc: 'Join our team and help shape the future of trading',
-        href: '/',
-        icon: FaBriefcase
       }
     ]
   },
   {
-    title: 'Resources',
-    links: [
-      {
-        title: 'Documentation',
-        desc: 'Comprehensive guides for using our platform',
-        href: '/',
-        icon: FaBook
-      },
-      {
-        title: 'Changelog',
-        desc: 'Integrate our services into your applications',
-        href: '/changelog',
-        icon: FaCode
-      }
-    ]
-  },
-  {
-    title: 'Account',
+    title: 'Features',
     links: [
       {
         title: 'Profile',
@@ -124,6 +96,29 @@ export const allLinks: LinkGroup[] = [
         desc: 'View and manage your subscription',
         href: '/',
         icon: FaCreditCard
+      }
+    ]
+  },
+  {
+    title: 'Resources',
+    links: [
+      {
+        title: 'Blog',
+        desc: 'Latest insights and trading strategies',
+        href: '/',
+        icon: FaBlog
+      },
+      {
+        title: 'Documentation',
+        desc: 'Comprehensive guides for using our platform',
+        href: '/',
+        icon: FaBook
+      },
+      {
+        title: 'Changelog',
+        desc: 'Integrate our services into your applications',
+        href: '/changelog',
+        icon: FaCode
       }
     ]
   }

@@ -7,7 +7,7 @@ export default function AboutPage() {
   return (
     <BackgroundGrid>
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-40">
+      <section className="relative overflow-hidden pt-40 font-outfit">
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-8">
           <div className="flex flex-col items-center text-center">
@@ -17,7 +17,7 @@ export default function AboutPage() {
               transition={{ duration: 0.5 }}
               className="mb-8"
             >
-              <h1 className="text-gray-gradient font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl">
+              <h1 className="text-gray-gradient max-w-4xl text-6xl font-bold tracking-tight text-transparent lg:text-7xl">
                 We're Building A New Lens for Trading
               </h1>
               <p className="mt-6 font-mono text-lg text-white/60">
@@ -36,9 +36,7 @@ export default function AboutPage() {
               className="space-y-12"
             >
               <div className="space-y-6">
-                <h2
-                  className={`text-gray-gradient font-outfit text-3xl font-bold`}
-                >
+                <h2 className={`text-gray-gradient text-3xl font-bold`}>
                   From Games to Trading
                 </h2>
                 <div className="space-y-4 text-lg text-white/60">
@@ -62,9 +60,7 @@ export default function AboutPage() {
               </div>
 
               <div className="space-y-6">
-                <h2
-                  className={`text-gray-gradient font-outfit text-3xl font-bold`}
-                >
+                <h2 className={`text-gray-gradient text-3xl font-bold`}>
                   A New Perspective
                 </h2>
                 <div className="space-y-4 text-lg text-white/60">
@@ -78,9 +74,7 @@ export default function AboutPage() {
               </div>
 
               <div className="space-y-6">
-                <h2
-                  className={`text-gray-gradient font-outfit text-3xl font-bold`}
-                >
+                <h2 className={`text-gray-gradient text-3xl font-bold`}>
                   The Cyclical Nature of Markets
                 </h2>
                 <div className="space-y-4 text-lg text-white/60">
@@ -134,12 +128,10 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] p-8"
               >
-                <div className="font-outfit text-4xl font-bold text-white">
+                <div className="text-4xl font-bold text-white">
                   {stat.number}
                 </div>
-                <div className="mt-2 font-outfit text-xl text-white/80">
-                  {stat.label}
-                </div>
+                <div className="mt-2 text-xl text-white/80">{stat.label}</div>
                 <div className="mt-2 font-mono text-sm text-white/60">
                   {stat.description}
                 </div>
@@ -156,7 +148,7 @@ export default function AboutPage() {
           <div className="mx-auto max-w-3xl">
             <div className="space-y-12">
               <div className="space-y-6">
-                <h2 className="text-gray-gradient text-center font-outfit text-4xl font-bold">
+                <h2 className="text-gray-gradient text-center text-4xl font-bold">
                   Two People, One Vision
                 </h2>
                 <div className="space-y-6 font-mono text-lg leading-relaxed text-white/60">
@@ -234,7 +226,7 @@ export default function AboutPage() {
                     <div className="rounded-xl bg-white/5 p-3 backdrop-blur-sm">
                       <belief.icon className="h-6 w-6 text-white transition-colors group-hover:text-white" />
                     </div>
-                    <h3 className="font-outfit text-2xl font-semibold text-white/90">
+                    <h3 className="text-2xl font-semibold text-white/90">
                       {belief.title}
                     </h3>
                   </div>
@@ -264,11 +256,11 @@ export default function AboutPage() {
               <div className="text-gray-gradient h-[1px] w-12 to-transparent" />
             </div>
             <h2
-              className={`text-gray-gradient mb-8 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`text-gray-gradient mb-8 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               Beyond Traditional Analysis
             </h2>
-            <p className="font-outfit text-lg text-white/60">
+            <p className="text-lg text-white/60">
               We're not just building another trading platform - we're creating
               new ways to understand and interact with complex systems.
             </p>
@@ -299,9 +291,7 @@ export default function AboutPage() {
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 className="relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] p-8"
               >
-                <h3
-                  className={`mb-4 font-outfit text-xl font-bold text-white/90`}
-                >
+                <h3 className={`mb-4 text-xl font-bold text-white/90`}>
                   {item.title}
                 </h3>
                 <p className="text-white/60">{item.description}</p>
