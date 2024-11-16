@@ -78,7 +78,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
             <div className="flex h-8 w-8 items-center">
               <LogoIcon />
             </div>
-            <span className={`text-russo text-2xl font-bold tracking-wide`}>
+            <span className={`font-russo text-2xl font-bold tracking-wide`}>
               RTHMN
             </span>
           </Link>

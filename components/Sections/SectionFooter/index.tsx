@@ -70,7 +70,7 @@ export function SectionFooter() {
   };
 
   return (
-    <footer className="border-t border-white/10 bg-black">
+    <footer className="z-90 relative border-t border-white/5 bg-black">
       <div className="mx-auto max-w-6xl px-4 py-12 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Left Side */}
@@ -81,13 +81,13 @@ export function SectionFooter() {
                   {getIcon('logo')}
                 </div>
                 <div
-                  className={`text-russo pt-1 text-2xl font-bold tracking-wide`}
+                  className={`pt-1 font-russo text-2xl font-bold tracking-wide`}
                 >
                   RTHMN
                 </div>
               </Link>
               <p
-                className={`text-kodemono mt-4 max-w-md text-sm text-gray-400`}
+                className={`mt-4 max-w-md font-kodemono text-sm text-gray-400`}
               >
                 Advanced pattern recognition for algorithmic trading. Built by
                 traders, for traders.
@@ -95,7 +95,7 @@ export function SectionFooter() {
             </div>
 
             {/* Newsletter */}
-            <div className={`text-kodemono`}>
+            <div className={`font-kodemono`}>
               <h3 className="text-sm font-semibold text-white">
                 Subscribe to our newsletter
               </h3>
@@ -129,7 +129,7 @@ export function SectionFooter() {
           <div className="grid grid-cols-2 gap-8 lg:grid-cols-3">
             {/* Links Sections */}
             {Object.entries(FOOTER_LINKS).map(([category, links]) => (
-              <div key={category} className="text-kodemono">
+              <div key={category} className="font-kodemono">
                 <h3 className="text-sm font-semibold uppercase text-white">
                   {category}
                 </h3>
@@ -152,8 +152,8 @@ export function SectionFooter() {
             ))}
           </div>
         </div>
-        <div className="mt-8 border-t border-white/10 pt-8 text-[11px] leading-relaxed text-gray-400">
-          <h4 className="text-kodemono mb-2 text-xs font-semibold text-gray-400">
+        <div className="mt-8 border-t border-white/10 pt-8 font-outfit text-[11px] leading-relaxed text-white/50">
+          <h4 className="mb-2 text-xs font-semibold text-white/50">
             Risk Disclosure & Disclaimer
           </h4>
           <p>
@@ -194,9 +194,9 @@ export function SectionFooter() {
         </div>
         {/* Bottom Section */}
         <div
-          className={`text-kodemono mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 lg:flex-row`}
+          className={`mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 font-kodemono lg:flex-row`}
         >
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-white/50">
             © 2024 Rthmn. All rights reserved.
           </p>
 

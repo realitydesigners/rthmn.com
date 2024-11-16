@@ -41,7 +41,7 @@ export default async function Account() {
               />
             </div>
             <div className="text-center sm:text-left">
-              <h2 className="text-outfit text-gray-gradient relative z-10 text-4xl font-bold leading-tight tracking-tight lg:text-5xl">
+              <h2 className="text-gray-gradient relative z-10 font-outfit text-4xl font-bold leading-tight tracking-tight lg:text-5xl">
                 {user.user_metadata?.full_name || 'Your Profile'}
               </h2>
               <p className="mt-2 font-outfit text-lg text-zinc-400">

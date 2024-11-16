@@ -116,7 +116,7 @@ body.no-scroll {
   }
 
   .text-dark-gray {
-    @apply bg-gradient-to-b from-gray-200/50 to-gray-200/40 bg-clip-text text-transparent;
+    @apply bg-gradient-to-b from-gray-200/40 to-gray-200/30 bg-clip-text text-transparent;
   }
 
   .border-gray {

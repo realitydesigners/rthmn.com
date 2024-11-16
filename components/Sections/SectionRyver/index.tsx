@@ -57,7 +57,7 @@ export function RyverSection() {
                 RTHMN
               </h1>
               <h1
-                className={`heading-text text-russo text-6xl font-bold leading-none tracking-wide lg:text-8xl`}
+                className={`heading-text font-russo text-6xl font-bold leading-none tracking-wide lg:text-8xl`}
               >
                 RYVER
               </h1>

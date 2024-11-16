@@ -78,7 +78,7 @@ export function SignalSidebar() {
               {signal.start_price}
             </p>
           </div>
-          <div className={`text-russo text-2xl font-bold text-white/50`}>
+          <div className={`font-russo text-2xl font-bold text-white/50`}>
             {pairName}
           </div>
         </div>
@@ -109,7 +109,7 @@ export function SignalSidebar() {
       >
         <div className="flex flex-1 flex-row items-center justify-between p-2 text-xs">
           <div
-            className={`text-russo mr-2.5 w-[70px] text-base font-bold text-white/50`}
+            className={`mr-2.5 w-[70px] font-russo text-base font-bold text-white/50`}
           >
             {pairName}
           </div>
