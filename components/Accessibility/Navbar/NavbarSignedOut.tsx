@@ -9,6 +9,7 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { MotionDiv } from '@/components/MotionDiv';
 import { NavButton } from '@/components/Buttons/NavButton';
 import { LogoIcon, MenuIcon } from '@/components/Accessibility/Icons/icons';
+import { allLinks, LinkItem } from './allLinks';
 
 interface NavbarSignedOutProps {
   user: User | null;
@@ -24,21 +25,17 @@ const Links = () => {
   return (
     <div className="group relative">
       <div className="flex">
-        <NavButton href="/" onMouseEnter={() => setActiveDropdown('plans')}>
+        <NavButton href="/" onMouseEnter={() => setActiveDropdown('pricing')}>
           Plans
         </NavButton>
-        <NavButton
-          href="/"
-          onMouseEnter={() => setActiveDropdown('how-it-works')}
-        >
-          How it works
+        <NavButton href="/" onMouseEnter={() => setActiveDropdown('company')}>
+          Company
         </NavButton>
         <NavButton href="/" onMouseEnter={() => setActiveDropdown('features')}>
           Features
         </NavButton>
-
-        <NavButton href="/" onMouseEnter={() => setActiveDropdown('community')}>
-          Community
+        <NavButton href="/" onMouseEnter={() => setActiveDropdown('resources')}>
+          Resources
         </NavButton>
       </div>
       <DesktopMenuContent
@@ -108,7 +105,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       )}
 
       <MotionDiv
-        className={`text-kodemono fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent lg:h-20`}
+        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent font-mono lg:h-20`}
         initial="hidden"
         animate="visible"
         variants={navVariants}
@@ -122,7 +119,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               <div className="flex h-8 w-8 items-center">
                 <LogoIcon />
               </div>
-              <div className={`text-oxanium text-2xl font-bold`}>RTHMN</div>
+              <div className={`font-russo text-2xl font-bold`}>RTHMN</div>
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -181,7 +178,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       <AnimatePresence>
         {isNavOpen && (
           <MotionDiv
-            className={`text-kodemono fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 backdrop-blur-sm lg:hidden`}
+            className={`fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 font-mono backdrop-blur-sm lg:hidden`}
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -100 }}
@@ -233,11 +230,12 @@ interface MenuModalProps {
 const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
   title,
   desc,
+  href,
   icon: Icon,
   className
 }) => (
   <Link
-    href="#"
+    href={href}
     className={`${styles.dropdownLink} ${className || ''}`}
     role="menuitem"
   >
@@ -315,7 +313,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             </div>
           </div>
         );
-      case 'plans':
+      case 'pricing':
         return (
           <div
             className={`${styles.dropdownContent} ${styles.dropdownPricing}`}
@@ -338,7 +336,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             </div>
           </div>
         );
-      case 'account':
+      case 'company':
         return (
           <div
             className={`${styles.dropdownContent} ${styles.dropdownAccount}`}
@@ -388,14 +386,14 @@ export const MobileMenuContent = () => {
     <div className="relative z-[100] grid grid-cols-2 gap-8 pt-8">
       {allLinks.map((item) => (
         <div key={item.title} className="flex flex-col">
-          <h2 className={`text-kodemono mb-2 text-lg font-bold text-[#555]`}>
+          <h2 className={`mb-2 font-mono text-lg font-bold text-[#555]`}>
             {item.title}
           </h2>
           {item.links.map((link) => (
             <Link
               key={link.title}
               href="/"
-              className={`heading-text text-kodemono py-2 text-base font-bold`}
+              className={`heading-text py-2 font-mono text-base font-bold`}
             >
               {link.title}
             </Link>
@@ -405,96 +403,3 @@ export const MobileMenuContent = () => {
     </div>
   );
 };
-
-import type { IconType } from 'react-icons';
-import {
-  FaSignal,
-  FaChartLine,
-  FaCrown,
-  FaBlog,
-  FaBook,
-  FaCode,
-  FaCompass,
-  FaUser,
-  FaCog,
-  FaCreditCard
-} from 'react-icons/fa';
-
-export interface LinkItem {
-  title: string;
-  desc?: string;
-  icon: IconType;
-}
-
-export interface LinkGroup {
-  title: string;
-  links: LinkItem[];
-}
-
-export const allLinks: LinkGroup[] = [
-  {
-    title: 'Pricing',
-    links: [
-      {
-        title: 'Signal Service',
-        desc: 'Real-time market signals for informed trading decisions',
-        icon: FaSignal
-      },
-      {
-        title: 'Premium Signals',
-        desc: 'Advanced signals with higher accuracy and frequency',
-        icon: FaChartLine
-      },
-      {
-        title: 'Elite Membership',
-        desc: 'Exclusive access to all features and personalized support',
-        icon: FaCrown
-      }
-    ]
-  },
-  {
-    title: 'Resources',
-    links: [
-      {
-        title: 'Blog',
-        desc: 'Latest insights and trading strategies',
-        icon: FaBlog
-      },
-      {
-        title: 'Documentation',
-        desc: 'Comprehensive guides for using our platform',
-        icon: FaBook
-      },
-      {
-        title: 'API',
-        desc: 'Integrate our services into your applications',
-        icon: FaCode
-      },
-      {
-        title: 'Support',
-        desc: 'Support for all your needs',
-        icon: FaCompass
-      }
-    ]
-  },
-  {
-    title: 'Account',
-    links: [
-      {
-        title: 'Profile',
-        desc: 'Manage your personal information',
-        icon: FaUser
-      },
-      {
-        title: 'Settings',
-        desc: 'Customize your trading environment',
-        icon: FaCog
-      },
-      {
-        title: 'Billing',
-        desc: 'View and manage your subscription',
-        icon: FaCreditCard
-      }
-    ]
-  }
-];

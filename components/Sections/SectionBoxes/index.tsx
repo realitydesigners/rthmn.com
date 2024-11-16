@@ -32,7 +32,7 @@ const FeatureTags = () => (
         <div className="items-centergap-1.5 relative flex">
           <div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur transition-opacity duration-500 group-hover:opacity-100" />
           <feature.icon className="relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4" />
-          <span className="text-kodemono text-white/60 transition-colors duration-300 group-hover:text-white">
+          <span className="font-mono text-white/60 transition-colors duration-300 group-hover:text-white">
             {feature.text}
           </span>
         </div>
@@ -158,19 +158,19 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24">
           <div className="flex flex-col justify-center">
-            <div className="text-kodemono mb-4 flex items-center gap-3 text-xs tracking-wider text-white/60 sm:mb-6 sm:text-sm">
+            <div className="mb-4 flex items-center gap-3 font-mono text-xs tracking-wider text-white/60 sm:mb-6 sm:text-sm">
               <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent sm:w-12" />
               MARKET INTELLIGENCE SYSTEM
               <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent sm:w-12" />
             </div>
 
-            <h2 className="text-outfit text-gray-gradient mb-4 text-4xl font-bold leading-tight tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl">
+            <h2 className="text-gray-gradient mb-4 font-outfit text-4xl font-bold leading-tight tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl">
               Natural Pattern
               <br />
               Recognition
             </h2>
 
-            <p className="text-kodemono mb-8 text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
+            <p className="mb-8 font-mono text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
               Discover hidden market patterns through advanced mathematics.
             </p>
 

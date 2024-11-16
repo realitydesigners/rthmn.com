@@ -5,35 +5,35 @@ export const ChangelogTemplate: PortableTextComponents = {
   block: {
     normal: ({ children }) => (
       <div className="mb-4">
-        <p className={`text-outfit text-base leading-relaxed text-gray-300`}>
+        <p className={`font-mono text-base leading-relaxed text-white/60`}>
           {children}
         </p>
       </div>
     ),
     h1: ({ children }) => (
       <h1
-        className={`text-outfit mb-6 text-3xl font-bold leading-relaxed text-white`}
+        className={`mb-6 font-mono text-3xl font-bold leading-relaxed text-white/60`}
       >
         {children}
       </h1>
     ),
     h2: ({ children }) => (
       <h2
-        className={`text-outfit mb-4 text-2xl font-bold leading-relaxed text-white`}
+        className={`mb-4 font-mono text-2xl font-bold leading-relaxed text-white`}
       >
         {children}
       </h2>
     ),
     h3: ({ children }) => (
       <h3
-        className={`text-outfit mb-3 text-xl font-bold leading-relaxed text-white`}
+        className={`mb-3 font-mono text-xl font-bold leading-relaxed text-white`}
       >
         {children}
       </h3>
     ),
     h4: ({ children }) => (
       <h4
-        className={`text-outfit mb-2 text-lg font-bold leading-relaxed text-white`}
+        className={`mb-2 font-mono text-lg font-bold leading-relaxed text-white`}
       >
         {children}
       </h4>
@@ -41,13 +41,13 @@ export const ChangelogTemplate: PortableTextComponents = {
   },
   list: {
     bullet: ({ children }) => (
-      <ul className={`text-outfit mb-6 list-disc space-y-2 pl-4 text-gray-300`}>
+      <ul className={`mb-6 list-disc space-y-2 pl-4 font-mono text-white/60`}>
         {children}
       </ul>
     ),
     number: ({ children }) => (
       <ol
-        className={`text-outfit mb-6 list-decimal space-y-2 pl-4 text-gray-300`}
+        className={`mb-6 list-decimal space-y-2 pl-4 font-mono text-white/60`}
       >
         {children}
       </ol>
@@ -55,10 +55,10 @@ export const ChangelogTemplate: PortableTextComponents = {
   },
   listItem: {
     bullet: ({ children }) => (
-      <li className="leading-relaxed text-gray-300">{children}</li>
+      <li className="leading-relaxed text-white/60">{children}</li>
     ),
     number: ({ children }) => (
-      <li className="leading-relaxed text-gray-300">{children}</li>
+      <li className="leading-relaxed text-white/60">{children}</li>
     )
   },
   marks: {

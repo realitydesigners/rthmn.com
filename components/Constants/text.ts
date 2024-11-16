@@ -7,8 +7,9 @@ import {
   FaMicrochip,
   FaRobot,
   FaCube,
-  FaVectorSquare,
-  FaAtom
+  FaDna,
+  FaRocket,
+  FaInfinity
 } from 'react-icons/fa';
 
 export const ALGORITHM_FEATURES = [
@@ -253,3 +254,30 @@ export const PRACTICAL_APPLICATIONS = {
     }
   ]
 };
+
+export const BELIEFS = [
+  {
+    title: 'Quantify Everything',
+    description:
+      'Every pattern, every movement, every decision can be measured. We believe in turning intuition into data, and data into actionable insights.',
+    icon: FaChartLine
+  },
+  {
+    title: 'Infinite Scalability',
+    description:
+      'Our approach to pattern recognition works across any timeframe, from milliseconds to months, revealing the fractal nature of market movements.',
+    icon: FaInfinity
+  },
+  {
+    title: 'Beyond Trading',
+    description:
+      'While we started with financial markets, our vision extends to any system where patterns emerge. From sports to weather, everything has a rhythm.',
+    icon: FaRocket
+  },
+  {
+    title: 'Evolving Intelligence',
+    description:
+      'Our systems learn and adapt, constantly refining their understanding of market rhythms and patterns to stay ahead of changing conditions.',
+    icon: FaDna
+  }
+];
