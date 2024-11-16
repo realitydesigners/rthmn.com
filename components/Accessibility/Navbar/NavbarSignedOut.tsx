@@ -34,7 +34,7 @@ const Links = () => {
     <div className="group relative" onMouseLeave={handleMouseLeave}>
       <div className="flex font-outfit">
         <NavButton
-          href="/"
+          href="/pricing"
           onMouseEnter={() => handleMouseEnter('pricing')}
           onClick={handleLinkClick}
           custom={0}

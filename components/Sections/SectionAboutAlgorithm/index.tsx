@@ -1,11 +1,11 @@
 'use client';
+import { Card } from '@/components/Card';
 import { MotionDiv } from '@/components/MotionDiv';
 import { FaWaveSquare, FaCube, FaFingerprint, FaAtom } from 'react-icons/fa';
 import {
   ALGORITHM_CONCEPTS,
   NATURE_EXAMPLE,
-  PRACTICAL_APPLICATIONS,
-  POSITION_STATES
+  PRACTICAL_APPLICATIONS
 } from '@/components/Constants/text';
 
 export function SectionAboutAlgorithm() {
@@ -37,79 +37,22 @@ export function SectionAboutAlgorithm() {
         <div className="my-20">
           <div className="mb-16 grid gap-8 lg:grid-cols-3">
             {ALGORITHM_CONCEPTS.map((concept, index) => (
-              <MotionDiv
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="group relative overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] p-8 backdrop-blur-sm transition-all duration-300 hover:bg-white/[0.05]"
-              >
-                {/* Flowing Radial Effect */}
-                <div className="absolute inset-0">
-                  <MotionDiv
-                    className="absolute inset-0"
-                    animate={{
-                      background: [
-                        'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
-                        'radial-gradient(circle at 100% 100%, #22c55e15 0%, transparent 50%)',
-                        'radial-gradient(circle at 0% 100%, #22c55e15 0%, transparent 50%)',
-                        'radial-gradient(circle at 100% 0%, #22c55e15 0%, transparent 50%)',
-                        'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)'
-                      ]
-                    }}
-                    transition={{
-                      duration: 10,
-                      repeat: Infinity,
-                      ease: 'linear'
-                    }}
-                  />
-                </div>
-
-                {/* Enhanced Dynamic Background */}
-                <div className="absolute inset-0 opacity-10">
-                  <MotionDiv
-                    className="absolute inset-0 opacity-10"
-                    animate={{
-                      backgroundPosition: ['0% 0%', '100% 100%'],
-                      opacity: [0.5, 0.8]
-                    }}
-                    transition={{
-                      duration: 10,
-                      repeat: Infinity,
-                      repeatType: 'reverse'
-                    }}
-                    style={{
-                      position: 'absolute',
-                      inset: 0,
-                      backgroundImage:
-                        'radial-gradient(circle at center, #22c55e33, transparent)',
-                      filter: 'blur(40px)'
-                    }}
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="relative z-10">
-                  <div className="mb-4 flex items-center gap-2">
-                    <div className="rounded-xl bg-white/5 p-3 backdrop-blur-sm">
-                      <concept.icon className="h-6 w-6 text-white transition-colors group-hover:text-white" />
-                    </div>
-                    <h3 className="font-outfit text-2xl font-semibold text-white/90">
-                      {concept.title}
-                    </h3>
+              <Card key={index} color="#22c55e" index={index}>
+                <div className="mb-4 flex items-center gap-2">
+                  <div className="rounded-xl bg-white/5 p-3 backdrop-blur-sm">
+                    <concept.icon className="h-6 w-6 text-white transition-colors group-hover:text-white" />
                   </div>
-                  <p className="font-kodemono text-white/60">
-                    {concept.description}
-                  </p>
+                  <h3 className="font-outfit text-2xl font-semibold text-white/90">
+                    {concept.title}
+                  </h3>
                 </div>
-
-                {/* Enhanced Hover Effect with green */}
-                <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                  <div className="h-full w-full bg-gradient-to-br from-[#22c55e]/[0.02] to-transparent" />
-                </div>
-              </MotionDiv>
+                <p className="font-kodemono text-white/60">
+                  {concept.description}
+                </p>
+              </Card>
             ))}
           </div>
+
           <div className="relative my-20 flex flex-col justify-center px-4 lg:px-[10vw]">
             <h3 className="mb-8 font-outfit text-3xl font-semibold text-white/90">
               {NATURE_EXAMPLE.title}

@@ -35,7 +35,7 @@ export const allLinks: LinkGroup[] = [
       {
         title: 'Signal Service',
         desc: 'Real-time market signals for informed trading decisions',
-        href: '/',
+        href: '/pricing',
         icon: FaSignal
       },
       {
