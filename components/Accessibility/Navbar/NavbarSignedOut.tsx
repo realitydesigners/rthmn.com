@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import { AnimatePresence } from 'framer-motion';
 import { User } from '@supabase/supabase-js';
@@ -26,27 +26,69 @@ const Links = () => {
     setActiveDropdown(null);
   };
 
+  const handleLinkClick = () => {
+    setActiveDropdown(null);
+  };
+
   return (
-    <div className="group relative">
+    <div className="group relative" onMouseLeave={handleMouseLeave}>
       <div className="flex font-outfit">
-        <NavButton href="/" onMouseEnter={() => handleMouseEnter('pricing')}>
+        <NavButton
+          href="/"
+          onMouseEnter={() => handleMouseEnter('pricing')}
+          onClick={handleLinkClick}
+          custom={0}
+        >
           Pricing
         </NavButton>
-        <NavButton href="/" onMouseEnter={() => handleMouseEnter('company')}>
+        <NavButton
+          href="/"
+          onMouseEnter={() => handleMouseEnter('company')}
+          onClick={handleLinkClick}
+          custom={1}
+        >
           Company
         </NavButton>
-        <NavButton href="/" onMouseEnter={() => handleMouseEnter('features')}>
-          Features
-        </NavButton>
-        <NavButton href="/" onMouseEnter={() => handleMouseEnter('resources')}>
+        <NavButton
+          href="/"
+          onMouseEnter={() => handleMouseEnter('resources')}
+          onClick={handleLinkClick}
+          custom={3}
+        >
           Resources
         </NavButton>
       </div>
       <DesktopMenuContent
         activeDropdown={activeDropdown}
+        onMouseEnter={() => {}}
         onMouseLeave={handleMouseLeave}
+        onLinkClick={handleLinkClick}
       />
     </div>
+  );
+};
+
+const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
+  title,
+  desc,
+  href,
+  icon: Icon,
+  className
+}) => {
+  return (
+    <Link
+      href={href}
+      className={`${styles.dropdownLink} ${className || ''}`}
+      role="menuitem"
+    >
+      <div className={styles.dropdownLinkIcon}>
+        <Icon className={styles.icon} />
+      </div>
+      <div className={styles.dropdownLinkContent}>
+        <div className={styles.dropdownLinkTitle}>{title}</div>
+        <div className={styles.dropdownLinkDesc}>{desc}</div>
+      </div>
+    </Link>
   );
 };
 
@@ -147,7 +189,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     />
                     <button
                       type="submit"
-                      className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                      className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
                       <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                         Sign out
@@ -157,7 +199,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 ) : (
                   <Link
                     href="/signin"
-                    className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                    className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
                     <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium">
                       Sign in
@@ -200,9 +242,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     />
                     <button
                       type="submit"
-                      className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                      className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
-                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
+                      <span className="py flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 text-sm font-medium">
                         Sign out
                       </span>
                     </button>
@@ -210,7 +252,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 ) : (
                   <Link
                     href="/signin"
-                    className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                    className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
                     <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                       Sign in
@@ -225,40 +267,19 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     </>
   );
 }
-
 interface MenuModalProps {
   activeDropdown: string | null;
   onMouseEnter: () => void;
   onMouseLeave: () => void;
+  onLinkClick: () => void;
 }
 
-const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
-  title,
-  desc,
-  href,
-  icon: Icon,
-  className
-}) => (
-  <Link
-    href={href}
-    className={`${styles.dropdownLink} ${className || ''}`}
-    role="menuitem"
-  >
-    <div className={styles.dropdownLinkIcon}>
-      <Icon className={styles.icon} />
-    </div>
-    <div className={styles.dropdownLinkContent}>
-      <div className={styles.dropdownLinkTitle}>{title}</div>
-      <div className={styles.dropdownLinkDesc}>{desc}</div>
-    </div>
-  </Link>
-);
-
-export const DesktopMenuContent: React.FC<MenuModalProps> = ({
+export const DesktopMenuContent = ({
   activeDropdown,
   onMouseEnter,
-  onMouseLeave
-}) => {
+  onMouseLeave,
+  onLinkClick
+}: MenuModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -299,9 +320,10 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
       case 'pricing':
         return (
           <div
-            className={`${styles.dropdownContent} ${styles.dropdownPricing} font-outfit`}
-            onMouseEnter={() => {}}
+            className={`${styles.dropdownContent} w-[750px] font-outfit`}
+            onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onClick={onLinkClick}
           >
             <MotionDiv
               className="flex w-1/2 flex-col gap-2"
@@ -311,7 +333,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             >
               {group.links.map((item, index) => (
                 <MotionDiv key={item.title} variants={itemVariants}>
-                  <DropdownLink {...item} className={styles.dropdownItem} />
+                  <DropdownLink {...item} />
                 </MotionDiv>
               ))}
             </MotionDiv>
@@ -324,9 +346,10 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
       case 'company':
         return (
           <div
-            className={`${styles.dropdownContent} ${styles.dropdownAccount} font-outfit`}
-            onMouseEnter={() => {}}
+            className={`${styles.dropdownContent} w-[600px] font-outfit`}
+            onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onClick={onLinkClick}
           >
             <div className="w-1/3 bg-[#181818]" />
             <MotionDiv
@@ -337,43 +360,20 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             >
               {group.links.map((item, index) => (
                 <MotionDiv key={item.title} variants={itemVariants}>
-                  <DropdownLink {...item} className={styles.dropdownItem} />
+                  <DropdownLink {...item} />
                 </MotionDiv>
               ))}
             </MotionDiv>
           </div>
         );
-      case 'features':
-        return (
-          <div
-            className={`${styles.dropdownContent} ${styles.dropdownResources} font-outfit`}
-            onMouseEnter={() => {}}
-            onMouseLeave={onMouseLeave}
-          >
-            <MotionDiv
-              className="flex w-1/2 flex-col gap-2"
-              variants={contentVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              {group.links.map((item, index) => (
-                <MotionDiv key={item.title} variants={itemVariants}>
-                  <DropdownLink {...item} className={styles.dropdownItem} />
-                </MotionDiv>
-              ))}
-            </MotionDiv>
-            <div className="flex w-1/2 flex-col gap-2">
-              <div className="h-full w-full bg-[#181818]" />
-              <div className="h-full w-full bg-[#181818]" />
-            </div>
-          </div>
-        );
+
       case 'resources':
         return (
           <div
-            className={`${styles.dropdownContent} ${styles.dropdownResources} font-outfit`}
-            onMouseEnter={() => {}}
+            className={`${styles.dropdownContent} w-[700px] font-outfit`}
+            onMouseEnter={onMouseEnter}
             onMouseLeave={onMouseLeave}
+            onClick={onLinkClick}
           >
             <MotionDiv
               className="flex w-1/2 flex-col gap-2"
@@ -383,7 +383,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
             >
               {group.links.map((item, index) => (
                 <MotionDiv key={item.title} variants={itemVariants}>
-                  <DropdownLink {...item} className={styles.dropdownItem} />
+                  <DropdownLink {...item} />
                 </MotionDiv>
               ))}
             </MotionDiv>
@@ -402,7 +402,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
     <AnimatePresence>
       {isVisible && (
         <MotionDiv
-          className={`${styles.dropdownContainer} ${activeDropdown ? styles.active : styles.inactive}`}
+          className={`fixed left-0 right-0 z-50 flex justify-center ${activeDropdown ? styles.active : styles.inactive}`}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
           variants={dropdownVariants}
@@ -410,9 +410,7 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
           animate="visible"
           exit="exit"
         >
-          <div className={styles.dropdownWrapper}>
-            {renderDropdownContent()}
-          </div>
+          {renderDropdownContent()}
         </MotionDiv>
       )}
     </AnimatePresence>
@@ -421,17 +419,15 @@ export const DesktopMenuContent: React.FC<MenuModalProps> = ({
 
 export const MobileMenuContent = () => {
   return (
-    <div className="relative z-[100] grid grid-cols-2 gap-8 pt-8">
+    <div className="relative z-[100] grid grid-cols-2 gap-8 pt-8 font-outfit">
       {allLinks.map((item) => (
         <div key={item.title} className="flex flex-col">
-          <h2 className={`mb-2 font-mono text-lg font-bold text-[#555]`}>
-            {item.title}
-          </h2>
+          <h2 className={`mb-2 text-lg text-[#555]`}>{item.title}</h2>
           {item.links.map((link) => (
             <Link
               key={link.title}
               href="/"
-              className={`heading-text py-2 font-mono text-base font-bold`}
+              className={`heading-text py-2 font-mono text-xl font-bold`}
             >
               {link.title}
             </Link>
