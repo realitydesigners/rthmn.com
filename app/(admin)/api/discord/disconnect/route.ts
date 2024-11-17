@@ -1,15 +1,10 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { Client, GatewayIntentBits } from 'discord.js';
-
-const discord = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
-});
-
-discord.login(process.env.DISCORD_BOT_TOKEN);
+import { getDiscordClient } from '@/utils/discord/client';
 
 export async function POST(request: Request) {
   try {
+    const discord = await getDiscordClient();
     const { discord_user_id } = await request.json();
 
     const guild = await discord.guilds.fetch(process.env.DISCORD_GUILD_ID!);
