@@ -1,47 +1,12 @@
-.dropdownContainer {
-  position: fixed;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  z-index: 50;
-  perspective: 1000px;
-}
-
-.dropdownWrapper {
-  border-radius: 0.75rem;
-  overflow: block;
-  box-shadow: 0 25px 50px -12px rgb(0, 0, 0);
-  transition: all 0.3s ease;
-  transform-style: preserve-3d;
-}
-
 .dropdownContent {
   display: flex;
   gap: 0.5rem;
   padding: 0.5rem;
-  margin-top: 1rem;
   border-radius: 0.5rem;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(50px);
   background: rgba(0, 0, 0, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transform-style: preserve-3d;
-}
-
-.dropdownResources,
-.dropdownPricing,
-.dropdownAccount {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.dropdownResources {
-  width: 700px;
-}
-.dropdownPricing {
-  width: 800px;
-}
-.dropdownAccount {
-  width: 600px;
 }
 
 .dropdownLink {
@@ -119,37 +84,6 @@
   color: rgba(255, 255, 255, 0.8);
 }
 
-.dropdownItemResources,
-.dropdownItemPricing,
-.dropdownItemAccount {
-  opacity: 0;
-  animation-fill-mode: forwards;
-  animation-duration: 0.3s;
-  animation-timing-function: ease-out;
-}
-
-.dropdownItemResources {
-  animation-name: slideIn;
-}
-.dropdownItemPricing {
-  animation-name: scaleIn;
-}
-.dropdownItemAccount {
-  animation-name: fadeIn;
-}
-
-.animateItem0 {
-  animation-delay: 0s;
-}
-.animateItem1 {
-  animation-delay: 0.1s;
-}
-.animateItem2 {
-  animation-delay: 0.2s;
-}
-.animateItem3 {
-  animation-delay: 0.3s;
-}
 
 @keyframes fadeIn {
   from {

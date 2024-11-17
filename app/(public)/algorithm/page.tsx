@@ -77,20 +77,20 @@ const AlgorithmPage = () => {
               className="mb-8"
             >
               <div
-                className={`text-kodemono mb-6 flex items-center gap-3 text-sm tracking-wider text-white/60`}
+                className={`font-kodemonomb-6 flex items-center gap-3 text-sm tracking-wider text-white/60`}
               >
                 <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 THE TECHNOLOGY
                 <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               </div>
               <h1
-                className={`text-outfit bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-6xl font-bold tracking-tight text-transparent lg:text-7xl`}
+                className={`bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl`}
               >
                 The Algorithm
               </h1>
             </MotionDiv>
             <p
-              className={`text-kodemono mx-auto max-w-3xl text-lg leading-relaxed text-white/60`}
+              className={`font-kodemonomx-auto max-w-3xl text-lg leading-relaxed text-white/60`}
             >
               At the heart of Rthmn lies a revolutionary approach to market
               analysis. Our algorithm decodes market structure through the lens
@@ -107,13 +107,13 @@ const AlgorithmPage = () => {
           <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
             {/* Left Column - Technical Specs */}
             <div className="space-y-8">
-              <h2 className={`text-outfit text-3xl font-bold text-white`}>
+              <h2 className={`font-outfit text-3xl font-bold text-white`}>
                 Technical Specifications
               </h2>
               <div className="space-y-6">
                 <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                   <h3
-                    className={`text-kodemono mb-4 text-xl font-semibold text-white/90`}
+                    className={`font-kodemonomb-4 text-xl font-semibold text-white/90`}
                   >
                     Processing Architecture
                   </h3>
@@ -125,7 +125,7 @@ const AlgorithmPage = () => {
                 </div>
                 <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                   <h3
-                    className={`text-kodemono mb-4 text-xl font-semibold text-white/90`}
+                    className={`font-kodemonomb-4 text-xl font-semibold text-white/90`}
                   >
                     Pattern Recognition
                   </h3>
@@ -140,7 +140,7 @@ const AlgorithmPage = () => {
 
             {/* Right Column - Core Concepts */}
             <div className="space-y-8">
-              <h2 className={`text-outfit text-3xl font-bold text-white`}>
+              <h2 className={`font-outfit text-3xl font-bold text-white`}>
                 Core Concepts
               </h2>
               <div className="grid gap-6">
@@ -158,7 +158,7 @@ const AlgorithmPage = () => {
                       </div>
                       <div>
                         <h3
-                          className={`text-outfit mb-2 text-xl font-semibold text-white`}
+                          className={`mb-2 font-outfit text-xl font-semibold text-white`}
                         >
                           {concept.title}
                         </h3>
@@ -178,14 +178,14 @@ const AlgorithmPage = () => {
         <div className="mx-auto max-w-7xl px-8">
           <div className="mb-16 text-center">
             <div
-              className={`text-kodemono mb-6 flex items-center justify-center gap-3 text-sm tracking-wider text-white/60`}
+              className={`font-kodemonomb-6 flex items-center justify-center gap-3 text-sm tracking-wider text-white/60`}
             >
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               PERFORMANCE METRICS
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             </div>
             <h2
-              className={`text-outfit bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               Algorithm Performance
             </h2>
@@ -221,12 +221,12 @@ const AlgorithmPage = () => {
               >
                 <div className="mb-4">
                   <div
-                    className={`text-kodemono mb-1 text-4xl font-bold text-white`}
+                    className={`font-kodemonomb-1 text-4xl font-bold text-white`}
                   >
                     {item.metric}
                   </div>
                   <div
-                    className={`text-outfit text-lg font-semibold text-white/80`}
+                    className={`font-outfit text-lg font-semibold text-white/80`}
                   >
                     {item.label}
                   </div>
@@ -249,12 +249,12 @@ const AlgorithmPage = () => {
               transition={{ duration: 0.5 }}
             >
               <div
-                className={`text-kodemono mb-6 text-sm tracking-wider text-white/60`}
+                className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}
               >
                 WAVE MECHANICS
               </div>
               <h2
-                className={`text-outfit mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+                className={`mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
               >
                 Position Wave Analysis
               </h2>
@@ -284,7 +284,7 @@ const AlgorithmPage = () => {
                     className="rounded-lg border border-white/10 bg-white/5 p-6"
                   >
                     <h3
-                      className={`text-outfit mb-2 text-xl font-semibold text-white/90`}
+                      className={`mb-2 font-outfit text-xl font-semibold text-white/90`}
                     >
                       {item.title}
                     </h3>
@@ -302,7 +302,7 @@ const AlgorithmPage = () => {
             >
               <div className="absolute inset-0 -z-10 bg-gradient-to-br from-white/[0.03] to-transparent" />
               <div className="flex h-full items-center justify-center">
-                <div className={`text-kodemono text-center text-white/40`}>
+                <div className={`font-kodemonotext-center text-white/40`}>
                   [Wave Visualization Placeholder]
                 </div>
               </div>
@@ -316,14 +316,14 @@ const AlgorithmPage = () => {
         <div className="mx-auto max-w-7xl px-8">
           <div className="mb-16 text-center">
             <div
-              className={`text-kodemono mb-6 flex items-center justify-center gap-3 text-sm tracking-wider text-white/60`}
+              className={`font-kodemonomb-6 flex items-center justify-center gap-3 text-sm tracking-wider text-white/60`}
             >
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               POSITION STATES
               <div className="h-[1px] w-12 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             </div>
             <h2
-              className={`text-outfit mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               8-Dimensional Analysis
             </h2>
@@ -382,13 +382,13 @@ const AlgorithmPage = () => {
                 <div className="mb-4 flex items-center gap-4">
                   <div className="rounded-full bg-white/10 p-3">
                     <div
-                      className={`text-kodemono text-lg font-bold text-white/80`}
+                      className={`font-kodemonotext-lg font-bold text-white/80`}
                     >
                       {item.state}
                     </div>
                   </div>
                   <h3
-                    className={`text-outfit text-lg font-semibold text-white/90`}
+                    className={`font-outfit text-lg font-semibold text-white/90`}
                   >
                     {item.name}
                   </h3>
@@ -407,12 +407,12 @@ const AlgorithmPage = () => {
           <div className="grid grid-cols-1 gap-24 lg:grid-cols-2">
             <div>
               <div
-                className={`text-kodemono mb-6 text-sm tracking-wider text-white/60`}
+                className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}
               >
                 PHILOSOPHICAL FOUNDATION
               </div>
               <h2
-                className={`text-outfit mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+                className={`mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
               >
                 Beyond Traditional
                 <br />
@@ -435,7 +435,7 @@ const AlgorithmPage = () => {
                 </p>
                 <div className="mt-12 flex items-center gap-8">
                   <div className="h-[2px] w-12 bg-gradient-to-r from-white/40 to-transparent" />
-                  <span className={`text-kodemono text-white/40`}>
+                  <span className={`font-kodemonotext-white/40`}>
                     Position State Theory
                   </span>
                 </div>
@@ -447,7 +447,7 @@ const AlgorithmPage = () => {
               <div className="relative space-y-8 p-8">
                 <div>
                   <h3
-                    className={`text-outfit mb-4 text-2xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
                   >
                     The Observer Effect
                   </h3>
@@ -460,7 +460,7 @@ const AlgorithmPage = () => {
                 </div>
                 <div>
                   <h3
-                    className={`text-outfit mb-4 text-2xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
                   >
                     Energy Conservation
                   </h3>
@@ -472,7 +472,7 @@ const AlgorithmPage = () => {
                 </div>
                 <div>
                   <h3
-                    className={`text-outfit mb-4 text-2xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
                   >
                     Deterministic Chaos
                   </h3>
@@ -494,12 +494,12 @@ const AlgorithmPage = () => {
         <div className="mx-auto max-w-7xl px-8">
           <div className="mx-auto max-w-3xl text-center">
             <div
-              className={`text-kodemono mb-6 text-sm tracking-wider text-white/60`}
+              className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}
             >
               MARKET MECHANICS
             </div>
             <h2
-              className={`text-outfit mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               The Mathematics of Markets
             </h2>
@@ -516,7 +516,7 @@ const AlgorithmPage = () => {
               <div className="absolute -inset-px rounded-lg bg-gradient-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100" />
               <div className="relative">
                 <h3
-                  className={`text-outfit mb-6 text-3xl font-semibold text-white/90`}
+                  className={`mb-6 font-outfit text-3xl font-semibold text-white/90`}
                 >
                   Core Position State Mathematics
                 </h3>
@@ -524,11 +524,11 @@ const AlgorithmPage = () => {
                   <div className="space-y-6">
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`text-kodemono mb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-white/40`}
                       >
                         Position State Evolution
                       </div>
-                      <div className={`text-kodemono text-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-white/80`}>
                         P(t+1) = ∑[P(t) × W(s)] + ε
                       </div>
                       <div className="mt-4 text-sm text-white/60">
@@ -543,11 +543,11 @@ const AlgorithmPage = () => {
 
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`text-kodemono mb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-white/40`}
                       >
                         Wave Propagation Function
                       </div>
-                      <div className={`text-kodemono text-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-white/80`}>
                         ψ(p,t) = A·sin(kp - ωt + φ)
                       </div>
                       <div className="mt-4 text-sm text-white/60">
@@ -565,11 +565,11 @@ const AlgorithmPage = () => {
                   <div className="space-y-6">
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`text-kodemono mb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-white/40`}
                       >
                         Energy Conservation Law
                       </div>
-                      <div className={`text-kodemono text-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-white/80`}>
                         E = ∑[Pi²] = constant
                       </div>
                       <div className="mt-4 text-sm text-white/60">
@@ -580,11 +580,11 @@ const AlgorithmPage = () => {
 
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`text-kodemono mb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-white/40`}
                       >
                         State Transition Probability
                       </div>
-                      <div className={`text-kodemono text-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-white/80`}>
                         T(i→j) = |⟨ψj|H|ψi⟩|²
                       </div>
                       <div className="mt-4 text-sm text-white/60">
@@ -600,7 +600,7 @@ const AlgorithmPage = () => {
             {/* Mathematical Framework Section */}
             <div className="space-y-12">
               <h3
-                className={`text-outfit text-3xl font-semibold text-white/90`}
+                className={`font-outfit text-3xl font-semibold text-white/90`}
               >
                 Understanding the Framework
               </h3>
@@ -608,7 +608,7 @@ const AlgorithmPage = () => {
               <div className="grid gap-8 lg:grid-cols-2">
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`text-outfit mb-4 text-xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
                   >
                     Step 1: Position State Space
                   </h4>
@@ -620,7 +620,7 @@ const AlgorithmPage = () => {
                       position.
                     </p>
                     <div className="rounded-lg bg-white/5 p-4">
-                      <div className={`text-kodemono text-sm`}>
+                      <div className={`font-kodemonotext-sm`}>
                         |ψ⟩ = ∑ ci|Pi⟩
                       </div>
                     </div>
@@ -629,7 +629,7 @@ const AlgorithmPage = () => {
 
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`text-outfit mb-4 text-xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
                   >
                     Step 2: Wave Propagation
                   </h4>
@@ -640,7 +640,7 @@ const AlgorithmPage = () => {
                       determines market structure.
                     </p>
                     <div className="rounded-lg bg-white/5 p-4">
-                      <div className={`text-kodemono text-sm`}>
+                      <div className={`font-kodemonotext-sm`}>
                         ∂²ψ/∂t² = v²∇²ψ
                       </div>
                     </div>
@@ -649,7 +649,7 @@ const AlgorithmPage = () => {
 
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`text-outfit mb-4 text-xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
                   >
                     Step 3: Energy Flow
                   </h4>
@@ -660,7 +660,7 @@ const AlgorithmPage = () => {
                       total energy of the system.
                     </p>
                     <div className="rounded-lg bg-white/5 p-4">
-                      <div className={`text-kodemono text-sm`}>
+                      <div className={`font-kodemonotext-sm`}>
                         H = T + V = -ℏ²/2m ∇² + V(x)
                       </div>
                     </div>
@@ -669,7 +669,7 @@ const AlgorithmPage = () => {
 
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`text-outfit mb-4 text-xl font-semibold text-white/90`}
+                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
                   >
                     Step 4: Pattern Formation
                   </h4>
@@ -680,7 +680,7 @@ const AlgorithmPage = () => {
                       strength.
                     </p>
                     <div className="rounded-lg bg-white/5 p-4">
-                      <div className={`text-kodemono text-sm`}>
+                      <div className={`font-kodemonotext-sm`}>
                         C(r) = ⟨ψ(x)ψ(x+r)⟩
                       </div>
                     </div>
@@ -698,12 +698,12 @@ const AlgorithmPage = () => {
         <div className="mx-auto max-w-7xl px-8">
           <div className="mx-auto max-w-3xl text-center">
             <div
-              className={`text-kodemono mb-6 text-sm tracking-wider text-white/60`}
+              className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}
             >
               UNDERSTANDING RTHMN
             </div>
             <h2
-              className={`text-outfit mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`mb-8 bg-gradient-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               The Algorithm Explained
             </h2>
@@ -718,7 +718,7 @@ const AlgorithmPage = () => {
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                 <h3
-                  className={`text-outfit mb-4 text-2xl font-semibold text-white/90`}
+                  className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
                 >
                   Think of Water
                 </h3>
@@ -732,7 +732,7 @@ const AlgorithmPage = () => {
 
               <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                 <h3
-                  className={`text-outfit mb-4 text-2xl font-semibold text-white/90`}
+                  className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
                 >
                   Eight Natural States
                 </h3>
@@ -746,7 +746,7 @@ const AlgorithmPage = () => {
 
               <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                 <h3
-                  className={`text-outfit mb-4 text-2xl font-semibold text-white/90`}
+                  className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
                 >
                   Energy Never Dies
                 </h3>
@@ -762,7 +762,7 @@ const AlgorithmPage = () => {
             {/* Step by Step Explanation */}
             <div className="space-y-12">
               <h3
-                className={`text-outfit text-3xl font-semibold text-white/90`}
+                className={`font-outfit text-3xl font-semibold text-white/90`}
               >
                 How It Works
               </h3>
@@ -778,13 +778,13 @@ const AlgorithmPage = () => {
                   >
                     <div className="flex items-start gap-8">
                       <div
-                        className={`text-kodemono text-3xl font-bold text-white/20`}
+                        className={`font-kodemonotext-3xl font-bold text-white/20`}
                       >
                         {item.step}
                       </div>
                       <div>
                         <h4
-                          className={`text-outfit mb-3 text-xl font-semibold text-white/90`}
+                          className={`mb-3 font-outfit text-xl font-semibold text-white/90`}
                         >
                           {item.title}
                         </h4>
@@ -801,7 +801,7 @@ const AlgorithmPage = () => {
             {/* Real World Example */}
             <div className="rounded-lg border border-white/10 bg-white/5 p-12">
               <h3
-                className={`text-outfit mb-6 text-3xl font-semibold text-white/90`}
+                className={`mb-6 font-outfit text-3xl font-semibold text-white/90`}
               >
                 A Simple Example
               </h3>

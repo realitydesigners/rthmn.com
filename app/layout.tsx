@@ -12,7 +12,8 @@ import Script from 'next/script';
 import {
   kodeMono,
   outfit,
-  oxanium
+  oxanium,
+  russo
 } from '@/components/Accessibility/Fonts/fonts';
 import { Analytics } from '@vercel/analytics/react';
 
@@ -52,7 +53,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${kodeMono.variable} ${outfit.variable} ${oxanium.variable} bg-black`}
+      className={`${kodeMono.variable} ${outfit.variable} ${oxanium.variable} ${russo.variable} bg-black`}
     >
       <GoogleTagManager gtmId="GTM-XYZ" />
       <body className="bg-black">

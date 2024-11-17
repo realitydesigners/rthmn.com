@@ -77,7 +77,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
   if (!product) return null;
 
   return (
-    <section className="relative bg-black py-20">
+    <section className="relative py-20">
       {/* Background gradients */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
       <div className="absolute inset-0 -z-10">
@@ -86,15 +86,10 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
       <div className="mx-auto max-w-2xl px-4">
         <div className="mb-16 text-center">
-          <div className="text-kodemono mb-4 flex items-center justify-center gap-3 text-xs tracking-wider text-white/60">
-            <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-            PRICING PLANS
-            <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-          </div>
-          <h1 className="text-outfit text-gray-gradient mb-4 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          <h1 className="text-gray-gradient mb-4 font-outfit text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Box Seat
           </h1>
-          <p className="text-kodemono mt-4 text-lg text-white/60">
+          <p className="text-dark-gray mt-4 text-lg">
             Discord Community Access with a fully integrated Rthmn Dashboard
             Experience and access to latest builds + new indicators.
           </p>
@@ -108,7 +103,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
           <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm">
             <div className="flex flex-col gap-6 p-8">
               <div>
-                <h2 className="text-xl font-semibold text-white">
+                <h2 className="text-gray-gradient text-xl font-semibold">
                   {product.name}
                 </h2>
                 <p className="mt-2 text-sm text-white/60">

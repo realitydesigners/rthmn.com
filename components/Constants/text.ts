@@ -7,8 +7,9 @@ import {
   FaMicrochip,
   FaRobot,
   FaCube,
-  FaVectorSquare,
-  FaAtom
+  FaDna,
+  FaRocket,
+  FaInfinity
 } from 'react-icons/fa';
 
 export const ALGORITHM_FEATURES = [
@@ -253,3 +254,78 @@ export const PRACTICAL_APPLICATIONS = {
     }
   ]
 };
+
+export const BELIEFS = [
+  {
+    title: 'Quantify Everything',
+    description:
+      'Every pattern, every movement, every decision can be measured. We believe in turning intuition into data, and data into actionable insights.',
+    icon: FaChartLine,
+    keyPoints: [
+      'Pattern Recognition',
+      'Data Visualization',
+      'Algorithmic Analysis'
+    ],
+
+    color: '#22c55e',
+    stats: {
+      value: '100K+',
+      label: 'Data points analyzed per second'
+    },
+    tags: ['Analytics', 'Machine Learning', 'Real-time Processing']
+  },
+  {
+    title: 'Infinite Scalability',
+    description:
+      'Our approach to pattern recognition works across any timeframe, from milliseconds to months, revealing the fractal nature of market movements.',
+    icon: FaInfinity,
+    keyPoints: [
+      'Multi-timeframe Analysis',
+      'Fractal Patterns',
+      'Recursive Algorithms'
+    ],
+
+    color: '#6366f1',
+    stats: {
+      value: '8',
+      label: 'Dimensional market tracking'
+    },
+    tags: ['Scalability', 'Fractals', 'Pattern Recognition']
+  },
+  {
+    title: 'Beyond Trading',
+    description:
+      'While we started with financial markets, our vision extends to any system where patterns emerge. From sports to weather, everything has a rhythm.',
+    icon: FaRocket,
+    keyPoints: [
+      'Universal Patterns',
+      'Cross-domain Applications',
+      'Pattern Transfer'
+    ],
+
+    color: '#ec4899',
+    stats: {
+      value: '∞',
+      label: 'Potential applications'
+    },
+    tags: ['Innovation', 'Research', 'Future Tech']
+  },
+  {
+    title: 'Evolving Intelligence',
+    description:
+      'Our systems learn and adapt, constantly refining their understanding of market rhythms and patterns to stay ahead of changing conditions.',
+    icon: FaDna,
+    keyPoints: [
+      'Adaptive Learning',
+      'Dynamic Evolution',
+      'Continuous Improvement'
+    ],
+
+    color: '#f59e0b',
+    stats: {
+      value: '24/7',
+      label: 'Continuous learning & adaptation'
+    },
+    tags: ['AI', 'Evolution', 'Adaptation']
+  }
+];

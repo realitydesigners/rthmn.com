@@ -58,7 +58,7 @@ const MarketHeading = () => (
     transition={{ duration: 0.8 }}
     className="text-center lg:pl-32 lg:text-left"
   >
-    <h2 className="text-outfit relative z-10 bg-gradient-to-r from-white to-white/60 bg-clip-text text-[4em] font-bold leading-[1em] tracking-tight text-transparent sm:text-[5em] lg:text-[7em] lg:leading-[1em]">
+    <h2 className="relative z-10 bg-gradient-to-r from-white to-white/60 bg-clip-text font-outfit text-[4em] font-bold leading-[1em] tracking-tight text-transparent sm:text-[5em] lg:text-[7em] lg:leading-[1em]">
       Trading
       <br />
       Simplified

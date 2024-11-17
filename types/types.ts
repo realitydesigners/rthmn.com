@@ -205,3 +205,23 @@ export interface BoxData {
   value: number;
   changeToTime?: string;
 }
+
+export interface ChangelogEntry {
+  _id: string;
+  title: string;
+  description: string;
+  version: string;
+  releaseDate: string;
+  type: 'feature' | 'bugfix' | 'improvement' | 'breaking';
+  content: any[];
+  status: 'planned' | 'in-development' | 'released';
+  contributors?: {
+    _id: string;
+    name: string;
+    image: {
+      asset: {
+        url: string;
+      };
+    };
+  }[];
+}
