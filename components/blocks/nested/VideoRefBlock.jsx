@@ -1,3 +1,5 @@
+import React from 'react';
+
 const YouTubeEmbed = ({ videoUrl }) => {
   const embedUrl = `${videoUrl}?modestbranding=1&showinfo=0&rel=0&iv_load_policy=3&controls=0`;
   return (

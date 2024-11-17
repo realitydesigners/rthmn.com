@@ -1,26 +1,7 @@
-import type { IconType } from 'react-icons';
-import {
-  FaSignal,
-  FaChartLine,
-  FaCrown,
-  FaBlog,
-  FaBook,
-  FaCode,
-  FaCompass,
-  FaUser,
-  FaCog,
-  FaCreditCard,
-  FaUsers,
-  FaEnvelope,
-  FaHandshake,
-  FaBriefcase
-} from 'react-icons/fa';
-
 export interface LinkItem {
   title: string;
   desc?: string;
   href: string;
-  icon: IconType;
 }
 
 export interface LinkGroup {
@@ -35,20 +16,17 @@ export const allLinks: LinkGroup[] = [
       {
         title: 'Signal Service',
         desc: 'Real-time market signals for informed trading decisions',
-        href: '/pricing',
-        icon: FaSignal
+        href: '/pricing'
       },
       {
         title: 'Premium Signals',
         desc: 'Advanced signals with higher accuracy and frequency',
-        href: '/',
-        icon: FaChartLine
+        href: '/pricing'
       },
       {
         title: 'Elite Membership',
         desc: 'Exclusive access to all features and personalized support',
-        href: '/',
-        icon: FaCrown
+        href: '/pricing'
       }
     ]
   },
@@ -58,44 +36,17 @@ export const allLinks: LinkGroup[] = [
       {
         title: 'About',
         desc: 'Learn about our mission and values',
-        href: '/about',
-        icon: FaCompass
+        href: '/about'
       },
       {
         title: 'Team',
         desc: 'Meet the minds behind our signals',
-        href: '/',
-        icon: FaUsers
+        href: '/about'
       },
-
       {
         title: 'Contact',
         desc: 'Get in touch with our support team',
-        href: '/',
-        icon: FaEnvelope
-      }
-    ]
-  },
-  {
-    title: 'Features',
-    links: [
-      {
-        title: 'Profile',
-        desc: 'Manage your personal information',
-        href: '/',
-        icon: FaUser
-      },
-      {
-        title: 'Settings',
-        desc: 'Customize your trading environment',
-        href: '/',
-        icon: FaCog
-      },
-      {
-        title: 'Billing',
-        desc: 'View and manage your subscription',
-        href: '/',
-        icon: FaCreditCard
+        href: '/contact'
       }
     ]
   },
@@ -105,20 +56,17 @@ export const allLinks: LinkGroup[] = [
       {
         title: 'Blog',
         desc: 'Latest insights and trading strategies',
-        href: '/',
-        icon: FaBlog
+        href: '/blog'
       },
       {
-        title: 'Documentation',
+        title: 'Learn',
         desc: 'Comprehensive guides for using our platform',
-        href: '/',
-        icon: FaBook
+        href: '/'
       },
       {
         title: 'Changelog',
-        desc: 'Integrate our services into your applications',
-        href: '/changelog',
-        icon: FaCode
+        desc: 'Latest updates and improvements',
+        href: '/changelog'
       }
     ]
   }

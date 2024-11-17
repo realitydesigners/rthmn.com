@@ -72,18 +72,10 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
   title,
   desc,
   href,
-  icon: Icon,
   className
 }) => {
   return (
-    <Link
-      href={href}
-      className={`${styles.dropdownLink} ${className || ''}`}
-      role="menuitem"
-    >
-      <div className={styles.dropdownLinkIcon}>
-        <Icon className={styles.icon} />
-      </div>
+    <Link href={href} className={`${styles.dropdownLink} ${className || ''}`}>
       <div className={styles.dropdownLinkContent}>
         <div className={styles.dropdownLinkTitle}>{title}</div>
         <div className={styles.dropdownLinkDesc}>{desc}</div>
@@ -151,7 +143,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       )}
 
       <MotionDiv
-        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black to-transparent font-mono lg:h-20`}
+        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black/50 to-transparent font-mono lg:h-20`}
         initial="hidden"
         animate="visible"
         variants={navVariants}
