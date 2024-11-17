@@ -1,0 +1,11 @@
+export { default as posts } from '@/utils/sanity/schemas/posts';
+export { default as team } from '@/utils/sanity/schemas/team';
+export { default as category } from '@/utils/sanity/schemas/category';
+export { default as img } from '@/utils/sanity/schemas/img';
+export { default as video } from '@/utils/sanity/schemas/video';
+export { default as audio } from '@/utils/sanity/schemas/audio';
+export { default as glossary } from '@/utils/sanity/schemas/glossary';
+export { default as module } from '@/utils/sanity/schemas/module';
+export { default as lesson } from '@/utils/sanity/schemas/lesson';
+export { default as changelog } from '@/utils/sanity/schemas/changelog';
+export { default as marketData } from '@/utils/sanity/schemas/marketData';

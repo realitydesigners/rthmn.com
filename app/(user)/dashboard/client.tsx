@@ -1,11 +1,10 @@
 'use client';
-
 import React, { useState } from 'react';
-import SettingsBar from '@/components/SettingsBar';
+import SettingsBar from '@/components/Accessibility/SettingsBar';
 import PairGrid from '@/components/PairGrid';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { DashboardProvider } from '@/providers/DashboardProvider';
-import ConnectionBar from '@/components/ConnectionBar';
+import ConnectionBar from '@/components/Accessibility/ConnectionBar';
 import styles from './Dashboard.module.css';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {

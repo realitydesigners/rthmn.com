@@ -3,7 +3,6 @@ import Image from 'next/image';
 import Spline from '@splinetool/react-spline';
 import Link from 'next/link';
 import React from 'react';
-import { russo } from '@/fonts';
 
 const HeadingSplineBlock = ({ block }) => {
   const { className, url } = block;
@@ -31,7 +30,7 @@ const HeadingSplineBlock = ({ block }) => {
 
       const renderCategory = block.category ? (
         <span
-          className={`text-russo mr-1 h-auto items-center justify-center whitespace-nowrap bg-gray-200 p-1 pl-2 pr-2 text-xs font-semibold uppercase tracking-widest text-black`}
+          className={`mr-1 h-auto items-center justify-center whitespace-nowrap bg-gray-200 p-1 pl-2 pr-2 font-russo text-xs font-semibold uppercase tracking-widest text-black`}
         >
           {block.category.title}
         </span>
@@ -43,7 +42,7 @@ const HeadingSplineBlock = ({ block }) => {
             <div className="flex-cols flex w-11/12 flex-wrap items-center justify-between">
               <div className="flex w-auto">
                 <span
-                  className={`text-russo ml-2 w-auto text-xs uppercase tracking-widest text-gray-200`}
+                  className={`ml-2 w-auto font-russo text-xs uppercase tracking-widest text-gray-200`}
                 >
                   POSTED ON {formattedDate}
                 </span>
@@ -54,7 +53,7 @@ const HeadingSplineBlock = ({ block }) => {
             <div className="w-full flex-col lg:w-1/2">
               {block.heading && (
                 <h1
-                  className={`text-russo leading-tightest p-4 text-5xl text-gray-200 md:text-7xl`}
+                  className={`leading-tightest p-4 font-russo text-5xl text-gray-200 md:text-7xl`}
                 >
                   {block.heading}
                 </h1>
@@ -112,4 +111,4 @@ const HeadingSplineBlock = ({ block }) => {
   }
 };
 
-export default React.memo(HeadingSplineBlock);
+export default HeadingSplineBlock;

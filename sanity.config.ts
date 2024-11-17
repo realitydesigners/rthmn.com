@@ -7,8 +7,13 @@ import {
   headingBlock,
   headingSplineBlock,
   teamBlock
-} from '@/sanity/blocks/index';
-import { apiVersion, dataset, projectId, studioUrl } from '@/sanity/lib/api';
+} from '@/utils/sanity/blocks/index';
+import {
+  apiVersion,
+  dataset,
+  projectId,
+  studioUrl
+} from '@/utils/sanity/lib/api';
 import {
   audio,
   category,
@@ -21,10 +26,10 @@ import {
   module,
   lesson,
   marketData
-} from '@/sanity/schemas';
+} from '@/utils/sanity/schemas';
 
-import CustomItem from '@/sanity/ui/CustomItem';
-import CustomField from './sanity/ui/CustomField';
+import CustomItem from '@/utils/sanity/ui/CustomItem';
+import CustomField from '@/utils/sanity/ui/CustomField';
 
 const title =
   process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Reality Designers';

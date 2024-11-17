@@ -1,19 +1,19 @@
 'use client';
-
-import { SectionFeatures } from '@/components/SectionFeatures';
-import { SectionPricing } from '@/components/SectionPricing';
-import { RyverSection } from '@/components/SectionRyver';
-import { FAQSection } from '@/components/SectionFAQ';
-import { ServiceSection } from '@/components/SectionServices';
+import { BackgroundGrid } from '@/components/BackgroundGrid';
+import { SectionFeatures } from '@/components/Sections/SectionFeatures';
+import { SectionPricing } from '@/components/Sections/SectionPricing';
+import { RyverSection } from '@/components/Sections/SectionRyver';
+import { SectionFAQ } from '@/components/Sections/SectionFAQ';
+import { ServiceSection } from '@/components/Sections/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { SectionBoxes } from '@/components/SectionBoxes';
-import { SectionBlogPosts } from '@/components/SectionBlogPosts';
-import { SectionFooter } from '@/components/SectionFooter';
-import { SectionHistogram } from '@/components/SectionHistogram';
-import { SectionAboutAlgorithm } from '@/components/SectionAboutAlgorithm';
-import { SectionMarketDisplay } from '@/components/SectionMarketDisplay';
-import { SectionMarketTicker } from '@/components/SectionMarketTicker';
-import { SectionChart } from '@/components/SectionChart';
+import { SectionBoxes } from '@/components/Sections/SectionBoxes';
+import { SectionBlogPosts } from '@/components/Sections/SectionBlogPosts';
+import { SectionFooter } from '@/components/Sections/SectionFooter';
+import { SectionHistogram } from '@/components/Sections/SectionHistogram';
+import { SectionAboutAlgorithm } from '@/components/Sections/SectionAboutAlgorithm';
+import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
+import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
+import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
 
 interface MarketData {
   pair: string;
@@ -27,30 +27,6 @@ interface ClientPageProps {
   marketData: MarketData[];
 }
 
-const GridBackground = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <div className="relative min-h-screen overflow-y-hidden">
-      <div className="absolute inset-0 h-full w-full">
-        {[...Array(8 + 1)].map((_, i) => (
-          <div
-            key={`grid-x-${i}`}
-            className="absolute left-0 h-px w-full bg-white/5"
-            style={{ top: `${(i * 100) / 8}%` }}
-          />
-        ))}
-        {[...Array(8 + 1)].map((_, i) => (
-          <div
-            key={`grid-y-${i}`}
-            className="absolute top-0 h-full w-px bg-white/5"
-            style={{ left: `${(i * 100) / 8}%` }}
-          />
-        ))}
-      </div>
-      {children}
-    </div>
-  );
-};
-
 export default function ClientPage({
   posts,
   products,
@@ -59,13 +35,14 @@ export default function ClientPage({
   const { session } = useAuth();
 
   return (
-    <GridBackground>
+    <BackgroundGrid>
       <SectionMarketTicker marketData={marketData} />
       <SectionHistogram slice={null} />
       <SectionMarketDisplay marketData={marketData} />
-      <SectionChart marketData={marketData} />
+      <SectionRthmnDemo marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
+      <SectionFAQ />
       <SectionPricing
         user={session?.user}
         products={products ?? []}
@@ -73,6 +50,6 @@ export default function ClientPage({
       />
       <SectionBlogPosts initialPosts={posts} />
       <SectionFooter />
-    </GridBackground>
+    </BackgroundGrid>
   );
 }

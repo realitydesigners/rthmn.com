@@ -1,6 +1,4 @@
 'use client';
-
-import { russo, outfit } from '@/fonts';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -129,11 +127,11 @@ const HeadingBlock = ({ block }) => {
                 </div>
                 <Heading
                   heading={block.heading}
-                  className={`text-russo cursor-pointer bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
+                  className={`cursor-pointer bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 font-russo text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
                 />
                 <SubHeading
                   heading={block.subheading}
-                  className={`text-outfit bg-gradient-to-r from-blue-100/80 to-blue-100/70 bg-clip-text p-1 text-xl leading-tight text-transparent`}
+                  className={`bg-gradient-to-r from-blue-100/80 to-blue-100/70 bg-clip-text p-1 font-outfit text-xl leading-tight text-transparent`}
                 />
                 <div className="w-full">
                   <TeamSection team={block.team} theme={className} />

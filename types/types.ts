@@ -107,11 +107,6 @@ export interface TeamMember extends BaseItem {
   shortBio: string;
 }
 
-export interface MediaRef {
-  layout?: string;
-  image?: Image;
-}
-
 export interface BlockItem extends BaseItem {
   _key: string;
   heading?: string;
@@ -129,7 +124,7 @@ export interface BlockItem extends BaseItem {
     _key?: string;
     _type?: string;
     quote: string;
-    mediaRef?: MediaRef;
+    mediaRef?: any;
   };
   markDefs?: any;
   postsRef?: any;
@@ -209,4 +204,24 @@ export interface BoxData {
   low: number;
   value: number;
   changeToTime?: string;
+}
+
+export interface ChangelogEntry {
+  _id: string;
+  title: string;
+  description: string;
+  version: string;
+  releaseDate: string;
+  type: 'feature' | 'bugfix' | 'improvement' | 'breaking';
+  content: any[];
+  status: 'planned' | 'in-development' | 'released';
+  contributors?: {
+    _id: string;
+    name: string;
+    image: {
+      asset: {
+        url: string;
+      };
+    };
+  }[];
 }

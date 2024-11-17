@@ -5,25 +5,24 @@ import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
 import SplineRefBlock from '../nested/SplineRefBlock';
 import VideoRefBlock from '../nested/VideoRefBlock';
-import { outfit } from '@/fonts';
 import React from 'react';
-import { generateHeadingId } from '@/components/learn/TableOfContents';
+import { generateHeadingId } from '@/components/Accessibility/TOC';
 
 export type TemplateTheme = 'dark' | 'light';
 
 const headingStyles: Record<TemplateTheme, string> = {
-  dark: `text-outfit my-3 w-full text-white font-bold leading-none tracking-wide md:w-3/4 lg:w-1/2`,
-  light: `text-outfit my-3 w-11/12 text-black font-bold leading-none tracking-wide md:w-3/4 lg:w-1/2`
+  dark: `font-outfit my-3 w-full text-white font-bold leading-none tracking-wide md:w-3/4 lg:w-1/2`,
+  light: `font-outfit my-3 w-11/12 text-black font-bold leading-none tracking-wide md:w-3/4 lg:w-1/2`
 };
 
 const listStyles: Record<TemplateTheme, string> = {
-  dark: `text-outfit w-full text-white  leading-7 md:w-3/4 lg:w-1/2 text-xl list-decimal list-inside outfit-y-6 mb-6`,
-  light: `text-outfit w-11/12 text-black leading-7 md:w-3/4 text-xl lg:w-1/2  list-decimal list-inside outfit-y-6 mb-6`
+  dark: `font-outfit w-full text-white  leading-7 md:w-3/4 lg:w-1/2 text-xl list-decimal list-inside outfit-y-6 mb-6`,
+  light: `font-outfit w-11/12 text-black leading-7 md:w-3/4 text-xl lg:w-1/2  list-decimal list-inside outfit-y-6 mb-6`
 };
 
 const normalTextStyles: Record<TemplateTheme, string> = {
-  dark: `text-outfit w-full text-white   bg-clip-text leading-[1.4em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`,
-  light: `text-outfit text-black leading-[1.5em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`
+  dark: `font-outfit w-full text-white   bg-clip-text leading-[1.4em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`,
+  light: `font-outfit text-black leading-[1.5em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`
 };
 
 interface ChildProps {

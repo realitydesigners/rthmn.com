@@ -1,6 +1,5 @@
-import Image from 'next/image';
-import { russo } from '@/fonts';
 import React from 'react';
+import Image from 'next/image';
 
 const QuoteRefBlock = ({ quote, className, image }) => {
   if (!quote) {
@@ -28,7 +27,7 @@ const QuoteCard = ({ quote, image, className }) => {
                 />
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
                   <h4
-                    className={`text-russo flex items-center justify-center p-4 text-center text-2xl font-bold uppercase leading-none tracking-wide text-blue-100 sm:text-5xl lg:text-6xl`}
+                    className={`flex items-center justify-center p-4 text-center font-russo text-2xl font-bold uppercase leading-none tracking-wide text-blue-100 sm:text-5xl lg:text-6xl`}
                   >
                     {quote}
                   </h4>
@@ -56,7 +55,7 @@ const QuoteCard = ({ quote, image, className }) => {
                 </div>
                 <div className="z-10 h-full w-full items-center justify-center p-4">
                   <h4
-                    className={`text-russo text-center text-2xl font-bold uppercase leading-[1.2em] tracking-wide text-blue-100 lg:text-3xl`}
+                    className={`text-center font-russo text-2xl font-bold uppercase leading-[1.2em] tracking-wide text-blue-100 lg:text-3xl`}
                   >
                     {quote}
                   </h4>
@@ -82,7 +81,7 @@ const QuoteCard = ({ quote, image, className }) => {
                 />
                 <div className="absolute inset-0 z-10 flex items-center justify-center">
                   <h4
-                    className={`text-russo flex items-center justify-center p-4 text-center text-2xl font-bold uppercase leading-none tracking-wide text-blue-100 sm:text-4xl lg:text-5xl`}
+                    className={`flex items-center justify-center p-4 text-center font-russo text-2xl font-bold uppercase leading-none tracking-wide text-blue-100 sm:text-4xl lg:text-5xl`}
                   >
                     {quote}
                   </h4>
@@ -95,4 +94,4 @@ const QuoteCard = ({ quote, image, className }) => {
   }
 };
 
-export default React.memo(QuoteRefBlock);
+export default QuoteRefBlock;

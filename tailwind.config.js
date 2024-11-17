@@ -8,9 +8,9 @@ module.exports = {
         sans: 'var(--font-sans)',
         serif: 'var(--font-serif)',
         kodemono: 'var(--font-kodemono)',
-        outfit: 'var(--font-outfit)',
+        outfit: 'var(--font-outfit )',
         oxanium: 'var(--font-oxanium)',
-        russo: 'var(--font-russo)'
+        russo: 'var(--font-russo  )'
       },
       colors: {
         black: '#000'

@@ -118,7 +118,11 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
 
 export const getSignals = cache(async (supabase: SupabaseClient) => {
   try {
-    const { data: signals, error } = await supabase.from('signals').select('*');
+    // Simple query - RLS will ensure user is authenticated
+    const { data: signals, error } = await supabase
+      .from('signals')
+      .select('*')
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return signals;

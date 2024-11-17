@@ -1,9 +1,9 @@
-import Spline from "@splinetool/react-spline";
+import Spline from '@splinetool/react-spline';
 
 interface SceneProps {
-	scene: string;
+  scene: string;
 }
 
 export const Scene: React.FC<SceneProps> = ({ scene }) => {
-	return <Spline scene={scene} />;
+  return <Spline scene={scene} />;
 };
