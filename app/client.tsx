@@ -38,9 +38,9 @@ export default function ClientPage({
     <BackgroundGrid>
       <SectionMarketTicker marketData={marketData} />
       <SectionHistogram slice={null} />
-      <SectionMarketDisplay marketData={marketData} />
       <SectionRthmnDemo marketData={marketData} />
-      <SectionBoxes slice={null} />
+      <SectionMarketDisplay marketData={marketData} />
+      <SectionBoxes />
       <SectionAboutAlgorithm />
       <SectionFAQ />
       <SectionPricing
