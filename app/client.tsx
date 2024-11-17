@@ -13,7 +13,7 @@ import { SectionHistogram } from '@/components/Sections/SectionHistogram';
 import { SectionAboutAlgorithm } from '@/components/Sections/SectionAboutAlgorithm';
 import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
 import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
-import { SectionChart } from '@/components/Sections/SectionChart';
+import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
 
 interface MarketData {
   pair: string;
@@ -39,7 +39,7 @@ export default function ClientPage({
       <SectionMarketTicker marketData={marketData} />
       <SectionHistogram slice={null} />
       <SectionMarketDisplay marketData={marketData} />
-      <SectionChart marketData={marketData} />
+      <SectionRthmnDemo marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
       <SectionFAQ />

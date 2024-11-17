@@ -1,8 +1,9 @@
 'use client';
 import type React from 'react';
 import { useState } from 'react';
-import { FaQuestionCircle } from 'react-icons/fa';
+import { FaChevronDown } from 'react-icons/fa';
 import { FAQ } from '@/components/Constants/text';
+import { MotionDiv } from '@/components/MotionDiv';
 
 export const SectionFAQ: React.FC = () => {
   const [activeService, setActiveService] = useState<string | null>(null);
@@ -20,46 +21,95 @@ export const SectionFAQ: React.FC = () => {
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         </div>
 
-        <div className="mb-4 border-b border-white/5 pb-2">
-          <h2 className="text-2xl font-bold text-white/90">
+        <div className="mb-8 text-center">
+          <h2 className="bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 font-outfit text-5xl font-bold text-transparent">
             Frequently Asked Questions
           </h2>
+          <p className="mx-auto max-w-2xl text-lg text-white/60">
+            Everything you need to know about rthmn. Can't find the answer
+            you're looking for? Feel free to contact our support team.
+          </p>
         </div>
 
-        <ul className="w-full space-y-3">
+        <ul className="mx-auto max-w-4xl space-y-4">
           {FAQ.map(({ question, answer }) => (
-            <li key={question}>
-              <div
-                className={`w-full cursor-pointer rounded-lg border transition-all duration-300 ${
+            <MotionDiv
+              key={question}
+              initial={false}
+              animate={{
+                backgroundColor:
                   activeService === question
-                    ? 'border-[#22c55e]/50 bg-[#22c55e]/10'
-                    : 'border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60'
-                }`}
+                    ? 'rgba(52, 211, 153, 0.1)'
+                    : 'rgba(0, 0, 0, 0.4)'
+              }}
+              whileHover={{ scale: 1.005 }}
+              whileTap={{ scale: 0.995 }}
+              className={`w-full overflow-hidden rounded-lg border transition-all duration-300 ${
+                activeService === question
+                  ? 'border-emerald-400/50'
+                  : 'border-white/5 hover:border-white/10'
+              }`}
+            >
+              <div
+                className="flex w-full cursor-pointer items-center justify-between p-5"
+                onClick={() => handleFAQClick(question)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleFAQClick(question);
+                  }
+                }}
+                role="button"
+                tabIndex={0}
               >
-                <div
-                  className="flex w-full items-center p-4"
-                  onClick={() => handleFAQClick(question)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      handleFAQClick(question);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                >
-                  <FaQuestionCircle className="mr-3 h-5 w-5 text-[#22c55e]" />
-                  <div className="text-sm font-medium text-white/90">
+                <div className="flex items-center gap-4">
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 ${
+                      activeService === question
+                        ? 'border-emerald-400 bg-emerald-400/10'
+                        : 'border-white/10 bg-white/5'
+                    }`}
+                  >
+                    <span className="text-base font-bold text-emerald-400">
+                      Q
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-medium text-white/90">
                     {question}
+                  </h3>
+                </div>
+                <FaChevronDown
+                  className={`h-5 w-5 text-emerald-400 transition-transform duration-300 ${
+                    activeService === question ? 'rotate-180' : ''
+                  }`}
+                />
+              </div>
+
+              <MotionDiv
+                initial={false}
+                animate={{
+                  height: activeService === question ? 'auto' : 0,
+                  opacity: activeService === question ? 1 : 0
+                }}
+                transition={{
+                  duration: 0.3,
+                  ease: 'easeInOut'
+                }}
+                className="overflow-hidden"
+              >
+                <div className="border-t border-white/5 px-5 py-5">
+                  <div className="flex gap-4">
+                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 font-outfit">
+                      <span className="text-base font-bold text-white/70">
+                        A
+                      </span>
+                    </div>
+                    <p className="text-base leading-relaxed text-white/70 [text-wrap:pretty]">
+                      {answer}
+                    </p>
                   </div>
                 </div>
-
-                {activeService === question && (
-                  <div className="border-t border-white/5 px-4 py-3">
-                    <p className="text-sm text-white/70">{answer}</p>
-                  </div>
-                )}
-              </div>
-            </li>
+              </MotionDiv>
+            </MotionDiv>
           ))}
         </ul>
       </div>

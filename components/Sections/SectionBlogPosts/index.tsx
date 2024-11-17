@@ -45,48 +45,50 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
     <MotionDiv
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="group relative rounded-xl border border-white/10 bg-black/90 backdrop-blur-md"
+      className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-white/5 to-transparent p-[1px]"
     >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-      </div>
-
-      {block?.imageRef && (
-        <div className="relative h-48 w-full overflow-hidden rounded-t-xl">
-          <Image
-            src={block.imageRef.imageUrl}
-            alt={block.imageRef.imageAlt || 'Post image'}
-            fill
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+      <div className="relative h-full rounded-xl border border-white/10 bg-black/90 backdrop-blur-md">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         </div>
-      )}
 
-      <div className="flex flex-col space-y-3 p-5">
-        <FormattedDate
-          date={block?.publicationDate}
-          className="2 font-kodemono text-xs font-medium"
-        />
+        {block?.imageRef && (
+          <div className="relative h-48 w-full overflow-hidden rounded-t-xl">
+            <Image
+              src={block.imageRef.imageUrl}
+              alt={block.imageRef.imageAlt || 'Post image'}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+        )}
 
-        <Link href={`/posts/${post.slug.current}`}>
-          <h2 className="font-outfit text-xl font-bold text-white/90 transition-colors duration-200 group-hover:text-[#22c55e]">
-            {block?.heading || 'No title'}
-          </h2>
-        </Link>
+        <div className="flex flex-col space-y-3 p-5">
+          <FormattedDate
+            date={block?.publicationDate}
+            className="font-kodemono text-xs font-medium text-[#22c55e]"
+          />
 
-        <p className="line-clamp-2 font-kodemono text-sm text-white/70">
-          {block?.subheading || 'No subheading'}
-        </p>
+          <Link href={`/posts/${post.slug.current}`}>
+            <h2 className="font-outfit text-xl font-bold text-white/90 transition-colors duration-200 group-hover:text-[#22c55e]">
+              {block?.heading || 'No title'}
+            </h2>
+          </Link>
 
-        <Link
-          href={`/posts/${post.slug.current}`}
-          className="inline-flex items-center space-x-2 text-sm font-medium text-[#22c55e] transition-all duration-200 hover:text-[#22c55e]/80"
-        >
-          <span>Read More</span>
-          <FaArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-1" />
-        </Link>
+          <p className="line-clamp-2 font-kodemono text-sm text-white/70">
+            {block?.subheading || 'No subheading'}
+          </p>
+
+          <Link
+            href={`/posts/${post.slug.current}`}
+            className="inline-flex items-center space-x-2 text-sm font-medium text-[#22c55e] transition-all duration-200 hover:text-[#22c55e]/80"
+          >
+            <span>Read More</span>
+            <FaArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-1" />
+          </Link>
+        </div>
       </div>
     </MotionDiv>
   );

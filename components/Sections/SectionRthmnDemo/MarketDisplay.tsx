@@ -3,18 +3,6 @@ import { useState } from 'react';
 import { MotionDiv } from '@/components/MotionDiv';
 import { CandleData } from '@/types/types';
 
-// interface CandleData {
-//   complete: boolean;
-//   volume: number;
-//   time: string;
-//   mid: {
-//     o: string;
-//     h: string;
-//     l: string;
-//     c: string;
-//   };
-// }
-
 interface MarketData {
   pair: string;
   lastUpdated: string;
