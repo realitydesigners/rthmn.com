@@ -55,6 +55,7 @@
     "react-merge-refs": "2.1.1",
     "react-responsive": "10.0.0",
     "sanity": "^3.64.1",
+    "@sanity/vision": "^3.64.1",
     "stripe": "14.25.0",
     "styled-components": "6.1.13",
     "tailwind-merge": "2.5.4",
