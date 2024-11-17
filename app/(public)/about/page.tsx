@@ -5,6 +5,7 @@ import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { Card } from '@/components/Card';
 import { Scene } from '@/components/Scene/Scene';
 import { GlowingCard } from '@/components/GlowingCard';
+import { TeamCard } from './TeamCard';
 
 export default function AboutPage() {
   return (
@@ -90,6 +91,7 @@ export default function AboutPage() {
                 <h2 className="text-gray-gradient text-center font-outfit text-7xl font-bold">
                   The Team
                 </h2>
+                <TeamCard />
                 <div className="space-y-6 text-xl leading-[1.75em] text-white/60">
                   <p>
                     We are small team of two developers on a relentless journey
