@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { FaCog } from 'react-icons/fa';
-import { useDashboard, AVAILABLE_PAIRS } from '@/providers/DashboardProvider';
+import {
+  useDashboard,
+  FOREX_PAIRS,
+  CRYPTO_PAIRS
+} from '@/providers/DashboardProvider';
 import styles from './styles.module.css';
 import { colorPresets } from '@/utils/colorPresets';
 
@@ -56,6 +60,17 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
     }
   };
 
+  const getPairsForAsset = (asset: string) => {
+    switch (asset) {
+      case 'FOREX':
+        return FOREX_PAIRS;
+      case 'Crypto':
+        return CRYPTO_PAIRS;
+      default:
+        return [];
+    }
+  };
+
   return (
     <div
       className={`${styles.sidebar} ${isOpen ? styles.open : styles.collapsed}`}
@@ -82,10 +97,10 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
                     placeholder={`Search ${asset}`}
                     className={styles.searchInput}
                   />
-                  {/* Grid of pairs - currently only showing FOREX pairs */}
-                  {asset === 'FOREX' && (
+                  {/* Grid of pairs - show based on selected asset */}
+                  {(asset === 'FOREX' || asset === 'Crypto') && (
                     <div className={styles.pairGrid}>
-                      {AVAILABLE_PAIRS.map((pair) => (
+                      {getPairsForAsset(asset).map((pair) => (
                         <button
                           key={pair}
                           onClick={() => togglePair(pair)}

@@ -23,7 +23,7 @@ const DashboardContext = createContext<DashboardContextType | undefined>(
   undefined
 );
 
-export const AVAILABLE_PAIRS = [
+export const FOREX_PAIRS = [
   'USDJPY',
   'GBPUSD',
   'AUDUSD',
@@ -35,7 +35,20 @@ export const AVAILABLE_PAIRS = [
   'GBPCAD',
   'GBPNZD',
   'EURJPY'
-];
+] as const;
+
+export const CRYPTO_PAIRS = [
+  'BTCUSD',
+  'ETHUSD',
+  'LTCUSD',
+  'BCHUSD',
+  'PAXGUSD',
+  'LINKUSD',
+  'UNIUSD',
+  'AAVEUSD'
+] as const;
+
+export const AVAILABLE_PAIRS = [...FOREX_PAIRS, ...CRYPTO_PAIRS] as const;
 
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   children
