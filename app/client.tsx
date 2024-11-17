@@ -3,7 +3,7 @@ import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { SectionFeatures } from '@/components/Sections/SectionFeatures';
 import { SectionPricing } from '@/components/Sections/SectionPricing';
 import { RyverSection } from '@/components/Sections/SectionRyver';
-import { FAQSection } from '@/components/Sections/SectionFAQ';
+import { SectionFAQ } from '@/components/Sections/SectionFAQ';
 import { ServiceSection } from '@/components/Sections/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { SectionBoxes } from '@/components/Sections/SectionBoxes';
@@ -42,6 +42,7 @@ export default function ClientPage({
       <SectionChart marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
+      <SectionFAQ />
       <SectionPricing
         user={session?.user}
         products={products ?? []}
