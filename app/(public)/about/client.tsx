@@ -1,4 +1,6 @@
 'use client';
+import { BackgroundGrid } from '@/components/BackgroundGrid';
+import { AboutTemplate } from '@/components/blocks/templates/AboutTemplate';
 import { PortableText } from '@/components/PortableText';
 
 interface Section {
@@ -15,7 +17,7 @@ interface PageData {
 
 export default function AboutClient({ page }: { page: PageData }) {
   return (
-    <div className="flex flex-col">
+    <BackgroundGrid>
       {page.sections?.map((section, index) => (
         <section
           key={index}
@@ -25,16 +27,11 @@ export default function AboutClient({ page }: { page: PageData }) {
               : ''
           } px-6 py-16`}
         >
-          {section.sectionTitle && (
-            <h2 className="mb-8 text-3xl font-bold text-white">
-              {section.sectionTitle}
-            </h2>
-          )}
-          <div className="prose prose-invert max-w-none">
-            <PortableText value={section.content} />
+          <div className="relative z-10">
+            <PortableText value={section.content} template="about" />
           </div>
         </section>
       ))}
-    </div>
+    </BackgroundGrid>
   );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { PortableTextComponents } from '@portabletext/react';
-import { TeamCard } from '@/app/(public)/about/TeamCard';
+import { TeamCard } from '@/components/TeamCard';
+import { Scene } from '@/components/Scene/Scene';
 
 const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex w-full justify-center p-3">
@@ -16,10 +17,10 @@ const Heading: React.FC<{ children: React.ReactNode; level: number }> = ({
 }) => {
   const baseStyle = 'font-outfit text-gray-gradient font-bold tracking-wide';
   const sizes = {
-    1: 'text-4xl lg:text-5xl',
-    2: 'text-4xl lg:text-6xl',
-    3: 'text-2xl lg:text-3xl',
-    4: 'text-xl lg:text-2xl'
+    1: 'pt-12 text-4xl lg:text-7xl',
+    2: 'pt-12 text-4xl lg:text-6xl',
+    3: 'pt-12 text-2xl lg:text-3xl',
+    4: 'pt-12 text-xl lg:text-2xl'
   };
 
   return (
@@ -76,6 +77,11 @@ export const AboutTemplate: PortableTextComponents = {
     teamGrid: () => (
       <div className="w-full py-8 lg:px-[20vw]">
         <TeamCard />
+      </div>
+    ),
+    sceneBlock: ({ value }) => (
+      <div className={`w-full ${value.height || 'h-[500px]'}`}>
+        <Scene scene={value.sceneUrl} />
       </div>
     ),
     image: ({ value }) => (

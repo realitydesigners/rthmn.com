@@ -66,6 +66,10 @@ export default defineType({
                   title: 'Team Grid'
                 },
                 {
+                  type: 'sceneBlock',
+                  title: '3D Scene'
+                },
+                {
                   type: 'image',
                   title: 'Image'
                 }
@@ -100,5 +104,12 @@ export default defineType({
         }
       ]
     })
-  ]
+  ],
+  preview: {
+    prepare() {
+      return {
+        title: 'Page Content'
+      };
+    }
+  }
 });
