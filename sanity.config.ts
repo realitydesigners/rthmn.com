@@ -1,5 +1,4 @@
 'use client';
-import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import {
@@ -66,5 +65,5 @@ export default defineConfig({
       field: CustomField
     }
   },
-  plugins: [structureTool({}), visionTool({ defaultApiVersion: apiVersion })]
+  plugins: [structureTool({})]
 });

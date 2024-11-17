@@ -1,13 +1,6 @@
 import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
-import { manageDiscordAccess } from '@/utils/discord/server';
-import { Client, GatewayIntentBits } from 'discord.js';
-
-const discord = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
-});
-
-discord.login(process.env.DISCORD_BOT_TOKEN);
+import { getDiscordClient } from '@/utils/discord/client';
 
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -19,6 +12,7 @@ export async function GET(request: Request) {
   }
 
   try {
+    const discord = await getDiscordClient();
     const user = await supabase.auth.getUser();
 
     // Exchange code for Discord token and get user info
