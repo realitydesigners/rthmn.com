@@ -3,7 +3,7 @@ import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { SectionFeatures } from '@/components/Sections/SectionFeatures';
 import { SectionPricing } from '@/components/Sections/SectionPricing';
 import { RyverSection } from '@/components/Sections/SectionRyver';
-import { FAQSection } from '@/components/Sections/SectionFAQ';
+import { SectionFAQ } from '@/components/Sections/SectionFAQ';
 import { ServiceSection } from '@/components/Sections/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { SectionBoxes } from '@/components/Sections/SectionBoxes';
@@ -13,7 +13,7 @@ import { SectionHistogram } from '@/components/Sections/SectionHistogram';
 import { SectionAboutAlgorithm } from '@/components/Sections/SectionAboutAlgorithm';
 import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
 import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
-import { SectionChart } from '@/components/Sections/SectionChart';
+import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
 
 interface MarketData {
   pair: string;
@@ -39,9 +39,10 @@ export default function ClientPage({
       <SectionMarketTicker marketData={marketData} />
       <SectionHistogram slice={null} />
       <SectionMarketDisplay marketData={marketData} />
-      <SectionChart marketData={marketData} />
+      <SectionRthmnDemo marketData={marketData} />
       <SectionBoxes slice={null} />
       <SectionAboutAlgorithm />
+      <SectionFAQ />
       <SectionPricing
         user={session?.user}
         products={products ?? []}

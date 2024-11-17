@@ -1,18 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { MotionDiv } from '@/components/MotionDiv';
-
-interface CandleData {
-  complete: boolean;
-  volume: number;
-  time: string;
-  mid: {
-    o: string;
-    h: string;
-    l: string;
-    c: string;
-  };
-}
+import { CandleData } from '@/types/types';
 
 interface MarketData {
   pair: string;
@@ -76,15 +65,6 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
     }
   };
 
-  const getTotalVolume = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      return data.reduce((sum, candle) => sum + candle.volume, 0);
-    } catch (e) {
-      return null;
-    }
-  };
-
   const getSparklinePoints = (
     candleData: string,
     width: number,
@@ -96,9 +76,6 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
       const min = Math.min(...prices);
       const max = Math.max(...prices);
       const range = max - min;
-
-      // Prevent division by zero
-      if (range === 0) return null;
 
       // Create points for the sparkline
       return prices
@@ -129,12 +106,12 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
             >
               <div className="mb-2 flex items-start justify-between">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-lg font-medium text-white">
+                  <h4 className="font-outfit text-lg font-medium text-white">
                     {item.pair.replace('_', '/')}
                   </h4>
                 </div>
                 <span
-                  className={`text-sm ${
+                  className={`font-kodemono text-xs ${
                     priceChange && priceChange >= 0
                       ? 'text-green-400'
                       : 'text-red-400'
@@ -143,21 +120,21 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
                   {priceChange ? `${priceChange.toFixed(2)}%` : 'N/A'}
                 </span>
               </div>
-              <div className="mb-2 text-2xl font-bold text-white">
+              <div className="mb-2 font-kodemono text-2xl font-bold text-white">
                 {latestPrice
                   ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5)
                   : 'N/A'}
               </div>
               {getDayHighLow(item.candleData) && (
-                <div className="mb-2 flex justify-between text-xs text-white/60">
+                <div className="mb-6 flex justify-between font-kodemono text-xs text-white/60">
                   <span>
-                    H:{' '}
+                    High:{' '}
                     {getDayHighLow(item.candleData)?.high.toFixed(
                       item.pair.includes('JPY') ? 3 : 5
                     )}
                   </span>
                   <span>
-                    L:{' '}
+                    Low:{' '}
                     {getDayHighLow(item.candleData)?.low.toFixed(
                       item.pair.includes('JPY') ? 3 : 5
                     )}
@@ -188,13 +165,6 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
                     />
                   </svg>
                 )}
-              </div>
-              <div className="flex justify-between text-xs text-white/60">
-                <span>
-                  Vol: {volume?.toLocaleString() || 'N/A'}
-                  {getTotalVolume(item.candleData) &&
-                    ` (${getTotalVolume(item.candleData)?.toLocaleString()} total)`}
-                </span>
               </div>
             </MotionDiv>
           );

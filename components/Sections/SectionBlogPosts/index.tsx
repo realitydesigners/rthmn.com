@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { MotionDiv } from '../../MotionDiv';
+import { FaArrowRight } from 'react-icons/fa';
 
 export interface Post {
   slug: { current: string };
@@ -41,41 +42,53 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
   const block = post.block[0];
 
   return (
-    <MotionDiv className="group flex h-full flex-col overflow-hidden rounded-lg border border-[#181818] bg-black shadow-lg transition-all duration-300 hover:scale-105">
-      {block?.imageRef && (
-        <div className="relative h-80 w-full overflow-hidden lg:h-40">
-          <Image
-            src={block.imageRef.imageUrl}
-            alt={block.imageRef.imageAlt || 'Post image'}
-            width={1000}
-            height={1000}
-            className="object-contain object-cover transition-transform duration-300 group-hover:scale-110"
-          />
+    <MotionDiv
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-white/5 to-transparent p-[1px]"
+    >
+      <div className="relative h-full rounded-xl border border-white/10 bg-black/90 backdrop-blur-md">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         </div>
-      )}
-      <div className="flex flex-grow flex-col p-4">
-        <FormattedDate
-          date={block?.publicationDate}
-          className={`font-kodemonomb-2 text-xs font-semibold text-gray-500`}
-        />
-        <Link href={`/posts/${post.slug.current}`}>
-          <h2
-            className={`mb-3 font-outfit text-2xl font-bold text-white transition-colors duration-200 hover:text-[#76FFD6]`}
+
+        {block?.imageRef && (
+          <div className="relative h-48 w-full overflow-hidden rounded-t-xl">
+            <Image
+              src={block.imageRef.imageUrl}
+              alt={block.imageRef.imageAlt || 'Post image'}
+              fill
+              className="object-cover transition-transform duration-300 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+          </div>
+        )}
+
+        <div className="flex flex-col space-y-3 p-5">
+          <FormattedDate
+            date={block?.publicationDate}
+            className="font-kodemono text-xs font-medium text-[#22c55e]"
+          />
+
+          <Link href={`/posts/${post.slug.current}`}>
+            <h2 className="font-outfit text-xl font-bold text-white/90 transition-colors duration-200 group-hover:text-[#22c55e]">
+              {block?.heading || 'No title'}
+            </h2>
+          </Link>
+
+          <p className="line-clamp-2 font-kodemono text-sm text-white/70">
+            {block?.subheading || 'No subheading'}
+          </p>
+
+          <Link
+            href={`/posts/${post.slug.current}`}
+            className="inline-flex items-center space-x-2 text-sm font-medium text-[#22c55e] transition-all duration-200 hover:text-[#22c55e]/80"
           >
-            {block?.heading || 'No title'}
-          </h2>
-        </Link>
-        <p
-          className={`font-kodemonomb-4 line-clamp-3 flex-grow text-sm text-gray-400`}
-        >
-          {block?.subheading || 'No subheading'}
-        </p>
-        <Link
-          href={`/posts/${post.slug.current}`}
-          className={`font-kodemonoself-start rounded-full bg-gradient-to-b from-[#333333] to-[#181818] px-4 py-2 pb-3 text-sm font-semibold text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]`}
-        >
-          Read More
-        </Link>
+            <span>Read More</span>
+            <FaArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-1" />
+          </Link>
+        </div>
       </div>
     </MotionDiv>
   );
@@ -93,19 +106,16 @@ export function SectionBlogPosts({ initialPosts }: PostListProps) {
   }, [initialPosts]);
 
   return (
-    <div
-      className={`mt-16 flex w-full flex-col px-4 py-8 sm:px-6 sm:py-24 lg:px-32`}
-    >
-      <h2
-        className={`text-gray-gradient mb-12 text-center font-outfit text-4xl font-bold text-white lg:text-left`}
-      >
-        Latest Posts
-      </h2>
-      <div className="grid grid-cols-1 items-center justify-center gap-8 md:grid-cols-3">
+    <section className="relative z-[100] px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
+      <div className="mb-6 border-b border-white/5 pb-2">
+        <h2 className="text-2xl font-bold text-white/90">Latest Posts</h2>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
         {posts.map((post, index) => (
           <PostItem key={post.slug.current} post={post} index={index} />
         ))}
       </div>
-    </div>
+    </section>
   );
 }

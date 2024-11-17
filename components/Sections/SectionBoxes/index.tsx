@@ -5,7 +5,8 @@ import { useState, useEffect, useRef } from 'react';
 import {
   sequences,
   createDemoStep,
-  createMockBoxData
+  createMockBoxData,
+  BASE_VALUES
 } from '@/components/Constants/constants';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { FEATURE_TAGS } from '@/components/Constants/text';
@@ -13,14 +14,13 @@ import { MotionDiv } from '@/components/MotionDiv';
 
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
-const BASE_VALUES = [2000, 1732, 1500, 1299, 1125, 974, 843, 730];
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
 }
 
 const FeatureTags = () => (
-  <div className="flex flex-wrap justify-center gap-4 text-xs sm:text-sm lg:justify-start lg:gap-6">
+  <div className="flex flex-wrap justify-center gap-4 font-outfit text-xs sm:text-sm lg:justify-start lg:gap-6">
     {FEATURE_TAGS.map((feature, index) => (
       <MotionDiv
         initial={{ opacity: 0, x: -20 }}
@@ -158,19 +158,13 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24">
           <div className="flex flex-col justify-center">
-            <div className="mb-4 flex items-center gap-3 font-mono text-xs tracking-wider text-white/60 sm:mb-6 sm:text-sm">
-              <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent sm:w-12" />
-              MARKET INTELLIGENCE SYSTEM
-              <div className="h-[1px] w-8 bg-gradient-to-r from-transparent via-white/20 to-transparent sm:w-12" />
-            </div>
-
             <h2 className="text-gray-gradient mb-4 font-outfit text-4xl font-bold leading-tight tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl">
               Natural Pattern
               <br />
               Recognition
             </h2>
 
-            <p className="mb-8 font-mono text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
+            <p className="mb-8 font-kodemono text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
               Discover hidden market patterns through advanced mathematics.
             </p>
 

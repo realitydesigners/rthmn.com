@@ -11,7 +11,7 @@ import { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
 
 // Add these constants at the top with other constants
-const VISIBLE_POINTS = 1000;
+const VISIBLE_POINTS = 100;
 const MIN_ZOOM = 0.1; // Most zoomed out
 const MAX_ZOOM = 5; // Most zoomed in
 
