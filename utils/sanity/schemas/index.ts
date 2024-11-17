@@ -9,3 +9,4 @@ export { default as module } from '@/utils/sanity/schemas/module';
 export { default as lesson } from '@/utils/sanity/schemas/lesson';
 export { default as changelog } from '@/utils/sanity/schemas/changelog';
 export { default as marketData } from '@/utils/sanity/schemas/marketData';
+export { default as faq } from '@/utils/sanity/schemas/faq';

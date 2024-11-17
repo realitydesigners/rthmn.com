@@ -1,6 +1,5 @@
 'use client';
 import type React from 'react';
-import type { BoxSlice } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import {
   sequences,
@@ -15,10 +14,6 @@ import { MotionDiv } from '@/components/MotionDiv';
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
 
-interface BoxComponentProps {
-  slice: BoxSlice | null;
-}
-
 const FeatureTags = () => (
   <div className="flex flex-wrap justify-center gap-4 font-outfit text-xs sm:text-sm lg:justify-start lg:gap-6">
     {FEATURE_TAGS.map((feature, index) => (
@@ -32,7 +27,7 @@ const FeatureTags = () => (
         <div className="items-centergap-1.5 relative flex">
           <div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur transition-opacity duration-500 group-hover:opacity-100" />
           <feature.icon className="relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4" />
-          <span className="font-mono text-white/60 transition-colors duration-300 group-hover:text-white">
+          <span className="font-kodemono text-white/60 transition-colors duration-300 group-hover:text-white">
             {feature.text}
           </span>
         </div>
@@ -54,11 +49,8 @@ const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => {
         setBaseSize(250);
       }
     };
-
-    // Set initial size
     handleResize();
 
-    // Add event listener
     window.addEventListener('resize', handleResize);
 
     // Cleanup
@@ -100,14 +92,12 @@ const BoxVisualization = ({ currentSlice, demoStep, isPaused }) => {
   );
 };
 
-export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
-  // State
+export const SectionBoxes: React.FC = () => {
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const tableRef = useRef<HTMLDivElement>(null);
   const totalStepsRef = useRef(sequences.length);
 
-  // Auto-scroll effect
   useEffect(() => {
     if (tableRef.current) {
       const scrollContainer = tableRef.current;
@@ -118,7 +108,6 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
     }
   }, [demoStep]);
 
-  // Animation interval effect
   useEffect(() => {
     const interval = setInterval(() => {
       const currentPatternIndex = Math.floor(demoStep / 1) % sequences.length;
@@ -140,10 +129,9 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
 
-  // Data preparation
   const currentValues = createDemoStep(demoStep, sequences, BASE_VALUES);
   const mockBoxData = createMockBoxData(currentValues);
-  const currentSlice = slice || {
+  const currentSlice = {
     timestamp: new Date().toISOString(),
     boxes: mockBoxData
   };
@@ -151,37 +139,20 @@ export const SectionBoxes: React.FC<BoxComponentProps> = ({ slice }) => {
   return (
     <section className="relative h-full w-full px-4 py-16 sm:px-8 lg:px-[10vw] lg:py-32">
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#22c55e]/[0.03] via-transparent to-transparent blur-xl" />
-      </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-24">
           <div className="flex flex-col justify-center">
             <h2 className="text-gray-gradient mb-4 font-outfit text-4xl font-bold leading-tight tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl">
-              Natural Pattern
+              A New Era In Pattern
               <br />
               Recognition
             </h2>
-
             <p className="mb-8 font-kodemono text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
               Discover hidden market patterns through advanced mathematics.
             </p>
-
-            {/* Box Visualization for mobile only - appears after title */}
-            <div className="my-12 flex items-center justify-center lg:hidden">
-              <BoxVisualization
-                currentSlice={currentSlice}
-                demoStep={demoStep}
-                isPaused={isPaused}
-              />
-            </div>
-
             <FeatureTags />
           </div>
-
-          {/* Box Visualization for desktop only - appears in right column */}
-          <div className="hidden items-center justify-center lg:flex">
+          <div className="order-2 flex items-center justify-center lg:order-none">
             <BoxVisualization
               currentSlice={currentSlice}
               demoStep={demoStep}

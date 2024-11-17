@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { MotionDiv } from '@/components/MotionDiv';
 import {
@@ -27,12 +27,15 @@ const BoxVisualization = ({
   candleData: string;
 }) => {
   const [baseSize, setBaseSize] = useState(250);
-  const [randomSequence] = useState(() => {
-    const randomIndex = Math.floor(Math.random() * sequences.length);
+  const randomSequence = useMemo(() => {
+    const pairHash = pair.split('').reduce((acc, char) => {
+      return char.charCodeAt(0) + ((acc << 5) - acc);
+    }, 0);
+    const randomIndex = Math.abs(pairHash) % sequences.length;
     const sequence = sequences[randomIndex];
     const values = BASE_VALUES.map((value, i) => value * (sequence[i] || 1));
     return createMockBoxData(values);
-  });
+  }, [pair]);
 
   useEffect(() => {
     const handleResize = () => {
