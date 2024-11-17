@@ -6,6 +6,7 @@ import { MotionDiv } from '@/components/MotionDiv';
 import { CandleData } from '@/types/types';
 import { FaChartArea, FaTable, FaCube } from 'react-icons/fa';
 import { PatternDisplay } from './PatternDisplay';
+import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
 
 interface MarketData {
   pair: string;
@@ -13,7 +14,7 @@ interface MarketData {
   candleData: string;
 }
 
-type TabType = 'chart' | 'grid' | 'pattern';
+type TabType = 'chart' | 'grid' | 'boxes';
 
 const MarketCard = ({
   item,
@@ -59,11 +60,9 @@ const MarketCard = ({
           : 'border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60'
       }`}
     >
-      {/* Selection indicator */}
       {isSelected && (
         <div className="absolute left-0 top-0 h-full w-[3px] rounded-l-md bg-[#22c55e]" />
       )}
-
       <div className="flex w-full items-center justify-between">
         <span className="text-xs font-medium text-white/90">
           {item.pair.replace('_', '/')}
@@ -87,50 +86,73 @@ const MarketCard = ({
   );
 };
 
-const Navigation = ({
+const DemoNavbar = ({
   activeTab,
   setActiveTab
 }: {
   activeTab: TabType;
   setActiveTab: (tab: TabType) => void;
-}) => (
-  <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-2">
-    <div className="flex items-center gap-4">
+}) => {
+  return (
+    <div className="mb-4 flex h-16 w-full items-center justify-between rounded-lg border border-white/5 bg-black/40 px-4 backdrop-blur-sm">
+      {/* Left section */}
       <div className="flex items-center gap-2">
+        <div className="flex h-5 w-5 items-center">
+          <LogoIcon />
+        </div>
+        <span className="font-russo text-lg font-bold tracking-wide text-white">
+          RTHMN
+        </span>
+      </div>
+
+      {/* Center section - Navigation Tabs */}
+      <div className="absolute left-1/2 flex -translate-x-1/2 transform items-center gap-3">
         {[
-          { id: 'chart', label: 'Chart View', icon: FaChartArea },
-          { id: 'grid', label: 'Market Grid', icon: FaTable },
-          { id: 'pattern', label: 'Patterns', icon: FaCube }
+          { id: 'boxes', label: 'Boxes', icon: FaCube },
+          { id: 'chart', label: 'Chart', icon: FaChartArea },
+          { id: 'grid', label: 'Grid', icon: FaTable }
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as TabType)}
-            className={`flex items-center gap-1.5 rounded-md bg-gradient-to-b p-[1px] transition-all duration-200 ${
-              activeTab === tab.id
-                ? 'from-emerald-500/50 to-emerald-500/20 hover:from-emerald-500/60 hover:to-emerald-500/30'
-                : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
-            } `}
+            className="flex h-auto items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
           >
             <span
-              className={`flex w-full items-center gap-1.5 rounded-md bg-gradient-to-b from-black to-black/80 px-3 py-1.5 text-sm font-medium ${
-                activeTab === tab.id ? 'text-emerald-400' : 'text-white/70'
-              } `}
+              className={`flex w-full items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 font-outfit text-xs font-semibold ${
+                activeTab === tab.id
+                  ? 'text-emerald-400'
+                  : 'text-white hover:text-white'
+              }`}
             >
-              <tab.icon className="h-3.5 w-3.5" />
+              <tab.icon className="h-3 w-3" />
               {tab.label}
             </span>
           </button>
         ))}
       </div>
+
+      {/* Right section */}
+      <div className="flex items-center space-x-4">
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+            <BellIcon />
+          </div>
+        </button>
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+            <span className="text-sm font-bold">D</span>
+          </div>
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
   const [selectedPair, setSelectedPair] = useState<string>(
     marketData[0]?.pair || ''
   );
-  const [activeTab, setActiveTab] = useState<TabType>('chart');
+  const [activeTab, setActiveTab] = useState<TabType>('boxes');
   const containerRef = useRef<HTMLDivElement>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
@@ -210,9 +232,9 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
           </div>
         );
 
-      case 'pattern':
+      case 'boxes':
         return (
-          <div className="overflow-y-auto">
+          <div className="overflow-x-auto overflow-y-auto">
             <PatternDisplay marketData={marketData} />
           </div>
         );
@@ -223,13 +245,13 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
   };
 
   return (
-    <section className="relative z-[100] px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
-      <div className="relative rounded-xl border border-white/10 bg-black/90 p-6 backdrop-blur-md">
+    <section className="relative z-[100] flex items-center justify-center px-4 py-12">
+      <div className="relative w-[90vw] overflow-hidden rounded-xl border border-white/10 bg-black/90 p-2 backdrop-blur-md 2xl:h-[75vh] 2xl:w-[75vw]">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
+          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
         </div>
-        <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
+        <DemoNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
         <MotionDiv
           key={activeTab}
           initial={{ opacity: 0, y: 20 }}

@@ -112,46 +112,51 @@ export function PatternDisplay({ marketData }: PatternDisplayProps) {
   };
 
   return (
-    <section className="relative z-[100]">
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {marketData.map((item) => {
-          const latestPrice = getLatestPrice(item.candleData);
-          const priceChange = getPriceChange(item.candleData);
+    <section className="relative z-[100] h-full">
+      <div className="scrollbar-thin scrollbar-track-white/5 h-[calc(100vh-20rem)] overflow-y-auto pr-2 2xl:h-[calc(75vh)]">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {marketData.map((item) => {
+            const latestPrice = getLatestPrice(item.candleData);
+            const priceChange = getPriceChange(item.candleData);
 
-          return (
-            <MotionDiv
-              key={item.pair}
-              className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-white/5 bg-black/40 p-4 transition-all duration-300 hover:border-white/10"
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div>
-                    <h3 className="font-outfit text-xl font-semibold text-white/90">
-                      {item.pair.replace('_', '/')}
-                    </h3>
-                    <div className="flex items-center gap-3">
-                      <span className="font-kodemono text-sm text-white/70">
-                        {latestPrice?.toFixed(
-                          item.pair.includes('JPY') ? 3 : 5
-                        )}
-                      </span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                          priceChange && priceChange >= 0
-                            ? 'bg-emerald-400/10 text-emerald-400'
-                            : 'bg-red-500/10 text-red-500'
-                        }`}
-                      >
-                        {priceChange ? `${priceChange.toFixed(2)}%` : 'N/A'}
-                      </span>
+            return (
+              <MotionDiv
+                key={item.pair}
+                className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-white/5 bg-black/40 p-4 transition-all duration-300 hover:border-white/10"
+              >
+                <div className="mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <h3 className="font-outfit text-xl font-semibold text-white/90">
+                        {item.pair.replace('_', '/')}
+                      </h3>
+                      <div className="flex items-center gap-3">
+                        <span className="font-kodemono text-sm text-white/70">
+                          {latestPrice?.toFixed(
+                            item.pair.includes('JPY') ? 3 : 5
+                          )}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            priceChange && priceChange >= 0
+                              ? 'bg-emerald-400/10 text-emerald-400'
+                              : 'bg-red-500/10 text-red-500'
+                          }`}
+                        >
+                          {priceChange ? `${priceChange.toFixed(2)}%` : 'N/A'}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <BoxVisualization pair={item.pair} candleData={item.candleData} />
-            </MotionDiv>
-          );
-        })}
+                <BoxVisualization
+                  pair={item.pair}
+                  candleData={item.candleData}
+                />
+              </MotionDiv>
+            );
+          })}
+        </div>
       </div>
     </section>
   );
