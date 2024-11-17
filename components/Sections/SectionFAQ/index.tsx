@@ -1,15 +1,41 @@
 'use client';
 import type React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
-import { FAQ } from '@/components/Constants/text';
 import { MotionDiv } from '@/components/MotionDiv';
+import { client } from '@/utils/sanity/lib/client';
+import { PortableText } from '@portabletext/react';
+
+interface FAQItem {
+  _id: string;
+  question: string;
+  answer: any[];
+  category?: string;
+  isPublished: boolean;
+}
 
 export const SectionFAQ: React.FC = () => {
   const [activeService, setActiveService] = useState<string | null>(null);
+  const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
 
-  const handleFAQClick = (label: string) => {
-    setActiveService(activeService !== label ? label : null);
+  useEffect(() => {
+    const fetchFAQ = async () => {
+      const query = `*[_type == "faq"] {
+        _id,
+        question,
+        answer,
+        category
+      }`;
+
+      const result = await client.fetch(query);
+      setFaqItems(result);
+    };
+
+    fetchFAQ();
+  }, []);
+
+  const handleFAQClick = (id: string) => {
+    setActiveService(activeService !== id ? id : null);
   };
 
   return (
@@ -32,30 +58,30 @@ export const SectionFAQ: React.FC = () => {
         </div>
 
         <ul className="mx-auto max-w-4xl space-y-4">
-          {FAQ.map(({ question, answer }) => (
+          {faqItems.map(({ _id, question, answer }) => (
             <MotionDiv
-              key={question}
+              key={_id}
               initial={false}
               animate={{
                 backgroundColor:
-                  activeService === question
+                  activeService === _id
                     ? 'rgba(52, 211, 153, 0.1)'
                     : 'rgba(0, 0, 0, 0.4)'
               }}
               whileHover={{ scale: 1.005 }}
               whileTap={{ scale: 0.995 }}
               className={`w-full overflow-hidden rounded-lg border transition-all duration-300 ${
-                activeService === question
+                activeService === _id
                   ? 'border-emerald-400/50'
                   : 'border-white/5 hover:border-white/10'
               }`}
             >
               <div
                 className="flex w-full cursor-pointer items-center justify-between p-5"
-                onClick={() => handleFAQClick(question)}
+                onClick={() => handleFAQClick(_id)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
-                    handleFAQClick(question);
+                    handleFAQClick(_id);
                   }
                 }}
                 role="button"
@@ -64,7 +90,7 @@ export const SectionFAQ: React.FC = () => {
                 <div className="flex items-center gap-4">
                   <div
                     className={`flex h-10 w-10 items-center justify-center rounded-full border transition-colors duration-300 ${
-                      activeService === question
+                      activeService === _id
                         ? 'border-emerald-400 bg-emerald-400/10'
                         : 'border-white/10 bg-white/5'
                     }`}
@@ -79,7 +105,7 @@ export const SectionFAQ: React.FC = () => {
                 </div>
                 <FaChevronDown
                   className={`h-5 w-5 text-emerald-400 transition-transform duration-300 ${
-                    activeService === question ? 'rotate-180' : ''
+                    activeService === _id ? 'rotate-180' : ''
                   }`}
                 />
               </div>
@@ -87,8 +113,8 @@ export const SectionFAQ: React.FC = () => {
               <MotionDiv
                 initial={false}
                 animate={{
-                  height: activeService === question ? 'auto' : 0,
-                  opacity: activeService === question ? 1 : 0
+                  height: activeService === _id ? 'auto' : 0,
+                  opacity: activeService === _id ? 1 : 0
                 }}
                 transition={{
                   duration: 0.3,
@@ -103,9 +129,9 @@ export const SectionFAQ: React.FC = () => {
                         A
                       </span>
                     </div>
-                    <p className="text-base leading-relaxed text-white/70 [text-wrap:pretty]">
-                      {answer}
-                    </p>
+                    <div className="text-base leading-relaxed text-white/70 [text-wrap:pretty]">
+                      <PortableText value={answer} />
+                    </div>
                   </div>
                 </div>
               </MotionDiv>

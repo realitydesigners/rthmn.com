@@ -25,7 +25,8 @@ import {
   changelog,
   module,
   lesson,
-  marketData
+  marketData,
+  faq
 } from '@/utils/sanity/schemas';
 
 import CustomItem from '@/utils/sanity/ui/CustomItem';
@@ -55,7 +56,8 @@ export default defineConfig({
       module,
       lesson,
       changelog,
-      marketData
+      marketData,
+      faq
     ]
   },
   form: {
