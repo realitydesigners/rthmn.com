@@ -94,7 +94,7 @@ export function TeamCard() {
           <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-6 transition-all duration-500 ease-out group-hover:translate-y-0">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <h3 className="group-hover:text-shadow text-2xl font-semibold tracking-wide text-white/90 transition-all duration-300 group-hover:text-white">
+                <h3 className="group-hover:text-shadow font-outfit text-2xl font-semibold tracking-wide text-white/90 transition-all duration-300 group-hover:text-white">
                   {member.name}
                 </h3>
                 <div className="flex gap-4">
@@ -120,10 +120,10 @@ export function TeamCard() {
                   )}
                 </div>
               </div>
-              <p className="text-base font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
+              <p className="font-kodemono font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
                 {member.role}
               </p>
-              <p className="text-sm leading-relaxed text-white/50 transition-colors duration-300 group-hover:text-white/70">
+              <p className="font-outfit text-sm leading-relaxed text-white/50 transition-colors duration-300 group-hover:text-white/70">
                 {member.shortBio}
               </p>
             </div>

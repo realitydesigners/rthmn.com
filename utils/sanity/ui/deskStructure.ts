@@ -1,10 +1,39 @@
 import { StructureBuilder } from 'sanity/structure';
-import { ImageIcon, DocumentIcon, TagIcon } from '@sanity/icons';
+import { ImageIcon, DocumentIcon, TagIcon, HomeIcon } from '@sanity/icons';
 
 export const StudioStructure = (S: StructureBuilder) =>
   S.list()
     .title('Content')
     .items([
+      // Pages
+      S.listItem()
+        .title('Pages')
+        .icon(HomeIcon)
+        .child(
+          S.list()
+            .title('Pages')
+            .items([
+              S.listItem()
+                .title('About Page')
+                .icon(DocumentIcon)
+                .child(
+                  S.editor()
+                    .id('aboutPage')
+                    .schemaType('page')
+                    .documentId('about')
+                ),
+              S.listItem()
+                .title('Section Page')
+                .icon(DocumentIcon)
+                .child(
+                  S.editor()
+                    .id('sectionPage')
+                    .schemaType('page')
+                    .documentId('section')
+                )
+            ])
+        ),
+
       // Content
       S.listItem()
         .title('Content')
