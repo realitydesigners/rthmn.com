@@ -18,7 +18,24 @@ const nextConfig = {
         pathname: '/a/**'
       }
     ]
-  }
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        'zlib-sync': false,
+        bufferutil: false,
+        'utf-8-validate': false
+      };
+    }
+    return config;
+  },
+  serverExternalPackages: [
+    'discord.js',
+    'zlib-sync',
+    'bufferutil',
+    'utf-8-validate'
+  ]
 };
 
 module.exports = nextConfig;

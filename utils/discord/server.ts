@@ -1,19 +1,13 @@
 import { createClient } from '@/utils/supabase/server';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { getDiscordClient } from './client';
 import { getDiscordConnection } from '@/utils/supabase/queries';
-
-const discord = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers]
-});
-
-// Login bot once
-discord.login(process.env.DISCORD_BOT_TOKEN);
 
 export async function manageDiscordAccess(
   stripeCustomerId: string,
   isActive: boolean
 ) {
   const supabase = await createClient();
+  const discord = await getDiscordClient();
 
   try {
     // 1. Get user from stripe customer ID

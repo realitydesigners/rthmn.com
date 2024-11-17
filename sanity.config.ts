@@ -1,5 +1,4 @@
 'use client';
-import { visionTool } from '@sanity/vision';
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import {
@@ -25,7 +24,8 @@ import {
   changelog,
   module,
   lesson,
-  marketData
+  marketData,
+  faq
 } from '@/utils/sanity/schemas';
 
 import CustomItem from '@/utils/sanity/ui/CustomItem';
@@ -55,7 +55,8 @@ export default defineConfig({
       module,
       lesson,
       changelog,
-      marketData
+      marketData,
+      faq
     ]
   },
   form: {
@@ -64,5 +65,5 @@ export default defineConfig({
       field: CustomField
     }
   },
-  plugins: [structureTool({}), visionTool({ defaultApiVersion: apiVersion })]
+  plugins: [structureTool({})]
 });
