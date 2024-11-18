@@ -310,6 +310,13 @@ export const glossaryBySlugQuery = groq`
   }
 `;
 
+export const pageQuery = groq`
+  *[_type == "page" && slug.current == $slug][0] {
+    title,
+    content
+  }
+`;
+
 export async function getModules() {
   return client.fetch(
     groq`*[_type == "module"] | order(order asc) {
