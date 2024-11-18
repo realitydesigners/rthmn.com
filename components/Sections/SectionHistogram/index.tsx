@@ -95,7 +95,7 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
           </p>
 
           <div className="mt-6 flex gap-6">
-            <StartButton href="#pricing" />
+            <StartButton href="#pricing" custom={0} />
           </div>
         </div>
 
