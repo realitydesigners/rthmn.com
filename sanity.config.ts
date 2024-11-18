@@ -5,7 +5,9 @@ import {
   contentBlock,
   headingBlock,
   headingSplineBlock,
-  teamBlock
+  teamBlock,
+  teamGrid,
+  sceneBlock
 } from '@/utils/sanity/blocks/index';
 import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
 import {
@@ -27,9 +29,9 @@ import { CustomItem } from '@/utils/sanity/ui/CustomItem';
 
 import { StudioStructure } from '@/utils/sanity/ui/deskStructure';
 import { myTheme } from '@/utils/sanity/ui/theme';
+import page from '@/utils/sanity/schemas/page';
 
-const title =
-  process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'Reality Designers';
+const title = process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'RTHMN';
 
 export default defineConfig({
   basePath: studioUrl,
@@ -53,7 +55,10 @@ export default defineConfig({
       lesson,
       changelog,
       marketData,
-      faq
+      faq,
+      page,
+      teamGrid,
+      sceneBlock
     ]
   },
   form: {
