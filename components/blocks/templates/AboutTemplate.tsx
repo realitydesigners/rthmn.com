@@ -45,14 +45,14 @@ export const AboutTemplate: PortableTextComponents = {
   list: {
     bullet: ({ children }) => (
       <div className="flex w-full justify-center p-3">
-        <ul className="w-full list-disc space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2">
+        <ul className="w-full list-disc space-y-2 pl-4 font-outfit text-white/70 md:w-3/4 lg:w-1/2">
           {children}
         </ul>
       </div>
     ),
     number: ({ children }) => (
       <div className="flex w-full justify-center p-3">
-        <ol className="w-full list-decimal space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2">
+        <ol className="w-full list-decimal space-y-2 pl-4 font-outfit text-white/70 md:w-3/4 lg:w-1/2">
           {children}
         </ol>
       </div>
@@ -62,7 +62,7 @@ export const AboutTemplate: PortableTextComponents = {
     link: ({ children, value }) => (
       <a
         href={value?.href}
-        className="text-cyan-400 transition-colors duration-200 hover:text-cyan-300"
+        className="font-outfit text-cyan-400 transition-colors duration-200 hover:text-cyan-300"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -70,7 +70,9 @@ export const AboutTemplate: PortableTextComponents = {
       </a>
     ),
     strong: ({ children }) => (
-      <strong className="font-semibold text-white/90">{children}</strong>
+      <strong className="font-outfit font-semibold text-white/90">
+        {children}
+      </strong>
     )
   },
   types: {
