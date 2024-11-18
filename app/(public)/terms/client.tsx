@@ -12,7 +12,7 @@ interface PageData {
   }[];
 }
 
-export default function AboutClient({ page }: { page: PageData }) {
+export default function PrivacyClient({ page }: { page: PageData }) {
   return (
     <BackgroundGrid>
       {page.sections?.map((section, index) => (

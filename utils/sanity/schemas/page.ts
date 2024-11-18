@@ -1,3 +1,4 @@
+import { title } from 'process';
 import { defineField, defineType } from 'sanity';
 
 export default defineType({
@@ -106,10 +107,8 @@ export default defineType({
     })
   ],
   preview: {
-    prepare() {
-      return {
-        title: 'Page Content'
-      };
+    select: {
+      title: 'title'
     }
   }
 });
