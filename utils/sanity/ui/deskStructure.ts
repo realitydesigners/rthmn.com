@@ -8,31 +8,8 @@ export const StudioStructure = (S: StructureBuilder) =>
       // Pages
       S.listItem()
         .title('Pages')
-        .icon(HomeIcon)
-        .child(
-          S.list()
-            .title('Pages')
-            .items([
-              S.listItem()
-                .title('About Page')
-                .icon(DocumentIcon)
-                .child(
-                  S.editor()
-                    .id('aboutPage')
-                    .schemaType('page')
-                    .documentId('about')
-                ),
-              S.listItem()
-                .title('Section Page')
-                .icon(DocumentIcon)
-                .child(
-                  S.editor()
-                    .id('sectionPage')
-                    .schemaType('page')
-                    .documentId('section')
-                )
-            ])
-        ),
+        .icon(DocumentIcon)
+        .child(S.documentTypeList('page')),
 
       // Content
       S.listItem()
