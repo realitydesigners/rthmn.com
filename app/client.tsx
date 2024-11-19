@@ -22,8 +22,8 @@ interface MarketData {
 }
 
 interface ClientPageProps {
-  posts: any[];
-  products: any[] | null;
+  posts: any;
+  products: any[];
   marketData: MarketData[];
 }
 
@@ -36,9 +36,9 @@ export default function ClientPage({
 
   return (
     <BackgroundGrid>
-      <SectionMarketTicker marketData={marketData} />
-      <SectionHistogram slice={null} />
-      <SectionRthmnDemo marketData={marketData} />
+      {/* <SectionMarketTicker marketData={marketData} /> */}
+      <SectionHistogram slice={null} marketData={marketData} />
+      {/* <SectionRthmnDemo marketData={marketData} /> */}
       <SectionMarketDisplay marketData={marketData} />
       <SectionBoxes />
       <SectionAboutAlgorithm />
