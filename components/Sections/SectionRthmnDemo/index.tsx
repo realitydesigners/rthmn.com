@@ -4,9 +4,16 @@ import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
 import { MotionDiv } from '@/components/MotionDiv';
 import { CandleData } from '@/types/types';
-import { FaChartArea, FaTable, FaCube, FaUserCircle } from 'react-icons/fa';
+import {
+  FaChartArea,
+  FaTable,
+  FaCube,
+  FaUserCircle,
+  FaList
+} from 'react-icons/fa';
 import { PatternDisplay } from './PatternDisplay';
 import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
+import { PairSlider } from './PairSlider';
 
 interface MarketData {
   pair: string;
@@ -14,7 +21,7 @@ interface MarketData {
   candleData: string;
 }
 
-type TabType = 'chart' | 'grid' | 'boxes';
+type TabType = 'chart' | 'grid' | 'boxes' | 'navigation';
 
 const MarketCard = ({
   item,
@@ -108,6 +115,7 @@ const DemoNavbar = ({
           { id: 'boxes', label: 'Boxes', icon: FaCube },
           { id: 'chart', label: 'Chart', icon: FaChartArea },
           { id: 'grid', label: 'Grid', icon: FaTable }
+          // { id: 'navigation', label: 'Navigation', icon: FaList }
         ].map((tab) => (
           <button
             key={tab.id}
@@ -236,14 +244,25 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
           </div>
         );
 
+      case 'navigation':
+        return (
+          <div className="flex h-full gap-4">
+            <PairSlider
+              marketData={marketData}
+              selectedPair={selectedPair}
+              onPairSelect={setSelectedPair}
+            />
+          </div>
+        );
+
       default:
         return null;
     }
   };
 
   return (
-    <section className="relative z-[100] flex items-center justify-center py-12">
-      <div className="relative h-[75vh] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md md:h-[75vh] md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]">
+    <section className="relative z-[100] flex h-full items-center justify-center py-12">
+      <div className="relative h-[75vh] w-full overflow-hidden border-white/10 bg-black bg-black/90 p-2 backdrop-blur-md md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
