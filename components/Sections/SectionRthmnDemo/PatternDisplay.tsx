@@ -26,7 +26,7 @@ const BoxVisualization = ({
   pair: string;
   candleData: string;
 }) => {
-  const [baseSize, setBaseSize] = useState(250);
+  const [baseSize, setBaseSize] = useState(150);
   const randomSequence = useMemo(() => {
     const pairHash = pair.split('').reduce((acc, char) => {
       return char.charCodeAt(0) + ((acc << 5) - acc);
@@ -42,9 +42,9 @@ const BoxVisualization = ({
       if (window.innerWidth >= 1024) {
         setBaseSize(250);
       } else if (window.innerWidth >= 640) {
-        setBaseSize(125);
+        setBaseSize(150);
       } else {
-        setBaseSize(100);
+        setBaseSize(150);
       }
     };
 

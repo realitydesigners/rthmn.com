@@ -4,7 +4,7 @@ import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
 import { MotionDiv } from '@/components/MotionDiv';
 import { CandleData } from '@/types/types';
-import { FaChartArea, FaTable, FaCube } from 'react-icons/fa';
+import { FaChartArea, FaTable, FaCube, FaUserCircle } from 'react-icons/fa';
 import { PatternDisplay } from './PatternDisplay';
 import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
 
@@ -100,9 +100,6 @@ const DemoNavbar = ({
         <div className="flex h-5 w-5 items-center">
           <LogoIcon />
         </div>
-        <span className="font-russo text-lg font-bold tracking-wide text-white">
-          RTHMN
-        </span>
       </div>
 
       {/* Center section - Navigation Tabs */}
@@ -140,7 +137,7 @@ const DemoNavbar = ({
         </button>
         <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
           <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
-            <span className="text-sm font-bold">D</span>
+            <FaUserCircle className="h-6 w-6 text-gray-300" />
           </div>
         </button>
       </div>
@@ -245,8 +242,8 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
   };
 
   return (
-    <section className="relative z-[100] flex items-center justify-center px-4 py-12">
-      <div className="relative w-[90vw] overflow-hidden rounded-xl border border-white/10 bg-black/90 p-2 backdrop-blur-md 2xl:h-[75vh] 2xl:w-[75vw]">
+    <section className="relative z-[100] flex items-center justify-center py-12">
+      <div className="relative h-[75vh] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md md:h-[75vh] md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
