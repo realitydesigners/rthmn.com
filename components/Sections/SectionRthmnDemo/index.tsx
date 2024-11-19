@@ -14,6 +14,8 @@ import {
 import { PatternDisplay } from './PatternDisplay';
 import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
 import { PairSlider } from './PairSlider';
+import { TrendingInsights } from './TrendingInsights';
+import { MarketNavigator } from './MarketNavigator';
 
 interface MarketData {
   pair: string;
@@ -247,11 +249,20 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
       case 'navigation':
         return (
           <div className="flex h-full gap-4">
-            <PairSlider
-              marketData={marketData}
-              selectedPair={selectedPair}
-              onPairSelect={setSelectedPair}
-            />
+            <div className="w-[300px]">
+              <MarketNavigator
+                marketData={marketData}
+                selectedPair={selectedPair}
+                onPairSelect={setSelectedPair}
+              />
+            </div>
+            <div className="flex-1">
+              <PairSlider
+                marketData={marketData}
+                selectedPair={selectedPair}
+                onPairSelect={setSelectedPair}
+              />
+            </div>
           </div>
         );
 
