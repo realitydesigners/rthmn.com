@@ -108,6 +108,32 @@ export function PairSlider({
     return () => observer.disconnect();
   }, [marketData, onPairSelect]);
 
+  const getSparklinePoints = (
+    candleData: string,
+    width: number,
+    height: number
+  ) => {
+    try {
+      const data = JSON.parse(candleData) as CandleData[];
+      const prices = data.map((d) => parseFloat(d.mid.c));
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      const range = max - min;
+
+      if (range === 0) return null;
+
+      return prices
+        .map((price, i) => {
+          const x = (i / (prices.length - 1)) * width;
+          const y = height - ((price - min) / range) * height;
+          return `${x},${y}`;
+        })
+        .join(' ');
+    } catch (e) {
+      return null;
+    }
+  };
+
   return (
     <div className="relative h-full w-full" {...handlers}>
       <div
@@ -137,15 +163,81 @@ export function PairSlider({
             >
               {isActive && <div className="absolute inset-0 z-0"></div>}
               <div className="relative z-10 flex flex-col items-center">
-                <h3
-                  className={`font-outfit text-5xl font-bold tracking-tight transition-all duration-300 ${
-                    isActive
-                      ? 'scale-110 text-white'
-                      : 'scale-90 text-gray-500/50'
-                  }`}
-                >
-                  {item.pair.replace('_', '/')}
-                </h3>
+                <div className="flex items-center gap-8">
+                  <h3
+                    className={`font-outfit text-5xl font-bold tracking-tight transition-all duration-300 ${
+                      isActive
+                        ? 'text-gray-gradient scale-110'
+                        : 'scale-90 text-gray-500/40'
+                    }`}
+                  >
+                    {item.pair.replace('_', '/')}
+                  </h3>
+
+                  {/* Sparkline Chart for Active Item */}
+                  {isActive && (
+                    <div className="h-10 w-20 opacity-80">
+                      {getSparklinePoints(item.candleData, 128, 64) && (
+                        <svg
+                          width="100%"
+                          height="100%"
+                          viewBox="0 0 128 64"
+                          preserveAspectRatio="none"
+                          className="overflow-visible"
+                        >
+                          <defs>
+                            <linearGradient
+                              id={`gradient-${index}`}
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor={
+                                  priceChange >= 0 ? '#4ade80' : '#f87171'
+                                }
+                                stopOpacity="0.2"
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor={
+                                  priceChange >= 0 ? '#4ade80' : '#f87171'
+                                }
+                                stopOpacity="0"
+                              />
+                            </linearGradient>
+                          </defs>
+                          <path
+                            d={`M 0,64 L 0,${
+                              getSparklinePoints(item.candleData, 128, 64)
+                                ?.split(' ')[0]
+                                ?.split(',')[1] || 0
+                            } ${getSparklinePoints(
+                              item.candleData,
+                              128,
+                              64
+                            )} L 128,64 Z`}
+                            fill={`url(#gradient-${index})`}
+                          />
+                          <polyline
+                            points={getSparklinePoints(
+                              item.candleData,
+                              128,
+                              64
+                            )}
+                            fill="none"
+                            stroke={priceChange >= 0 ? '#4ade80' : '#f87171'}
+                            strokeWidth="2"
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                  )}
+                </div>
+
                 {isActive && (
                   <div className="mt-4 flex items-center gap-2">
                     <div className="font-kodemono text-lg text-white/80">
