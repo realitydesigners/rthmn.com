@@ -1,16 +1,27 @@
 'use client';
 import type React from 'react';
-import type { BoxSlice } from '@/types/types';
+import type { BoxSlice, CandleData } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import { sequences } from '@/components/Constants/constants';
+import { SectionRthmnDemo } from '../SectionRthmnDemo';
 import { HistoricalPatternView } from './HistoricalPatternView';
 import { StartButton } from '@/components/Buttons/StartNowButton';
+import { MarketWall } from './MarketWall';
+
+interface MarketData {
+  pair: string;
+  lastUpdated: string;
+  candleData: string;
+}
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
+  marketData: MarketData[];
 }
 
-export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
+export const SectionHistogram: React.FC<BoxComponentProps> = ({
+  marketData
+}) => {
   const [containerHeight, setContainerHeight] = useState(200);
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -57,7 +68,7 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
       if (!isPaused) {
         setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
       }
-    }, 50);
+    }, 250);
 
     return () => clearInterval(interval);
   }, [demoStep, isPaused]);
@@ -79,7 +90,9 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
 
   return (
     <section className="relative min-h-screen overflow-hidden pt-60">
-      <div className="relative flex w-full flex-col gap-24">
+      <MarketWall marketData={marketData} />
+
+      <div className="relative flex w-full flex-col gap-8">
         <div className="relative flex flex-col items-center text-center">
           <h2
             className={`text-gray-gradient relative z-10 font-outfit text-[3em] font-bold leading-[1em] tracking-tight lg:text-[7em] lg:leading-[1em]`}
@@ -98,9 +111,10 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
             <StartButton href="#pricing" custom={0} />
           </div>
         </div>
+        <SectionRthmnDemo marketData={marketData} />
 
-        <div className="w-full bg-black/75 px-[0vw] lg:px-[10vw]">
-          <HistoricalPatternView
+        <div className="w-full bg-black px-[0vw] lg:px-[10vw]">
+          {/* <HistoricalPatternView
             tableRef={tableRef}
             demoStep={demoStep}
             patterns={sequences}
@@ -117,7 +131,7 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({ slice }) => {
               )
             }
             isPaused={isPaused}
-          />
+          /> */}
         </div>
       </div>
     </section>
