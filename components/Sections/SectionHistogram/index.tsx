@@ -95,7 +95,7 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({
       <div className="relative flex w-full flex-col gap-8">
         <div className="relative flex flex-col items-center text-center">
           <h2
-            className={`text-gray-gradient relative z-10 font-outfit text-[3em] font-bold leading-[1em] tracking-tight lg:text-[7em] lg:leading-[1em]`}
+            className={`text-gray-gradient relative z-10 font-outfit text-[3em] font-bold leading-[1em] tracking-tight lg:text-[8em] lg:leading-[1em]`}
           >
             The Future of
             <br />
