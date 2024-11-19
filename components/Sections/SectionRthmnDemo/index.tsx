@@ -4,17 +4,10 @@ import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
 import { MotionDiv } from '@/components/MotionDiv';
 import { CandleData } from '@/types/types';
-import {
-  FaChartArea,
-  FaTable,
-  FaCube,
-  FaUserCircle,
-  FaList
-} from 'react-icons/fa';
+import { FaChartArea, FaTable, FaCube, FaUserCircle } from 'react-icons/fa';
 import { PatternDisplay } from './PatternDisplay';
 import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
 import { PairSlider } from './PairSlider';
-import { TrendingInsights } from './TrendingInsights';
 import { MarketNavigator } from './MarketNavigator';
 
 interface MarketData {
