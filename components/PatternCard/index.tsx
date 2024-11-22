@@ -1,5 +1,5 @@
 import React from 'react';
-import ShiftedBox from '@/components/Charts/Reso/Shifted';
+import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { Signal, BoxSlice } from '@/types/types';
 import { useSignals } from '@/providers/SignalProviderClient';
 
@@ -19,15 +19,10 @@ const PatternCard: React.FC<PatternCardProps> = ({ signal }) => {
   // Parse boxes from string to object
   const boxes = signal.boxes ? JSON.parse(signal.boxes) : [];
 
-  // Create BoxSlice object for ShiftedBox component
-  const boxSlice: BoxSlice = {
-    timestamp: signal.start_time || new Date().toISOString(),
-    boxes: boxes.map((box: any) => ({
-      high: box.high,
-      low: box.low,
-      value: box.value
-    }))
-  };
+  // Transform boxes to match NestedBoxes format
+  const transformedBoxes = boxes.map((box: any) => ({
+    value: box.value // NestedBoxes only needs the value property
+  }));
 
   // Calculate time left (10 minutes from start time)
   const startTime = signal.start_time
@@ -57,9 +52,15 @@ const PatternCard: React.FC<PatternCardProps> = ({ signal }) => {
         <div>{signal.pattern_type}</div>
       </div>
 
-      {/* Middle Container */}
-      <div className="mb-2">
-        <ShiftedBox slice={boxSlice} isLoading={false} />
+      {/* Middle Container - Replace ShiftedBox with NestedBoxes */}
+      <div className="mb-2 relative flex justify-center">
+        <NestedBoxes 
+          boxes={transformedBoxes}
+          demoStep={0}
+          isPaused={true}
+          baseSize={250}
+          colorScheme="green-red"
+        />
       </div>
 
       {/* Bottom Container */}
