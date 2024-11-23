@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
-import ShiftedBox from '@/components/Charts/Reso/Shifted';
-import SettingsBar from '@/components/Accessibility/SettingsBar';
+import { ResoBox } from '@/components/Charts/ResoBox';
+import { SettingsBar } from '@/components/Accessibility/SettingsBar';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC } from '@/types/types';
 
@@ -29,7 +29,7 @@ export default function Dashboard() {
             const data = pairData[pair];
             if (!data?.boxes?.length) return null;
             return data.boxes.map((boxSlice, index) => (
-              <PairCard
+              <PairResoBox
                 key={`${pair}-${index}`}
                 pair={pair}
                 boxSlice={boxSlice}
@@ -43,7 +43,7 @@ export default function Dashboard() {
   );
 }
 
-const PairCard = ({
+const PairResoBox = ({
   pair,
   boxSlice,
   currentOHLC
@@ -65,7 +65,7 @@ const PairCard = ({
         </div>
       </div>
       <div className="mb-2 w-full">
-        <ShiftedBox slice={boxSlice} isLoading={false} />
+        <ResoBox slice={boxSlice} isLoading={false} />
       </div>
     </div>
   );

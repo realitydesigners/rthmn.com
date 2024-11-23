@@ -8,7 +8,7 @@ interface BoxComponentProps {
   isLoading: boolean;
 }
 
-const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
+export const ResoBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
   const { boxColors } = useDashboard();
 
   const renderShiftedBoxes = (boxArray: Box[]) => {
@@ -130,5 +130,3 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
     </div>
   );
 };
-
-export default ShiftedBox;

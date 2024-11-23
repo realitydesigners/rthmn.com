@@ -52,7 +52,10 @@ const StyleControl: React.FC<{
   );
 };
 
-const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
+export const SettingsBar: React.FC<SettingsBarProps> = ({
+  isOpen,
+  onToggle
+}) => {
   const { selectedPairs, togglePair, boxColors, updateBoxColors } =
     useDashboard();
   const [activeAsset, setActiveAsset] = useState<string | null>('FOREX');
@@ -265,5 +268,3 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
     </div>
   );
 };
-
-export default SettingsBar;
