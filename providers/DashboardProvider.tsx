@@ -1,5 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { BoxSlice, PairData } from '@/types/types';
 import { useWebSocket } from '@/providers/WebSocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
@@ -25,31 +26,6 @@ interface DashboardContextType {
 const DashboardContext = createContext<DashboardContextType | undefined>(
   undefined
 );
-
-export const FOREX_PAIRS = [
-  'USDJPY',
-  'GBPUSD',
-  'AUDUSD',
-  'EURUSD',
-  'USDCAD',
-  'USDCHF',
-  'NZDUSD',
-  'GBPAUD',
-  'GBPCAD',
-  'GBPNZD',
-  'EURJPY'
-] as const;
-
-export const CRYPTO_PAIRS = [
-  'BTCUSD',
-  'ETHUSD',
-  'LTCUSD',
-  'BCHUSD',
-  'PAXGUSD',
-  'LINKUSD',
-  'UNIUSD',
-  'AAVEUSD'
-] as const;
 
 export const AVAILABLE_PAIRS = [...FOREX_PAIRS, ...CRYPTO_PAIRS] as const;
 
