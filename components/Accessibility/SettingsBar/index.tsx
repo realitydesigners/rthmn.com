@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import { FaCog } from 'react-icons/fa';
-import {
-  useDashboard,
-  FOREX_PAIRS,
-  CRYPTO_PAIRS
-} from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import styles from './styles.module.css';
 import { colorPresets } from '@/utils/colorPresets';
 import { BoxColors } from '@/utils/localStorage';
@@ -55,7 +52,10 @@ const StyleControl: React.FC<{
   );
 };
 
-const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
+export const SettingsBar: React.FC<SettingsBarProps> = ({
+  isOpen,
+  onToggle
+}) => {
   const { selectedPairs, togglePair, boxColors, updateBoxColors } =
     useDashboard();
   const [activeAsset, setActiveAsset] = useState<string | null>('FOREX');
@@ -268,5 +268,3 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
     </div>
   );
 };
-
-export default SettingsBar;
