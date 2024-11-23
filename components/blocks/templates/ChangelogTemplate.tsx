@@ -67,7 +67,7 @@ export const ChangelogTemplate: PortableTextComponents = {
     ),
     em: ({ children }) => <em className="italic text-gray-300">{children}</em>,
     code: ({ children }) => (
-      <code className="rounded bg-gray-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400">
+      <code className="rounded-sm bg-gray-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400">
         {children}
       </code>
     ),

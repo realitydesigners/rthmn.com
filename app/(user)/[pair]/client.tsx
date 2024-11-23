@@ -97,7 +97,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
 
   return (
     <div className="flex h-screen w-full flex-col overflow-hidden bg-black">
-      <div className="min-h-[400px] flex-grow overflow-hidden">
+      <div className="min-h-[400px] grow overflow-hidden">
         {candleData.length > 0 ? (
           <LineChart pair={pair} candles={candleData} />
         ) : (
@@ -108,7 +108,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
       
       KEEP THIS
       <div
-        className="flex-shrink-0"
+        className="shrink-0"
         style={{
           height: `${histogramHeight + 40}px`
         }}

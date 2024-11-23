@@ -20,7 +20,7 @@ export default function AboutClient({ page }: { page: PageData }) {
           key={index}
           className={` ${section.layout === 'contained' ? 'container mx-auto max-w-7xl' : ''} ${section.layout === 'wide' ? 'container mx-auto max-w-[90vw]' : ''} ${section.backgroundColor === 'dark' ? 'bg-black/50' : ''} ${section.backgroundColor === 'light' ? 'bg-white/5' : ''} ${
             section.backgroundColor === 'gradient'
-              ? 'bg-gradient-to-b from-black/50 to-transparent'
+              ? 'bg-linear-to-b from-black/50 to-transparent'
               : ''
           } px-6 py-16`}
         >

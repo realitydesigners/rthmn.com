@@ -3,5 +3,5 @@ export default function StudioLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <div className="absolute z-[10000] h-full w-screen">{children}</div>;
+  return <div className="absolute z-10000 h-full w-screen">{children}</div>;
 }

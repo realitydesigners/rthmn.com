@@ -7,7 +7,7 @@ const RenderCategory = ({ category }) => {
   if (!category) return null;
 
   return (
-    <div className="my-1 flex items-center justify-center bg-gradient-to-r from-blue-100/100 to-blue-100/90 p-1 pl-2 pr-2">
+    <div className="my-1 flex items-center justify-center bg-linear-to-r from-blue-100/100 to-blue-100/90 p-1 pl-2 pr-2">
       <span
         className={`flex h-auto items-center justify-center whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-black`}
       >
@@ -63,7 +63,7 @@ const TeamSection = ({ team, theme }) => {
                 priority={true}
                 className="cover h-[2em] max-h-[2em] w-[2em] max-w-[2em] rounded-lg object-cover"
               />
-              <span className="ml-2 cursor-pointer bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-sm font-bold uppercase leading-none tracking-wide text-transparent">
+              <span className="ml-2 cursor-pointer bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-sm font-bold uppercase leading-none tracking-wide text-transparent">
                 Written by {team.name}
               </span>
             </div>
@@ -95,7 +95,7 @@ const HeadingBlock = ({ block }) => {
 
               <FormattedDate
                 date={publicationDate}
-                className={`my-1 w-auto bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xs uppercase tracking-widest text-transparent`}
+                className={`my-1 w-auto bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xs uppercase tracking-widest text-transparent`}
               />
             </div>
 
@@ -122,16 +122,16 @@ const HeadingBlock = ({ block }) => {
 
                   <FormattedDate
                     date={publicationDate}
-                    className={`w-auto bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xs uppercase tracking-widest text-transparent`}
+                    className={`w-auto bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xs uppercase tracking-widest text-transparent`}
                   />
                 </div>
                 <Heading
                   heading={block.heading}
-                  className={`cursor-pointer bg-gradient-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 font-russo text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
+                  className={`cursor-pointer bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 font-russo text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
                 />
                 <SubHeading
                   heading={block.subheading}
-                  className={`bg-gradient-to-r from-blue-100/80 to-blue-100/70 bg-clip-text p-1 font-outfit text-xl leading-tight text-transparent`}
+                  className={`bg-linear-to-r from-blue-100/80 to-blue-100/70 bg-clip-text p-1 font-outfit text-xl leading-tight text-transparent`}
                 />
                 <div className="w-full">
                   <TeamSection team={block.team} theme={className} />

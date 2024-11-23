@@ -39,10 +39,10 @@ export const NavButton: FC<NavButtonProps> = ({
       >
         <Link
           href={href}
-          className="flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+          className="flex items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
           onClick={onClick}
         >
-          <span className="flex w-full items-center space-x-3 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
+          <span className="flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
             {children}
           </span>
         </Link>

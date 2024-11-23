@@ -125,7 +125,7 @@ export const ServiceSection = () => {
       </div>
       {isDetailVisible && (
         <div
-          className="lg:-16 ml-0 mt-4 h-[80vh] flex-grow overflow-hidden border border-gray-600/25 p-4 transition-all duration-500 ease-in-out lg:ml-4 lg:mt-0 lg:w-3/4"
+          className="lg:-16 ml-0 mt-4 h-[80vh] grow overflow-hidden border border-gray-600/25 p-4 transition-all duration-500 ease-in-out lg:ml-4 lg:mt-0 lg:w-3/4"
           style={{
             maxHeight: isDetailVisible ? '100%' : '0',
             opacity: isDetailVisible ? 1 : 0

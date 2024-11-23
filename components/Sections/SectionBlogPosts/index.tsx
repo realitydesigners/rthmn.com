@@ -45,12 +45,12 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
     <MotionDiv
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
-      className="group relative overflow-hidden rounded-xl bg-gradient-to-b from-white/5 to-transparent p-[1px]"
+      className="group relative overflow-hidden rounded-xl bg-linear-to-b from-white/5 to-transparent p-[1px]"
     >
       <div className="relative h-full rounded-xl border border-white/10 bg-black/90 backdrop-blur-md">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
         </div>
 
         {block?.imageRef && (
@@ -61,7 +61,7 @@ const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
           </div>
         )}
 
@@ -106,7 +106,7 @@ export function SectionBlogPosts({ initialPosts }: PostListProps) {
   }, [initialPosts]);
 
   return (
-    <section className="relative z-[100] px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
+    <section className="relative z-100 px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
       <div className="mb-6 border-b border-white/5 pb-2">
         <h2 className="text-2xl font-bold text-white/90">Latest Posts</h2>
       </div>

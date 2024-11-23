@@ -58,7 +58,7 @@ const MarketHeading = () => (
     transition={{ duration: 0.8 }}
     className="text-center lg:pl-32 lg:text-left"
   >
-    <h2 className="relative z-10 bg-gradient-to-r from-white to-white/60 bg-clip-text font-outfit text-[4em] font-bold leading-[1em] tracking-tight text-transparent sm:text-[5em] lg:text-[7em] lg:leading-[1em]">
+    <h2 className="relative z-10 bg-linear-to-r from-white to-white/60 bg-clip-text font-outfit text-[4em] font-bold leading-[1em] tracking-tight text-transparent sm:text-[5em] lg:text-[7em] lg:leading-[1em]">
       Trading
       <br />
       Simplified
@@ -200,7 +200,7 @@ const MarketCard = ({
       style={{ transformStyle: 'preserve-3d' }}
     >
       <div className="relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md">
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 via-transparent to-black/30" />
+        <div className="absolute inset-0 rounded-xl bg-linear-to-br from-white/10 via-transparent to-black/30" />
         <div
           className={`absolute inset-0 rounded-xl opacity-20 blur-xl ${
             data.change >= 0 ? 'bg-emerald-500/20' : 'bg-red-500/20'
@@ -308,7 +308,7 @@ export function SectionMarketDisplay({
   };
 
   return (
-    <section className="relative z-[100] flex min-h-screen flex-col items-center justify-center overflow-hidden lg:flex-row">
+    <section className="relative z-100 flex min-h-screen flex-col items-center justify-center overflow-hidden lg:flex-row">
       <div className="relative flex w-full items-center justify-center px-4 py-8 lg:w-1/2 lg:px-0 lg:pr-16">
         <MarketHeading />
       </div>

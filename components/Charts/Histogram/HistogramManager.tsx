@@ -143,7 +143,7 @@ const HistogramChart: React.FC<{
       low: number;
     }> = ({ x, y, color, linePrice, high, low }) => (
       <div
-        className="pointer-events-none absolute z-[1000]"
+        className="pointer-events-none absolute z-1000"
         style={{
           left: `${x}px`,
           top: `${y}px`,
@@ -151,7 +151,7 @@ const HistogramChart: React.FC<{
         }}
       >
         <div
-          className="shadow-x mb-4 rounded px-2 py-1 text-xs font-bold text-black"
+          className="shadow-x mb-4 rounded-sm px-2 py-1 text-xs font-bold text-black"
           style={{ backgroundColor: color }}
         >
           <div>{linePrice.toFixed(3)}</div>
@@ -190,7 +190,7 @@ const HistogramChart: React.FC<{
               return (
                 <div
                   key={`${index}`}
-                  className="relative flex-shrink-0 cursor-pointer"
+                  className="relative shrink-0 cursor-pointer"
                   style={{
                     width: sliceWidth,
                     height: `${height}px`,
@@ -299,7 +299,7 @@ const TimeBar: React.FC<{
           return (
             <div
               key={index}
-              className="absolute flex-shrink-0 whitespace-nowrap text-center text-[11px] font-bold"
+              className="absolute shrink-0 whitespace-nowrap text-center text-[11px] font-bold"
               style={{
                 left: `${index * INITIAL_BAR_WIDTH}px`,
                 width: `${INITIAL_BAR_WIDTH}px`,

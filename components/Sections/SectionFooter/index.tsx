@@ -104,14 +104,14 @@ export function SectionFooter() {
               </p>
               <form onSubmit={handleSubmit} className="mt-4">
                 <div className="group relative">
-                  <div className="absolute -inset-0.5 rounded-lg bg-gradient-to-r from-blue-500/50 to-purple-500/50 opacity-0 blur transition-all duration-500 group-hover:opacity-100" />
+                  <div className="absolute -inset-0.5 rounded-lg bg-linear-to-r from-blue-500/50 to-purple-500/50 opacity-0 blur-sm transition-all duration-500 group-hover:opacity-100" />
                   <div className="relative flex">
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className="w-full rounded-l-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-gray-500 backdrop-blur-sm focus:outline-none"
+                      className="w-full rounded-l-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-gray-500 backdrop-blur-sm focus:outline-hidden"
                     />
                     <button
                       type="submit"
