@@ -83,7 +83,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                   {/* Card gradient effects */}
                   <div className="pointer-events-none absolute inset-0 rounded-xl">
                     <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-                    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                    <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent" />
                   </div>
 
                   {/* Timeline dot and connector */}
@@ -172,7 +172,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                       {/* Button gradient effects */}
                       <div className="pointer-events-none absolute inset-0">
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+                        <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent" />
                       </div>
                       <span className="font-kodemono text-sm text-white/60">
                         {expandedEntries.has(entry._id)

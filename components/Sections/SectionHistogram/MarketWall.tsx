@@ -1,15 +1,40 @@
 'use client';
-import { useEffect, useState, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo } from 'react';
 
-// Increased density
-const ROWS = 30;
-const COLS = 40;
-const BASE_OPACITY = 0.2;
-const HIGHLIGHT_OPACITY = 0.8;
-const UPDATE_INTERVAL = 3;
-const HIGHLIGHT_CHANCE = 0.2;
-const MIN_FONT_SIZE = 10; // Smaller font size to fit more numbers
-const BASE_FONT_SIZE = 10;
+const ROWS = 35;
+const HIGHLIGHT_CHANCE = 0.03;
+const GLOW_INTENSITY = 80;
+const GLOW_LAYERS = 2;
+const HIGHLIGHT_OPACITY = 1.0;
+const SIGNAL_LIFETIME = 3000;
+const FADE_IN_DURATION = 500;
+const FADE_OUT_DURATION = 500;
+const BASE_FONT_SIZE = '12px';
+const MIN_SIGNALS = 4;
+const MAX_SIGNALS = 8;
+const SIGNAL_SPACING = 100;
+const VIEWPORT_PADDING = 100;
+const SCALE_START = 0.5;
+const SCALE_END = 1;
+const LABEL_FONT_SIZE = '6px';
+const LABEL_SPACING = 2;
+
+const COLORS = {
+  emerald: {
+    glow: [
+      'rgba(52, 211, 153, 1)', // text-emerald-400 full opacity
+      'rgba(52, 211, 153, 0.8)' // text-emerald-400 80%
+    ],
+    text: '#4ade80'
+  },
+  red: {
+    glow: [
+      'rgba(248, 113, 113, 1)', // text-red-400 full opacity
+      'rgba(248, 113, 113, 0.8)' // text-red-400 80%
+    ],
+    text: '#ff8080'
+  }
+};
 
 interface MarketData {
   pair: string;
@@ -19,185 +44,229 @@ interface MarketData {
 
 interface NumberCell {
   value: string;
+  pair?: string;
   isHighlighted: boolean;
   isPositive: boolean;
   opacity: number;
-  pair?: string;
+  x: number;
+  y: number;
+  z: number;
+  scale: number;
+  createdAt: number;
+  tradeType: 'BUY | LONG' | 'SELL | SHORT';
 }
 
 export function MarketWall({ marketData }: { marketData: MarketData[] }) {
-  const [cells, setCells] = useState<NumberCell[][]>([]);
-  const frameRef = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const cellsRef = useRef<NumberCell[]>([]);
+  const animationFrameRef = useRef<number | undefined>(undefined);
 
-  // Memoize price lookup function
-  const getRealPrice = useMemo(() => {
-    const priceMap = new Map();
-    marketData.forEach((data) => {
-      try {
-        const candles = JSON.parse(data.candleData);
-        if (
-          Array.isArray(candles) &&
-          candles.length > 0 &&
-          candles[0]?.mid?.c
-        ) {
-          priceMap.set(data.pair, parseFloat(candles[0].mid.c).toFixed(4));
-        }
-      } catch (e) {
-        console.error('Error parsing price for', data.pair, e);
-      }
+  const getRandomPosition = (ctx: CanvasRenderingContext2D) => {
+    const padding = VIEWPORT_PADDING;
+    const width = ctx.canvas.width / window.devicePixelRatio;
+    const height = ctx.canvas.height / window.devicePixelRatio;
+
+    const gridCols = 4;
+    const gridRows = 3;
+    const sectionWidth = (width - padding * 2) / gridCols;
+    const sectionHeight = (height - padding * 2) / gridRows;
+
+    const gridX = Math.floor(Math.random() * gridCols);
+    const gridY = Math.floor(Math.random() * gridRows);
+
+    const x = padding + gridX * sectionWidth + Math.random() * sectionWidth;
+    const y = padding + gridY * sectionHeight + Math.random() * sectionHeight;
+
+    return { x, y };
+  };
+
+  const isTooClose = (x: number, y: number) => {
+    return cellsRef.current.some((cell) => {
+      const dx = cell.x - x;
+      const dy = cell.y - y;
+      return Math.sqrt(dx * dx + dy * dy) < SIGNAL_SPACING;
     });
-    return (pair: string) => priceMap.get(pair) || null;
-  }, [marketData]);
+  };
 
-  const generateNumber = (shouldIncludePair = false) => {
-    if (shouldIncludePair && marketData.length > 0) {
-      const randomPair =
-        marketData[Math.floor(Math.random() * marketData.length)]?.pair;
-      return {
-        value: getRealPrice(randomPair) || (Math.random() * 2 + 0.1).toFixed(4),
-        pair: randomPair,
-        isHighlighted: true,
-        isPositive: Math.random() > 0.5
-      };
-    }
+  const generateNumber = (x: number, y: number, z: number): NumberCell => {
+    const randomPair =
+      marketData[Math.floor(Math.random() * marketData.length)]?.pair;
+    const isPositive = Math.random() > 0.3;
     return {
       value: (Math.random() * 2 + 0.1).toFixed(4),
-      pair: undefined,
-      isHighlighted: false,
-      isPositive: false
+      pair: randomPair,
+      isHighlighted: true,
+      isPositive,
+      opacity: 0,
+      x,
+      y,
+      z,
+      scale: SCALE_START,
+      createdAt: Date.now(),
+      tradeType: isPositive ? 'BUY | LONG' : 'SELL | SHORT'
     };
   };
 
   useEffect(() => {
-    // Initialize cells with mostly background numbers
-    const initialCells: NumberCell[][] = Array(ROWS)
-      .fill(null)
-      .map((_, i) =>
-        Array(COLS)
-          .fill(null)
-          .map((_, j) => ({
-            ...generateNumber(Math.random() < 0.1), // 10% chance of being a pair
-            opacity: BASE_OPACITY
-          }))
-      );
-    setCells(initialCells);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-    let frameCount = 0;
-    const animate = () => {
-      frameCount++;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
 
-      if (frameCount % UPDATE_INTERVAL === 0) {
-        setCells((prev) => {
-          const newCells = [...prev];
-
-          // Update random cell with highlight
-          if (Math.random() < HIGHLIGHT_CHANCE) {
-            const row = Math.floor(Math.random() * ROWS);
-            const col = Math.floor(Math.random() * COLS);
-            const generated = generateNumber(true);
-
-            newCells[row][col] = {
-              ...generated,
-              opacity: HIGHLIGHT_OPACITY
-            };
-          }
-
-          // Fade out highlights
-          return newCells.map((row) =>
-            row.map((cell) => ({
-              ...cell,
-              opacity: cell.isHighlighted
-                ? Math.max(BASE_OPACITY, cell.opacity - 0.01)
-                : cell.opacity,
-              isHighlighted: cell.isHighlighted
-                ? cell.opacity > BASE_OPACITY
-                : false
-            }))
-          );
-        });
-      }
-
-      frameRef.current = requestAnimationFrame(animate);
+    const resizeCanvas = () => {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.style.width = '100vw';
+      canvas.style.height = '100vh';
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      ctx.scale(dpr, dpr);
     };
 
-    frameRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frameRef.current);
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    for (let i = 0; i < MIN_SIGNALS; i++) {
+      let position;
+      do {
+        position = getRandomPosition(ctx);
+      } while (isTooClose(position.x, position.y));
+
+      cellsRef.current.push(
+        generateNumber(position.x, position.y, Math.random() * ROWS)
+      );
+    }
+
+    const drawCell = (cell: NumberCell, currentTime: number) => {
+      const age = currentTime - cell.createdAt;
+
+      if (age < FADE_IN_DURATION) {
+        const progress = age / FADE_IN_DURATION;
+        cell.opacity = progress * HIGHLIGHT_OPACITY;
+        cell.scale = SCALE_START + (SCALE_END - SCALE_START) * progress;
+      } else if (age < SIGNAL_LIFETIME) {
+        const settleProgress = Math.min(1, (age - FADE_IN_DURATION) / 300);
+        cell.opacity = HIGHLIGHT_OPACITY;
+        cell.scale = SCALE_END - (SCALE_END - 1) * settleProgress;
+      } else if (age < SIGNAL_LIFETIME + FADE_OUT_DURATION) {
+        const progress = (age - SIGNAL_LIFETIME) / FADE_OUT_DURATION;
+        cell.opacity = HIGHLIGHT_OPACITY * (1 - progress);
+        cell.scale = 1 + progress * 0.2;
+      } else {
+        cell.opacity = 0;
+        return;
+      }
+
+      ctx.save();
+      ctx.globalAlpha = cell.opacity;
+      ctx.translate(cell.x, cell.y);
+      ctx.scale(cell.scale, cell.scale);
+      ctx.translate(-cell.x, -cell.y);
+
+      const colors = cell.isPositive ? COLORS.emerald : COLORS.red;
+
+      if (cell.pair) {
+        const text = `${cell.pair.replace('_', '/')} ${cell.value}`;
+
+        // Multiple glow layers for main text
+        for (let i = 0; i < GLOW_LAYERS; i++) {
+          ctx.save();
+          ctx.font = `${BASE_FONT_SIZE} "Kode Mono"`;
+          ctx.shadowColor = colors.glow[i];
+          ctx.shadowBlur = GLOW_INTENSITY * (1 - i * 0.2) * cell.scale;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          ctx.fillStyle = colors.text;
+          ctx.fillText(text, cell.x, cell.y);
+          ctx.restore();
+        }
+
+        // Final sharp layer for main text
+        ctx.font = `${BASE_FONT_SIZE} "Kode Mono"`;
+        ctx.fillStyle = colors.text;
+        ctx.fillText(text, cell.x, cell.y);
+
+        // Label with smaller glow
+        const labelText = cell.tradeType;
+        const mainTextWidth = ctx.measureText(text).width;
+        const labelY = cell.y + parseInt(BASE_FONT_SIZE) + LABEL_SPACING;
+        const labelX =
+          cell.x + (mainTextWidth - ctx.measureText(labelText).width) / 2;
+
+        // Multiple glow layers for label
+        for (let i = 0; i < GLOW_LAYERS; i++) {
+          ctx.save();
+          ctx.font = `${LABEL_FONT_SIZE} "Kode Mono"`;
+          ctx.shadowColor = colors.glow[i];
+          ctx.shadowBlur = GLOW_INTENSITY * 0.6 * (1 - i * 0.2) * cell.scale;
+          ctx.shadowOffsetX = 0;
+          ctx.shadowOffsetY = 0;
+          ctx.fillStyle = colors.text;
+          ctx.fillText(labelText, labelX, labelY);
+          ctx.restore();
+        }
+
+        // Final sharp layer for label
+        ctx.font = `${LABEL_FONT_SIZE} "Kode Mono"`;
+        ctx.fillStyle = colors.text;
+        ctx.fillText(labelText, labelX, labelY);
+      }
+
+      ctx.restore();
+    };
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const currentTime = Date.now();
+
+      if (
+        cellsRef.current.length < MAX_SIGNALS &&
+        Math.random() < HIGHLIGHT_CHANCE
+      ) {
+        let position;
+        do {
+          position = getRandomPosition(ctx);
+        } while (isTooClose(position.x, position.y));
+
+        cellsRef.current.push(
+          generateNumber(position.x, position.y, Math.random() * ROWS)
+        );
+      }
+
+      if (cellsRef.current.length < MIN_SIGNALS) {
+        let position = getRandomPosition(ctx);
+        cellsRef.current.push(
+          generateNumber(position.x, position.y, Math.random() * ROWS)
+        );
+      }
+
+      cellsRef.current.forEach((cell) => drawCell(cell, currentTime));
+
+      cellsRef.current = cellsRef.current.filter(
+        (cell) =>
+          currentTime - cell.createdAt < SIGNAL_LIFETIME + FADE_OUT_DURATION
+      );
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      window.removeEventListener('resize', resizeCanvas);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+    };
   }, [marketData]);
 
-  // Rest of the render code remains similar, but with optimized cell rendering
   return (
-    <div className="absolute inset-0 z-0 h-screen max-h-screen w-screen overflow-hidden bg-gradient-to-b from-transparent to-black/40">
-      <div
-        className="grid h-full w-full transform-gpu"
-        style={{
-          gridTemplateRows: `repeat(${ROWS}, 1fr)`,
-          transform: 'rotateX(45deg) rotateZ(0deg) scale(2.5) translateY(25%) ',
-          transformOrigin: 'center 50%',
-          transformStyle: 'preserve-3d'
-        }}
-      >
-        {cells.map((row, i) => (
-          <div
-            key={i}
-            className="relative flex"
-            style={{
-              transform: `translateZ(${i * 4}px)`,
-              opacity: 1 - i * 0.02,
-              gap: '2px'
-            }}
-          >
-            {row.map((cell, j) => {
-              const randomX = Math.sin(i * j * 0.5) * 50;
-              const randomY = Math.cos(i * j * 0.7) * 100;
-
-              return (
-                <div
-                  key={`${i}-${j}`}
-                  className={`relative flex flex-1 items-center justify-between px-0.5 font-kodemono transition-all duration-300 ease-out ${
-                    cell.isHighlighted ? 'z-10 scale-110' : 'scale-100'
-                  } ${
-                    cell.isHighlighted
-                      ? cell.isPositive
-                        ? 'text-emerald-300'
-                        : 'text-red-300'
-                      : 'text-white/25'
-                  } ${cell.isHighlighted ? 'animate-[float_3s_ease-in-out_infinite]' : ''} `}
-                  style={{
-                    opacity: cell.opacity,
-                    fontSize: `${Math.max(MIN_FONT_SIZE, BASE_FONT_SIZE - i * 0.1)}px`,
-                    transform: cell.isHighlighted
-                      ? `translateZ(${8}px) translateY(${Math.sin(Date.now() * 0.003) * 2}px)`
-                      : `translate(${randomX}px, ${randomY}px)`,
-                    position: 'relative',
-                    left: `${Math.sin(i * j * 0.3) * 30}px`
-                  }}
-                >
-                  {/* Glow layers first (behind text) */}
-                  {cell.isHighlighted && (
-                    <>
-                      <div
-                        className={`absolute inset-0 -z-20 blur-lg ${cell.isPositive ? 'bg-emerald-500/10' : 'bg-red-500/10'} scale-125`}
-                      />
-                      <div
-                        className={`absolute inset-0 -z-20 blur-md ${cell.isPositive ? 'bg-emerald-500/30' : 'bg-red-500/30'} `}
-                      />
-                    </>
-                  )}
-                  {/* Crisp text on top */}
-                  <div className="relative z-20 flex w-full items-center justify-between gap-4">
-                    <span
-                      className={`transition-opacity duration-300 ${cell.isHighlighted ? 'opacity-90' : 'opacity-30'} ${cell.pair ? '' : 'invisible'} `}
-                    >
-                      {cell.pair?.replace('_', '/') || 'XXX/XXX'}
-                    </span>
-                    <span>{cell.value}</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        ))}
-      </div>
+    <div className="absolute inset-0 z-0 h-screen max-h-screen w-screen overflow-hidden bg-black">
+      <canvas
+        ref={canvasRef}
+        className="h-full w-full"
+        style={{ width: '100%', height: '100%' }}
+      />
     </div>
   );
 }

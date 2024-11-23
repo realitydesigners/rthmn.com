@@ -68,7 +68,7 @@ export function SignalSidebar() {
         <div className="flex flex-1 flex-col p-2 text-xs uppercase">
           <div className="flex gap-2">
             <p
-              className={`heading-text text-oxanium mb-2 inline-block rounded px-1.5 py-0.5 text-xs`}
+              className={`heading-text text-oxanium mb-2 inline-block rounded-sm px-1.5 py-0.5 text-xs`}
             >
               {signal.pattern_type === 'defaultType'
                 ? 'BUY'
@@ -114,7 +114,7 @@ export function SignalSidebar() {
             {pairName}
           </div>
           <p
-            className={`heading-text text-oxanium inline-block w-[50px] rounded border-[#747578] px-1.5 py-0.5 text-center text-xs`}
+            className={`heading-text text-oxanium inline-block w-[50px] rounded-sm border-[#747578] px-1.5 py-0.5 text-center text-xs`}
           >
             {signal.pattern_type === 'defaultType'
               ? 'BUY'
@@ -133,7 +133,7 @@ export function SignalSidebar() {
 
   return (
     <div
-      className={`text-oxanium fixed bottom-0 right-0 top-20 z-[1000] w-[300px] overflow-y-auto border border-[#181818] bg-black p-2 shadow-md`}
+      className={`text-oxanium fixed bottom-0 right-0 top-20 z-1000 w-[300px] overflow-y-auto border border-[#181818] bg-black p-2 shadow-md`}
     >
       <div className="mb-2 flex justify-between">
         <button
@@ -141,7 +141,7 @@ export function SignalSidebar() {
           onMouseEnter={() => setIsDetailedHovered(true)}
           onMouseLeave={() => setIsDetailedHovered(false)}
           onClick={() => toggleViewMode('detailed')}
-          className={`p-2 ${viewMode === 'detailed' ? 'bg-[#121212]' : 'bg-black'} rounded`}
+          className={`p-2 ${viewMode === 'detailed' ? 'bg-[#121212]' : 'bg-black'} rounded-sm`}
         >
           <DetailedIcon isDetailedHovered={isDetailedHovered} />
         </button>
@@ -150,7 +150,7 @@ export function SignalSidebar() {
           onMouseEnter={() => setIsCondensedHovered(true)}
           onMouseLeave={() => setIsCondensedHovered(false)}
           onClick={() => toggleViewMode('condensed')}
-          className={`p-2 ${viewMode === 'condensed' ? 'bg-[#121212]' : 'bg-black'} rounded`}
+          className={`p-2 ${viewMode === 'condensed' ? 'bg-[#121212]' : 'bg-black'} rounded-sm`}
         >
           <CondensedIcon isCondensedHovered={isCondensedHovered} />
         </button>
@@ -181,7 +181,7 @@ const StatusCircle: React.FC<{ status: string }> = ({ status }) => {
 
   return (
     <div
-      className={`mt-4 flex items-center justify-center rounded px-1.5 py-0.5 font-bold uppercase ${getStatusColor} text-oxanium`}
+      className={`mt-4 flex items-center justify-center rounded-sm px-1.5 py-0.5 font-bold uppercase ${getStatusColor} text-oxanium`}
     >
       {status === 'active' && (
         <div className="mr-1 h-1.5 w-1.5 animate-pulse rounded-full bg-yellow-200" />

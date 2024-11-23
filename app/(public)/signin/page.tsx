@@ -68,11 +68,11 @@ export default function SignIn() {
             <div className="space-y-4">
               <form onSubmit={handleSignIn}>
                 <button
-                  className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-gray-100 to-gray-300 p-[2px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-gray-200 hover:to-gray-400"
+                  className="flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-gray-100 to-gray-300 p-[2px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-gray-200 hover:to-gray-400"
                   type="submit"
                   disabled={isLoading}
                 >
-                  <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-white to-gray-50 px-6 py-3 text-base font-medium text-gray-700">
+                  <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-white to-gray-50 px-6 py-3 text-base font-medium text-gray-700">
                     <FcGoogle className="mr-3 h-6 w-6" />
                     {isLoading ? 'Signing in...' : 'Sign in with Google'}
                   </span>

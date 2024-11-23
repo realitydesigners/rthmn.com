@@ -47,7 +47,7 @@ const DynamicBackground = ({ color }: { color: string }) => (
         position: 'absolute',
         inset: 0,
         backgroundImage: `radial-gradient(circle at center, ${hexToRGBA(color, 0.2)}, transparent)`,
-        filter: 'blur(40px)'
+        filter: 'blur-sm(40px)'
       }}
     />
   </div>
@@ -55,7 +55,7 @@ const DynamicBackground = ({ color }: { color: string }) => (
 
 const BorderHighlight = () => (
   <div className="pointer-events-none absolute inset-0">
-    <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/20 to-transparent" />
   </div>
 );
 
@@ -68,7 +68,7 @@ const GradientOverlay = () => (
 const HoverEffect = ({ color }: { color: string }) => (
   <div className="absolute inset-0 opacity-0 transition-opacity duration-700 group-hover:opacity-100">
     <div
-      className="h-full w-full bg-gradient-to-br"
+      className="h-full w-full bg-linear-to-br"
       style={{
         backgroundImage: `linear-gradient(to bottom right, ${hexToRGBA(color, 0.1)}, transparent)`
       }}

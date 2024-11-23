@@ -60,7 +60,7 @@ export function GlowingCard({
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <h3 className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent">
+            <h3 className="bg-linear-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent">
               {belief.title}
             </h3>
           </div>
@@ -103,7 +103,7 @@ export function GlowingCard({
             {belief.tags.map((tag, i) => (
               <span
                 key={i}
-                className="rounded bg-white/[0.03] px-2 py-1 text-xs text-white/40 backdrop-blur-sm"
+                className="rounded-sm bg-white/[0.03] px-2 py-1 text-xs text-white/40 backdrop-blur-sm"
               >
                 {tag}
               </span>

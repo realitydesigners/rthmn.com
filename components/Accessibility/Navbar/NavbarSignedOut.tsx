@@ -134,7 +134,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     <>
       {isNavOpen && (
         <div
-          className="fixed inset-0 z-[1000] bg-black/75 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-1000 bg-black/75 backdrop-blur-sm lg:hidden"
           onClick={handleBackdropClick}
           onKeyDown={(e) => e.key === 'Escape' && handleBackdropClick()}
           role="button"
@@ -143,7 +143,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       )}
 
       <MotionDiv
-        className={`fixed left-0 right-0 top-0 z-50 z-[1001] h-16 bg-gradient-to-b from-black via-black/50 to-transparent font-mono lg:h-20`}
+        className={`fixed left-0 right-0 top-0 z-50 z-1001 h-16 bg-linear-to-b from-black via-black/50 to-transparent font-mono lg:h-20`}
         initial="hidden"
         animate="visible"
         variants={navVariants}
@@ -181,9 +181,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     />
                     <button
                       type="submit"
-                      className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                      className="flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
-                      <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
+                      <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                         Sign out
                       </span>
                     </button>
@@ -191,9 +191,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 ) : (
                   <Link
                     href="/signin"
-                    className="flex items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                    className="flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
-                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium">
+                    <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium">
                       Sign in
                     </span>
                   </Link>
@@ -216,7 +216,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
       <AnimatePresence>
         {isNavOpen && (
           <MotionDiv
-            className={`fixed inset-0 z-[1000] bg-black bg-opacity-95 pt-16 font-mono backdrop-blur-sm lg:hidden`}
+            className={`fixed inset-0 z-1000 bg-black bg-opacity-95 pt-16 font-mono backdrop-blur-sm lg:hidden`}
             initial={{ opacity: 0, y: -100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -100 }}
@@ -234,9 +234,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     />
                     <button
                       type="submit"
-                      className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                      className="flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
-                      <span className="py flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 text-sm font-medium">
+                      <span className="py flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 text-sm font-medium">
                         Sign out
                       </span>
                     </button>
@@ -244,9 +244,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 ) : (
                   <Link
                     href="/signin"
-                    className="flex w-full items-center justify-center space-x-3 rounded-md bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                    className="flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] font-outfit text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
-                    <span className="flex w-full items-center justify-center rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
+                    <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
                       Sign in
                     </span>
                   </Link>
@@ -411,7 +411,7 @@ export const DesktopMenuContent = ({
 
 export const MobileMenuContent = () => {
   return (
-    <div className="relative z-[100] grid grid-cols-2 gap-8 pt-8 font-outfit">
+    <div className="relative z-100 grid grid-cols-2 gap-8 pt-8 font-outfit">
       {allLinks.map((item) => (
         <div key={item.title} className="flex flex-col">
           <h2 className={`mb-2 text-lg text-[#555]`}>{item.title}</h2>

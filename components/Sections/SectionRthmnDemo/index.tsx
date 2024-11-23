@@ -115,10 +115,10 @@ const DemoNavbar = ({
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as TabType)}
-            className="flex h-auto items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+            className="flex h-auto items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
           >
             <span
-              className={`flex w-full items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 font-outfit text-xs font-semibold ${
+              className={`flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 font-outfit text-xs font-semibold ${
                 activeTab === tab.id
                   ? 'text-emerald-400'
                   : 'text-white hover:text-white'
@@ -133,13 +133,13 @@ const DemoNavbar = ({
 
       {/* Right section */}
       <div className="flex items-center space-x-4">
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
             <BellIcon />
           </div>
         </button>
-        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+        <button className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
             <FaUserCircle className="h-6 w-6 text-gray-300" />
           </div>
         </button>
@@ -201,14 +201,14 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
         return (
           <div className="flex flex-col gap-4 lg:flex-row">
             {/* Main Chart Area */}
-            <div className="relative z-[100] flex-1 space-y-3">
+            <div className="relative z-100 flex-1 space-y-3">
               <div className="relative h-[400px] overflow-hidden rounded-lg border border-white/5 bg-black/20 backdrop-blur-sm lg:h-[500px]">
                 <LineChart pair={selectedPair} candles={candles} />
               </div>
             </div>
 
             {/* Market Cards - Side on desktop, bottom on mobile */}
-            <div className="w-full flex-shrink-0 space-y-3 lg:w-[220px]">
+            <div className="w-full shrink-0 space-y-3 lg:w-[220px]">
               <div className="rounded-lg border border-white/5 bg-black/20 p-2 backdrop-blur-sm">
                 <div className="scrollbar-thin scrollbar-track-white/5 grid max-h-[200px] grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3 lg:max-h-[500px] lg:grid-cols-1">
                   {marketData.map((marketItem) => (
@@ -265,11 +265,11 @@ export function SectionRthmnDemo({ marketData }: { marketData: MarketData[] }) {
   };
 
   return (
-    <section className="relative z-[100] flex h-full items-center justify-center py-12">
+    <section className="relative z-100 flex h-full items-center justify-center py-12">
       <div className="relative h-[75vh] w-full overflow-hidden border-white/10 bg-black bg-black/90 p-2 backdrop-blur-md md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
         </div>
         <DemoNavbar activeTab={activeTab} setActiveTab={setActiveTab} />
         <MotionDiv

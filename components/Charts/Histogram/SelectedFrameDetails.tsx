@@ -40,7 +40,7 @@ const SelectedFrameDetails: React.FC<SelectedFrameDetailsProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white focus:outline-none"
+            className="text-gray-400 hover:text-white focus:outline-hidden"
           >
             <svg
               className="h-6 w-6"

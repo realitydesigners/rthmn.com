@@ -36,16 +36,16 @@ export const NestedBoxes = ({
         if (colorScheme === 'green-red') {
           if (isFirstDifferent) {
             return box.value > 0
-              ? 'bg-gradient-to-br from-emerald-500/25 to-emerald-500/5 shadow-[inset_0_2px_15px_rgba(16,185,129,0.2)]'
-              : 'bg-gradient-to-br from-red-500/25 to-red-500/5 shadow-[inset_0_2px_15px_rgba(239,68,68,0.2)]';
+              ? 'bg-linear-to-br from-emerald-500/25 to-emerald-500/5 shadow-[inset_0_2px_15px_rgba(16,185,129,0.2)]'
+              : 'bg-linear-to-br from-red-500/25 to-red-500/5 shadow-[inset_0_2px_15px_rgba(239,68,68,0.2)]';
           }
           return box.value > 0
-            ? 'bg-gradient-to-br from-emerald-500/15 to-emerald-500/5 shadow-[inset_0_2px_10px_rgba(16,185,129,0.15)]'
-            : 'bg-gradient-to-br from-red-500/15 to-red-500/5 shadow-[inset_0_2px_10px_rgba(239,68,68,0.15)]';
+            ? 'bg-linear-to-br from-emerald-500/15 to-emerald-500/5 shadow-[inset_0_2px_10px_rgba(16,185,129,0.15)]'
+            : 'bg-linear-to-br from-red-500/15 to-red-500/5 shadow-[inset_0_2px_10px_rgba(239,68,68,0.15)]';
         }
         return box.value > 0
-          ? 'bg-gradient-to-br from-white/20 to-white/10'
-          : 'bg-gradient-to-br from-white/10 to-transparent';
+          ? 'bg-linear-to-br from-white/20 to-white/10'
+          : 'bg-linear-to-br from-white/10 to-transparent';
       };
 
       const getBorderColor = () => {
@@ -109,8 +109,8 @@ export const NestedBoxes = ({
         <div
           className={`absolute -inset-[1px] rounded-lg opacity-40 ${
             box.value > 0
-              ? 'bg-gradient-to-br from-emerald-500/20 to-transparent'
-              : 'bg-gradient-to-br from-red-500/20 to-transparent'
+              ? 'bg-linear-to-br from-emerald-500/20 to-transparent'
+              : 'bg-linear-to-br from-red-500/20 to-transparent'
           }`}
         />
 
@@ -118,8 +118,8 @@ export const NestedBoxes = ({
           <div
             className={`absolute inset-0 rounded-lg ${
               box.value > 0
-                ? 'bg-gradient-to-br from-emerald-500/20 to-transparent shadow-[inset_0_4px_25px_rgba(16,185,129,0.2)]'
-                : 'bg-gradient-to-br from-red-500/20 to-transparent shadow-[inset_0_4px_25px_rgba(239,68,68,0.2)]'
+                ? 'bg-linear-to-br from-emerald-500/20 to-transparent shadow-[inset_0_4px_25px_rgba(16,185,129,0.2)]'
+                : 'bg-linear-to-br from-red-500/20 to-transparent shadow-[inset_0_4px_25px_rgba(239,68,68,0.2)]'
             }`}
             style={{
               animation: 'pulse 2s ease-in-out infinite'
@@ -128,7 +128,7 @@ export const NestedBoxes = ({
         )}
 
         <div
-          className={`absolute inset-0 rounded-lg bg-gradient-to-br from-white/10 to-transparent opacity-20 ${
+          className={`absolute inset-0 rounded-lg bg-linear-to-br from-white/10 to-transparent opacity-20 ${
             box.value > 0
               ? 'shadow-[inset_0_8px_30px_rgba(16,185,129,0.1)]'
               : 'shadow-[inset_0_8px_30px_rgba(239,68,68,0.1)]'

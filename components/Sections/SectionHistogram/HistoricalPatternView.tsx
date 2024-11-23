@@ -52,7 +52,7 @@ export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
               return (
                 <div
                   key={patternIndex}
-                  className={`relative flex-shrink-0 transition-all duration-300 ${
+                  className={`relative shrink-0 transition-all duration-300 ${
                     isCurrentPattern
                       ? 'scale-105 opacity-100'
                       : 'scale-100 opacity-70'

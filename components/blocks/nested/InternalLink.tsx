@@ -15,8 +15,8 @@ const themeClasses: Record<TemplateTheme, ThemeProps> = {
   },
   dark: {
     textColor:
-      'bg-gradient-to-r from-blue-100/100 to-blue-100/90 text-transparent bg-clip-text transition-color',
-    backgroundColor: 'bg-gradient-to-r from-blue-200/10 to-blue-200/5 ',
+      'bg-linear-to-r from-blue-100/100 to-blue-100/90 text-transparent bg-clip-text transition-color',
+    backgroundColor: 'bg-linear-to-r from-blue-200/10 to-blue-200/5 ',
     topBackgroundColor: 'bg-blue-200/5 ',
     buttonTextColor: 'text-blue-100',
     buttonBackgroundColor: 'bg-blue-200/10 hover:bg-blue-200/20'
@@ -184,7 +184,7 @@ export default React.memo(InternalLink);
 
 const LoadingIndicator = () => (
   <div className="my-4 flex items-center justify-center">
-    <div className="flex h-auto w-full animate-pulse items-center justify-center rounded-lg bg-gradient-to-r from-blue-200/10 to-blue-200/5 p-4 shadow-lg">
+    <div className="flex h-auto w-full animate-pulse items-center justify-center rounded-lg bg-linear-to-r from-blue-200/10 to-blue-200/5 p-4 shadow-lg">
       {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
       <svg
         width="100"

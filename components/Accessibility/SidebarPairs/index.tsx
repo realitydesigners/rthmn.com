@@ -161,7 +161,7 @@ const PairsSidebar: React.FC<PairsSidebarProps> = ({
                     <button
                       key={label}
                       onClick={() => handleOffsetClick(pair, value)}
-                      className="flex w-8 items-center justify-center rounded bg-[#222] px-1 py-1 text-xs hover:bg-[#181818]"
+                      className="flex w-8 items-center justify-center rounded-sm bg-[#222] px-1 py-1 text-xs hover:bg-[#181818]"
                       onMouseEnter={() => setHoveredOffset(`${pair}-${label}`)}
                       onMouseLeave={() => setHoveredOffset(null)}
                     >

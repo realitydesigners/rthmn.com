@@ -71,7 +71,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     '?';
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-[1001] h-16 lg:h-20">
+    <nav className="fixed left-0 right-0 top-0 z-1001 h-16 lg:h-20">
       <div className="h-full w-full px-4">
         <div className="flex h-full items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -90,17 +90,17 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
             >
               Dashboard
             </Link>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
-              <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
                 <BellIcon />
               </div>
             </button>
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="flex items-center space-x-3 rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+                className="flex items-center space-x-3 rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
               >
-                <div className="flex items-center space-x-3 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+                <div className="flex items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
                   {/* <div className="py-1 pl-4 pr-1 text-left">
                     <p className="text-[12px] font-semibold">
                       {user?.user_metadata?.full_name || 'User'}

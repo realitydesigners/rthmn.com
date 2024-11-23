@@ -55,7 +55,7 @@ const PairResoBox = ({
   const closePrice = currentOHLC?.close || 'N/A';
 
   return (
-    <div className="m-auto flex flex-col items-center justify-center gap-5 rounded-lg border border-[#222] bg-gradient-to-b from-[#121314] to-[#0B0C0D] p-4 text-center text-white shadow-md">
+    <div className="m-auto flex flex-col items-center justify-center gap-5 rounded-lg border border-[#222] bg-linear-to-b from-[#121314] to-[#0B0C0D] p-4 text-center text-white shadow-md">
       <div className="mb-2 flex w-full items-center justify-between">
         <div className="font-outfit text-lg font-bold tracking-wider">
           {pair.toUpperCase()}

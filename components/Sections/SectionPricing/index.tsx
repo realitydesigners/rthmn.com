@@ -165,7 +165,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
                 disabled={
                   !selectedPriceId || priceIdLoading === selectedPriceId
                 }
-                className="mt-4 w-full rounded-md bg-[#22c55e] px-4 py-3 text-sm font-medium text-black transition-all hover:bg-[#22c55e]/90 focus:outline-none focus:ring-2 focus:ring-[#22c55e] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                className="mt-4 w-full rounded-md bg-[#22c55e] px-4 py-3 text-sm font-medium text-black transition-all hover:bg-[#22c55e]/90 focus:outline-hidden focus:ring-2 focus:ring-[#22c55e] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {priceIdLoading === selectedPriceId ? (
                   <span className="flex items-center justify-center gap-2">
@@ -195,7 +195,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
             </div>
 
             {/* Gradient overlay */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#22c55e]/5 via-transparent to-[#22c55e]/5" />
+            <div className="absolute inset-0 -z-10 bg-linear-to-br from-[#22c55e]/5 via-transparent to-[#22c55e]/5" />
           </div>
         </MotionDiv>
       </div>

@@ -42,7 +42,7 @@ const ArtistInfo = ({ artist, className }) => {
   const { isInset, textColor } =
     themeClasses[className] || themeClasses['image-standard'];
   const insetStyles = isInset
-    ? 'rounded-b-[1.2em] pl-2 -mt-[60px] pb-3 pt-1 bg-gradient-to-t from-black to-transparent'
+    ? 'rounded-b-[1.2em] pl-2 -mt-[60px] pb-3 pt-1 bg-linear-to-t from-black to-transparent'
     : '';
 
   return (

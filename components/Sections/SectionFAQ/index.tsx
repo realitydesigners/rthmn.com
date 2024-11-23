@@ -39,16 +39,16 @@ export const SectionFAQ: React.FC = () => {
   };
 
   return (
-    <section className="relative z-[100] px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
+    <section className="relative z-100 px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
       <div className="relative rounded-xl border border-white/10 bg-black/90 p-6 backdrop-blur-md">
         {/* Effects */}
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
         </div>
 
         <div className="mb-8 text-center">
-          <h2 className="bg-gradient-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 font-outfit text-5xl font-bold text-transparent">
+          <h2 className="bg-linear-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 font-outfit text-5xl font-bold text-transparent">
             Frequently Asked Questions
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-white/60">
@@ -124,7 +124,7 @@ export const SectionFAQ: React.FC = () => {
               >
                 <div className="border-t border-white/5 px-5 py-5">
                   <div className="flex gap-4">
-                    <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 font-outfit">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 font-outfit">
                       <span className="text-base font-bold text-white/70">
                         A
                       </span>

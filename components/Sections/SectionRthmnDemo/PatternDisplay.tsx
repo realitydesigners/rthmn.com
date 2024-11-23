@@ -115,7 +115,7 @@ export function PatternDisplay({ marketData }: PatternDisplayProps) {
   };
 
   return (
-    <section className="relative z-[100] h-full">
+    <section className="relative z-100 h-full">
       <div className="scrollbar-thin scrollbar-track-white/5 h-[calc(100vh-20rem)] overflow-y-auto pr-2 2xl:h-[calc(75vh)]">
         <div className="grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {marketData.map((item) => {

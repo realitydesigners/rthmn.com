@@ -42,7 +42,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
   };
 
   return (
-    <div className="rounded-lg border border-[#333] bg-gradient-to-b from-[#0A0A0A] to-[#181818] p-6">
+    <div className="rounded-lg border border-[#333] bg-linear-to-b from-[#0A0A0A] to-[#181818] p-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -79,9 +79,9 @@ export default function CustomerPortalForm({ subscription }: Props) {
         <button
           onClick={handleStripePortalRequest}
           disabled={isSubmitting}
-          className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828] disabled:opacity-50"
+          className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828] disabled:opacity-50"
         >
-          <div className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
+          <div className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
             <FaCreditCard className="h-4 w-4" />
             <span className="font-outfit text-sm">
               {isSubmitting ? 'Loading...' : 'Manage Plan'}

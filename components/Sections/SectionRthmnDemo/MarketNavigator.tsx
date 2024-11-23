@@ -73,7 +73,7 @@ export function MarketNavigator({
           placeholder="Search pairs..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full rounded-lg border border-white/5 bg-black/40 py-2 pl-10 pr-4 font-outfit text-sm text-white placeholder-white/40 outline-none focus:border-white/10"
+          className="w-full rounded-lg border border-white/5 bg-black/40 py-2 pl-10 pr-4 font-outfit text-sm text-white placeholder-white/40 outline-hidden focus:border-white/10"
         />
       </div>
 
