@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useMemo } from 'react';
+import { useEffect, useRef, useMemo, useCallback } from 'react';
 
 const ROWS = 35;
 const HIGHLIGHT_CHANCE = 0.03;
@@ -10,8 +10,7 @@ const SIGNAL_LIFETIME = 3000;
 const FADE_IN_DURATION = 500;
 const FADE_OUT_DURATION = 500;
 const BASE_FONT_SIZE = '12px';
-const MIN_SIGNALS = 4;
-const MAX_SIGNALS = 8;
+const MAX_SIGNALS = 12;
 const SIGNAL_SPACING = 100;
 const VIEWPORT_PADDING = 100;
 const SCALE_START = 0.5;
@@ -56,12 +55,45 @@ interface NumberCell {
   tradeType: 'BUY | LONG' | 'SELL | SHORT';
 }
 
+interface ProcessedMarketData {
+  pair: string;
+  price: string;
+}
+
 export function MarketWall({ marketData }: { marketData: MarketData[] }) {
+  const processedData = useMemo(() => {
+    return marketData.reduce<ProcessedMarketData[]>((acc, item) => {
+      try {
+        const candles = JSON.parse(item.candleData);
+        if (candles?.[0]?.mid?.c) {
+          acc.push({
+            pair: item.pair,
+            price: candles[0].mid.c
+          });
+        }
+        return acc;
+      } catch {
+        return acc;
+      }
+    }, []);
+  }, [marketData]);
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cellsRef = useRef<NumberCell[]>([]);
   const animationFrameRef = useRef<number | undefined>(undefined);
+  const contextRef = useRef<CanvasRenderingContext2D | null>(null);
+  const lastFrameTimeRef = useRef<number>(0);
+  const processedDataRef = useRef(processedData);
+  const FPS = 30; // Limit FPS
+  const frameInterval = 1000 / FPS;
 
-  const getRandomPosition = (ctx: CanvasRenderingContext2D) => {
+  // Update ref when processed data changes
+  useEffect(() => {
+    processedDataRef.current = processedData;
+  }, [processedData]);
+
+  // Memoize functions to prevent recreations
+  const getRandomPosition = useCallback((ctx: CanvasRenderingContext2D) => {
     const padding = VIEWPORT_PADDING;
     const width = ctx.canvas.width / window.devicePixelRatio;
     const height = ctx.canvas.height / window.devicePixelRatio;
@@ -78,66 +110,43 @@ export function MarketWall({ marketData }: { marketData: MarketData[] }) {
     const y = padding + gridY * sectionHeight + Math.random() * sectionHeight;
 
     return { x, y };
-  };
+  }, []);
 
-  const isTooClose = (x: number, y: number) => {
+  const isTooClose = useCallback((x: number, y: number) => {
     return cellsRef.current.some((cell) => {
       const dx = cell.x - x;
       const dy = cell.y - y;
       return Math.sqrt(dx * dx + dy * dy) < SIGNAL_SPACING;
     });
-  };
+  }, []);
 
-  const generateNumber = (x: number, y: number, z: number): NumberCell => {
-    const randomPair =
-      marketData[Math.floor(Math.random() * marketData.length)]?.pair;
-    const isPositive = Math.random() > 0.3;
-    return {
-      value: (Math.random() * 2 + 0.1).toFixed(4),
-      pair: randomPair,
-      isHighlighted: true,
-      isPositive,
-      opacity: 0,
-      x,
-      y,
-      z,
-      scale: SCALE_START,
-      createdAt: Date.now(),
-      tradeType: isPositive ? 'BUY | LONG' : 'SELL | SHORT'
-    };
-  };
+  const generateNumber = useCallback(
+    (x: number, y: number, z: number): NumberCell => {
+      const data = processedDataRef.current;
+      if (!data.length) return null;
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+      const randomData = data[Math.floor(Math.random() * data.length)];
+      const isPositive = Math.random() > 0.5;
 
-    const ctx = canvas.getContext('2d', { alpha: true });
-    if (!ctx) return;
+      return {
+        value: randomData.price,
+        pair: randomData.pair,
+        isHighlighted: true,
+        isPositive,
+        opacity: HIGHLIGHT_OPACITY,
+        x,
+        y: y + 200,
+        z,
+        scale: SCALE_START,
+        createdAt: Date.now(),
+        tradeType: isPositive ? 'BUY | LONG' : 'SELL | SHORT'
+      };
+    },
+    []
+  ); // No dependencies needed as we use ref
 
-    const resizeCanvas = () => {
-      const dpr = window.devicePixelRatio || 1;
-      canvas.style.width = '100vw';
-      canvas.style.height = '100vh';
-      canvas.width = window.innerWidth * dpr;
-      canvas.height = window.innerHeight * dpr;
-      ctx.scale(dpr, dpr);
-    };
-
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    for (let i = 0; i < MIN_SIGNALS; i++) {
-      let position;
-      do {
-        position = getRandomPosition(ctx);
-      } while (isTooClose(position.x, position.y));
-
-      cellsRef.current.push(
-        generateNumber(position.x, position.y, Math.random() * ROWS)
-      );
-    }
-
-    const drawCell = (cell: NumberCell, currentTime: number) => {
+  const drawCell = useCallback(
+    (ctx: CanvasRenderingContext2D, cell: NumberCell, currentTime: number) => {
       const age = currentTime - cell.createdAt;
 
       if (age < FADE_IN_DURATION) {
@@ -213,52 +222,114 @@ export function MarketWall({ marketData }: { marketData: MarketData[] }) {
       }
 
       ctx.restore();
-    };
+    },
+    []
+  );
 
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const currentTime = Date.now();
+  const animate = useCallback((timestamp: number) => {
+    if (!contextRef.current) return;
+    const ctx = contextRef.current;
 
-      if (
-        cellsRef.current.length < MAX_SIGNALS &&
-        Math.random() < HIGHLIGHT_CHANCE
-      ) {
-        let position;
-        do {
-          position = getRandomPosition(ctx);
-        } while (isTooClose(position.x, position.y));
-
-        cellsRef.current.push(
-          generateNumber(position.x, position.y, Math.random() * ROWS)
-        );
-      }
-
-      if (cellsRef.current.length < MIN_SIGNALS) {
-        let position = getRandomPosition(ctx);
-        cellsRef.current.push(
-          generateNumber(position.x, position.y, Math.random() * ROWS)
-        );
-      }
-
-      cellsRef.current.forEach((cell) => drawCell(cell, currentTime));
-
-      cellsRef.current = cellsRef.current.filter(
-        (cell) =>
-          currentTime - cell.createdAt < SIGNAL_LIFETIME + FADE_OUT_DURATION
-      );
-
+    // FPS limiting
+    const elapsed = timestamp - lastFrameTimeRef.current;
+    if (elapsed < frameInterval) {
       animationFrameRef.current = requestAnimationFrame(animate);
+      return;
+    }
+    lastFrameTimeRef.current = timestamp - (elapsed % frameInterval);
+
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    // Batch updates
+    const currentTime = Date.now();
+
+    // Only add new signals if we have processed data
+    if (
+      processedDataRef.current.length > 0 &&
+      cellsRef.current.length < MAX_SIGNALS &&
+      Math.random() < HIGHLIGHT_CHANCE
+    ) {
+      let position;
+      do {
+        position = getRandomPosition(ctx);
+      } while (isTooClose(position.x, position.y));
+
+      const newCell = generateNumber(
+        position.x,
+        position.y,
+        Math.random() * ROWS
+      );
+      if (newCell) {
+        cellsRef.current.push(newCell);
+      }
+    }
+
+    // Filter and draw in one pass
+    const activeCells: NumberCell[] = [];
+    cellsRef.current.forEach((cell) => {
+      if (currentTime - cell.createdAt < SIGNAL_LIFETIME + FADE_OUT_DURATION) {
+        drawCell(ctx, cell, currentTime);
+        activeCells.push(cell);
+      }
+    });
+
+    cellsRef.current = activeCells;
+
+    animationFrameRef.current = requestAnimationFrame(animate);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d', {
+      alpha: true,
+      desynchronized: true // Potential performance boost
+    });
+    if (!ctx) return;
+
+    contextRef.current = ctx;
+
+    const resizeCanvas = () => {
+      if (!canvas || !ctx) return;
+      const dpr = window.devicePixelRatio || 1;
+      const displayWidth = window.innerWidth;
+      const displayHeight = window.innerHeight;
+
+      // Only resize if dimensions actually changed
+      if (
+        canvas.width !== displayWidth * dpr ||
+        canvas.height !== displayHeight * dpr
+      ) {
+        canvas.style.width = `${displayWidth}px`;
+        canvas.style.height = `${displayHeight}px`;
+        canvas.width = displayWidth * dpr;
+        canvas.height = displayHeight * dpr;
+        ctx.scale(dpr, dpr);
+      }
     };
 
-    animate();
+    const resizeObserver = new ResizeObserver(() => {
+      requestAnimationFrame(resizeCanvas);
+    });
+
+    resizeCanvas();
+    resizeObserver.observe(canvas);
+
+    // Start animation only if we have processed data
+    if (processedData.length > 0) {
+      animate(0);
+    }
 
     return () => {
-      window.removeEventListener('resize', resizeCanvas);
+      resizeObserver.disconnect();
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      cellsRef.current = [];
+      contextRef.current = null;
     };
-  }, [marketData]);
+  }, [processedData, animate]);
 
   return (
     <div className="absolute inset-0 z-0 h-screen max-h-screen w-screen overflow-hidden bg-black">
