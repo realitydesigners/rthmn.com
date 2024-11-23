@@ -25,7 +25,7 @@ const FeatureTags = () => (
         className="group flex cursor-pointer items-center gap-2 sm:gap-3"
       >
         <div className="items-centergap-1.5 relative flex">
-          <div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur transition-opacity duration-500 group-hover:opacity-100" />
+          <div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
           <feature.icon className="relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4" />
           <span className="font-kodemono text-white/60 transition-colors duration-300 group-hover:text-white">
             {feature.text}

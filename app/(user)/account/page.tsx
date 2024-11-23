@@ -34,7 +34,7 @@ export default async function Account() {
         {/* Profile Header */}
         <div className="-mt-32 mb-12">
           <div className="flex flex-col items-center space-y-6 sm:flex-row sm:items-end sm:space-x-6 sm:space-y-0">
-            <div className="relative h-40 w-40 flex-shrink-0">
+            <div className="relative h-40 w-40 shrink-0">
               <ProfilePhotoForm
                 avatarUrl={userDetails?.avatar_url}
                 userId={user.id}

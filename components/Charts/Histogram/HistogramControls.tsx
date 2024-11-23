@@ -26,7 +26,7 @@ const AdjusterButton: React.FC<{
 }> = ({ icon, onClick, disabled }) => (
   <button
     onClick={onClick}
-    className="flex h-8 w-8 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50"
+    className="flex h-8 w-8 items-center justify-center rounded-sm border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50"
     disabled={disabled}
   >
     {icon}
@@ -81,7 +81,7 @@ const HistogramControls: React.FC<HistogramControlsProps> = ({
       />
       <button
         onClick={cycleViewType}
-        className="mt-2 flex h-10 w-10 items-center justify-center rounded border border-[#181818] bg-black text-white hover:bg-[#181818]"
+        className="mt-2 flex h-10 w-10 items-center justify-center rounded-sm border border-[#181818] bg-black text-white hover:bg-[#181818]"
       >
         <ViewIcon viewType={viewType} />
       </button>

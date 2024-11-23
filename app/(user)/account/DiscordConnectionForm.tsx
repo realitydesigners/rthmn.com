@@ -45,7 +45,7 @@ export default function DiscordConnectionForm({
   };
 
   return (
-    <div className="rounded-lg border border-[#333] bg-gradient-to-b from-[#0A0A0A] to-[#181818] p-6">
+    <div className="rounded-lg border border-[#333] bg-linear-to-b from-[#0A0A0A] to-[#181818] p-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
@@ -65,9 +65,9 @@ export default function DiscordConnectionForm({
             <button
               onClick={handleDisconnect}
               disabled={isLoading}
-              className="flex items-center gap-2 rounded-full bg-gradient-to-b from-red-600 to-red-700 p-[2px] text-white transition-all duration-200 hover:from-red-500 hover:to-red-600 disabled:opacity-50"
+              className="flex items-center gap-2 rounded-full bg-linear-to-b from-red-600 to-red-700 p-[2px] text-white transition-all duration-200 hover:from-red-500 hover:to-red-600 disabled:opacity-50"
             >
-              <div className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
+              <div className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
                 <FaUnlink className="h-4 w-4" />
                 <span className="font-outfit text-sm">
                   {isLoading ? 'Disconnecting...' : 'Disconnect'}
@@ -77,9 +77,9 @@ export default function DiscordConnectionForm({
           ) : (
             <button
               onClick={() => (window.location.href = DISCORD_OAUTH_URL)}
-              className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#5865F2] to-[#4752C4] p-[2px] text-white transition-all duration-200 hover:from-[#4752C4] hover:to-[#3442A8]"
+              className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#5865F2] to-[#4752C4] p-[2px] text-white transition-all duration-200 hover:from-[#4752C4] hover:to-[#3442A8]"
             >
-              <div className="flex items-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
+              <div className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
                 <FaDiscord className="h-4 w-4" />
                 <span className="font-outfit text-sm">Connect</span>
               </div>

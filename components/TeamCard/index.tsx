@@ -72,7 +72,7 @@ export function TeamCard() {
           key={member._id}
           className="group relative h-[400px] overflow-hidden rounded-xl bg-black/20 ring-1 ring-white/[0.05] transition-all duration-500 hover:shadow-lg hover:shadow-black/20 hover:ring-white/[0.1]"
         >
-          <div className="absolute -inset-1 -z-10 animate-pulse bg-gradient-to-r from-purple-500/10 via-transparent to-cyan-500/10 opacity-0 transition-all duration-700 ease-in-out group-hover:opacity-100" />
+          <div className="absolute -inset-1 -z-10 animate-pulse bg-linear-to-r from-purple-500/10 via-transparent to-cyan-500/10 opacity-0 transition-all duration-700 ease-in-out group-hover:opacity-100" />
 
           {member.image?.asset?.url && (
             <div className="absolute inset-0 h-full w-full">
@@ -88,8 +88,8 @@ export function TeamCard() {
             </div>
           )}
 
-          <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/40 to-transparent opacity-60 transition-all duration-300 group-hover:opacity-80" />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-transparent opacity-60 transition-all duration-300 group-hover:opacity-80" />
+          <div className="absolute inset-0 bg-linear-to-r from-black/20 to-transparent opacity-0 transition-all duration-300 group-hover:opacity-100" />
 
           <div className="absolute bottom-0 left-0 right-0 translate-y-2 p-6 transition-all duration-500 ease-out group-hover:translate-y-0">
             <div className="space-y-3">
@@ -105,7 +105,7 @@ export function TeamCard() {
                       rel="noopener noreferrer"
                       className="transform text-white/60 transition-all duration-300 hover:-translate-y-0.5 hover:scale-110 hover:text-cyan-400 active:translate-y-0 active:scale-95"
                     >
-                      <FaTwitter size={22} className="drop-shadow" />
+                      <FaTwitter size={22} className="drop-shadow-sm" />
                     </a>
                   )}
                   {member.instagram && (
@@ -115,7 +115,7 @@ export function TeamCard() {
                       rel="noopener noreferrer"
                       className="transform text-white/60 transition-all duration-300 hover:-translate-y-0.5 hover:scale-110 hover:text-pink-500 active:translate-y-0 active:scale-95"
                     >
-                      <FaInstagram size={22} className="drop-shadow" />
+                      <FaInstagram size={22} className="drop-shadow-sm" />
                     </a>
                   )}
                 </div>

@@ -1,25 +1,34 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    inlineCss: true
+  },
   images: {
     remotePatterns: [
       {
         protocol: 'https',
+        port: '',
         hostname: 'cdn.sanity.io',
-        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/**`
+        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/**`,
+        search: ''
       },
       {
         protocol: 'https',
+        port: '',
         hostname: 'mcyjrazlwwmqjyhwzhcm.supabase.co',
-        pathname: '/storage/v1/object/public/**'
+        pathname: '/storage/v1/object/public/**',
+        search: ''
       },
       {
         protocol: 'https',
+        port: '',
         hostname: 'lh3.googleusercontent.com',
-        pathname: '/a/**'
+        pathname: '/a/**',
+        search: ''
       }
     ]
   },
-  webpack: (config, { isServer }) => {
+  turbopack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
