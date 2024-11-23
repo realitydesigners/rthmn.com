@@ -1,7 +1,7 @@
 import React from 'react';
 import { useSignals } from '@/providers/SignalProviderClient';
 import styles from './PatternModal.module.css';
-import ShiftedBox from '@/components/Charts/ResoBox/Shifted';
+import { ResoBox } from '@/components/Charts/ResoBox';
 import { LineChart } from '../Charts/LineChart';
 import { BoxSlice } from '@/types/types';
 
@@ -49,7 +49,7 @@ const PatternModal: React.FC = () => {
               <h2>{selectedSignal.pair}</h2>
             </div>
             <div className={styles.graphicContainer}>
-              <ShiftedBox slice={boxSlice} isLoading={false} />
+              <ResoBox slice={boxSlice} isLoading={false} />
             </div>
             <div className={styles.dataChartContainer}>
               <table>
