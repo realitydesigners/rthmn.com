@@ -7,11 +7,53 @@ import {
 } from '@/providers/DashboardProvider';
 import styles from './styles.module.css';
 import { colorPresets } from '@/utils/colorPresets';
+import { BoxColors } from '@/utils/localStorage';
 
 interface SettingsBarProps {
   isOpen: boolean;
   onToggle: () => void;
 }
+
+const StyleControl: React.FC<{
+  label: string;
+  value: number;
+  onChange: (value: number) => void;
+  min: number;
+  max: number;
+  step: number;
+  unit?: string;
+}> = ({ label, value, onChange, min, max, step, unit = '' }) => {
+  // Format the display value consistently
+  const formatValue = (val: number) => {
+    // Always show one decimal place for values less than 1
+    if (val < 1 && val > 0) {
+      return val.toFixed(1);
+    }
+    // Show no decimals for whole numbers
+    return Math.round(val).toString();
+  };
+
+  return (
+    <div className={styles.controlGroup}>
+      <label className={styles.controlLabel}>{label}</label>
+      <div className={styles.controlInput}>
+        <input
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={(e) => onChange(parseFloat(e.target.value))}
+          className={styles.slider}
+        />
+        <span className={styles.valueDisplay}>
+          {formatValue(value)}
+          {unit}
+        </span>
+      </div>
+    </div>
+  );
+};
 
 const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
   const { selectedPairs, togglePair, boxColors, updateBoxColors } =
@@ -55,7 +97,10 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
     if (preset) {
       updateBoxColors({
         positive: preset.positive,
-        negative: preset.negative
+        negative: preset.negative,
+        styles: {
+          ...boxColors.styles
+        }
       });
     }
   };
@@ -69,6 +114,19 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
       default:
         return [];
     }
+  };
+
+  const handleStyleChange = (
+    property: keyof BoxColors['styles'],
+    value: number
+  ) => {
+    updateBoxColors({
+      ...boxColors,
+      styles: {
+        ...boxColors.styles,
+        [property]: value
+      }
+    });
   };
 
   return (
@@ -171,6 +229,39 @@ const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
                 />
               </label>
             </div>
+          </div>
+        </div>
+
+        {/* Add Box Styling Controls */}
+        <div className={styles.section}>
+          <h3 className={styles.sectionTitle}>Box Styling</h3>
+          <div className={styles.styleControls}>
+            <StyleControl
+              label="Border Radius"
+              value={boxColors.styles?.borderRadius ?? 8}
+              onChange={(value) => handleStyleChange('borderRadius', value)}
+              min={0}
+              max={16}
+              step={1}
+              unit="px"
+            />
+            <StyleControl
+              label="Box Count"
+              value={boxColors.styles?.maxBoxCount ?? 10}
+              onChange={(value) => handleStyleChange('maxBoxCount', value)}
+              min={2}
+              max={20}
+              step={1}
+              unit=" boxes"
+            />
+            <StyleControl
+              label="Shadow Intensity"
+              value={boxColors.styles?.shadowIntensity ?? 0.25}
+              onChange={(value) => handleStyleChange('shadowIntensity', value)}
+              min={0}
+              max={1}
+              step={0.1}
+            />
           </div>
         </div>
       </div>

@@ -15,7 +15,15 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
   const renderShiftedBoxes = (boxArray: Box[]) => {
     if (!boxArray?.length) return null;
 
-    const maxSize = Math.abs(boxArray[0].value);
+    const sortedByMagnitude = boxArray.sort(
+      (a, b) => Math.abs(b.value) - Math.abs(a.value)
+    );
+
+    const maxBoxCount =
+      boxColors.styles?.maxBoxCount ?? sortedByMagnitude.length;
+    const sortedBoxes = sortedByMagnitude.slice(0, maxBoxCount);
+
+    const maxSize = Math.abs(sortedBoxes[0].value);
 
     const renderBox = (
       box: Box,
@@ -23,10 +31,17 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
       prevColor: string | null = null
     ) => {
       const intensity = Math.floor((Math.abs(box.value) / maxSize) * 255);
-      const boxColor =
+      const baseColor =
         box.value > 0
-          ? `${boxColors.positive}, ${intensity / 255})`
-          : `${boxColors.negative}, ${intensity / 255})`;
+          ? boxColors.positive
+              .replace('rgba', 'rgb')
+              .replace(/, *[0-9.]+\)/, ')')
+          : boxColors.negative
+              .replace('rgba', 'rgb')
+              .replace(/, *[0-9.]+\)/, ')');
+      const boxColor = baseColor
+        .replace('rgb', 'rgba')
+        .replace(')', `, ${intensity / 255})`);
 
       const size = (Math.abs(box.value) / maxSize) * 250;
 
@@ -40,29 +55,35 @@ const ShiftedBox: React.FC<BoxComponentProps> = ({ slice, isLoading }) => {
         }
       }
 
+      const dynamicStyles: React.CSSProperties = {
+        backgroundColor: boxColor,
+        width: `${size}px`,
+        height: `${size}px`,
+        opacity: 1,
+        borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+        borderWidth: '1px',
+        boxShadow: `inset 0 4px 20px rgba(0,0,0,${boxColors.styles?.shadowIntensity ?? 0.25})`,
+        ...positionStyle,
+        margin: '-1px'
+      };
+
       return (
         <MotionDiv
           key={`${slice?.timestamp}-${index}`}
           className={`absolute border border-black`}
-          style={{
-            backgroundColor: boxColor,
-            width: `${size}px`,
-            height: `${size}px`,
-            ...positionStyle,
-            margin: '-1px'
-          }}
+          style={dynamicStyles}
           initial={{ opacity: 1, scale: 1 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0 }}
         >
-          {index < boxArray.length - 1 &&
-            renderBox(boxArray[index + 1], index + 1, boxColor)}
+          {index < sortedBoxes.length - 1 &&
+            renderBox(sortedBoxes[index + 1], index + 1, boxColor)}
         </MotionDiv>
       );
     };
 
-    return renderBox(boxArray[0], 0);
+    return renderBox(sortedBoxes[0], 0);
   };
 
   const MotionDiv = motion.div as React.FC<

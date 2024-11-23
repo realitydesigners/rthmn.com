@@ -16,21 +16,27 @@ const BOX_COLORS_KEY = 'boxColors';
 export interface BoxColors {
   positive: string;
   negative: string;
+  styles: {
+    borderRadius: number;
+    shadowIntensity: number;
+    maxBoxCount: number;
+  };
 }
 
+const DEFAULT_BOX_COLORS: BoxColors = {
+  positive: 'rgba(88, 255, 160, 1)',
+  negative: 'rgba(214, 29, 97, 1)',
+  styles: {
+    borderRadius: 8,
+    shadowIntensity: 0.25,
+    maxBoxCount: 20
+  }
+};
+
 export const getBoxColors = (): BoxColors => {
-  if (typeof window === 'undefined')
-    return {
-      positive: 'rgba(88, 255, 160, 1)',
-      negative: 'rgba(214, 29, 97, 1)'
-    };
+  if (typeof window === 'undefined') return DEFAULT_BOX_COLORS;
   const stored = localStorage.getItem(BOX_COLORS_KEY);
-  return stored
-    ? JSON.parse(stored)
-    : {
-        positive: 'rgba(88, 255, 160, 1)',
-        negative: 'rgba(214, 29, 97, 1)'
-      };
+  return stored ? JSON.parse(stored) : DEFAULT_BOX_COLORS;
 };
 
 export const setBoxColors = (colors: BoxColors) => {
