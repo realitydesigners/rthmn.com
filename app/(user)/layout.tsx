@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { SignalProvider } from '@/providers/SignalProvider';
-import { WebSocketProvider } from '@/providers/WebSocketProvider';
+import { ClientProviders } from '@/providers/ClientProviders';
 
 export default async function UserLayout({
   children
@@ -20,15 +20,14 @@ export default async function UserLayout({
     redirect('/signin');
   }
 
-  // This will be replaced with /pricing page once finished
   if (!subscription) {
-    redirect('/');
+    redirect('/pricing');
   }
 
   return (
     <QueryProvider>
       <SignalProvider>
-        <WebSocketProvider>{children}</WebSocketProvider>
+        <ClientProviders>{children}</ClientProviders>
       </SignalProvider>
     </QueryProvider>
   );

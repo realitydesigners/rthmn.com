@@ -1,6 +1,8 @@
+'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { BoxSlice, PairData } from '@/types/types';
 import { useWebSocket } from '@/providers/WebSocketProvider';
+import { useAuth } from '@/providers/SupabaseProvider';
 import {
   getSelectedPairs,
   setSelectedPairs,
@@ -17,6 +19,7 @@ interface DashboardContextType {
   isConnected: boolean;
   boxColors: BoxColors;
   updateBoxColors: (colors: BoxColors) => void;
+  isAuthenticated: boolean;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(
@@ -58,34 +61,31 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [boxColors, setBoxColorsState] = useState<BoxColors>(getBoxColors());
 
+  const { session } = useAuth();
+  const isAuthenticated = !!session?.access_token;
+
   const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices } =
     useWebSocket();
 
   // Load selected pairs from localStorage
   useEffect(() => {
+    if (!isAuthenticated) return;
+
     const stored = getSelectedPairs();
     const initialPairs =
       stored.length > 0 ? stored : ['GBPUSD', 'USDJPY', 'AUDUSD'];
     setSelected(initialPairs);
 
-    // Always save the initial pairs to localStorage if none exist
     if (stored.length === 0) {
       setSelectedPairs(initialPairs);
     }
     setIsLoading(false);
-  }, []);
-
-  // Load colors from localStorage on mount
-  useEffect(() => {
-    const savedColors = getBoxColors();
-    setBoxColorsState(savedColors);
-  }, []);
+  }, [isAuthenticated]);
 
   // WebSocket subscription management
   useEffect(() => {
-    if (!isConnected || selectedPairs.length === 0) return;
+    if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
-    // Subscribe to all pairs
     selectedPairs.forEach((pair) => {
       subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
         setPairData((prev) => ({
@@ -103,7 +103,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
         unsubscribeFromBoxSlices(pair);
       });
     };
-  }, [isConnected, selectedPairs]); // Add selectedPairs as dependency
+  }, [isConnected, selectedPairs, isAuthenticated]);
 
   const togglePair = (pair: string) => {
     const wasSelected = selectedPairs.includes(pair);
@@ -147,7 +147,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     togglePair,
     isConnected,
     boxColors,
-    updateBoxColors
+    updateBoxColors,
+    isAuthenticated
   };
 
   return (

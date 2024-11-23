@@ -1,39 +1,28 @@
 'use client';
-import React, { useState } from 'react';
-import SettingsBar from '@/components/Accessibility/SettingsBar';
+import React from 'react';
 import PairGrid from '@/components/PairGrid';
-import { useAuth } from '@/providers/SupabaseProvider';
-import { DashboardProvider } from '@/providers/DashboardProvider';
-import ConnectionBar from '@/components/Accessibility/ConnectionBar';
-import styles from './Dashboard.module.css';
+import SettingsBar from '@/components/Accessibility/SettingsBar';
+import { useState } from 'react';
+import { useDashboard } from '@/providers/DashboardProvider';
 
-const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+export default function Dashboard() {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { isAuthenticated } = useDashboard();
 
-  return (
-    <div className={styles.dashboard}>
-      <SettingsBar
-        isOpen={isMenuOpen}
-        onToggle={() => setIsMenuOpen(!isMenuOpen)}
-      />
-      <div className={styles.contentContainer}>{children}</div>
-      <ConnectionBar />
-    </div>
-  );
-};
+  const toggleSettings = () => {
+    setIsSettingsOpen(!isSettingsOpen);
+  };
 
-const Dashboard: React.FC = () => {
-  const { session } = useAuth();
+  if (!isAuthenticated) {
+    return <div>Loading session...</div>;
+  }
 
   return (
-    <DashboardProvider>
-      <DashboardLayout>
-        <div className={styles.contentContainer}>
-          {session?.access_token ? <PairGrid /> : <p>Loading session...</p>}
-        </div>
-      </DashboardLayout>
-    </DashboardProvider>
+    <main className="flex min-h-screen flex-col bg-black">
+      <SettingsBar isOpen={isSettingsOpen} onToggle={toggleSettings} />
+      <div className="flex-1 overflow-hidden p-8 pt-24">
+        <PairGrid />
+      </div>
+    </main>
   );
-};
-
-export default Dashboard;
+}
