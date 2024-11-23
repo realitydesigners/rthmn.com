@@ -2,12 +2,6 @@ import type { Box } from '@/types/types';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 
-interface PositionStyle {
-  top?: number;
-  bottom?: number;
-  right: number;
-}
-
 interface NestedBoxesProps {
   boxes: Box[];
   demoStep: number;
