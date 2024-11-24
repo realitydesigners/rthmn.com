@@ -78,7 +78,7 @@ const FAQItem = memo(
                 }`}
               >
                 <FaQuestionCircle
-                  className={`h-5 w-5 transition-all duration-300 ${
+                  className={`min-h-5 min-w-5 transition-all duration-300 ${
                     isActive
                       ? 'text-emerald-400'
                       : 'text-gray-400 group-hover:text-gray-400'
@@ -114,7 +114,7 @@ const FAQItem = memo(
             <div className="border-t border-white/5 px-6 py-6">
               <div className="flex gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                  <FaCommentAlt className="h-5 w-5 text-gray-400" />
+                  <FaCommentAlt className="minw-5 min-h-5 text-gray-400" />
                 </div>
                 <div className="prose prose-invert max-w-none text-base leading-relaxed text-white/70">
                   <PortableText
