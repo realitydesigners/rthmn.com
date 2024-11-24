@@ -95,14 +95,14 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({
       <div className="relative flex w-full flex-col gap-8">
         <div className="relative flex flex-col items-center text-center">
           <h2
-            className={`text-gray-gradient relative z-10 font-outfit text-[3em] font-bold leading-[1em] tracking-tight lg:text-[8em] lg:leading-[1em]`}
+            className={`text-gray-gradient font-outfit relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[8em] lg:leading-[1em]`}
           >
             The Future of
             <br />
             Market Analysis
           </h2>
           <p
-            className={`text-dark-gray mb-6 w-11/12 pt-6 font-kodemono text-lg lg:text-xl`}
+            className={`text-dark-gray font-kodemono mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
           >
             The universal pattern recognition toolkit designed for trading.
           </p>

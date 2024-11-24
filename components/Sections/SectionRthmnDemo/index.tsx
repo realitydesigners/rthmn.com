@@ -291,7 +291,7 @@ export const SectionRthmnDemo = memo(
 
     return (
       <section className="relative z-100 flex h-full items-center justify-center py-12">
-        <div className="relative h-[75vh] w-full overflow-hidden border-white/10 bg-black bg-black/90 p-2 backdrop-blur-md md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]">
+        <div className="relative h-[75vh] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]">
           <div className="pointer-events-none absolute inset-0">
             <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />

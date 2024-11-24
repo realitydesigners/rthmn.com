@@ -39,7 +39,7 @@ export default function ClientPage({
       {/* <SectionMarketTicker marketData={marketData} /> */}
       <SectionHistogram slice={null} marketData={marketData} />
       {/* <SectionRthmnDemo marketData={marketData} /> */}
-      <SectionMarketDisplay marketData={marketData} />
+
       <SectionBoxes />
       <SectionAboutAlgorithm />
       <SectionFAQ />
@@ -48,7 +48,9 @@ export default function ClientPage({
         products={products ?? []}
         subscription={null}
       />
+
       <SectionBlogPosts initialPosts={posts} />
+      <SectionMarketDisplay marketData={marketData} />
       <SectionFooter />
     </BackgroundGrid>
   );
