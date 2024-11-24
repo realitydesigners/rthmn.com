@@ -10,6 +10,7 @@ import {
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { FEATURE_TAGS } from '@/components/Constants/text';
 import { MotionDiv } from '@/components/MotionDiv';
+import { BoxSlice } from '@/types/types';
 
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
@@ -39,69 +40,77 @@ const FeatureTags = memo(() => (
 
 FeatureTags.displayName = 'FeatureTags';
 
+interface BoxVisualizationProps {
+  currentSlice: BoxSlice;
+  demoStep: number;
+  isPaused: boolean;
+}
+
 // Memoize BoxVisualization component
-const BoxVisualization = memo(({ currentSlice, demoStep, isPaused }) => {
-  const [baseSize, setBaseSize] = useState(250);
+const BoxVisualization = memo(
+  ({ currentSlice, demoStep, isPaused }: BoxVisualizationProps) => {
+    const [baseSize, setBaseSize] = useState(250);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setBaseSize(400);
-      } else if (window.innerWidth >= 640) {
-        setBaseSize(300);
-      } else {
-        setBaseSize(250);
-      }
-    };
-    handleResize();
+    useEffect(() => {
+      const handleResize = () => {
+        if (window.innerWidth >= 1024) {
+          setBaseSize(400);
+        } else if (window.innerWidth >= 640) {
+          setBaseSize(300);
+        } else {
+          setBaseSize(250);
+        }
+      };
+      handleResize();
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-  const sortedBoxes = useMemo(() => {
+    const sortedBoxes = useMemo(() => {
+      return (
+        currentSlice?.boxes?.sort(
+          (a, b) => Math.abs(b.value) - Math.abs(a.value)
+        ) || []
+      );
+    }, [currentSlice]);
+
+    const isPointOfChange = useMemo(() => {
+      return (
+        Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX
+      );
+    }, [demoStep]);
+
     return (
-      currentSlice?.boxes?.sort(
-        (a, b) => Math.abs(b.value) - Math.abs(a.value)
-      ) || []
+      <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm sm:h-[300px] sm:w-[300px] lg:h-[400px] lg:w-[400px]">
+        <MotionDiv
+          className="absolute inset-0"
+          animate={{
+            background: [
+              'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
+              'radial-gradient(circle at 100% 100%, #22c55e15 0%, transparent 50%)',
+              'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)'
+            ]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        />
+
+        {currentSlice && sortedBoxes.length > 0 && (
+          <div className="relative h-full w-full">
+            <NestedBoxes
+              boxes={sortedBoxes}
+              demoStep={demoStep}
+              isPaused={isPaused}
+              isPointOfChange={isPointOfChange}
+              baseSize={baseSize}
+              colorScheme="green-red"
+            />
+          </div>
+        )}
+      </div>
     );
-  }, [currentSlice]);
-
-  const isPointOfChange = useMemo(() => {
-    return (
-      Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX
-    );
-  }, [demoStep]);
-
-  return (
-    <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm sm:h-[300px] sm:w-[300px] lg:h-[400px] lg:w-[400px]">
-      <MotionDiv
-        className="absolute inset-0"
-        animate={{
-          background: [
-            'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
-            'radial-gradient(circle at 100% 100%, #22c55e15 0%, transparent 50%)',
-            'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)'
-          ]
-        }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-      />
-
-      {currentSlice && sortedBoxes.length > 0 && (
-        <div className="relative h-full w-full">
-          <NestedBoxes
-            boxes={sortedBoxes}
-            demoStep={demoStep}
-            isPaused={isPaused}
-            isPointOfChange={isPointOfChange}
-            baseSize={baseSize}
-            colorScheme="green-red"
-          />
-        </div>
-      )}
-    </div>
-  );
-});
+  }
+);
 
 BoxVisualization.displayName = 'BoxVisualization';
 
