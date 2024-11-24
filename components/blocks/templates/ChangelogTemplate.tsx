@@ -5,35 +5,35 @@ export const ChangelogTemplate: PortableTextComponents = {
   block: {
     normal: ({ children }) => (
       <div className="mb-4">
-        <p className={`font-mono text-base leading-relaxed text-white/60`}>
+        <p className={`font-outfit leading-relaxed text-gray-400`}>
           {children}
         </p>
       </div>
     ),
     h1: ({ children }) => (
       <h1
-        className={`mb-6 font-mono text-3xl font-bold leading-relaxed text-white/60`}
+        className={`font-outfit mb-6 text-3xl leading-relaxed font-bold text-gray-400`}
       >
         {children}
       </h1>
     ),
     h2: ({ children }) => (
       <h2
-        className={`mb-4 font-mono text-2xl font-bold leading-relaxed text-white`}
+        className={`font-outfit mb-4text-2xl leading-relaxed font-bold text-white`}
       >
         {children}
       </h2>
     ),
     h3: ({ children }) => (
       <h3
-        className={`mb-3 font-mono text-xl font-bold leading-relaxed text-white`}
+        className={`font-outfit mb-3 text-xl leading-relaxed font-bold text-white`}
       >
         {children}
       </h3>
     ),
     h4: ({ children }) => (
       <h4
-        className={`mb-2 font-mono text-lg font-bold leading-relaxed text-white`}
+        className={`font-outfit mb-2 text-lg leading-relaxed font-bold text-white`}
       >
         {children}
       </h4>
@@ -41,13 +41,13 @@ export const ChangelogTemplate: PortableTextComponents = {
   },
   list: {
     bullet: ({ children }) => (
-      <ul className={`mb-6 list-disc space-y-2 pl-4 font-mono text-white/60`}>
+      <ul className={`mb-6 list-disc space-y-2 pl-4 font-mono text-gray-400`}>
         {children}
       </ul>
     ),
     number: ({ children }) => (
       <ol
-        className={`mb-6 list-decimal space-y-2 pl-4 font-mono text-white/60`}
+        className={`mb-6 list-decimal space-y-2 pl-4 font-mono text-gray-400`}
       >
         {children}
       </ol>
@@ -55,17 +55,17 @@ export const ChangelogTemplate: PortableTextComponents = {
   },
   listItem: {
     bullet: ({ children }) => (
-      <li className="leading-relaxed text-white/60">{children}</li>
+      <li className="leading-relaxed text-gray-400">{children}</li>
     ),
     number: ({ children }) => (
-      <li className="leading-relaxed text-white/60">{children}</li>
+      <li className="leading-relaxed text-gray-400">{children}</li>
     )
   },
   marks: {
     strong: ({ children }) => (
       <strong className="font-bold text-white">{children}</strong>
     ),
-    em: ({ children }) => <em className="italic text-gray-300">{children}</em>,
+    em: ({ children }) => <em className="text-gray-300 italic">{children}</em>,
     code: ({ children }) => (
       <code className="rounded-sm bg-gray-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400">
         {children}
@@ -74,7 +74,7 @@ export const ChangelogTemplate: PortableTextComponents = {
     link: ({ children, value }) => (
       <a
         href={value?.href}
-        className="text-blue-400 hover:text-blue-300 hover:underline"
+        className="font-bold text-white underline"
         target="_blank"
         rel="noopener noreferrer"
       >

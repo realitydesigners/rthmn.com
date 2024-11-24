@@ -40,7 +40,7 @@ export function SectionAboutAlgorithm() {
         </div>
 
         <div className="mb-8 text-center">
-          <h2 className="bg-linear-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 font-outfit text-5xl font-bold text-transparent">
+          <h2 className="font-outfit bg-linear-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 text-5xl font-bold text-transparent">
             Multi-Market Analysis
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-white/60">
@@ -75,7 +75,7 @@ export function SectionAboutAlgorithm() {
                 {market.description}
               </p>
 
-              <div className="font-kodemono text-sm text-white/40">
+              <div className="font-kodemono text-sm text-gray-400">
                 {market.highlight}
               </div>
             </MotionDiv>

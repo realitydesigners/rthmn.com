@@ -18,7 +18,7 @@ interface HistoricalPatternViewProps {
   isPaused: boolean;
 }
 
-export const HistoricalPatternView: React.FC<HistoricalPatternViewProps> = ({
+export const Histogram: React.FC<HistoricalPatternViewProps> = ({
   tableRef,
   demoStep,
   patterns,

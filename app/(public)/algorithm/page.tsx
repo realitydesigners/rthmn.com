@@ -84,7 +84,7 @@ const AlgorithmPage = () => {
                 <div className="h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent" />
               </div>
               <h1
-                className={`bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl`}
+                className={`font-outfit bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-6xl font-bold tracking-tight text-transparent lg:text-7xl`}
               >
                 The Algorithm
               </h1>
@@ -158,7 +158,7 @@ const AlgorithmPage = () => {
                       </div>
                       <div>
                         <h3
-                          className={`mb-2 font-outfit text-xl font-semibold text-white`}
+                          className={`font-outfit mb-2 text-xl font-semibold text-white`}
                         >
                           {concept.title}
                         </h3>
@@ -185,7 +185,7 @@ const AlgorithmPage = () => {
               <div className="h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent" />
             </div>
             <h2
-              className={`bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`font-outfit bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               Algorithm Performance
             </h2>
@@ -226,7 +226,7 @@ const AlgorithmPage = () => {
                     {item.metric}
                   </div>
                   <div
-                    className={`font-outfit text-lg font-semibold text-white/80`}
+                    className={`font-outfit text-lg font-semibold text-gray-400`}
                   >
                     {item.label}
                   </div>
@@ -254,7 +254,7 @@ const AlgorithmPage = () => {
                 WAVE MECHANICS
               </div>
               <h2
-                className={`mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+                className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
               >
                 Position Wave Analysis
               </h2>
@@ -284,7 +284,7 @@ const AlgorithmPage = () => {
                     className="rounded-lg border border-white/10 bg-white/5 p-6"
                   >
                     <h3
-                      className={`mb-2 font-outfit text-xl font-semibold text-white/90`}
+                      className={`font-outfit mb-2 text-xl font-semibold text-white/90`}
                     >
                       {item.title}
                     </h3>
@@ -302,7 +302,7 @@ const AlgorithmPage = () => {
             >
               <div className="absolute inset-0 -z-10 bg-linear-to-br from-white/[0.03] to-transparent" />
               <div className="flex h-full items-center justify-center">
-                <div className={`font-kodemonotext-center text-white/40`}>
+                <div className={`font-kodemonotext-center text-gray-400`}>
                   [Wave Visualization Placeholder]
                 </div>
               </div>
@@ -323,7 +323,7 @@ const AlgorithmPage = () => {
               <div className="h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent" />
             </div>
             <h2
-              className={`mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               8-Dimensional Analysis
             </h2>
@@ -382,7 +382,7 @@ const AlgorithmPage = () => {
                 <div className="mb-4 flex items-center gap-4">
                   <div className="rounded-full bg-white/10 p-3">
                     <div
-                      className={`font-kodemonotext-lg font-bold text-white/80`}
+                      className={`font-kodemonotext-lg font-bold text-gray-400`}
                     >
                       {item.state}
                     </div>
@@ -412,7 +412,7 @@ const AlgorithmPage = () => {
                 PHILOSOPHICAL FOUNDATION
               </div>
               <h2
-                className={`mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+                className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
               >
                 Beyond Traditional
                 <br />
@@ -435,7 +435,7 @@ const AlgorithmPage = () => {
                 </p>
                 <div className="mt-12 flex items-center gap-8">
                   <div className="h-[2px] w-12 bg-linear-to-r from-white/40 to-transparent" />
-                  <span className={`font-kodemonotext-white/40`}>
+                  <span className={`font-kodemonotext-gray-400`}>
                     Position State Theory
                   </span>
                 </div>
@@ -447,7 +447,7 @@ const AlgorithmPage = () => {
               <div className="relative space-y-8 p-8">
                 <div>
                   <h3
-                    className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-2xl font-semibold text-white/90`}
                   >
                     The Observer Effect
                   </h3>
@@ -460,7 +460,7 @@ const AlgorithmPage = () => {
                 </div>
                 <div>
                   <h3
-                    className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-2xl font-semibold text-white/90`}
                   >
                     Energy Conservation
                   </h3>
@@ -472,7 +472,7 @@ const AlgorithmPage = () => {
                 </div>
                 <div>
                   <h3
-                    className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-2xl font-semibold text-white/90`}
                   >
                     Deterministic Chaos
                   </h3>
@@ -499,7 +499,7 @@ const AlgorithmPage = () => {
               MARKET MECHANICS
             </div>
             <h2
-              className={`mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               The Mathematics of Markets
             </h2>
@@ -516,7 +516,7 @@ const AlgorithmPage = () => {
               <div className="absolute -inset-px rounded-lg bg-linear-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100" />
               <div className="relative">
                 <h3
-                  className={`mb-6 font-outfit text-3xl font-semibold text-white/90`}
+                  className={`font-outfit mb-6 text-3xl font-semibold text-white/90`}
                 >
                   Core Position State Mathematics
                 </h3>
@@ -524,16 +524,16 @@ const AlgorithmPage = () => {
                   <div className="space-y-6">
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`font-kodemonomb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-gray-400`}
                       >
                         Position State Evolution
                       </div>
-                      <div className={`font-kodemonotext-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-gray-400`}>
                         P(t+1) = ∑[P(t) × W(s)] + ε
                       </div>
                       <div className="mt-4 text-sm text-white/60">
                         Where:
-                        <ul className="ml-4 mt-2 space-y-1">
+                        <ul className="mt-2 ml-4 space-y-1">
                           <li>• P(t) = Current position state</li>
                           <li>• W(s) = State transition weights</li>
                           <li>• ε = Market noise factor</li>
@@ -543,16 +543,16 @@ const AlgorithmPage = () => {
 
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`font-kodemonomb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-gray-400`}
                       >
                         Wave Propagation Function
                       </div>
-                      <div className={`font-kodemonotext-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-gray-400`}>
                         ψ(p,t) = A·sin(kp - ωt + φ)
                       </div>
                       <div className="mt-4 text-sm text-white/60">
                         Where:
-                        <ul className="ml-4 mt-2 space-y-1">
+                        <ul className="mt-2 ml-4 space-y-1">
                           <li>• A = Wave amplitude</li>
                           <li>• k = Position wavenumber</li>
                           <li>• ω = Angular frequency</li>
@@ -565,11 +565,11 @@ const AlgorithmPage = () => {
                   <div className="space-y-6">
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`font-kodemonomb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-gray-400`}
                       >
                         Energy Conservation Law
                       </div>
-                      <div className={`font-kodemonotext-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-gray-400`}>
                         E = ∑[Pi²] = constant
                       </div>
                       <div className="mt-4 text-sm text-white/60">
@@ -580,11 +580,11 @@ const AlgorithmPage = () => {
 
                     <div className="rounded-lg border border-white/10 bg-white/5 p-6">
                       <div
-                        className={`font-kodemonomb-2 text-sm text-white/40`}
+                        className={`font-kodemonomb-2 text-sm text-gray-400`}
                       >
                         State Transition Probability
                       </div>
-                      <div className={`font-kodemonotext-lg text-white/80`}>
+                      <div className={`font-kodemonotext-lg text-gray-400`}>
                         T(i→j) = |⟨ψj|H|ψi⟩|²
                       </div>
                       <div className="mt-4 text-sm text-white/60">
@@ -608,7 +608,7 @@ const AlgorithmPage = () => {
               <div className="grid gap-8 lg:grid-cols-2">
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-xl font-semibold text-white/90`}
                   >
                     Step 1: Position State Space
                   </h4>
@@ -629,7 +629,7 @@ const AlgorithmPage = () => {
 
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-xl font-semibold text-white/90`}
                   >
                     Step 2: Wave Propagation
                   </h4>
@@ -649,7 +649,7 @@ const AlgorithmPage = () => {
 
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-xl font-semibold text-white/90`}
                   >
                     Step 3: Energy Flow
                   </h4>
@@ -669,7 +669,7 @@ const AlgorithmPage = () => {
 
                 <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                   <h4
-                    className={`mb-4 font-outfit text-xl font-semibold text-white/90`}
+                    className={`font-outfit mb-4 text-xl font-semibold text-white/90`}
                   >
                     Step 4: Pattern Formation
                   </h4>
@@ -703,7 +703,7 @@ const AlgorithmPage = () => {
               UNDERSTANDING RTHMN
             </div>
             <h2
-              className={`mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text font-outfit text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
+              className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}
             >
               The Algorithm Explained
             </h2>
@@ -718,7 +718,7 @@ const AlgorithmPage = () => {
             <div className="grid gap-8 lg:grid-cols-3">
               <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                 <h3
-                  className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
+                  className={`font-outfit mb-4 text-2xl font-semibold text-white/90`}
                 >
                   Think of Water
                 </h3>
@@ -732,7 +732,7 @@ const AlgorithmPage = () => {
 
               <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                 <h3
-                  className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
+                  className={`font-outfit mb-4 text-2xl font-semibold text-white/90`}
                 >
                   Eight Natural States
                 </h3>
@@ -746,7 +746,7 @@ const AlgorithmPage = () => {
 
               <div className="rounded-lg border border-white/10 bg-white/5 p-8">
                 <h3
-                  className={`mb-4 font-outfit text-2xl font-semibold text-white/90`}
+                  className={`font-outfit mb-4 text-2xl font-semibold text-white/90`}
                 >
                   Energy Never Dies
                 </h3>
@@ -778,13 +778,13 @@ const AlgorithmPage = () => {
                   >
                     <div className="flex items-start gap-8">
                       <div
-                        className={`font-kodemonotext-3xl font-bold text-white/20`}
+                        className={`font-kodemonotext-3xl font-bold text-gray-400`}
                       >
                         {item.step}
                       </div>
                       <div>
                         <h4
-                          className={`mb-3 font-outfit text-xl font-semibold text-white/90`}
+                          className={`font-outfit mb-3 text-xl font-semibold text-white/90`}
                         >
                           {item.title}
                         </h4>
@@ -801,7 +801,7 @@ const AlgorithmPage = () => {
             {/* Real World Example */}
             <div className="rounded-lg border border-white/10 bg-white/5 p-12">
               <h3
-                className={`mb-6 font-outfit text-3xl font-semibold text-white/90`}
+                className={`font-outfit mb-6 text-3xl font-semibold text-white/90`}
               >
                 A Simple Example
               </h3>
