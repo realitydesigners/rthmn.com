@@ -1,27 +1,10 @@
 'use client';
 import type React from 'react';
-import type { BoxSlice, CandleData } from '@/types/types';
 import { useState, useEffect, useRef } from 'react';
 import { sequences } from '@/components/Constants/constants';
-import { SectionRthmnDemo } from '../SectionRthmnDemo';
-import { HistoricalPatternView } from './HistoricalPatternView';
-import { StartButton } from '@/components/Buttons/StartNowButton';
-import { MarketWall } from './MarketWall';
+import { Histogram } from './Histogram';
 
-interface MarketData {
-  pair: string;
-  lastUpdated: string;
-  candleData: string;
-}
-
-interface BoxComponentProps {
-  slice: BoxSlice | null;
-  marketData: MarketData[];
-}
-
-export const SectionHistogram: React.FC<BoxComponentProps> = ({
-  marketData
-}) => {
+export const SectionHistogram = () => {
   const [containerHeight, setContainerHeight] = useState(200);
   const [demoStep, setDemoStep] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -89,50 +72,26 @@ export const SectionHistogram: React.FC<BoxComponentProps> = ({
   }, []);
 
   return (
-    <section className="relative min-h-screen overflow-hidden pt-60">
-      <MarketWall marketData={marketData} />
-
-      <div className="relative flex w-full flex-col gap-8">
-        <div className="relative flex flex-col items-center text-center">
-          <h2
-            className={`text-gray-gradient font-outfit relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[8em] lg:leading-[1em]`}
-          >
-            The Future of
-            <br />
-            Market Analysis
-          </h2>
-          <p
-            className={`text-dark-gray font-kodemono mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
-          >
-            The universal pattern recognition toolkit designed for trading.
-          </p>
-
-          <div className="mt-6 flex gap-6">
-            <StartButton href="#pricing" custom={0} />
-          </div>
-        </div>
-        <SectionRthmnDemo marketData={marketData} />
-
-        <div className="w-full bg-black px-[0vw] lg:px-[10vw]">
-          {/* <HistoricalPatternView
-            tableRef={tableRef}
-            demoStep={demoStep}
-            patterns={sequences}
-            dimensions={dimensions}
-            onPause={() => setIsPaused(true)}
-            onResume={() => setIsPaused(false)}
-            onNext={() =>
-              setDemoStep((prev) => (prev + 1) % totalStepsRef.current)
-            }
-            onPrevious={() =>
-              setDemoStep(
-                (prev) =>
-                  (prev - 1 + totalStepsRef.current) % totalStepsRef.current
-              )
-            }
-            isPaused={isPaused}
-          /> */}
-        </div>
+    <section className="relative overflow-hidden">
+      <div className="w-full bg-black px-[0vw] lg:px-[10vw]">
+        <Histogram
+          tableRef={tableRef}
+          demoStep={demoStep}
+          patterns={sequences}
+          dimensions={dimensions}
+          onPause={() => setIsPaused(true)}
+          onResume={() => setIsPaused(false)}
+          onNext={() =>
+            setDemoStep((prev) => (prev + 1) % totalStepsRef.current)
+          }
+          onPrevious={() =>
+            setDemoStep(
+              (prev) =>
+                (prev - 1 + totalStepsRef.current) % totalStepsRef.current
+            )
+          }
+          isPaused={isPaused}
+        />
       </div>
     </section>
   );

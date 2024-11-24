@@ -3,8 +3,8 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MotionDiv } from '../../MotionDiv';
-import { FaArrowRight } from 'react-icons/fa';
+import { MotionDiv } from '@/components/MotionDiv';
+import { FaArrowRight, FaCalendar, FaClock } from 'react-icons/fa';
 
 export interface Post {
   slug: { current: string };
@@ -19,102 +19,127 @@ export interface Post {
   }[];
 }
 
-interface PostListProps {
-  initialPosts: Post[];
-}
-
-const FormattedDate: React.FC<{ date?: string; className?: string }> = ({
-  date,
-  className
-}) => {
-  const formattedDate = date
-    ? new Date(date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      })
-    : 'Date not available';
-
-  return <span className={className}>{formattedDate}</span>;
-};
-
-const PostItem: React.FC<{ post: Post; index: number }> = ({ post, index }) => {
+const PostCard = ({ post, index }: { post: Post; index: number }) => {
   const block = post.block[0];
 
   return (
     <MotionDiv
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className="group relative overflow-hidden rounded-xl bg-linear-to-b from-white/5 to-transparent p-[1px]"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <div className="relative h-full rounded-xl border border-white/10 bg-black/90 backdrop-blur-md">
+      <MotionDiv
+        whileHover={{ y: -5 }}
+        className="group relative h-full overflow-hidden rounded-xl border border-white/10 bg-black/40 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-black/60"
+      >
+        {/* Subtle Glow Effect */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
+          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </div>
 
         {block?.imageRef && (
-          <div className="relative h-48 w-full overflow-hidden rounded-t-xl">
+          <div className="relative h-64 w-full overflow-hidden">
             <Image
               src={block.imageRef.imageUrl}
               alt={block.imageRef.imageAlt || 'Post image'}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-110"
+              className="object-cover transition-all duration-500 group-hover:scale-110"
             />
-            <div className="absolute inset-0 bg-linear-to-t from-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60" />
+
+            {/* Hover Overlay - More subtle */}
+            <div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </div>
         )}
 
-        <div className="flex flex-col space-y-3 p-5">
-          <FormattedDate
-            date={block?.publicationDate}
-            className="font-kodemono text-xs font-medium text-[#22c55e]"
-          />
+        <div className="relative z-10 p-6">
+          {/* Meta Information */}
+          <div className="mb-4 flex items-center gap-4 text-xs text-white/60">
+            <div className="flex items-center gap-2">
+              <FaCalendar className="h-3 w-3 text-white/80" />
+              <span className="font-kodemono">
+                {new Date(block?.publicationDate).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric'
+                })}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FaClock className="h-3 w-3 text-white/80" />
+              <span className="font-kodemono">5 min read</span>
+            </div>
+          </div>
 
+          {/* Title */}
           <Link href={`/posts/${post.slug.current}`}>
-            <h2 className="font-outfit text-xl font-bold text-white/90 transition-colors duration-200 group-hover:text-[#22c55e]">
+            <h3 className="font-outfit mb-3 text-2xl font-bold tracking-tight text-white/90 transition-colors duration-300 group-hover:text-white">
               {block?.heading || 'No title'}
-            </h2>
+            </h3>
           </Link>
 
-          <p className="line-clamp-2 font-kodemono text-sm text-white/70">
+          {/* Description */}
+          <p className="font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-white/60">
             {block?.subheading || 'No subheading'}
           </p>
 
-          <Link
-            href={`/posts/${post.slug.current}`}
-            className="inline-flex items-center space-x-2 text-sm font-medium text-[#22c55e] transition-all duration-200 hover:text-[#22c55e]/80"
-          >
-            <span>Read More</span>
-            <FaArrowRight className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-1" />
+          {/* Read More Button - Updated to match NavButton style */}
+          <Link href={`/posts/${post.slug.current}`}>
+            <MotionDiv
+              whileHover={{ x: 5 }}
+              className="flex w-fit items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+            >
+              <span className="flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
+                <span>Read Article</span>
+                <FaArrowRight className="h-3 w-3" />
+              </span>
+            </MotionDiv>
           </Link>
         </div>
-      </div>
+      </MotionDiv>
     </MotionDiv>
   );
 };
 
-export function SectionBlogPosts({ initialPosts }: PostListProps) {
+export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
-    const uniquePosts = initialPosts.filter(
-      (post, index, self) =>
-        index === self.findIndex((t) => t.slug.current === post.slug.current)
-    );
-    setPosts(uniquePosts);
+    setPosts(initialPosts);
   }, [initialPosts]);
 
   return (
-    <section className="relative z-100 px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
-      <div className="mb-6 border-b border-white/5 pb-2">
-        <h2 className="text-2xl font-bold text-white/90">Latest Posts</h2>
+    <section className="relative z-10 min-h-screen overflow-hidden px-4 py-32">
+      {/* Background Effects - More subtle */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]" />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post, index) => (
-          <PostItem key={post.slug.current} post={post} index={index} />
-        ))}
+      <div className="mx-auto max-w-7xl">
+        {/* Section Header */}
+        <MotionDiv
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-16 text-center"
+        >
+          <h2 className="text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Latest Insights
+          </h2>
+          <p className="font-kodemono mx-auto max-w-2xl text-base text-white/60 sm:text-lg">
+            Explore our latest thoughts on market analysis, trading strategies,
+            and technological innovations.
+          </p>
+        </MotionDiv>
+
+        {/* Posts Grid */}
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {posts.map((post, index) => (
+            <PostCard key={post.slug.current} post={post} index={index} />
+          ))}
+        </div>
       </div>
     </section>
   );
