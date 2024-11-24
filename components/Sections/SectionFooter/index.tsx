@@ -1,32 +1,47 @@
 'use client';
 import Link from 'next/link';
 import { useState, type JSX } from 'react';
-import { FaGithub, FaTwitter, FaDiscord, FaInstagram } from 'react-icons/fa';
+import {
+  FaGithub,
+  FaTwitter,
+  FaDiscord,
+  FaInstagram,
+  FaYoutube
+} from 'react-icons/fa';
 
 const FOOTER_LINKS = {
   product: [
     { name: 'Features', href: '#' },
-    { name: 'Pricing', href: '#' }
+    { name: 'Pricing', href: '/pricing' },
+    { name: 'FAQ', href: '/faq' },
+    { name: 'Learn', href: '/learn' }
   ],
+
   company: [
-    { name: 'About', href: '#' },
-    { name: 'Blog', href: '#' },
-    { name: 'Careers', href: '#' },
-    { name: 'Contact', href: '#' }
+    { name: 'About', href: '/about' },
+    { name: 'Algorithmn', href: '/algorithmn' },
+    { name: 'Changelog', href: '/changelog' },
+    { name: 'Blog', href: '/blog' }
   ],
   legal: [
+    { name: 'Contact', href: '/contact' },
     { name: 'Privacy', href: '#' },
     { name: 'Terms', href: '/terms' }
   ]
 };
 
 const SOCIAL_LINKS = [
-  { name: 'GitHub', icon: FaGithub, href: 'https://github.com/rthmnapp' },
   { name: 'Twitter', icon: FaTwitter, href: 'https://x.com/rthmnapp' },
   {
     name: 'Instagram',
     icon: FaInstagram,
     href: 'https://www.instagram.com/rthmnapp/'
+  },
+  { name: 'GitHub', icon: FaGithub, href: 'https://github.com/rthmnapp' },
+  {
+    name: 'Youtube',
+    icon: FaYoutube,
+    href: 'https://www.youtube.com/@rthmnco'
   }
 ];
 
@@ -70,7 +85,7 @@ export function SectionFooter() {
   };
 
   return (
-    <footer className="z-90 relative border-t border-white/5 bg-black">
+    <footer className="relative z-90 border-t border-white/5 bg-black">
       <div className="mx-auto max-w-7xl px-4 py-12 lg:px-8">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
           {/* Left Side */}
@@ -81,47 +96,30 @@ export function SectionFooter() {
                   {getIcon('logo')}
                 </div>
                 <div
-                  className={`pt-1 font-russo text-2xl font-bold tracking-wide`}
+                  className={`font-russo pt-1 text-2xl font-bold tracking-wide`}
                 >
                   RTHMN
                 </div>
               </Link>
               <p
-                className={`mt-4 max-w-md font-kodemono text-sm text-gray-400`}
+                className={`font-kodemono mt-4 max-w-md text-sm text-gray-400`}
               >
                 Advanced pattern recognition for algorithmic trading. Built by
                 traders, for traders.
               </p>
-            </div>
-
-            {/* Newsletter */}
-            <div className={`font-kodemono`}>
-              <h3 className="text-sm font-semibold text-white">
-                Subscribe to our newsletter
-              </h3>
-              <p className="mt-2 text-sm text-gray-400">
-                Get the latest updates and market insights.
-              </p>
-              <form onSubmit={handleSubmit} className="mt-4">
-                <div className="group relative">
-                  <div className="absolute -inset-0.5 rounded-lg bg-linear-to-r from-blue-500/50 to-purple-500/50 opacity-0 blur-sm transition-all duration-500 group-hover:opacity-100" />
-                  <div className="relative flex">
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className="w-full rounded-l-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-white placeholder-gray-500 backdrop-blur-sm focus:outline-hidden"
-                    />
-                    <button
-                      type="submit"
-                      className="rounded-r-lg border border-l-0 border-white/10 bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20"
-                    >
-                      Subscribe
-                    </button>
-                  </div>
-                </div>
-              </form>
+              {/* Social Links */}
+              <div className="mt-6 flex space-x-6">
+                {SOCIAL_LINKS.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="group relative text-gray-400 transition-colors duration-200 hover:text-white"
+                  >
+                    <span className="absolute -inset-2 -z-10 rounded-full bg-white/0 transition-all duration-300 group-hover:bg-white/5" />
+                    <item.icon className="h-5 w-5" />
+                  </a>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -130,7 +128,7 @@ export function SectionFooter() {
             {/* Links Sections */}
             {Object.entries(FOOTER_LINKS).map(([category, links]) => (
               <div key={category} className="font-kodemono">
-                <h3 className="text-sm font-semibold uppercase text-white">
+                <h3 className="text-sm font-semibold text-white uppercase">
                   {category}
                 </h3>
                 <ul className="mt-4 space-y-2">
@@ -152,20 +150,20 @@ export function SectionFooter() {
             ))}
           </div>
         </div>
-        <div className="mt-8 border-t border-white/10 pt-8 font-outfit text-[11px] leading-relaxed text-white/50">
-          <h4 className="mb-2 text-xs font-semibold text-white/50">
+        <div className="font-kodemono mt-8 border-t border-white/10 pt-8 text-[11px] leading-relaxed text-gray-400">
+          <h4 className="mb-2 text-xs font-semibold text-white uppercase">
             Risk Disclosure & Disclaimer
           </h4>
-          <p>
-            RTHMN is an advanced pattern recognition platform providing
-            algorithmic trading indicators and analysis tools. Built by traders,
-            for traders. Trading in financial instruments involves high risks
-            including the risk of losing some, or all, of your investment
-            amount, and may not be suitable for all investors. Before deciding
-            to trade, you should carefully consider your investment objectives,
-            level of experience, and risk appetite.
+          <p className="text-gray-400">
+            RTHMN is pattern recognition platform providing algorithmic trading
+            indicators and analysis tools. Built by traders, for traders.
+            Trading in financial instruments involves high risks including the
+            risk of losing some, or all, of your investment amount, and may not
+            be suitable for all investors. Before deciding to trade, you should
+            carefully consider your investment objectives, level of experience,
+            and risk appetite.
           </p>
-          <p className="mt-2">
+          <p className="mt-2 text-gray-400">
             The information and tools provided by RTHMN, including but not
             limited to our indicators, pattern recognition systems, and market
             analysis, do not constitute investment advice, financial advice,
@@ -176,14 +174,14 @@ export function SectionFooter() {
             directly or indirectly from use of or reliance on our platform or
             information.
           </p>
-          <p className="mt-2">
+          <p className="mt-2 text-gray-400">
             Past performance of any trading system, methodology, or pattern
             recognition tool is not necessarily indicative of future results.
             Market patterns and behaviors are inherently unpredictable. You
             should be aware of all the risks associated with trading and seek
             advice from an independent financial advisor if you have any doubts.
           </p>
-          <p className="mt-2">
+          <p className="mt-2 text-gray-400">
             Hypothetical or simulated performance results have certain inherent
             limitations. Unlike actual trading performance, simulated results do
             not represent actual trading and may not be impacted by real market
@@ -194,25 +192,11 @@ export function SectionFooter() {
         </div>
         {/* Bottom Section */}
         <div
-          className={`mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 font-kodemono lg:flex-row`}
+          className={`font-kodemono mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 lg:flex-row`}
         >
-          <p className="text-xs text-white/50">
+          <p className="text-xs text-gray-400">
             © 2024 Rthmn. All rights reserved.
           </p>
-
-          {/* Social Links */}
-          <div className="mt-4 flex space-x-6 lg:mt-0">
-            {SOCIAL_LINKS.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className="group relative text-gray-400 transition-colors duration-200 hover:text-white"
-              >
-                <span className="absolute -inset-2 -z-10 rounded-full bg-white/0 transition-all duration-300 group-hover:bg-white/5" />
-                <item.icon className="h-5 w-5" />
-              </a>
-            ))}
-          </div>
         </div>
       </div>
     </footer>

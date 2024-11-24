@@ -332,7 +332,7 @@ export function MarketWall({ marketData }: { marketData: MarketData[] }) {
   }, [processedData, animate]);
 
   return (
-    <div className="absolute inset-0 z-0 h-screen max-h-screen w-screen overflow-hidden bg-black">
+    <div className="absolute inset-0 z-0 h-screen max-h-screen w-screen overflow-hidden">
       <canvas
         ref={canvasRef}
         className="h-full w-full"

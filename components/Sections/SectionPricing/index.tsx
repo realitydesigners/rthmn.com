@@ -6,6 +6,13 @@ import type { User } from '@supabase/supabase-js';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { MotionDiv } from '@/components/MotionDiv';
+import {
+  FaCheck,
+  FaArrowRight,
+  FaCrown,
+  FaBolt,
+  FaRocket
+} from 'react-icons/fa';
 
 type Subscription = any;
 type Product = any;
@@ -26,7 +33,14 @@ interface Props {
   subscription: SubscriptionWithProduct | null;
 }
 
-type BillingInterval = 'lifetime' | 'year' | 'month';
+const PricingBenefits = [
+  'Real-time Pattern Recognition',
+  'Advanced Pattern Detection',
+  'Real-time Market Analysis',
+  'Premium Discord Access',
+  'Trading Indicators',
+  'Early Access Features'
+];
 
 export function SectionPricing({ user, products, subscription }: Props) {
   const router = useRouter();
@@ -35,7 +49,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
   const currentPath = usePathname();
 
   const product = products[0];
-  const prices = product?.prices || [];
+  const price = product?.prices?.[0];
 
   const handleStripeCheckout = async (price: Price) => {
     setPriceIdLoading(price.id);
@@ -74,130 +88,135 @@ export function SectionPricing({ user, products, subscription }: Props) {
     setPriceIdLoading(undefined);
   };
 
-  if (!product) return null;
+  if (!product || !price) return null;
+
+  const priceString = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: price.currency ?? 'USD',
+    minimumFractionDigits: 0
+  }).format((price.unit_amount ?? 0) / 100);
 
   return (
-    <section className="relative py-20">
-      {/* Background gradients */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#22c55e]/[0.03] via-transparent to-transparent blur-xl" />
+    <section className="relative min-h-screen overflow-hidden py-32">
+      {/* Enhanced Background Effects */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]" />
       </div>
 
-      <div className="mx-auto max-w-2xl px-4">
-        <div className="mb-16 text-center">
-          <h1 className="text-gray-gradient mb-4 font-outfit text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-            Box Seat
-          </h1>
-          <p className="text-dark-gray mt-4 text-lg">
-            Discord Community Access with a fully integrated Rthmn Dashboard
-            Experience and access to latest builds + new indicators.
-          </p>
-        </div>
-
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Enhanced Header Section */}
         <MotionDiv
-          className="w-full"
-          whileHover={{ scale: 1.02 }}
-          transition={{ duration: 0.2 }}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto mb-12 max-w-3xl text-center"
         >
-          <div className="relative overflow-hidden rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm">
-            <div className="flex flex-col gap-6 p-8">
-              <div>
-                <h2 className="text-gray-gradient text-xl font-semibold">
+          <h1 className="text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+            Elevate Your Trading Strategy
+          </h1>
+          <p className="font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg">
+            Join an elite community of traders using trading tools from the
+            future.
+          </p>
+        </MotionDiv>
+
+        {/* Single Pricing Card */}
+        <MotionDiv
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mx-auto max-w-2xl"
+        >
+          <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40 inset-shadow-sm shadow-xl shadow-black/20 inset-shadow-white/5 backdrop-blur-sm">
+            {/* Enhanced glow effects */}
+            <div className="pointer-events-none absolute inset-0">
+              <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+            </div>
+
+            <div className="p-8">
+              {/* Price Header */}
+              <div className="mb-8 text-center">
+                <h2 className="font-outfit mb-4 text-3xl font-bold text-white">
                   {product.name}
                 </h2>
-                <p className="mt-2 text-sm text-white/60">
+                <div className="mb-4">
+                  <div className="inline-flexrounded-full px-6 py-2 inset-shadow-xs shadow-lg">
+                    <span className="font-outfit text-6xl font-bold text-white">
+                      {priceString}
+                    </span>
+                    <span className="font-kodemono ml-2 text-lg text-gray-400">
+                      /month
+                    </span>
+                  </div>
+                </div>
+                <p className="font-kodemono text-md text-gray-400">
                   {product.description}
                 </p>
               </div>
 
-              <div className="flex flex-col gap-4">
-                {prices.map((price) => {
-                  const priceString = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: price.currency ?? 'USD',
-                    minimumFractionDigits: 0
-                  }).format((price.unit_amount ?? 0) / 100);
-
-                  const isSelected = selectedPriceId === price.id;
-
-                  return (
-                    <button
-                      key={price.id}
-                      onClick={() => setSelectedPriceId(price.id)}
-                      className={`flex items-center justify-between rounded-md border p-4 transition-all ${
-                        isSelected
-                          ? 'border-[#22c55e] bg-[#22c55e]/10'
-                          : 'border-white/10 bg-black/20 hover:border-white/20'
-                      }`}
+              {/* Benefits List */}
+              <div className="mb-8">
+                <div className="flex w-full flex-col items-start justify-start">
+                  {PricingBenefits.map((benefit, index) => (
+                    <div
+                      key={index}
+                      className="flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-gray-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10"
                     >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`flex h-5 w-5 items-center justify-center rounded-full border ${
-                            isSelected
-                              ? 'border-[#22c55e] bg-[#22c55e]'
-                              : 'border-white/20'
-                          }`}
-                        >
-                          {isSelected && (
-                            <div className="h-2 w-2 rounded-full bg-black" />
-                          )}
-                        </div>
-                        <span className="text-white">{priceString}/month</span>
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/5 inset-shadow-xs shadow-sm inset-shadow-white/10">
+                        <FaCheck className="h-3 w-3 text-emerald-400" />
                       </div>
-                      {price.unit_amount === 2999 && (
-                        <span className="rounded-full bg-[#22c55e]/20 px-3 py-1 text-xs text-[#22c55e]">
-                          Popular
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+                      <span className="font-kodemono text-md">{benefit}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
+              {/* Action Button */}
               <button
-                onClick={() => {
-                  const selectedPrice = prices.find(
-                    (p) => p.id === selectedPriceId
-                  );
-                  if (selectedPrice) handleStripeCheckout(selectedPrice);
-                }}
-                disabled={
-                  !selectedPriceId || priceIdLoading === selectedPriceId
-                }
-                className="mt-4 w-full rounded-md bg-[#22c55e] px-4 py-3 text-sm font-medium text-black transition-all hover:bg-[#22c55e]/90 focus:outline-hidden focus:ring-2 focus:ring-[#22c55e] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                onClick={() => handleStripeCheckout(price)}
+                disabled={priceIdLoading === price.id}
+                className="group relative flex w-full items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white inset-ring inset-shadow-sm ring-1 shadow-lg shadow-black/20 ring-white/10 inset-shadow-white/10 inset-ring-white/5 transition-all duration-300 hover:from-[#444444] hover:to-[#282828] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {priceIdLoading === selectedPriceId ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      />
-                    </svg>
-                    Processing...
-                  </span>
-                ) : subscription ? (
-                  'Manage Subscription'
-                ) : (
-                  'Subscribe'
-                )}
+                <span className="font-outfit relative flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-lg font-medium transition-all duration-300 group-hover:inset-shadow-sm group-hover:inset-shadow-white/5">
+                  {priceIdLoading === price.id ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24">
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      Processing...
+                    </span>
+                  ) : subscription ? (
+                    'Manage Subscription'
+                  ) : (
+                    <>
+                      Get Started Now
+                      <FaArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5" />
+                    </>
+                  )}
+                </span>
               </button>
             </div>
-
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 -z-10 bg-linear-to-br from-[#22c55e]/5 via-transparent to-[#22c55e]/5" />
           </div>
         </MotionDiv>
+      </div>
+
+      {/* Add floating elements */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
+        <div className="absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-white/5 blur-3xl" />
       </div>
     </section>
   );

@@ -65,12 +65,12 @@ export function GlowingCard({
             </h3>
           </div>
           <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/5 p-3 backdrop-blur-sm">
-            <IconComponent className="h-8 w-8 text-white/80" />
+            <IconComponent className="h-8 w-8 text-gray-400" />
           </div>
         </div>
 
         {/* Highlight Quote */}
-        {/* <blockquote className="border-l-2 border-white/10 pl-4 font-mono text-sm italic text-white/40">
+        {/* <blockquote className="border-l-2 border-white/10 pl-4 font-mono text-sm italic text-gray-400">
           "{belief.highlight}"
         </blockquote> */}
 
@@ -97,13 +97,13 @@ export function GlowingCard({
             <div className="text-3xl font-bold text-white">
               {belief.stats.value}
             </div>
-            <div className="text-sm text-white/40">{belief.stats.label}</div>
+            <div className="text-sm text-gray-400">{belief.stats.label}</div>
           </div>
           <div className="flex flex-wrap justify-end gap-2">
             {belief.tags.map((tag, i) => (
               <span
                 key={i}
-                className="rounded-sm bg-white/[0.03] px-2 py-1 text-xs text-white/40 backdrop-blur-sm"
+                className="rounded-sm bg-white/[0.03] px-2 py-1 text-xs text-gray-400 backdrop-blur-sm"
               >
                 {tag}
               </span>
