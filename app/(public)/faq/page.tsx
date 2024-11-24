@@ -77,12 +77,12 @@ const SectionGitHub = () => (
           <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         </div>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-center justify-between md:flex-row">
           <div>
             <h2 className="font-outfit mb-2 text-2xl font-bold text-white">
               Found a Bug?
             </h2>
-            <p className="font-kodemono text-gray-400">
+            <p className="font-kodemono mb-8 text-gray-400 md:mb-0">
               Report issues directly on our GitHub repository
             </p>
           </div>

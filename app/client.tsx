@@ -40,13 +40,13 @@ export default function ClientPage({
       <SectionRthmnDemo marketData={marketData} />
       <SectionBoxes />
       <SectionAboutAlgorithm />
-      <SectionFAQ />
       <SectionPricing
         user={session?.user}
         products={products ?? []}
         subscription={null}
       />
       <SectionBlogPosts initialPosts={posts} />
+      <SectionFAQ />
       <SectionMarketDisplay marketData={marketData} />
       <SectionFooter />
     </BackgroundGrid>

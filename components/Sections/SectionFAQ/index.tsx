@@ -7,12 +7,12 @@ import {
   FaQuestionCircle,
   FaCommentAlt,
   FaSearch,
-  FaTags,
-  FaExternalLinkAlt
+  FaTags
 } from 'react-icons/fa';
 import { MotionDiv } from '@/components/MotionDiv';
 import { client } from '@/utils/sanity/lib/client';
 import { PortableText } from '@portabletext/react';
+import { ChangelogTemplate } from '@/components/blocks/templates/ChangelogTemplate';
 import { useInView } from 'react-intersection-observer';
 import { AnimatePresence } from 'framer-motion';
 
@@ -24,7 +24,9 @@ interface FAQItem {
   isPublished: boolean;
 }
 
-// Enhanced FAQ Item component
+const ITEMS_PER_PAGE = 5;
+const LOAD_MORE_COUNT = 10;
+
 const FAQItem = memo(
   ({
     item,
@@ -115,7 +117,10 @@ const FAQItem = memo(
                   <FaCommentAlt className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="prose prose-invert max-w-none text-base leading-relaxed text-white/70">
-                  <PortableText value={item.answer} />
+                  <PortableText
+                    value={item.answer}
+                    components={ChangelogTemplate}
+                  />
                 </div>
               </div>
               {item.category && (
@@ -135,7 +140,6 @@ const FAQItem = memo(
 
 FAQItem.displayName = 'FAQItem';
 
-// Enhanced search input
 const SearchInput = memo(
   ({
     value,
@@ -162,7 +166,6 @@ const SearchInput = memo(
 
 SearchInput.displayName = 'SearchInput';
 
-// Enhanced category filter
 const CategoryFilter = memo(
   ({
     categories,
@@ -209,6 +212,22 @@ const CategoryFilter = memo(
 
 CategoryFilter.displayName = 'CategoryFilter';
 
+// Add a LoadMore button component
+const LoadMoreButton = memo(({ onClick }: { onClick: () => void }) => (
+  <button
+    onClick={onClick}
+    className="group relative mt-8 flex w-full items-center justify-center rounded-full border border-white/10 bg-black/40 p-4 text-white transition-all duration-300 hover:border-white/20 hover:bg-black/60"
+  >
+    <div className="pointer-events-none absolute inset-0">
+      <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+    </div>
+    <span className="font-kodemono text-sm">Show More</span>
+  </button>
+));
+
+LoadMoreButton.displayName = 'LoadMoreButton';
+
 // Main FAQ Section
 export const SectionFAQ: React.FC = () => {
   const [activeId, setActiveId] = useState<string | null>(null);
@@ -221,6 +240,10 @@ export const SectionFAQ: React.FC = () => {
     threshold: 0.1,
     triggerOnce: true
   });
+
+  // Add pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     const fetchFAQ = async () => {
@@ -252,6 +275,7 @@ export const SectionFAQ: React.FC = () => {
     [faqItems]
   );
 
+  // Update the filtered items logic
   const filteredItems = useMemo(() => {
     return faqItems.filter((item) => {
       const matchesSearch = item.question
@@ -263,15 +287,25 @@ export const SectionFAQ: React.FC = () => {
     });
   }, [faqItems, searchQuery, selectedCategory]);
 
+  // Add pagination logic
+  const paginatedItems = useMemo(() => {
+    return filteredItems.slice(0, displayCount);
+  }, [filteredItems, displayCount]);
+
+  // Handle load more
+  const handleLoadMore = () => {
+    setDisplayCount((prev) => prev + LOAD_MORE_COUNT);
+    setCurrentPage((prev) => prev + 1);
+  };
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setDisplayCount(ITEMS_PER_PAGE);
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
   return (
     <section className="relative min-h-screen overflow-hidden py-32">
-      {/* Enhanced Background Effects */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]" />
-        <div className="absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-emerald-400/5 blur-3xl" />
-        <div className="absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-emerald-400/5 blur-3xl" />
-      </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <MotionDiv
           ref={ref}
@@ -291,14 +325,11 @@ export const SectionFAQ: React.FC = () => {
               className="text-emerald-400 hover:text-emerald-300"
             >
               Contact our support team
-              <FaExternalLinkAlt className="ml-1 inline-block h-3 w-3" />
             </Link>
           </p>
         </MotionDiv>
-
         <div className="mx-auto max-w-4xl">
           <SearchInput value={searchQuery} onChange={setSearchQuery} />
-
           {categories.length > 0 && (
             <CategoryFilter
               categories={categories}
@@ -306,10 +337,9 @@ export const SectionFAQ: React.FC = () => {
               onSelect={setSelectedCategory}
             />
           )}
-
           <AnimatePresence mode="wait">
             {isLoading ? (
-              <div className="animate-pulse space-y-4">
+              <div className="animate-pulse space-y-4 bg-black">
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
@@ -323,19 +353,39 @@ export const SectionFAQ: React.FC = () => {
                 ))}
               </div>
             ) : filteredItems.length > 0 ? (
-              <div className="space-y-4 bg-black">
-                {filteredItems.map((item, index) => (
-                  <FAQItem
-                    key={item._id}
-                    item={item}
-                    isActive={activeId === item._id}
-                    onClick={() =>
-                      setActiveId(activeId === item._id ? null : item._id)
-                    }
-                    index={index}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="space-y-4 bg-black">
+                  {paginatedItems.map((item, index) => (
+                    <FAQItem
+                      key={item._id}
+                      item={item}
+                      isActive={activeId === item._id}
+                      onClick={() =>
+                        setActiveId(activeId === item._id ? null : item._id)
+                      }
+                      index={index}
+                    />
+                  ))}
+                </div>
+                {/* Show load more button if there are more items */}
+                {displayCount < filteredItems.length && (
+                  <MotionDiv
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <LoadMoreButton onClick={handleLoadMore} />
+                  </MotionDiv>
+                )}
+
+                {/* Show results count */}
+                <div className="mt-6 text-center">
+                  <p className="font-kodemono text-sm text-gray-400">
+                    Showing {paginatedItems.length} of {filteredItems.length}{' '}
+                    questions
+                  </p>
+                </div>
+              </>
             ) : (
               <MotionDiv
                 initial={{ opacity: 0 }}

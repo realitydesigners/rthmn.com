@@ -60,7 +60,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
               <h1 className="text-gray-gradient font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl">
                 Changelog
               </h1>
-              <p className="mt-6 font-kodemono text-lg text-white/60">
+              <p className="font-kodemono mt-6 text-lg text-gray-400">
                 Track our journey as we build the future of data visualization
                 for trading and investing.
               </p>
@@ -70,7 +70,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
           {/* Changelog Entries */}
           <div className="mx-auto mt-20 max-w-4xl">
             <div className="relative space-y-8">
-              <div className="absolute left-0 top-0 h-full w-[1px] bg-[#333] lg:left-[29px]" />
+              <div className="absolute top-0 left-0 h-full w-[1px] bg-[#333] lg:left-[29px]" />
 
               {changelog.map((entry: ChangelogEntry, index: number) => (
                 <MotionDiv
@@ -94,7 +94,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                     </div>
 
                     {/* Horizontal connector */}
-                    <div className="absolute left-1/2 top-[8px] h-[1px] w-[16px] bg-[#333] lg:w-[36px]" />
+                    <div className="absolute top-[8px] left-1/2 h-[1px] w-[16px] bg-[#333] lg:w-[36px]" />
                   </div>
 
                   <div className="space-y-6">
@@ -105,10 +105,10 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                           {entry.title}
                         </h2>
                         <div className="mt-2 flex items-center gap-4">
-                          <span className="font-kodemono text-sm text-white/40">
+                          <span className="font-kodemono text-sm text-gray-400">
                             v{entry.version}
                           </span>
-                          <span className="font-kodemono text-sm text-white/40">
+                          <span className="font-kodemono text-sm text-gray-400">
                             {new Date(entry.releaseDate).toLocaleDateString()}
                           </span>
                         </div>
@@ -121,13 +121,13 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                     </div>
 
                     {/* Description */}
-                    <p className="font-kodemono text-lg text-white/60">
+                    <p className="font-kodemono text-lg text-gray-400">
                       {entry.description}
                     </p>
 
                     {entry.contributors && entry.contributors.length > 0 && (
                       <div className="mt-6 flex items-center gap-2">
-                        <span className="font-kodemono text-sm text-white/40">
+                        <span className="font-kodemono text-sm text-gray-400/50">
                           Contributors:
                         </span>
                         <div className="flex -space-x-2">
@@ -174,7 +174,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
                         <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent" />
                       </div>
-                      <span className="font-kodemono text-sm text-white/60">
+                      <span className="font-kodemono text-sm text-gray-400">
                         {expandedEntries.has(entry._id)
                           ? 'Show Less'
                           : 'Read More'}
