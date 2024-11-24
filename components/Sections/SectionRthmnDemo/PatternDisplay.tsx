@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { MotionDiv } from '@/components/MotionDiv';
 import {
@@ -19,100 +19,97 @@ interface PatternDisplayProps {
   marketData: MarketData[];
 }
 
-const BoxVisualization = ({
-  pair,
-  candleData
-}: {
-  pair: string;
-  candleData: string;
-}) => {
-  const [baseSize, setBaseSize] = useState(150);
-  const randomSequence = useMemo(() => {
-    const pairHash = pair.split('').reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
-    const randomIndex = Math.abs(pairHash) % sequences.length;
-    const sequence = sequences[randomIndex];
-    const values = BASE_VALUES.map((value, i) => value * (sequence[i] || 1));
-    return createMockBoxData(values);
-  }, [pair]);
+const BoxVisualization = memo(
+  ({ pair, candleData }: { pair: string; candleData: string }) => {
+    const [baseSize, setBaseSize] = useState(150);
+    const randomSequence = useMemo(() => {
+      const pairHash = pair.split('').reduce((acc, char) => {
+        return char.charCodeAt(0) + ((acc << 5) - acc);
+      }, 0);
+      const randomIndex = Math.abs(pairHash) % sequences.length;
+      const sequence = sequences[randomIndex];
+      const values = BASE_VALUES.map((value, i) => value * (sequence[i] || 1));
+      return createMockBoxData(values);
+    }, [pair]);
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        setBaseSize(250);
-      } else if (window.innerWidth >= 640) {
-        setBaseSize(150);
-      } else {
-        setBaseSize(150);
-      }
-    };
+    useEffect(() => {
+      const handleResize = () => {
+        setBaseSize(window.innerWidth >= 1024 ? 250 : 150);
+      };
 
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+      handleResize();
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
-  return (
-    <div
-      className="relative flex items-center justify-center rounded-lg border border-white/10 backdrop-blur-sm"
-      style={{ height: `${baseSize}px`, width: `${baseSize}px` }}
-    >
-      <MotionDiv
-        className="absolute inset-0"
-        animate={{
-          background: [
-            'radial-gradient(circle at 0% 0%, #34d39915 0%, transparent 50%)',
-            'radial-gradient(circle at 100% 100%, #34d39915 0%, transparent 50%)',
-            'radial-gradient(circle at 0% 0%, #34d39915 0%, transparent 50%)'
-          ]
-        }}
-        transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-      />
+    return (
+      <div
+        className="relative flex items-center justify-center rounded-lg border border-white/10 backdrop-blur-sm"
+        style={{ height: `${baseSize}px`, width: `${baseSize}px` }}
+      >
+        <MotionDiv
+          className="absolute inset-0"
+          animate={{
+            background: [
+              'radial-gradient(circle at 0% 0%, #34d39915 0%, transparent 50%)',
+              'radial-gradient(circle at 100% 100%, #34d39915 0%, transparent 50%)',
+              'radial-gradient(circle at 0% 0%, #34d39915 0%, transparent 50%)'
+            ]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        />
 
-      {randomSequence.length > 0 && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="relative"
-            style={{ width: baseSize, height: baseSize }}
-          >
-            <NestedBoxes
-              boxes={randomSequence.sort(
-                (a, b) => Math.abs(b.value) - Math.abs(a.value)
-              )}
-              demoStep={0}
-              isPaused={false}
-              baseSize={baseSize}
-              colorScheme="green-red"
-            />
+        {randomSequence.length > 0 && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              className="relative"
+              style={{ width: baseSize, height: baseSize }}
+            >
+              <NestedBoxes
+                boxes={randomSequence.sort(
+                  (a, b) => Math.abs(b.value) - Math.abs(a.value)
+                )}
+                demoStep={0}
+                isPaused={false}
+                baseSize={baseSize}
+                colorScheme="green-red"
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    );
+  }
+);
+
+BoxVisualization.displayName = 'BoxVisualization';
+
+export const PatternDisplay = memo(({ marketData }: PatternDisplayProps) => {
+  const getLatestPrice = useMemo(
+    () => (candleData: string) => {
+      try {
+        const data = JSON.parse(candleData) as CandleData[];
+        return parseFloat(data[data.length - 1].mid.c);
+      } catch (e) {
+        return null;
+      }
+    },
+    []
   );
-};
 
-export function PatternDisplay({ marketData }: PatternDisplayProps) {
-  const getLatestPrice = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      return parseFloat(data[data.length - 1].mid.c);
-    } catch (e) {
-      return null;
-    }
-  };
-
-  const getPriceChange = (candleData: string) => {
-    try {
-      const data = JSON.parse(candleData) as CandleData[];
-      const firstPrice = parseFloat(data[0].mid.o);
-      const lastPrice = parseFloat(data[data.length - 1].mid.c);
-      const change = ((lastPrice - firstPrice) / firstPrice) * 100;
-      return change;
-    } catch (e) {
-      return null;
-    }
-  };
+  const getPriceChange = useMemo(
+    () => (candleData: string) => {
+      try {
+        const data = JSON.parse(candleData) as CandleData[];
+        const firstPrice = parseFloat(data[0].mid.o);
+        const lastPrice = parseFloat(data[data.length - 1].mid.c);
+        return ((lastPrice - firstPrice) / firstPrice) * 100;
+      } catch (e) {
+        return null;
+      }
+    },
+    []
+  );
 
   return (
     <section className="relative z-100 h-full">
@@ -163,4 +160,6 @@ export function PatternDisplay({ marketData }: PatternDisplayProps) {
       </div>
     </section>
   );
-}
+});
+
+PatternDisplay.displayName = 'PatternDisplay';
