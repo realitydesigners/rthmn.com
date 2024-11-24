@@ -56,9 +56,9 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 
         <div className="relative z-10 p-6">
           {/* Meta Information */}
-          <div className="mb-4 flex items-center gap-4 text-xs text-white/60">
+          <div className="mb-4 flex items-center gap-4 text-xs text-gray-400">
             <div className="flex items-center gap-2">
-              <FaCalendar className="h-3 w-3 text-white/80" />
+              <FaCalendar className="h-3 w-3 text-gray-400" />
               <span className="font-kodemono">
                 {new Date(block?.publicationDate).toLocaleDateString('en-US', {
                   year: 'numeric',
@@ -68,20 +68,20 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <FaClock className="h-3 w-3 text-white/80" />
+              <FaClock className="h-3 w-3 text-gray-400" />
               <span className="font-kodemono">5 min read</span>
             </div>
           </div>
 
           {/* Title */}
           <Link href={`/posts/${post.slug.current}`}>
-            <h3 className="font-outfit mb-3 text-2xl font-bold tracking-tight text-white/90 transition-colors duration-300 group-hover:text-white">
+            <h3 className="font-outfit mb-3 text-2xl font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-white">
               {block?.heading || 'No title'}
             </h3>
           </Link>
 
           {/* Description */}
-          <p className="font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-white/60">
+          <p className="font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-gray-400">
             {block?.subheading || 'No subheading'}
           </p>
 
@@ -128,7 +128,7 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
           <h2 className="text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Latest Insights
           </h2>
-          <p className="font-kodemono mx-auto max-w-2xl text-base text-white/60 sm:text-lg">
+          <p className="font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg">
             Explore our latest thoughts on market analysis, trading strategies,
             and technological innovations.
           </p>

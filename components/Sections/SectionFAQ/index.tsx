@@ -79,11 +79,11 @@ const FAQItem = memo(
                   className={`h-5 w-5 transition-all duration-300 ${
                     isActive
                       ? 'text-emerald-400'
-                      : 'text-white/60 group-hover:text-white/80'
+                      : 'text-gray-400 group-hover:text-gray-400'
                   }`}
                 />
               </div>
-              <h3 className="text-left text-lg font-medium text-white/90">
+              <h3 className="text-left text-lg font-medium text-white">
                 {item.question}
               </h3>
             </div>
@@ -93,7 +93,7 @@ const FAQItem = memo(
               className={`transition-colors duration-300 ${
                 isActive
                   ? 'text-emerald-400'
-                  : 'text-white/60 group-hover:text-white/80'
+                  : 'text-gray-400 group-hover:text-gray-400'
               }`}
             >
               <FaChevronDown className="h-5 w-5" />
@@ -112,7 +112,7 @@ const FAQItem = memo(
             <div className="border-t border-white/5 px-6 py-6">
               <div className="flex gap-4">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5">
-                  <FaCommentAlt className="h-5 w-5 text-white/60" />
+                  <FaCommentAlt className="h-5 w-5 text-gray-400" />
                 </div>
                 <div className="prose prose-invert max-w-none text-base leading-relaxed text-white/70">
                   <PortableText value={item.answer} />
@@ -120,7 +120,7 @@ const FAQItem = memo(
               </div>
               {item.category && (
                 <div className="mt-4 flex items-center gap-2">
-                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-white/40">
+                  <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-gray-400">
                     {item.category}
                   </span>
                 </div>
@@ -146,14 +146,14 @@ const SearchInput = memo(
   }) => (
     <div className="group relative mb-8">
       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-        <FaSearch className="h-5 w-5 text-white/40 transition-colors duration-300 group-focus-within:text-emerald-400" />
+        <FaSearch className="h-5 w-5 text-gray-400 transition-colors duration-300 group-focus-within:text-emerald-400" />
       </div>
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Search questions..."
-        className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white/90 placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none"
+        className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none"
       />
       <div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
     </div>
@@ -179,7 +179,7 @@ const CategoryFilter = memo(
         className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
           selected === 'all'
             ? 'border-emerald-400/50 bg-emerald-400/10 text-emerald-400'
-            : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white/80'
+            : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:bg-white/10 hover:text-gray-400'
         }`}
       >
         <FaTags
@@ -194,7 +194,7 @@ const CategoryFilter = memo(
           className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition-all duration-300 ${
             selected === category
               ? 'border-emerald-400/50 bg-emerald-400/10 text-emerald-400'
-              : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10 hover:text-white/80'
+              : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20 hover:bg-white/10 hover:text-gray-400'
           }`}
         >
           <FaTags
@@ -283,7 +283,7 @@ export const SectionFAQ: React.FC = () => {
           <h2 className="text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
             Frequently Asked Questions
           </h2>
-          <p className="font-kodemono mx-auto max-w-2xl text-base text-white/60 sm:text-lg">
+          <p className="font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg">
             Everything you need to know about rthmn. Can't find the answer
             you're looking for?{' '}
             <Link
@@ -341,7 +341,7 @@ export const SectionFAQ: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="text-center text-white/60"
+                className="text-center text-gray-400"
               >
                 No questions found matching your criteria
               </MotionDiv>

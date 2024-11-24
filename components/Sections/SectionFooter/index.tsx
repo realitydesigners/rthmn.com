@@ -150,7 +150,7 @@ export function SectionFooter() {
             ))}
           </div>
         </div>
-        <div className="font-kodemono mt-8 border-t border-white/10 pt-8 text-[11px] leading-relaxed text-white/50">
+        <div className="font-kodemono mt-8 border-t border-white/10 pt-8 text-[11px] leading-relaxed text-gray-400">
           <h4 className="mb-2 text-xs font-semibold text-white uppercase">
             Risk Disclosure & Disclaimer
           </h4>

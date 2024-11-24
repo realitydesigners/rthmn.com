@@ -90,7 +90,7 @@ const MarketHeading = memo(() => (
           <br />
           Simplified
         </h2>
-        <p className="font-kodemono mx-auto mt-6 max-w-2xl px-4 text-base text-white/60 sm:text-lg">
+        <p className="font-kodemono mx-auto mt-6 max-w-2xl px-4 text-base text-gray-400 sm:text-lg">
           Experience real-time market data visualization with our advanced
           pattern recognition system.
         </p>
@@ -257,7 +257,7 @@ const CardContent = memo(
     return (
       <div className="relative z-10">
         <div className="mb-2 flex items-start justify-between">
-          <h4 className="text-sm font-medium text-white/90">
+          <h4 className="text-sm font-medium text-white">
             {item.pair.replace('_', '/')}
           </h4>
           <MotionDiv

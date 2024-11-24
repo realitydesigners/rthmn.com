@@ -29,7 +29,7 @@ const FeatureTags = memo(() => (
         <div className="items-centergap-1.5 relative flex">
           <div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
           <feature.icon className="relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4" />
-          <span className="font-kodemono text-white/60 transition-colors duration-300 group-hover:text-white">
+          <span className="font-kodemono text-gray-400 transition-colors duration-300 group-hover:text-white">
             {feature.text}
           </span>
         </div>
@@ -122,7 +122,7 @@ const StaticContent = memo(() => (
       <br />
       Recognition
     </h2>
-    <p className="font-kodemono mb-8 text-base leading-relaxed text-white/60 sm:mb-12 sm:text-lg">
+    <p className="font-kodemono mb-8 text-base leading-relaxed text-gray-400 sm:mb-12 sm:text-lg">
       Discover hidden market patterns through advanced mathematics.
     </p>
     <FeatureTags />
