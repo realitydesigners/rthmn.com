@@ -4,10 +4,11 @@ import { ResoBox } from '@/components/Charts/ResoBox';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC } from '@/types/types';
+import { BoxDetailsRow } from '@/components/Charts/BoxDetailsRow';
 
 export default function Dashboard() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const { pairData, selectedPairs, isLoading, isAuthenticated } =
+  const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } =
     useDashboard();
 
   const toggleSettings = () => {
@@ -37,6 +38,26 @@ export default function Dashboard() {
               />
             ));
           })}
+        </div>
+
+        {/* Box Details Section */}
+        <div className="mt-8 rounded-lg border border-[#181818] p-4">
+          <h2 className="mb-4 text-sm font-bold text-white">Pattern Details</h2>
+          <div className="flex flex-col gap-2">
+            {selectedPairs.map((pair, pairIndex) => {
+              const data = pairData[pair];
+              if (!data?.boxes?.length) return null;
+              return data.boxes.map((boxSlice, index) => (
+                <BoxDetailsRow
+                  key={`details-${pair}-${index}`}
+                  boxes={boxSlice.boxes}
+                  maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                  pairName={pair}
+                  showSizes={pairIndex === 0 && index === 0}
+                />
+              ));
+            })}
+          </div>
         </div>
       </div>
     </main>
