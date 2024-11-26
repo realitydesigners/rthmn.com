@@ -162,7 +162,7 @@ const ResultCard = memo(
   }: {
     label: string;
     value: string;
-    subValue?: string;
+    subValue?: string | React.ReactNode;
     icon: React.ReactNode;
     positive?: boolean;
     isInvalid?: boolean;
