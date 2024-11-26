@@ -38,7 +38,23 @@ export const StudioStructure = (S: StructureBuilder) =>
               S.listItem()
                 .title('FAQ')
                 .icon(DocumentIcon)
-                .child(S.documentTypeList('faq'))
+                .child(S.documentTypeList('faq')),
+              S.listItem()
+                .title('Team')
+                .icon(TagIcon)
+                .child(S.documentTypeList('team')),
+              S.listItem()
+                .title('Categories')
+                .icon(TagIcon)
+                .child(S.documentTypeList('category')),
+              S.listItem()
+                .title('Market Data')
+                .icon(TagIcon)
+                .child(S.documentTypeList('marketData')),
+              S.listItem()
+                .title('Changelog')
+                .icon(TagIcon)
+                .child(S.documentTypeList('changelog'))
             ])
         ),
 
@@ -62,33 +78,6 @@ export const StudioStructure = (S: StructureBuilder) =>
                 .title('Audio')
                 .icon(ImageIcon)
                 .child(S.documentTypeList('audio'))
-            ])
-        ),
-
-      // Settings
-      S.listItem()
-        .title('Settings')
-        .icon(TagIcon)
-        .child(
-          S.list()
-            .title('Settings')
-            .items([
-              S.listItem()
-                .title('Team')
-                .icon(TagIcon)
-                .child(S.documentTypeList('team')),
-              S.listItem()
-                .title('Categories')
-                .icon(TagIcon)
-                .child(S.documentTypeList('category')),
-              S.listItem()
-                .title('Market Data')
-                .icon(TagIcon)
-                .child(S.documentTypeList('marketData')),
-              S.listItem()
-                .title('Changelog')
-                .icon(TagIcon)
-                .child(S.documentTypeList('changelog'))
             ])
         )
     ]);
