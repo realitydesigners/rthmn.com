@@ -3,8 +3,10 @@ import { FaCog } from 'react-icons/fa';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import styles from './styles.module.css';
+import { BoxSlice } from '@/types/types';
 import { colorPresets } from '@/utils/colorPresets';
 import { BoxColors } from '@/utils/localStorage';
+import { useBoxSliceData } from '@/hooks/useBoxSliceData';
 
 interface SettingsBarProps {
   isOpen: boolean;
@@ -20,14 +22,8 @@ const StyleControl: React.FC<{
   step: number;
   unit?: string;
 }> = ({ label, value, onChange, min, max, step, unit = '' }) => {
-  // Format the display value consistently
   const formatValue = (val: number) => {
-    // Always show one decimal place for values less than 1
-    if (val < 1 && val > 0) {
-      return val.toFixed(1);
-    }
-    // Show no decimals for whole numbers
-    return Math.round(val).toString();
+    return step < 1 ? val.toFixed(2) : val.toString();
   };
 
   return (
@@ -39,8 +35,11 @@ const StyleControl: React.FC<{
           min={min}
           max={max}
           step={step}
-          value={value}
-          onChange={(e) => onChange(parseFloat(e.target.value))}
+          value={Math.min(value, max)}
+          onChange={(e) => {
+            const newValue = parseFloat(e.target.value);
+            onChange(newValue);
+          }}
           className={styles.slider}
         />
         <span className={styles.valueDisplay}>
@@ -59,6 +58,22 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
   const { selectedPairs, togglePair, boxColors, updateBoxColors } =
     useDashboard();
   const [activeAsset, setActiveAsset] = useState<string | null>('FOREX');
+
+  // Get data for the first selected pair (or use a default)
+  const { filteredData } = useBoxSliceData(
+    selectedPairs[0] || 'EURUSD',
+    '1m',
+    [] as BoxSlice[],
+    0,
+    0
+  );
+
+  // Get the actual maximum number of boxes from the most recent slice
+  const totalBoxCount = filteredData?.[0]?.boxes?.length;
+
+  const handleBoxCountChange = (value: number) => {
+    handleStyleChange('maxBoxCount', value);
+  };
 
   const toggleAsset = (asset: string) => {
     setActiveAsset(activeAsset === asset ? null : asset);
@@ -246,11 +261,11 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
               unit="px"
             />
             <StyleControl
-              label="Box Count"
+              label="Count"
               value={boxColors.styles?.maxBoxCount ?? 10}
-              onChange={(value) => handleStyleChange('maxBoxCount', value)}
+              onChange={handleBoxCountChange}
               min={2}
-              max={20}
+              max={totalBoxCount || 38}
               step={1}
               unit=" boxes"
             />
@@ -260,7 +275,8 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
               onChange={(value) => handleStyleChange('shadowIntensity', value)}
               min={0}
               max={1}
-              step={0.1}
+              step={0.05}
+              unit=""
             />
           </div>
         </div>

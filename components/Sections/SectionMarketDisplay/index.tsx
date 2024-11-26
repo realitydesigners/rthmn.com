@@ -4,6 +4,7 @@ import { MotionDiv } from '@/components/MotionDiv';
 import { StartButton } from '@/components/Buttons/StartNowButton';
 import { CandleData } from '@/types/types';
 import { useInView } from 'react-intersection-observer';
+import { FaPlay } from 'react-icons/fa';
 
 // Types
 interface MarketData {
@@ -105,26 +106,7 @@ const MarketHeading = memo(() => (
         <button className="g flex h-[60px] items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
           <div className="flex h-[56px] w-full items-center space-x-6 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2 text-sm">
             <span className="text-md mr-4">Watch Demo</span>
-
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+            <FaPlay />
           </div>
         </button>
       </div>
