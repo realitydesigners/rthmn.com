@@ -1,19 +1,41 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
 import { useDashboard } from '@/providers/DashboardProvider';
-import { BoxSlice, OHLC } from '@/types/types';
+import { BoxSlice, OHLC, PairData } from '@/types/types';
 import { BoxDetailsRow } from '@/components/Charts/BoxDetailsRow';
 
 export default function Dashboard() {
+  const queryClient = useQueryClient();
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } =
     useDashboard();
 
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+      console.log(
+        'Query cache updated:',
+        selectedPairs.map((pair) => ({
+          pair,
+          data: queryClient.getQueryData(['pairData', pair])
+        }))
+      );
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [queryClient, selectedPairs]);
+
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
   };
+
+  useEffect(() => {
+    console.log('PairData updated:', pairData);
+  }, [pairData]);
 
   if (!isAuthenticated) {
     return <div>Loading session...</div>;
@@ -27,11 +49,18 @@ export default function Dashboard() {
       <div className="flex-1 overflow-hidden p-8 pt-24">
         <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] justify-center gap-4">
           {selectedPairs.map((pair) => {
-            const data = pairData[pair];
-            if (!data?.boxes?.length) return null;
+            const data = queryClient.getQueryData([
+              'pairData',
+              pair
+            ]) as PairData;
+            if (!data?.boxes?.length) {
+              console.log(`No data for ${pair}:`, data);
+              return null;
+            }
+            console.log(`Rendering data for ${pair}:`, data);
             return data.boxes.map((boxSlice, index) => (
               <PairResoBox
-                key={`${pair}-${index}`}
+                key={`${pair}-${boxSlice.timestamp}`}
                 pair={pair}
                 boxSlice={boxSlice}
                 currentOHLC={data.currentOHLC}
@@ -75,6 +104,10 @@ const PairResoBox = ({
 }) => {
   const closePrice = currentOHLC?.close || 'N/A';
 
+  useEffect(() => {
+    console.log(`${pair} box updated:`, boxSlice);
+  }, [pair, boxSlice]);
+
   return (
     <div className="m-auto flex flex-col items-center justify-center gap-5 rounded-lg border border-[#222] bg-linear-to-b from-[#121314] to-[#0B0C0D] p-4 text-center text-white shadow-md">
       <div className="mb-2 flex w-full items-center justify-between">
@@ -86,7 +119,11 @@ const PairResoBox = ({
         </div>
       </div>
       <div className="mb-2 w-full">
-        <ResoBox slice={boxSlice} isLoading={false} />
+        <ResoBox
+          key={`${pair}-${boxSlice.timestamp}`}
+          slice={boxSlice}
+          isLoading={false}
+        />
       </div>
     </div>
   );
