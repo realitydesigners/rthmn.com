@@ -13,29 +13,9 @@ export default function Dashboard() {
   const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } =
     useDashboard();
 
-  useEffect(() => {
-    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
-      console.log(
-        'Query cache updated:',
-        selectedPairs.map((pair) => ({
-          pair,
-          data: queryClient.getQueryData(['pairData', pair])
-        }))
-      );
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [queryClient, selectedPairs]);
-
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
   };
-
-  useEffect(() => {
-    console.log('PairData updated:', pairData);
-  }, [pairData]);
 
   if (!isAuthenticated) {
     return <div>Loading session...</div>;
@@ -92,7 +72,6 @@ export default function Dashboard() {
     </main>
   );
 }
-
 const PairResoBox = ({
   pair,
   boxSlice,
@@ -103,10 +82,6 @@ const PairResoBox = ({
   currentOHLC: OHLC;
 }) => {
   const closePrice = currentOHLC?.close || 'N/A';
-
-  useEffect(() => {
-    console.log(`${pair} box updated:`, boxSlice);
-  }, [pair, boxSlice]);
 
   return (
     <div className="m-auto flex flex-col items-center justify-center gap-5 rounded-lg border border-[#222] bg-linear-to-b from-[#121314] to-[#0B0C0D] p-4 text-center text-white shadow-md">

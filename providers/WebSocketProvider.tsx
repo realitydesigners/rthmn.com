@@ -1,16 +1,12 @@
 'use client';
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-  useRef
-} from 'react';
-import { BoxSlice, PairData } from '@/types/types';
+import React, { createContext, useContext, useEffect, useRef } from 'react';
+import { BoxSlice } from '@/types/types';
 import { wsClient } from '@/utils/websocketClient';
 import { useAuth } from '@/providers/SupabaseProvider';
 
-type WebSocketContextType = {
+const PROVIDER_ERROR = 'useWebSocket must be used within a WebSocketProvider';
+
+interface WebSocketContextType {
   subscribeToBoxSlices: (
     pair: string,
     handler: (data: BoxSlice) => void
@@ -18,117 +14,103 @@ type WebSocketContextType = {
   unsubscribeFromBoxSlices: (pair: string) => void;
   isConnected: boolean;
   disconnect: () => void;
-};
+}
 
-type Subscriptions = Map<string, (data: BoxSlice) => void>;
+interface WebSocketHandlers {
+  handleOpen: () => void;
+  handleClose: () => void;
+  handleMessage: (event: MessageEvent) => void;
+}
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(
   undefined
 );
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-  const [isConnected, setIsConnected] = useState(false);
+  const [isConnected, setIsConnected] = React.useState(false);
   const { session } = useAuth();
-  const subscriptionsRef = useRef<Subscriptions>(new Map());
+  const subscriptionsRef = useRef<Map<string, (data: BoxSlice) => void>>(
+    new Map()
+  );
 
+  // Connection management
   useEffect(() => {
     if (session?.access_token && !isConnected) {
-      wsClient.setAccessToken(session.access_token);
-      wsClient.connect();
+      initializeConnection();
     }
   }, [session, isConnected]);
 
-  useEffect(() => {
-    const handleOpen = () => {
-      setIsConnected(true);
-      console.log('WebSocket connected');
-    };
-    const handleClose = () => {
-      setIsConnected(false);
-      console.log('WebSocket disconnected');
-    };
+  // Event handlers setup
+  useEffect(() => setupConnectionHandlers(), []);
+  useEffect(() => setupMessageHandler(), []);
 
+  const initializeConnection = () => {
+    wsClient.setAccessToken(session!.access_token);
+    wsClient.connect();
+  };
+
+  const createHandlers = (): WebSocketHandlers => ({
+    handleOpen: () => {
+      setIsConnected(true);
+      console.log('🟢 WebSocket connected');
+    },
+    handleClose: () => {
+      setIsConnected(false);
+      console.log('🔴 WebSocket disconnected');
+    },
+    handleMessage: (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      if (data.type === 'boxSlice') {
+        handleBoxSliceMessage(data);
+      }
+    }
+  });
+
+  const handleBoxSliceMessage = (data: any) => {
+    const callback = subscriptionsRef.current.get(data.pair);
+    if (callback && data.slice) {
+      callback(data.slice);
+    }
+  };
+
+  const setupConnectionHandlers = () => {
+    const { handleOpen, handleClose } = createHandlers();
     wsClient.onOpen(handleOpen);
     wsClient.onClose(handleClose);
-
     return () => {
       wsClient.offOpen(handleOpen);
       wsClient.offClose(handleClose);
     };
-  }, []);
-
-  const handleMessage = (event: MessageEvent) => {
-    try {
-      const data = JSON.parse(event.data);
-      console.log('📥 WebSocket message in provider:', {
-        type: data.type,
-        pair: data.pair,
-        hasCallback: data.pair ? subscriptionsRef.current.has(data.pair) : false
-      });
-
-      if (data.type === 'boxSlice') {
-        const callback = subscriptionsRef.current.get(data.pair);
-        if (callback && data.slice) {
-          console.log(`📦 Processing data for ${data.pair}`);
-          const boxSlice: BoxSlice = {
-            boxes: data.slice.boxes || [],
-            timestamp: data.slice.timestamp || new Date().toISOString(),
-            currentOHLC: data.slice.currentOHLC || {
-              open: 0,
-              high: 0,
-              low: 0,
-              close: 0
-            }
-          };
-          callback(boxSlice);
-        }
-      }
-    } catch (error) {
-      console.error('Error handling WebSocket message:', error);
-    }
   };
 
-  useEffect(() => {
+  const setupMessageHandler = () => {
+    const { handleMessage } = createHandlers();
     wsClient.onMessage(handleMessage);
     return () => wsClient.offMessage(handleMessage);
-  }, []);
-
-  const disconnect = () => {
-    wsClient.disconnect();
   };
 
-  const subscribeToBoxSlices = (
-    pair: string,
-    handler: (data: BoxSlice) => void
-  ) => {
-    console.log(`🔄 Subscribing to ${pair}`);
-    subscriptionsRef.current.set(pair, handler);
-    wsClient.subscribe(pair, handler);
-  };
-
-  const unsubscribeFromBoxSlices = (pair: string) => {
-    subscriptionsRef.current.delete(pair);
-    wsClient.unsubscribe(pair);
+  const contextValue = {
+    subscribeToBoxSlices: (pair, handler) => {
+      subscriptionsRef.current.set(pair, handler);
+      wsClient.subscribe(pair, handler);
+    },
+    unsubscribeFromBoxSlices: (pair) => {
+      subscriptionsRef.current.delete(pair);
+      wsClient.unsubscribe(pair);
+    },
+    isConnected,
+    disconnect: () => wsClient.disconnect()
   };
 
   return (
-    <WebSocketContext.Provider
-      value={{
-        subscribeToBoxSlices,
-        unsubscribeFromBoxSlices,
-        isConnected,
-        disconnect
-      }}
-    >
+    <WebSocketContext.Provider value={contextValue}>
       {children}
     </WebSocketContext.Provider>
   );
 }
 
-export function useWebSocket() {
+export const useWebSocket = () => {
   const context = useContext(WebSocketContext);
-  if (context === undefined) {
-    throw new Error('useWebSocket must be used within a WebSocketProvider');
-  }
+  if (!context) throw new Error(PROVIDER_ERROR);
   return context;
-}
+};
