@@ -1,6 +1,6 @@
 import { BackgroundGrid } from '@/components/BackgroundGrid';
-import { SectionFAQ } from '@/components/Sections/SectionFAQ';
-import { SectionFooter } from '@/components/Sections/SectionFooter';
+import { SectionFAQ } from '@/components/sections/SectionFAQ';
+import { SectionFooter } from '@/components/sections/SectionFooter';
 import Link from 'next/link';
 import {
   FaDiscord,

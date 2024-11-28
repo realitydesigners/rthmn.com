@@ -8,7 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { useDashboard } from '@/providers/DashboardProvider';
-import { SearchBar } from '../SearchBar';
+import { SearchBar } from '../../dashboard/SearchBar';
 
 interface NavbarSignedInProps {
   user: User | null;
