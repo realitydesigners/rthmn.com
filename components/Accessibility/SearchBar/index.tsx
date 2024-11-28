@@ -69,9 +69,9 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
 
   return (
     <div className="relative flex-1 px-32" ref={searchRef}>
-      <div className="relative mx-auto max-w-70">
+      <div className="relative mx-auto max-w-60">
         <div className="flex items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
-          <div className="flex h-10 w-full items-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
+          <div className="flex h-9 w-full items-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
             <FaSearch className="ml-4 text-[#818181]" />
             <input
               type="text"
@@ -88,12 +88,12 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
         </div>
 
         {showResults && (
-          <div className="absolute left-1/2 mt-2 w-[500px] -translate-x-1/2 overflow-hidden rounded-lg border border-[#222] bg-[#111]/95 shadow-lg backdrop-blur-sm">
-            <div className="flex max-h-[300px] divide-x divide-[#222]">
+          <div className="absolute left-1/2 mt-2 w-[700px] -translate-x-1/2 overflow-hidden rounded-lg border border-[#222] bg-[#111]/95 shadow-lg backdrop-blur-sm">
+            <div className="flex max-h-[250px] divide-x divide-[#222]">
               {getFilteredGroups().map((group) => (
                 <div key={group.label} className="flex-1 px-2">
                   <div
-                    className="sticky top-0 z-10 bg-[#111]/95 px-2 py-2 text-xs font-medium backdrop-blur-sm"
+                    className="sticky top-0 z-10 px-2 py-2 text-xs font-medium"
                     style={{ color: group.color }}
                   >
                     {group.label}

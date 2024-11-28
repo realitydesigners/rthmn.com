@@ -102,7 +102,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   }, []);
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-1001 h-16 lg:h-20">
+    <nav className="fixed top-0 right-0 left-0 z-1001 h-16 border-b border-[#222] bg-black lg:h-14">
       <div className="h-full w-full px-4">
         <div className="flex h-full items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -131,7 +131,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                 className="flex items-center space-x-3 rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
               >
                 <div className="flex items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
-                  <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black">
+                  <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-black">
                     {avatarUrl ? (
                       <Image
                         src={avatarUrl}

@@ -7,16 +7,12 @@ import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
 import { BoxDetailsRow } from '@/components/Charts/BoxDetailsRow';
+import { DashboardSidebar } from '@/components/Accessibility/DashboardSidebar';
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } =
     useDashboard();
-
-  const toggleSettings = () => {
-    setIsSettingsOpen(!isSettingsOpen);
-  };
 
   if (!isAuthenticated) {
     return <div>Loading session...</div>;
@@ -26,13 +22,32 @@ export default function Dashboard() {
 
   return (
     <main className="flex min-h-screen flex-col bg-black">
-      <SettingsBar isOpen={isSettingsOpen} onToggle={toggleSettings} />
+      <DashboardSidebar />
 
-      <div className="flex-1 overflow-hidden">
-        {/* Selected Pairs Section */}
-        <div className="relative pt-16">
-          <SelectedPairs />
-          {selectedPairs.length === 0 && (
+      <div className="ml-14 flex-1 overflow-hidden">
+        {/* Trading Pairs Grid */}
+        <div className="pt-16">
+          {selectedPairs.length > 0 ? (
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] justify-center gap-4 p-8">
+              {selectedPairs.map((pair) => {
+                const data = queryClient.getQueryData([
+                  'pairData',
+                  pair
+                ]) as PairData;
+                if (!data?.boxes?.length) {
+                  return null;
+                }
+                return data.boxes.map((boxSlice, index) => (
+                  <PairResoBox
+                    key={`${pair}-${boxSlice.timestamp}`}
+                    pair={pair}
+                    boxSlice={boxSlice}
+                    currentOHLC={data.currentOHLC}
+                  />
+                ));
+              })}
+            </div>
+          ) : (
             <div className="flex flex-col items-center justify-center px-8 py-12 text-center">
               <p className="text-lg text-gray-400">No instruments selected</p>
               <p className="mt-2 text-sm text-gray-600">
@@ -41,29 +56,6 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-
-        {/* Trading Pairs Grid */}
-        {selectedPairs.length > 0 && (
-          <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] justify-center gap-4 p-8">
-            {selectedPairs.map((pair) => {
-              const data = queryClient.getQueryData([
-                'pairData',
-                pair
-              ]) as PairData;
-              if (!data?.boxes?.length) {
-                return null;
-              }
-              return data.boxes.map((boxSlice, index) => (
-                <PairResoBox
-                  key={`${pair}-${boxSlice.timestamp}`}
-                  pair={pair}
-                  boxSlice={boxSlice}
-                  currentOHLC={data.currentOHLC}
-                />
-              ));
-            })}
-          </div>
-        )}
 
         {/* Box Details Section */}
         {selectedPairs.length > 0 && (
