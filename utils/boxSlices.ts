@@ -27,7 +27,8 @@ export async function getBoxSlices(
   count?: number,
   serverToken?: string
 ): Promise<BoxSlice[]> {
-  let url = `${BASE_URL}/boxslices/${pair}`;
+  const normalizedPair = pair.toUpperCase();
+  let url = `${BASE_URL}/boxslices/${normalizedPair}`;
 
   const params = new URLSearchParams();
   if (lastTimestamp)
