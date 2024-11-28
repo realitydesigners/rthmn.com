@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { BoxSlice, PairData, OHLC } from '@/types/types';
-import { useWebSocket } from '@/providers/WebSocketProvider';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import {
   getSelectedPairs,

@@ -3,7 +3,7 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { NavbarSignedIn } from '@/components/Accessibility/NavbarSignedIn';
 import { NavbarSignedOut } from './NavbarSignedOut';
 import { QueryProvider } from '@/providers/QueryProvider';
-import { WebSocketProvider } from '@/providers/WebSocketProvider';
+import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { DashboardProvider } from '@/providers/DashboardProvider';
 
 export const Navbar = () => {

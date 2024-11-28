@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSignals } from '@/providers/SignalProviderClient';
+import { useSignals } from '@/providers/SignalProvider/client';
 import styles from './PatternModal.module.css';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { LineChart } from '../Charts/LineChart';

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Signal } from '@/types/types';
-import { useSignals } from '@/providers/SignalProviderClient';
+import { useSignals } from '@/providers/SignalProvider/client';
 import { getTimeAgo } from '@/utils/dateUtils';
 import {
   CondensedIcon,
@@ -109,7 +109,7 @@ export function SignalSidebar() {
       >
         <div className="flex flex-1 flex-row items-center justify-between p-2 text-xs">
           <div
-            className={`mr-2.5 w-[70px] font-russo text-base font-bold text-white/50`}
+            className={`font-russo mr-2.5 w-[70px] text-base font-bold text-white/50`}
           >
             {pairName}
           </div>
@@ -133,7 +133,7 @@ export function SignalSidebar() {
 
   return (
     <div
-      className={`text-oxanium fixed bottom-0 right-0 top-20 z-1000 w-[300px] overflow-y-auto border border-[#181818] bg-black p-2 shadow-md`}
+      className={`text-oxanium fixed top-20 right-0 bottom-0 z-1000 w-[300px] overflow-y-auto border border-[#181818] bg-black p-2 shadow-md`}
     >
       <div className="mb-2 flex justify-between">
         <button
