@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
+import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
 import { BoxDetailsRow } from '@/components/Charts/BoxDetailsRow';
@@ -26,48 +27,67 @@ export default function Dashboard() {
   return (
     <main className="flex min-h-screen flex-col bg-black">
       <SettingsBar isOpen={isSettingsOpen} onToggle={toggleSettings} />
-      <div className="flex-1 overflow-hidden p-8 pt-24">
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] justify-center gap-4">
-          {selectedPairs.map((pair) => {
-            const data = queryClient.getQueryData([
-              'pairData',
-              pair
-            ]) as PairData;
-            if (!data?.boxes?.length) {
-              console.log(`No data for ${pair}:`, data);
-              return null;
-            }
-            console.log(`Rendering data for ${pair}:`, data);
-            return data.boxes.map((boxSlice, index) => (
-              <PairResoBox
-                key={`${pair}-${boxSlice.timestamp}`}
-                pair={pair}
-                boxSlice={boxSlice}
-                currentOHLC={data.currentOHLC}
-              />
-            ));
-          })}
+
+      <div className="flex-1 overflow-hidden">
+        {/* Selected Pairs Section */}
+        <div className="relative pt-16">
+          <SelectedPairs />
+          {selectedPairs.length === 0 && (
+            <div className="flex flex-col items-center justify-center px-8 py-12 text-center">
+              <p className="text-lg text-gray-400">No instruments selected</p>
+              <p className="mt-2 text-sm text-gray-600">
+                Use the search bar above to add trading pairs
+              </p>
+            </div>
+          )}
         </div>
 
-        {/* Box Details Section */}
-        <div className="mt-8 rounded-lg border border-[#181818] p-4">
-          <h2 className="mb-4 text-sm font-bold text-white">Pattern Details</h2>
-          <div className="flex flex-col gap-2">
-            {selectedPairs.map((pair, pairIndex) => {
-              const data = pairData[pair];
-              if (!data?.boxes?.length) return null;
+        {/* Trading Pairs Grid */}
+        {selectedPairs.length > 0 && (
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] justify-center gap-4 p-8">
+            {selectedPairs.map((pair) => {
+              const data = queryClient.getQueryData([
+                'pairData',
+                pair
+              ]) as PairData;
+              if (!data?.boxes?.length) {
+                return null;
+              }
               return data.boxes.map((boxSlice, index) => (
-                <BoxDetailsRow
-                  key={`details-${pair}-${index}`}
-                  boxes={boxSlice.boxes}
-                  maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
-                  pairName={pair}
-                  showSizes={pairIndex === 0 && index === 0}
+                <PairResoBox
+                  key={`${pair}-${boxSlice.timestamp}`}
+                  pair={pair}
+                  boxSlice={boxSlice}
+                  currentOHLC={data.currentOHLC}
                 />
               ));
             })}
           </div>
-        </div>
+        )}
+
+        {/* Box Details Section */}
+        {selectedPairs.length > 0 && (
+          <div className="mx-8 mt-8 rounded-lg border border-[#181818] p-4">
+            <h2 className="mb-4 text-sm font-bold text-white">
+              Pattern Details
+            </h2>
+            <div className="flex flex-col gap-2">
+              {selectedPairs.map((pair, pairIndex) => {
+                const data = pairData[pair];
+                if (!data?.boxes?.length) return null;
+                return data.boxes.map((boxSlice, index) => (
+                  <BoxDetailsRow
+                    key={`details-${pair}-${index}`}
+                    boxes={boxSlice.boxes}
+                    maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                    pairName={pair}
+                    showSizes={pairIndex === 0 && index === 0}
+                  />
+                ));
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

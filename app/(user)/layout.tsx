@@ -4,6 +4,7 @@ import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { SignalProvider } from '@/providers/SignalProvider';
 import { ClientProviders } from '@/providers/ClientProviders';
+import { NavbarSignedIn } from '@/components/Accessibility/NavbarSignedIn';
 
 export default async function UserLayout({
   children
@@ -27,7 +28,10 @@ export default async function UserLayout({
   return (
     <QueryProvider>
       <SignalProvider>
-        <ClientProviders>{children}</ClientProviders>
+        <ClientProviders>
+          <NavbarSignedIn user={user} />
+          {children}
+        </ClientProviders>
       </SignalProvider>
     </QueryProvider>
   );

@@ -2,16 +2,17 @@ import React from 'react';
 import Dashboard from './client';
 
 const DashboardPage: React.FC = () => {
-  // You can perform server-side logic or data fetching here if needed
-
   return (
-    <div>
-      <Dashboard />
+    <div className="relative min-h-screen">
+      <div className="relative z-10">
+        <Dashboard />
+      </div>
     </div>
   );
 };
 
 export default DashboardPage;
+
 /**
  * Dashboard Data Flow Architecture
  *
