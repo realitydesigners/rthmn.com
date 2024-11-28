@@ -1,4 +1,4 @@
-import { BoxSlice, PairData } from '@/types/types';
+import { BoxSlice } from '@/types/types';
 
 class WebSocketClient {
   private socket: WebSocket | null = null;

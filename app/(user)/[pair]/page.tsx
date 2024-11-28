@@ -1,5 +1,4 @@
 import Client from './client';
-import { getLatestBoxSlices } from '@/utils/boxSlices';
 
 interface PageProps {
   params: Promise<{
