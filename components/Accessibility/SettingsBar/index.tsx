@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { LuChevronRight } from 'react-icons/lu';
+import { LuChevronRight, LuPipette } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { colorPresets } from '@/utils/colorPresets';
 import { BoxColors } from '@/utils/localStorage';
@@ -80,6 +80,37 @@ const ColorPresetButton = ({
   </button>
 );
 
+const ColorPicker = ({
+  label,
+  color,
+  onChange
+}: {
+  label: string;
+  color: string;
+  onChange: (color: string) => void;
+}) => (
+  <div className="group flex items-center justify-between rounded-lg border border-[#222] bg-[#141414] p-3 transition-all hover:border-[#333] hover:bg-[#1A1A1A]">
+    <div className="flex items-center gap-3">
+      <div className="relative">
+        <div
+          className="h-8 w-8 rounded-md shadow-md transition-all group-hover:scale-105"
+          style={{ backgroundColor: color }}
+        />
+        <LuPipette className="absolute -right-1 -bottom-1 h-4 w-4 text-gray-400" />
+      </div>
+      <span className="text-sm text-gray-400 group-hover:text-gray-300">
+        {label}
+      </span>
+    </div>
+    <input
+      type="color"
+      value={color}
+      onChange={(e) => onChange(e.target.value)}
+      className="invisible absolute h-8 w-8 cursor-pointer group-hover:visible"
+    />
+  </div>
+);
+
 const StyleControl = ({
   label,
   value,
@@ -125,9 +156,6 @@ const StyleControl = ({
           value={value}
           onChange={(e) => onChange(parseFloat(e.target.value))}
           className="relative h-8 w-full cursor-pointer appearance-none rounded-lg bg-transparent transition-all"
-          style={{
-            '--range-progress': `${percentage}%`
-          }}
         />
       </div>
     </div>
@@ -165,25 +193,57 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
       />
 
       {activeSection === 'colors' && (
-        <div className="space-y-2 px-2 py-3">
-          <div className="grid grid-cols-1 gap-2">
-            {colorPresets.map((preset) => (
-              <ColorPresetButton
-                key={preset.name}
-                preset={preset}
-                isSelected={
-                  boxColors.positive === preset.positive &&
-                  boxColors.negative === preset.negative
-                }
-                onClick={() => {
-                  updateBoxColors({
-                    ...boxColors,
-                    positive: preset.positive,
-                    negative: preset.negative
-                  });
-                }}
-              />
-            ))}
+        <div className="space-y-4 px-2 py-3">
+          <div className="space-y-2">
+            <ColorPicker
+              label="Positive Color"
+              color={boxColors.positive}
+              onChange={(color) =>
+                updateBoxColors({
+                  ...boxColors,
+                  positive: color
+                })
+              }
+            />
+            <ColorPicker
+              label="Negative Color"
+              color={boxColors.negative}
+              onChange={(color) =>
+                updateBoxColors({
+                  ...boxColors,
+                  negative: color
+                })
+              }
+            />
+          </div>
+
+          <div className="relative py-3">
+            <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#222]" />
+          </div>
+
+          <div className="space-y-1">
+            <p className="px-1 text-xs font-medium text-gray-500">
+              Color Presets
+            </p>
+            <div className="grid grid-cols-1 gap-2">
+              {colorPresets.map((preset) => (
+                <ColorPresetButton
+                  key={preset.name}
+                  preset={preset}
+                  isSelected={
+                    boxColors.positive === preset.positive &&
+                    boxColors.negative === preset.negative
+                  }
+                  onClick={() => {
+                    updateBoxColors({
+                      ...boxColors,
+                      positive: preset.positive,
+                      negative: preset.negative
+                    });
+                  }}
+                />
+              ))}
+            </div>
           </div>
         </div>
       )}

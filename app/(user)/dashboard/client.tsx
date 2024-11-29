@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
@@ -23,9 +23,9 @@ export default function Dashboard() {
     <main className="w-full">
       <div className="flex-overflow-hidden">
         {/* Trading Pairs Grid */}
-        <div className="pt-16">
+        <div className="pt-13">
           {selectedPairs.length > 0 ? (
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] justify-center gap-4 p-8">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] justify-center">
               {selectedPairs.map((pair) => {
                 const data = queryClient.getQueryData([
                   'pairData',
@@ -81,34 +81,45 @@ export default function Dashboard() {
     </main>
   );
 }
-const PairResoBox = ({
-  pair,
-  boxSlice,
-  currentOHLC
-}: {
-  pair: string;
-  boxSlice: BoxSlice;
-  currentOHLC: OHLC;
-}) => {
-  const closePrice = currentOHLC?.close || 'N/A';
+const PairResoBox = React.memo(
+  ({
+    pair,
+    boxSlice,
+    currentOHLC
+  }: {
+    pair: string;
+    boxSlice: BoxSlice;
+    currentOHLC: OHLC;
+  }) => {
+    const closePrice = currentOHLC?.close || 'N/A';
 
-  return (
-    <div className="m-auto flex flex-col items-center justify-center gap-5 rounded-lg border border-[#222] bg-linear-to-b from-[#121314] to-[#0B0C0D] p-4 text-center text-white shadow-md">
-      <div className="mb-2 flex w-full items-center justify-between">
-        <div className="font-outfit text-lg font-bold tracking-wider">
-          {pair.toUpperCase()}
+    return (
+      <div className="m-auto flex w-full flex-col items-center justify-center gap-4 border-r border-b border-[#222] p-4 p-12 text-center text-white shadow-md">
+        <div className="mb-2 aspect-square w-full">
+          <ResoBox
+            key={`${pair}-${boxSlice.timestamp}`}
+            slice={boxSlice}
+            isLoading={false}
+            className="h-full w-full"
+          />
         </div>
-        <div className="font-outfit text-sm font-medium text-[#44FBC7]">
-          {closePrice}
+        <div className="mb-2 flex w-full items-center justify-between">
+          <div className="font-kodemono text-lg font-bold tracking-wider">
+            {pair.toUpperCase()}
+          </div>
+          <div className="font-kodemono text-sm font-medium text-gray-200">
+            {closePrice}
+          </div>
         </div>
       </div>
-      <div className="mb-2 w-full">
-        <ResoBox
-          key={`${pair}-${boxSlice.timestamp}`}
-          slice={boxSlice}
-          isLoading={false}
-        />
-      </div>
-    </div>
-  );
-};
+    );
+  },
+  (prevProps, nextProps) => {
+    // Custom comparison function
+    return (
+      prevProps.pair === nextProps.pair &&
+      prevProps.boxSlice.timestamp === nextProps.boxSlice.timestamp &&
+      prevProps.currentOHLC.close === nextProps.currentOHLC.close
+    );
+  }
+);
