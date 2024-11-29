@@ -1,11 +1,11 @@
 import React from 'react';
 import type { PortableTextComponents } from '@portabletext/react';
-import { TeamCard } from '@/components/TeamCard';
+import { TeamCard } from '@/components/blocks/TeamCard';
 import { Scene } from '@/components/Scene/Scene';
 
 const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <div className="flex w-full justify-center p-3">
-    <p className="w-full font-outfit text-lg leading-relaxed text-white/70 md:w-3/4 lg:w-1/2">
+    <p className="font-outfit w-full text-lg leading-relaxed text-white/70 md:w-3/4 lg:w-1/2">
       {children}
     </p>
   </div>
@@ -45,14 +45,14 @@ export const AboutTemplate: PortableTextComponents = {
   list: {
     bullet: ({ children }) => (
       <div className="flex w-full justify-center p-3">
-        <ul className="w-full list-disc space-y-2 pl-4 font-outfit text-white/70 md:w-3/4 lg:w-1/2">
+        <ul className="font-outfit w-full list-disc space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2">
           {children}
         </ul>
       </div>
     ),
     number: ({ children }) => (
       <div className="flex w-full justify-center p-3">
-        <ol className="w-full list-decimal space-y-2 pl-4 font-outfit text-white/70 md:w-3/4 lg:w-1/2">
+        <ol className="font-outfit w-full list-decimal space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2">
           {children}
         </ol>
       </div>

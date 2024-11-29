@@ -1,8 +1,8 @@
 import React from 'react';
-import { useSignals } from '@/providers/SignalProviderClient';
+import { useSignals } from '@/providers/SignalProvider/client';
 import styles from './PatternModal.module.css';
 import { ResoBox } from '@/components/Charts/ResoBox';
-import { LineChart } from '../Charts/LineChart';
+import { LineChart } from '@/components/Charts/LineChart';
 import { BoxSlice } from '@/types/types';
 
 const PatternModal: React.FC = () => {

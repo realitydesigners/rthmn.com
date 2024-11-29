@@ -1,7 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
 import { useCallback, useMemo } from 'react';
 import { BoxSlice } from '@/types/types';
-import { getBoxSlices } from '@/utils/boxSlices';
+
+async function fetchBoxSlices(
+  pair: string,
+  lastTimestamp: string | undefined,
+  count: number,
+  token: string
+): Promise<BoxSlice[]> {
+  const params = new URLSearchParams({
+    pair,
+    token
+  });
+  if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
+  if (count) params.append('count', count.toString());
+
+  const response = await fetch(`/api/getBoxSlices?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch box slices');
+  }
+  return response.json();
+}
 
 function compareSlices(
   slice1: BoxSlice,
@@ -34,7 +53,7 @@ export const useBoxSliceData = (
       return [];
     }
     try {
-      const data = await getBoxSlices(
+      const data = await fetchBoxSlices(
         pair,
         undefined,
         500,
@@ -55,10 +74,6 @@ export const useBoxSliceData = (
     refetchInterval: 10000,
     enabled: !!session?.access_token
   });
-
-  console.log('Query data:', data);
-  console.log('Query error:', error);
-  console.log('Query isLoading:', isLoading);
 
   const filteredData = useMemo(() => {
     if (!data) return [];

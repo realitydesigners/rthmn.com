@@ -77,37 +77,37 @@ export default function SignalsPage() {
               <table className="min-w-full rounded-lg bg-black text-xs shadow-lg">
                 <thead className="bg-black">
                   <tr>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Pair
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Pattern Type
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Pattern
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Status
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Start Price
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       End Price
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Stop Loss
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Take Profit
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Start Time
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       End Time
                     </th>
-                    <th className="px-3 py-2 text-left text-[10px] font-bold uppercase tracking-wider text-gray-300">
+                    <th className="px-3 py-2 text-left text-[10px] font-bold tracking-wider text-gray-300 uppercase">
                       Created At
                     </th>
                   </tr>
@@ -124,10 +124,10 @@ export default function SignalsPage() {
                         : signal.boxes;
                     return (
                       <tr key={signal.id} className="hover:bg-[#181818]">
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.pair}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.pattern_type}
                         </td>
                         <td className="px-3 py-2 text-gray-300">
@@ -141,40 +141,40 @@ export default function SignalsPage() {
                             </div>
                           )}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.status}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.start_price
                             ? signal.start_price.toFixed(4)
                             : 'N/A'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.end_price
                             ? signal.end_price.toFixed(4)
                             : 'N/A'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.stop_loss
                             ? signal.stop_loss.toFixed(4)
                             : 'N/A'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.take_profit
                             ? signal.take_profit.toFixed(4)
                             : 'N/A'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.start_time
                             ? new Date(signal.start_time).toLocaleString()
                             : 'N/A'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {signal.end_time
                             ? new Date(signal.end_time).toLocaleString()
                             : 'N/A'}
                         </td>
-                        <td className="whitespace-nowrap px-3 py-2 text-gray-300">
+                        <td className="px-3 py-2 whitespace-nowrap text-gray-300">
                           {new Date(signal.created_at).toLocaleString()}
                         </td>
                       </tr>

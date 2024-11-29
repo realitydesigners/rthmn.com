@@ -14,7 +14,7 @@ import { client } from '@/utils/sanity/lib/client';
 import { PortableText } from '@portabletext/react';
 import { ChangelogTemplate } from '@/components/blocks/templates/ChangelogTemplate';
 import { useInView } from 'react-intersection-observer';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 
 interface FAQItem {
   _id: string;

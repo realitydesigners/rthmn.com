@@ -418,3 +418,83 @@
   color: rgba(255, 255, 255, 0.6);
   text-align: right;
 }
+
+input[type="range"] {
+  -webkit-appearance: none;
+  background: transparent;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 50%;
+  background: #10b981;
+  cursor: pointer;
+  margin-top: -7px;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #059669;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.4);
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+  transform: scale(0.95);
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: transparent;
+  border-radius: 999px;
+}
+
+.settings-panel {
+  background: linear-gradient(180deg, rgba(26, 26, 26, 0.9) 0%, rgba(18, 18, 18, 0.9) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.color-preset-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 8px;
+}
+
+.color-picker-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.color-picker-container:hover .color-picker-overlay {
+  opacity: 1;
+}
+
+.color-picker-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}

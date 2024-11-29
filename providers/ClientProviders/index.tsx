@@ -1,6 +1,6 @@
 'use client';
-import { DashboardProvider } from './DashboardProvider';
-import { WebSocketProvider } from './WebSocketProvider';
+import { DashboardProvider } from '../DashboardProvider';
+import { WebSocketProvider } from '../WebsocketProvider';
 
 export function ClientProviders({ children }: { children: React.ReactNode }) {
   return (

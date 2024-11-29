@@ -6,6 +6,9 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { LogoIcon, BellIcon } from '@/components/Accessibility/Icons/icons';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { useDashboard } from '@/providers/DashboardProvider';
+import { SearchBar } from '../../dashboard/SearchBar';
 
 interface NavbarSignedInProps {
   user: User | null;
@@ -17,6 +20,10 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchResults, setShowSearchResults] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const { togglePair, selectedPairs } = useDashboard();
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -70,21 +77,44 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     user?.email?.[0].toUpperCase() ||
     '?';
 
+  // Combine all pairs for search
+  const allPairs = [...FOREX_PAIRS, ...CRYPTO_PAIRS];
+
+  // Filter pairs based on search query
+  const filteredPairs = allPairs.filter((pair) =>
+    pair.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setShowSearchResults(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
   return (
-    <nav className="fixed left-0 right-0 top-0 z-1001 h-16 lg:h-20">
+    <nav className="fixed top-0 right-0 left-0 z-1001 h-16 border-b border-[#222] bg-black lg:h-14">
       <div className="h-full w-full px-4">
         <div className="flex h-full items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center">
               <LogoIcon />
             </div>
-            <span className={`font-russo text-2xl font-bold tracking-wide`}>
-              RTHMN
-            </span>
           </Link>
 
+          <SearchBar selectedPairs={selectedPairs} />
+
           <div className="flex items-center space-x-4">
-            <Link
+            {/* <Link
               href="/dashboard"
               className="text-sm font-semibold text-white hover:underline"
             >
@@ -94,20 +124,14 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
               <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
                 <BellIcon />
               </div>
-            </button>
+            </button> */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center space-x-3 rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
               >
                 <div className="flex items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
-                  {/* <div className="py-1 pl-4 pr-1 text-left">
-                    <p className="text-[12px] font-semibold">
-                      {user?.user_metadata?.full_name || 'User'}
-                    </p>
-                    <p className="text-[10px] text-gray-300">{user?.email}</p>
-                  </div> */}
-                  <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black">
+                  <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-black">
                     {avatarUrl ? (
                       <Image
                         src={avatarUrl}
@@ -123,7 +147,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                 </div>
               </button>
               {isDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-64 rounded-md border border-[#181818] bg-black shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="ring-opacity-5 absolute right-0 mt-2 w-64 rounded-md border border-[#181818] bg-black ring-1 shadow-lg ring-black">
                   <div
                     className="py-1"
                     role="menu"
