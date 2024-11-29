@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useCallback
 } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import type { Box, BoxSlice } from '@/types/types';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { MotionDiv } from '@/components/MotionDiv';
