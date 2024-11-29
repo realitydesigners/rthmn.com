@@ -7,7 +7,6 @@ import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
 import { BoxDetailsRow } from '@/components/Charts/BoxDetailsRow';
-import { DashboardSidebar } from '@/components/Accessibility/DashboardSidebar';
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
@@ -21,10 +20,8 @@ export default function Dashboard() {
   if (isLoading) return <p>Loading...</p>;
 
   return (
-    <main className="flex min-h-screen flex-col bg-black">
-      <DashboardSidebar />
-
-      <div className="ml-14 flex-1 overflow-hidden">
+    <main className="w-full">
+      <div className="flex-overflow-hidden">
         {/* Trading Pairs Grid */}
         <div className="pt-16">
           {selectedPairs.length > 0 ? (

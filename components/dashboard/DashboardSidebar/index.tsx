@@ -1,14 +1,35 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
-import { FaChartBar, FaCog, FaLayerGroup, FaBell } from 'react-icons/fa';
+import { LuLayers, LuSettings, LuBell, LuLineChart } from 'react-icons/lu';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
+
+import { IconType } from 'react-icons';
+
+interface SidebarHeaderProps {
+  title: string;
+  icon: IconType;
+}
+
+export const SidebarHeader: React.FC<SidebarHeaderProps> = ({
+  title,
+  icon: Icon
+}) => {
+  return (
+    <div className="mb-4 flex items-center gap-2 p-2">
+      <Icon size={14} className="text-[#818181]" />
+      <h2 className="font-outfit text-xs font-medium text-[#818181] uppercase">
+        {title}
+      </h2>
+    </div>
+  );
+};
 
 type Panel = 'pairs' | 'settings' | 'alerts' | 'patterns' | null;
 
 export const DashboardSidebar = () => {
   const [activePanel, setActivePanel] = useState<Panel>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(true); // Always open in panel
+  const [isSettingsOpen, setIsSettingsOpen] = useState(true);
 
   const togglePanel = (panel: Panel) => {
     setActivePanel(activePanel === panel ? null : panel);
@@ -19,18 +40,14 @@ export const DashboardSidebar = () => {
       case 'pairs':
         return (
           <>
-            <h2 className="mb-4 font-mono text-xs font-medium text-[#818181] uppercase">
-              Selected Pairs
-            </h2>
+            <SidebarHeader title="Selected Pairs" icon={LuLayers} />
             <SelectedPairs />
           </>
         );
       case 'settings':
         return (
           <div className="relative">
-            <h2 className="mb-4 font-mono text-xs font-medium text-[#818181] uppercase">
-              Settings
-            </h2>
+            <SidebarHeader title="Settings" icon={LuSettings} />
             <div className="relative">
               <SettingsBar
                 isOpen={isSettingsOpen}
@@ -40,25 +57,16 @@ export const DashboardSidebar = () => {
           </div>
         );
       case 'alerts':
-        return (
-          <h2 className="mb-4 font-mono text-xs font-medium text-[#818181] uppercase">
-            Alerts Panel
-          </h2>
-        );
+        return <SidebarHeader title="Alerts Panel" icon={LuBell} />;
       case 'patterns':
-        return (
-          <h2 className="mb-4 font-mono text-xs font-medium text-[#818181] uppercase">
-            Patterns Panel
-          </h2>
-        );
+        return <SidebarHeader title="Patterns Panel" icon={LuLineChart} />;
       default:
         return null;
     }
   };
 
   return (
-    <div className="fixed top-0 left-0 z-10 mt-14 flex h-screen">
-      {/* Main Sidebar with Icons */}
+    <div className="fixed top-0 left-0 z-90 mt-14 flex h-screen">
       <div className="y-10 flex h-full w-14 flex-col items-center border-r border-[#222] bg-black pt-4">
         <div className="flex flex-col gap-2">
           <button
@@ -69,7 +77,7 @@ export const DashboardSidebar = () => {
                 : 'text-[#818181]'
             }`}
           >
-            <FaLayerGroup size={18} />
+            <LuLayers size={18} />
           </button>
           <button
             onClick={() => togglePanel('patterns')}
@@ -79,7 +87,7 @@ export const DashboardSidebar = () => {
                 : 'text-[#818181]'
             }`}
           >
-            <FaChartBar size={18} />
+            <LuLineChart size={18} />
           </button>
           <button
             onClick={() => togglePanel('alerts')}
@@ -89,7 +97,7 @@ export const DashboardSidebar = () => {
                 : 'text-[#818181]'
             }`}
           >
-            <FaBell size={18} />
+            <LuBell size={18} />
           </button>
           <button
             onClick={() => togglePanel('settings')}
@@ -99,15 +107,15 @@ export const DashboardSidebar = () => {
                 : 'text-[#818181]'
             }`}
           >
-            <FaCog size={18} />
+            <LuSettings size={18} />
           </button>
         </div>
       </div>
 
       {/* Panel Content */}
       {activePanel && (
-        <div className="h-full w-60 border-r border-[#222] bg-[#0A0A0A]/95 backdrop-blur-sm">
-          <div className="relative p-4">{renderPanel()}</div>
+        <div className="h-full w-60 border-r border-[#222] bg-black backdrop-blur-sm">
+          <div className="relative p-2">{renderPanel()}</div>
         </div>
       )}
     </div>
