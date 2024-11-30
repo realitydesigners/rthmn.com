@@ -1,6 +1,6 @@
 import { BackgroundGrid } from '@/components/BackgroundGrid';
-import { SectionCalculator } from '@/components/sections/SectionCalculator';
-import { SectionFooter } from '@/components/sections/SectionFooter';
+import { SectionCalculator } from '@/components/Sections/SectionCalculator';
+import { SectionFooter } from '@/components/Sections/SectionFooter';
 
 export default function CalculatorPage() {
   return (
