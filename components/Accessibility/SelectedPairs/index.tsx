@@ -42,7 +42,6 @@ export const SelectedPairs = () => {
 
   return (
     <div ref={containerRef} className="flex h-full flex-col">
-      {/* Header */}
       <div className="font-kodemono flex h-8 items-center justify-between border-b border-[#222] px-4 text-xs font-medium tracking-wider text-[#818181]">
         <div className="flex w-[140px] items-center gap-2">
           <span className="uppercase">Symbol</span>
@@ -51,8 +50,7 @@ export const SelectedPairs = () => {
         <div className="w-[100px] text-right uppercase">Price</div>
       </div>
 
-      {/* Pairs List */}
-      <div className="custom-scrollbar flex flex-col overflow-y-auto">
+      <div className="custom-scrollbar flex flex-col gap-1 overflow-y-auto p-2">
         {selectedPairs.map((pair) => {
           const currentPrice = pairData[pair]?.currentOHLC?.close;
           const isActive = activeRow === pair;
@@ -61,29 +59,29 @@ export const SelectedPairs = () => {
             <div
               key={pair}
               onContextMenu={(e) => handleContextMenu(e, pair)}
-              className="group flex h-9 cursor-default items-center justify-between border-l-2 border-transparent px-2 transition-all select-none hover:border-[#333] hover:bg-[#111]"
+              className="group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-[#333]"
             >
-              {isActive && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent click from bubbling
-                    togglePair(pair);
-                    setActiveRow(null);
-                  }}
-                  className="mr-2 flex min-h-4 min-w-4 items-center justify-center rounded border border-red-400 bg-red-400/80 text-[10px] text-black transition-colors hover:text-white"
-                >
-                  <FaTimes />
-                </button>
-              )}
-              <div className="flex w-[140px] items-center">
-                <span className="font-outfit text-[13px] font-bold tracking-wider text-white">
+              <div className="flex items-center overflow-hidden">
+                <span className="font-outfit truncate text-[13px] font-bold tracking-wider text-white">
                   {pair}
                 </span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex shrink-0 items-center gap-3">
                 <span className="font-kodemono text-[13px] font-medium tracking-wider text-[#666]">
                   {currentPrice ? formatPrice(currentPrice) : '0'}
                 </span>
+                {isActive && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      togglePair(pair);
+                      setActiveRow(null);
+                    }}
+                    className="flex h-5 w-5 items-center justify-center rounded border border-red-400 bg-red-400/80 opacity-0 transition-all group-hover:opacity-100 hover:text-white"
+                  >
+                    <FaTimes size={10} className="text-black" />
+                  </button>
+                )}
               </div>
             </div>
           );
