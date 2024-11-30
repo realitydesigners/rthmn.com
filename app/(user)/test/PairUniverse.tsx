@@ -4,39 +4,24 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Modal } from './Modal';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 
-interface PairUniverseProps {
+type Position3D = { x: number; y: number; z: number };
+type PairOHLC = { open: number; high: number; low: number; close: number };
+type PairData = { currentOHLC?: PairOHLC; boxes: Array<any> };
+type PairUniverseProps = {
   selectedPairs: string[];
-  pairData: {
-    [key: string]: {
-      currentOHLC?: {
-        close: number;
-        open: number;
-        high: number;
-        low: number;
-      };
-      boxes: Array<any>;
-    };
-  };
-}
-
-interface Position3D {
-  x: number;
-  y: number;
-  z: number;
-}
-
-interface ProcessedPairData {
+  pairData: { [key: string]: PairData };
+};
+type ProcessedPairData = {
   name: string;
   position: Position3D | null;
   price: number;
   visible: boolean;
   index: number;
-}
-
-interface ProcessedSceneData {
+};
+type ProcessedSceneData = {
   activePairs: ProcessedPairData[];
   inactivePairs: ProcessedPairData[];
-}
+};
 
 const isValidPairData = (pairData: any) => {
   if (!pairData) return false;
@@ -61,22 +46,8 @@ const processSceneData = (
   },
   allPossiblePairs: string[]
 ): ProcessedSceneData => {
-  if (!isValidPairData(pairData)) {
-    console.log('Waiting for valid pair data...');
-    return {
-      activePairs: [],
-      inactivePairs: []
-    };
-  }
-
-  console.log('Processing valid pair data:', pairData);
-
   const activePairs = selectedPairs.map((pair, index) => {
     const currentPrice = pairData[pair]?.currentOHLC?.close ?? 0;
-    if (currentPrice === 0) {
-      console.warn(`Zero price detected for ${pair}`, pairData[pair]);
-    }
-    console.log(`${pair} current price:`, currentPrice);
 
     return {
       name: pair,
@@ -99,14 +70,6 @@ const processSceneData = (
         index: -1
       };
     });
-
-  console.log('Processed scene data:', {
-    activePairs: activePairs.map((p) => ({ name: p.name, price: p.price })),
-    inactivePairs: inactivePairs.map((p) => ({
-      name: p.name,
-      price: p.price
-    }))
-  });
 
   return {
     activePairs,
@@ -149,11 +112,12 @@ const sceneManager = {
 
         // Update price display using pair-specific variable
         if (spline && price) {
-          const pairPriceVariable = `${object.name}price`; // e.g., "USDJPYprice"
+          // Each pair needs its own variable in Spline: EURUSD_PRICE, GBPUSD_PRICE, etc.
+          const pairPriceVariable = `${object.name}price`;
           spline.setVariable(pairPriceVariable, price.toFixed(4));
           console.log(`Set ${pairPriceVariable} to ${price.toFixed(4)}`);
 
-          // Also update the global price variable when clicked
+          // Update the global price variable only for selected pair
           if (object.name === selectedPair) {
             spline.setVariable('price', price.toFixed(4));
           }
@@ -214,16 +178,31 @@ const sceneManager = {
             spline,
             selectedPair
           );
-          console.log(
-            `Positioned ${name} at:`,
-            position,
-            `with price: ${price}`,
-            'spline instance:',
-            !!spline
-          );
         } catch (error) {
           console.error(`Failed to position ${name}:`, error);
         }
+      }
+    });
+  },
+
+  updateAllPrices: (
+    spline: any,
+    pairData: {
+      [key: string]: {
+        currentOHLC?: {
+          close: number;
+        };
+      };
+    }
+  ) => {
+    if (!spline) return;
+
+    Object.entries(pairData).forEach(([pairName, data]) => {
+      const price = data?.currentOHLC?.close ?? 0;
+      if (price > 0) {
+        const pairPriceVariable = `${pairName}price`;
+        spline.setVariable(pairPriceVariable, price.toFixed(4));
+        console.log(`Updated ${pairPriceVariable} to ${price.toFixed(4)}`);
       }
     });
   }
@@ -237,46 +216,18 @@ export default function PairUniverse({
   const splineRef = useRef<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [sceneLoaded, setSceneLoaded] = useState(false);
-  const [previousPairs, setPreviousPairs] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPair, setSelectedPair] = useState<string | null>(null);
 
   function onSplineMouseDown(e) {
-    if (!e.target || !isValidPairData(pairData)) return;
+    if (!e.target) return;
 
     const clickedObject = e.target;
-    console.log('Clicked object:', clickedObject);
 
     const allPossiblePairs = [...FOREX_PAIRS, ...CRYPTO_PAIRS];
     if (allPossiblePairs.includes(clickedObject.name)) {
       setSelectedPair(clickedObject.name);
       setModalOpen(true);
-
-      const sceneData = processSceneData(
-        selectedPairs,
-        pairData,
-        allPossiblePairs
-      );
-      const clickedPairData = [
-        ...sceneData.activePairs,
-        ...sceneData.inactivePairs
-      ].find((pair) => pair.name === clickedObject.name);
-
-      if (clickedPairData && splineRef.current) {
-        // Update both the pair-specific price and global price
-        const pairPriceVariable = `${clickedObject.name}price`;
-        splineRef.current.setVariable(
-          pairPriceVariable,
-          clickedPairData.price.toFixed(4)
-        );
-        splineRef.current.setVariable(
-          'price',
-          clickedPairData.price.toFixed(4)
-        );
-        console.log(
-          `Updated price for ${clickedPairData.name}: ${clickedPairData.price}`
-        );
-      }
     }
   }
 
@@ -292,11 +243,11 @@ export default function PairUniverse({
       setSceneLoaded(true);
       setIsLoading(false);
 
-      // Debug: List all available variables in the scene
       const variables = spline.getVariables();
       console.log('Available Spline variables:', variables);
 
       if (selectedPairs.length) {
+        sceneManager.updateAllPrices(spline, pairData);
         sceneManager.updatePositions(
           spline,
           processSceneData(selectedPairs, pairData, [
@@ -314,18 +265,11 @@ export default function PairUniverse({
   };
 
   useEffect(() => {
-    console.log('pairData updated:', {
-      pairData,
-      hasData: Object.keys(pairData).length > 0,
-      samplePair: selectedPairs[0],
-      samplePrice: selectedPairs[0]
-        ? pairData[selectedPairs[0]]?.currentOHLC?.close
-        : null
-    });
-  }, [pairData, selectedPairs]);
-
-  useEffect(() => {
     if (sceneLoaded && splineRef.current && isValidPairData(pairData)) {
+      // First update all prices
+      sceneManager.updateAllPrices(splineRef.current, pairData);
+
+      // Then update positions
       const processedData = processSceneData(selectedPairs, pairData, [
         ...FOREX_PAIRS,
         ...CRYPTO_PAIRS
