@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    inlineCss: true
+    reactCompiler: true
   },
   images: {
     remotePatterns: [
@@ -28,7 +28,7 @@ const nextConfig = {
       }
     ]
   },
-  turbopack: (config, { isServer }) => {
+  webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,

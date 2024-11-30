@@ -1,18 +1,18 @@
 'use client';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
-import { SectionPricing } from '@/components/sections/SectionPricing';
-import { SectionFAQ } from '@/components/sections/SectionFAQ';
-import { ServiceSection } from '@/components/sections/SectionServices';
+import { SectionPricing } from '@/components/Sections/SectionPricing';
+import { SectionFAQ } from '@/components/Sections/SectionFAQ';
+import { ServiceSection } from '@/components/Sections/SectionServices';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { SectionBoxes } from '@/components/sections/SectionBoxes';
-import { SectionBlogPosts } from '@/components/sections/SectionBlogPosts';
-import { SectionFooter } from '@/components/sections/SectionFooter';
-import { SectionHero } from '@/components/sections/SectionHero';
-import { SectionAboutAlgorithm } from '@/components/sections/SectionAboutAlgorithm';
-import { SectionMarketDisplay } from '@/components/sections/SectionMarketDisplay';
-import { SectionMarketTicker } from '@/components/sections/SectionMarketTicker';
-import { SectionRthmnDemo } from '@/components/sections/SectionRthmnDemo';
-import { SectionHistogram } from '@/components/sections/SectionHistogram';
+import { SectionBoxes } from '@/components/Sections/SectionBoxes';
+import { SectionBlogPosts } from '@/components/Sections/SectionBlogPosts';
+import { SectionFooter } from '@/components/Sections/SectionFooter';
+import { SectionHero } from '@/components/Sections/SectionHero';
+import { SectionAboutAlgorithm } from '@/components/Sections/SectionAboutAlgorithm';
+import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
+import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
+import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
+import { SectionHistogram } from '@/components/Sections/SectionHistogram';
 
 interface MarketData {
   pair: string;

@@ -90,7 +90,7 @@ class WebSocketClient {
     if (message.message === 'auth operation successful') {
       this.handleAuthSuccess();
     } else {
-      console.log('✅ Received ack:', message);
+      // console.log('✅ Received ack:', message);
     }
   }
 
@@ -233,9 +233,9 @@ class WebSocketClient {
   }
 
   private requestUpdate(pair: string, timeSinceUpdate: number) {
-    console.log(
-      `🔄 Requesting update for ${pair} (${Math.round(timeSinceUpdate / 1000)}s since last update)`
-    );
+    // console.log(
+    //   `🔄 Requesting update for ${pair} (${Math.round(timeSinceUpdate / 1000)}s since last update)`
+    // );
     this.socket!.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
   }
 
@@ -274,12 +274,12 @@ class WebSocketClient {
   }
 
   private logMessage(message: any, timestamp: string) {
-    console.log('📥 WebSocket message:', {
-      type: message.type,
-      pair: message.pair,
-      timestamp,
-      dataTimestamp: message.data?.timestamp
-    });
+    // console.log('📥 WebSocket message:', {
+    //   type: message.type,
+    //   pair: message.pair,
+    //   timestamp,
+    //   dataTimestamp: message.data?.timestamp
+    // });
   }
 }
 
