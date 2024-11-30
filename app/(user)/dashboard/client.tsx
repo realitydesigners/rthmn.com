@@ -73,8 +73,7 @@ export default function Dashboard() {
             </div>
           )}
         </div>
-
-        {/* Box Details Section */}
+        {/* 
         {selectedPairs.length > 0 && (
           <div className="mx-8 mt-8 rounded-lg border border-[#181818] p-4">
             <h2 className="mb-4 text-sm font-bold text-white">
@@ -92,7 +91,7 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </main>
   );
@@ -109,8 +108,8 @@ const PairResoBox = ({
   const closePrice = currentOHLC?.close || 'N/A';
 
   return (
-    <div className="m-auto flex w-full flex-col items-center justify-center gap-4 rounded-lg border border-[#222] bg-gradient-to-b from-[#121314] to-[#0B0C0D] p-4 text-center text-white shadow-md">
-      <div className="aspect-[4/3] w-full">
+    <div className="r group m-auto flex w-full flex-col items-center justify-center gap-4 border border-[#222] p-8 text-center text-white shadow-md transition-all duration-500 ease-in-out">
+      <div className="w-full transition-transform duration-300 ease-in-out group-hover:scale-[1.02]">
         <ResoBox
           key={`${pair}-${boxSlice.timestamp}`}
           slice={boxSlice}
@@ -122,7 +121,7 @@ const PairResoBox = ({
         <div className="font-outfit text-lg font-bold tracking-wider">
           {pair.toUpperCase()}
         </div>
-        <div className="font-outfit text-sm font-medium text-[#44FBC7]">
+        <div className="font-outfit text-sm font-medium text-gray-200">
           {closePrice}
         </div>
       </div>
