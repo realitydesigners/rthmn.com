@@ -90,17 +90,17 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
-    console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
+    // console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
 
     selectedPairs.forEach((pair) => {
       subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
-        console.log(`📊 Processing update for ${pair}:`, {
-          timestamp: wsData.timestamp,
-          currentPrice: wsData.currentOHLC?.close,
-          lastUpdate: (
-            queryClient.getQueryData(['pairData', pair]) as PairData | undefined
-          )?.boxes?.[0]?.timestamp
-        });
+        // console.log(`📊 Processing update for ${pair}:`, {
+        //   timestamp: wsData.timestamp,
+        //   currentPrice: wsData.currentOHLC?.close,
+        //   lastUpdate: (
+        //     queryClient.getQueryData(['pairData', pair]) as PairData | undefined
+        //   )?.boxes?.[0]?.timestamp
+        // });
 
         queryClient.setQueryData(
           ['pairData', pair],
@@ -111,14 +111,14 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
             };
 
             // Log if data actually changed
-            if (JSON.stringify(oldData) !== JSON.stringify(newData)) {
-              console.log(`📈 Data changed for ${pair}:`, {
-                old: oldData?.boxes?.[0]?.timestamp,
-                new: wsData.timestamp,
-                oldPrice: oldData?.currentOHLC?.close,
-                newPrice: wsData.currentOHLC?.close
-              });
-            }
+            // if (JSON.stringify(oldData) !== JSON.stringify(newData)) {
+            //   console.log(`📈 Data changed for ${pair}:`, {
+            //     old: oldData?.boxes?.[0]?.timestamp,
+            //     new: wsData.timestamp,
+            //     oldPrice: oldData?.currentOHLC?.close,
+            //     newPrice: wsData.currentOHLC?.close
+            //   });
+            // }
 
             return newData;
           }

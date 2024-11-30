@@ -90,7 +90,7 @@ class WebSocketClient {
     if (message.message === 'auth operation successful') {
       this.handleAuthSuccess();
     } else {
-      console.log('✅ Received ack:', message);
+      // console.log('✅ Received ack:', message);
     }
   }
 
@@ -274,12 +274,12 @@ class WebSocketClient {
   }
 
   private logMessage(message: any, timestamp: string) {
-    console.log('📥 WebSocket message:', {
-      type: message.type,
-      pair: message.pair,
-      timestamp,
-      dataTimestamp: message.data?.timestamp
-    });
+    // console.log('📥 WebSocket message:', {
+    //   type: message.type,
+    //   pair: message.pair,
+    //   timestamp,
+    //   dataTimestamp: message.data?.timestamp
+    // });
   }
 }
 
