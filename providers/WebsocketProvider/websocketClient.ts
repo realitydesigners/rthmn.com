@@ -233,9 +233,9 @@ class WebSocketClient {
   }
 
   private requestUpdate(pair: string, timeSinceUpdate: number) {
-    console.log(
-      `🔄 Requesting update for ${pair} (${Math.round(timeSinceUpdate / 1000)}s since last update)`
-    );
+    // console.log(
+    //   `🔄 Requesting update for ${pair} (${Math.round(timeSinceUpdate / 1000)}s since last update)`
+    // );
     this.socket!.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
   }
 
