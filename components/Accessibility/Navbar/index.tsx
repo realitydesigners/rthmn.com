@@ -1,15 +1,25 @@
 'use client';
-import React from 'react';
-import { NavbarSignedOut } from '@/components/Accessibility/Navbar/NavbarSignedOut';
-import { NavbarSignedIn } from '@/components/Accessibility/Navbar/NavbarSignedIn';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { NavbarSignedIn } from '@/components/Accessibility/NavbarSignedIn';
+import { NavbarSignedOut } from './NavbarSignedOut';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { WebSocketProvider } from '@/providers/WebsocketProvider';
+import { DashboardProvider } from '@/providers/DashboardProvider';
 
 export const Navbar = () => {
-  const { session } = useAuth();
+  const { user } = useAuth();
 
-  return session ? (
-    <NavbarSignedIn user={session.user} />
-  ) : (
-    <NavbarSignedOut user={null} />
+  if (!user) {
+    return <NavbarSignedOut user={null} />;
+  }
+
+  return (
+    <QueryProvider>
+      <WebSocketProvider>
+        <DashboardProvider>
+          <NavbarSignedIn user={user} />
+        </DashboardProvider>
+      </WebSocketProvider>
+    </QueryProvider>
   );
 };

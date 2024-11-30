@@ -1,8 +1,7 @@
 import React from 'react';
-import PatternCard from '@/components/PatternCard';
+import PatternCard from '@/components/dashboard/PatternCard';
 import styles from './styles.module.css';
-import { Signal } from '@/types/types';
-import { useSignals } from '@/providers/SignalProviderClient';
+import { useSignals } from '@/providers/SignalProvider/client';
 
 const BoxGrid: React.FC = () => {
   const { signalsData } = useSignals();

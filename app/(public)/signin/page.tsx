@@ -41,7 +41,7 @@ export default function SignIn() {
     return (
       <div className="flex h-screen items-center justify-center bg-black">
         <div className="text-center">
-          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
+          <div className="mb-4 h-8 w-8 animate-spin rounded-full border-t-2 border-b-2 border-white"></div>
           <p className={`text-oxanium text-lg text-gray-300`}>
             Signing you in...
           </p>
@@ -57,10 +57,10 @@ export default function SignIn() {
       </div>
       <div className="flex w-full flex-col items-center justify-center bg-black lg:w-1/2">
         <div className="w-96 max-w-xl">
-          <h1 className={`mb-6 font-outfit text-5xl font-bold text-white`}>
+          <h1 className={`font-outfit mb-6 text-5xl font-bold text-white`}>
             Ready to use RTHMN?
           </h1>
-          <p className={`mb-10 font-kodemono text-xl text-gray-300`}>
+          <p className={`font-kodemono mb-10 text-xl text-gray-300`}>
             Sign in with Google to get started
           </p>
 

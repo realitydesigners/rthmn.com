@@ -1,4 +1,4 @@
-import { motion, HTMLMotionProps } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'motion/react';
 
 export const MotionDiv = motion.div as React.FC<
   HTMLMotionProps<'div'> & {

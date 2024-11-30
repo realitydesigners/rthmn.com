@@ -1,7 +1,7 @@
 import React from 'react';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { Signal, BoxSlice } from '@/types/types';
-import { useSignals } from '@/providers/SignalProviderClient';
+import { useSignals } from '@/providers/SignalProvider/client';
 
 type PatternCardProps = {
   signal: Signal;
@@ -53,8 +53,8 @@ const PatternCard: React.FC<PatternCardProps> = ({ signal }) => {
       </div>
 
       {/* Middle Container - Replace ShiftedBox with NestedBoxes */}
-      <div className="mb-2 relative flex justify-center">
-        <NestedBoxes 
+      <div className="relative mb-2 flex justify-center">
+        <NestedBoxes
           boxes={transformedBoxes}
           demoStep={0}
           isPaused={true}

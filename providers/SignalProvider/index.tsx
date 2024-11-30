@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
-import { SignalProviderClient } from './SignalProviderClient';
+import { SignalProviderClient } from './client';
 
 async function fetchSignalsServer() {
   const cookieStore = await cookies();
