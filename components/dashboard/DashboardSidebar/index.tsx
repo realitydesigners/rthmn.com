@@ -111,7 +111,7 @@ export const DashboardSidebar = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 z-90 mt-14 flex h-screen">
+    <div className="fixed top-0 left-0 z-[1000] mt-14 flex h-screen">
       <div className="y-10 flex h-full w-14 flex-col items-center border-r border-[#222] bg-black pt-4">
         <div className="flex flex-col gap-2">
           <SidebarIconButton

@@ -108,13 +108,13 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
     <div className="relative flex-1 px-32" ref={searchRef}>
       {showResults && (
         <div
-          className="fixed inset-0 z-10 bg-black/50 backdrop-blur-sm"
+          className="fixed inset-0 z-[85] mt-14 bg-black/50 backdrop-blur-sm"
           onClick={() => setShowResults(false)}
         />
       )}
 
       <div className="relative mx-auto max-w-60">
-        <div className="relative z-50 flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+        <div className="relative z-[95] flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
           <div className="flex h-9 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
             <FaSearch className="ml-4 text-[#666]" />
             <input
@@ -132,7 +132,7 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
         </div>
 
         {showResults && (
-          <div className="absolute left-1/2 z-50 mt-[20px] w-[750px] -translate-x-1/2 overflow-hidden rounded-md border border-[#222] bg-black/95 shadow-xl backdrop-blur-sm">
+          <div className="absolute left-1/2 z-[95] mt-[20px] w-[750px] -translate-x-1/2 overflow-hidden rounded-md border border-[#222] bg-black/95 shadow-xl backdrop-blur-sm">
             {/* Selected Pairs Section */}
             {selectedPairs.length > 0 && (
               <div className="border-b border-[#222]">

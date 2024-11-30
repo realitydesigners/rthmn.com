@@ -102,10 +102,13 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   }, []);
 
   return (
-    <nav className="fixed top-0 right-0 left-0 z-1001 h-16 border-b border-[#222] bg-black lg:h-14">
-      <div className="h-full w-full px-4">
+    <nav className="fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#222] bg-black lg:h-14">
+      <div className="relative z-[110] h-full w-full px-4">
         <div className="flex h-full items-center justify-between">
-          <Link href="/dashboard" className="flex items-center gap-2">
+          <Link
+            href="/dashboard"
+            className="relative z-[110] flex items-center gap-2"
+          >
             <div className="flex h-8 w-8 items-center">
               <LogoIcon />
             </div>
@@ -113,18 +116,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 
           <SearchBar selectedPairs={selectedPairs} />
 
-          <div className="flex items-center space-x-4">
-            {/* <Link
-              href="/dashboard"
-              className="text-sm font-semibold text-white hover:underline"
-            >
-              Dashboard
-            </Link>
-            <button className="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
-              <div className="flex h-full w-full items-center justify-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]">
-                <BellIcon />
-              </div>
-            </button> */}
+          <div className="relative z-[110] flex items-center space-x-4">
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
