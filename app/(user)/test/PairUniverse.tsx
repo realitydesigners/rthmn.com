@@ -1,6 +1,7 @@
 'use client';
 import Spline from '@splinetool/react-spline';
 import React, { useRef, useState, useEffect } from 'react';
+import { Modal } from './Modal';
 
 interface PairUniverseProps {
   selectedPairs: string[];
@@ -17,36 +18,53 @@ export default function PairUniverse({ selectedPairs }: PairUniverseProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [sceneLoaded, setSceneLoaded] = useState(false);
   const [previousPairs, setPreviousPairs] = useState<string[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPair, setSelectedPair] = useState<string | null>(null);
 
   const calculatePosition = (index: number): Position3D => {
-    const spacing = 400;
+    const radius = 800;
+    const totalPairs = selectedPairs.length;
+    const angle = (index * 2 * Math.PI) / totalPairs;
+    const yOffset = 120;
+
     return {
-      x: (index - 1) * spacing,
-      y: 0,
-      z: 0
+      x: radius * Math.cos(angle),
+      y: yOffset,
+      z: radius * Math.sin(angle)
     };
   };
 
   const moveObject = (object: any, position: Position3D, visible: boolean) => {
     try {
-      // Set position
       object.position.x = position.x;
       object.position.y = position.y;
       object.position.z = position.z;
-
-      // Set scale based on visibility
       object.scale.x = visible ? 1 : 0;
       object.scale.y = visible ? 1 : 0;
       object.scale.z = visible ? 1 : 0;
-
-      // Only rotate if visible
-      if (visible) {
-        object.rotation.y = Math.PI * 0.1;
-      }
     } catch (error) {
       console.error('Error moving object:', error);
     }
   };
+
+  function onSplineMouseDown(e) {
+    if (!e.target) return;
+
+    const clickedObject = e.target;
+    console.log('Clicked object:', clickedObject);
+
+    setSelectedPair(clickedObject.name);
+    setModalOpen(true);
+    console.log('Modal state after click:', {
+      selectedPair: clickedObject.name,
+      modalOpen: true
+    });
+  }
+
+  function closeModal() {
+    setModalOpen(false);
+    setSelectedPair(null);
+  }
 
   const updatePositions = (spline: any) => {
     if (!spline) return;
@@ -78,7 +96,6 @@ export default function PairUniverse({ selectedPairs }: PairUniverseProps) {
       }
     });
 
-    // Update previous pairs for next comparison
     setPreviousPairs(selectedPairs);
   };
 
@@ -89,20 +106,9 @@ export default function PairUniverse({ selectedPairs }: PairUniverseProps) {
   }, [selectedPairs, sceneLoaded]);
 
   const onLoad = (spline: any) => {
+    splineRef.current = spline;
+
     try {
-      splineRef.current = spline;
-
-      // Set up camera for side view
-      const camera = spline.findObjectByName('Camera');
-      if (camera) {
-        camera.position.x = 0;
-        camera.position.y = 500;
-        camera.position.z = 1500;
-        camera.rotation.x = -0.3;
-        camera.rotation.y = 0;
-        camera.rotation.z = 0;
-      }
-
       setSceneLoaded(true);
       setIsLoading(false);
 
@@ -116,10 +122,14 @@ export default function PairUniverse({ selectedPairs }: PairUniverseProps) {
   };
 
   return (
-    <Spline
-      className="h-full w-full"
-      scene="https://prod.spline.design/cV1oOhbcJ9pajG3g/scene.splinecode"
-      onLoad={onLoad}
-    />
+    <div className="relative h-full w-full overflow-hidden">
+      <Spline
+        className="z-0 h-full w-full"
+        scene="https://prod.spline.design/lrIbm-6D-FR6eTG0/scene.splinecode"
+        onLoad={onLoad}
+        onSplineMouseDown={onSplineMouseDown}
+      />
+      <Modal isOpen={modalOpen} onClose={closeModal} pairName={selectedPair} />
+    </div>
   );
 }
