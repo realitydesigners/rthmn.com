@@ -198,7 +198,71 @@ export default function App() {
     return cornerDistance;
   };
 
-  const applyBoxConfiguration = (config: BoxesConfig) => {
+  const ANIMATION_DURATION = 500; // Faster animation (0.5 seconds)
+  const ANIMATION_STEPS = 30; // Maintain 60fps
+  const CORNER_THRESHOLD = 0.05; // More precise corner detection
+  const GREEN_BOXES = ['1g', '2g', '3g', '4g', '5g'];
+
+  interface ProcessBoxParams {
+    index: number;
+    config: BoxesConfig;
+  }
+
+  const processBox = async ({ index, config }: ProcessBoxParams) => {
+    if (index === 0) return; // First box stays at origin
+
+    const box = splineRef.current.findObjectByName(GREEN_BOXES[index]);
+    const parentBox = splineRef.current.findObjectByName(
+      GREEN_BOXES[index - 1]
+    );
+
+    if (!box || !parentBox) return;
+
+    const currentDimensions = calculateBoxDimensions(index, 100, Math.sqrt(2));
+    const parentDimensions = calculateBoxDimensions(
+      index - 1,
+      100,
+      Math.sqrt(2)
+    );
+    const cornerOffset = calculateCornerOffset(
+      currentDimensions,
+      parentDimensions,
+      Math.sqrt(2)
+    );
+
+    // Calculate target position
+    const targetY =
+      parentBox.position.y +
+      (config[index] === 'Up' ? cornerOffset : -cornerOffset);
+
+    // Function to check if box has reached target
+    const hasReachedTarget = () => Math.abs(box.position.y - targetY) < 0.01;
+
+    // If box is already at target, no need to animate
+    if (hasReachedTarget()) return;
+
+    const startY = box.position.y;
+
+    // Animate the position
+    for (let step = 0; step <= ANIMATION_STEPS; step++) {
+      const progress = step / ANIMATION_STEPS;
+      const newY = startY + (targetY - startY) * progress;
+      box.position.y = newY;
+      await new Promise((resolve) =>
+        setTimeout(resolve, ANIMATION_DURATION / ANIMATION_STEPS)
+      );
+    }
+
+    // Force exact position
+    box.position.y = targetY;
+
+    // Wait until box has definitely reached target position
+    while (!hasReachedTarget()) {
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+  };
+
+  const applyBoxConfiguration = async (config: BoxesConfig) => {
     if (isAnimating) return;
 
     const spline = splineRef.current;
@@ -212,45 +276,87 @@ export default function App() {
       }))
     );
 
-    const greenBoxes = ['1g', '2g', '3g', '4g', '5g'];
+    try {
+      // Calculate initial positions and offsets
+      const boxes = new Map<
+        number,
+        {
+          box: any;
+          startY: number;
+          cornerOffset: number;
+          finalY: number;
+        }
+      >();
 
-    // Process boxes in sequence to ensure proper parent-child positioning
-    const processBox = (index: number) => {
-      if (index === 0) return; // First box stays at origin
+      // First calculate all final positions
+      let currentParentY = 0; // Base box position
+      for (let i = 1; i <= 4; i++) {
+        const box = spline.findObjectByName(GREEN_BOXES[i]);
+        const parentBox = spline.findObjectByName(GREEN_BOXES[i - 1]);
 
-      const box = spline.findObjectByName(greenBoxes[index]);
-      const parentBox = spline.findObjectByName(greenBoxes[index - 1]);
+        if (box && parentBox) {
+          const currentDimensions = calculateBoxDimensions(
+            i,
+            100,
+            Math.sqrt(2)
+          );
+          const parentDimensions = calculateBoxDimensions(
+            i - 1,
+            100,
+            Math.sqrt(2)
+          );
+          const cornerOffset = calculateCornerOffset(
+            currentDimensions,
+            parentDimensions,
+            Math.sqrt(2)
+          );
 
-      if (!box || !parentBox) return;
+          // Calculate final position based on parent's final position
+          const finalY =
+            currentParentY +
+            (config[i] === 'Up' ? cornerOffset : -cornerOffset);
+          currentParentY = finalY; // Update for next box
 
-      const currentDimensions = calculateBoxDimensions(
-        index,
-        100,
-        Math.sqrt(2)
-      );
-      const parentDimensions = calculateBoxDimensions(
-        index - 1,
-        100,
-        Math.sqrt(2)
-      );
-      const cornerOffset = calculateCornerOffset(
-        currentDimensions,
-        parentDimensions,
-        Math.sqrt(2)
-      );
+          boxes.set(i, {
+            box,
+            startY: box.position.y,
+            cornerOffset,
+            finalY
+          });
+        }
+      }
 
-      // Directly set position without animation
-      box.position.y =
-        parentBox.position.y +
-        (config[index] === 'Up' ? cornerOffset : -cornerOffset);
-    };
+      // Single animation loop
+      const totalSteps = 30;
+      const stepDuration = 500 / totalSteps;
 
-    // Process boxes sequentially
-    for (let i = 1; i < greenBoxes.length; i++) {
-      processBox(i);
+      for (let step = 0; step <= totalSteps; step++) {
+        const progress = step / totalSteps;
+
+        // Update positions from smallest to largest
+        for (let i = 4; i >= 1; i--) {
+          const data = boxes.get(i);
+          if (data) {
+            const { box, startY, finalY } = data;
+            // Animate directly to final position
+            const newY = startY + (finalY - startY) * progress;
+            box.position.y = newY;
+          }
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, stepDuration));
+      }
+
+      // Set final positions
+      for (let i = 4; i >= 1; i--) {
+        const data = boxes.get(i);
+        if (data) {
+          data.box.position.y = data.finalY;
+        }
+      }
+    } finally {
+      setIsAnimating(false);
     }
-
-    setIsAnimating(false);
   };
 
   const onLoad = (spline: any) => {
