@@ -9,9 +9,18 @@ interface BoxDimensions {
   position: { x: number; y: number; z: number };
 }
 
-type BoxPosition = 'Up' | 'Down';
-type BoxConfig = 'Up' | 'Down';
-type BoxesConfig = [BoxConfig, BoxConfig, BoxConfig, BoxConfig, BoxConfig];
+type BoxPosition = 1 | -1;
+type BoxConfig = 1 | -1;
+type BoxesConfig = [
+  BoxConfig,
+  BoxConfig,
+  BoxConfig,
+  BoxConfig,
+  BoxConfig,
+  BoxConfig,
+  BoxConfig,
+  BoxConfig
+];
 
 interface BoxState {
   name: string;
@@ -23,47 +32,59 @@ interface ConfigState {
   label: string;
 }
 
-// Predefined configurations for auto-play
-const CONFIGS: ConfigState[] = [
-  {
-    config: ['Up', 'Up', 'Up', 'Up', 'Up'] as BoxesConfig,
-    label: 'UUUUU'
-  },
-  {
-    config: ['Up', 'Up', 'Up', 'Up', 'Down'] as BoxesConfig,
-    label: 'UUUUD'
-  },
-  {
-    config: ['Up', 'Up', 'Up', 'Down', 'Up'] as BoxesConfig,
-    label: 'UUUDU'
-  },
-  {
-    config: ['Up', 'Up', 'Down', 'Up', 'Up'] as BoxesConfig,
-    label: 'UUDUU'
-  }
-];
+// Define sequences
+const sequences: BoxesConfig[] = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, -1],
+  [1, 1, 1, 1, 1, 1, -1, -1],
+  [1, 1, 1, 1, 1, -1, -1, -1],
+  [1, 1, 1, 1, -1, -1, -1, -1],
+  [1, 1, 1, 1, -1, -1, -1, 1],
+  [1, 1, 1, 1, -1, -1, 1, 1],
+  [1, 1, 1, 1, -1, 1, 1, -1],
+  [1, 1, 1, 1, -1, 1, -1, -1],
+  [1, 1, 1, 1, -1, -1, -1, -1],
+  [1, 1, 1, -1, -1, -1, -1, -1],
+  [1, 1, 1, -1, -1, -1, -1, 1],
+  [1, 1, 1, -1, -1, -1, 1, 1],
+  [1, 1, 1, -1, -1, 1, 1, -1],
+  [1, 1, 1, -1, -1, 1, -1, -1],
+  [1, 1, 1, -1, -1, 1, -1, 1],
+  [1, 1, 1, -1, -1, 1, 1, 1],
+  [1, 1, 1, -1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1]
+] as BoxesConfig[];
+
+// Convert sequences to ConfigState format
+const CONFIGS: ConfigState[] = sequences.map((config) => ({
+  config,
+  label: config.map((n) => (n === 1 ? 'P' : 'N')).join('') // P for Positive, N for Negative
+}));
 
 interface AutoBoxModuleProps {
   splineRef: React.MutableRefObject<any>;
 }
 
-export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
+export const BoxSection: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentConfigIndex, setCurrentConfigIndex] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
   const [boxStates, setBoxStates] = useState<BoxState[]>([
-    { name: 'Box 1', position: 'Up' },
-    { name: 'Box 2', position: 'Up' },
-    { name: 'Box 3', position: 'Up' },
-    { name: 'Box 4', position: 'Up' },
-    { name: 'Box 5', position: 'Up' }
+    { name: 'Box 1', position: 1 },
+    { name: 'Box 2', position: 1 },
+    { name: 'Box 3', position: 1 },
+    { name: 'Box 4', position: 1 },
+    { name: 'Box 5', position: 1 },
+    { name: 'Box 6', position: 1 },
+    { name: 'Box 7', position: 1 },
+    { name: 'Box 8', position: 1 }
   ]);
 
   // Constants
   const ANIMATION_DURATION = 500;
   const ANIMATION_STEPS = 30;
   const CORNER_THRESHOLD = 0.05;
-  const GREEN_BOXES = ['1g', '2g', '3g', '4g', '5g'];
+  const GREEN_BOXES = ['1g', '2g', '3g', '4g', '5g', '6g', '7g', '8g'];
 
   // Helper functions
   const calculateBoxDimensions = (
@@ -115,7 +136,7 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
       >();
 
       let currentParentY = 0;
-      for (let i = 1; i <= 4; i++) {
+      for (let i = 1; i <= 7; i++) {
         const box = spline.findObjectByName(GREEN_BOXES[i]);
         const parentBox = spline.findObjectByName(GREEN_BOXES[i - 1]);
 
@@ -137,8 +158,7 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
           );
 
           const finalY =
-            currentParentY +
-            (config[i] === 'Up' ? cornerOffset : -cornerOffset);
+            currentParentY + (config[i] === 1 ? cornerOffset : -cornerOffset);
           currentParentY = finalY;
 
           boxes.set(i, {
@@ -153,7 +173,7 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
       // Animate
       for (let step = 0; step <= ANIMATION_STEPS; step++) {
         const progress = step / ANIMATION_STEPS;
-        for (let i = 4; i >= 1; i--) {
+        for (let i = 7; i >= 1; i--) {
           const data = boxes.get(i);
           if (data) {
             const { box, startY, finalY } = data;
@@ -254,7 +274,7 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
       <div className="overflow-hidden rounded-md border border-[#222] bg-black/95 shadow-xl backdrop-blur-sm">
         <div className="font-kodemono flex h-8 items-center justify-between border-b border-[#222] px-4 text-xs font-medium tracking-wider text-[#818181]">
           <div className="flex items-center gap-2">
-            <span className="uppercase">Auto Box Controls</span>
+            <span className="uppercase">Box Sequence</span>
             <FaChevronDown size={8} className="opacity-50" />
           </div>
         </div>
@@ -265,7 +285,7 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
             <div className="font-kodemono mb-2 text-[11px] tracking-wider text-[#666] uppercase">
               Current State
             </div>
-            <div className="grid grid-cols-5 gap-1">
+            <div className="grid grid-cols-8 gap-1">
               {boxStates.map((box, index) => (
                 <div
                   key={box.name}
@@ -276,10 +296,10 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
                   </span>
                   <span
                     className={`font-kodemono text-[13px] font-bold tracking-wider ${
-                      box.position === 'Up' ? 'text-blue-400' : 'text-blue-300'
+                      box.position === 1 ? 'text-blue-400' : 'text-blue-300'
                     }`}
                   >
-                    {box.position}
+                    {box.position === 1 ? '+1' : '-1'}
                   </span>
                 </div>
               ))}
@@ -289,10 +309,10 @@ export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
           {/* Current Configuration */}
           <div className="p-2">
             <div className="font-kodemono mb-2 text-[11px] tracking-wider text-[#666] uppercase">
-              Current Configuration ({currentConfigIndex + 1}/{CONFIGS.length})
+              Sequence ({currentConfigIndex + 1}/{CONFIGS.length})
             </div>
             <div className="font-outfit text-center text-sm">
-              {CONFIGS[currentConfigIndex].label}
+              {sequences[currentConfigIndex].join(' → ')}
             </div>
           </div>
         </div>

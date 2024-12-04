@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, ReactNode } from 'react';
+import { useSuppressSplineError } from './useSupressSplineError';
 
 interface SceneObject {
   name: string;
@@ -17,6 +18,9 @@ export const useSceneManager = (
   splineRef: React.MutableRefObject<any>,
   objects: SceneObject[]
 ) => {
+  // Suppress Spline errors
+  useSuppressSplineError();
+
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const lastPositions = useRef<Record<string, number>>({});
   const originalScales = useRef<
