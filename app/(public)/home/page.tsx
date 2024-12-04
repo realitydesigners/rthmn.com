@@ -1,28 +1,47 @@
 'use client';
 import Spline from '@splinetool/react-spline';
-import React, { useRef } from 'react';
-import { BoxModule } from './modules/BoxModule';
-import { useModuleVisibility } from '@/hooks/useModuleVisibility';
-import { useSuppressSplineError } from '@/hooks/useSupressSplineError';
+import React, { useRef, useMemo } from 'react';
 import { AutoBoxModule } from './modules/AutoBoxModule';
+import { useSceneManager } from '@/hooks/useSceneManager';
+import { useSuppressSplineError } from '@/hooks/useSupressSplineError';
 
 export default function App() {
   useSuppressSplineError();
   const splineRef = useRef(null);
 
-  const showBoxModule = useModuleVisibility(splineRef, {
-    objectName: 'BoxSection',
-    threshold: 1100
-  });
+  const sceneObjects = useMemo(
+    () => [
+      {
+        name: 'DataStream',
+        show: 0,
+        hide: 7000
+      },
+      {
+        name: 'BoxSection',
+        show: 1200,
+        hide: 1300,
 
-  const showAutoBoxModule = useModuleVisibility(splineRef, {
-    objectName: 'BoxSection',
-    threshold: 1500
-  });
+        component: <AutoBoxModule splineRef={splineRef} />
+      }
+    ],
+    [splineRef]
+  );
+
+  const visibility = useSceneManager(splineRef, sceneObjects);
 
   const onLoad = (spline: any) => {
     if (!spline) return;
     splineRef.current = spline;
+
+    console.log('All Scene Objects:', {
+      all: spline.getAllObjects(),
+      named: spline.getAllObjects().map((obj: any) => ({
+        name: obj.name,
+        type: obj.type,
+        scale: obj.scale,
+        position: obj.position
+      }))
+    });
   };
 
   return (
@@ -33,8 +52,13 @@ export default function App() {
           onLoad={onLoad}
         />
       </div>
-      {/* {showBoxModule && <BoxModule splineRef={splineRef} />} */}
-      {showAutoBoxModule && <AutoBoxModule splineRef={splineRef} />}
+      {sceneObjects.map(
+        (obj) =>
+          obj.component &&
+          visibility[obj.name] && (
+            <React.Fragment key={obj.name}>{obj.component}</React.Fragment>
+          )
+      )}
     </main>
   );
 }
