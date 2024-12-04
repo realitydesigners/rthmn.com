@@ -2,6 +2,7 @@ import { useRef, useEffect, useState, ReactNode } from 'react';
 import { useSuppressSplineError } from './useSupressSplineError';
 
 interface SceneObject {
+  id: string;
   name: string;
   show: number;
   hide: number;
@@ -52,7 +53,7 @@ export const useSceneManager = (
 
     const newStates: SceneVisibility = {};
 
-    objects.forEach(({ name, show, hide, debug }) => {
+    objects.forEach(({ id, name, show, hide, debug }) => {
       const object = spline.findObjectByName(name);
       if (!object) return;
 
@@ -85,7 +86,7 @@ export const useSceneManager = (
       }
 
       // Update visibility state
-      newStates[name] = distance < show;
+      newStates[id] = distance < show;
     });
 
     setVisibilityStates(newStates);

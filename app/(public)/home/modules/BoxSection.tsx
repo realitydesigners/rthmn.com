@@ -270,34 +270,60 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
   }, [currentConfigIndex, isAnimating, isInitialized]);
 
   return (
-    <div className="mt- fixed right-0 bottom-50 mr-2 flex w-[400px] flex-col gap-2">
-      <div className="overflow-hidden rounded-md border border-[#222] bg-black/95 shadow-xl backdrop-blur-sm">
-        <div className="font-kodemono flex h-8 items-center justify-between border-b border-[#222] px-4 text-xs font-medium tracking-wider text-[#818181]">
-          <div className="flex items-center gap-2">
-            <span className="uppercase">Box Sequence</span>
-            <FaChevronDown size={8} className="opacity-50" />
+    <div className="fixed right-0 -bottom-500 mr-2 flex w-[400px] flex-col gap-2">
+      <div className="overflow-hidden rounded-md border border-[#222] bg-black/80 shadow-xl backdrop-blur-lg">
+        {/* Header */}
+        <div className="font-kodemono flex h-10 items-center justify-between border-b border-[#222]/50 px-4">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500/50" />
+            <span className="text-xs font-medium tracking-wider text-[#818181]">
+              SEQUENCE VISUALIZER
+            </span>
           </div>
         </div>
 
-        <div className="divide-y divide-[#222]">
-          {/* Status Section */}
-          <div className="p-2">
-            <div className="font-kodemono mb-2 text-[11px] tracking-wider text-[#666] uppercase">
-              Current State
+        <div className="divide-y divide-[#222]/30">
+          {/* Sequence Visualization */}
+          <div className="p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="font-kodemono text-[11px] text-[#666] uppercase">
+                Pattern {currentConfigIndex + 1}/{CONFIGS.length}
+              </span>
+              <span className="font-mono text-[10px] text-[#444]">
+                {sequences[currentConfigIndex].join('')}
+              </span>
             </div>
-            <div className="grid grid-cols-8 gap-1">
+
+            {/* Abstract Visualization */}
+            <div className="relative h-16 w-full overflow-hidden rounded-md bg-[#111]">
+              <div className="absolute inset-0 flex items-center justify-center">
+                {sequences[currentConfigIndex].map((value, idx) => (
+                  <div
+                    key={idx}
+                    className={`mx-0.5 h-12 w-1 transform transition-all duration-500 ${value === 1 ? 'bg-blue-400/40' : 'bg-blue-300/20'} ${value === 1 ? 'scale-y-100' : 'scale-y-50'} `}
+                    style={{
+                      transform: `scaleY(${value === 1 ? '1' : '0.5'}) translateY(${value === 1 ? '-4px' : '4px'})`,
+                      transition: 'transform 0.5s ease'
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Current State */}
+          <div className="p-4">
+            <div className="flex flex-wrap gap-1">
               {boxStates.map((box, index) => (
                 <div
                   key={box.name}
-                  className="group flex flex-col items-center rounded border border-transparent bg-[#111] p-2 transition-all hover:border-[#333]"
+                  className={`relative flex h-12 w-12 items-center justify-center rounded ${box.position === 1 ? 'bg-blue-500/10' : 'bg-blue-300/5'} transition-all duration-300`}
                 >
-                  <span className="font-outfit text-[11px] font-medium text-[#666]">
-                    Box {index + 1}
-                  </span>
+                  <div
+                    className={`absolute inset-0 border ${box.position === 1 ? 'border-blue-400/30' : 'border-blue-300/20'} rounded transition-all duration-300`}
+                  />
                   <span
-                    className={`font-kodemono text-[13px] font-bold tracking-wider ${
-                      box.position === 1 ? 'text-blue-400' : 'text-blue-300'
-                    }`}
+                    className={`font-mono text-xs font-bold ${box.position === 1 ? 'text-blue-400' : 'text-blue-300/70'} `}
                   >
                     {box.position === 1 ? '+1' : '-1'}
                   </span>
@@ -306,13 +332,15 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
             </div>
           </div>
 
-          {/* Current Configuration */}
-          <div className="p-2">
-            <div className="font-kodemono mb-2 text-[11px] tracking-wider text-[#666] uppercase">
-              Sequence ({currentConfigIndex + 1}/{CONFIGS.length})
-            </div>
-            <div className="font-outfit text-center text-sm">
-              {sequences[currentConfigIndex].join(' → ')}
+          {/* Progress Bar */}
+          <div className="px-4 py-2">
+            <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#222]/30">
+              <div
+                className="h-full bg-blue-400/30 transition-all duration-500"
+                style={{
+                  width: `${(currentConfigIndex / (CONFIGS.length - 1)) * 100}%`
+                }}
+              />
             </div>
           </div>
         </div>

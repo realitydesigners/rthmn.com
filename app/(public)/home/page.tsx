@@ -1,28 +1,12 @@
 'use client';
-import Spline from '@splinetool/react-spline';
-import React, { useRef, useMemo } from 'react';
-import { BoxSection } from './modules/BoxSection';
+import { useRef } from 'react';
+import { useSceneConfig } from './config';
 import { useSceneManager } from '@/hooks/useSceneManager';
+import Spline from '@splinetool/react-spline';
 
 export default function App() {
   const splineRef = useRef(null);
-
-  const sceneObjects = useMemo(
-    () => [
-      {
-        name: 'DataStream',
-        show: 0,
-        hide: 6800
-      },
-      {
-        name: 'BoxSection',
-        show: 1000,
-        hide: 1100,
-        component: <BoxSection splineRef={splineRef} />
-      }
-    ],
-    [splineRef]
-  );
+  const sceneObjects = useSceneConfig(splineRef);
   const visibility = useSceneManager(splineRef, sceneObjects);
 
   const onLoad = (spline: any) => {
@@ -39,8 +23,7 @@ export default function App() {
         />
       </div>
       {sceneObjects.map(
-        (obj) =>
-          visibility[obj.name] && <div key={obj.name}>{obj.component}</div>
+        (obj) => visibility[obj.id] && <div key={obj.id}>{obj.component}</div>
       )}
     </main>
   );
