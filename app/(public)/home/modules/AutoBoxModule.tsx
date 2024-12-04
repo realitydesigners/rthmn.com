@@ -1,5 +1,5 @@
 'use client';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 // Types
@@ -23,12 +23,34 @@ interface ConfigState {
   label: string;
 }
 
-interface BoxModuleProps {
+// Predefined configurations for auto-play
+const CONFIGS: ConfigState[] = [
+  {
+    config: ['Up', 'Up', 'Up', 'Up', 'Up'] as BoxesConfig,
+    label: 'UUUUU'
+  },
+  {
+    config: ['Up', 'Up', 'Up', 'Up', 'Down'] as BoxesConfig,
+    label: 'UUUUD'
+  },
+  {
+    config: ['Up', 'Up', 'Up', 'Down', 'Up'] as BoxesConfig,
+    label: 'UUUDU'
+  },
+  {
+    config: ['Up', 'Up', 'Down', 'Up', 'Up'] as BoxesConfig,
+    label: 'UUDUU'
+  }
+];
+
+interface AutoBoxModuleProps {
   splineRef: React.MutableRefObject<any>;
 }
 
-export const BoxModule = ({ splineRef }: BoxModuleProps) => {
+export const AutoBoxModule: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
   const [isAnimating, setIsAnimating] = useState(false);
+  const [currentConfigIndex, setCurrentConfigIndex] = useState(0);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [boxStates, setBoxStates] = useState<BoxState[]>([
     { name: 'Box 1', position: 'Up' },
     { name: 'Box 2', position: 'Up' },
@@ -68,29 +90,9 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
     return cornerDistance;
   };
 
-  const generateConfigs = (): ConfigState[] => {
-    const configs: ConfigState[] = [];
-    for (let i = 0; i < Math.pow(2, 5); i++) {
-      const binary = i.toString(2).padStart(5, '0');
-      const config = binary
-        .split('')
-        .map((b) => (b === '0' ? 'Up' : 'Down')) as BoxesConfig;
-      configs.push({
-        config,
-        label: config.map((c) => (c === 'Up' ? 'U' : 'D')).join('')
-      });
-    }
-    return configs;
-  };
-
-  const configs = generateConfigs();
-
   // Box manipulation functions
   const applyBoxConfiguration = async (config: BoxesConfig) => {
-    if (isAnimating) return;
-
-    const spline = splineRef.current;
-    if (!spline) return;
+    if (isAnimating || !splineRef.current) return;
 
     setIsAnimating(true);
     setBoxStates((prevStates) =>
@@ -101,6 +103,7 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
     );
 
     try {
+      const spline = splineRef.current;
       const boxes = new Map<
         number,
         {
@@ -147,12 +150,9 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
         }
       }
 
-      const totalSteps = 30;
-      const stepDuration = 500 / totalSteps;
-
-      for (let step = 0; step <= totalSteps; step++) {
-        const progress = step / totalSteps;
-
+      // Animate
+      for (let step = 0; step <= ANIMATION_STEPS; step++) {
+        const progress = step / ANIMATION_STEPS;
         for (let i = 4; i >= 1; i--) {
           const data = boxes.get(i);
           if (data) {
@@ -161,16 +161,15 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
             box.position.y = newY;
           }
         }
-
-        await new Promise((resolve) => setTimeout(resolve, stepDuration));
+        await new Promise((resolve) =>
+          setTimeout(resolve, ANIMATION_DURATION / ANIMATION_STEPS)
+        );
       }
 
-      for (let i = 4; i >= 1; i--) {
-        const data = boxes.get(i);
-        if (data) {
-          data.box.position.y = data.finalY;
-        }
-      }
+      // Set final positions
+      boxes.forEach((data) => {
+        data.box.position.y = data.finalY;
+      });
     } finally {
       setIsAnimating(false);
     }
@@ -186,17 +185,13 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
         const currentBox = spline.findObjectByName(name);
 
         if (currentBox) {
-          console.log(`Found box: ${name}`, currentBox);
-
           try {
-            // Get current box dimensions
             const currentDimensions = calculateBoxDimensions(
               index,
               100,
               Math.sqrt(2)
             );
 
-            // Apply scale
             currentBox.scale.x = currentDimensions.scale;
             currentBox.scale.y = currentDimensions.scale;
             currentBox.scale.z = currentDimensions.scale;
@@ -206,58 +201,60 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
               const parentBox = spline.findObjectByName(parentName);
 
               if (parentBox) {
-                // Get parent box dimensions
                 const parentDimensions = calculateBoxDimensions(
                   index - 1,
                   100,
                   Math.sqrt(2)
                 );
 
-                // Calculate corner offset using sqrt(2) relationship
                 const cornerOffset = calculateCornerOffset(
                   currentDimensions,
                   parentDimensions,
                   Math.sqrt(2)
                 );
 
-                // Position smaller box in corner of parent box
                 currentBox.position.x = parentBox.position.x + cornerOffset;
                 currentBox.position.y = parentBox.position.y + cornerOffset;
                 currentBox.position.z = parentBox.position.z - cornerOffset;
-
-                console.log(
-                  `Box ${name} - Size: ${currentDimensions.size}, ` +
-                    `Parent Size: ${parentDimensions.size}, ` +
-                    `Corner Offset: ${cornerOffset}`
-                );
               }
             } else {
-              // First box at origin
               currentBox.position.x = 0;
               currentBox.position.y = 0;
               currentBox.position.z = 0;
             }
           } catch (error) {
             console.error(`Error manipulating box ${name}:`, error);
-            console.log('Box object structure:', currentBox);
           }
-        } else {
-          console.warn(`Box not found: ${name}`);
         }
       });
     };
 
-    // Position the boxes
+    // Position the boxes and start auto-play
     positionNestedBoxes(GREEN_BOXES);
-  }, [splineRef.current]); // Only run when splineRef.current changes
+    setIsInitialized(true);
+  }, [splineRef.current]);
 
-  // UI Component
+  // Auto-play effect
+  useEffect(() => {
+    if (!isInitialized) return;
+
+    const playNextConfig = async () => {
+      if (isAnimating) return;
+
+      await applyBoxConfiguration(CONFIGS[currentConfigIndex].config);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      setCurrentConfigIndex((prev) => (prev + 1) % CONFIGS.length);
+    };
+
+    playNextConfig();
+  }, [currentConfigIndex, isAnimating, isInitialized]);
+
   return (
-    <div className="mt- fixed top-50 right-0 mr-2 flex w-[400px] flex-col gap-2">
+    <div className="mt- fixed right-0 bottom-50 mr-2 flex w-[400px] flex-col gap-2">
       <div className="overflow-hidden rounded-md border border-[#222] bg-black/95 shadow-xl backdrop-blur-sm">
         <div className="font-kodemono flex h-8 items-center justify-between border-b border-[#222] px-4 text-xs font-medium tracking-wider text-[#818181]">
           <div className="flex items-center gap-2">
-            <span className="uppercase">Box Controls</span>
+            <span className="uppercase">Auto Box Controls</span>
             <FaChevronDown size={8} className="opacity-50" />
           </div>
         </div>
@@ -289,47 +286,13 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
             </div>
           </div>
 
-          {/* Configurations Section */}
+          {/* Current Configuration */}
           <div className="p-2">
             <div className="font-kodemono mb-2 text-[11px] tracking-wider text-[#666] uppercase">
-              Available Patterns
+              Current Configuration ({currentConfigIndex + 1}/{CONFIGS.length})
             </div>
-            <div className="grid grid-cols-4 gap-1">
-              {configs.map((config, index) => (
-                <button
-                  key={index}
-                  onClick={() => applyBoxConfiguration(config.config)}
-                  disabled={isAnimating}
-                  className={`group font-outfit flex h-9 items-center justify-center rounded border border-transparent bg-[#111] px-2 text-[13px] font-bold tracking-wider transition-all ${
-                    isAnimating
-                      ? 'cursor-not-allowed opacity-50'
-                      : 'hover:border-[#333] hover:bg-[#181818]'
-                  }`}
-                >
-                  <span className="text-white">{config.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Info Section */}
-          <div className="p-2">
-            <div className="font-kodemono mb-2 text-[11px] tracking-wider text-[#666] uppercase">
-              Legend
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 rounded bg-[#111] p-2">
-                <div className="h-2 w-2 rounded-full bg-blue-400" />
-                <span className="font-outfit text-[11px] text-[#666]">
-                  Up - Top Corner
-                </span>
-              </div>
-              <div className="flex items-center gap-2 rounded bg-[#111] p-2">
-                <div className="h-2 w-2 rounded-full bg-blue-300" />
-                <span className="font-outfit text-[11px] text-[#666]">
-                  Down - Bottom Corner
-                </span>
-              </div>
+            <div className="font-outfit text-center text-sm">
+              {CONFIGS[currentConfigIndex].label}
             </div>
           </div>
         </div>
@@ -337,4 +300,3 @@ export const BoxModule = ({ splineRef }: BoxModuleProps) => {
     </div>
   );
 };
-export type { BoxModuleProps, BoxesConfig };
