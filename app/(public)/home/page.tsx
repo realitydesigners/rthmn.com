@@ -17,7 +17,7 @@ export default function App() {
     <main className="relative flex h-screen w-screen overflow-hidden">
       <div className="flex-1">
         <Spline
-          scene="https://prod.spline.design/cP3iqEd5u4uCWRDI/scene.splinecode"
+          scene="https://prod.spline.design/FJKjAlRWBk2Y3SyO/scene.splinecode"
           onLoad={onLoad}
         />
       </div>
