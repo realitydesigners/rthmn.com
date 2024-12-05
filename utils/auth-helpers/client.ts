@@ -2,24 +2,21 @@
 
 import type { Provider } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
+import { getURL } from '@/utils/helpers';
 
 export function useSignInWithOAuth() {
   const supabase = createClient();
 
   return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
     e.preventDefault();
-    const redirectURL =
-      process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : 'https://www.rthmn.com';
+    const redirectURL = getURL('/auth/callback');
 
     if (provider === 'discord') {
-      // Add discord-specific scopes
       await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: redirectURL,
-          scopes: 'identify' // Add any additional scopes you need
+          scopes: 'identify'
         }
       });
     } else {

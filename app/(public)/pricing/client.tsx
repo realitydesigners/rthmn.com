@@ -2,8 +2,8 @@
 import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { SectionPricing } from '@/components/Sections/SectionPricing';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { SectionBlogPosts } from '@/components/Sections/SectionBlogPosts';
-import { SectionFooter } from '@/components/Sections/SectionFooter';
+// import { SectionBlogPosts } from '@/components/Sections/SectionBlogPosts';
+// import { SectionFooter } from '@/components/Sections/SectionFooter';
 
 interface MarketData {
   pair: string;
@@ -27,8 +27,8 @@ export default function ClientPage({ posts, products }: ClientPageProps) {
         products={products ?? []}
         subscription={null}
       />
-      <SectionBlogPosts initialPosts={posts} />
-      <SectionFooter />
+      {/* <SectionBlogPosts initialPosts={posts} />
+      <SectionFooter /> */}
     </BackgroundGrid>
   );
 }
