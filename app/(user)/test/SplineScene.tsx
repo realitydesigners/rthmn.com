@@ -460,7 +460,7 @@ export default function App() {
   };
 
   return (
-    <main className="relative flex h-screen w-screen overflow-hidden">
+    <main className="relative flex h-full w-full overflow-hidden">
       <div className="flex-1">
         <SplineScene onLoad={onLoad} />
       </div>

@@ -16,6 +16,10 @@ interface NavbarSignedOutProps {
 }
 
 const Links = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
   const handleMouseEnter = (dropdown: string) => {
@@ -74,6 +78,10 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
   href,
   className
 }) => {
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
   return (
     <Link href={href} className={`${styles.dropdownLink} ${className || ''}`}>
       <div className={styles.dropdownLinkContent}>
@@ -87,6 +95,7 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
 export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const { session, signOut } = useAuth();
+  const isProduction = process.env.NODE_ENV === 'production';
 
   useEffect(() => {
     if (isNavOpen) {
@@ -132,7 +141,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 
   return (
     <>
-      {isNavOpen && (
+      {isNavOpen && !isProduction && (
         <div
           className="fixed inset-0 z-1000 bg-black/75 backdrop-blur-sm lg:hidden"
           onClick={handleBackdropClick}
@@ -161,12 +170,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             </Link>
 
             <div className="flex items-center space-x-4">
-              <nav className="hidden space-x-4 lg:flex">
-                <Links />
-              </nav>
+              {!isProduction && (
+                <nav className="hidden space-x-4 lg:flex">
+                  <Links />
+                </nav>
+              )}
             </div>
             <div className="hidden items-center space-x-4 pr-2 lg:flex">
-              {/* Desktop sign-in/sign-out button */}
               <MotionDiv
                 className="flex hidden lg:block"
                 variants={linkVariants}
@@ -194,68 +204,72 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                   >
                     <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium">
-                      Sign in
+                      Beta Access
                     </span>
                   </Link>
                 )}
               </MotionDiv>
             </div>
 
-            <button
-              onClick={toggleNav}
-              className="menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden"
-              aria-label="Toggle navigation"
-            >
-              <MenuIcon isOpen={isNavOpen} />
-            </button>
+            {!isProduction && (
+              <button
+                onClick={toggleNav}
+                className="menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden"
+                aria-label="Toggle navigation"
+              >
+                <MenuIcon isOpen={isNavOpen} />
+              </button>
+            )}
           </div>
         </div>
       </MotionDiv>
 
-      {/* Mobile Navigation Menu */}
-      <AnimatePresence>
-        {isNavOpen && (
-          <MotionDiv
-            className={`bg-opacity-95 fixed inset-0 z-1000 bg-black pt-16 font-mono backdrop-blur-sm lg:hidden`}
-            initial={{ opacity: 0, y: -100 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="flex h-full flex-col overflow-y-auto px-6">
-              <MobileMenuContent />
-              <div className="mt-8">
-                {user ? (
-                  <form onSubmit={handleSignOut}>
-                    <input
-                      type="hidden"
-                      name="pathName"
-                      value={usePathname()}
-                    />
-                    <button
-                      type="submit"
+      {/* Mobile Navigation Menu - Only in development */}
+      {!isProduction && (
+        <AnimatePresence>
+          {isNavOpen && (
+            <MotionDiv
+              className={`bg-opacity-95 fixed inset-0 z-1000 bg-black pt-16 font-mono backdrop-blur-sm lg:hidden`}
+              initial={{ opacity: 0, y: -100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -100 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="flex h-full flex-col overflow-y-auto px-6">
+                <MobileMenuContent />
+                <div className="mt-8">
+                  {user ? (
+                    <form onSubmit={handleSignOut}>
+                      <input
+                        type="hidden"
+                        name="pathName"
+                        value={usePathname()}
+                      />
+                      <button
+                        type="submit"
+                        className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+                      >
+                        <span className="py flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 text-sm font-medium">
+                          Sign out
+                        </span>
+                      </button>
+                    </form>
+                  ) : (
+                    <Link
+                      href="/signin"
                       className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
                     >
-                      <span className="py flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 text-sm font-medium">
-                        Sign out
+                      <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
+                        Beta Access
                       </span>
-                    </button>
-                  </form>
-                ) : (
-                  <Link
-                    href="/signin"
-                    className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
-                  >
-                    <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
-                      Sign in
-                    </span>
-                  </Link>
-                )}
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
-          </MotionDiv>
-        )}
-      </AnimatePresence>
+            </MotionDiv>
+          )}
+        </AnimatePresence>
+      )}
     </>
   );
 }
@@ -272,6 +286,10 @@ export const DesktopMenuContent = ({
   onMouseLeave,
   onLinkClick
 }: MenuModalProps) => {
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -410,6 +428,10 @@ export const DesktopMenuContent = ({
 };
 
 export const MobileMenuContent = () => {
+  if (process.env.NODE_ENV === 'production') {
+    return null;
+  }
+
   return (
     <div className="font-outfit relative z-100 grid grid-cols-2 gap-8 pt-8">
       {allLinks.map((item) => (
