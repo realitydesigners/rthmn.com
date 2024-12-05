@@ -3,11 +3,13 @@ import { useRef } from 'react';
 import { useSceneConfig } from './config';
 import { useSceneManager } from '@/hooks/useSceneManager';
 import Spline from '@splinetool/react-spline';
+import { AnimatePresence } from 'framer-motion';
 
 export default function App() {
   const splineRef = useRef(null);
   const sceneObjects = useSceneConfig(splineRef);
   const visibility = useSceneManager(splineRef, sceneObjects);
+  const finalSceneObjects = useSceneConfig(splineRef, visibility);
 
   const onLoad = (spline: any) => {
     if (!spline) return;
@@ -22,9 +24,11 @@ export default function App() {
           onLoad={onLoad}
         />
       </div>
-      {sceneObjects.map(
-        (obj) => visibility[obj.id] && <div key={obj.id}>{obj.component}</div>
-      )}
+      <AnimatePresence mode="wait">
+        {finalSceneObjects.map((obj) => (
+          <div key={obj.id}>{obj.component}</div>
+        ))}
+      </AnimatePresence>
     </main>
   );
 }

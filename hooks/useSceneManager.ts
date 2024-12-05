@@ -12,7 +12,10 @@ interface SceneObject {
 }
 
 interface SceneVisibility {
-  [key: string]: boolean;
+  [key: string]: {
+    isVisible: boolean;
+    distance: number;
+  };
 }
 
 export const useSceneManager = (
@@ -86,7 +89,10 @@ export const useSceneManager = (
       }
 
       // Update visibility state
-      newStates[id] = distance < show;
+      newStates[id] = {
+        isVisible: distance < hide,
+        distance
+      };
     });
 
     setVisibilityStates(newStates);

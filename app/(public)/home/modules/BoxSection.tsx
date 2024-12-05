@@ -1,6 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { MotionDiv } from '@/components/MotionDiv';
 
 // Types
 interface BoxDimensions {
@@ -63,9 +65,18 @@ const CONFIGS: ConfigState[] = sequences.map((config) => ({
 
 interface AutoBoxModuleProps {
   splineRef: React.MutableRefObject<any>;
+  visibility?: {
+    isVisible: boolean;
+    distance: number;
+  };
+  hideDistance: number;
 }
 
-export const BoxSection: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
+export const BoxSection: React.FC<AutoBoxModuleProps> = ({
+  splineRef,
+  visibility,
+  hideDistance
+}) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentConfigIndex, setCurrentConfigIndex] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -269,8 +280,18 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
     playNextConfig();
   }, [currentConfigIndex, isAnimating, isInitialized]);
 
+  const isVisible = visibility?.isVisible && visibility.distance < hideDistance;
+
   return (
-    <div className="fixed right-0 -bottom-500 mr-2 flex w-[400px] flex-col gap-2">
+    <MotionDiv
+      initial={{ opacity: 0, x: 20 }}
+      animate={{
+        opacity: isVisible ? 1 : 0,
+        x: isVisible ? 0 : 20
+      }}
+      transition={{ duration: 0.5 }}
+      className="fixed right-0 -bottom-0 mr-2 flex w-[400px] flex-col gap-2"
+    >
       <div className="overflow-hidden rounded-md border border-[#222] bg-black/80 shadow-xl backdrop-blur-lg">
         {/* Header */}
         <div className="font-kodemono flex h-10 items-center justify-between border-b border-[#222]/50 px-4">
@@ -345,6 +366,6 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({ splineRef }) => {
           </div>
         </div>
       </div>
-    </div>
+    </MotionDiv>
   );
 };

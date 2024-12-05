@@ -3,7 +3,17 @@ import { useMemo } from 'react';
 import { BoxSection } from './modules/BoxSection';
 import { BoxInfo } from './modules/BoxInfo';
 
-export const useSceneConfig = (splineRef: any) => {
+interface SceneVisibility {
+  [key: string]: {
+    isVisible: boolean;
+    distance: number;
+  };
+}
+
+export const useSceneConfig = (
+  splineRef: any,
+  visibility?: SceneVisibility
+) => {
   return useMemo(
     () => [
       {
@@ -17,16 +27,28 @@ export const useSceneConfig = (splineRef: any) => {
         name: 'BoxSection',
         show: 1000,
         hide: 1100,
-        component: <BoxSection splineRef={splineRef} />
+        component: (
+          <BoxSection
+            splineRef={splineRef}
+            visibility={visibility?.['boxsection-controls']}
+            hideDistance={1100}
+          />
+        )
       },
       {
         id: 'boxsection-info',
         name: 'BoxSection',
-        show: 850,
-        hide: 1100,
-        component: <BoxInfo splineRef={splineRef} />
+        show: 500,
+        hide: 1000,
+        component: (
+          <BoxInfo
+            splineRef={splineRef}
+            visibility={visibility?.['boxsection-info']}
+            hideDistance={850}
+          />
+        )
       }
     ],
-    [splineRef]
+    [splineRef, visibility]
   );
 };
