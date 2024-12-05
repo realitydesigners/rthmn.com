@@ -26,7 +26,7 @@ export default function ClientPage({ page }: { page: PageData }) {
   return (
     <BackgroundGrid>
       {/* Top Beta Access Button - Added pt-20 */}
-      <div className="fixed top-0 right-6 z-50 pt-20">
+      <div className="fixed top-0 right-6 z-50 pt-10">
         <Link
           href="/signin"
           className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
@@ -37,7 +37,7 @@ export default function ClientPage({ page }: { page: PageData }) {
         </Link>
       </div>
       {/* Social Media Links - Added pt-20 */}
-      <div className="fixed top-0 left-6 z-50 flex space-x-6 pt-20">
+      <div className="fixed top-0 left-6 z-50 flex space-x-6 pt-10">
         {socialMediaLinks.map((social, index) => (
           <Link
             key={index}
