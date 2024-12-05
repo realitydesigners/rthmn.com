@@ -153,13 +153,13 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                     >
                       Account
                     </Link>
-                    <Link
+                    {/* <Link
                       href="/settings"
                       className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]"
                       role="menuitem"
                     >
                       Settings
-                    </Link>
+                    </Link> */}
                     <button
                       onClick={handleSignOut}
                       disabled={isSigningOut}
