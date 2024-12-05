@@ -10,7 +10,7 @@ export const Navbar = () => {
   const { user } = useAuth();
 
   if (!user) {
-    return;
+    return <NavbarSignedOut user={null} />;
   }
 
   return (
