@@ -1,26 +1,14 @@
 'use client';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+
 import { Scene } from '@/components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
 import { FcGoogle } from 'react-icons/fc';
 import { useEffect, useState } from 'react';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
-import { IconType } from 'react-icons';
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
-import { useAuth } from '@/providers/SupabaseProvider';
 
 export default function SignIn() {
-  const router = useRouter();
   const signInWithOAuth = useSignInWithOAuth();
   const [isLoading, setIsLoading] = useState(false);
-  const { session } = useAuth();
-
-  useEffect(() => {
-    if (session) {
-      router.replace('/dashboard');
-    }
-  }, [session, router]);
 
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
