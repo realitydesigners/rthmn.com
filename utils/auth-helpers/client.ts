@@ -31,11 +31,10 @@ export function useSignInWithOAuth() {
 
   return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
     e.preventDefault();
-
-    // Use getURL without path for OAuth redirect
-    const redirectURL = getURL();
-    console.log('Provider:', provider);
-    console.log('Base Redirect URL:', redirectURL);
+    const redirectURL =
+      process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000'
+        : 'https://www.rthmn.com';
 
     if (provider === 'discord') {
       // Add discord-specific scopes
@@ -43,7 +42,7 @@ export function useSignInWithOAuth() {
         provider,
         options: {
           redirectTo: redirectURL,
-          scopes: 'identify'
+          scopes: 'identify' // Add any additional scopes you need
         }
       });
     } else {
