@@ -2,7 +2,6 @@
 
 import type { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 import { redirectToPath } from './server';
-import { getURL } from '@/utils/helpers';
 import type { Provider } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 
@@ -33,8 +32,8 @@ export function useSignInWithOAuth() {
     e.preventDefault();
     const redirectURL =
       process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000'
-        : 'https://www.rthmn.com';
+        ? 'http://localhost:3000/dashboard'
+        : 'https://www.rthmn.com/dashboard';
 
     if (provider === 'discord') {
       // Add discord-specific scopes
