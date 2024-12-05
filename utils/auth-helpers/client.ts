@@ -30,25 +30,30 @@ export function useSignInWithOAuth() {
 
   return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
     e.preventDefault();
-    const redirectURL =
+    const baseURL =
       process.env.NODE_ENV === 'development'
-        ? 'http://localhost:3000/dashboard'
-        : 'https://www.rthmn.com/dashboard';
+        ? 'http://localhost:3000'
+        : 'https://www.rthmn.com';
 
     if (provider === 'discord') {
-      // Add discord-specific scopes
       await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: redirectURL,
-          scopes: 'identify' // Add any additional scopes you need
+          redirectTo: `${baseURL}/dashboard`,
+          scopes: 'identify',
+          queryParams: {
+            callback_url: `${baseURL}/api/auth/callback`
+          }
         }
       });
     } else {
       await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: redirectURL
+          redirectTo: `${baseURL}/dashboard`,
+          queryParams: {
+            callback_url: `${baseURL}/api/auth/callback`
+          }
         }
       });
     }
