@@ -68,14 +68,13 @@ interface AutoBoxModuleProps {
   visibility?: {
     isVisible: boolean;
     distance: number;
+    isScaled: boolean;
   };
-  hideDistance: number;
 }
 
 export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   splineRef,
-  visibility,
-  hideDistance
+  visibility
 }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentConfigIndex, setCurrentConfigIndex] = useState(0);
@@ -280,89 +279,101 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
     playNextConfig();
   }, [currentConfigIndex, isAnimating, isInitialized]);
 
-  const isVisible = visibility?.isVisible && visibility.distance < hideDistance;
-
   return (
     <MotionDiv
       initial={{ opacity: 0, x: 20 }}
       animate={{
-        opacity: isVisible ? 1 : 0,
-        x: isVisible ? 0 : 20
+        opacity: visibility?.isVisible ? 1 : 0,
+        x: visibility?.isVisible ? 0 : 20
       }}
       transition={{ duration: 0.5 }}
-      className="fixed right-0 -bottom-0 mr-2 flex w-[400px] flex-col gap-2"
+      className="fixed right-8 bottom-8 w-[320px]"
     >
-      <div className="overflow-hidden rounded-md border border-[#222] bg-black/80 shadow-xl backdrop-blur-lg">
-        {/* Header */}
-        <div className="font-kodemono flex h-10 items-center justify-between border-b border-[#222]/50 px-4">
-          <div className="flex items-center gap-3">
-            <div className="h-2 w-2 animate-pulse rounded-full bg-blue-500/50" />
-            <span className="text-xs font-medium tracking-wider text-[#818181]">
-              SEQUENCE VISUALIZER
+      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/90 shadow-2xl backdrop-blur-lg">
+        {/* Enhanced Glow Effects */}
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_50%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(59,130,246,0.03),transparent_50%)]" />
+        </div>
+
+        {/* Ultra Compact Header */}
+        <div className="flex h-8 items-center justify-between px-3">
+          <div className="flex items-center gap-2">
+            <div className="relative flex items-center gap-1">
+              <div className="h-1 w-1 rounded-full bg-blue-400" />
+              <div className="h-1 w-1 rounded-full bg-blue-400/50" />
+              <div className="h-1 w-1 rounded-full bg-blue-400/20" />
+            </div>
+            <span className="font-kodemono text-[10px] tracking-wider text-white/40">
+              {currentConfigIndex + 1}/{CONFIGS.length}
             </span>
           </div>
         </div>
 
-        <div className="divide-y divide-[#222]/30">
+        {/* Pattern Display */}
+        <div className="space-y-3 p-3">
           {/* Sequence Visualization */}
-          <div className="p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <span className="font-kodemono text-[11px] text-[#666] uppercase">
-                Pattern {currentConfigIndex + 1}/{CONFIGS.length}
-              </span>
-              <span className="font-mono text-[10px] text-[#444]">
-                {sequences[currentConfigIndex].join('')}
-              </span>
-            </div>
-
-            {/* Abstract Visualization */}
-            <div className="relative h-16 w-full overflow-hidden rounded-md bg-[#111]">
-              <div className="absolute inset-0 flex items-center justify-center">
-                {sequences[currentConfigIndex].map((value, idx) => (
-                  <div
-                    key={idx}
-                    className={`mx-0.5 h-12 w-1 transform transition-all duration-500 ${value === 1 ? 'bg-blue-400/40' : 'bg-blue-300/20'} ${value === 1 ? 'scale-y-100' : 'scale-y-50'} `}
-                    style={{
-                      transform: `scaleY(${value === 1 ? '1' : '0.5'}) translateY(${value === 1 ? '-4px' : '4px'})`,
-                      transition: 'transform 0.5s ease'
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Current State */}
-          <div className="p-4">
-            <div className="flex flex-wrap gap-1">
-              {boxStates.map((box, index) => (
-                <div
-                  key={box.name}
-                  className={`relative flex h-12 w-12 items-center justify-center rounded ${box.position === 1 ? 'bg-blue-500/10' : 'bg-blue-300/5'} transition-all duration-300`}
-                >
-                  <div
-                    className={`absolute inset-0 border ${box.position === 1 ? 'border-blue-400/30' : 'border-blue-300/20'} rounded transition-all duration-300`}
-                  />
-                  <span
-                    className={`font-mono text-xs font-bold ${box.position === 1 ? 'text-blue-400' : 'text-blue-300/70'} `}
-                  >
-                    {box.position === 1 ? '+1' : '-1'}
-                  </span>
-                </div>
+          <div className="relative h-14 w-full overflow-hidden rounded-lg bg-gradient-to-b from-black/60 to-black/40">
+            <div className="absolute inset-0 flex items-center justify-center gap-0.5">
+              {sequences[currentConfigIndex].map((value, idx) => (
+                <MotionDiv
+                  key={idx}
+                  initial={{ height: 0 }}
+                  animate={{
+                    height: value === 1 ? 36 : 18,
+                    y: value === 1 ? -2 : 2
+                  }}
+                  transition={{
+                    type: 'spring',
+                    stiffness: 300,
+                    damping: 20
+                  }}
+                  className={`w-[3px] rounded-full ${
+                    value === 1
+                      ? 'bg-gradient-to-t from-blue-400/10 via-blue-400/30 to-blue-400/50'
+                      : 'bg-gradient-to-b from-blue-300/5 via-blue-300/10 to-blue-300/20'
+                  }`}
+                />
               ))}
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="px-4 py-2">
-            <div className="h-0.5 w-full overflow-hidden rounded-full bg-[#222]/30">
-              <div
-                className="h-full bg-blue-400/30 transition-all duration-500"
-                style={{
-                  width: `${(currentConfigIndex / (CONFIGS.length - 1)) * 100}%`
-                }}
-              />
-            </div>
+          {/* Compact Box Grid */}
+          <div className="grid grid-cols-8 gap-[2px]">
+            {boxStates.map((box, index) => (
+              <div key={box.name} className="group relative">
+                <div
+                  className={`relative flex h-8 w-full flex-col items-center justify-center rounded border transition-all duration-300 ${
+                    box.position === 1
+                      ? 'border-blue-400/20 bg-gradient-to-b from-blue-500/10 to-blue-500/5 hover:border-blue-400/40'
+                      : 'border-blue-300/10 bg-gradient-to-b from-blue-300/5 to-transparent hover:border-blue-300/20'
+                  }`}
+                >
+                  <span
+                    className={`font-mono text-[10px] font-bold ${
+                      box.position === 1 ? 'text-blue-400' : 'text-blue-300/50'
+                    }`}
+                  >
+                    {box.position === 1 ? '1' : '0'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Sleek Progress Bar */}
+        <div className="px-3 pb-2">
+          <div className="relative h-[2px] w-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+            <div
+              className="absolute h-full bg-gradient-to-r from-blue-400/40 to-blue-400/60 transition-all duration-500"
+              style={{
+                width: `${(currentConfigIndex / (CONFIGS.length - 1)) * 100}%`,
+                boxShadow: '0 0 20px rgba(59,130,246,0.3)'
+              }}
+            />
           </div>
         </div>
       </div>

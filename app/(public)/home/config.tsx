@@ -7,6 +7,7 @@ interface SceneVisibility {
   [key: string]: {
     isVisible: boolean;
     distance: number;
+    isScaled: boolean;
   };
 }
 
@@ -19,34 +20,33 @@ export const useSceneConfig = (
       {
         id: 'datastream',
         name: 'DataStream',
-        show: 0,
-        hide: 6800
+        scaleIn: 0,
+        scaleOut: 6800,
+        fadeIn: 0,
+        fadeOut: 6800
       },
       {
         id: 'boxsection-controls',
         name: 'BoxSection',
-        show: 1000,
-        hide: 1100,
+        scaleIn: 1000,
+        scaleOut: 1100,
+        fadeIn: 800,
+        fadeOut: 1000,
         component: (
           <BoxSection
             splineRef={splineRef}
             visibility={visibility?.['boxsection-controls']}
-            hideDistance={1100}
           />
         )
       },
       {
         id: 'boxsection-info',
         name: 'BoxSection',
-        show: 500,
-        hide: 1000,
-        component: (
-          <BoxInfo
-            splineRef={splineRef}
-            visibility={visibility?.['boxsection-info']}
-            hideDistance={850}
-          />
-        )
+        scaleIn: 500,
+        scaleOut: 1000,
+        fadeIn: 600,
+        fadeOut: 850,
+        component: <BoxInfo visibility={visibility?.['boxsection-info']} />
       }
     ],
     [splineRef, visibility]

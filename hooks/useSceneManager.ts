@@ -4,17 +4,18 @@ import { useSuppressSplineError } from './useSupressSplineError';
 interface SceneObject {
   id: string;
   name: string;
-  show: number;
-  hide: number;
-  debug?: boolean;
+  scaleIn: number;
+  scaleOut: number;
+  fadeIn: number;
+  fadeOut: number;
   component?: ReactNode;
-  originalScale?: { x: number; y: number; z: number };
 }
 
 interface SceneVisibility {
   [key: string]: {
     isVisible: boolean;
     distance: number;
+    isScaled: boolean;
   };
 }
 
@@ -56,42 +57,26 @@ export const useSceneManager = (
 
     const newStates: SceneVisibility = {};
 
-    objects.forEach(({ id, name, show, hide, debug }) => {
+    objects.forEach(({ id, name, scaleIn, scaleOut, fadeIn, fadeOut }) => {
       const object = spline.findObjectByName(name);
       if (!object) return;
 
-      // Initialize object's original scale if not already stored
       initializeObject(name, object);
       const originalScale = originalScales.current[name];
-
       const distance = calculateDistance(camera.position, object.position);
 
-      // Debug logging
-      if (
-        debug &&
-        Math.abs(camera.position.y - (lastPositions.current[name] || 0)) > 0.1
-      ) {
-        console.log(`${name} Update:`, {
-          currentY: Math.round(camera.position.y),
-          objectY: Math.round(object.position.y),
-          distance: Math.round(distance),
-          scale: object.scale
-        });
-        lastPositions.current[name] = camera.position.y;
-      }
-
-      // Handle object scaling
-      if (distance > hide) {
+      // Handle Spline object scaling
+      if (distance > scaleOut) {
         object.scale.set(0, 0, 0);
       } else {
-        // Restore original scale
         object.scale.set(originalScale.x, originalScale.y, originalScale.z);
       }
 
-      // Update visibility state
+      // Handle component visibility
       newStates[id] = {
-        isVisible: distance < hide,
-        distance
+        isVisible: distance >= fadeIn && distance < fadeOut,
+        distance,
+        isScaled: distance < scaleOut
       };
     });
 
