@@ -25,6 +25,17 @@ interface PageData {
 export default function ClientPage({ page }: { page: PageData }) {
   return (
     <BackgroundGrid>
+      {/* Top Beta Access Button - Added pt-20 */}
+      <div className="fixed top-0 right-6 z-50 pt-20">
+        <Link
+          href="/signin"
+          className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+        >
+          <span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
+            Beta Access
+          </span>
+        </Link>
+      </div>
       {/* Social Media Links - Added pt-20 */}
       <div className="fixed top-0 left-6 z-50 flex space-x-6 pt-20">
         {socialMediaLinks.map((social, index) => (
