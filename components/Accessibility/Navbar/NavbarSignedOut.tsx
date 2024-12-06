@@ -95,7 +95,7 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({
 export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const { session, signOut } = useAuth();
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isproduction = process.env.NODE_ENV === 'production';
 
   useEffect(() => {
     if (isNavOpen) {
@@ -141,7 +141,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 
   return (
     <>
-      {isNavOpen && !isProduction && (
+      {isNavOpen && !isproduction && (
         <div
           className="fixed inset-0 z-1000 bg-black/75 backdrop-blur-sm lg:hidden"
           onClick={handleBackdropClick}
@@ -166,19 +166,19 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               <div className="flex h-8 w-8 items-center">
                 <LogoIcon />
               </div>
-              <div className={`font-russo text-2xl font-bold`}>RTHMN</div>
+              <div className={`font-russo text-xl lg:text-2xl`}>RTHMN</div>
             </Link>
 
             <div className="flex items-center space-x-4">
-              {!isProduction && (
+              {!isproduction && (
                 <nav className="hidden space-x-4 lg:flex">
                   <Links />
                 </nav>
               )}
             </div>
-            <div className="hidden items-center space-x-4 pr-2 lg:flex">
+            <div className="flex items-center space-x-4 pr-2">
               <MotionDiv
-                className="flex hidden lg:block"
+                className="mr-2 flex"
                 variants={linkVariants}
                 custom={3}
               >
@@ -211,7 +211,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               </MotionDiv>
             </div>
 
-            {!isProduction && (
+            {/* {!isproduction && (
               <button
                 onClick={toggleNav}
                 className="menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden"
@@ -219,13 +219,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               >
                 <MenuIcon isOpen={isNavOpen} />
               </button>
-            )}
+            )} */}
           </div>
         </div>
       </MotionDiv>
 
-      {/* Mobile Navigation Menu - Only in development */}
-      {!isProduction && (
+      {/* Mobile Navigation Menu - Only in production */}
+      {!isproduction && (
         <AnimatePresence>
           {isNavOpen && (
             <MotionDiv
