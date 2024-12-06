@@ -184,4 +184,79 @@
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* Technical Overlay Frame */
+.technical-frame {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.technical-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  margin: 12px;
+}
+
+.technical-frame::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.01);
+}
+
+/* Corner Accents */
+.technical-frame-corner {
+  position: fixed;
+  width: 64px;
+  height: 64px;
+  pointer-events: none;
+  z-index: 101;
+}
+
+.technical-frame-corner::before,
+.technical-frame-corner::after {
+  content: '';
+  position: absolute;
+  background: linear-gradient(to var(--direction, right), rgba(255, 255, 255, 0.1), transparent);
+  opacity: 0.5;
+}
+
+.technical-frame-corner::before {
+  height: 1px;
+  width: 100%;
+}
+
+.technical-frame-corner::after {
+  width: 1px;
+  height: 100%;
+}
+
+.technical-frame-corner-tl {
+  top: 12px;
+  left: 12px;
+}
+
+.technical-frame-corner-tr {
+  top: 12px;
+  right: 12px;
+  transform: rotate(90deg);
+}
+
+.technical-frame-corner-bl {
+  bottom: 12px;
+  left: 12px;
+  transform: rotate(-90deg);
+}
+
+.technical-frame-corner-br {
+  bottom: 12px;
+  right: 12px;
+  transform: rotate(180deg);
 } 
