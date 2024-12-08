@@ -1,5 +1,5 @@
 'use client';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { useSceneConfig, Buttons, ButtonsMap } from './config';
 import { useSceneManager } from '@/hooks/useSceneManager';
 import Spline from '@splinetool/react-spline';
@@ -16,10 +16,15 @@ export default function HomeClient({
   products: any[];
 }) {
   const splineRef = useRef(null);
+  const [hoveredButton, setHoveredButton] = useState<string | null>(null);
   const sceneObjects = useSceneConfig(splineRef);
 
-  const { visibilityStates, handleButtonClick, triggerSceneTransition } =
-    useSceneManager(splineRef, sceneObjects, ButtonsMap);
+  const {
+    visibilityStates,
+    handleButtonClick,
+    triggerSceneTransition,
+    currentSection
+  } = useSceneManager(splineRef, sceneObjects, ButtonsMap);
 
   const finalSceneObjects = useSceneConfig(splineRef, visibilityStates);
 
@@ -34,16 +39,42 @@ export default function HomeClient({
           }}
         />
       </div>
-      <div className="fixed right-4 bottom-4 z-10 flex flex-col gap-2">
+
+      {/* Navigation Dots */}
+      <div className="fixed bottom-8 left-1/2 flex -translate-x-1/2 flex-row items-center gap-6">
         {Buttons.map((button) => (
-          <button
-            key={button.sectionId}
-            onClick={() => handleButtonClick(button.sectionId)}
-            className="rounded bg-blue-500 px-4 py-2 text-white"
-            aria-label={`Trigger ${button.name}`}
-          >
-            {button.name}
-          </button>
+          <div key={button.sectionId} className="group relative">
+            {/* Dot button */}
+            <button
+              onClick={() => handleButtonClick(button.sectionId)}
+              onMouseEnter={() => setHoveredButton(button.sectionId)}
+              onMouseLeave={() => setHoveredButton(null)}
+              className={`h-3 w-3 rounded-full transition-all duration-300 ${
+                currentSection === button.sectionId
+                  ? 'scale-125 bg-blue-500'
+                  : 'bg-gray-400 hover:bg-blue-400'
+              }`}
+              aria-label={`Navigate to ${button.name}`}
+            />
+
+            {/* Label that appears on hover */}
+            <div
+              className={`absolute bottom-full left-1/2 mb-2 -translate-x-1/2 rounded px-2 py-1 whitespace-nowrap transition-all duration-200 ${
+                hoveredButton === button.sectionId
+                  ? 'translate-y-0 opacity-100'
+                  : 'translate-y-1 opacity-0'
+              } `}
+            >
+              <span className="text-sm font-medium text-gray-700">
+                {button.name}
+              </span>
+            </div>
+
+            {/* Active indicator line */}
+            {currentSection === button.sectionId && (
+              <div className="absolute -bottom-2 left-1/2 h-0.5 w-8 -translate-x-1/2 bg-blue-500 transition-all duration-300" />
+            )}
+          </div>
         ))}
       </div>
 

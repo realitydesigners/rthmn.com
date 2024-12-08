@@ -13,7 +13,7 @@ export default async function HomePage() {
   const supabase = await createClient();
   const products = await getProducts(supabase);
 
-  const url = 'https://prod.spline.design/WpLSES6seOFsIOi1/scene.splinecode';
+  const url = 'https://prod.spline.design/FhwJgKysWOeoB4hh/scene.splinecode';
 
   return (
     <HomeClient
