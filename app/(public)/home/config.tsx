@@ -1,15 +1,8 @@
 'use client';
 import { useMemo } from 'react';
-import { BoxSection } from './modules/BoxSection';
-import { BoxInfo } from './modules/BoxInfo';
+import { BoxSection, BoxInfo } from './modules';
 
-export type SceneState = {
-  id: string;
-  buttonName: string; // Name in Spline scene
-  // Add any other state-specific properties here
-};
-
-export const SCENE_STATES: Record<string, SceneState> = {
+export const Buttons: Record<string, { id: string; buttonName: string }> = {
   baseState: {
     id: 'baseState',
     buttonName: 'BaseState'
@@ -26,7 +19,6 @@ export const SCENE_STATES: Record<string, SceneState> = {
     id: 'state3',
     buttonName: 'State3'
   }
-  // Add more states as needed...
 };
 
 export const useSceneConfig = (

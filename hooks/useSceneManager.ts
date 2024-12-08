@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, ReactNode } from 'react';
+import { useRef, useEffect, useState, ReactNode, useCallback } from 'react';
 import { useSuppressSplineError } from './useSupressSplineError';
 
 interface SceneObject {
@@ -19,11 +19,20 @@ interface SceneVisibility {
   };
 }
 
+interface SplineEventTarget {
+  name: string;
+  id: string;
+}
+
+type SplineMouseEvent = CustomEvent & {
+  target: SplineEventTarget;
+};
+
 export const useSceneManager = (
   splineRef: React.MutableRefObject<any>,
-  objects: SceneObject[]
+  objects: SceneObject[],
+  sceneStates?: Record<string, { id: string; buttonName: string }>
 ) => {
-  // Suppress Spline errors
   useSuppressSplineError();
 
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
@@ -33,7 +42,46 @@ export const useSceneManager = (
   >({});
   const [visibilityStates, setVisibilityStates] = useState<SceneVisibility>({});
 
-  // Store original scales when objects are first found
+  const handleStateChange = useCallback(
+    (stateId: string, source: 'button' | 'scene') => {
+      const state = sceneStates?.[stateId];
+      if (!state || !splineRef.current) return;
+
+      if (source === 'button') {
+        try {
+          const button = splineRef.current.findObjectByName(state.buttonName);
+          button?.emitEvent('mouseDown');
+        } catch (error) {
+          console.warn('Failed to emit event:', error);
+        }
+      }
+    },
+    [sceneStates]
+  );
+
+  const setupMouseHandlers = useCallback(
+    (spline: any) => {
+      const handleMouseDown = (e: Event) => {
+        const splineEvent = e as SplineMouseEvent;
+        const stateId =
+          splineEvent.target.name.charAt(0).toLowerCase() +
+          splineEvent.target.name.slice(1);
+
+        if (sceneStates?.[stateId]) {
+          if (process.env.NODE_ENV === 'development') {
+            console.log(`Transitioning to ${stateId}`);
+          }
+          handleStateChange(stateId, 'scene');
+        }
+      };
+
+      spline.addEventListener('mouseDown', handleMouseDown);
+      return () => spline.removeEventListener('mouseDown', handleMouseDown);
+    },
+    [handleStateChange, sceneStates]
+  );
+
+  // Original distance and scaling logic...
   const initializeObject = (name: string, object: any) => {
     if (!originalScales.current[name]) {
       originalScales.current[name] = {
@@ -65,14 +113,12 @@ export const useSceneManager = (
       const originalScale = originalScales.current[name];
       const distance = calculateDistance(camera.position, object.position);
 
-      // Handle Spline object scaling
       if (distance > scaleOut) {
         object.scale.set(0, 0, 0);
       } else {
         object.scale.set(originalScale.x, originalScale.y, originalScale.z);
       }
 
-      // Handle component visibility
       newStates[id] = {
         isVisible: distance >= fadeIn && distance < fadeOut,
         distance,
@@ -106,11 +152,17 @@ export const useSceneManager = (
     if (!spline) return;
 
     checkObjectDistances(spline);
+    if (sceneStates) {
+      setupMouseHandlers(spline);
+    }
 
     spline.addEventListener('cameraMove', () => {
       checkObjectDistances(spline);
     });
-  }, [objects]);
+  }, [objects, setupMouseHandlers]);
 
-  return visibilityStates;
+  return {
+    visibilityStates,
+    handleStateChange
+  };
 };
