@@ -1,5 +1,5 @@
 'use client';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 interface CardProps {
@@ -18,7 +18,7 @@ const hexToRGBA = (hex: string, alpha: number) => {
 
 const FlowingRadialEffect = ({ color }: { color: string }) => (
   <div className="absolute inset-0">
-    <MotionDiv
+    <motion.div
       className="absolute inset-0"
       animate={{
         background: [
@@ -36,7 +36,7 @@ const FlowingRadialEffect = ({ color }: { color: string }) => (
 
 const DynamicBackground = ({ color }: { color: string }) => (
   <div className="absolute inset-0">
-    <MotionDiv
+    <motion.div
       className="absolute inset-0"
       animate={{
         backgroundPosition: ['0% 0%', '100% 100%'],
@@ -83,7 +83,7 @@ export function Card({
   index = 0
 }: CardProps) {
   return (
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, delay: index * 0.2 }}
@@ -95,6 +95,6 @@ export function Card({
       <GradientOverlay />
       <div className="relative z-10">{children}</div>
       <HoverEffect color={color} />
-    </MotionDiv>
+    </motion.div>
   );
 }

@@ -5,7 +5,7 @@ import { checkoutWithStripe } from '@/utils/stripe/server';
 import type { User } from '@supabase/supabase-js';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import {
   FaCheck,
   FaArrowRight,
@@ -105,7 +105,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Enhanced Header Section */}
-        <MotionDiv
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -118,10 +118,10 @@ export function SectionPricing({ user, products, subscription }: Props) {
             Join an elite community of traders using trading tools from the
             future.
           </p>
-        </MotionDiv>
+        </motion.div>
 
         {/* Single Pricing Card */}
-        <MotionDiv
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -210,7 +210,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
               </button>
             </div>
           </div>
-        </MotionDiv>
+        </motion.div>
       </div>
 
       {/* Add floating elements */}

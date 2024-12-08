@@ -1,6 +1,6 @@
 'use client';
 import { StartButton } from '@/components/Buttons/StartNowButton';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 import { FaCode, FaCube, FaChartLine, FaBrain } from 'react-icons/fa';
 
@@ -38,7 +38,7 @@ const FEATURES = [
 
 export const BoxInfo: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
   return (
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{
         opacity: visibility?.isVisible ? 1 : 0,
@@ -67,7 +67,7 @@ export const BoxInfo: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
         {/* Features Grid */}
         {/* <div className="grid grid-cols-2 gap-3">
           {FEATURES.map((feature, index) => (
-            <MotionDiv
+            <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -93,10 +93,10 @@ export const BoxInfo: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
                   {feature.description}
                 </p>
               </div>
-            </MotionDiv>
+            </motion.div>
           ))}
         </div> */}
       </div>
-    </MotionDiv>
+    </motion.div>
   );
 };

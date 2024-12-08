@@ -1,41 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { FaChevronDown } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { MotionDiv } from '@/components/MotionDiv';
 
-// Types
-interface BoxDimensions {
-  size: number;
-  scale: number;
-  position: { x: number; y: number; z: number };
-}
-
-type BoxPosition = 1 | -1;
-type BoxConfig = 1 | -1;
-type BoxesConfig = [
-  BoxConfig,
-  BoxConfig,
-  BoxConfig,
-  BoxConfig,
-  BoxConfig,
-  BoxConfig,
-  BoxConfig,
-  BoxConfig
-];
-
-interface BoxState {
-  name: string;
-  position: BoxPosition;
-}
-
-interface ConfigState {
-  config: BoxesConfig;
-  label: string;
-}
-
-// Define sequences
-const sequences: BoxesConfig[] = [
+const sequences: any[] = [
   [1, 1, 1, 1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1, -1],
   [1, 1, 1, 1, 1, 1, -1, -1],
@@ -55,16 +22,16 @@ const sequences: BoxesConfig[] = [
   [1, 1, 1, -1, -1, 1, 1, 1],
   [1, 1, 1, -1, 1, 1, 1, 1],
   [1, 1, 1, 1, 1, 1, 1, 1]
-] as BoxesConfig[];
+] as any[];
 
 // Convert sequences to ConfigState format
-const CONFIGS: ConfigState[] = sequences.map((config) => ({
+const CONFIGS: any[] = sequences.map((config) => ({
   config,
   label: config.map((n) => (n === 1 ? 'P' : 'N')).join('') // P for Positive, N for Negative
 }));
 
 interface AutoBoxModuleProps {
-  splineRef: React.MutableRefObject<any>;
+  splineRef: any;
   visibility?: {
     isVisible: boolean;
     distance: number;
@@ -79,7 +46,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   const [isAnimating, setIsAnimating] = useState(false);
   const [currentConfigIndex, setCurrentConfigIndex] = useState(0);
   const [isInitialized, setIsInitialized] = useState(false);
-  const [boxStates, setBoxStates] = useState<BoxState[]>([
+  const [boxStates, setBoxStates] = useState<any[]>([
     { name: 'Box 1', position: 1 },
     { name: 'Box 2', position: 1 },
     { name: 'Box 3', position: 1 },
@@ -93,7 +60,6 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   // Constants
   const ANIMATION_DURATION = 500;
   const ANIMATION_STEPS = 30;
-  const CORNER_THRESHOLD = 0.05;
   const GREEN_BOXES = ['1g', '2g', '3g', '4g', '5g', '6g', '7g', '8g'];
 
   // Helper functions
@@ -101,7 +67,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
     index: number,
     baseSize: number,
     scaleFactor: number
-  ): BoxDimensions => {
+  ): any => {
     const scale = Math.pow(1 / scaleFactor, index);
     return {
       size: baseSize * scale,
@@ -111,8 +77,8 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   };
 
   const calculateCornerOffset = (
-    currentBox: BoxDimensions,
-    parentBox: BoxDimensions,
+    currentBox: any,
+    parentBox: any,
     scaleFactor: number
   ): number => {
     const cornerDistance =
@@ -122,7 +88,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   };
 
   // Box manipulation functions
-  const applyBoxConfiguration = async (config: BoxesConfig) => {
+  const applyBoxConfiguration = async (config: any) => {
     if (isAnimating || !splineRef.current) return;
 
     setIsAnimating(true);
@@ -135,15 +101,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 
     try {
       const spline = splineRef.current;
-      const boxes = new Map<
-        number,
-        {
-          box: any;
-          startY: number;
-          cornerOffset: number;
-          finalY: number;
-        }
-      >();
+      const boxes = new Map();
 
       let currentParentY = 0;
       for (let i = 1; i <= 7; i++) {
@@ -280,7 +238,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   }, [currentConfigIndex, isAnimating, isInitialized]);
 
   return (
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{
         opacity: visibility?.isVisible ? 1 : 0,
@@ -317,7 +275,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
           <div className="relative h-14 w-full overflow-hidden rounded-lg bg-gradient-to-b from-black/60 to-black/40">
             <div className="absolute inset-0 flex items-center justify-center gap-0.5">
               {sequences[currentConfigIndex].map((value, idx) => (
-                <MotionDiv
+                <motion.div
                   key={idx}
                   initial={{ height: 0 }}
                   animate={{
@@ -377,6 +335,6 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
           </div>
         </div>
       </div>
-    </MotionDiv>
+    </motion.div>
   );
 };

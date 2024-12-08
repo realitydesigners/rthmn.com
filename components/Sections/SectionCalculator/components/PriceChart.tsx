@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 interface PriceChartProps {
   entryPrice: number;
@@ -24,7 +24,7 @@ export const PriceChart = memo(
 
         <div className="relative h-full">
           {/* Take Profit Line */}
-          <MotionDiv
+          <motion.div
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
             transition={{ duration: 0.5 }}
@@ -38,10 +38,10 @@ export const PriceChart = memo(
                 </span>
               </div>
             </div>
-          </MotionDiv>
+          </motion.div>
 
           {/* Entry Price Line */}
-          <MotionDiv
+          <motion.div
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -55,10 +55,10 @@ export const PriceChart = memo(
                 </span>
               </div>
             </div>
-          </MotionDiv>
+          </motion.div>
 
           {/* Stop Loss Line */}
-          <MotionDiv
+          <motion.div
             initial={{ width: 0 }}
             animate={{ width: '100%' }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -72,10 +72,10 @@ export const PriceChart = memo(
                 </span>
               </div>
             </div>
-          </MotionDiv>
+          </motion.div>
 
           {/* Direction Arrow */}
-          <MotionDiv
+          <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -98,7 +98,7 @@ export const PriceChart = memo(
                 }`}
               />
             </div>
-          </MotionDiv>
+          </motion.div>
 
           {/* Risk/Reward Label */}
           <div className="absolute bottom-4 left-4">

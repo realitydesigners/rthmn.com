@@ -1,39 +1,46 @@
-import { useRef, useEffect, useState, ReactNode } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useSuppressSplineError } from './useSupressSplineError';
 
-interface SceneObject {
-  id: string;
-  name: string;
-  scaleIn: number;
-  scaleOut: number;
-  fadeIn: number;
-  fadeOut: number;
-  component?: ReactNode;
-}
-
-interface SceneVisibility {
-  [key: string]: {
-    isVisible: boolean;
-    distance: number;
-    isScaled: boolean;
-  };
-}
-
 export const useSceneManager = (
-  splineRef: React.MutableRefObject<any>,
-  objects: SceneObject[]
+  splineRef: any,
+  objects: {
+    id: string;
+    name: string;
+    scaleIn: number;
+    scaleOut: number;
+    fadeIn: number;
+    fadeOut: number;
+  }[],
+  sceneStates?: {
+    [key: string]: { object: string; sectionId: string; name: string };
+  }
 ) => {
-  // Suppress Spline errors
   useSuppressSplineError();
 
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const lastPositions = useRef<Record<string, number>>({});
-  const originalScales = useRef<
-    Record<string, { x: number; y: number; z: number }>
-  >({});
-  const [visibilityStates, setVisibilityStates] = useState<SceneVisibility>({});
+  const originalScales = useRef<any>({});
+  const [visibilityStates, setVisibilityStates] = useState({});
+  const [isSceneLoaded, setIsSceneLoaded] = useState(false);
+  const [currentSection, setCurrentSection] = useState<string>('');
 
-  // Store original scales when objects are first found
+  const handleButtonClick = useCallback(
+    (stateId: string) => {
+      const state = sceneStates?.[stateId];
+      if (!state || !splineRef.current) return;
+
+      try {
+        const button = splineRef.current.findObjectByName(state.object);
+        button?.emitEvent('mouseDown');
+        window.location.hash = state.sectionId;
+        setCurrentSection(state.sectionId);
+      } catch (error) {
+        console.warn('Failed to emit event:', error);
+      }
+    },
+    [sceneStates]
+  );
+
+  // Original distance and scaling logic...
   const initializeObject = (name: string, object: any) => {
     if (!originalScales.current[name]) {
       originalScales.current[name] = {
@@ -53,9 +60,7 @@ export const useSceneManager = (
 
   const checkObjectDistances = (spline: any) => {
     const camera = spline.findObjectByName('Camera');
-    if (!camera) return;
-
-    const newStates: SceneVisibility = {};
+    const newStates = {};
 
     objects.forEach(({ id, name, scaleIn, scaleOut, fadeIn, fadeOut }) => {
       const object = spline.findObjectByName(name);
@@ -65,14 +70,12 @@ export const useSceneManager = (
       const originalScale = originalScales.current[name];
       const distance = calculateDistance(camera.position, object.position);
 
-      // Handle Spline object scaling
       if (distance > scaleOut) {
         object.scale.set(0, 0, 0);
       } else {
         object.scale.set(originalScale.x, originalScale.y, originalScale.z);
       }
 
-      // Handle component visibility
       newStates[id] = {
         isVisible: distance >= fadeIn && distance < fadeOut,
         distance,
@@ -101,16 +104,25 @@ export const useSceneManager = (
     };
   }, [objects]);
 
-  useEffect(() => {
-    const spline = splineRef.current;
-    if (!spline) return;
+  const triggerSceneTransition = useCallback(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash && sceneStates && Object.keys(sceneStates).includes(hash)) {
+      setTimeout(() => {
+        const button = splineRef.current?.findObjectByName(
+          sceneStates[hash].object
+        );
+        if (button) {
+          button.emitEvent('mouseDown');
+        }
+      }, 500);
+    }
+  }, [sceneStates]);
 
-    checkObjectDistances(spline);
-
-    spline.addEventListener('cameraMove', () => {
-      checkObjectDistances(spline);
-    });
-  }, [objects]);
-
-  return visibilityStates;
+  return {
+    visibilityStates,
+    handleButtonClick,
+    isSceneLoaded,
+    triggerSceneTransition,
+    currentSection
+  };
 };

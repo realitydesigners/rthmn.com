@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, memo, useMemo, useCallback } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import {
   FaCalculator,
@@ -167,7 +167,7 @@ const ResultCard = memo(
     positive?: boolean;
     isInvalid?: boolean;
   }) => (
-    <MotionDiv
+    <motion.div
       whileHover={{ scale: 1.02 }}
       className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm transition-all duration-300"
     >
@@ -199,7 +199,7 @@ const ResultCard = memo(
           </div>
         )}
       </div>
-    </MotionDiv>
+    </motion.div>
   )
 );
 
@@ -368,7 +368,7 @@ export const SectionCalculator = () => {
       </div>
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <MotionDiv
+        <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -382,7 +382,7 @@ export const SectionCalculator = () => {
             Calculate your optimal position size and risk management parameters
             with precision.
           </p>
-        </MotionDiv>
+        </motion.div>
 
         {/* Three Column Layout */}
         <div className="mx-auto flex gap-8">

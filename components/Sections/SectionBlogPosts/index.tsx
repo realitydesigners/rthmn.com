@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { FaArrowRight, FaCalendar, FaClock } from 'react-icons/fa';
 
 export interface Post {
@@ -23,13 +23,13 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
   const block = post.block[0];
 
   return (
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
     >
-      <MotionDiv
+      <motion.div
         whileHover={{ y: -5 }}
         className="group relative h-full overflow-hidden rounded-xl border border-white/10 bg-black/40 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-black/60"
       >
@@ -87,7 +87,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 
           {/* Read More Button - Updated to match NavButton style */}
           <Link href={`/posts/${post.slug.current}`}>
-            <MotionDiv
+            <motion.div
               whileHover={{ x: 5 }}
               className="flex w-fit items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
             >
@@ -95,11 +95,11 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
                 <span>Read Article</span>
                 <FaArrowRight className="h-3 w-3" />
               </span>
-            </MotionDiv>
+            </motion.div>
           </Link>
         </div>
-      </MotionDiv>
-    </MotionDiv>
+      </motion.div>
+    </motion.div>
   );
 };
 
@@ -119,7 +119,7 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
 
       <div className="mx-auto max-w-7xl">
         {/* Section Header */}
-        <MotionDiv
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -132,7 +132,7 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
             Explore our latest thoughts on market analysis, trading strategies,
             and technological innovations.
           </p>
-        </MotionDiv>
+        </motion.div>
 
         {/* Posts Grid */}
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

@@ -9,7 +9,7 @@ import {
   FaSearch,
   FaTags
 } from 'react-icons/fa';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { client } from '@/utils/sanity/lib/client';
 import { PortableText } from '@portabletext/react';
 import { ChangelogTemplate } from '@/components/blocks/templates/ChangelogTemplate';
@@ -45,7 +45,7 @@ const FAQItem = memo(
     });
 
     return (
-      <MotionDiv
+      <motion.div
         ref={ref}
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -89,7 +89,7 @@ const FAQItem = memo(
                 {item.question}
               </h3>
             </div>
-            <MotionDiv
+            <motion.div
               animate={{ rotate: isActive ? 180 : 0 }}
               transition={{ duration: 0.3 }}
               className={`transition-colors duration-300 ${
@@ -99,10 +99,10 @@ const FAQItem = memo(
               }`}
             >
               <FaChevronDown className="h-5 w-5" />
-            </MotionDiv>
+            </motion.div>
           </button>
 
-          <MotionDiv
+          <motion.div
             initial={false}
             animate={{
               height: isActive ? 'auto' : 0,
@@ -131,9 +131,9 @@ const FAQItem = memo(
                 </div>
               )}
             </div>
-          </MotionDiv>
+          </motion.div>
         </div>
-      </MotionDiv>
+      </motion.div>
     );
   }
 );
@@ -307,7 +307,7 @@ export const SectionFAQ: React.FC = () => {
   return (
     <section className="relative min-h-screen overflow-hidden py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <MotionDiv
+        <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
@@ -327,7 +327,7 @@ export const SectionFAQ: React.FC = () => {
               Contact our support team
             </Link>
           </p>
-        </MotionDiv>
+        </motion.div>
         <div className="mx-auto max-w-4xl">
           <SearchInput value={searchQuery} onChange={setSearchQuery} />
           {categories.length > 0 && (
@@ -369,13 +369,13 @@ export const SectionFAQ: React.FC = () => {
                 </div>
                 {/* Show load more button if there are more items */}
                 {displayCount < filteredItems.length && (
-                  <MotionDiv
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
                   >
                     <LoadMoreButton onClick={handleLoadMore} />
-                  </MotionDiv>
+                  </motion.div>
                 )}
 
                 {/* Show results count */}
@@ -387,14 +387,14 @@ export const SectionFAQ: React.FC = () => {
                 </div>
               </>
             ) : (
-              <MotionDiv
+              <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 className="text-center text-gray-400"
               >
                 No questions found matching your criteria
-              </MotionDiv>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>

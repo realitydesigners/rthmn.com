@@ -9,7 +9,7 @@ import React, {
 import { AnimatePresence } from 'motion/react';
 import type { Box, BoxSlice } from '@/types/types';
 import { useDashboard } from '@/providers/DashboardProvider';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 interface BoxComponentProps {
   slice: BoxSlice | null;
@@ -105,7 +105,7 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
         };
 
         return (
-          <MotionDiv
+          <motion.div
             key={`${slice?.timestamp}-${index}`}
             className={`absolute border border-black`}
             style={dynamicStyles}
@@ -116,7 +116,7 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
           >
             {index < sortedBoxes.length - 1 &&
               renderBox(sortedBoxes[index + 1], index + 1, boxColor)}
-          </MotionDiv>
+          </motion.div>
         );
       },
       [maxSize, containerSize, boxColors, slice?.timestamp]
@@ -131,7 +131,7 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
     );
 
     return (
-      <MotionDiv
+      <motion.div
         ref={boxRef}
         className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${className}`}
         style={{
@@ -145,25 +145,25 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
         <AnimatePresence>
           {(!slice || !slice.boxes || slice.boxes.length === 0) &&
             !isLoading && (
-              <MotionDiv
+              <motion.div
                 key="initial-state"
                 initial={{ opacity: 1 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 1 }}
                 transition={{ duration: 0 }}
-              ></MotionDiv>
+              ></motion.div>
             )}
           {isLoading && (
-            <MotionDiv
+            <motion.div
               key="loading-spinner"
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 1 }}
               transition={{ duration: 0 }}
-            ></MotionDiv>
+            ></motion.div>
           )}
           {slice?.boxes && slice.boxes.length > 0 && (
-            <MotionDiv
+            <motion.div
               key="box-container"
               className="relative h-full w-full"
               initial={{ opacity: 1 }}
@@ -178,10 +178,10 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
                   )
                 )}
               </AnimatePresence>
-            </MotionDiv>
+            </motion.div>
           )}
         </AnimatePresence>
-      </MotionDiv>
+      </motion.div>
     );
   },
   (prevProps, nextProps) => {

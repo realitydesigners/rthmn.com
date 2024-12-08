@@ -6,7 +6,7 @@ import styles from './styles.module.css';
 import { AnimatePresence } from 'motion/react';
 import { User } from '@supabase/supabase-js';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { NavButton } from '@/components/Buttons/NavButton';
 import { LogoIcon, MenuIcon } from '@/components/Accessibility/Icons/icons';
 import { allLinks, LinkItem } from './allLinks';
@@ -151,7 +151,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         />
       )}
 
-      <MotionDiv
+      <motion.div
         className={`fixed top-0 right-0 left-0 z-50 z-1001 h-16 bg-linear-to-b from-black via-black/50 to-transparent font-mono lg:h-20`}
         initial="hidden"
         animate="visible"
@@ -177,7 +177,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
               )}
             </div>
             <div className="flex items-center space-x-4 pr-2">
-              <MotionDiv
+              <motion.div
                 className="mr-2 flex"
                 variants={linkVariants}
                 custom={3}
@@ -208,7 +208,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                     </span>
                   </Link>
                 )}
-              </MotionDiv>
+              </motion.div>
             </div>
 
             {/* {!isproduction && (
@@ -222,13 +222,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             )} */}
           </div>
         </div>
-      </MotionDiv>
+      </motion.div>
 
       {/* Mobile Navigation Menu - Only in production */}
       {!isproduction && (
         <AnimatePresence>
           {isNavOpen && (
-            <MotionDiv
+            <motion.div
               className={`bg-opacity-95 fixed inset-0 z-1000 bg-black pt-16 font-mono backdrop-blur-sm lg:hidden`}
               initial={{ opacity: 0, y: -100 }}
               animate={{ opacity: 1, y: 0 }}
@@ -266,7 +266,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                   )}
                 </div>
               </div>
-            </MotionDiv>
+            </motion.div>
           )}
         </AnimatePresence>
       )}
@@ -335,18 +335,18 @@ export const DesktopMenuContent = ({
             onMouseLeave={onMouseLeave}
             onClick={onLinkClick}
           >
-            <MotionDiv
+            <motion.div
               className="flex w-1/2 flex-col gap-2"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
             >
               {group.links.map((item, index) => (
-                <MotionDiv key={item.title} variants={itemVariants}>
+                <motion.div key={item.title} variants={itemVariants}>
                   <DropdownLink {...item} />
-                </MotionDiv>
+                </motion.div>
               ))}
-            </MotionDiv>
+            </motion.div>
             <div className="flex w-1/2 flex-row gap-2">
               <div className="h-full w-1/2 bg-[#181818]" />
               <div className="h-full w-1/2 bg-[#181818]" />
@@ -362,18 +362,18 @@ export const DesktopMenuContent = ({
             onClick={onLinkClick}
           >
             <div className="w-1/3 bg-[#181818]" />
-            <MotionDiv
+            <motion.div
               className="flex w-2/3 flex-col gap-2"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
             >
               {group.links.map((item, index) => (
-                <MotionDiv key={item.title} variants={itemVariants}>
+                <motion.div key={item.title} variants={itemVariants}>
                   <DropdownLink {...item} />
-                </MotionDiv>
+                </motion.div>
               ))}
-            </MotionDiv>
+            </motion.div>
           </div>
         );
 
@@ -385,18 +385,18 @@ export const DesktopMenuContent = ({
             onMouseLeave={onMouseLeave}
             onClick={onLinkClick}
           >
-            <MotionDiv
+            <motion.div
               className="flex w-1/2 flex-col gap-2"
               variants={contentVariants}
               initial="hidden"
               animate="visible"
             >
               {group.links.map((item, index) => (
-                <MotionDiv key={item.title} variants={itemVariants}>
+                <motion.div key={item.title} variants={itemVariants}>
                   <DropdownLink {...item} />
-                </MotionDiv>
+                </motion.div>
               ))}
-            </MotionDiv>
+            </motion.div>
             <div className="flex w-1/2 flex-col gap-2">
               <div className="h-full w-full bg-[#181818]" />
               <div className="h-full w-full bg-[#181818]" />
@@ -411,7 +411,7 @@ export const DesktopMenuContent = ({
   return (
     <AnimatePresence>
       {isVisible && (
-        <MotionDiv
+        <motion.div
           className={`fixed right-0 left-0 z-50 flex justify-center ${activeDropdown ? styles.active : styles.inactive}`}
           onMouseEnter={onMouseEnter}
           onMouseLeave={onMouseLeave}
@@ -421,7 +421,7 @@ export const DesktopMenuContent = ({
           exit="exit"
         >
           {renderDropdownContent()}
-        </MotionDiv>
+        </motion.div>
       )}
     </AnimatePresence>
   );

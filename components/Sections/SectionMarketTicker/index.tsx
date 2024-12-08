@@ -1,5 +1,5 @@
 'use client';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { CandleData } from '@/types/types';
 
 interface MarketData {
@@ -65,7 +65,7 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
   const priceChange = getPriceChange(item.candleData);
 
   return (
-    <MotionDiv
+    <motion.div
       key={`${prefix}-${item.pair}`}
       className="flex h-12 w-36 items-center justify-between rounded-[4px] border border-white/10 bg-black/40 px-1.5 shadow-lg backdrop-blur-sm transition-all hover:border-white/20 hover:bg-black/60"
       whileHover={{ scale: 1.02 }}
@@ -109,7 +109,7 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
           </svg>
         )}
       </div>
-    </MotionDiv>
+    </motion.div>
   );
 };
 
@@ -123,7 +123,7 @@ export function SectionMarketTicker({ marketData }: SectionMarketTickerProps) {
   );
 
   return (
-    <section className="absolute left-0 right-0 z-100 mt-20 w-full overflow-hidden bg-black/20 backdrop-blur-[2px]">
+    <section className="absolute right-0 left-0 z-100 mt-20 w-full overflow-hidden bg-black/20 backdrop-blur-[2px]">
       <div className="animate-marquee flex gap-2 p-1.5">
         {/* First set of cards */}
         {sortedPairs.map((item) => (

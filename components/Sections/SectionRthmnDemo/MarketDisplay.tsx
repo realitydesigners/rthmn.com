@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { CandleData } from '@/types/types';
 
 interface MarketData {
@@ -99,7 +99,7 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
           const volume = getVolume(item.candleData);
 
           return (
-            <MotionDiv
+            <motion.div
               key={item.pair}
               className="border-gray cursor-pointer rounded-lg bg-black/50 p-4 transition-colors"
               onClick={() => setSelectedPair(item.pair)}
@@ -120,13 +120,13 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
                   {priceChange ? `${priceChange.toFixed(2)}%` : 'N/A'}
                 </span>
               </div>
-              <div className="mb-2 font-kodemono text-2xl font-bold text-white">
+              <div className="font-kodemono mb-2 text-2xl font-bold text-white">
                 {latestPrice
                   ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5)
                   : 'N/A'}
               </div>
               {getDayHighLow(item.candleData) && (
-                <div className="mb-6 flex justify-between font-kodemono text-xs text-white/60">
+                <div className="font-kodemono mb-6 flex justify-between text-xs text-white/60">
                   <span>
                     High:{' '}
                     {getDayHighLow(item.candleData)?.high.toFixed(
@@ -166,7 +166,7 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
                   </svg>
                 )}
               </div>
-            </MotionDiv>
+            </motion.div>
           );
         })}
       </div>

@@ -1,5 +1,5 @@
 'use client';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { FaChartLine, FaCoins, FaChartBar } from 'react-icons/fa';
 
 const MARKETS = [
@@ -51,7 +51,7 @@ export function SectionAboutAlgorithm() {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {MARKETS.map((market, index) => (
-            <MotionDiv
+            <motion.div
               key={market.title}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -78,7 +78,7 @@ export function SectionAboutAlgorithm() {
               <div className="font-kodemono text-sm text-gray-400">
                 {market.highlight}
               </div>
-            </MotionDiv>
+            </motion.div>
           ))}
         </div>
       </div>
