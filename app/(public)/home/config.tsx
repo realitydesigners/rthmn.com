@@ -2,24 +2,37 @@
 import { useMemo } from 'react';
 import { BoxSection, BoxInfo } from './modules';
 
-export const Buttons: Record<string, { id: string; buttonName: string }> = {
-  baseState: {
-    id: 'baseState',
-    buttonName: 'BaseState'
+export const Buttons = [
+  {
+    sectionId: '1',
+    object: 'BaseState',
+    name: 'Base State'
   },
-  state1: {
-    id: 'state1',
-    buttonName: 'State1'
+  {
+    sectionId: '2',
+    object: 'State1',
+    name: 'State One'
   },
-  state2: {
-    id: 'state2',
-    buttonName: 'State2'
+  {
+    sectionId: '3',
+    object: 'State2',
+    name: 'State Two'
   },
-  state3: {
-    id: 'state3',
-    buttonName: 'State3'
+  {
+    sectionId: '4',
+    object: 'State3',
+    name: 'State Three'
   }
-};
+] as const;
+
+// If we need to access by sectionId, we can create a helper
+export const ButtonsMap = Buttons.reduce(
+  (acc, button) => ({
+    ...acc,
+    [button.sectionId]: button
+  }),
+  {} as Record<string, (typeof Buttons)[number]>
+);
 
 export const useSceneConfig = (
   splineRef: any,

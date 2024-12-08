@@ -1,6 +1,6 @@
 'use client';
-import { useRef, useEffect, useState } from 'react';
-import { useSceneConfig, Buttons } from './config';
+import { useRef } from 'react';
+import { useSceneConfig, Buttons, ButtonsMap } from './config';
 import { useSceneManager } from '@/hooks/useSceneManager';
 import Spline from '@splinetool/react-spline';
 
@@ -18,12 +18,8 @@ export default function HomeClient({
   const splineRef = useRef(null);
   const sceneObjects = useSceneConfig(splineRef);
 
-  const {
-    visibilityStates,
-    handleButtonClick,
-    isSceneLoaded,
-    triggerSceneTransition
-  } = useSceneManager(splineRef, sceneObjects, Buttons);
+  const { visibilityStates, handleButtonClick, triggerSceneTransition } =
+    useSceneManager(splineRef, sceneObjects, ButtonsMap);
 
   const finalSceneObjects = useSceneConfig(splineRef, visibilityStates);
 
@@ -39,14 +35,14 @@ export default function HomeClient({
         />
       </div>
       <div className="fixed right-4 bottom-4 z-10 flex flex-col gap-2">
-        {Object.values(Buttons).map((state) => (
+        {Buttons.map((button) => (
           <button
-            key={state.id}
-            onClick={() => handleButtonClick(state.id)}
+            key={button.sectionId}
+            onClick={() => handleButtonClick(button.sectionId)}
             className="rounded bg-blue-500 px-4 py-2 text-white"
-            aria-label={`Trigger ${state.id}`}
+            aria-label={`Trigger ${button.name}`}
           >
-            {state.id}
+            {button.name}
           </button>
         ))}
       </div>

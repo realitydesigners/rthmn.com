@@ -28,10 +28,16 @@ type SplineMouseEvent = CustomEvent & {
   target: SplineEventTarget;
 };
 
+type ButtonConfig = {
+  sectionId: string;
+  object: string;
+  name: string;
+};
+
 export const useSceneManager = (
   splineRef: any,
   objects: SceneObject[],
-  sceneStates?: Record<string, { id: string; buttonName: string }>
+  sceneStates?: Record<string, ButtonConfig>
 ) => {
   useSuppressSplineError();
 
@@ -51,9 +57,9 @@ export const useSceneManager = (
 
       if (source === 'button') {
         try {
-          const button = splineRef.current.findObjectByName(state.buttonName);
+          const button = splineRef.current.findObjectByName(state.object);
           button?.emitEvent('mouseDown');
-          window.location.hash = stateId;
+          window.location.hash = state.sectionId;
         } catch (error) {
           console.warn('Failed to emit event:', error);
         }
@@ -162,7 +168,7 @@ export const useSceneManager = (
     if (hash && sceneStates && Object.keys(sceneStates).includes(hash)) {
       setTimeout(() => {
         const button = splineRef.current?.findObjectByName(
-          sceneStates[hash].buttonName
+          sceneStates[hash].object
         );
         if (button) {
           button.emitEvent('mouseDown');
