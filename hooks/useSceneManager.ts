@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, ReactNode, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback } from 'react';
 import { useSuppressSplineError } from './useSupressSplineError';
 
 export const useSceneManager = (

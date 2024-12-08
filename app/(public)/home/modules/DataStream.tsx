@@ -1,6 +1,5 @@
 'use client';
 import { StartButton } from '@/components/Buttons/StartNowButton';
-
 import { motion } from 'framer-motion';
 
 interface AutoBoxModuleProps {
@@ -19,9 +18,9 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
         y: visibility?.isVisible ? 0 : 20
       }}
       transition={{ duration: 0.8, ease: 'easeOut' }}
-      className="fixed inset-0 flex items-center justify-center"
+      className="absolute top-1/2 left-1/2 z-10 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 px-4"
     >
-      <div className="relative px-4">
+      <div className="relative">
         <div className="space-y-8 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -30,9 +29,9 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
           >
             <h2 className="font-outfit text-[2.5em] leading-[1em] font-bold text-white lg:text-[6em]">
               The First Smart
-              <br></br>
+              <br />
               Pattern Recognition
-              <br></br>
+              <br />
               Tool For Trading
             </h2>
           </motion.div>

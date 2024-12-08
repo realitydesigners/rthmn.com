@@ -25,7 +25,6 @@ export const Buttons = [
   }
 ] as const;
 
-// If we need to access by sectionId, we can create a helper
 export const ButtonsMap = Buttons.reduce(
   (acc, button) => ({
     ...acc,
