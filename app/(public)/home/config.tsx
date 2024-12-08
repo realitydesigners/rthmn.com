@@ -3,17 +3,37 @@ import { useMemo } from 'react';
 import { BoxSection } from './modules/BoxSection';
 import { BoxInfo } from './modules/BoxInfo';
 
-interface SceneVisibility {
-  [key: string]: {
-    isVisible: boolean;
-    distance: number;
-    isScaled: boolean;
-  };
-}
+export type SceneState = {
+  id: string;
+  buttonName: string; // Name in Spline scene
+  // Add any other state-specific properties here
+};
+
+export const SCENE_STATES: Record<string, SceneState> = {
+  baseState: {
+    id: 'baseState',
+    buttonName: 'BaseState'
+  },
+  state1: {
+    id: 'state1',
+    buttonName: 'State1'
+  },
+  state2: {
+    id: 'state2',
+    buttonName: 'State2'
+  },
+  state3: {
+    id: 'state3',
+    buttonName: 'State3'
+  }
+  // Add more states as needed...
+};
 
 export const useSceneConfig = (
   splineRef: any,
-  visibility?: SceneVisibility
+  visibility?: {
+    [key: string]: { isVisible: boolean; distance: number; isScaled: boolean };
+  }
 ) => {
   return useMemo(
     () => [
