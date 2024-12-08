@@ -1,6 +1,6 @@
 'use client';
 import { useMemo } from 'react';
-import { BoxSection, BoxInfo } from './modules';
+import { BoxSection, BoxInfo, DataStream } from './modules';
 
 export const Buttons = [
   {
@@ -46,9 +46,10 @@ export const useSceneConfig = (
         id: 'datastream',
         name: 'DataStream',
         scaleIn: 0,
-        scaleOut: 6800,
+        scaleOut: 6000,
         fadeIn: 0,
-        fadeOut: 6800
+        fadeOut: 5800,
+        component: <DataStream visibility={visibility?.['datastream']} />
       },
       {
         id: 'boxsection-controls',
