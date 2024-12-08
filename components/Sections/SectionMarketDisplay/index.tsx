@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, memo, useRef } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { StartButton } from '@/components/Buttons/StartNowButton';
 import { CandleData } from '@/types/types';
 import { useInView } from 'react-intersection-observer';
@@ -80,7 +80,7 @@ const CARD_ANIMATION = {
 // Memoize the MarketHeading component
 const MarketHeading = memo(() => (
   <div className="relative z-20 text-center">
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8 }}
@@ -110,7 +110,7 @@ const MarketHeading = memo(() => (
           </div>
         </button>
       </div>
-    </MotionDiv>
+    </motion.div>
   </div>
 ));
 
@@ -242,7 +242,7 @@ const CardContent = memo(
           <h4 className="text-sm font-medium text-white">
             {item.pair.replace('_', '/')}
           </h4>
-          <MotionDiv
+          <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -253,16 +253,16 @@ const CardContent = memo(
             }`}
           >
             {data.change.toFixed(2)}%
-          </MotionDiv>
+          </motion.div>
         </div>
-        <MotionDiv
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
           className="mb-3 text-xl font-bold text-white tabular-nums"
         >
           {data.price.toFixed(item.pair.includes('JPY') ? 3 : 5)}
-        </MotionDiv>
+        </motion.div>
         <div className="h-12 w-full">
           <SparklineChart data={data.points} change={data.change} />
         </div>
@@ -357,7 +357,7 @@ const CardTransform = memo(
     );
 
     return (
-      <MotionDiv
+      <motion.div
         className="absolute top-1/2 left-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]"
         initial={{
           x:
@@ -416,7 +416,7 @@ const CardTransform = memo(
         }}
       >
         {children}
-      </MotionDiv>
+      </motion.div>
     );
   }
 );

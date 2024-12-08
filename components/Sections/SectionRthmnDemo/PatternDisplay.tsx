@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef, useMemo, memo } from 'react';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import {
   sequences,
   BASE_VALUES,
@@ -47,7 +47,7 @@ const BoxVisualization = memo(
         className="relative flex items-center justify-center rounded-lg border border-white/10 backdrop-blur-sm"
         style={{ height: `${baseSize}px`, width: `${baseSize}px` }}
       >
-        <MotionDiv
+        <motion.div
           className="absolute inset-0"
           animate={{
             background: [
@@ -120,7 +120,7 @@ export const PatternDisplay = memo(({ marketData }: PatternDisplayProps) => {
             const priceChange = getPriceChange(item.candleData);
 
             return (
-              <MotionDiv
+              <motion.div
                 key={item.pair}
                 className="relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-white/5 bg-black/40 p-4 transition-all duration-300 hover:border-white/10"
               >
@@ -153,7 +153,7 @@ export const PatternDisplay = memo(({ marketData }: PatternDisplayProps) => {
                   pair={item.pair}
                   candleData={item.candleData}
                 />
-              </MotionDiv>
+              </motion.div>
             );
           })}
         </div>

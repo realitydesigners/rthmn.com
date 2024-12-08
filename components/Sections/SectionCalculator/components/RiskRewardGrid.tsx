@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 interface RiskRewardGridProps {
   riskAmount: number;
@@ -20,7 +20,7 @@ export const RiskRewardGrid = memo(
         <div className={`grid grid-cols-${gridSize} gap-1`}>
           {/* Reward Squares (Green) */}
           {Array.from({ length: rewardSquares }).map((_, i) => (
-            <MotionDiv
+            <motion.div
               key={`reward-${i}`}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -30,7 +30,7 @@ export const RiskRewardGrid = memo(
           ))}
           {/* Risk Squares (Red) */}
           {Array.from({ length: riskSquares }).map((_, i) => (
-            <MotionDiv
+            <motion.div
               key={`risk-${i}`}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}

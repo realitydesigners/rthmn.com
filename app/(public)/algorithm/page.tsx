@@ -1,6 +1,6 @@
 'use client';
 import { FaWaveSquare, FaLayerGroup, FaChartLine } from 'react-icons/fa';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 interface Step {
   step: string;
@@ -70,7 +70,7 @@ const AlgorithmPage = () => {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-8">
           <div className="flex flex-col items-center text-center">
-            <MotionDiv
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -88,7 +88,7 @@ const AlgorithmPage = () => {
               >
                 The Algorithm
               </h1>
-            </MotionDiv>
+            </motion.div>
             <p
               className={`font-kodemonomx-auto max-w-3xl text-lg leading-relaxed text-white/60`}
             >
@@ -145,7 +145,7 @@ const AlgorithmPage = () => {
               </h2>
               <div className="grid gap-6">
                 {CORE_CONCEPTS.map((concept, index) => (
-                  <MotionDiv
+                  <motion.div
                     key={index}
                     initial={{ opacity: 0, x: 20 }}
                     whileInView={{ opacity: 1, x: 0 }}
@@ -165,7 +165,7 @@ const AlgorithmPage = () => {
                         <p className="text-white/60">{concept.description}</p>
                       </div>
                     </div>
-                  </MotionDiv>
+                  </motion.div>
                 ))}
               </div>
             </div>
@@ -212,7 +212,7 @@ const AlgorithmPage = () => {
                   'Eight-dimensional market structure analysis for complete coverage'
               }
             ].map((item, index) => (
-              <MotionDiv
+              <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -232,7 +232,7 @@ const AlgorithmPage = () => {
                   </div>
                 </div>
                 <p className="text-white/60">{item.description}</p>
-              </MotionDiv>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -243,7 +243,7 @@ const AlgorithmPage = () => {
         <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-8">
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
-            <MotionDiv
+            <motion.div
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -276,7 +276,7 @@ const AlgorithmPage = () => {
                       'Analyzes multiple wave patterns simultaneously to identify high-probability trade setups'
                   }
                 ].map((item, index) => (
-                  <MotionDiv
+                  <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -289,12 +289,12 @@ const AlgorithmPage = () => {
                       {item.title}
                     </h3>
                     <p className="text-white/60">{item.description}</p>
-                  </MotionDiv>
+                  </motion.div>
                 ))}
               </div>
-            </MotionDiv>
+            </motion.div>
 
-            <MotionDiv
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5 }}
@@ -306,7 +306,7 @@ const AlgorithmPage = () => {
                   [Wave Visualization Placeholder]
                 </div>
               </div>
-            </MotionDiv>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -372,7 +372,7 @@ const AlgorithmPage = () => {
                 description: 'Return to neutral positioning'
               }
             ].map((item, index) => (
-              <MotionDiv
+              <motion.div
                 key={index}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -394,7 +394,7 @@ const AlgorithmPage = () => {
                   </h3>
                 </div>
                 <p className="text-sm text-white/60">{item.description}</p>
-              </MotionDiv>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -769,7 +769,7 @@ const AlgorithmPage = () => {
 
               <div className="space-y-8">
                 {STEPS.map((item, index) => (
-                  <MotionDiv
+                  <motion.div
                     key={index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -793,7 +793,7 @@ const AlgorithmPage = () => {
                         </p>
                       </div>
                     </div>
-                  </MotionDiv>
+                  </motion.div>
                 ))}
               </div>
             </div>

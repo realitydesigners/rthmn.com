@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { FC } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 interface NavButtonProps {
   href: string;
@@ -31,7 +31,7 @@ export const NavButton: FC<NavButtonProps> = ({
       className="relative flex h-20 items-center px-2 transition-colors duration-200 hover:text-gray-600"
       onMouseEnter={onMouseEnter}
     >
-      <MotionDiv
+      <motion.div
         variants={buttonVariants}
         initial="hidden"
         animate="visible"
@@ -46,7 +46,7 @@ export const NavButton: FC<NavButtonProps> = ({
             {children}
           </span>
         </Link>
-      </MotionDiv>
+      </motion.div>
     </div>
   );
 };

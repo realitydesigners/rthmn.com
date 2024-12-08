@@ -3,7 +3,7 @@ import type React from 'react';
 
 import { StartButton } from '@/components/Buttons/StartNowButton';
 import { MarketWall } from './MarketWall';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 
 interface MarketData {
   pair: string;
@@ -25,7 +25,7 @@ export const SectionHero: React.FC<BoxComponentProps> = ({ marketData }) => {
 
       <MarketWall marketData={marketData} />
       <div className="relative flex w-full flex-col gap-8">
-        <MotionDiv
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
@@ -48,7 +48,7 @@ export const SectionHero: React.FC<BoxComponentProps> = ({ marketData }) => {
               <StartButton href="#pricing" custom={0} />
             </div>
           </div>
-        </MotionDiv>
+        </motion.div>
       </div>
     </section>
   );

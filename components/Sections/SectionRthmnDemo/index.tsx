@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect, useMemo, memo, useCallback } from 'react';
 import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { CandleData } from '@/types/types';
 import { FaChartArea, FaTable, FaCube, FaUserCircle } from 'react-icons/fa';
 import { PatternDisplay } from './PatternDisplay';
@@ -53,7 +53,7 @@ const MarketCard = memo(
     const priceChange = getPriceChange(item.candleData);
 
     return (
-      <MotionDiv
+      <motion.div
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         onClick={onClick}
@@ -85,7 +85,7 @@ const MarketCard = memo(
             {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}
           </span>
         </div>
-      </MotionDiv>
+      </motion.div>
     );
   }
 );
@@ -297,7 +297,7 @@ export const SectionRthmnDemo = memo(
             <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
           </div>
           <DemoNavbar activeTab={activeTab} setActiveTab={handleTabChange} />
-          <MotionDiv
+          <motion.div
             key={activeTab}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -306,7 +306,7 @@ export const SectionRthmnDemo = memo(
             className="relative z-10 h-full [transform:translateZ(20px)]"
           >
             {renderActiveTab}
-          </MotionDiv>
+          </motion.div>
         </div>
       </section>
     );

@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import {
   FaChartLine,
   FaPercentage,
@@ -61,7 +61,7 @@ export const TradeStats = memo(
             bgColor: 'bg-amber-400/10'
           }
         ].map((stat, index) => (
-          <MotionDiv
+          <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -87,7 +87,7 @@ export const TradeStats = memo(
                 {stat.value}
               </div>
             </div>
-          </MotionDiv>
+          </motion.div>
         ))}
       </div>
     );

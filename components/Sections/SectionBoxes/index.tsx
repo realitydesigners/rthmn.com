@@ -9,7 +9,7 @@ import {
 } from '@/components/Constants/constants';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { FEATURE_TAGS } from '@/components/Constants/text';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { BoxSlice } from '@/types/types';
 
 const POINT_OF_CHANGE_INDEX = 29;
@@ -19,7 +19,7 @@ const PAUSE_DURATION = 5000;
 const FeatureTags = memo(() => (
   <div className="font-outfit flex flex-wrap justify-center gap-4 text-xs sm:text-sm lg:justify-start lg:gap-6">
     {FEATURE_TAGS.map((feature, index) => (
-      <MotionDiv
+      <motion.div
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: index * 0.1 }}
@@ -33,7 +33,7 @@ const FeatureTags = memo(() => (
             {feature.text}
           </span>
         </div>
-      </MotionDiv>
+      </motion.div>
     ))}
   </div>
 ));
@@ -83,7 +83,7 @@ const BoxVisualization = memo(
 
     return (
       <div className="relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm sm:h-[300px] sm:w-[300px] lg:h-[400px] lg:w-[400px]">
-        <MotionDiv
+        <motion.div
           className="absolute inset-0"
           animate={{
             background: [

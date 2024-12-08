@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 import { motion } from 'framer-motion';
-import { MotionDiv } from '@/components/MotionDiv';
 
 // Types
 interface BoxDimensions {
@@ -280,7 +279,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
   }, [currentConfigIndex, isAnimating, isInitialized]);
 
   return (
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, x: 20 }}
       animate={{
         opacity: visibility?.isVisible ? 1 : 0,
@@ -317,7 +316,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
           <div className="relative h-14 w-full overflow-hidden rounded-lg bg-gradient-to-b from-black/60 to-black/40">
             <div className="absolute inset-0 flex items-center justify-center gap-0.5">
               {sequences[currentConfigIndex].map((value, idx) => (
-                <MotionDiv
+                <motion.div
                   key={idx}
                   initial={{ height: 0 }}
                   animate={{
@@ -377,6 +376,6 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
           </div>
         </div>
       </div>
-    </MotionDiv>
+    </motion.div>
   );
 };

@@ -1,6 +1,7 @@
 'use client';
 import { StartButton } from '@/components/Buttons/StartNowButton';
-import { MotionDiv } from '@/components/MotionDiv';
+
+import { motion } from 'framer-motion';
 
 interface AutoBoxModuleProps {
   visibility?: {
@@ -11,7 +12,7 @@ interface AutoBoxModuleProps {
 
 export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
   return (
-    <MotionDiv
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{
         opacity: visibility?.isVisible ? 1 : 0,
@@ -22,7 +23,7 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
     >
       <div className="relative px-4">
         <div className="space-y-8 text-center">
-          <MotionDiv
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -34,9 +35,9 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
               <br></br>
               Tool For Trading
             </h2>
-          </MotionDiv>
+          </motion.div>
 
-          <MotionDiv
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -46,9 +47,9 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
               <br />
               designed for trading
             </p>
-          </MotionDiv>
+          </motion.div>
 
-          <MotionDiv
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.6 }}
@@ -57,7 +58,7 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
             <StartButton href="#pricing" custom={0}>
               Start now →
             </StartButton>
-          </MotionDiv>
+          </motion.div>
         </div>
 
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -65,6 +66,6 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
           <div className="absolute top-1/2 left-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400/10 blur-2xl" />
         </div>
       </div>
-    </MotionDiv>
+    </motion.div>
   );
 };

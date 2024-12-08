@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { MotionDiv } from '@/components/MotionDiv';
+import { motion } from 'framer-motion';
 import { PortableText } from '@portabletext/react';
 import { ChangelogTemplate } from '@/components/blocks/templates/ChangelogTemplate';
 import { ChangelogEntry } from '@/types/types';
@@ -51,7 +51,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
         <div className="mx-auto max-w-7xl px-8">
           {/* Rest of the component remains the same... */}
           <div className="flex flex-col items-center text-center">
-            <MotionDiv
+            <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
@@ -64,7 +64,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                 Track our journey as we build the future of data visualization
                 for trading and investing.
               </p>
-            </MotionDiv>
+            </motion.div>
           </div>
 
           {/* Changelog Entries */}
@@ -73,7 +73,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
               <div className="absolute top-0 left-0 h-full w-[1px] bg-[#333] lg:left-[29px]" />
 
               {changelog.map((entry: ChangelogEntry, index: number) => (
-                <MotionDiv
+                <motion.div
                   key={entry._id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -148,7 +148,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                     )}
 
                     {/* Expandable Content */}
-                    <MotionDiv
+                    <motion.div
                       initial={false}
                       animate={{
                         height: expandedEntries.has(entry._id) ? 'auto' : 0
@@ -162,7 +162,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                           components={ChangelogTemplate}
                         />
                       </div>
-                    </MotionDiv>
+                    </motion.div>
 
                     {/* Read More Button */}
                     <button
@@ -181,7 +181,7 @@ export default function ClientPage({ changelog }: ClientPageProps) {
                       </span>
                     </button>
                   </div>
-                </MotionDiv>
+                </motion.div>
               ))}
             </div>
           </div>
