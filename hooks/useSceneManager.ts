@@ -29,7 +29,7 @@ type SplineMouseEvent = CustomEvent & {
 };
 
 export const useSceneManager = (
-  splineRef: React.MutableRefObject<any>,
+  splineRef: any,
   objects: SceneObject[],
   sceneStates?: Record<string, { id: string; buttonName: string }>
 ) => {
