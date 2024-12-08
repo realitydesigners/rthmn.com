@@ -16,31 +16,16 @@ export default function HomeClient({
   products: any[];
 }) {
   const splineRef = useRef(null);
-  const [isSceneLoaded, setIsSceneLoaded] = useState(false);
   const sceneObjects = useSceneConfig(splineRef);
 
-  const { visibilityStates, handleStateChange } = useSceneManager(
-    splineRef,
-    sceneObjects,
-    Buttons
-  );
-
-  // Handle initial state from URL after scene is loaded
-  useEffect(() => {
-    if (isSceneLoaded) {
-      const hash = window.location.hash.slice(1);
-      if (hash && Object.keys(Buttons).includes(hash)) {
-        handleStateChange(hash, 'button');
-      }
-    }
-  }, [isSceneLoaded]); // Only run when scene is loaded
+  const {
+    visibilityStates,
+    handleButtonClick,
+    isSceneLoaded,
+    triggerSceneTransition
+  } = useSceneManager(splineRef, sceneObjects, Buttons);
 
   const finalSceneObjects = useSceneConfig(splineRef, visibilityStates);
-
-  const handleButtonClick = (stateId: string) => {
-    handleStateChange(stateId, 'button');
-    window.location.hash = stateId;
-  };
 
   return (
     <main className="fixed inset-0 flex h-screen w-screen overflow-hidden">
@@ -49,7 +34,7 @@ export default function HomeClient({
           scene={url}
           onLoad={(spline) => {
             splineRef.current = spline;
-            setIsSceneLoaded(true); // Set loaded state after Spline is ready
+            triggerSceneTransition();
           }}
         />
       </div>

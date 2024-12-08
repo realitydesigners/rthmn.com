@@ -36,11 +36,13 @@ export const useSceneManager = (
   useSuppressSplineError();
 
   const intervalRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const lastPositions = useRef<Record<string, number>>({});
   const originalScales = useRef<
     Record<string, { x: number; y: number; z: number }>
   >({});
   const [visibilityStates, setVisibilityStates] = useState<SceneVisibility>({});
+  const [isSceneLoaded, setIsSceneLoaded] = useState(false);
+
+  const hasHandledInitialHash = useRef(false);
 
   const handleStateChange = useCallback(
     (stateId: string, source: 'button' | 'scene') => {
@@ -51,12 +53,20 @@ export const useSceneManager = (
         try {
           const button = splineRef.current.findObjectByName(state.buttonName);
           button?.emitEvent('mouseDown');
+          window.location.hash = stateId;
         } catch (error) {
           console.warn('Failed to emit event:', error);
         }
       }
     },
     [sceneStates]
+  );
+
+  const handleButtonClick = useCallback(
+    (stateId: string) => {
+      handleStateChange(stateId, 'button');
+    },
+    [handleStateChange]
   );
 
   const setupMouseHandlers = useCallback(
@@ -147,6 +157,20 @@ export const useSceneManager = (
     };
   }, [objects]);
 
+  const triggerSceneTransition = useCallback(() => {
+    const hash = window.location.hash.slice(1);
+    if (hash && sceneStates && Object.keys(sceneStates).includes(hash)) {
+      setTimeout(() => {
+        const button = splineRef.current?.findObjectByName(
+          sceneStates[hash].buttonName
+        );
+        if (button) {
+          button.emitEvent('mouseDown');
+        }
+      }, 500);
+    }
+  }, [sceneStates]);
+
   useEffect(() => {
     const spline = splineRef.current;
     if (!spline) return;
@@ -155,14 +179,18 @@ export const useSceneManager = (
     if (sceneStates) {
       setupMouseHandlers(spline);
     }
+    setIsSceneLoaded(true);
 
     spline.addEventListener('cameraMove', () => {
       checkObjectDistances(spline);
     });
-  }, [objects, setupMouseHandlers]);
+  }, [objects, setupMouseHandlers, sceneStates]);
 
   return {
     visibilityStates,
-    handleStateChange
+    handleStateChange,
+    handleButtonClick,
+    isSceneLoaded,
+    triggerSceneTransition
   };
 };
