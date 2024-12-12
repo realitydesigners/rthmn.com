@@ -93,7 +93,7 @@ const NavigationButtons = ({
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
 }) => (
-  <div className="absolute right-0 bottom-32 left-0 z-10 flex items-center justify-center gap-2 py-2">
+  <div className="absolute right-0 bottom-28 left-0 z-[1000] flex items-center justify-center gap-2 py-2">
     {navigationButtons.map((button) => (
       <NavigationButton
         key={button.mode}
@@ -162,42 +162,48 @@ export const PairNavigator = () => {
   }
 
   return (
-    <div className="fixed bottom-0 left-1/2 z-0 h-[60vh] w-screen -translate-x-1/2 border-t border-[#222] bg-black pb-24">
-      <div className="flex h-full flex-col">
-        <div className="absolute top-0 right-0 left-0 z-90 h-20 bg-gradient-to-b from-black via-black/60 to-transparent" />
+    <>
+      <div className="backdrop-blur- fixed inset-0 z-[85] bg-black/80" />
 
-        <div
-          ref={scrollRef}
-          className="w-full flex-1 overflow-hidden px-3"
-          {...handlers}
-        >
+      <div className="fixed bottom-0 left-1/2 z-[90] h-[60vh] w-screen -translate-x-1/2 bg-black">
+        {/* <div className="absolute -top-10 right-0 left-0 h-10 bg-gradient-to-b from-transparent via-black/90 to-black" /> */}
+
+        <div className="relative h-full">
+          <div className="absolute top-0 right-0 left-0 z-[98] h-20 bg-gradient-to-b from-black via-black/95 to-transparent" />
+
           <div
-            className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth"
-            style={{
-              scrollSnapType: 'y mandatory'
-            }}
+            ref={scrollRef}
+            className="relative z-[96] h-full w-full overflow-hidden px-4"
+            {...handlers}
           >
-            <div className="py-[30vh]">
-              <PairList
-                viewMode={viewMode}
-                currentPairs={currentPairs}
-                groupedPairs={groupedPairs}
-                activeIndex={activeIndex}
-                pairData={pairData}
-                selectedPairs={selectedPairs}
-                showRemoveForPair={showRemoveForPair}
-                handleIndexChange={handleIndexChange}
-                togglePair={togglePair}
-                setShowRemoveForPair={setShowRemoveForPair}
-              />
+            <div
+              className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth"
+              style={{
+                scrollSnapType: 'y mandatory'
+              }}
+            >
+              <div className="py-[25vh]">
+                <PairList
+                  viewMode={viewMode}
+                  currentPairs={currentPairs}
+                  groupedPairs={groupedPairs}
+                  activeIndex={activeIndex}
+                  pairData={pairData}
+                  selectedPairs={selectedPairs}
+                  showRemoveForPair={showRemoveForPair}
+                  handleIndexChange={handleIndexChange}
+                  togglePair={togglePair}
+                  setShowRemoveForPair={setShowRemoveForPair}
+                />
+              </div>
             </div>
           </div>
-        </div>
-        <div className="absolute right-0 bottom-24 left-0 z-10 h-30 bg-gradient-to-t from-black via-black/60 to-transparent" />
 
-        <NavigationButtons viewMode={viewMode} setViewMode={setViewMode} />
+          <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-40 bg-gradient-to-t from-black via-black to-transparent" />
+          <NavigationButtons viewMode={viewMode} setViewMode={setViewMode} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -238,13 +244,13 @@ const PairList = ({
 
   return Object.entries(groupedPairs).map(([category, pairs]) => (
     <div key={category}>
-      <div className="sticky top-4 z-100 px-4 py-2">
-        <div className="font-kodemono flex items-center gap-2 text-xs font-medium tracking-wider text-gray-500">
-          <span className="h-[1px] flex-1 bg-gray-500/20" />
+      {/* <div className="sticky top-2 z-[99] px-4 py-2">
+        <div className="font-kodemono flex items-center gap-3 text-xs font-medium tracking-wider text-gray-400">
+          <span className="h-[1px] flex-1 bg-white/5" />
           {category}
-          <span className="h-[1px] flex-1 bg-gray-500/20" />
+          <span className="h-[1px] flex-1 bg-white/5" />
         </div>
-      </div>
+      </div> */}
       {pairs.map((pair, index) => (
         <PairItem
           key={pair}

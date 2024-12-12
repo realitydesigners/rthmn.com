@@ -28,11 +28,15 @@ export const PairItem = ({
 
   const [showAddForPair, setShowAddForPair] = useState<boolean>(false);
 
+  const formatPrice = (price: number) => {
+    return price.toFixed(pair.includes('JPY') ? 3 : 5);
+  };
+
   return (
     <div
       data-index={index}
       className={`pair-item relative shrink-0 cursor-pointer px-2 py-4 transition-all duration-300 ${
-        isActive ? 'bg-white/5' : ''
+        isActive ? '' : ''
       } ${isPressed ? 'scale-[0.98]' : ''}`}
       style={{ scrollSnapAlign: 'center' }}
       onClick={() => !showRemove && !showAddForPair && onIndexChange(index)}
@@ -58,9 +62,9 @@ export const PairItem = ({
               {pair.replace('_', '/')}
             </h3>
 
-            {isActive && currentPrice && !showRemove && !showAddForPair && (
+            {currentPrice && !showRemove && !showAddForPair && (
               <div className="font-kodemono text-sm text-gray-400">
-                {currentPrice.toFixed(pair.includes('JPY') ? 3 : 5)}
+                {formatPrice(currentPrice)}
               </div>
             )}
           </div>
