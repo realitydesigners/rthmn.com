@@ -3,7 +3,13 @@ import { useState, useEffect, useRef } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { useSwipeable } from 'react-swipeable';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
-import { LuDollarSign, LuBitcoin, LuList, LuBookmark } from 'react-icons/lu';
+import {
+  LuDollarSign,
+  LuBitcoin,
+  LuList,
+  LuBookmark,
+  LuSearch
+} from 'react-icons/lu';
 import { NavigationButton } from './NavigationButton';
 import { PairItem } from './PairItem';
 import { ViewMode, GroupedPairs, PairListProps } from './types';
@@ -93,7 +99,7 @@ const NavigationButtons = ({
   viewMode: ViewMode;
   setViewMode: (mode: ViewMode) => void;
 }) => (
-  <div className="absolute right-0 bottom-28 left-0 z-[1000] flex items-center justify-center gap-2 py-2">
+  <div className="absolute right-0 bottom-20 left-0 z-[1000] flex items-center justify-center gap-2 py-2">
     {navigationButtons.map((button) => (
       <NavigationButton
         key={button.mode}
@@ -163,43 +169,49 @@ export const PairNavigator = () => {
 
   return (
     <>
-      <div className="backdrop-blur- fixed inset-0 z-[85] bg-black/80" />
+      <div className="fixed inset-0 z-[85] backdrop-blur-sm" />
 
-      <div className="fixed bottom-0 left-1/2 z-[90] h-[60vh] w-screen -translate-x-1/2 bg-black">
-        {/* <div className="absolute -top-10 right-0 left-0 h-10 bg-gradient-to-b from-transparent via-black/90 to-black" /> */}
+      <div className="fixed bottom-0 left-1/2 z-[90] h-[50vh] w-screen -translate-x-1/2 bg-black">
+        <div className="absolute -top-4 right-0 left-0 h-20 rounded-[200em] border-t border-[#222] bg-black" />
 
-        <div className="relative h-full">
-          <div className="absolute top-0 right-0 left-0 z-[98] h-20 bg-gradient-to-b from-black via-black/95 to-transparent" />
+        <div className="pointer-events-none absolute top-2 right-0 left-0 z-[98] h-20 bg-gradient-to-b from-black via-black/95 to-transparent" />
 
-          <div
-            ref={scrollRef}
-            className="relative z-[96] h-full w-full overflow-hidden px-4"
-            {...handlers}
-          >
-            <div
-              className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth"
-              style={{
-                scrollSnapType: 'y mandatory'
-              }}
-            >
-              <div className="py-[25vh]">
-                <PairList
-                  viewMode={viewMode}
-                  currentPairs={currentPairs}
-                  groupedPairs={groupedPairs}
-                  activeIndex={activeIndex}
-                  pairData={pairData}
-                  selectedPairs={selectedPairs}
-                  showRemoveForPair={showRemoveForPair}
-                  handleIndexChange={handleIndexChange}
-                  togglePair={togglePair}
-                  setShowRemoveForPair={setShowRemoveForPair}
-                />
-              </div>
+        <div className="relative z-[99] px-4">
+          <div className="relative flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+            <div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+              <LuSearch className="ml-4 h-5 w-5 text-[#666]" />
+              <input
+                type="text"
+                placeholder="Search instruments..."
+                className="font-outfit text-md w-full bg-transparent px-3 py-2 text-white placeholder-[#666] focus:outline-none"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div
+          ref={scrollRef}
+          className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
+          {...handlers}
+        >
+          <div className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth">
+            <div className="mb-[25vh]">
+              <PairList
+                viewMode={viewMode}
+                currentPairs={currentPairs}
+                groupedPairs={groupedPairs}
+                activeIndex={activeIndex}
+                pairData={pairData}
+                selectedPairs={selectedPairs}
+                showRemoveForPair={showRemoveForPair}
+                handleIndexChange={handleIndexChange}
+                togglePair={togglePair}
+                setShowRemoveForPair={setShowRemoveForPair}
+              />
             </div>
           </div>
 
-          <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-40 bg-gradient-to-t from-black via-black to-transparent" />
+          <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-36 bg-gradient-to-t from-black via-black/95 to-transparent" />
           <NavigationButtons viewMode={viewMode} setViewMode={setViewMode} />
         </div>
       </div>

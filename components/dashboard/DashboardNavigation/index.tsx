@@ -2,17 +2,21 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconType } from 'react-icons';
-import { LuLayers, LuSettings, LuBeaker } from 'react-icons/lu';
+import { LuLayers, LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
 import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
 import { PairNavigator } from '@/components/dashboard/PairNavigator';
 import { useScrollDirection } from '../../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
+import { SearchBar } from '@/components/dashboard/SearchBar';
+import { useDashboard } from '@/providers/DashboardProvider';
+import { MobileSearchBar } from '@/components/dashboard/MobileSearchBar';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | null;
 
 export const DashboardNavigation = () => {
   const router = useRouter();
+  const { selectedPairs } = useDashboard();
   const [activePanel, setActivePanel] = useState<Panel>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const scrollDirection = useScrollDirection();
@@ -37,7 +41,13 @@ export const DashboardNavigation = () => {
   const renderPanel = () => {
     switch (activePanel) {
       case 'pairs':
-        return <PairNavigator />;
+        return (
+          <>
+            <div className="relative">
+              <PairNavigator />
+            </div>
+          </>
+        );
       case 'settings':
         return (
           <div className="relative">
@@ -54,6 +64,10 @@ export const DashboardNavigation = () => {
 
   return (
     <>
+      {activePanel === 'pairs' && (
+        <div className="fixed inset-0 z-[85] bg-black/80" />
+      )}
+
       {/* Gradient backdrop */}
       <div
         className={`bg-gradient-o-t fixed bottom-0 left-0 z-[1000] h-16 w-full from-black via-black/80 to-transparent transition-transform duration-300 ${
@@ -72,7 +86,7 @@ export const DashboardNavigation = () => {
       >
         <div className="flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2">
           <SidebarIconButton
-            icon={LuLayers}
+            icon={LuSearch}
             isActive={activePanel === 'pairs'}
             onClick={() => handleButtonClick('pairs')}
             label="Instruments"

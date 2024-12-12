@@ -47,7 +47,7 @@ export const PairItem = ({
           <div className="flex items-baseline gap-3">
             <h3
               className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ${
-                isActive ? 'scale-110 text-white' : 'scale-90 text-gray-500/40'
+                isActive ? 'scale-110 text-white' : 'scale-90 text-gray-400/25'
               } ${showRemove ? 'text-red-400' : ''} ${
                 showAddForPair ? 'text-green-400' : ''
               }`}
@@ -63,7 +63,7 @@ export const PairItem = ({
             </h3>
 
             {currentPrice && !showRemove && !showAddForPair && (
-              <div className="font-kodemono text-sm text-gray-400">
+              <div className="font-kodemono ml-2 text-sm text-gray-200">
                 {formatPrice(currentPrice)}
               </div>
             )}
