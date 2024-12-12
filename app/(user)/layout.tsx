@@ -1,9 +1,7 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
-import { QueryProvider } from '@/providers/QueryProvider';
-import { SignalProvider } from '@/providers/SignalProvider';
-import { ClientProviders } from '@/providers/ClientProviders';
+import { Providers } from '@/providers/Providers';
 import { DashboardSidebar } from '@/components/dashboard/DashboardSidebar';
 import { NavbarSignedIn } from '@/components/Accessibility/NavbarSignedIn';
 
@@ -27,14 +25,10 @@ export default async function UserLayout({
   }
 
   return (
-    <QueryProvider>
-      <SignalProvider>
-        <ClientProviders>
-          <NavbarSignedIn user={user} />
-          <DashboardSidebar />
-          <div className="ml-14">{children}</div>
-        </ClientProviders>
-      </SignalProvider>
-    </QueryProvider>
+    <Providers>
+      <NavbarSignedIn user={user} />
+      <DashboardSidebar />
+      <div className="ml-14">{children}</div>
+    </Providers>
   );
 }
