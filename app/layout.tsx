@@ -1,7 +1,7 @@
 import { Navbar } from '@/components/Accessibility/Navbar';
 import { Toaster } from '@/components/Accessibility/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
 import ogImage from '@/public/opengraph-image.png';
 import SupabaseProvider from '@/providers/SupabaseProvider';
@@ -36,6 +36,10 @@ export const metadata: Metadata = {
       }
     ]
   }
+};
+
+export const viewport: Viewport = {
+  maximumScale: 1
 };
 
 export default async function RootLayout({

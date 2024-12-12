@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    reactCompiler: true
+    reactCompiler: true,
+    inlineCss: true
   },
   images: {
     remotePatterns: [
