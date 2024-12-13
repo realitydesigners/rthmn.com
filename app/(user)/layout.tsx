@@ -26,9 +26,8 @@ export default async function UserLayout({
 
   return (
     <Providers>
-      <NavbarSignedIn user={user} />
-      <DashboardNavigation />
       <div>{children}</div>
+      <DashboardNavigation />
     </Providers>
   );
 }

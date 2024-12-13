@@ -10,15 +10,13 @@ import {
   LuBookmark,
   LuSearch
 } from 'react-icons/lu';
-import { NavigationButton } from './NavigationButton';
-import { PairItem } from './PairItem';
-import { ViewMode, GroupedPairs, PairListProps } from './types';
+import { PairItem } from '../PairItem';
 
 const navigationButtons = [
-  { mode: 'favorites' as ViewMode, label: 'Favorites', icon: LuBookmark },
-  { mode: 'fx' as ViewMode, label: 'FX', icon: LuDollarSign },
-  { mode: 'crypto' as ViewMode, label: 'Crypto', icon: LuBitcoin },
-  { mode: 'all' as ViewMode, label: 'All', icon: LuList }
+  { mode: 'favorites', label: 'Favorites', icon: LuBookmark },
+  { mode: 'fx', label: 'FX', icon: LuDollarSign },
+  { mode: 'crypto', label: 'Crypto', icon: LuBitcoin },
+  { mode: 'all', label: 'All', icon: LuList }
 ];
 
 const useKeyboardNavigation = (
@@ -77,8 +75,8 @@ const EmptyFavorites = ({
   viewMode,
   setViewMode
 }: {
-  viewMode: ViewMode;
-  setViewMode: (mode: ViewMode) => void;
+  viewMode: string;
+  setViewMode: (mode: string) => void;
 }) => (
   <div className="fixed bottom-24 left-1/2 h-[500px] w-[1000px] -translate-x-1/2 border-t border-[#222] bg-black backdrop-blur-sm">
     <div className="flex h-full flex-col px-3">
@@ -87,21 +85,21 @@ const EmptyFavorites = ({
         <span className="mt-1 text-xs">Use the search bar to add pairs</span>
       </div>
 
-      <NavigationButtons viewMode={viewMode} setViewMode={setViewMode} />
+      <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
     </div>
   </div>
 );
 
-const NavigationButtons = ({
+const PairFilters = ({
   viewMode,
   setViewMode
 }: {
-  viewMode: ViewMode;
-  setViewMode: (mode: ViewMode) => void;
+  viewMode: string;
+  setViewMode: (mode: string) => void;
 }) => (
   <div className="absolute right-0 bottom-20 left-0 z-[1000] flex items-center justify-center gap-2 py-2">
     {navigationButtons.map((button) => (
-      <NavigationButton
+      <PairFilterButtons
         key={button.mode}
         icon={button.icon}
         isActive={viewMode === button.mode}
@@ -115,15 +113,19 @@ const NavigationButtons = ({
 export const PairNavigator = () => {
   const { selectedPairs, togglePair, pairData } = useDashboard();
   const [activeIndex, setActiveIndex] = useState(0);
-  const [viewMode, setViewMode] = useState<ViewMode>('favorites');
+  const [viewMode, setViewMode] = useState<string>('favorites');
   const scrollRef = useRef<HTMLDivElement>(null);
   const [showRemoveForPair, setShowRemoveForPair] = useState<string | null>(
     null
   );
+  const [selectedPairForModal, setSelectedPairForModal] = useState<
+    string | null
+  >(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const groupedPairs: GroupedPairs = {
-    FX: FOREX_PAIRS,
-    CRYPTO: CRYPTO_PAIRS
+  const groupedPairs: { [key: string]: string[] } = {
+    FX: [...FOREX_PAIRS] as string[],
+    CRYPTO: [...CRYPTO_PAIRS] as string[]
   };
 
   const currentPairs =
@@ -170,25 +172,10 @@ export const PairNavigator = () => {
   return (
     <>
       <div className="fixed inset-0 z-[85] backdrop-blur-sm" />
-
       <div className="fixed bottom-0 left-1/2 z-[90] h-[50vh] w-screen -translate-x-1/2 bg-black">
         <div className="absolute -top-4 right-0 left-0 h-20 rounded-[200em] border-t border-[#222] bg-black" />
-
         <div className="pointer-events-none absolute top-2 right-0 left-0 z-[98] h-20 bg-gradient-to-b from-black via-black/95 to-transparent" />
-
-        <div className="relative z-[99] px-4">
-          <div className="relative flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
-            <div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
-              <LuSearch className="ml-4 h-5 w-5 text-[#666]" />
-              <input
-                type="text"
-                placeholder="Search instruments..."
-                className="font-outfit text-md w-full bg-transparent px-3 py-2 text-white placeholder-[#666] focus:outline-none"
-              />
-            </div>
-          </div>
-        </div>
-
+        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
         <div
           ref={scrollRef}
           className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
@@ -210,9 +197,8 @@ export const PairNavigator = () => {
               />
             </div>
           </div>
-
           <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-36 bg-gradient-to-t from-black via-black/95 to-transparent" />
-          <NavigationButtons viewMode={viewMode} setViewMode={setViewMode} />
+          <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
         </div>
       </div>
     </>
@@ -230,7 +216,18 @@ const PairList = ({
   handleIndexChange,
   togglePair,
   setShowRemoveForPair
-}: PairListProps) => {
+}: {
+  viewMode: string;
+  currentPairs: string[];
+  groupedPairs: { [key: string]: string[] };
+  activeIndex: number;
+  pairData: { [key: string]: any };
+  selectedPairs: string[];
+  showRemoveForPair: string | null;
+  handleIndexChange: (index: number) => void;
+  togglePair: (pair: string) => void;
+  setShowRemoveForPair: (pair: string) => void;
+}) => {
   if (viewMode === 'favorites') {
     return currentPairs.map((pair, index) => (
       <PairItem
@@ -250,19 +247,13 @@ const PairList = ({
         setShowRemoveForPair={setShowRemoveForPair}
         toggleFavorite={() => togglePair(pair)}
         viewMode={viewMode}
+        onViewClick={() => {}}
       />
     ));
   }
 
   return Object.entries(groupedPairs).map(([category, pairs]) => (
     <div key={category}>
-      {/* <div className="sticky top-2 z-[99] px-4 py-2">
-        <div className="font-kodemono flex items-center gap-3 text-xs font-medium tracking-wider text-gray-400">
-          <span className="h-[1px] flex-1 bg-white/5" />
-          {category}
-          <span className="h-[1px] flex-1 bg-white/5" />
-        </div>
-      </div> */}
       {pairs.map((pair, index) => (
         <PairItem
           key={pair}
@@ -281,8 +272,67 @@ const PairList = ({
           setShowRemoveForPair={setShowRemoveForPair}
           toggleFavorite={() => togglePair(pair)}
           viewMode={viewMode}
+          onViewClick={() => {}}
         />
       ))}
     </div>
   ));
+};
+
+export const PairFilterButtons = ({
+  icon: Icon,
+  isActive,
+  onClick,
+  label
+}: {
+  icon: any;
+  isActive: boolean;
+  onClick: () => void;
+  label: string;
+}) => {
+  return (
+    <button onClick={onClick} className="group relative flex items-center">
+      <div
+        className={`group flex h-10 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
+          isActive
+            ? 'from-[#444444] to-[#282828]'
+            : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
+        }`}
+      >
+        <div
+          className={`font-outfit flex h-full w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] py-2 pr-4 pl-3 text-sm font-medium ${
+            isActive ? 'text-gray-200' : 'text-[#818181]'
+          }`}
+        >
+          <Icon size={14} />
+          {label}
+        </div>
+      </div>
+    </button>
+  );
+};
+
+export const SearchBar = ({
+  searchQuery,
+  setSearchQuery
+}: {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}) => {
+  return (
+    <div className="relative z-[99] flex justify-center px-4">
+      <div className="relative flex w-full items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#444444] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]">
+        <div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+          <LuSearch className="ml-4 h-5 w-5 text-[#666]" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search instruments..."
+            className="font-outfit text-md ml-2 w-full bg-transparent pr-3 text-white placeholder-[#666] focus:outline-none"
+          />
+        </div>
+      </div>
+    </div>
+  );
 };

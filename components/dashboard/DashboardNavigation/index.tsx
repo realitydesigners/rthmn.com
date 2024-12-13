@@ -2,13 +2,12 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconType } from 'react-icons';
-import { LuLayers, LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
+import { LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
 import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
 import { SettingsBar } from '@/components/Accessibility/SettingsBar';
 import { PairNavigator } from '@/components/dashboard/PairNavigator';
 import { useScrollDirection } from '../../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
-
 import { useDashboard } from '@/providers/DashboardProvider';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | null;
@@ -20,7 +19,6 @@ export const DashboardNavigation = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const scrollDirection = useScrollDirection();
 
-  // Lock scroll when PairNavigator is open
   useScrollLock(activePanel === 'pairs');
 
   const handleButtonClick = (panel: Panel, path?: string) => {
@@ -66,18 +64,7 @@ export const DashboardNavigation = () => {
       {activePanel === 'pairs' && (
         <div className="fixed inset-0 z-[85] bg-black/80" />
       )}
-
-      {/* Gradient backdrop */}
-      <div
-        className={`bg-gradient-o-t fixed bottom-0 left-0 z-[1000] h-16 w-full from-black via-black/80 to-transparent transition-transform duration-300 ${
-          scrollDirection === 'down' ? 'translate-y-24' : 'translate-y-0'
-        }`}
-      />
-
-      {/* Panel Content */}
       <div className="relative z-[999]">{activePanel && renderPanel()}</div>
-
-      {/* Navigation */}
       <div
         className={`fixed bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 transform transition-transform duration-300 ${
           scrollDirection === 'down' ? 'translate-y-24' : 'translate-y-0'
@@ -88,20 +75,17 @@ export const DashboardNavigation = () => {
             icon={LuSearch}
             isActive={activePanel === 'pairs'}
             onClick={() => handleButtonClick('pairs')}
-            label="Instruments"
           />
           <SidebarIconButton
             icon={LuSettings}
             isActive={activePanel === 'settings'}
             onClick={() => handleButtonClick('settings')}
-            label="Settings"
           />
           {process.env.NODE_ENV === 'development' && (
             <SidebarIconButton
               icon={LuBeaker}
               isActive={false}
               onClick={() => handleButtonClick(null, '/test')}
-              label="Test Page"
             />
           )}
         </div>
@@ -110,19 +94,15 @@ export const DashboardNavigation = () => {
   );
 };
 
-interface SidebarIconButtonProps {
-  icon: IconType;
-  isActive: boolean;
-  onClick: () => void;
-  label: string;
-}
-
 const SidebarIconButton = ({
   icon: Icon,
   isActive,
-  onClick,
-  label
-}: SidebarIconButtonProps) => {
+  onClick
+}: {
+  icon: IconType;
+  isActive: boolean;
+  onClick: () => void;
+}) => {
   return (
     <button onClick={onClick} className="group relative flex items-center">
       <div
@@ -137,12 +117,9 @@ const SidebarIconButton = ({
             isActive ? 'text-white' : 'text-[#818181]'
           }`}
         >
-          <Icon size={18} />
+          <Icon size={20} />
         </div>
       </div>
-      <span className="absolute left-full ml-2 hidden rounded bg-gray-800 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity group-hover:opacity-100 lg:block">
-        {label}
-      </span>
     </button>
   );
 };
