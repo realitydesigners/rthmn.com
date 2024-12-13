@@ -195,7 +195,7 @@ export const PairNavigator = () => {
           {...handlers}
         >
           <div className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth">
-            <div className="mb-[25vh]">
+            <div className="mb-[25vh] pt-2">
               <PairList
                 viewMode={viewMode}
                 currentPairs={currentPairs}

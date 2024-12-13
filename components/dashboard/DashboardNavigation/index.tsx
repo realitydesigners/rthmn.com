@@ -8,9 +8,8 @@ import { SettingsBar } from '@/components/Accessibility/SettingsBar';
 import { PairNavigator } from '@/components/dashboard/PairNavigator';
 import { useScrollDirection } from '../../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
-import { SearchBar } from '@/components/dashboard/SearchBar';
+
 import { useDashboard } from '@/providers/DashboardProvider';
-import { MobileSearchBar } from '@/components/dashboard/MobileSearchBar';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | null;
 

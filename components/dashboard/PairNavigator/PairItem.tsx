@@ -1,6 +1,12 @@
 import { useLongPress } from '@/hooks/useLongPress';
 import Link from 'next/link';
-import { LuExternalLink, LuPlus, LuBookmark } from 'react-icons/lu';
+import {
+  LuExternalLink,
+  LuPlus,
+  LuBookmark,
+  LuX,
+  LuTrash2
+} from 'react-icons/lu';
 import { useState } from 'react';
 import { PairItemProps } from './types';
 
@@ -48,9 +54,7 @@ export const PairItem = ({
             <h3
               className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ${
                 isActive ? 'scale-110 text-white' : 'scale-90 text-gray-400/25'
-              } ${showRemove ? 'text-red-400' : ''} ${
-                showAddForPair ? 'text-green-400' : ''
-              }`}
+              } `}
             >
               {isFavorite && viewMode !== 'favorites' && (
                 <LuBookmark
@@ -92,9 +96,9 @@ export const PairItem = ({
                     e.stopPropagation();
                     setShowAddForPair(false);
                   }}
-                  className="flex items-center gap-1.5 rounded-full bg-white/5 px-3.5 py-1.5 text-xs font-medium text-gray-400 transition-all hover:bg-white/10 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-white/20 hover:text-white"
                 >
-                  Cancel
+                  <LuX size={18} className="text-gray-300" />
                 </button>
                 <button
                   onClick={(e) => {
@@ -102,10 +106,9 @@ export const PairItem = ({
                     toggleFavorite?.();
                     setShowAddForPair(false);
                   }}
-                  className="flex items-center gap-1.5 rounded-full bg-green-500/10 px-3.5 py-1.5 text-xs font-medium text-green-400 transition-all hover:bg-green-500/20"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-green-500/10 text-green-400 transition-all hover:bg-green-500/20"
                 >
-                  <LuPlus size={12} className="opacity-50" />
-                  Add
+                  <LuPlus size={18} />
                 </button>
               </div>
             )}
@@ -117,18 +120,18 @@ export const PairItem = ({
                     e.stopPropagation();
                     onCancelRemove();
                   }}
-                  className="flex items-center gap-1.5 rounded-full bg-white/5 px-3.5 py-1.5 text-xs font-medium text-gray-400 transition-all hover:bg-white/10 hover:text-white"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-all hover:bg-white/20 hover:text-white"
                 >
-                  Cancel
+                  <LuX size={18} className="text-gray-300" />
                 </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     onRemove();
                   }}
-                  className="flex items-center gap-1.5 rounded-full bg-red-500/10 px-3.5 py-1.5 text-xs font-medium text-red-400 transition-all hover:bg-red-500/20"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-red-500/10 text-red-400 transition-all hover:bg-red-500/20"
                 >
-                  Remove
+                  <LuTrash2 size={18} />
                 </button>
               </div>
             )}
