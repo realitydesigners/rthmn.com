@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaStripe, FaCreditCard } from 'react-icons/fa';
+import { useUser } from '@/providers/UserProvider';
 
 type Subscription = any;
 type Price = any;
@@ -17,14 +18,11 @@ type SubscriptionWithPriceAndProduct = Subscription & {
     | null;
 };
 
-interface Props {
-  subscription: SubscriptionWithPriceAndProduct | null;
-}
-
-export default function CustomerPortalForm({ subscription }: Props) {
+export default function CustomerPortalForm() {
   const router = useRouter();
   const currentPath = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { subscription } = useUser();
 
   const subscriptionPrice =
     subscription &&
@@ -50,7 +48,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
               Subscription Plan
             </h3>
           </div>
-          <p className="mt-1 font-outfit text-sm text-zinc-400">
+          <p className="font-outfit mt-1 text-sm text-zinc-400">
             {subscription
               ? `${subscription?.prices?.products?.name} Plan`
               : 'No active subscription'}
@@ -72,7 +70,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
         </div>
       </div>
       <div className="mt-6 flex items-center justify-between">
-        <div className="flex items-center gap-2 pr-6 font-outfit text-sm text-zinc-400">
+        <div className="font-outfit flex items-center gap-2 pr-6 text-sm text-zinc-400">
           <FaStripe className="h-5 w-5" />
           <span>Manage your subscription</span>
         </div>

@@ -16,6 +16,7 @@ import {
   russo
 } from '@/components/Accessibility/Fonts/fonts';
 import { Analytics } from '@vercel/analytics/react';
+import UserProvider from '@/providers/UserProvider';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -62,12 +63,13 @@ export default async function RootLayout({
       <GoogleTagManager gtmId="GTM-XYZ" />
       <body className="bg-black">
         <SupabaseProvider initialUser={user}>
-          <Navbar />
-          {children}
-          {/* <Footer /> */}
-          <Suspense>
-            <Toaster />
-          </Suspense>
+          <UserProvider initialUser={user}>
+            <Navbar />
+            {children}
+            <Suspense>
+              <Toaster />
+            </Suspense>
+          </UserProvider>
         </SupabaseProvider>
         <Analytics />
         {/* Google Analytics */}

@@ -54,7 +54,7 @@ export default function DiscordConnectionForm({
               Discord Connection
             </h3>
           </div>
-          <p className="mt-1 font-outfit text-sm text-zinc-400">
+          <p className="font-outfit mt-1 text-sm text-zinc-400">
             {discordConnection
               ? `Connected as ${discordConnection.discord_username}`
               : 'Connect your Discord account'}
