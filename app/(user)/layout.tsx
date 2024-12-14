@@ -3,7 +3,7 @@ import { createClient } from '@/utils/supabase/server';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { Providers } from '@/providers/Providers';
 import { DashboardNavigation } from '@/components/dashboard/DashboardNavigation';
-import { NavbarSignedIn } from '@/components/Accessibility/NavbarSignedIn';
+import { BackgroundGrid } from '@/components/BackgroundGrid';
 
 export default async function UserLayout({
   children
@@ -26,8 +26,10 @@ export default async function UserLayout({
 
   return (
     <Providers>
-      <div>{children}</div>
-      <DashboardNavigation />
+      <BackgroundGrid>
+        <div>{children}</div>
+        <DashboardNavigation />
+      </BackgroundGrid>
     </Providers>
   );
 }
