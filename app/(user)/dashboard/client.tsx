@@ -108,7 +108,7 @@ const PairResoBox = ({
   const closePrice = currentOHLC?.close || 'N/A';
 
   return (
-    <div className="group m-auto flex w-full flex-col items-center justify-center gap-4 p-8 text-center text-white shadow-md transition-all duration-500 ease-in-out lg:p-16">
+    <div className="group m-auto flex w-full flex-col items-center justify-center gap-4 p-12 text-center text-white shadow-md transition-all duration-500 ease-in-out lg:p-16">
       <div className="w-full transition-transform duration-300 ease-in-out">
         <ResoBox
           key={`${pair}-${boxSlice.timestamp}`}
@@ -117,11 +117,11 @@ const PairResoBox = ({
           className="h-full w-full"
         />
       </div>
-      <div className="flex w-full items-center justify-between">
+      <div className="flex w-full items-center gap-4">
         <div className="font-outfit text-lg font-bold tracking-wider">
           {pair.toUpperCase()}
         </div>
-        <div className="font-outfit text-sm font-medium text-gray-200">
+        <div className="font-kodemono text-sm font-medium text-gray-200">
           {closePrice}
         </div>
       </div>

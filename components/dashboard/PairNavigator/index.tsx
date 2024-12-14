@@ -170,38 +170,35 @@ export const PairNavigator = () => {
   }
 
   return (
-    <>
-      <div className="fixed inset-0 z-[85] backdrop-blur-sm" />
-      <div className="fixed bottom-0 left-1/2 z-[90] h-[50vh] w-screen -translate-x-1/2 bg-black">
-        <div className="absolute -top-4 right-0 left-0 h-20 rounded-[200em] border-t border-[#222] bg-black" />
-        <div className="pointer-events-none absolute top-2 right-0 left-0 z-[98] h-20 bg-gradient-to-b from-black via-black/95 to-transparent" />
-        <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        <div
-          ref={scrollRef}
-          className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
-          {...handlers}
-        >
-          <div className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth">
-            <div className="mb-[25vh] pt-2">
-              <PairList
-                viewMode={viewMode}
-                currentPairs={currentPairs}
-                groupedPairs={groupedPairs}
-                activeIndex={activeIndex}
-                pairData={pairData}
-                selectedPairs={selectedPairs}
-                showRemoveForPair={showRemoveForPair}
-                handleIndexChange={handleIndexChange}
-                togglePair={togglePair}
-                setShowRemoveForPair={setShowRemoveForPair}
-              />
-            </div>
+    <div className="fixed bottom-0 left-1/2 z-[90] h-[50vh] w-screen -translate-x-1/2 bg-black">
+      <div className="absolute -top-4 right-0 left-0 h-20 rounded-[10em] border-t border-[#222] bg-black" />
+      <div className="pointer-events-none absolute top-2 right-0 left-0 z-[98] h-20 bg-gradient-to-b from-black via-black/95 to-transparent" />
+      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <div
+        ref={scrollRef}
+        className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
+        {...handlers}
+      >
+        <div className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth">
+          <div className="mb-[25vh] pt-2">
+            <PairList
+              viewMode={viewMode}
+              currentPairs={currentPairs}
+              groupedPairs={groupedPairs}
+              activeIndex={activeIndex}
+              pairData={pairData}
+              selectedPairs={selectedPairs}
+              showRemoveForPair={showRemoveForPair}
+              handleIndexChange={handleIndexChange}
+              togglePair={togglePair}
+              setShowRemoveForPair={setShowRemoveForPair}
+            />
           </div>
-          <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-36 bg-gradient-to-t from-black via-black/95 to-transparent" />
-          <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
         </div>
+        <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-36 bg-gradient-to-t from-black via-black/95 to-transparent" />
+        <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
       </div>
-    </>
+    </div>
   );
 };
 

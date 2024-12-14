@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconType } from 'react-icons';
 import { LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
@@ -9,16 +9,128 @@ import { PairNavigator } from '@/components/dashboard/PairNavigator';
 import { useScrollDirection } from '../../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useDashboard } from '@/providers/DashboardProvider';
+import Image from 'next/image';
+import { useAuth } from '@/providers/SupabaseProvider';
+import { createClient } from '@/utils/supabase/client';
+import Link from 'next/link';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | null;
+
+const ProfileIcon = () => {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const { signOut, user } = useAuth();
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!user) return;
+
+      const supabase = createClient();
+      const { data: userDetails } = await supabase
+        .from('users')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .single();
+
+      if (userDetails?.avatar_url) {
+        setAvatarUrl(userDetails.avatar_url);
+      }
+    };
+
+    fetchUserDetails();
+  }, [user]);
+
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut();
+    } catch (error) {
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
+  const userInitial =
+    user?.user_metadata?.full_name?.[0].toUpperCase() ||
+    user?.email?.[0].toUpperCase() ||
+    '?';
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="group flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+      >
+        <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+          <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black">
+            {avatarUrl ? (
+              <Image
+                src={avatarUrl}
+                alt="Profile"
+                className="object-cover"
+                width={80}
+                height={80}
+              />
+            ) : (
+              <span className="text-lg font-bold">{userInitial}</span>
+            )}
+          </div>
+        </div>
+      </button>
+      {isDropdownOpen && (
+        <div className="ring-opacity-5 absolute right-0 bottom-full mb-2 w-64 rounded-md border border-[#181818] bg-black ring-1 shadow-lg ring-black">
+          <div className="py-1" role="menu">
+            <Link
+              href="/account"
+              className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]"
+              role="menuitem"
+            >
+              Account
+            </Link>
+            <button
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              className="block w-full px-4 py-2 text-left text-sm text-gray-100 hover:bg-[#181818]"
+              role="menuitem"
+            >
+              {isSigningOut ? 'Signing out...' : 'Sign out'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const DashboardNavigation = () => {
   const router = useRouter();
   const { selectedPairs } = useDashboard();
   const [activePanel, setActivePanel] = useState<Panel>(null);
   const scrollDirection = useScrollDirection();
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useScrollLock(activePanel === 'pairs');
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(event.target as Node)
+      ) {
+        setActivePanel(null);
+      }
+    };
+
+    if (activePanel) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activePanel]);
 
   const handleButtonClick = (panel: Panel, path?: string) => {
     if (path) {
@@ -38,19 +150,30 @@ export const DashboardNavigation = () => {
     switch (activePanel) {
       case 'pairs':
         return (
-          <div className="relative">
+          <div className="relative z-[90]">
+            <div
+              className="fixed inset-0 z-[85] backdrop-blur-sm"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setActivePanel(null);
+                }
+              }}
+            />
             <PairNavigator />
           </div>
         );
       case 'settings':
         return (
-          <div className="fixed inset-0 z-[85]">
-            <div className="relative">
-              <SettingsBar
-                isOpen={true}
-                onToggle={() => setActivePanel(null)}
-              />
-            </div>
+          <div className="relative z-[90]">
+            <div
+              className="fixed inset-0 z-[85] backdrop-blur-sm"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setActivePanel(null);
+                }
+              }}
+            />
+            <SettingsBar isOpen={true} onToggle={() => setActivePanel(null)} />
           </div>
         );
       default:
@@ -60,16 +183,16 @@ export const DashboardNavigation = () => {
 
   return (
     <>
-      {activePanel === 'pairs' && (
-        <div className="fixed inset-0 z-[85] bg-black/80" />
+      {activePanel && (
+        <div className="fixed inset-0 z-[85] bg-black/80">{renderPanel()}</div>
       )}
-      <div className="relative z-[999]">{activePanel && renderPanel()}</div>
       <div
-        className={`fixed bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 transform transition-transform duration-300 ${
+        className={`fixed bottom-4 left-1/2 z-[1000] flex -translate-x-1/2 transform transition-transform duration-300 lg:hidden ${
           scrollDirection === 'down' ? 'translate-y-24' : 'translate-y-0'
         }`}
       >
         <div className="flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2">
+          <ProfileIcon />
           <SidebarIconButton
             icon={LuSearch}
             isActive={activePanel === 'pairs'}
@@ -80,13 +203,14 @@ export const DashboardNavigation = () => {
             isActive={activePanel === 'settings'}
             onClick={() => handleButtonClick('settings')}
           />
-          {process.env.NODE_ENV === 'development' && (
+
+          {/* {process.env.NODE_ENV === 'development' && (
             <SidebarIconButton
               icon={LuBeaker}
               isActive={false}
               onClick={() => handleButtonClick(null, '/test')}
             />
-          )}
+          )} */}
         </div>
       </div>
     </>

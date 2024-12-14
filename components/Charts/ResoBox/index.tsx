@@ -115,7 +115,7 @@ const Box: React.FC<{
 
       {/* Additional gradient layer */}
       <div
-        className="absolute -inset-[1px]"
+        className="absolute inset-0"
         style={{
           borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
           background: `linear-gradient(to bottom right, ${baseColor.replace(')', `, ${opacity}`)} 100%, transparent 100%)`,

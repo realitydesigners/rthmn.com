@@ -185,11 +185,9 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
 
   return (
     <>
-      <div className="fixed inset-0 z-[85] backdrop-blur-sm" />
-
-      <div className="fixed bottom-0 left-1/2 z-[90] h-[50vh] w-screen -translate-x-1/2 bg-black">
+      <div className="fixed bottom-0 left-1/2 z-[1000] h-[50vh] w-screen -translate-x-1/2 bg-black">
         {/* Rounded top edge */}
-        <div className="absolute -top-4 right-0 left-0 h-20 rounded-[200em] border-t border-[#222] bg-black" />
+        <div className="absolute -top-4 right-0 left-0 h-20 rounded-[10em] border-t border-[#222] bg-black" />
 
         {/* Settings Content */}
         <div className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4">
