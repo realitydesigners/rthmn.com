@@ -24,21 +24,22 @@ const MenuButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={cn(
-      'flex w-full items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-medium transition-all',
+    className={`group flex w-full items-center justify-between rounded-full border ${
       isActive
-        ? 'bg-[#1A1A1A] text-white shadow-lg'
-        : 'text-gray-400 hover:bg-[#1A1A1A]/50'
-    )}
+        ? 'border-[#333] bg-[#181818] text-white'
+        : 'border-[#222] bg-[#111] text-[#818181] hover:border-[#333] hover:bg-[#181818]'
+    }`}
   >
-    <span>{label}</span>
-    <LuChevronRight
-      className={cn(
-        'transition-transform duration-200',
-        isActive && 'rotate-90'
-      )}
-      size={16}
-    />
+    <div className="flex h-12 w-full items-center justify-between px-4">
+      <span className="text-sm font-medium">{label}</span>
+      <LuChevronRight
+        className={cn(
+          'transition-transform duration-200',
+          isActive && 'rotate-90'
+        )}
+        size={16}
+      />
+    </div>
   </button>
 );
 
@@ -171,7 +172,7 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
 
   const handleStyleChange = (
     property: keyof BoxColors['styles'],
-    value: number
+    value: number | boolean
   ) => {
     updateBoxColors({
       ...boxColors,
@@ -183,109 +184,164 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
   };
 
   return (
-    <div className="flex h-[calc(100vh-120px)] flex-col space-y-1 overflow-y-auto p-4">
-      <MenuButton
-        label="Colors"
-        isActive={activeSection === 'colors'}
-        onClick={() =>
-          setActiveSection(activeSection === 'colors' ? null : 'colors')
-        }
-      />
+    <>
+      <div className="fixed inset-0 z-[85] backdrop-blur-sm" />
 
-      {activeSection === 'colors' && (
-        <div className="space-y-4 px-2 py-3">
-          <div className="space-y-2">
-            <ColorPicker
-              label="Positive Color"
-              color={boxColors.positive}
-              onChange={(color) =>
-                updateBoxColors({
-                  ...boxColors,
-                  positive: color
-                })
-              }
-            />
-            <ColorPicker
-              label="Negative Color"
-              color={boxColors.negative}
-              onChange={(color) =>
-                updateBoxColors({
-                  ...boxColors,
-                  negative: color
-                })
-              }
-            />
-          </div>
+      <div className="fixed bottom-0 left-1/2 z-[90] h-[50vh] w-screen -translate-x-1/2 bg-black">
+        {/* Rounded top edge */}
+        <div className="absolute -top-4 right-0 left-0 h-20 rounded-[200em] border-t border-[#222] bg-black" />
 
-          <div className="relative py-3">
-            <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#222]" />
-          </div>
+        {/* Settings Content */}
+        <div className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4">
+          <div className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth">
+            <div className="mb-[25vh] space-y-2 pt-2">
+              {/* Menu Buttons */}
+              <MenuButton
+                label="Colors"
+                isActive={activeSection === 'colors'}
+                onClick={() =>
+                  setActiveSection(activeSection === 'colors' ? null : 'colors')
+                }
+              />
 
-          <div className="space-y-1">
-            <p className="px-1 text-xs font-medium text-gray-500">
-              Color Presets
-            </p>
-            <div className="grid grid-cols-1 gap-2">
-              {colorPresets.map((preset) => (
-                <ColorPresetButton
-                  key={preset.name}
-                  preset={preset}
-                  isSelected={
-                    boxColors.positive === preset.positive &&
-                    boxColors.negative === preset.negative
-                  }
-                  onClick={() => {
-                    updateBoxColors({
-                      ...boxColors,
-                      positive: preset.positive,
-                      negative: preset.negative
-                    });
-                  }}
-                />
-              ))}
+              {activeSection === 'colors' && (
+                <div className="space-y-4 px-2 py-3">
+                  <div className="space-y-2">
+                    <ColorPicker
+                      label="Positive Color"
+                      color={boxColors.positive}
+                      onChange={(color) =>
+                        updateBoxColors({
+                          ...boxColors,
+                          positive: color
+                        })
+                      }
+                    />
+                    <ColorPicker
+                      label="Negative Color"
+                      color={boxColors.negative}
+                      onChange={(color) =>
+                        updateBoxColors({
+                          ...boxColors,
+                          negative: color
+                        })
+                      }
+                    />
+                  </div>
+
+                  <div className="relative py-3">
+                    <div className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#222]" />
+                  </div>
+
+                  <div className="space-y-1">
+                    <p className="px-1 text-xs font-medium text-gray-500">
+                      Color Presets
+                    </p>
+                    <div className="grid grid-cols-1 gap-2">
+                      {colorPresets.map((preset) => (
+                        <ColorPresetButton
+                          key={preset.name}
+                          preset={preset}
+                          isSelected={
+                            boxColors.positive === preset.positive &&
+                            boxColors.negative === preset.negative
+                          }
+                          onClick={() => {
+                            updateBoxColors({
+                              ...boxColors,
+                              positive: preset.positive,
+                              negative: preset.negative
+                            });
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <MenuButton
+                label="Box Styles"
+                isActive={activeSection === 'boxStyles'}
+                onClick={() =>
+                  setActiveSection(
+                    activeSection === 'boxStyles' ? null : 'boxStyles'
+                  )
+                }
+              />
+
+              {activeSection === 'boxStyles' && (
+                <div className="space-y-6 px-2 py-3">
+                  <StyleControl
+                    label="Border Radius"
+                    value={boxColors.styles?.borderRadius ?? 8}
+                    onChange={(value) =>
+                      handleStyleChange('borderRadius', value)
+                    }
+                    min={0}
+                    max={16}
+                    step={1}
+                    unit="px"
+                  />
+                  <StyleControl
+                    label="Pattern Length"
+                    value={boxColors.styles?.maxBoxCount ?? 10}
+                    onChange={(value) =>
+                      handleStyleChange('maxBoxCount', value)
+                    }
+                    min={2}
+                    max={38}
+                    step={1}
+                    unit=" boxes"
+                  />
+                  <StyleControl
+                    label="Shadow Depth"
+                    value={boxColors.styles?.shadowIntensity ?? 0.25}
+                    onChange={(value) =>
+                      handleStyleChange('shadowIntensity', value)
+                    }
+                    min={0}
+                    max={1}
+                    step={0.05}
+                  />
+                  <StyleControl
+                    label="Opacity"
+                    value={boxColors.styles?.opacity ?? 1}
+                    onChange={(value) => handleStyleChange('opacity', value)}
+                    min={0.1}
+                    max={1}
+                    step={0.05}
+                  />
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-medium text-gray-400">
+                      Show Border
+                    </span>
+                    <button
+                      onClick={() =>
+                        handleStyleChange(
+                          'showBorder',
+                          !boxColors.styles?.showBorder
+                        )
+                      }
+                      className={`relative h-6 w-11 rounded-full transition-colors ${
+                        boxColors.styles?.showBorder
+                          ? 'bg-emerald-500/30'
+                          : 'bg-[#222]'
+                      }`}
+                    >
+                      <div
+                        className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${
+                          boxColors.styles?.showBorder ? 'left-6' : 'left-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
-      )}
-
-      <MenuButton
-        label="Box Styles"
-        isActive={activeSection === 'boxStyles'}
-        onClick={() =>
-          setActiveSection(activeSection === 'boxStyles' ? null : 'boxStyles')
-        }
-      />
-
-      {activeSection === 'boxStyles' && (
-        <div className="space-y-6 px-2 py-3">
-          <StyleControl
-            label="Border Radius"
-            value={boxColors.styles?.borderRadius ?? 8}
-            onChange={(value) => handleStyleChange('borderRadius', value)}
-            min={0}
-            max={16}
-            step={1}
-            unit="px"
-          />
-          <StyleControl
-            label="Pattern Length"
-            value={boxColors.styles?.maxBoxCount ?? 10}
-            onChange={(value) => handleStyleChange('maxBoxCount', value)}
-            min={2}
-            max={38}
-            step={1}
-            unit=" boxes"
-          />
-          <StyleControl
-            label="Shadow Depth"
-            value={boxColors.styles?.shadowIntensity ?? 0.25}
-            onChange={(value) => handleStyleChange('shadowIntensity', value)}
-            min={0}
-            max={1}
-            step={0.05}
-          />
-        </div>
-      )}
-    </div>
+      </div>
+    </>
   );
 };

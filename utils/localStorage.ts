@@ -16,20 +16,24 @@ const BOX_COLORS_KEY = 'boxColors';
 export interface BoxColors {
   positive: string;
   negative: string;
-  styles: {
+  styles?: {
     borderRadius: number;
-    shadowIntensity: number;
     maxBoxCount: number;
+    shadowIntensity: number;
+    showBorder: boolean;
+    opacity: number;
   };
 }
 
 const DEFAULT_BOX_COLORS: BoxColors = {
-  positive: 'rgba(88, 255, 160, 1)',
-  negative: 'rgba(214, 29, 97, 1)',
+  positive: '#34D399',
+  negative: '#F87171',
   styles: {
     borderRadius: 8,
+    maxBoxCount: 10,
     shadowIntensity: 0.25,
-    maxBoxCount: 20
+    showBorder: true,
+    opacity: 1
   }
 };
 

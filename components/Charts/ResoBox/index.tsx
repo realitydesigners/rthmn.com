@@ -32,19 +32,13 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
         }
       };
 
-      // Create a ResizeObserver to watch for container size changes
       const resizeObserver = new ResizeObserver(() => {
-        // Add small delay to ensure DOM is ready
         requestAnimationFrame(updateSize);
       });
-
       if (boxRef.current) {
         resizeObserver.observe(boxRef.current);
       }
-
-      // Initial size update with small delay
       requestAnimationFrame(updateSize);
-
       return () => {
         resizeObserver.disconnect();
       };
@@ -68,22 +62,31 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
     const renderBox = useCallback(
       (box: Box, index: number, prevColor: string | null = null) => {
         const intensity = Math.floor((Math.abs(box.value) / maxSize) * 255);
+        const opacity = boxColors.styles?.opacity ?? 1;
+
+        // Check if this is the first box with different direction
+        const isFirstDifferent =
+          prevColor &&
+          ((box.value > 0 && prevColor.includes(boxColors.negative)) ||
+            (box.value < 0 && prevColor.includes(boxColors.positive)));
+
         const baseColor =
-          box.value > 0
-            ? boxColors.positive
-                .replace('rgba', 'rgb')
-                .replace(/, *[0-9.]+\)/, ')')
-            : boxColors.negative
-                .replace('rgba', 'rgb')
-                .replace(/, *[0-9.]+\)/, ')');
+          box.value > 0 ? boxColors.positive : boxColors.negative;
+
+        // Increase opacity for first different box
+        const boxOpacity = isFirstDifferent
+          ? Math.min((intensity / 255) * opacity * 1.5, 1) // 50% more intense
+          : (intensity / 255) * opacity;
+
         const boxColor = baseColor
+          .replace('rgba', 'rgb')
+          .replace(/, *[0-9.]+\)/, '')
           .replace('rgb', 'rgba')
-          .replace(')', `, ${intensity / 255})`);
+          .replace(')', `, ${boxOpacity})`);
 
         const calculatedSize = (Math.abs(box.value) / maxSize) * containerSize;
 
         let positionStyle: React.CSSProperties = { top: 0, right: 0 };
-
         if (prevColor !== null) {
           if (prevColor.includes(boxColors.negative.split(',')[0])) {
             positionStyle = { bottom: 0, right: 0 };
@@ -96,12 +99,14 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
           backgroundColor: boxColor,
           width: `${calculatedSize}px`,
           height: `${calculatedSize}px`,
-          opacity: 1,
           borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-          borderWidth: '1px',
-          boxShadow: `inset 0 4px 20px rgba(0,0,0,${boxColors.styles?.shadowIntensity ?? 0.25})`,
+          borderWidth: boxColors.styles?.showBorder ? '1px' : '0',
+          boxShadow: isFirstDifferent
+            ? `inset 0 4px 25px rgba(0,0,0,${(boxColors.styles?.shadowIntensity ?? 0.25) * 1.5})` // Deeper shadow for first different
+            : `inset 0 4px 20px rgba(0,0,0,${boxColors.styles?.shadowIntensity ?? 0.25})`,
           ...positionStyle,
-          margin: '-1px'
+          margin: boxColors.styles?.showBorder ? '-1px' : '0',
+          transition: 'all 0.2s ease-out'
         };
 
         return (
@@ -114,12 +119,39 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
             exit={{ opacity: 0.8 }}
             transition={{ duration: 0.2 }}
           >
+            {/* Add gradient overlay for first different box */}
+            {isFirstDifferent && (
+              <>
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    background:
+                      box.value > 0
+                        ? `linear-gradient(to bottom right, ${boxColors.positive.replace(')', ', 0.2)')}, transparent)`
+                        : `linear-gradient(to bottom right, ${boxColors.negative.replace(')', ', 0.2)')}, transparent)`,
+                    borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`
+                  }}
+                />
+                {/* Additional shadow overlay for first different box */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+                    boxShadow:
+                      box.value > 0
+                        ? `inset 0 4px 25px ${boxColors.positive.replace(')', ', 0.2)')}`
+                        : `inset 0 4px 25px ${boxColors.negative.replace(')', ', 0.2)')}`
+                  }}
+                />
+              </>
+            )}
+
             {index < sortedBoxes.length - 1 &&
               renderBox(sortedBoxes[index + 1], index + 1, boxColor)}
           </motion.div>
         );
       },
-      [maxSize, containerSize, boxColors, slice?.timestamp]
+      [maxSize, containerSize, boxColors, slice?.timestamp, sortedBoxes.length]
     );
 
     const renderShiftedBoxes = useCallback(
@@ -133,35 +165,13 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
     return (
       <motion.div
         ref={boxRef}
-        className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${className}`}
-        style={{
-          aspectRatio: '1 / 1'
-        }}
+        className={`relative aspect-square h-full w-full overflow-hidden border border-[#181818] bg-black ${className}`}
         initial={{ opacity: 1 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 1 }}
         transition={{ duration: 0 }}
       >
         <AnimatePresence>
-          {(!slice || !slice.boxes || slice.boxes.length === 0) &&
-            !isLoading && (
-              <motion.div
-                key="initial-state"
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 1 }}
-                transition={{ duration: 0 }}
-              ></motion.div>
-            )}
-          {isLoading && (
-            <motion.div
-              key="loading-spinner"
-              initial={{ opacity: 1 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 1 }}
-              transition={{ duration: 0 }}
-            ></motion.div>
-          )}
           {slice?.boxes && slice.boxes.length > 0 && (
             <motion.div
               key="box-container"
@@ -171,13 +181,11 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
               exit={{ opacity: 1 }}
               transition={{ duration: 0 }}
             >
-              <AnimatePresence>
-                {renderShiftedBoxes(
-                  slice.boxes.sort(
-                    (a, b) => Math.abs(b.value) - Math.abs(a.value)
-                  )
-                )}
-              </AnimatePresence>
+              {renderShiftedBoxes(
+                slice.boxes.sort(
+                  (a, b) => Math.abs(b.value) - Math.abs(a.value)
+                )
+              )}
             </motion.div>
           )}
         </AnimatePresence>

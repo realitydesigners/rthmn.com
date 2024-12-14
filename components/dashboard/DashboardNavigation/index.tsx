@@ -16,7 +16,6 @@ export const DashboardNavigation = () => {
   const router = useRouter();
   const { selectedPairs } = useDashboard();
   const [activePanel, setActivePanel] = useState<Panel>(null);
-  const [isSettingsOpen, setIsSettingsOpen] = useState(true);
   const scrollDirection = useScrollDirection();
 
   useScrollLock(activePanel === 'pairs');
@@ -39,19 +38,19 @@ export const DashboardNavigation = () => {
     switch (activePanel) {
       case 'pairs':
         return (
-          <>
-            <div className="relative">
-              <PairNavigator />
-            </div>
-          </>
+          <div className="relative">
+            <PairNavigator />
+          </div>
         );
       case 'settings':
         return (
-          <div className="relative">
-            <SettingsBar
-              isOpen={isSettingsOpen}
-              onToggle={() => setIsSettingsOpen(!isSettingsOpen)}
-            />
+          <div className="fixed inset-0 z-[85]">
+            <div className="relative">
+              <SettingsBar
+                isOpen={true}
+                onToggle={() => setActivePanel(null)}
+              />
+            </div>
           </div>
         );
       default:
