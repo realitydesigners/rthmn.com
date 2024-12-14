@@ -13,10 +13,15 @@ import Image from 'next/image';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
+import { ProfilePanel } from '@/components/dashboard/ProfilePanel';
 
-type Panel = 'pairs' | 'settings' | 'alerts' | null;
+type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | null;
 
-const ProfileIcon = () => {
+const ProfileIcon = ({
+  setActivePanel
+}: {
+  setActivePanel: (panel: Panel) => void;
+}) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -60,7 +65,10 @@ const ProfileIcon = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        onClick={() => {
+          setIsDropdownOpen(!isDropdownOpen);
+          setActivePanel('profile');
+        }}
         className="group flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
       >
         <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
@@ -79,27 +87,6 @@ const ProfileIcon = () => {
           </div>
         </div>
       </button>
-      {isDropdownOpen && (
-        <div className="ring-opacity-5 absolute right-0 bottom-full mb-2 w-64 rounded-md border border-[#181818] bg-black ring-1 shadow-lg ring-black">
-          <div className="py-1" role="menu">
-            <Link
-              href="/account"
-              className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]"
-              role="menuitem"
-            >
-              Account
-            </Link>
-            <button
-              onClick={handleSignOut}
-              disabled={isSigningOut}
-              className="block w-full px-4 py-2 text-left text-sm text-gray-100 hover:bg-[#181818]"
-              role="menuitem"
-            >
-              {isSigningOut ? 'Signing out...' : 'Sign out'}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
@@ -176,6 +163,20 @@ export const DashboardNavigation = () => {
             <SettingsBar isOpen={true} onToggle={() => setActivePanel(null)} />
           </div>
         );
+      case 'profile':
+        return (
+          <div className="relative z-[90]">
+            <div
+              className="fixed inset-0 z-[85] backdrop-blur-sm"
+              onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                  setActivePanel(null);
+                }
+              }}
+            />
+            <ProfilePanel />
+          </div>
+        );
       default:
         return null;
     }
@@ -192,7 +193,7 @@ export const DashboardNavigation = () => {
         }`}
       >
         <div className="flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2">
-          <ProfileIcon />
+          <ProfileIcon setActivePanel={setActivePanel} />
           <SidebarIconButton
             icon={LuSearch}
             isActive={activePanel === 'pairs'}
