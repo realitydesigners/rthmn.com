@@ -308,7 +308,7 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({
                     label="Opacity"
                     value={boxColors.styles?.opacity ?? 1}
                     onChange={(value) => handleStyleChange('opacity', value)}
-                    min={0.1}
+                    min={0.01}
                     max={1}
                     step={0.05}
                   />
