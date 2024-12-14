@@ -1,16 +1,17 @@
 'use client';
 import React from 'react';
 import dynamic from 'next/dynamic';
-
-// Dynamically import SplineScene with ssr disabled
-const SplineScene = dynamic(() => import('./SplineScene'), {
-  ssr: false
-});
+import PairUniverse from './PairUniverse';
+import { useDashboard } from '@/providers/DashboardProvider';
+import App from '@/app/(user)/test/SplineScene';
 
 export default function TestPage() {
+  const { selectedPairs, pairData } = useDashboard();
+
   return (
-    <main className="relative h-full w-full overflow-hidden">
-      <SplineScene />
+    <main className="relative h-screen w-full overflow-hidden">
+      {/* <App /> */}
+      <PairUniverse selectedPairs={selectedPairs} pairData={pairData} />
     </main>
   );
 }

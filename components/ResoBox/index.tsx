@@ -11,21 +11,6 @@ import type { Box, BoxSlice } from '@/types/types';
 import { useDashboard } from '@/providers/DashboardProvider';
 
 // Types
-interface BoxComponentProps {
-  slice: BoxSlice | null;
-  isLoading: boolean;
-  className?: string;
-}
-
-const getPositionStyle = (
-  prevColor: string | null,
-  negativeColor: string
-): React.CSSProperties => {
-  if (!prevColor) return { top: 0, right: 0 };
-  return prevColor.includes(negativeColor.split(',')[0])
-    ? { bottom: 0, right: 0 }
-    : { top: 0, right: 0 };
-};
 
 // Box Component
 const Box: React.FC<{
@@ -53,7 +38,6 @@ const Box: React.FC<{
   sortedBoxes,
   renderBox
 }) => {
-  const intensity = Math.floor((Math.abs(box.value) / maxSize) * 255);
   const isFirstDifferent =
     prevColor &&
     ((box.value > 0 && prevColor.includes(boxColors.negative)) ||
@@ -62,8 +46,6 @@ const Box: React.FC<{
   const baseColor = box.value > 0 ? boxColors.positive : boxColors.negative;
   const opacity = boxColors.styles?.opacity ?? 0.2;
   const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
-
-  // Calculate shadow values
   const shadowY = Math.floor(shadowIntensity * 16);
   const shadowBlur = Math.floor(shadowIntensity * 80);
   const shadowColor = (alpha: number) =>
@@ -72,6 +54,17 @@ const Box: React.FC<{
       : boxColors.negative.replace(')', `, ${alpha})`);
 
   const calculatedSize = (Math.abs(box.value) / maxSize) * containerSize;
+
+  const getPositionStyle = (
+    prevColor: string | null,
+    negativeColor: string
+  ): React.CSSProperties => {
+    if (!prevColor) return { top: 0, right: 0 };
+    return prevColor.includes(negativeColor.split(',')[0])
+      ? { bottom: 0, right: 0 }
+      : { top: 0, right: 0 };
+  };
+
   const positionStyle = getPositionStyle(prevColor, boxColors.negative);
 
   const baseStyles: React.CSSProperties = {
@@ -147,14 +140,20 @@ const Box: React.FC<{
   );
 };
 
-// Main Component
-export const ResoBox: React.FC<BoxComponentProps> = React.memo(
-  ({ slice, isLoading, className = '' }) => {
+export const ResoBox = React.memo(
+  ({
+    slice,
+
+    className = ''
+  }: {
+    slice: BoxSlice | null;
+
+    className?: string;
+  }) => {
     const { boxColors } = useDashboard();
     const boxRef = useRef<HTMLDivElement>(null);
     const [containerSize, setContainerSize] = useState(0);
 
-    // Size observer effect
     useEffect(() => {
       const updateSize = () => {
         if (boxRef.current) {
@@ -163,7 +162,6 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
           setContainerSize(Math.min(rect.width, rect.height));
         }
       };
-
       const resizeObserver = new ResizeObserver(() => {
         requestAnimationFrame(updateSize);
       });
@@ -242,7 +240,6 @@ export const ResoBox: React.FC<BoxComponentProps> = React.memo(
   (prevProps, nextProps) => {
     return (
       prevProps.slice?.timestamp === nextProps.slice?.timestamp &&
-      prevProps.isLoading === nextProps.isLoading &&
       prevProps.className === nextProps.className
     );
   }
