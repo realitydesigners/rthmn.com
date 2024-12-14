@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { Providers } from '@/providers/Providers';
-import { DashboardNavigation } from '@/components/dashboard/DashboardNavigation';
+import { DashboardNavigation } from '@/components/DashboardNavigation';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
 
 export default async function UserLayout({

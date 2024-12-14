@@ -1,5 +1,5 @@
-import { Navbar } from '@/components/Accessibility/Navbar';
-import { Toaster } from '@/components/Accessibility/Toasts/toaster';
+import { Navbar } from '@/components/Navbar';
+import { Toaster } from '@/components/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';
@@ -9,12 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 import './main.css';
 import { GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
-import {
-  kodeMono,
-  outfit,
-  oxanium,
-  russo
-} from '@/components/Accessibility/Fonts/fonts';
+import { kodeMono, outfit, oxanium, russo } from '@/components/Fonts/fonts';
 import { Analytics } from '@vercel/analytics/react';
 import UserProvider from '@/providers/UserProvider';
 

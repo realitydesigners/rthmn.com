@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FaStripe, FaCreditCard } from 'react-icons/fa';
-import { useUser } from '@/providers/UserProvider';
 
 type Subscription = any;
 type Price = any;
@@ -18,11 +17,14 @@ type SubscriptionWithPriceAndProduct = Subscription & {
     | null;
 };
 
-export default function CustomerPortalForm() {
+interface Props {
+  subscription: SubscriptionWithPriceAndProduct | null;
+}
+
+export default function CustomerPortalForm({ subscription }: Props) {
   const router = useRouter();
   const currentPath = usePathname();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { subscription } = useUser();
 
   const subscriptionPrice =
     subscription &&

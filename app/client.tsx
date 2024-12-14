@@ -1,6 +1,6 @@
 'use client';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
-import { PortableText } from '@/components/blocks/PortableText';
+import { PortableText } from '@/app/(public)/_components/blocks/PortableText';
 import Link from 'next/link';
 import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { IconType } from 'react-icons';

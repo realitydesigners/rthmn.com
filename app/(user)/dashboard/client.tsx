@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { ResoBox } from '@/components/Charts/ResoBox';
-import { SettingsBar } from '@/components/Accessibility/SettingsBar';
-import { SelectedPairs } from '@/components/Accessibility/SelectedPairs';
+import { ResoBox } from '@/components/ResoBox';
+import { SettingsBar } from '@/components/SettingsBar';
+import { SelectedPairs } from '@/components/SelectedPairs';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
-import { BoxDetailsRow } from '@/components/Charts/BoxDetailsRow';
+import { BoxDetailsRow } from '@/components/BoxDetailsRow';
 
 export default function Dashboard() {
   const queryClient = useQueryClient();

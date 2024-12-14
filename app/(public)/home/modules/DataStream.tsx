@@ -1,5 +1,5 @@
 'use client';
-import { StartButton } from '@/components/Buttons/StartNowButton';
+import { StartButton } from '@/components/StartNowButton';
 import { motion } from 'framer-motion';
 
 interface AutoBoxModuleProps {

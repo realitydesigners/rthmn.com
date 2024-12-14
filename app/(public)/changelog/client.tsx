@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { PortableText } from '@portabletext/react';
-import { ChangelogTemplate } from '@/components/blocks/templates/ChangelogTemplate';
+import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
 import { ChangelogEntry } from '@/types/types';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
 
