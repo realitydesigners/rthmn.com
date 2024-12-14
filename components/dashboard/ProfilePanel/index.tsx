@@ -1,11 +1,11 @@
 'use client';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { createClient } from '@/utils/supabase/client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { LuUser, LuCreditCard, LuLogOut, LuSettings } from 'react-icons/lu';
 import { FaDiscord } from 'react-icons/fa';
+import { useUser } from '@/providers/UserProvider';
 
 const menuItems = [
   {
@@ -46,7 +46,7 @@ const MenuButton = ({
   variant = 'default'
 }: MenuButtonProps) => {
   const baseStyles =
-    'flex items-center justify-between rounded-full bg-gradient-to-b p-[1px] transition-all duration-200';
+    'flex items-center justify-between rounded-md my-4 bg-gradient-to-b p-[1px]  transition-all duration-200';
   const variantStyles =
     variant === 'danger'
       ? 'from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30'
@@ -56,7 +56,7 @@ const MenuButton = ({
 
   const Button = (
     <div className={`${baseStyles} ${variantStyles} w-full`}>
-      <div className="flex w-full items-center gap-3 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-3">
+      <div className="flex w-full items-center gap-3 rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-3">
         <div className="rounded-md bg-white/5 p-2">
           <Icon className={`h-4 w-4 ${textColor}`} />
         </div>
@@ -78,28 +78,8 @@ const MenuButton = ({
 
 export const ProfilePanel = () => {
   const { user, signOut } = useAuth();
-  const [userDetails, setUserDetails] = useState<any>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const { userDetails } = useUser();
   const [isSigningOut, setIsSigningOut] = useState(false);
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      if (!user) return;
-
-      const supabase = createClient();
-      const { data: userDetails } = await supabase
-        .from('users')
-        .select('avatar_url')
-        .eq('id', user.id)
-        .single();
-
-      if (userDetails?.avatar_url) {
-        setAvatarUrl(userDetails.avatar_url);
-      }
-    };
-
-    fetchUserDetails();
-  }, [user]);
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -119,17 +99,15 @@ export const ProfilePanel = () => {
   if (!user) return null;
 
   return (
-    <div className="fixed bottom-0 left-1/2 z-[90] h-[60vh] w-screen -translate-x-1/2 bg-black">
-      <div className="absolute -top-4 right-0 left-0 h-20 rounded-[10em] border-t border-[#222] bg-black" />
-
+    <div className="fixed bottom-0 left-1/2 z-[90] h-[575px] w-screen -translate-x-1/2 rounded-[3em] border-t border-[#222] bg-black pb-20">
       <div className="scrollbar-none h-full overflow-y-auto px-4 pt-8">
         {/* Profile Header */}
         <div className="mb-6">
           <div className="flex flex-col items-center">
             <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-black">
-              {avatarUrl ? (
+              {userDetails?.avatar_url ? (
                 <Image
-                  src={avatarUrl}
+                  src={userDetails.avatar_url}
                   alt="Profile"
                   className="object-cover"
                   width={80}
@@ -161,7 +139,7 @@ export const ProfilePanel = () => {
             />
           ))}
 
-          <div className="relative py-2">
+          <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-[#222]"></div>
             </div>

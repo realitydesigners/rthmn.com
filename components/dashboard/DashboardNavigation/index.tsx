@@ -11,9 +11,9 @@ import { useScrollLock } from '@/hooks/useScrollLock';
 import { useDashboard } from '@/providers/DashboardProvider';
 import Image from 'next/image';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { createClient } from '@/utils/supabase/client';
 import Link from 'next/link';
 import { ProfilePanel } from '@/components/dashboard/ProfilePanel';
+import { useUser } from '@/providers/UserProvider';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | null;
 
@@ -23,29 +23,10 @@ const ProfileIcon = ({
   setActivePanel: (panel: Panel) => void;
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut, user } = useAuth();
-
-  useEffect(() => {
-    const fetchUserDetails = async () => {
-      if (!user) return;
-
-      const supabase = createClient();
-      const { data: userDetails } = await supabase
-        .from('users')
-        .select('avatar_url')
-        .eq('id', user.id)
-        .single();
-
-      if (userDetails?.avatar_url) {
-        setAvatarUrl(userDetails.avatar_url);
-      }
-    };
-
-    fetchUserDetails();
-  }, [user]);
+  const { userDetails } = useUser();
 
   const handleSignOut = async () => {
     setIsSigningOut(true);
@@ -73,9 +54,9 @@ const ProfileIcon = ({
       >
         <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
           <div className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-black">
-            {avatarUrl ? (
+            {userDetails?.avatar_url ? (
               <Image
-                src={avatarUrl}
+                src={userDetails.avatar_url}
                 alt="Profile"
                 className="object-cover"
                 width={80}
@@ -98,7 +79,7 @@ export const DashboardNavigation = () => {
   const scrollDirection = useScrollDirection();
   const panelRef = useRef<HTMLDivElement>(null);
 
-  useScrollLock(activePanel === 'pairs');
+  useScrollLock(activePanel !== null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
