@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation';
 import { IconType } from 'react-icons';
 import { LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
 import { SelectedPairs } from '@/components/SelectedPairs';
-import { SettingsBar } from '@/components/SettingsBar';
-import { PairNavigator } from '@/components/PairNavigator';
+import { SettingsBar } from '@/components/DashboardNavigation/SettingsBar';
+import { PairNavigator } from '@/components/DashboardNavigation/PairNavigator';
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useDashboard } from '@/providers/DashboardProvider';
 import Image from 'next/image';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { ProfilePanel } from '@/components/ProfilePanel';
+import { ProfilePanel } from '@/components/DashboardNavigation/ProfilePanel';
 import { useUser } from '@/providers/UserProvider';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | null;
@@ -22,7 +22,6 @@ const ProfileIcon = ({
   setActivePanel: (panel: Panel) => void;
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut, user } = useAuth();
   const { userDetails } = useUser();

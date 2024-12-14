@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { ResoBox } from '@/components/ResoBox';
-import { SettingsBar } from '@/components/SettingsBar';
+
 import { SelectedPairs } from '@/components/SelectedPairs';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxSlice, OHLC, PairData } from '@/types/types';

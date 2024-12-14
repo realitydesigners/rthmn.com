@@ -10,7 +10,7 @@ import {
   LuBookmark,
   LuSearch
 } from 'react-icons/lu';
-import { PairItem } from '../PairItem';
+import { PairItem } from './PairItem';
 
 const navigationButtons = [
   { mode: 'favorites', label: 'Favorites', icon: LuBookmark },
