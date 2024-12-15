@@ -105,24 +105,17 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
   const [showRemoveForPair, setShowRemoveForPair] = useState<string | null>(
     null
   );
+  const [showAddForPair, setShowAddForPair] = useState<string | null>(null);
   const [selectedPairForModal, setSelectedPairForModal] = useState<
     string | null
   >(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const lastScrollTop = useRef(0);
-  const [resetTrigger, setResetTrigger] = useState(0);
   const lastScrollPosition = useRef(0);
   const [isScrolling, setIsScrolling] = useState(false);
-
-  const resetStates = useCallback(() => {
+  const [resetStates, setResetStates] = useState(() => () => {
     setShowRemoveForPair(null);
-    setResetTrigger((prev) => prev + 1);
-  }, []);
-
-  const groupedPairs: { [key: string]: string[] } = {
-    FX: [...FOREX_PAIRS] as string[],
-    CRYPTO: [...CRYPTO_PAIRS] as string[]
-  };
+    setShowAddForPair(null);
+  });
 
   const currentPairs =
     viewMode === 'favorites'
@@ -288,138 +281,71 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
 
   return (
     <div
-      className={`fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-black/95 pt-4 transition-all duration-300 ${
-        isModalOpen ? 'h-[175px] lg:hidden' : 'h-[50vh]'
+      className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-black/95 pt-4 transition-all duration-300 ${
+        isModalOpen ? 'h-[175px] lg:hidden' : 'h-[66vh]'
       }`}
     >
       <div className="pointer-events-none absolute top-2 right-0 left-0 z-[98] h-24 rounded-t-[3em] bg-gradient-to-b from-black via-black/95 to-transparent" />
       <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <div
         ref={scrollRef}
-        className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
+        className="scrollbar-none relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
         {...handlers}
       >
-        <div
-          className="scrollbar-none flex h-full flex-col overflow-y-scroll overscroll-none scroll-smooth"
-          style={{ WebkitOverflowScrolling: 'touch' }}
-        >
-          <div className="mb-[25vh] pt-2">
-            <PairList
-              viewMode={viewMode}
-              currentPairs={currentPairs}
-              groupedPairs={groupedPairs}
-              activeIndex={activeIndex}
-              pairData={pairData}
-              selectedPairs={selectedPairs}
-              showRemoveForPair={showRemoveForPair}
-              handleIndexChange={handleIndexChange}
-              togglePair={togglePair}
-              setShowRemoveForPair={setShowRemoveForPair}
-              resetTrigger={resetTrigger}
-              isScrolling={isScrolling}
-            />
-          </div>
+        <div className="pointer-events-none absolute top-1/2 right-0 left-0 z-[97] flex -translate-y-1/2 items-center justify-between">
+          <div className="h-[2px] w-4 bg-gradient-to-r from-white/20 to-transparent" />
+          <div className="h-[2px] w-4 bg-gradient-to-l from-white/20 to-transparent" />
         </div>
-        <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-40 bg-gradient-to-t from-black via-black/95 to-transparent" />
-        {!isModalOpen && (
-          <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
-        )}
+
+        <div
+          className="scrollbar-none h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth"
+          style={{
+            WebkitOverflowScrolling: 'touch',
+            scrollSnapType: 'y mandatory',
+            scrollPaddingTop: '50%',
+            scrollPaddingBottom: '50%'
+          }}
+        >
+          <div className="h-[50vh]" />
+
+          {currentPairs.map((pair, index) => (
+            <PairItem
+              key={pair}
+              pair={pair}
+              index={index}
+              isActive={activeIndex === index}
+              isFavorite={selectedPairs.includes(pair)}
+              currentPrice={pairData[pair]?.currentOHLC?.close}
+              showRemove={showRemoveForPair === pair}
+              showAdd={showAddForPair === pair}
+              onIndexChange={handleIndexChange}
+              onRemove={() => {
+                togglePair(pair);
+                setShowRemoveForPair(null);
+              }}
+              onCancelRemove={() => setShowRemoveForPair(null)}
+              setShowRemoveForPair={setShowRemoveForPair}
+              setShowAddForPair={setShowAddForPair}
+              toggleFavorite={() => togglePair(pair)}
+              viewMode={viewMode}
+              onViewClick={() => {}}
+              onLongPressReset={resetStates}
+              style={{
+                scrollSnapAlign: 'center',
+                height: '64px'
+              }}
+            />
+          ))}
+
+          <div className="h-[50vh]" />
+        </div>
       </div>
+      <div className="pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-40 bg-gradient-to-t from-black via-black/95 to-transparent" />
+      {!isModalOpen && (
+        <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
+      )}
     </div>
   );
-};
-
-const PairList = ({
-  viewMode,
-  currentPairs,
-  groupedPairs,
-  activeIndex,
-  pairData,
-  selectedPairs,
-  showRemoveForPair,
-  handleIndexChange,
-  togglePair,
-  setShowRemoveForPair,
-  resetTrigger,
-  isScrolling
-}: {
-  viewMode: string;
-  currentPairs: string[];
-  groupedPairs: { [key: string]: string[] };
-  activeIndex: number;
-  pairData: { [key: string]: any };
-  selectedPairs: string[];
-  showRemoveForPair: string | null;
-  handleIndexChange: (index: number) => void;
-  togglePair: (pair: string) => void;
-  setShowRemoveForPair: (pair: string) => void;
-  resetTrigger: number;
-  isScrolling: boolean;
-}) => {
-  const [resetCounter, setResetCounter] = useState(0);
-
-  useEffect(() => {
-    if (isScrolling) {
-      console.log('🧹 Clearing actions due to scroll');
-      triggerReset();
-    }
-  }, [isScrolling]);
-
-  const triggerReset = useCallback(() => {
-    setShowRemoveForPair(null);
-  }, [setShowRemoveForPair]);
-
-  if (viewMode === 'favorites') {
-    return currentPairs.map((pair, index) => (
-      <PairItem
-        key={pair}
-        pair={pair}
-        index={index}
-        isActive={activeIndex === index}
-        isFavorite={selectedPairs.includes(pair)}
-        currentPrice={pairData[pair]?.currentOHLC?.close}
-        showRemove={showRemoveForPair === pair}
-        onIndexChange={handleIndexChange}
-        onRemove={() => {
-          togglePair(pair);
-          setShowRemoveForPair(null);
-        }}
-        onCancelRemove={() => setShowRemoveForPair(null)}
-        setShowRemoveForPair={setShowRemoveForPair}
-        toggleFavorite={() => togglePair(pair)}
-        viewMode={viewMode}
-        onViewClick={() => {}}
-        onLongPressReset={triggerReset}
-      />
-    ));
-  }
-
-  return Object.entries(groupedPairs).map(([category, pairs]) => (
-    <div key={category}>
-      {pairs.map((pair, index) => (
-        <PairItem
-          key={pair}
-          pair={pair}
-          index={index}
-          isActive={activeIndex === index}
-          isFavorite={selectedPairs.includes(pair)}
-          currentPrice={pairData[pair]?.currentOHLC?.close}
-          showRemove={showRemoveForPair === pair}
-          onIndexChange={handleIndexChange}
-          onRemove={() => {
-            togglePair(pair);
-            setShowRemoveForPair(null);
-          }}
-          onCancelRemove={() => setShowRemoveForPair(null)}
-          setShowRemoveForPair={setShowRemoveForPair}
-          toggleFavorite={() => togglePair(pair)}
-          viewMode={viewMode}
-          onViewClick={() => {}}
-          onLongPressReset={triggerReset}
-        />
-      ))}
-    </div>
-  ));
 };
 
 export const PairFilterButtons = ({
@@ -552,14 +478,17 @@ export const PairItem = ({
   isFavorite,
   currentPrice,
   showRemove,
+  showAdd,
   onIndexChange,
   onRemove,
   onCancelRemove,
   setShowRemoveForPair,
+  setShowAddForPair,
   toggleFavorite,
   viewMode,
   onViewClick,
-  onLongPressReset
+  onLongPressReset,
+  style
 }: {
   pair: string;
   index: number;
@@ -567,17 +496,18 @@ export const PairItem = ({
   isFavorite: boolean;
   currentPrice: number;
   showRemove: boolean;
+  showAdd: boolean;
   onIndexChange: (index: number) => void;
   onRemove: () => void;
   onCancelRemove: () => void;
   setShowRemoveForPair: (pair: string) => void;
+  setShowAddForPair: (pair: string | null) => void;
   toggleFavorite: () => void;
   viewMode: string;
   onViewClick: (pair: string) => void;
   onLongPressReset: () => void;
+  style?: React.CSSProperties;
 }) => {
-  const [showAddForPair, setShowAddForPair] = useState(false);
-
   const { isPressed, handlers } = useLongPress(() => {
     setTimeout(() => {
       onIndexChange(index);
@@ -585,13 +515,13 @@ export const PairItem = ({
       if (isFavorite) {
         setShowRemoveForPair(pair);
       } else if (viewMode !== 'favorites') {
-        setShowAddForPair(true);
+        setShowAddForPair(pair);
       }
     }, 50);
   });
 
   useEffect(() => {
-    setShowAddForPair(false);
+    setShowAddForPair(null);
   }, [onLongPressReset]);
 
   const renderActions = () => {
@@ -610,17 +540,17 @@ export const PairItem = ({
       );
     }
 
-    if (showAddForPair) {
+    if (showAdd) {
       return (
         <AddActions
           onCancel={(e) => {
             e.stopPropagation();
-            setShowAddForPair(false);
+            setShowAddForPair(null);
           }}
           onAdd={(e) => {
             e.stopPropagation();
             toggleFavorite();
-            setShowAddForPair(false);
+            setShowAddForPair(null);
           }}
         />
       );
@@ -645,9 +575,10 @@ export const PairItem = ({
         WebkitUserSelect: 'none',
         userSelect: 'none',
         touchAction: 'manipulation',
-        WebkitTouchCallout: 'none'
+        WebkitTouchCallout: 'none',
+        ...style
       }}
-      onClick={() => !showRemove && !showAddForPair && onIndexChange(index)}
+      onClick={() => !showRemove && !showAdd && onIndexChange(index)}
       {...handlers}
     >
       <div className="relative z-10 flex flex-col">
@@ -681,11 +612,9 @@ export const PairItem = ({
           <div className="flex items-center gap-3">{renderActions()}</div>
         </div>
 
-        {isActive && !showRemove && !showAddForPair && (
-          <PairIndicator type="active" />
-        )}
+        {isActive && !showRemove && !showAdd && <PairIndicator type="active" />}
         {showRemove && <PairIndicator type="remove" />}
-        {showAddForPair && <PairIndicator type="add" />}
+        {showAdd && <PairIndicator type="add" />}
       </div>
     </div>
   );
