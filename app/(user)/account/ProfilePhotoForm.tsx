@@ -96,7 +96,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
   };
 
   return (
-    <div className="relative font-outfit">
+    <div className="font-outfit relative">
       {/* Hidden file input */}
       <input
         ref={fileInputRef}
@@ -131,7 +131,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
         )}
 
         {/* Simple hover text */}
-        <div className="absolute inset-0 flex items-center justify-center font-outfit opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div className="font-outfit absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
           <span className="rounded-full bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm">
             Change Photo
           </span>
@@ -146,7 +146,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
       )}
 
       {/* Help Text */}
-      <div className="mt-2 text-center font-outfit text-xs text-zinc-500">
+      <div className="font-outfit mt-2 text-center text-xs text-zinc-500">
         Click to change • Max 2MB
       </div>
     </div>

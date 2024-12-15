@@ -45,48 +45,41 @@ export default function DiscordConnectionForm({
   };
 
   return (
-    <div className="rounded-lg border border-[#333] bg-linear-to-b from-[#0A0A0A] to-[#181818] p-6">
-      <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center gap-3">
+        <div className="rounded-md bg-white/5 p-2">
+          <FaDiscord className="h-5 w-5 text-[#5865F2]" />
+        </div>
         <div>
-          <div className="flex items-center gap-2">
-            <FaDiscord className="h-5 w-5 text-[#5865F2]" />
-            <h3 className="font-russo text-base font-medium text-white">
-              Discord Connection
-            </h3>
-          </div>
-          <p className="font-outfit mt-1 text-sm text-zinc-400">
+          <h3 className="font-outfit text-lg font-semibold text-white">
+            Discord Connection
+          </h3>
+          <p className="font-outfit text-sm text-zinc-400">
             {discordConnection
               ? `Connected as ${discordConnection.discord_username}`
               : 'Connect your Discord account'}
           </p>
         </div>
-        <div>
-          {discordConnection ? (
-            <button
-              onClick={handleDisconnect}
-              disabled={isLoading}
-              className="flex items-center gap-2 rounded-full bg-linear-to-b from-red-600 to-red-700 p-[2px] text-white transition-all duration-200 hover:from-red-500 hover:to-red-600 disabled:opacity-50"
-            >
-              <div className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
-                <FaUnlink className="h-4 w-4" />
-                <span className="font-outfit text-sm">
-                  {isLoading ? 'Disconnecting...' : 'Disconnect'}
-                </span>
-              </div>
-            </button>
-          ) : (
-            <button
-              onClick={() => (window.location.href = DISCORD_OAUTH_URL)}
-              className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#5865F2] to-[#4752C4] p-[2px] text-white transition-all duration-200 hover:from-[#4752C4] hover:to-[#3442A8]"
-            >
-              <div className="flex items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2">
-                <FaDiscord className="h-4 w-4" />
-                <span className="font-outfit text-sm">Connect</span>
-              </div>
-            </button>
-          )}
-        </div>
       </div>
+
+      {discordConnection ? (
+        <button
+          onClick={handleDisconnect}
+          disabled={isLoading}
+          className="flex items-center gap-2 rounded-full bg-red-500/10 px-6 py-2 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50"
+        >
+          <span className="font-outfit text-sm">
+            {isLoading ? 'Disconnecting...' : 'Disconnect'}
+          </span>
+        </button>
+      ) : (
+        <button
+          onClick={() => (window.location.href = DISCORD_OAUTH_URL)}
+          className="flex items-center gap-2 rounded-full bg-[#5865F2] px-6 py-2 text-white transition-all duration-200 hover:bg-[#4752C4]"
+        >
+          <span className="font-outfit text-sm">Connect Discord</span>
+        </button>
+      )}
     </div>
   );
 }
