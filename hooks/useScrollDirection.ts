@@ -1,27 +1,49 @@
 import { useState, useEffect } from 'react';
 
-export const useScrollDirection = () => {
+export function useScrollDirection() {
   const [scrollDirection, setScrollDirection] = useState<'up' | 'down'>('up');
-  const [prevScrollY, setPrevScrollY] = useState(0);
+  const [lastScroll, setLastScroll] = useState(0);
+  const upThreshold = 20; // Threshold for scrolling up
+  const downThreshold = 80; // Threshold for scrolling down
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    let scrollTimeout: NodeJS.Timeout;
 
-      if (currentScrollY > prevScrollY && scrollDirection !== 'down') {
+    const updateScrollDirection = () => {
+      const currentScroll = window.scrollY;
+      const scrollDifference = currentScroll - lastScroll;
+
+      // Different thresholds for up and down scrolling
+      if (scrollDifference > downThreshold) {
         // Scrolling down
         setScrollDirection('down');
-      } else if (currentScrollY < prevScrollY - 1 && scrollDirection !== 'up') {
-        // Scrolling up (with 10px threshold)
+        setLastScroll(currentScroll);
+      } else if (scrollDifference < -upThreshold) {
+        // Scrolling up
         setScrollDirection('up');
+        setLastScroll(currentScroll);
       }
-
-      setPrevScrollY(currentScrollY);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [prevScrollY, scrollDirection]);
+    const onScroll = () => {
+      // Clear existing timeout
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+
+      // Set new timeout to debounce scroll events
+      scrollTimeout = setTimeout(updateScrollDirection, 10);
+    };
+
+    window.addEventListener('scroll', onScroll);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (scrollTimeout) {
+        clearTimeout(scrollTimeout);
+      }
+    };
+  }, [lastScroll]);
 
   return scrollDirection;
-};
+}
