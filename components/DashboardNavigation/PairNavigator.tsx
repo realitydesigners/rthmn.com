@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { useSwipeable } from 'react-swipeable';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
@@ -126,6 +126,8 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     string | null
   >(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const lastScrollTop = useRef(0);
+  const [resetTrigger, setResetTrigger] = useState(0);
 
   const groupedPairs: { [key: string]: string[] } = {
     FX: [...FOREX_PAIRS] as string[],
@@ -149,12 +151,20 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
 
   const handlers = useSwipeable({
     onSwipedUp: () => {
+      setShowRemoveForPair(null);
+      setResetTrigger((prev) => prev + 1);
       const nextIndex = Math.min(activeIndex + 1, currentPairs.length - 1);
       handleIndexChange(nextIndex);
     },
     onSwipedDown: () => {
+      setShowRemoveForPair(null);
+      setResetTrigger((prev) => prev + 1);
       const prevIndex = Math.max(activeIndex - 1, 0);
       handleIndexChange(prevIndex);
+    },
+    onSwiping: () => {
+      setShowRemoveForPair(null);
+      setResetTrigger((prev) => prev + 1);
     },
     trackMouse: true,
     swipeDuration: 500,
@@ -168,6 +178,29 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
 
   useKeyboardNavigation(activeIndex, currentPairs, handleIndexChange);
   useIntersectionObserver(scrollRef, currentPairs, setActiveIndex);
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+
+    const handleScroll = () => {
+      if (scrollElement) {
+        const scrollTop = scrollElement.scrollTop;
+        const scrollDiff = Math.abs(scrollTop - lastScrollTop.current);
+
+        if (scrollDiff > 10) {
+          setShowRemoveForPair(null);
+        }
+        lastScrollTop.current = scrollTop;
+      }
+    };
+
+    scrollElement?.addEventListener('scroll', handleScroll);
+    return () => scrollElement?.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    setShowRemoveForPair(null);
+  }, [viewMode]);
 
   if (viewMode === 'favorites' && selectedPairs.length === 0) {
     return <EmptyFavorites viewMode={viewMode} setViewMode={setViewMode} />;
@@ -199,6 +232,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
               handleIndexChange={handleIndexChange}
               togglePair={togglePair}
               setShowRemoveForPair={setShowRemoveForPair}
+              resetTrigger={resetTrigger}
             />
           </div>
         </div>
@@ -221,7 +255,8 @@ const PairList = ({
   showRemoveForPair,
   handleIndexChange,
   togglePair,
-  setShowRemoveForPair
+  setShowRemoveForPair,
+  resetTrigger
 }: {
   viewMode: string;
   currentPairs: string[];
@@ -233,7 +268,18 @@ const PairList = ({
   handleIndexChange: (index: number) => void;
   togglePair: (pair: string) => void;
   setShowRemoveForPair: (pair: string) => void;
+  resetTrigger: number;
 }) => {
+  const [resetCounter, setResetCounter] = useState(0);
+
+  useEffect(() => {
+    triggerReset();
+  }, [resetTrigger]);
+
+  const triggerReset = useCallback(() => {
+    setShowRemoveForPair(null);
+  }, [setShowRemoveForPair]);
+
   if (viewMode === 'favorites') {
     return currentPairs.map((pair, index) => (
       <PairItem
@@ -254,6 +300,7 @@ const PairList = ({
         toggleFavorite={() => togglePair(pair)}
         viewMode={viewMode}
         onViewClick={() => {}}
+        onLongPressReset={triggerReset}
       />
     ));
   }
@@ -279,6 +326,7 @@ const PairList = ({
           toggleFavorite={() => togglePair(pair)}
           viewMode={viewMode}
           onViewClick={() => {}}
+          onLongPressReset={triggerReset}
         />
       ))}
     </div>

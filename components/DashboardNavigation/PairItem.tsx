@@ -6,8 +6,61 @@ import {
   LuTrash2,
   LuArrowRight
 } from 'react-icons/lu';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+
+// Extract action buttons into separate components
+const ViewButton = ({ pair }: { pair: string }) => (
+  <Link
+    href={`/pair/${pair}`}
+    as={`/pair/${pair}`}
+    onClick={(e) => e.stopPropagation()}
+    className="-webkit-tap-highlight-color-transparent flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all hover:bg-white/20 hover:text-white"
+    style={{ WebkitTapHighlightColor: 'transparent' }}
+  >
+    <LuArrowRight size={25} />
+  </Link>
+);
+
+const RemoveActions = ({
+  onCancel,
+  onRemove
+}: {
+  onCancel: (e: React.MouseEvent) => void;
+  onRemove: (e: React.MouseEvent) => void;
+}) => (
+  <div className="animate-in fade-in slide-in-from-right flex items-center gap-2 duration-200">
+    {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
+    <ActionButton
+      onClick={onRemove}
+      icon={<LuTrash2 size={22} />}
+      variant="danger"
+    />
+  </div>
+);
+
+const AddActions = ({
+  onCancel,
+  onAdd
+}: {
+  onCancel: (e: React.MouseEvent) => void;
+  onAdd: (e: React.MouseEvent) => void;
+}) => (
+  <div className="animate-in fade-in slide-in-from-right flex items-center gap-2 duration-200">
+    {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
+    <ActionButton
+      onClick={onAdd}
+      icon={<LuPlus size={22} />}
+      variant="success"
+    />
+  </div>
+);
+
+const PairPrice = ({ price, isJPY }: { price: number; isJPY: boolean }) => (
+  <div className="font-kodemono ml-2 text-sm text-gray-200">
+    {price.toFixed(isJPY ? 3 : 5)}
+  </div>
+);
 
 export const PairItem = ({
   pair,
@@ -22,7 +75,8 @@ export const PairItem = ({
   setShowRemoveForPair,
   toggleFavorite,
   viewMode,
-  onViewClick
+  onViewClick,
+  onLongPressReset
 }: {
   pair: string;
   index: number;
@@ -37,6 +91,7 @@ export const PairItem = ({
   toggleFavorite: () => void;
   viewMode: string;
   onViewClick: (pair: string) => void;
+  onLongPressReset: () => void;
 }) => {
   const [showAddForPair, setShowAddForPair] = useState(false);
 
@@ -48,65 +103,44 @@ export const PairItem = ({
     }
   });
 
+  useEffect(() => {
+    setShowAddForPair(false);
+  }, [onLongPressReset]);
+
   const renderActions = () => {
     if (showRemove) {
       return (
-        <div className="animate-in fade-in slide-in-from-right flex items-center gap-2 duration-200">
-          <ActionButton
-            onClick={(e) => {
-              e.stopPropagation();
-              onCancelRemove();
-            }}
-            icon={<LuX size={18} />}
-          />
-          <ActionButton
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            icon={<LuTrash2 size={18} />}
-            variant="danger"
-          />
-        </div>
+        <RemoveActions
+          onCancel={(e) => {
+            e.stopPropagation();
+            onCancelRemove();
+          }}
+          onRemove={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        />
       );
     }
 
     if (showAddForPair) {
       return (
-        <div className="animate-in fade-in slide-in-from-right flex items-center gap-2 duration-200">
-          <ActionButton
-            onClick={(e) => {
-              e.stopPropagation();
-              setShowAddForPair(false);
-            }}
-            icon={<LuX size={18} />}
-          />
-          <ActionButton
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleFavorite();
-              setShowAddForPair(false);
-            }}
-            icon={<LuPlus size={18} />}
-            variant="success"
-          />
-        </div>
+        <AddActions
+          onCancel={(e) => {
+            e.stopPropagation();
+            setShowAddForPair(false);
+          }}
+          onAdd={(e) => {
+            e.stopPropagation();
+            toggleFavorite();
+            setShowAddForPair(false);
+          }}
+        />
       );
     }
 
     if (isActive) {
-      return (
-        <Link
-          href={`/pair/${pair}`}
-          as={`/pair/${pair}`}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all hover:bg-white/20 hover:text-white"
-        >
-          <LuArrowRight size={20} />
-        </Link>
-      );
+      return <ViewButton pair={pair} />;
     }
 
     return null;
@@ -115,10 +149,13 @@ export const PairItem = ({
   return (
     <div
       data-index={index}
-      className={`pair-item relative shrink-0 cursor-pointer px-2 py-4 transition-all duration-300 ${
+      className={`pair-item -webkit-tap-highlight-color-transparent relative shrink-0 cursor-pointer px-2 py-4 transition-all duration-300 ${
         isPressed ? 'scale-[0.98]' : ''
       }`}
-      style={{ scrollSnapAlign: 'center' }}
+      style={{
+        scrollSnapAlign: 'center',
+        WebkitTapHighlightColor: 'transparent'
+      }}
       onClick={() => !showRemove && !showAddForPair && onIndexChange(index)}
       {...handlers}
     >
@@ -133,14 +170,13 @@ export const PairItem = ({
               {pair.replace('_', '/')}
             </h3>
 
-            {currentPrice && !showRemove && !showAddForPair && (
-              <div className="font-kodemono ml-2 text-sm text-gray-200">
-                {currentPrice.toFixed(pair.includes('JPY') ? 3 : 5)}
-              </div>
+            {currentPrice && (
+              <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} />
             )}
+
             {isFavorite && viewMode !== 'favorites' && (
               <LuBookmark
-                size={12}
+                size={15}
                 className="ml-1 inline-block text-blue-400/70"
                 style={{ transform: 'translateY(-2px)' }}
               />
@@ -178,25 +214,12 @@ const ActionButton = ({
   return (
     <button
       onClick={onClick}
-      className={`flex h-9 w-9 items-center justify-center rounded-full transition-all ${variantStyles[variant]}`}
+      className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${variantStyles[variant]}`}
     >
       {icon}
     </button>
   );
 };
-
-const ViewButton = ({
-  onClick
-}: {
-  onClick: (e: React.MouseEvent) => void;
-}) => (
-  <button
-    onClick={onClick}
-    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all hover:bg-white/20 hover:text-white"
-  >
-    <LuArrowRight size={20} />
-  </button>
-);
 
 const PairIndicator = ({ type }: { type: 'active' | 'remove' | 'add' }) => {
   const styles = {
