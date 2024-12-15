@@ -149,22 +149,58 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   };
 
+  const resetStates = useCallback(() => {
+    setShowRemoveForPair(null);
+    setResetTrigger((prev) => prev + 1);
+  }, []);
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+    let lastScrollTop = 0;
+
+    const handleScroll = () => {
+      if (scrollElement) {
+        const scrollTop = scrollElement.scrollTop;
+        const scrollDiff = Math.abs(scrollTop - lastScrollTop);
+
+        if (scrollDiff > 5) {
+          // Lower threshold
+          resetStates();
+        }
+        lastScrollTop = scrollTop;
+      }
+    };
+
+    // For desktop scroll
+    scrollElement?.addEventListener('scroll', handleScroll, { passive: true });
+    // For mobile momentum scroll
+    scrollElement?.addEventListener('touchmove', handleScroll, {
+      passive: true
+    });
+
+    return () => {
+      scrollElement?.removeEventListener('scroll', handleScroll);
+      scrollElement?.removeEventListener('touchmove', handleScroll);
+    };
+  }, [resetStates]);
+
   const handlers = useSwipeable({
     onSwipedUp: () => {
-      setShowRemoveForPair(null);
-      setResetTrigger((prev) => prev + 1);
+      resetStates();
       const nextIndex = Math.min(activeIndex + 1, currentPairs.length - 1);
       handleIndexChange(nextIndex);
     },
     onSwipedDown: () => {
-      setShowRemoveForPair(null);
-      setResetTrigger((prev) => prev + 1);
+      resetStates();
       const prevIndex = Math.max(activeIndex - 1, 0);
       handleIndexChange(prevIndex);
     },
     onSwiping: () => {
-      setShowRemoveForPair(null);
-      setResetTrigger((prev) => prev + 1);
+      resetStates();
+    },
+    onTouchStartOrOnMouseDown: () => {
+      // Reset on any touch/mouse interaction
+      resetStates();
     },
     trackMouse: true,
     swipeDuration: 500,
@@ -178,25 +214,6 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
 
   useKeyboardNavigation(activeIndex, currentPairs, handleIndexChange);
   useIntersectionObserver(scrollRef, currentPairs, setActiveIndex);
-
-  useEffect(() => {
-    const scrollElement = scrollRef.current;
-
-    const handleScroll = () => {
-      if (scrollElement) {
-        const scrollTop = scrollElement.scrollTop;
-        const scrollDiff = Math.abs(scrollTop - lastScrollTop.current);
-
-        if (scrollDiff > 10) {
-          setShowRemoveForPair(null);
-        }
-        lastScrollTop.current = scrollTop;
-      }
-    };
-
-    scrollElement?.addEventListener('scroll', handleScroll);
-    return () => scrollElement?.removeEventListener('scroll', handleScroll);
-  }, []);
 
   useEffect(() => {
     setShowRemoveForPair(null);

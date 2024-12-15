@@ -18,7 +18,7 @@ const ViewButton = ({ pair }: { pair: string }) => (
     className="-webkit-tap-highlight-color-transparent flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all hover:bg-white/20 hover:text-white"
     style={{ WebkitTapHighlightColor: 'transparent' }}
   >
-    <LuArrowRight size={25} />
+    <LuArrowRight size={24} />
   </Link>
 );
 
@@ -29,11 +29,11 @@ const RemoveActions = ({
   onCancel: (e: React.MouseEvent) => void;
   onRemove: (e: React.MouseEvent) => void;
 }) => (
-  <div className="animate-in fade-in slide-in-from-right flex items-center gap-2 duration-200">
+  <div className="-webkit-tap-highlight-color-transparent bg-red-500/05 flex h-11 w-11 items-center justify-center rounded-full text-red-400 transition-all hover:bg-red-500/20 hover:text-white">
     {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
     <ActionButton
       onClick={onRemove}
-      icon={<LuTrash2 size={22} />}
+      icon={<LuTrash2 size={24} />}
       variant="danger"
     />
   </div>
@@ -46,18 +46,30 @@ const AddActions = ({
   onCancel: (e: React.MouseEvent) => void;
   onAdd: (e: React.MouseEvent) => void;
 }) => (
-  <div className="animate-in fade-in slide-in-from-right flex items-center gap-2 duration-200">
+  <div className="-webkit-tap-highlight-color-transparent bg-emerald-500/05 flex h-11 w-11 items-center justify-center rounded-full text-emerald-400 transition-all hover:bg-emerald-500/20 hover:text-white">
     {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
     <ActionButton
       onClick={onAdd}
-      icon={<LuPlus size={22} />}
+      icon={<LuPlus size={24} />}
       variant="success"
     />
   </div>
 );
 
-const PairPrice = ({ price, isJPY }: { price: number; isJPY: boolean }) => (
-  <div className="font-kodemono ml-2 text-sm text-gray-200">
+const PairPrice = ({
+  price,
+  isJPY,
+  isActive
+}: {
+  price: number;
+  isJPY: boolean;
+  isActive: boolean;
+}) => (
+  <div
+    className={`font-kodemono ml-2 text-sm ${
+      isActive ? 'text-white' : 'text-[#222]'
+    }`}
+  >
     {price.toFixed(isJPY ? 3 : 5)}
   </div>
 );
@@ -96,6 +108,8 @@ export const PairItem = ({
   const [showAddForPair, setShowAddForPair] = useState(false);
 
   const { isPressed, handlers } = useLongPress(() => {
+    onIndexChange(index);
+
     if (isFavorite) {
       setShowRemoveForPair(pair);
     } else if (viewMode !== 'favorites') {
@@ -149,12 +163,16 @@ export const PairItem = ({
   return (
     <div
       data-index={index}
-      className={`pair-item -webkit-tap-highlight-color-transparent relative shrink-0 cursor-pointer px-2 py-4 transition-all duration-300 ${
+      className={`pair-item -webkit-tap-highlight-color-transparent relative shrink-0 cursor-pointer px-2 py-4 transition-all duration-300 select-none ${
         isPressed ? 'scale-[0.98]' : ''
       }`}
       style={{
         scrollSnapAlign: 'center',
-        WebkitTapHighlightColor: 'transparent'
+        WebkitTapHighlightColor: 'transparent',
+        WebkitUserSelect: 'none',
+        userSelect: 'none',
+        msUserSelect: 'none',
+        MozUserSelect: 'none'
       }}
       onClick={() => !showRemove && !showAddForPair && onIndexChange(index)}
       {...handlers}
@@ -163,15 +181,19 @@ export const PairItem = ({
         <div className="group flex w-full items-center justify-between">
           <div className="flex items-baseline gap-3">
             <h3
-              className={`font-outfit text-2xl font-bold tracking-tight text-white transition-all duration-300 ${
-                isActive ? 'scale-105' : 'scale-90'
+              className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ${
+                isActive ? 'scale-105 text-white' : 'scale-90 text-[#222]'
               }`}
             >
               {pair.replace('_', '/')}
             </h3>
 
             {currentPrice && (
-              <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} />
+              <PairPrice
+                price={currentPrice}
+                isJPY={pair.includes('JPY')}
+                isActive={isActive}
+              />
             )}
 
             {isFavorite && viewMode !== 'favorites' && (

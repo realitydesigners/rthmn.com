@@ -50,10 +50,12 @@ export const useLongPress = (callback: () => void, ms: number = 500) => {
         ? { x: e.touches[0].clientX, y: e.touches[0].clientY }
         : { x: e.clientX, y: e.clientY };
 
-    const moveThreshold = 10; // pixels of movement before considered scrolling
+    const moveThreshold = 3; // Even more sensitive
     const deltaY = Math.abs(currentPosition.y - startPosition.current.y);
+    const deltaX = Math.abs(currentPosition.x - startPosition.current.x);
 
-    if (deltaY > moveThreshold) {
+    // Check for movement in any direction
+    if (deltaY > moveThreshold || deltaX > moveThreshold) {
       scrolling.current = true;
       if (timerRef.current) {
         clearTimeout(timerRef.current);
