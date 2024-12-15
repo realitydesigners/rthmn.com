@@ -6,7 +6,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
-        "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md,html}\" --ignore-path .prettierignore",
+        "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\" --ignore-path .prettierignore",
         "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md,html}\" --ignore-path .prettierignore",
         "prettier-check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
         "stripe:login": "stripe login",
@@ -79,8 +79,8 @@
         "lint-staged": "^15.0.0"
     },
     "lint-staged": {
-        "**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
-            "prettier --write"
+        "*": [
+            "bun format"
         ]
     }
 }
