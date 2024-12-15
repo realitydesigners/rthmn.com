@@ -15,7 +15,7 @@ const ViewButton = ({ pair }: { pair: string }) => (
     href={`/pair/${pair}`}
     as={`/pair/${pair}`}
     onClick={(e) => e.stopPropagation()}
-    className="-webkit-tap-highlight-color-transparent flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all hover:bg-white/20 hover:text-white"
+    className="-webkit-tap-highlight-color-transparent flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all outline-none hover:bg-white/20 hover:text-white focus:outline-none"
     style={{ WebkitTapHighlightColor: 'transparent' }}
   >
     <LuArrowRight size={24} />
@@ -108,13 +108,15 @@ export const PairItem = ({
   const [showAddForPair, setShowAddForPair] = useState(false);
 
   const { isPressed, handlers } = useLongPress(() => {
-    onIndexChange(index);
+    setTimeout(() => {
+      onIndexChange(index);
 
-    if (isFavorite) {
-      setShowRemoveForPair(pair);
-    } else if (viewMode !== 'favorites') {
-      setShowAddForPair(true);
-    }
+      if (isFavorite) {
+        setShowRemoveForPair(pair);
+      } else if (viewMode !== 'favorites') {
+        setShowAddForPair(true);
+      }
+    }, 50);
   });
 
   useEffect(() => {
@@ -163,7 +165,7 @@ export const PairItem = ({
   return (
     <div
       data-index={index}
-      className={`pair-item -webkit-tap-highlight-color-transparent relative shrink-0 cursor-pointer px-2 py-4 transition-all duration-300 select-none ${
+      className={`pair-item relative shrink-0 cursor-pointer touch-none px-2 py-4 transition-all duration-300 select-none ${
         isPressed ? 'scale-[0.98]' : ''
       }`}
       style={{
@@ -171,8 +173,8 @@ export const PairItem = ({
         WebkitTapHighlightColor: 'transparent',
         WebkitUserSelect: 'none',
         userSelect: 'none',
-        msUserSelect: 'none',
-        MozUserSelect: 'none'
+        touchAction: 'manipulation',
+        WebkitTouchCallout: 'none'
       }}
       onClick={() => !showRemove && !showAddForPair && onIndexChange(index)}
       {...handlers}

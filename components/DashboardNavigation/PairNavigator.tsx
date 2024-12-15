@@ -19,27 +19,6 @@ const navigationButtons = [
   { mode: 'all', label: 'All', icon: LuList }
 ];
 
-const useKeyboardNavigation = (
-  activeIndex: number,
-  currentPairs: string[],
-  handleIndexChange: (index: number) => void
-) => {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowUp') {
-        const prevIndex = Math.max(activeIndex - 1, 0);
-        handleIndexChange(prevIndex);
-      } else if (e.key === 'ArrowDown') {
-        const nextIndex = Math.min(activeIndex + 1, currentPairs.length - 1);
-        handleIndexChange(nextIndex);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeIndex, currentPairs.length, handleIndexChange]);
-};
-
 const useIntersectionObserver = (
   scrollRef: React.RefObject<HTMLDivElement>,
   currentPairs: string[],
@@ -128,6 +107,13 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const lastScrollTop = useRef(0);
   const [resetTrigger, setResetTrigger] = useState(0);
+  const lastScrollPosition = useRef(0);
+  const [isScrolling, setIsScrolling] = useState(false);
+
+  const resetStates = useCallback(() => {
+    setShowRemoveForPair(null);
+    setResetTrigger((prev) => prev + 1);
+  }, []);
 
   const groupedPairs: { [key: string]: string[] } = {
     FX: [...FOREX_PAIRS] as string[],
@@ -143,46 +129,51 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
           ? [...CRYPTO_PAIRS]
           : ([...FOREX_PAIRS, ...CRYPTO_PAIRS] as string[]);
 
-  const handleIndexChange = (index: number) => {
-    setActiveIndex(index);
-    const element = document.querySelector(`[data-index="${index}"]`);
-    element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  };
-
-  const resetStates = useCallback(() => {
-    setShowRemoveForPair(null);
-    setResetTrigger((prev) => prev + 1);
-  }, []);
+  const handleScroll = useCallback(() => {
+    if (scrollRef.current) {
+      resetStates();
+    }
+  }, [resetStates]);
 
   useEffect(() => {
     const scrollElement = scrollRef.current;
-    let lastScrollTop = 0;
+    if (scrollElement) {
+      scrollElement.addEventListener('scroll', handleScroll, { passive: true });
+      scrollElement.addEventListener('touchmove', handleScroll, {
+        passive: true
+      });
 
-    const handleScroll = () => {
-      if (scrollElement) {
-        const scrollTop = scrollElement.scrollTop;
-        const scrollDiff = Math.abs(scrollTop - lastScrollTop);
+      return () => {
+        scrollElement.removeEventListener('scroll', handleScroll);
+        scrollElement.removeEventListener('touchmove', handleScroll);
+      };
+    }
+  }, [handleScroll]);
 
-        if (scrollDiff > 5) {
-          // Lower threshold
-          resetStates();
-        }
-        lastScrollTop = scrollTop;
+  const handleIndexChange = (index: number) => {
+    setActiveIndex(index);
+
+    requestAnimationFrame(() => {
+      const element = document.querySelector(`[data-index="${index}"]`);
+      const container = scrollRef.current;
+
+      if (element && container) {
+        const elementRect = element.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+
+        const scrollTop =
+          container.scrollTop +
+          elementRect.top -
+          containerRect.top -
+          (containerRect.height - elementRect.height) / 2;
+
+        container.scrollTo({
+          top: scrollTop,
+          behavior: 'smooth'
+        });
       }
-    };
-
-    // For desktop scroll
-    scrollElement?.addEventListener('scroll', handleScroll, { passive: true });
-    // For mobile momentum scroll
-    scrollElement?.addEventListener('touchmove', handleScroll, {
-      passive: true
     });
-
-    return () => {
-      scrollElement?.removeEventListener('scroll', handleScroll);
-      scrollElement?.removeEventListener('touchmove', handleScroll);
-    };
-  }, [resetStates]);
+  };
 
   const handlers = useSwipeable({
     onSwipedUp: () => {
@@ -212,12 +203,80 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     setActiveIndex(0);
   }, [viewMode]);
 
-  useKeyboardNavigation(activeIndex, currentPairs, handleIndexChange);
   useIntersectionObserver(scrollRef, currentPairs, setActiveIndex);
 
   useEffect(() => {
     setShowRemoveForPair(null);
   }, [viewMode]);
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+
+    const handleScroll = () => {
+      if (scrollElement) {
+        const currentScroll = scrollElement.scrollTop;
+        const scrollDiff = Math.abs(currentScroll - lastScrollPosition.current);
+
+        // If scrolled more than 2px, reset states
+        if (scrollDiff > 2) {
+          resetStates();
+        }
+
+        lastScrollPosition.current = currentScroll;
+      }
+    };
+
+    scrollElement?.addEventListener('scroll', handleScroll);
+
+    // Also handle touch events
+    const handleTouch = () => {
+      resetStates();
+    };
+
+    scrollElement?.addEventListener('touchstart', handleTouch);
+    scrollElement?.addEventListener('touchmove', handleTouch);
+
+    return () => {
+      scrollElement?.removeEventListener('scroll', handleScroll);
+      scrollElement?.removeEventListener('touchstart', handleTouch);
+      scrollElement?.removeEventListener('touchmove', handleTouch);
+    };
+  }, [resetStates]);
+
+  useEffect(() => {
+    const scrollElement = scrollRef.current;
+    let scrollTimeout: NodeJS.Timeout;
+
+    const handleScroll = () => {
+      console.log('🔄 Scrolling detected');
+      setIsScrolling(true);
+      resetStates();
+
+      // Clear previous timeout
+      clearTimeout(scrollTimeout);
+
+      // Set new timeout
+      scrollTimeout = setTimeout(() => {
+        console.log('⏹️ Scroll ended');
+        setIsScrolling(false);
+      }, 150);
+    };
+
+    if (scrollElement) {
+      scrollElement.addEventListener('scroll', handleScroll, { passive: true });
+      scrollElement.addEventListener('touchmove', handleScroll, {
+        passive: true
+      });
+    }
+
+    return () => {
+      if (scrollElement) {
+        scrollElement.removeEventListener('scroll', handleScroll);
+        scrollElement.removeEventListener('touchmove', handleScroll);
+      }
+      clearTimeout(scrollTimeout);
+    };
+  }, [resetStates]);
 
   if (viewMode === 'favorites' && selectedPairs.length === 0) {
     return <EmptyFavorites viewMode={viewMode} setViewMode={setViewMode} />;
@@ -236,7 +295,10 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
         className="relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4"
         {...handlers}
       >
-        <div className="scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth">
+        <div
+          className="scrollbar-none flex h-full flex-col overflow-y-scroll overscroll-none scroll-smooth"
+          style={{ WebkitOverflowScrolling: 'touch' }}
+        >
           <div className="mb-[25vh] pt-2">
             <PairList
               viewMode={viewMode}
@@ -250,6 +312,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
               togglePair={togglePair}
               setShowRemoveForPair={setShowRemoveForPair}
               resetTrigger={resetTrigger}
+              isScrolling={isScrolling}
             />
           </div>
         </div>
@@ -273,7 +336,8 @@ const PairList = ({
   handleIndexChange,
   togglePair,
   setShowRemoveForPair,
-  resetTrigger
+  resetTrigger,
+  isScrolling
 }: {
   viewMode: string;
   currentPairs: string[];
@@ -286,12 +350,16 @@ const PairList = ({
   togglePair: (pair: string) => void;
   setShowRemoveForPair: (pair: string) => void;
   resetTrigger: number;
+  isScrolling: boolean;
 }) => {
   const [resetCounter, setResetCounter] = useState(0);
 
   useEffect(() => {
-    triggerReset();
-  }, [resetTrigger]);
+    if (isScrolling) {
+      console.log('🧹 Clearing actions due to scroll');
+      triggerReset();
+    }
+  }, [isScrolling]);
 
   const triggerReset = useCallback(() => {
     setShowRemoveForPair(null);

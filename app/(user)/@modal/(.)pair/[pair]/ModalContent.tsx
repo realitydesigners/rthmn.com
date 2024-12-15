@@ -15,7 +15,6 @@ interface ModalContentProps {
 
 export function ModalContent({ pair }: ModalContentProps) {
   const router = useRouter();
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const { pairData } = useDashboard();
   const { session } = useAuth();
   const data = pairData[pair];
@@ -30,24 +29,6 @@ export function ModalContent({ pair }: ModalContentProps) {
     visibleBoxesCount
   );
 
-  useEffect(() => {
-    if (!dialogRef.current?.open) {
-      dialogRef.current?.showModal();
-    }
-  }, []);
-
-  //   useEffect(() => {
-  //     if (session?.access_token) {
-  //       const token = session.access_token;
-
-  //       // Fetch initial data
-  //       fetch(`/api/getBoxSlices?pair=${pair}&token=${token}`)
-  //         .then((response) => response.json())
-  //         .then((data) => setInitialData(data))
-  //         .catch((error) => console.error('Error fetching initial data:', error));
-  //     }
-  //   }, [session, pair]);
-
   function onDismiss() {
     router.back();
   }
@@ -55,11 +36,7 @@ export function ModalContent({ pair }: ModalContentProps) {
   const hasData = data?.boxes?.length > 0;
 
   return (
-    <dialog
-      ref={dialogRef}
-      onClose={onDismiss}
-      className="fixed inset-0 z-[100] h-full w-full bg-transparent p-0"
-    >
+    <div className="fixed inset-0 z-[100] h-full w-full bg-transparent">
       <div className="animate-in fade-in slide-in-from-top-4 fixed inset-x-0 top-4 z-[100] mx-auto w-full max-w-2xl px-4 duration-300">
         <div className="overflow-hidden rounded-2xl border border-[#222] bg-black shadow-2xl">
           {/* h-[calc(100vh-190px)] */}
@@ -106,6 +83,6 @@ export function ModalContent({ pair }: ModalContentProps) {
         </div>
       </div>
       <div className="fixed inset-0" onClick={onDismiss} />
-    </dialog>
+    </div>
   );
 }
