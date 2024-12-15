@@ -1,4 +1,12 @@
 import { BoxSlice } from '@/types/types';
+import { decode } from '@msgpack/msgpack';
+
+interface WebSocketMessage {
+  type: 'boxSlice' | 'subscribeAll' | 'ack' | 'updateAll';
+  pair?: string;
+  data?: any;
+  message?: string;
+}
 
 class WebSocketClient {
   private socket: WebSocket | null = null;
@@ -9,12 +17,7 @@ class WebSocketClient {
   private globalMessageHandlers: Set<(event: MessageEvent) => void> = new Set();
   private accessToken: string | null = null;
   private isAuthenticated: boolean = false;
-  private lastUpdateTimes: Map<string, number> = new Map();
-  private heartbeatInterval: NodeJS.Timeout | null = null;
   private pendingOperations: (() => void)[] = [];
-
-  private static readonly UPDATE_CHECK_INTERVAL = 2000; // 2 seconds
-  private static readonly UPDATE_THRESHOLD = 8000; // 8 seconds
 
   public setAccessToken(token: string) {
     this.accessToken = token;
@@ -45,6 +48,7 @@ class WebSocketClient {
 
   private initializeConnection(wsUrl: string) {
     this.socket = new WebSocket(wsUrl);
+    this.socket.binaryType = 'arraybuffer';
     this.setupEventHandlers();
   }
 
@@ -60,19 +64,49 @@ class WebSocketClient {
   private handleOpen() {
     console.log('🟢 WebSocket connection opened');
     this.authenticate();
-    this.startHeartbeat();
   }
 
   private handleMessage(event: MessageEvent) {
     try {
-      const message = JSON.parse(event.data);
+      let message;
+      if (event.data instanceof ArrayBuffer) {
+        const uint8Array = new Uint8Array(event.data);
+        message = decode(uint8Array);
+      } else {
+        message = JSON.parse(event.data);
+      }
+
+      if (message.type !== 'ack') {
+        console.log('📥 WebSocket:', {
+          type: message.type,
+          ...(message.pair && { pair: message.pair }),
+          timestamp: new Date().toISOString(),
+          ...(message.type === 'subscribeAll' && {
+            action: 'Initial subscription',
+            pairs: Object.keys(message.data || {}).length,
+            data: message.data
+          }),
+          ...(message.type === 'updateAll' && {
+            action: 'Bulk update',
+            pairs: Object.keys(message.data || {}).length,
+            data: message.data
+          }),
+          ...(message.type === 'boxSlice' && {
+            data: message.data
+          })
+        });
+      }
+
       this.processMessage(message);
     } catch (error) {
-      console.error('❌ Error processing WebSocket message:', error);
+      console.error('❌ Error processing WebSocket message:', error, {
+        dataType: event.data?.constructor?.name,
+        messageLength: event.data?.byteLength
+      });
     }
   }
 
-  private processMessage(message: any) {
+  private processMessage(message: WebSocketMessage) {
     const timestamp = new Date().toISOString();
     this.logMessage(message, timestamp);
 
@@ -80,10 +114,56 @@ class WebSocketClient {
       case 'boxSlice':
         this.handleBoxSliceMessage(message, timestamp);
         break;
+      case 'subscribeAll':
+        this.handleSubscribeAllMessage(message);
+        break;
       case 'ack':
         this.handleAckMessage(message);
         break;
+      case 'updateAll':
+        this.handleUpdateAllMessage(message);
+        break;
     }
+  }
+
+  private handleSubscribeAllMessage(message: WebSocketMessage) {
+    if (!message.data) return;
+
+    console.log('📊 Initial data received:', {
+      pairs: Object.keys(message.data).join(', '),
+      timestamp: new Date().toISOString()
+    });
+
+    Object.entries(message.data).forEach(([pair, data]) => {
+      const handler = this.messageHandlers.get(pair);
+      if (handler) {
+        const boxSlice = this.formatBoxSliceData(
+          data,
+          new Date().toISOString()
+        );
+        handler(boxSlice);
+      }
+    });
+  }
+
+  private handleUpdateAllMessage(message: WebSocketMessage) {
+    if (!message.data) return;
+
+    console.log('🔄 Bulk update received:', {
+      pairs: Object.keys(message.data).join(', '),
+      timestamp: new Date().toISOString()
+    });
+
+    Object.entries(message.data).forEach(([pair, data]) => {
+      const handler = this.messageHandlers.get(pair);
+      if (handler) {
+        const boxSlice = this.formatBoxSliceData(
+          data,
+          new Date().toISOString()
+        );
+        handler(boxSlice);
+      }
+    });
   }
 
   private handleAckMessage(message: any) {
@@ -95,11 +175,11 @@ class WebSocketClient {
   }
 
   private handleAuthSuccess() {
-    console.log('🟢 Authentication successful, resubscribing to pairs');
+    console.log('🟢 Authentication successful');
     this.isAuthenticated = true;
     this.openHandlers.forEach((handler) => handler());
+    this.subscribeAll();
     this.processPendingOperations();
-    this.resubscribe();
   }
 
   private handleError(error: Event) {
@@ -113,7 +193,6 @@ class WebSocketClient {
 
   private cleanupConnection() {
     this.isAuthenticated = false;
-    this.stopHeartbeat();
   }
 
   private scheduleReconnect(event: CloseEvent) {
@@ -164,14 +243,12 @@ class WebSocketClient {
   public unsubscribe(pair: string) {
     this.subscriptions.delete(pair);
     this.messageHandlers.delete(pair);
-    this.lastUpdateTimes.delete(pair);
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ type: 'unsubscribe', pairs: [pair] }));
     }
   }
 
   public disconnect() {
-    this.stopHeartbeat();
     if (this.socket) {
       this.socket.close();
       this.socket = null;
@@ -185,64 +262,13 @@ class WebSocketClient {
         JSON.stringify({ type: 'auth', token: this.accessToken })
       );
     } else {
-      console.warn('⚠️ Cannot authenticate - socket not ready or no token', {
+      console.warn('��️ Cannot authenticate - socket not ready or no token', {
         readyState: this.socket?.readyState,
         hasToken: !!this.accessToken,
         socketState: this.socket
           ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.socket.readyState]
           : 'NO_SOCKET'
       });
-    }
-  }
-
-  private startHeartbeat() {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-    }
-
-    Array.from(this.subscriptions).forEach((pair) => {
-      if (!this.lastUpdateTimes.has(pair)) {
-        this.lastUpdateTimes.set(pair, Date.now());
-      }
-    });
-
-    this.heartbeatInterval = setInterval(() => {
-      if (this.socket?.readyState === WebSocket.OPEN) {
-        this.checkForUpdates();
-      }
-    }, WebSocketClient.UPDATE_CHECK_INTERVAL);
-  }
-
-  private stopHeartbeat() {
-    if (this.heartbeatInterval) {
-      clearInterval(this.heartbeatInterval);
-      this.heartbeatInterval = null;
-    }
-  }
-
-  private checkForUpdates() {
-    const now = Date.now();
-    Array.from(this.subscriptions).forEach((pair) => {
-      const lastUpdate = this.lastUpdateTimes.get(pair) || now;
-      const timeSinceUpdate = now - lastUpdate;
-
-      if (timeSinceUpdate > WebSocketClient.UPDATE_THRESHOLD) {
-        this.requestUpdate(pair, timeSinceUpdate);
-      }
-    });
-  }
-
-  private requestUpdate(pair: string, timeSinceUpdate: number) {
-    // console.log(
-    //   `🔄 Requesting update for ${pair} (${Math.round(timeSinceUpdate / 1000)}s since last update)`
-    // );
-    this.socket!.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
-  }
-
-  private resubscribe() {
-    const pairs = Array.from(this.subscriptions);
-    if (pairs.length > 0 && this.socket?.readyState === WebSocket.OPEN) {
-      pairs.forEach((pair) => this.requestUpdate(pair, 0));
     }
   }
 
@@ -260,14 +286,8 @@ class WebSocketClient {
         const boxSlice: BoxSlice = {
           boxes: message.data.boxes || [],
           timestamp: message.data.timestamp || timestamp,
-          currentOHLC: message.data.currentOHLC || {
-            open: 0,
-            high: 0,
-            low: 0,
-            close: 0
-          }
+          currentOHLC: message.data.currentOHLC
         };
-        this.lastUpdateTimes.set(message.pair, Date.now());
         handler(boxSlice);
       }
     }
@@ -280,6 +300,42 @@ class WebSocketClient {
     //   timestamp,
     //   dataTimestamp: message.data?.timestamp
     // });
+  }
+
+  private async subscribeAll(retryCount = 3) {
+    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
+      if (retryCount > 0) {
+        console.log(
+          `Retrying subscribeAll in 1s (${retryCount} attempts left)`
+        );
+        setTimeout(() => this.subscribeAll(retryCount - 1), 1000);
+        return;
+      }
+      console.error('Failed to subscribe to all pairs after retries');
+      return;
+    }
+
+    try {
+      this.socket.send(JSON.stringify({ type: 'subscribeAll' }));
+    } catch (error) {
+      console.error('Failed to send subscribeAll message:', error);
+      if (retryCount > 0) {
+        setTimeout(() => this.subscribeAll(retryCount - 1), 1000);
+      }
+    }
+  }
+
+  private formatBoxSliceData(data: any, timestamp: string): BoxSlice {
+    return {
+      boxes: data.boxes || [],
+      timestamp: data.timestamp || timestamp,
+      currentOHLC: data.currentOHLC || {
+        open: 0,
+        high: 0,
+        low: 0,
+        close: 0
+      }
+    };
   }
 }
 

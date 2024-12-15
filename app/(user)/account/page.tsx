@@ -62,7 +62,7 @@ export default function AccountContent() {
   );
 }
 
-export function NameForm({ userName }: { userName: string }) {
+const NameForm = ({ userName }: { userName: string }) => {
   return (
     <div className="flex items-center gap-3">
       <p className="font-outfit text-lg font-medium text-zinc-100">
@@ -70,9 +70,9 @@ export function NameForm({ userName }: { userName: string }) {
       </p>
     </div>
   );
-}
+};
 
-export function EmailForm({ userEmail }: { userEmail: string | undefined }) {
+const EmailForm = ({ userEmail }: { userEmail: string | undefined }) => {
   return (
     <div className="flex items-center gap-3">
       <p className="font-outfit text-lg font-medium text-zinc-100">
@@ -80,4 +80,4 @@ export function EmailForm({ userEmail }: { userEmail: string | undefined }) {
       </p>
     </div>
   );
-}
+};
