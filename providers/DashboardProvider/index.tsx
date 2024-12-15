@@ -57,72 +57,58 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     setIsLoading(false);
   }, [isAuthenticated]);
 
-  // Use React Query for each pair
-  const queries = useQueries({
-    queries: selectedPairs.map((pair) => ({
-      queryKey: ['pairData', pair],
-      queryFn: () => {
-        const existingData = queryClient.getQueryData([
-          'pairData',
-          pair
-        ]) as PairData;
-        return (
-          existingData ||
-          ({
-            boxes: [],
-            currentOHLC: {
-              open: 0,
-              high: 0,
-              low: 0,
-              close: 0
-            }
-          } as PairData)
-        );
-      },
-      enabled: isConnected && isAuthenticated,
-      staleTime: Infinity,
-      cacheTime: Infinity,
-      refetchInterval: 0 as const
-    }))
-  });
+  // Single query for all pair data instead of individual queries
+  const pairDataQuery = useQueries({
+    queries: [
+      {
+        queryKey: ['allPairData'],
+        queryFn: () => {
+          const existingData = queryClient.getQueryData([
+            'allPairData'
+          ]) as Record<string, PairData>;
+          return (
+            existingData ||
+            selectedPairs.reduce(
+              (acc, pair) => ({
+                ...acc,
+                [pair]: {
+                  boxes: [],
+                  currentOHLC: { open: 0, high: 0, low: 0, close: 0 }
+                }
+              }),
+              {}
+            )
+          );
+        },
+        enabled: isConnected && isAuthenticated,
+        staleTime: Infinity,
+        gcTime: Infinity,
+        refetchInterval: 0 as const
+      }
+    ]
+  })[0];
 
-  // WebSocket subscription management
+  // WebSocket subscription management - optimized for bulk updates
   useEffect(() => {
     if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
-    // console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
+    const handleBulkUpdate = (pair: string, wsData: BoxSlice) => {
+      queryClient.setQueryData(
+        ['allPairData'],
+        (oldData: Record<string, PairData> | undefined) => ({
+          ...oldData,
+          [pair]: {
+            boxes: [wsData],
+            currentOHLC: wsData.currentOHLC
+          }
+        })
+      );
+    };
 
+    // Subscribe to all pairs at once
     selectedPairs.forEach((pair) => {
       subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
-        // console.log(`📊 Processing update for ${pair}:`, {
-        //   timestamp: wsData.timestamp,
-        //   currentPrice: wsData.currentOHLC?.close,
-        //   lastUpdate: (
-        //     queryClient.getQueryData(['pairData', pair]) as PairData | undefined
-        //   )?.boxes?.[0]?.timestamp
-        // });
-
-        queryClient.setQueryData(
-          ['pairData', pair],
-          (oldData: PairData | undefined) => {
-            const newData = {
-              boxes: [wsData],
-              currentOHLC: wsData.currentOHLC
-            };
-
-            // Log if data actually changed
-            // if (JSON.stringify(oldData) !== JSON.stringify(newData)) {
-            //   console.log(`📈 Data changed for ${pair}:`, {
-            //     old: oldData?.boxes?.[0]?.timestamp,
-            //     new: wsData.timestamp,
-            //     oldPrice: oldData?.currentOHLC?.close,
-            //     newPrice: wsData.currentOHLC?.close
-            //   });
-            // }
-
-            return newData;
-          }
-        );
+        handleBulkUpdate(pair, wsData);
       });
     });
 
@@ -141,20 +127,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
     queryClient
   ]);
 
-  // Combine all pair data with proper typing
-  const pairData = queries.reduce<Record<string, PairData>>(
-    (acc, query, index) => {
-      const data = query.data as PairData;
-      if (data?.boxes && data?.currentOHLC) {
-        acc[selectedPairs[index]] = {
-          boxes: data.boxes,
-          currentOHLC: data.currentOHLC
-        };
-      }
-      return acc;
-    },
-    {}
-  );
+  const pairData = pairDataQuery.data || {};
 
   const togglePair = (pair: string) => {
     const wasSelected = selectedPairs.includes(pair);
@@ -167,7 +140,15 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
 
     if (wasSelected) {
       unsubscribeFromBoxSlices(pair);
-      queryClient.removeQueries({ queryKey: ['pairData', pair] });
+      // Update the allPairData by removing the pair
+      queryClient.setQueryData(
+        ['allPairData'],
+        (oldData: Record<string, PairData> | undefined) => {
+          if (!oldData) return {};
+          const { [pair]: removed, ...rest } = oldData;
+          return rest;
+        }
+      );
     }
   };
 
@@ -179,7 +160,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({
   const value = {
     pairData,
     selectedPairs,
-    isLoading: queries.some((q) => q.isLoading),
+    isLoading: pairDataQuery.isLoading,
     togglePair,
     isConnected,
     boxColors,

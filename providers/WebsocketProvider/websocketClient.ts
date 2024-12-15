@@ -18,6 +18,7 @@ class WebSocketClient {
   private accessToken: string | null = null;
   private isAuthenticated: boolean = false;
   private pendingOperations: (() => void)[] = [];
+  private lastUpdateLog: number = 0;
 
   public setAccessToken(token: string) {
     this.accessToken = token;
@@ -76,27 +77,6 @@ class WebSocketClient {
         message = JSON.parse(event.data);
       }
 
-      if (message.type !== 'ack') {
-        console.log('📥 WebSocket:', {
-          type: message.type,
-          ...(message.pair && { pair: message.pair }),
-          timestamp: new Date().toISOString(),
-          ...(message.type === 'subscribeAll' && {
-            action: 'Initial subscription',
-            pairs: Object.keys(message.data || {}).length,
-            data: message.data
-          }),
-          ...(message.type === 'updateAll' && {
-            action: 'Bulk update',
-            pairs: Object.keys(message.data || {}).length,
-            data: message.data
-          }),
-          ...(message.type === 'boxSlice' && {
-            data: message.data
-          })
-        });
-      }
-
       this.processMessage(message);
     } catch (error) {
       console.error('❌ Error processing WebSocket message:', error, {
@@ -149,18 +129,25 @@ class WebSocketClient {
   private handleUpdateAllMessage(message: WebSocketMessage) {
     if (!message.data) return;
 
-    console.log('🔄 Bulk update received:', {
-      pairs: Object.keys(message.data).join(', '),
-      timestamp: new Date().toISOString()
-    });
+    const now = Date.now();
+    if (now - this.lastUpdateLog > 1000) {
+      console.log('🔄 Bulk update received:', {
+        pairs: Object.keys(message.data).join(', '),
+        timestamp: new Date().toISOString()
+      });
+      this.lastUpdateLog = now;
+    }
 
-    Object.entries(message.data).forEach(([pair, data]) => {
+    // Process all updates in a single batch
+    const updates = Object.entries(message.data).map(([pair, data]) => ({
+      pair,
+      boxSlice: this.formatBoxSliceData(data, new Date().toISOString())
+    }));
+
+    // Notify handlers of all updates at once
+    updates.forEach(({ pair, boxSlice }) => {
       const handler = this.messageHandlers.get(pair);
       if (handler) {
-        const boxSlice = this.formatBoxSliceData(
-          data,
-          new Date().toISOString()
-        );
         handler(boxSlice);
       }
     });
