@@ -9,14 +9,6 @@ export default function Dashboard() {
   const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } =
     useDashboard();
 
-  if (!isAuthenticated) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="h-8 w-32 animate-pulse bg-gray-200" />
-      </div>
-    );
-  }
-
   const filteredPairData = selectedPairs
     .map((pair) => {
       const data = pairData[pair];

@@ -4,7 +4,8 @@ import React, {
   useState,
   useEffect,
   useMemo,
-  useCallback
+  useCallback,
+  memo
 } from 'react';
 import styles from './styles.module.css';
 import { Candle } from '@/types/types';
@@ -138,10 +139,17 @@ const HoverInfo: React.FC<HoverInfoProps> = ({
   );
 };
 
-export const LineChart: React.FC<{
+interface LineChartProps {
   pair: string;
-  candles: Candle[];
-}> = ({ pair, candles }) => {
+  candles: any[];
+  height?: number;
+}
+
+export const LineChart = ({
+  pair,
+  candles = [],
+  height = 400
+}: LineChartProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [yAxisScale, setYAxisScale] = useState(1);
@@ -203,12 +211,22 @@ export const LineChart: React.FC<{
     time: string;
   } | null>(null);
 
-  // Keep dimension update effect
+  // Keep dimension update effect but make it more responsive
   useEffect(() => {
     const updateDimensions = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
-        setDimensions({ width, height });
+        // Adjust padding for mobile
+        const mobileView = width < 768; // Check if we're on mobile
+        setDimensions({
+          width,
+          height: height || 200
+        });
+        // Adjust chart padding for mobile
+        chartPadding.right = mobileView ? 40 : 60;
+        chartPadding.left = mobileView ? 5 : 10;
+        chartPadding.top = mobileView ? 10 : 20;
+        chartPadding.bottom = mobileView ? 20 : 30;
       }
     };
 
@@ -293,31 +311,58 @@ export const LineChart: React.FC<{
     return priceBufferRef.current.getVisiblePoints(startIndex, endIndex);
   }, [scrollLeft, chartWidth]);
 
+  // Format the candle data
+  const formattedCandles = useMemo(() => {
+    return candles.map((candle) => ({
+      ...candle,
+      timestamp: new Date(candle.timestamp).getTime(),
+      close: Number(candle.currentOHLC.close),
+      open: Number(candle.currentOHLC.open),
+      high: Number(candle.currentOHLC.high),
+      low: Number(candle.currentOHLC.low)
+    }));
+  }, [candles]);
+
   const { minY, maxY, yScale } = useMemo(() => {
-    const prices = visibleData.map((d) => d.price);
+    if (!formattedCandles.length) {
+      return { minY: 0, maxY: 0, yScale: 1 };
+    }
+    const prices = formattedCandles.map((d) => d.close);
     const minY = Math.min(...prices);
     const maxY = Math.max(...prices);
-    const yScale = chartHeight / (maxY - minY);
+    const yScale = chartHeight / (maxY - minY || 1);
     return { minY, maxY, yScale };
-  }, [visibleData, chartHeight]);
+  }, [formattedCandles, chartHeight]);
 
   // Update the scaledData calculation
   const scaledData = useMemo(() => {
+    if (!formattedCandles.length) return [];
+
     const midPrice = (maxY + minY) / 2;
-    return visibleData.map((point, index) => {
+    return formattedCandles.map((point, index) => {
+      const price = Number(point.close) || 0; // Ensure number
       const scaledX = ensureNumber(
-        index * (chartWidth / (visibleData.length - 1))
+        index * (chartWidth / (formattedCandles.length - 1))
       );
       const scaledY = ensureNumber(
-        chartHeight / 2 - ((point.price - midPrice) * yScale) / animatedScale
+        chartHeight / 2 - ((price - midPrice) * yScale) / animatedScale
       );
       return {
         ...point,
+        price,
         scaledX,
         scaledY
       };
     });
-  }, [visibleData, chartWidth, chartHeight, minY, maxY, yScale, animatedScale]);
+  }, [
+    formattedCandles,
+    chartWidth,
+    chartHeight,
+    minY,
+    maxY,
+    yScale,
+    animatedScale
+  ]);
 
   const pathData = useMemo(() => {
     return PathGenerator.generate(scaledData, chartWidth, chartHeight);
@@ -360,21 +405,36 @@ export const LineChart: React.FC<{
     setHoverInfo(null);
   }, []);
 
+  // Add early return for empty data
+  if (!formattedCandles.length) {
+    return (
+      <div
+        style={{ height }}
+        className="flex items-center justify-center text-sm text-gray-400"
+      >
+        No chart data available
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
-      className={`relative h-full w-full overflow-hidden border border-[#181818] bg-black ${styles.chartContainer}`}
+      className={`relative h-full w-full overflow-hidden border-t border-[#222] bg-black ${
+        styles.chartContainer
+      }`}
       onMouseDown={handleMouseDown}
       onMouseMove={handleContainerMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
+      style={{ height }}
     >
-      <PairName pair={pair} />
       <svg
         width="100%"
         height="100%"
         viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
         preserveAspectRatio="none"
+        className="touch-pan-x touch-pan-y" // Add touch support
         onMouseMove={handleSvgMouseMove}
         onMouseLeave={handleMouseLeave}
         style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
@@ -448,16 +508,19 @@ const XAxis: React.FC<{
   chartHeight: number;
   hoverInfo: { time: string; x: number } | null;
   formatTime: (date: Date) => string;
-}> = React.memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
+}> = memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
   const intervals = useMemo(() => {
     if (data.length === 0) return [];
 
-    const intervalMs = 10 * 60 * 1000; // 10 minutes
-    const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
+    const hourMs = 60 * 60 * 1000; // 1 hour in milliseconds
+    const firstTime = new Date(data[0].timestamp);
+    // Round to nearest hour
+    const startTime = new Date(firstTime).setMinutes(0, 0, 0);
     const endTime = data[data.length - 1].timestamp;
     const result = [];
 
-    for (let time = startTime; time <= endTime; time += intervalMs) {
+    for (let time = startTime; time <= endTime; time += hourMs) {
+      // Find the closest data point to this hour
       const closestPoint = data.reduce((prev, curr) =>
         Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time)
           ? curr
@@ -466,8 +529,15 @@ const XAxis: React.FC<{
       result.push(closestPoint);
     }
 
+    // If we have too many points for mobile, reduce them
+    const maxPoints = chartWidth < 400 ? 4 : 6;
+    if (result.length > maxPoints) {
+      const step = Math.ceil(result.length / maxPoints);
+      return result.filter((_, i) => i % step === 0);
+    }
+
     return result;
-  }, [data]);
+  }, [data, chartWidth]);
 
   if (data.length === 0) {
     return null;
@@ -529,7 +599,7 @@ const YAxis: React.FC<{
   onScale: (scaleFactor: number) => void;
   yAxisScale: number;
   hoverInfo: { price: number; y: number } | null;
-}> = React.memo(
+}> = memo(
   ({
     minY,
     maxY,
@@ -571,7 +641,10 @@ const YAxis: React.FC<{
     const scaledVisibleRange = visibleRange * yAxisScale;
     const visibleMin = midPrice - scaledVisibleRange / 2;
     const visibleMax = midPrice + scaledVisibleRange / 2;
-    const steps = Math.max(2, Math.round(10 * yAxisScale));
+    const steps = Math.max(
+      2,
+      Math.round(chartHeight < 300 ? 4 : 10 * yAxisScale)
+    );
     const stepSize = scaledVisibleRange / steps;
 
     return (
@@ -648,12 +721,3 @@ const YAxis: React.FC<{
     );
   }
 );
-
-const PairName: React.FC<{ pair: string }> = React.memo(({ pair }) => {
-  const pairName = pair.substring(0, 7).replace(/_/g, '');
-  return (
-    <div className="absolute left-6 top-20 font-mono text-2xl font-bold uppercase text-gray-200">
-      {pairName}
-    </div>
-  );
-});
