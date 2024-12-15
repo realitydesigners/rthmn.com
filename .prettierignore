@@ -11,3 +11,8 @@ compiled/
 pnpm-lock.yaml
 types_db.ts
 
+node_modules
+build
+coverage
+public
+
