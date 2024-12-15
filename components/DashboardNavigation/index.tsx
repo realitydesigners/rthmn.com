@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { IconType } from 'react-icons';
 import { LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
 import { SelectedPairs } from '@/components/SelectedPairs';
@@ -62,10 +62,14 @@ const ProfileIcon = ({
 
 export const DashboardNavigation = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const { selectedPairs } = useDashboard();
   const [activePanel, setActivePanel] = useState<Panel>(null);
   const scrollDirection = useScrollDirection();
   const panelRef = useRef<HTMLDivElement>(null);
+
+  // Check if we're viewing a pair modal
+  const isPairModalOpen = pathname.includes('/pair/');
 
   useScrollLock(activePanel !== null);
 
@@ -115,7 +119,7 @@ export const DashboardNavigation = () => {
                 }
               }}
             />
-            <PairNavigator />
+            <PairNavigator isModalOpen={isPairModalOpen} />
           </div>
         );
       case 'settings':
