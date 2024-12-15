@@ -39,9 +39,11 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({
-  children
+  children,
+  modal
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   const supabase = await createClient();
 
@@ -61,6 +63,8 @@ export default async function RootLayout({
           <UserProvider initialUser={user}>
             <Navbar />
             {children}
+            {modal}
+            <div id="modal-root" />
             <Suspense>
               <Toaster />
             </Suspense>

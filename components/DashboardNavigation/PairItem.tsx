@@ -7,6 +7,7 @@ import {
   LuArrowRight
 } from 'react-icons/lu';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export const PairItem = ({
   pair,
@@ -95,12 +96,15 @@ export const PairItem = ({
 
     if (isActive) {
       return (
-        <ViewButton
+        <Link
+          href={`/pair/${pair}`}
           onClick={(e) => {
             e.stopPropagation();
-            onViewClick(pair);
           }}
-        />
+          className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all hover:bg-white/20 hover:text-white"
+        >
+          <LuArrowRight size={20} />
+        </Link>
       );
     }
 

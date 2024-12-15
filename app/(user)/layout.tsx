@@ -6,9 +6,11 @@ import { DashboardNavigation } from '@/components/DashboardNavigation';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
 
 export default async function UserLayout({
-  children
+  children,
+  modal
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   const supabase = await createClient();
   const [user, subscription] = await Promise.all([
@@ -27,7 +29,10 @@ export default async function UserLayout({
   return (
     <Providers>
       <BackgroundGrid>
-        <div>{children}</div>
+        <div>
+          {children}
+          {modal}
+        </div>
         <DashboardNavigation />
       </BackgroundGrid>
     </Providers>
