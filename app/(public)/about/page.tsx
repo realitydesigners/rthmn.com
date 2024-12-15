@@ -2,7 +2,7 @@ import { client } from '@/utils/sanity/lib/client';
 import AboutClient from './client';
 
 async function getAboutPage() {
-  return client.fetch(`
+    return client.fetch(`
     *[_type == "page" && slug.current == "about"][0] {
       title,
       sections[] {
@@ -16,6 +16,6 @@ async function getAboutPage() {
 }
 
 export default async function AboutPage() {
-  const page = await getAboutPage();
-  return <AboutClient page={page} />;
+    const page = await getAboutPage();
+    return <AboutClient page={page} />;
 }

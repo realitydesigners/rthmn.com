@@ -318,8 +318,8 @@ export const pageQuery = groq`
 `;
 
 export async function getModules() {
-  return client.fetch(
-    groq`*[_type == "module"] | order(order asc) {
+    return client.fetch(
+        groq`*[_type == "module"] | order(order asc) {
       _id,
       title,
       description,
@@ -332,12 +332,12 @@ export async function getModules() {
         order
       } | order(order asc)
     }`
-  );
+    );
 }
 
 export async function getModule(moduleSlug: string) {
-  return client.fetch(
-    groq`*[_type == "module" && slug.current == $moduleSlug][0] {
+    return client.fetch(
+        groq`*[_type == "module" && slug.current == $moduleSlug][0] {
       _id,
       title,
       description,
@@ -351,13 +351,13 @@ export async function getModule(moduleSlug: string) {
         order
       } | order(order asc)
     }`,
-    { moduleSlug }
-  );
+        { moduleSlug }
+    );
 }
 
 export async function getLesson(lessonSlug: string) {
-  return client.fetch(
-    groq`*[_type == "lesson" && slug.current == $lessonSlug][0] {
+    return client.fetch(
+        groq`*[_type == "lesson" && slug.current == $lessonSlug][0] {
       _id,
       title,
       description,
@@ -369,13 +369,13 @@ export async function getLesson(lessonSlug: string) {
         slug
       }
     }`,
-    { lessonSlug }
-  );
+        { lessonSlug }
+    );
 }
 
 export async function getChangeLog() {
-  return client.fetch(
-    groq`*[_type == "changelog"] | order(releaseDate desc) {
+    return client.fetch(
+        groq`*[_type == "changelog"] | order(releaseDate desc) {
       _id,
       title,
       description,
@@ -402,7 +402,7 @@ export async function getChangeLog() {
         }
       }
     }`
-  );
+    );
 }
 
 export const marketDataQuery = groq`

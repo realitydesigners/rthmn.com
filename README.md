@@ -5,6 +5,7 @@ Welcome to the public issue tracker for [rthmn](https://rthmn.com)! This reposit
 ## 🎯 Purpose
 
 This repository serves as a public space for:
+
 - Bug reports
 - Feature requests
 - General feedback
@@ -47,5 +48,6 @@ We provide several issue templates to help you submit:
 ## 📱 Support
 
 For urgent issues or private concerns, please contact:
+
 - Discord: [Join our community](https://discord.gg/rthmn)
 - Email: support@rthmn.com

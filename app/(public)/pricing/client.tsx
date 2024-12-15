@@ -6,29 +6,25 @@ import { useAuth } from '@/providers/SupabaseProvider';
 // import { SectionFooter } from '@/components/Sections/SectionFooter';
 
 interface MarketData {
-  pair: string;
-  lastUpdated: string;
-  candleData: string;
+    pair: string;
+    lastUpdated: string;
+    candleData: string;
 }
 
 interface ClientPageProps {
-  posts: any[];
-  products: any[] | null;
-  marketData: MarketData[];
+    posts: any[];
+    products: any[] | null;
+    marketData: MarketData[];
 }
 
 export default function ClientPage({ posts, products }: ClientPageProps) {
-  const { session } = useAuth();
+    const { session } = useAuth();
 
-  return (
-    <BackgroundGrid>
-      <SectionPricing
-        user={session?.user}
-        products={products ?? []}
-        subscription={null}
-      />
-      {/* <SectionBlogPosts initialPosts={posts} />
+    return (
+        <BackgroundGrid>
+            <SectionPricing user={session?.user} products={products ?? []} subscription={null} />
+            {/* <SectionBlogPosts initialPosts={posts} />
       <SectionFooter /> */}
-    </BackgroundGrid>
-  );
+        </BackgroundGrid>
+    );
 }

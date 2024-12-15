@@ -7,19 +7,19 @@ import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { DashboardProvider } from '@/providers/DashboardProvider';
 
 export const Navbar = () => {
-  const { user } = useAuth();
+    const { user } = useAuth();
 
-  if (!user) {
-    return <NavbarSignedOut user={null} />;
-  }
+    if (!user) {
+        return <NavbarSignedOut user={null} />;
+    }
 
-  return (
-    <QueryProvider>
-      <WebSocketProvider>
-        <DashboardProvider>
-          <NavbarSignedIn user={user} />
-        </DashboardProvider>
-      </WebSocketProvider>
-    </QueryProvider>
-  );
+    return (
+        <QueryProvider>
+            <WebSocketProvider>
+                <DashboardProvider>
+                    <NavbarSignedIn user={user} />
+                </DashboardProvider>
+            </WebSocketProvider>
+        </QueryProvider>
+    );
 };

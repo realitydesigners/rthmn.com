@@ -5,27 +5,27 @@ import { createClient } from '@/utils/supabase/client';
 import { getURL } from '@/utils/helpers';
 
 export function useSignInWithOAuth() {
-  const supabase = createClient();
+    const supabase = createClient();
 
-  return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
-    e.preventDefault();
-    const redirectURL = getURL('/auth/callback');
+    return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
+        e.preventDefault();
+        const redirectURL = getURL('/auth/callback');
 
-    if (provider === 'discord') {
-      await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: redirectURL,
-          scopes: 'identify'
+        if (provider === 'discord') {
+            await supabase.auth.signInWithOAuth({
+                provider,
+                options: {
+                    redirectTo: redirectURL,
+                    scopes: 'identify',
+                },
+            });
+        } else {
+            await supabase.auth.signInWithOAuth({
+                provider,
+                options: {
+                    redirectTo: redirectURL,
+                },
+            });
         }
-      });
-    } else {
-      await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: redirectURL
-        }
-      });
-    }
-  };
+    };
 }

@@ -4,26 +4,22 @@ import { AboutTemplate } from '@/app/(public)/_components/blocks/templates/About
 import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
 
 interface PortableTextProps {
-  value: any;
-  template?: 'about' | 'changelog' | 'default';
-  components?: Partial<PortableTextComponents>;
+    value: any;
+    template?: 'about' | 'changelog' | 'default';
+    components?: Partial<PortableTextComponents>;
 }
 
-export function PortableText({
-  value,
-  template = 'default',
-  components
-}: PortableTextProps) {
-  const getTemplate = () => {
-    switch (template) {
-      case 'about':
-        return AboutTemplate;
-      case 'changelog':
-        return ChangelogTemplate;
-      default:
-        return components || {};
-    }
-  };
+export function PortableText({ value, template = 'default', components }: PortableTextProps) {
+    const getTemplate = () => {
+        switch (template) {
+            case 'about':
+                return AboutTemplate;
+            case 'changelog':
+                return ChangelogTemplate;
+            default:
+                return components || {};
+        }
+    };
 
-  return <SanityPortableText value={value} components={getTemplate()} />;
+    return <SanityPortableText value={value} components={getTemplate()} />;
 }

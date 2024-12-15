@@ -50,9 +50,9 @@
     border-radius: 0.25em;
     transition: all 0.2s ease-in-out;
     border: 1px solid #181818;
-    font-size: .8rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
-    padding: .3rem .5rem .3rem .5rem;
+    padding: 0.3rem 0.5rem 0.3rem 0.5rem;
     font-family: 'Oxanium', sans-serif;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .buttonInactive:hover {
-    color: #BFC0C1;
+    color: #bfc0c1;
 }
 
 .dropdown {
@@ -84,7 +84,7 @@
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
-    padding: .25rem;
+    padding: 0.25rem;
 }
 
 .dropdown button {
@@ -93,7 +93,8 @@
     border: 1px solid #181818;
 }
 
-.priceLabel, .timeLabel {
+.priceLabel,
+.timeLabel {
     background-color: rgba(24, 24, 24, 0.8);
     color: white;
     padding: 2px 4px;

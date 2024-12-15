@@ -7,9 +7,9 @@ const allowPassword = false;
 const allowServerRedirect = false;
 
 export const getAuthTypes = () => ({
-  allowOauth,
-  allowEmail,
-  allowPassword
+    allowOauth,
+    allowEmail,
+    allowPassword,
 });
 
 export const getViewTypes = () => ['signin'];
@@ -17,5 +17,5 @@ export const getViewTypes = () => ['signin'];
 export const getDefaultSignInView = () => 'signin';
 
 export const getRedirectMethod = () => {
-  return allowServerRedirect ? 'server' : 'client';
+    return allowServerRedirect ? 'server' : 'client';
 };
