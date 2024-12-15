@@ -93,27 +93,24 @@ export const useBoxSliceData = (
     }, []);
   }, [data, boxOffset, visibleBoxesCount]);
 
-  const candleData = useMemo(() => {
-    if (!data || data.length === 0) {
-      console.warn('No data available for candles');
-      return [];
-    }
-    console.log('Data for candleData:', data);
-    return data.map((slice) => ({
-      time: new Date(slice.timestamp).toISOString(),
-      open: slice.currentOHLC?.open ?? slice.boxes[0]?.high ?? 0,
-      high:
-        slice.currentOHLC?.high ??
-        Math.max(...slice.boxes.map((box) => box.high)),
-      low:
-        slice.currentOHLC?.low ??
-        Math.min(...slice.boxes.map((box) => box.low)),
-      close:
-        slice.currentOHLC?.close ??
-        slice.boxes[slice.boxes.length - 1]?.low ??
-        0
+  const formattedCandleData = useMemo(() => {
+    if (!data) return [];
+
+    return data.map((item) => ({
+      ...item,
+      time: new Date(item.timestamp).getTime(),
+      open: Number(item.currentOHLC.open),
+      high: Number(item.currentOHLC.high),
+      low: Number(item.currentOHLC.low),
+      close: Number(item.currentOHLC.close)
     }));
   }, [data]);
 
-  return { data, filteredData, candleData, error, isLoading };
+  return {
+    data,
+    filteredData,
+    candleData: formattedCandleData,
+    error,
+    isLoading
+  };
 };

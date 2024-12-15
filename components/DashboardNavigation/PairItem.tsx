@@ -98,6 +98,7 @@ export const PairItem = ({
       return (
         <Link
           href={`/pair/${pair}`}
+          as={`/pair/${pair}`}
           onClick={(e) => {
             e.stopPropagation();
           }}
