@@ -176,7 +176,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
   return (
     <div
       className={`fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-black/95 pt-4 transition-all duration-300 ${
-        isModalOpen ? 'h-[160px]' : 'h-[50vh]'
+        isModalOpen ? 'h-[170px] lg:hidden' : 'h-[50vh]'
       }`}
     >
       <div className="pointer-events-none absolute top-2 right-0 left-0 z-[98] h-24 rounded-t-[3em] bg-gradient-to-b from-black via-black/95 to-transparent" />

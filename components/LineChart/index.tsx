@@ -512,12 +512,15 @@ const XAxis: React.FC<{
   const intervals = useMemo(() => {
     if (data.length === 0) return [];
 
-    const intervalMs = 10 * 60 * 1000; // 10 minutes
-    const startTime = Math.floor(data[0].timestamp / intervalMs) * intervalMs;
+    const hourMs = 60 * 60 * 1000; // 1 hour in milliseconds
+    const firstTime = new Date(data[0].timestamp);
+    // Round to nearest hour
+    const startTime = new Date(firstTime).setMinutes(0, 0, 0);
     const endTime = data[data.length - 1].timestamp;
     const result = [];
 
-    for (let time = startTime; time <= endTime; time += intervalMs) {
+    for (let time = startTime; time <= endTime; time += hourMs) {
+      // Find the closest data point to this hour
       const closestPoint = data.reduce((prev, curr) =>
         Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time)
           ? curr
@@ -526,8 +529,15 @@ const XAxis: React.FC<{
       result.push(closestPoint);
     }
 
+    // If we have too many points for mobile, reduce them
+    const maxPoints = chartWidth < 400 ? 4 : 6;
+    if (result.length > maxPoints) {
+      const step = Math.ceil(result.length / maxPoints);
+      return result.filter((_, i) => i % step === 0);
+    }
+
     return result;
-  }, [data]);
+  }, [data, chartWidth]);
 
   if (data.length === 0) {
     return null;
