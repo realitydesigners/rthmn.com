@@ -59,38 +59,38 @@ const ColorPicker = ({ label, color, onChange }: { label: string; color: string;
     </div>
 );
 
-const StyleControl = ({
-    label,
-    value,
-    onChange,
-    min,
-    max,
-    step,
-    unit = '',
-}: {
-    label: string;
+interface StyleControlProps {
+    label?: string;
     value: number;
     onChange: (value: number) => void;
     min: number;
     max: number;
     step: number;
     unit?: string;
-}) => {
+    hideLabel?: boolean;
+    preview?: React.ReactNode;
+}
+
+const StyleControl: React.FC<StyleControlProps> = ({ label, value, onChange, min, max, step, unit = '', hideLabel = false, preview }) => {
     const percentage = ((value - min) / (max - min)) * 100;
 
     return (
         <div className='space-y-2'>
-            <div className='flex items-center justify-between px-1'>
-                <label className='text-xs font-medium text-gray-400'>{label}</label>
-                <span className='font-mono text-xs font-medium text-emerald-500'>
-                    {step < 1 ? value.toFixed(2) : value}
-                    {unit}
-                </span>
-            </div>
+            {!hideLabel && (
+                <div className='flex items-center justify-between px-1'>
+                    <label className='text-xs font-medium text-gray-400'>{label}</label>
+                    <span className='font-mono text-xs font-medium text-white/70'>
+                        {step < 1 ? value.toFixed(2) : value}
+                        {unit}
+                    </span>
+                </div>
+            )}
             <div className='group relative'>
+                {preview && <div className='mb-2 h-12 rounded-lg border border-[#222] bg-[#111]'>{preview}</div>}
                 <div className='absolute inset-y-0 left-0 flex w-full items-center px-3'>
-                    <div className='relative h-1 w-full rounded-full bg-[#222]'>
-                        <div className='absolute h-full rounded-full bg-emerald-500/30' style={{ width: `${percentage}%` }} />
+                    <div className='relative h-[2px] w-full bg-[#222]'>
+                        <div className='absolute h-full bg-white/20' style={{ width: `${percentage}%` }} />
+                        <div className='absolute h-full bg-white/40' style={{ width: `${percentage}%` }} />
                     </div>
                 </div>
                 <input
@@ -100,8 +100,201 @@ const StyleControl = ({
                     step={step}
                     value={value}
                     onChange={(e) => onChange(parseFloat(e.target.value))}
-                    className='relative h-8 w-full cursor-pointer appearance-none rounded-lg bg-transparent transition-all'
+                    className='relative h-8 w-full cursor-pointer appearance-none rounded-lg bg-transparent transition-all hover:cursor-grab active:cursor-grabbing'
+                    style={
+                        {
+                            '--thumb-size': '16px',
+                            '--thumb-color': '#fff',
+                        } as React.CSSProperties
+                    }
                 />
+                <style jsx global>{`
+                    input[type='range']::-webkit-slider-thumb {
+                        -webkit-appearance: none;
+                        height: var(--thumb-size);
+                        width: var(--thumb-size);
+                        border-radius: 50%;
+                        background: var(--thumb-color);
+                        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+                        border: 2px solid rgba(255, 255, 255, 0.1);
+                        cursor: grab;
+                        transition: all 0.15s ease;
+                    }
+                    input[type='range']::-webkit-slider-thumb:hover {
+                        transform: scale(1.1);
+                        box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+                    }
+                    input[type='range']::-webkit-slider-thumb:active {
+                        cursor: grabbing;
+                        transform: scale(0.95);
+                    }
+                `}</style>
+            </div>
+        </div>
+    );
+};
+
+interface PatternVisualizerProps {
+    startIndex: number;
+    maxBoxCount: number;
+    boxes: number[];
+    onStyleChange: (property: keyof BoxColors['styles'], value: number | boolean) => void;
+}
+
+const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange }) => {
+    return (
+        <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+                <span className='text-xs font-medium text-gray-400'>Pattern Range</span>
+                <span className='font-mono text-xs font-medium text-white/70'>
+                    {startIndex} → {startIndex + maxBoxCount - 1}
+                </span>
+            </div>
+
+            {/* Visualization Container */}
+            <div className='relative h-24 rounded-xl border border-[#1a1a1a] bg-[#0a0a0a] p-4'>
+                {/* Background bars */}
+                <div className='flex h-full items-center'>
+                    {Array.from({ length: 38 }).map((_, i) => (
+                        <div key={i} className='flex h-full flex-1 items-center px-[0.5px]'>
+                            <div
+                                className={cn(
+                                    'h-8 w-full rounded-sm transition-all duration-200',
+                                    i >= startIndex && i < startIndex + maxBoxCount ? 'bg-white/20' : 'bg-[#1a1a1a]'
+                                )}
+                            />
+                        </div>
+                    ))}
+                </div>
+
+                {/* Selection indicator */}
+                <div
+                    className='absolute inset-y-0 transition-all duration-200'
+                    style={{
+                        left: `${(startIndex / 38) * 100}%`,
+                        width: `${(maxBoxCount / 38) * 100}%`,
+                    }}>
+                    {/* Vertical lines */}
+                    <div className='absolute inset-y-4 left-0 w-[1px] bg-white/40' />
+                    <div className='absolute inset-y-4 right-0 w-[1px] bg-white/40' />
+
+                    {/* Labels */}
+                    <div className='absolute -top-3 left-0 -translate-x-1/2 text-center'>
+                        <div className='font-mono text-[10px] font-medium text-white/40'>Start</div>
+                        <div className='font-mono text-[10px] font-medium text-white/70'>{startIndex}</div>
+                    </div>
+                    <div className='absolute -top-3 right-0 translate-x-1/2 text-center'>
+                        <div className='font-mono text-[10px] font-medium text-white/40'>End</div>
+                        <div className='font-mono text-[10px] font-medium text-white/70'>{startIndex + maxBoxCount - 1}</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Controls */}
+            <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-2 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-3'>
+                    <div className='flex items-center justify-between'>
+                        <span className='text-xs font-medium text-gray-400'>Length</span>
+                        <span className='font-mono text-xs font-medium text-white/70'>{maxBoxCount}</span>
+                    </div>
+                    <StyleControl value={maxBoxCount} onChange={(value) => onStyleChange('maxBoxCount', value)} min={2} max={38} step={1} hideLabel />
+                </div>
+
+                <div className='space-y-2 rounded-lg border border-[#1a1a1a] bg-[#0a0a0a] p-3'>
+                    <div className='flex items-center justify-between'>
+                        <span className='text-xs font-medium text-gray-400'>Start</span>
+                        <span className='font-mono text-xs font-medium text-white/70'>{startIndex}</span>
+                    </div>
+                    <StyleControl
+                        value={startIndex}
+                        onChange={(value) => {
+                            const maxStartIndex = Math.min(value, 38 - maxBoxCount);
+                            onStyleChange('startIndex', maxStartIndex);
+                        }}
+                        min={0}
+                        max={Math.min(36, 38 - maxBoxCount)}
+                        step={1}
+                        hideLabel
+                    />
+                </div>
+            </div>
+        </div>
+    );
+};
+
+interface BoxVisualizerProps {
+    borderRadius: number;
+    shadowIntensity: number;
+    opacity: number;
+    showBorder: boolean;
+    onStyleChange: (property: keyof BoxColors['styles'], value: number | boolean) => void;
+}
+
+const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }) => {
+    return (
+        <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+                <span className='text-xs font-medium text-gray-400'>Box Appearance</span>
+            </div>
+
+            {/* Preview Container */}
+            <div className='h-auto rounded-lg border border-[#222] bg-[#111]'>
+                <div className='relative flex h-full items-center justify-center p-6'>
+                    {/* Background grid for better shadow visibility */}
+
+                    {/* Preview Box */}
+                    <div
+                        className='relative h-40 w-40 border border-white/20 transition-all duration-200'
+                        style={{
+                            borderRadius: `${borderRadius}px`,
+                            boxShadow: `inset 0 0 ${shadowIntensity * 50}px rgba(255, 255, 255, ${shadowIntensity * 0.3})`,
+                            backgroundColor: `rgba(255, 255, 255, ${opacity * 0.1})`,
+                        }}>
+                        {/* Inner gradient for depth effect */}
+                        <div
+                            className='absolute inset-0 transition-all duration-200'
+                            style={{
+                                borderRadius: `${borderRadius}px`,
+                                background: `radial-gradient(circle at center, transparent, rgba(0, 0, 0, ${shadowIntensity * 0.5}))`,
+                            }}
+                        />
+                    </div>
+
+                    {/* Dynamic Labels */}
+                    <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
+                        <div className='absolute top-2 left-2 rounded-md bg-black/80 px-2 py-1 backdrop-blur-sm' style={{ transform: 'translate(50%, 50%)' }}>
+                            <span className='font-mono text-xs text-white/70'>{borderRadius}px</span>
+                        </div>
+
+                        <div className='absolute right-2 bottom-2 rounded-md bg-black/80 px-2 py-1 backdrop-blur-sm' style={{ transform: 'translate(-50%, -50%)' }}>
+                            <div className='flex items-center gap-1'>
+                                <span className='font-mono text-xs text-white/70'>{(shadowIntensity * 100).toFixed(0)}%</span>
+                            </div>
+                        </div>
+
+                        <div className='absolute top-2 right-2 rounded-md bg-black/80 px-2 py-1 backdrop-blur-sm' style={{ transform: 'translate(-50%, 50%)' }}>
+                            <span className='font-mono text-xs text-white/70'>{(opacity * 100).toFixed(0)}%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Controls */}
+            <div className='space-y-3 pt-2'>
+                <StyleControl label='Border Radius' value={borderRadius} onChange={(value) => onStyleChange('borderRadius', value)} min={0} max={16} step={1} unit='px' />
+
+                <StyleControl label='Shadow Depth' value={shadowIntensity} onChange={(value) => onStyleChange('shadowIntensity', value)} min={0} max={1} step={0.05} />
+
+                <StyleControl label='Opacity' value={opacity} onChange={(value) => onStyleChange('opacity', value)} min={0.01} max={1} step={0.05} />
+
+                <div className='flex items-center justify-between rounded-lg border border-[#222] bg-[#141414] p-3'>
+                    <span className='text-xs font-medium text-gray-400'>Show Border</span>
+                    <button
+                        onClick={() => onStyleChange('showBorder', !showBorder)}
+                        className={`relative h-6 w-11 rounded-full transition-colors ${showBorder ? 'bg-white/20' : 'bg-[#222]'}`}>
+                        <div className={`absolute top-1 h-4 w-4 rounded-full bg-white/90 transition-all ${showBorder ? 'left-6' : 'left-1'}`} />
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -123,15 +316,12 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) =>
 
     return (
         <>
-            <div className='fixed bottom-0 left-1/2 z-[1000] h-[50vh] w-screen -translate-x-1/2 bg-black'>
-                {/* Rounded top edge */}
+            <div className='fixed bottom-0 left-1/2 z-[1000] h-[90vh] w-screen -translate-x-1/2 bg-black'>
                 <div className='absolute -top-4 right-0 left-0 h-20 rounded-[10em] border-t border-[#222] bg-black' />
 
-                {/* Settings Content */}
                 <div className='relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4'>
                     <div className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'>
                         <div className='mb-[25vh] space-y-2 pt-2'>
-                            {/* Menu Buttons */}
                             <MenuButton label='Colors' isActive={activeSection === 'colors'} onClick={() => setActiveSection(activeSection === 'colors' ? null : 'colors')} />
 
                             {activeSection === 'colors' && (
@@ -193,99 +383,24 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) =>
 
                             {activeSection === 'boxStyles' && (
                                 <div className='space-y-6 px-2 py-3'>
-                                    <StyleControl
-                                        label='Border Radius'
-                                        value={boxColors.styles?.borderRadius ?? 8}
-                                        onChange={(value) => handleStyleChange('borderRadius', value)}
-                                        min={0}
-                                        max={16}
-                                        step={1}
-                                        unit='px'
+                                    <PatternVisualizer
+                                        startIndex={boxColors.styles?.startIndex ?? 0}
+                                        maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                                        boxes={[]}
+                                        onStyleChange={handleStyleChange}
                                     />
-                                    <StyleControl
-                                        label='Pattern Length'
-                                        value={boxColors.styles?.maxBoxCount ?? 10}
-                                        onChange={(value) => handleStyleChange('maxBoxCount', value)}
-                                        min={2}
-                                        max={38}
-                                        step={1}
-                                        unit=' boxes'
-                                    />
-                                    <StyleControl
-                                        label='Shadow Depth'
-                                        value={boxColors.styles?.shadowIntensity ?? 0.25}
-                                        onChange={(value) => handleStyleChange('shadowIntensity', value)}
-                                        min={0}
-                                        max={1}
-                                        step={0.05}
-                                    />
-                                    <StyleControl
-                                        label='Opacity'
-                                        value={boxColors.styles?.opacity ?? 1}
-                                        onChange={(value) => handleStyleChange('opacity', value)}
-                                        min={0.01}
-                                        max={1}
-                                        step={0.05}
-                                    />
-                                    <div className='flex items-center justify-between'>
-                                        <span className='text-xs font-medium text-gray-400'>Show Border</span>
-                                        <button
-                                            onClick={() => handleStyleChange('showBorder', !boxColors.styles?.showBorder)}
-                                            className={`relative h-6 w-11 rounded-full transition-colors ${boxColors.styles?.showBorder ? 'bg-emerald-500/30' : 'bg-[#222]'}`}>
-                                            <div className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${boxColors.styles?.showBorder ? 'left-6' : 'left-1'}`} />
-                                        </button>
+
+                                    <div className='relative py-3'>
+                                        <div className='absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#222]' />
                                     </div>
-                                    <div className='space-y-6'>
-                                        <p className='text-xs font-medium text-gray-500'>Pattern Display Range</p>
 
-                                        {/* Pattern Length Control */}
-                                        <StyleControl
-                                            label='Pattern Length'
-                                            value={boxColors.styles?.maxBoxCount ?? 10}
-                                            onChange={(value) => handleStyleChange('maxBoxCount', value)}
-                                            min={2}
-                                            max={38}
-                                            step={1}
-                                            unit=' boxes'
-                                        />
-
-                                        {/* Start Position Control */}
-                                        <StyleControl
-                                            label='Start Position'
-                                            value={boxColors.styles?.startIndex ?? 0}
-                                            onChange={(value) => {
-                                                // Ensure we don't exceed array bounds
-                                                const maxStartIndex = Math.min(value, 38 - (boxColors.styles?.maxBoxCount ?? 10));
-                                                handleStyleChange('startIndex', maxStartIndex);
-                                            }}
-                                            min={0}
-                                            max={Math.min(36, 38 - (boxColors.styles?.maxBoxCount ?? 10))} // Ensure we can't start beyond possible range
-                                            step={1}
-                                            unit=''
-                                        />
-
-                                        {/* Visual indicator of selected range */}
-                                        <div className='px-1'>
-                                            <div className='flex items-center gap-1'>
-                                                {Array.from({ length: 38 }).map((_, i) => (
-                                                    <div
-                                                        key={i}
-                                                        className={cn(
-                                                            'h-1 w-1 rounded-full transition-all',
-                                                            i >= (boxColors.styles?.startIndex ?? 0) &&
-                                                                i < (boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? 10)
-                                                                ? 'bg-emerald-500'
-                                                                : 'bg-[#222]'
-                                                        )}
-                                                    />
-                                                ))}
-                                            </div>
-                                            <p className='mt-2 text-xs text-gray-400'>
-                                                Showing positions {boxColors.styles?.startIndex} to{' '}
-                                                {(boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? 10) - 1}
-                                            </p>
-                                        </div>
-                                    </div>
+                                    <BoxVisualizer
+                                        borderRadius={boxColors.styles?.borderRadius ?? 8}
+                                        shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
+                                        opacity={boxColors.styles?.opacity ?? 1}
+                                        showBorder={boxColors.styles?.showBorder ?? true}
+                                        onStyleChange={handleStyleChange}
+                                    />
                                 </div>
                             )}
                         </div>
