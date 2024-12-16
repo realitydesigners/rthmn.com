@@ -5,13 +5,9 @@ import { useDashboard } from '@/providers/DashboardProvider';
 import { colorPresets } from '@/utils/colorPresets';
 import { BoxColors } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
+import { PatternVisualizer, BoxVisualizer } from './Visualizers';
 
 type SettingsSection = 'colors' | 'boxStyles' | null;
-
-interface SettingsBarProps {
-    isOpen: boolean;
-    onToggle: () => void;
-}
 
 const MenuButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => (
     <button
@@ -59,55 +55,7 @@ const ColorPicker = ({ label, color, onChange }: { label: string; color: string;
     </div>
 );
 
-const StyleControl = ({
-    label,
-    value,
-    onChange,
-    min,
-    max,
-    step,
-    unit = '',
-}: {
-    label: string;
-    value: number;
-    onChange: (value: number) => void;
-    min: number;
-    max: number;
-    step: number;
-    unit?: string;
-}) => {
-    const percentage = ((value - min) / (max - min)) * 100;
-
-    return (
-        <div className='space-y-2'>
-            <div className='flex items-center justify-between px-1'>
-                <label className='text-xs font-medium text-gray-400'>{label}</label>
-                <span className='font-mono text-xs font-medium text-emerald-500'>
-                    {step < 1 ? value.toFixed(2) : value}
-                    {unit}
-                </span>
-            </div>
-            <div className='group relative'>
-                <div className='absolute inset-y-0 left-0 flex w-full items-center px-3'>
-                    <div className='relative h-1 w-full rounded-full bg-[#222]'>
-                        <div className='absolute h-full rounded-full bg-emerald-500/30' style={{ width: `${percentage}%` }} />
-                    </div>
-                </div>
-                <input
-                    type='range'
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={(e) => onChange(parseFloat(e.target.value))}
-                    className='relative h-8 w-full cursor-pointer appearance-none rounded-lg bg-transparent transition-all'
-                />
-            </div>
-        </div>
-    );
-};
-
-export const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) => {
+export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
     const { boxColors, updateBoxColors } = useDashboard();
     const [activeSection, setActiveSection] = useState<SettingsSection>(null);
 
@@ -123,15 +71,12 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) =>
 
     return (
         <>
-            <div className='fixed bottom-0 left-1/2 z-[1000] h-[50vh] w-screen -translate-x-1/2 bg-black'>
-                {/* Rounded top edge */}
+            <div className='fixed bottom-0 left-1/2 z-[1000] h-[95vh] w-screen -translate-x-1/2 bg-black'>
                 <div className='absolute -top-4 right-0 left-0 h-20 rounded-[10em] border-t border-[#222] bg-black' />
 
-                {/* Settings Content */}
                 <div className='relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4'>
                     <div className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'>
                         <div className='mb-[25vh] space-y-2 pt-2'>
-                            {/* Menu Buttons */}
                             <MenuButton label='Colors' isActive={activeSection === 'colors'} onClick={() => setActiveSection(activeSection === 'colors' ? null : 'colors')} />
 
                             {activeSection === 'colors' && (
@@ -193,48 +138,19 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) =>
 
                             {activeSection === 'boxStyles' && (
                                 <div className='space-y-6 px-2 py-3'>
-                                    <StyleControl
-                                        label='Border Radius'
-                                        value={boxColors.styles?.borderRadius ?? 8}
-                                        onChange={(value) => handleStyleChange('borderRadius', value)}
-                                        min={0}
-                                        max={16}
-                                        step={1}
-                                        unit='px'
+                                    <PatternVisualizer
+                                        startIndex={boxColors.styles?.startIndex ?? 0}
+                                        maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                                        boxes={[]}
+                                        onStyleChange={handleStyleChange}
                                     />
-                                    <StyleControl
-                                        label='Pattern Length'
-                                        value={boxColors.styles?.maxBoxCount ?? 10}
-                                        onChange={(value) => handleStyleChange('maxBoxCount', value)}
-                                        min={2}
-                                        max={38}
-                                        step={1}
-                                        unit=' boxes'
+                                    <BoxVisualizer
+                                        borderRadius={boxColors.styles?.borderRadius ?? 8}
+                                        shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
+                                        opacity={boxColors.styles?.opacity ?? 1}
+                                        showBorder={boxColors.styles?.showBorder ?? true}
+                                        onStyleChange={handleStyleChange}
                                     />
-                                    <StyleControl
-                                        label='Shadow Depth'
-                                        value={boxColors.styles?.shadowIntensity ?? 0.25}
-                                        onChange={(value) => handleStyleChange('shadowIntensity', value)}
-                                        min={0}
-                                        max={1}
-                                        step={0.05}
-                                    />
-                                    <StyleControl
-                                        label='Opacity'
-                                        value={boxColors.styles?.opacity ?? 1}
-                                        onChange={(value) => handleStyleChange('opacity', value)}
-                                        min={0.01}
-                                        max={1}
-                                        step={0.05}
-                                    />
-                                    <div className='flex items-center justify-between'>
-                                        <span className='text-xs font-medium text-gray-400'>Show Border</span>
-                                        <button
-                                            onClick={() => handleStyleChange('showBorder', !boxColors.styles?.showBorder)}
-                                            className={`relative h-6 w-11 rounded-full transition-colors ${boxColors.styles?.showBorder ? 'bg-emerald-500/30' : 'bg-[#222]'}`}>
-                                            <div className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${boxColors.styles?.showBorder ? 'left-6' : 'left-1'}`} />
-                                        </button>
-                                    </div>
                                 </div>
                             )}
                         </div>
