@@ -19,6 +19,7 @@ export interface BoxColors {
     styles?: {
         borderRadius: number;
         maxBoxCount: number;
+        startIndex: number;
         shadowIntensity: number;
         showBorder: boolean;
         opacity: number;
@@ -31,6 +32,7 @@ const DEFAULT_BOX_COLORS: BoxColors = {
     styles: {
         borderRadius: 8,
         maxBoxCount: 10,
+        startIndex: 0,
         shadowIntensity: 0.25,
         showBorder: true,
         opacity: 1,

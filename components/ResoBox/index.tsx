@@ -143,8 +143,25 @@ export const ResoBox = React.memo(
 
         const sortedBoxes = useMemo(() => {
             if (!slice?.boxes?.length) return [];
-            return slice.boxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)).slice(0, boxColors.styles?.maxBoxCount ?? slice.boxes.length);
-        }, [slice?.boxes, boxColors.styles?.maxBoxCount]);
+
+            // First slice the array based on startIndex and maxBoxCount
+            const selectedBoxes = slice.boxes.slice(boxColors.styles?.startIndex ?? 0, (boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? slice.boxes.length));
+
+            console.log('Settings:', {
+                startIndex: boxColors.styles?.startIndex,
+                maxBoxCount: boxColors.styles?.maxBoxCount,
+            });
+
+            console.log('Original boxes:', slice.boxes);
+            console.log('Selected boxes (after slice):', selectedBoxes);
+
+            // Then sort the selected boxes by absolute value
+            const sorted = selectedBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
+            console.log('Sorted boxes (final):', sorted);
+
+            return sorted;
+        }, [slice?.boxes, boxColors.styles?.maxBoxCount, boxColors.styles?.startIndex]);
 
         const maxSize = useMemo(() => {
             if (!sortedBoxes.length) return 0;

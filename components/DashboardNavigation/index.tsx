@@ -46,6 +46,20 @@ const ProfileIcon = ({ setActivePanel }: { setActivePanel: (panel: Panel) => voi
     );
 };
 
+const PanelWrapper = ({ children, onClose }: { children: React.ReactNode; onClose: () => void }) => (
+    <div className='relative z-[90]'>
+        <div
+            className='fixed inset-0 z-[85] backdrop-blur-lg'
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose();
+                }
+            }}
+        />
+        {children}
+    </div>
+);
+
 export const DashboardNavigation = () => {
     const router = useRouter();
     const pathname = usePathname();
@@ -90,52 +104,19 @@ export const DashboardNavigation = () => {
     };
 
     const renderPanel = () => {
-        switch (activePanel) {
-            case 'pairs':
-                return (
-                    <div className='relative z-[90]'>
-                        <div
-                            className='fixed inset-0 z-[85] backdrop-blur-sm'
-                            onClick={(e) => {
-                                if (e.target === e.currentTarget) {
-                                    setActivePanel(null);
-                                }
-                            }}
-                        />
-                        <PairNavigator isModalOpen={isPairModalOpen} />
-                    </div>
-                );
-            case 'settings':
-                return (
-                    <div className='relative z-[90]'>
-                        <div
-                            className='fixed inset-0 z-[85] backdrop-blur-sm'
-                            onClick={(e) => {
-                                if (e.target === e.currentTarget) {
-                                    setActivePanel(null);
-                                }
-                            }}
-                        />
-                        <SettingsBar isOpen={true} onToggle={() => setActivePanel(null)} />
-                    </div>
-                );
-            case 'profile':
-                return (
-                    <div className='relative z-[90]'>
-                        <div
-                            className='fixed inset-0 z-[85] backdrop-blur-sm'
-                            onClick={(e) => {
-                                if (e.target === e.currentTarget) {
-                                    setActivePanel(null);
-                                }
-                            }}
-                        />
-                        <ProfilePanel />
-                    </div>
-                );
-            default:
-                return null;
-        }
+        const handleClose = () => setActivePanel(null);
+
+        const panels = {
+            pairs: <PairNavigator isModalOpen={isPairModalOpen} />,
+            settings: <SettingsBar isOpen={true} onToggle={handleClose} />,
+            profile: <ProfilePanel />,
+        };
+
+        const content = panels[activePanel as keyof typeof panels];
+
+        if (!content) return null;
+
+        return <PanelWrapper onClose={handleClose}>{content}</PanelWrapper>;
     };
 
     return (

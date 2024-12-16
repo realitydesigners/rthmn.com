@@ -19,11 +19,6 @@ const menuItems = [
         href: '/account',
     },
     {
-        icon: FaDiscord,
-        label: 'Connect Discord',
-        href: '/account',
-    },
-    {
         icon: LuSettings,
         label: 'Settings',
         href: '/account',
@@ -87,7 +82,7 @@ export const ProfilePanel = () => {
     if (!user) return null;
 
     return (
-        <div className='fixed bottom-0 left-1/2 z-[90] h-[575px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#222] bg-black pb-20'>
+        <div className='fixed bottom-0 left-1/2 z-[90] h-[px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#222] bg-black pb-20'>
             <div className='scrollbar-none h-full overflow-y-auto px-4 pt-8'>
                 {/* Profile Header */}
                 <div className='mb-6'>

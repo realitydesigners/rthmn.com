@@ -235,6 +235,57 @@ export const SettingsBar: React.FC<SettingsBarProps> = ({ isOpen, onToggle }) =>
                                             <div className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${boxColors.styles?.showBorder ? 'left-6' : 'left-1'}`} />
                                         </button>
                                     </div>
+                                    <div className='space-y-6'>
+                                        <p className='text-xs font-medium text-gray-500'>Pattern Display Range</p>
+
+                                        {/* Pattern Length Control */}
+                                        <StyleControl
+                                            label='Pattern Length'
+                                            value={boxColors.styles?.maxBoxCount ?? 10}
+                                            onChange={(value) => handleStyleChange('maxBoxCount', value)}
+                                            min={2}
+                                            max={38}
+                                            step={1}
+                                            unit=' boxes'
+                                        />
+
+                                        {/* Start Position Control */}
+                                        <StyleControl
+                                            label='Start Position'
+                                            value={boxColors.styles?.startIndex ?? 0}
+                                            onChange={(value) => {
+                                                // Ensure we don't exceed array bounds
+                                                const maxStartIndex = Math.min(value, 38 - (boxColors.styles?.maxBoxCount ?? 10));
+                                                handleStyleChange('startIndex', maxStartIndex);
+                                            }}
+                                            min={0}
+                                            max={Math.min(36, 38 - (boxColors.styles?.maxBoxCount ?? 10))} // Ensure we can't start beyond possible range
+                                            step={1}
+                                            unit=''
+                                        />
+
+                                        {/* Visual indicator of selected range */}
+                                        <div className='px-1'>
+                                            <div className='flex items-center gap-1'>
+                                                {Array.from({ length: 38 }).map((_, i) => (
+                                                    <div
+                                                        key={i}
+                                                        className={cn(
+                                                            'h-1 w-1 rounded-full transition-all',
+                                                            i >= (boxColors.styles?.startIndex ?? 0) &&
+                                                                i < (boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? 10)
+                                                                ? 'bg-emerald-500'
+                                                                : 'bg-[#222]'
+                                                        )}
+                                                    />
+                                                ))}
+                                            </div>
+                                            <p className='mt-2 text-xs text-gray-400'>
+                                                Showing positions {boxColors.styles?.startIndex} to{' '}
+                                                {(boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? 10) - 1}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                             )}
                         </div>
