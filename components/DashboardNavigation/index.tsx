@@ -4,7 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { IconType } from 'react-icons';
 import { LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
 import { SelectedPairs } from '@/components/SelectedPairs';
-import { SettingsBar } from '@/components/DashboardNavigation/SettingsBar';
+import { SettingsBar } from '@/components/SettingsBar';
 import { PairNavigator } from '@/components/DashboardNavigation/PairNavigator';
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
