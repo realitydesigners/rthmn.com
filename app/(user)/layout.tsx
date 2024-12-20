@@ -21,12 +21,14 @@ export default async function UserLayout({ children, modal }: { children: React.
     return (
         <Providers>
             <BackgroundGrid>
-                <div>
-                    {children}
-                    {modal}
+                <div className='relative flex min-h-screen'>
+                    <main className='flex-1 transition-[margin] duration-300 ease-in-out'>
+                        {children}
+                        {modal}
+                    </main>
+                    <Sidebar />
+                    <DashboardNavigation />
                 </div>
-                <DashboardNavigation />
-                <Sidebar />
             </BackgroundGrid>
         </Providers>
     );
