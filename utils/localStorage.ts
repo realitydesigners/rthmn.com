@@ -26,16 +26,18 @@ export interface BoxColors {
     };
 }
 
+export const DEFAULT_PAIRS = ['GBPUSD', 'USDJPY', 'AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD'];
+
 export const DEFAULT_BOX_COLORS: BoxColors = {
     positive: '#ffffff',
     negative: '#ff1414',
     styles: {
         borderRadius: 6,
-        maxBoxCount: 16,
-        startIndex: 0,
+        maxBoxCount: 12,
         shadowIntensity: 0.35,
-        showBorder: true,
         opacity: 0.31,
+        showBorder: false,
+        startIndex: 0,
     },
 };
 

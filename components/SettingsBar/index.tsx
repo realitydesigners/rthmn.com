@@ -3,15 +3,12 @@ import React, { useState } from 'react';
 import { LuChevronRight, LuPipette, LuRotateCcw } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { colorPresets } from '@/utils/localStorage';
-import { BoxColors, setBoxColors, setSelectedPairs, DEFAULT_BOX_COLORS } from '@/utils/localStorage';
+import { BoxColors, setBoxColors, setSelectedPairs, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
 import { useQueryClient } from '@tanstack/react-query';
 
 type SettingsSection = 'colors' | 'boxStyles' | null;
-
-// Default pairs from DashboardProvider
-const defaultPairs = ['GBPUSD', 'USDJPY', 'AUDUSD'];
 
 const MenuButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => (
     <button
@@ -64,30 +61,9 @@ export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (
     const [activeSection, setActiveSection] = useState<SettingsSection>(null);
     const queryClient = useQueryClient();
 
-    const updateColorsAndRefresh = (newColors: BoxColors) => {
-        // Update the state in DashboardProvider first
-        updateBoxColors(newColors);
-
-        // // Log the current settings
-        // console.log('Current Settings:', {
-        //     positive: newColors.positive,
-        //     negative: newColors.negative,
-        //     styles: {
-        //         borderRadius: newColors.styles?.borderRadius,
-        //         maxBoxCount: newColors.styles?.maxBoxCount,
-        //         startIndex: newColors.styles?.startIndex,
-        //         shadowIntensity: newColors.styles?.shadowIntensity,
-        //         showBorder: newColors.styles?.showBorder,
-        //         opacity: newColors.styles?.opacity,
-        //     },
-        // });
-
-        // Force a refresh of the data
-        queryClient.refetchQueries({ queryKey: ['allPairData'] });
-    };
-
     const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
         if (!boxColors.styles) return;
+        console.log('Style change:', property, value);
         const newColors = {
             ...boxColors,
             styles: {
@@ -95,37 +71,39 @@ export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (
                 [property]: value,
             },
         };
-        updateColorsAndRefresh(newColors);
+        console.log('New colors object:', newColors);
+        updateBoxColors(newColors);
     };
 
     const handleColorChange = (type: 'positive' | 'negative', color: string) => {
+        console.log('Color change:', type, color);
         const newColors = {
             ...boxColors,
             [type]: color,
         };
-        updateColorsAndRefresh(newColors);
+        console.log('New colors object:', newColors);
+        updateBoxColors(newColors);
     };
 
     const handlePresetClick = (preset: { positive: string; negative: string }) => {
-        const newColors = {
+        updateBoxColors({
             ...boxColors,
             positive: preset.positive,
             negative: preset.negative,
-        };
-        updateColorsAndRefresh(newColors);
+        });
     };
 
     const handleResetSettings = () => {
-        // Reset to defaults from localStorage.ts
-        updateColorsAndRefresh(DEFAULT_BOX_COLORS);
+        // Reset to defaults
+        updateBoxColors(DEFAULT_BOX_COLORS);
 
         // Reset selected pairs
         selectedPairs.forEach((pair) => {
-            if (!defaultPairs.includes(pair)) {
+            if (!DEFAULT_PAIRS.includes(pair)) {
                 togglePair(pair);
             }
         });
-        defaultPairs.forEach((pair) => {
+        DEFAULT_PAIRS.forEach((pair) => {
             if (!selectedPairs.includes(pair)) {
                 togglePair(pair);
             }
@@ -138,7 +116,7 @@ export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (
         <>
             <div className='fixed inset-0 z-[1000] flex items-center justify-center'>
                 <div className='fixed inset-0 bg-black/80 backdrop-blur-sm' onClick={onToggle} />
-                <div className='relative z-[1001] w-full max-w-4xl rounded-2xl border border-[#222] bg-black shadow-2xl'>
+                <div className='relative z-[1001] w-full max-w-xl rounded-2xl border border-[#222] bg-black shadow-2xl'>
                     <div className='flex items-center justify-between border-b border-[#222] px-6 py-4'>
                         <h2 className='text-lg font-medium'>Settings</h2>
                         <div className='flex items-center gap-2'>

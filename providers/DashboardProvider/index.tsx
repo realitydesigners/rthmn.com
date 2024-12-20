@@ -124,8 +124,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
 
     const updateBoxColors = (colors: BoxColors) => {
-        setBoxColorsState(colors);
+        console.log('DashboardProvider updateBoxColors called with:', colors);
+        // Update localStorage first
         setBoxColors(colors);
+        // Force a re-render by creating a new object
+        setBoxColorsState(colors);
+        console.log('DashboardProvider state updated');
     };
 
     const value = {

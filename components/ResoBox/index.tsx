@@ -203,7 +203,8 @@ export const ResoBox = React.memo(
             prevProps.slice?.timestamp === nextProps.slice?.timestamp &&
             prevProps.className === nextProps.className &&
             prevProps.boxColors.positive === nextProps.boxColors.positive &&
-            prevProps.boxColors.negative === nextProps.boxColors.negative
+            prevProps.boxColors.negative === nextProps.boxColors.negative &&
+            JSON.stringify(prevProps.boxColors.styles) === JSON.stringify(nextProps.boxColors.styles)
         );
     }
 );

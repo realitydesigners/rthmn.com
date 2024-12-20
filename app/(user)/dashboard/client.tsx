@@ -1,5 +1,5 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxDetailsRow } from '@/components/BoxDetailsRow';
 import { PairResoBox } from './PairResoBox';
@@ -8,7 +8,12 @@ import { NoInstruments } from './LoadingSkeleton';
 export default function Dashboard() {
     const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } = useDashboard();
 
-    // Memoize the filtered data with boxColors as a dependency
+    // Log when boxColors changes
+    useEffect(() => {
+        console.log('Dashboard received new boxColors:', boxColors);
+    }, [boxColors]);
+
+    // Memoize the filtered data
     const filteredPairData = useMemo(() => {
         return selectedPairs
             .map((pair) => {
@@ -25,7 +30,7 @@ export default function Dashboard() {
             })
             .filter(Boolean)
             .flat();
-    }, [selectedPairs, pairData]); // Remove boxColors from dependencies as it's only used for rendering
+    }, [selectedPairs, pairData]);
 
     return (
         <main className='w-full'>
@@ -35,7 +40,7 @@ export default function Dashboard() {
                         <div className='grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] justify-center'>
                             {filteredPairData.map(({ pair, boxSlice, currentOHLC }) => (
                                 <PairResoBox
-                                    key={`${pair}-${boxSlice.timestamp}-${boxColors.positive}-${boxColors.negative}`}
+                                    key={`${pair}-${boxSlice.timestamp}-${JSON.stringify(boxColors)}`}
                                     pair={pair}
                                     boxSlice={boxSlice}
                                     currentOHLC={currentOHLC}
