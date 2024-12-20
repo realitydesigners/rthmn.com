@@ -9,6 +9,9 @@ import { LogoIcon, BellIcon } from '@/components/Icons/icons';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { SearchBar } from '../SearchBar';
+import { LuSettings } from 'react-icons/lu';
+import { SettingsBar } from '@/components/SettingsBar';
+import { useScrollLock } from '@/hooks/useScrollLock';
 
 interface NavbarSignedInProps {
     user: User | null;
@@ -18,12 +21,15 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const [isSigningOut, setIsSigningOut] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { signOut } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearchResults, setShowSearchResults] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
     const { togglePair, selectedPairs } = useDashboard();
+
+    useScrollLock(isSettingsOpen);
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -87,59 +93,71 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     }, []);
 
     return (
-        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 lg:fixed lg:flex lg:h-14'>
-            <div className='relative z-[110] h-full w-full px-4'>
-                <div className='flex h-full items-center justify-between'>
-                    <Link href='/dashboard' className='relative z-[110] flex items-center gap-2'>
-                        <div className='flex h-8 w-8 items-center'>
-                            <LogoIcon />
-                        </div>
-                    </Link>
+        <>
+            {isSettingsOpen && (
+                <div className='fixed inset-0 z-[1000] flex items-center justify-center'>
+                    <div className='fixed inset-0 bg-black/80 backdrop-blur-sm' onClick={() => setIsSettingsOpen(false)} />
+                    <div className='relative z-[1001] w-full max-w-2xl'>
+                        <SettingsBar isOpen={true} onToggle={() => setIsSettingsOpen(false)} />
+                    </div>
+                </div>
+            )}
 
-                    <SearchBar selectedPairs={selectedPairs} />
+            <nav className='top-0 right-0 left-0 z-[100] hidden h-16 lg:fixed lg:flex lg:h-14'>
+                <div className='relative z-[110] h-full w-full px-4'>
+                    <div className='flex h-full items-center justify-between'>
+                        <Link href='/dashboard' className='relative z-[110] flex items-center gap-2'>
+                            <div className='flex h-8 w-8 items-center'>
+                                <LogoIcon />
+                            </div>
+                        </Link>
 
-                    <div className='relative z-[110] flex items-center space-x-4'>
-                        <div className='relative' ref={dropdownRef}>
+                        <SearchBar selectedPairs={selectedPairs} />
+
+                        <div className='relative z-[110] flex items-center space-x-4'>
                             <button
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className='flex items-center space-x-3 rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                                <div className='flex items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]'>
-                                    <div className='relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-black'>
-                                        {avatarUrl ? (
-                                            <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
-                                        ) : (
-                                            <span className='text-lg font-bold'>{userInitial}</span>
-                                        )}
-                                    </div>
+                                onClick={() => setIsSettingsOpen(true)}
+                                className='group flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] text-[#818181] group-hover:text-white'>
+                                    <LuSettings size={20} />
                                 </div>
                             </button>
-                            {isDropdownOpen && (
-                                <div className='ring-opacity-5 absolute right-0 mt-2 w-64 rounded-md border border-[#181818] bg-black ring-1 shadow-lg ring-black'>
-                                    <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
-                                        <Link href='/account' className='block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]' role='menuitem'>
-                                            Account
-                                        </Link>
-                                        {/* <Link
-                      href="/settings"
-                      className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]"
-                      role="menuitem"
-                    >
-                      Settings
-                    </Link> */}
-                                        <button
-                                            onClick={handleSignOut}
-                                            disabled={isSigningOut}
-                                            className='block w-full px-4 py-2 text-left text-sm text-gray-100 hover:bg-[#181818]'
-                                            role='menuitem'>
-                                            {isSigningOut ? 'Signing out...' : 'Sign out'}
-                                        </button>
+
+                            <div className='relative' ref={dropdownRef}>
+                                <button
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    className='group flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                    <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]'>
+                                        <div className='relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-black'>
+                                            {avatarUrl ? (
+                                                <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
+                                            ) : (
+                                                <span className='text-sm font-bold'>{userInitial}</span>
+                                            )}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                </button>
+                                {isDropdownOpen && (
+                                    <div className='absolute right-0 mt-2 w-64 rounded-md border border-[#222] bg-black/95 shadow-lg backdrop-blur-lg'>
+                                        <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
+                                            <Link href='/account' className='block px-4 py-2 text-sm text-gray-100 transition-colors hover:bg-white/5' role='menuitem'>
+                                                Account
+                                            </Link>
+                                            <button
+                                                onClick={handleSignOut}
+                                                disabled={isSigningOut}
+                                                className='block w-full px-4 py-2 text-left text-sm text-gray-100 transition-colors hover:bg-white/5'
+                                                role='menuitem'>
+                                                {isSigningOut ? 'Signing out...' : 'Sign out'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </>
     );
 };
