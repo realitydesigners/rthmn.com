@@ -102,34 +102,27 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                         <div className='relative' ref={dropdownRef}>
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className='flex items-center space-x-3 rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[2px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                                <div className='flex items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]'>
-                                    <div className='relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-black'>
+                                className='group flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]'>
+                                    <div className='relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-black'>
                                         {avatarUrl ? (
                                             <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
                                         ) : (
-                                            <span className='text-lg font-bold'>{userInitial}</span>
+                                            <span className='text-sm font-bold'>{userInitial}</span>
                                         )}
                                     </div>
                                 </div>
                             </button>
                             {isDropdownOpen && (
-                                <div className='ring-opacity-5 absolute right-0 mt-2 w-64 rounded-md border border-[#181818] bg-black ring-1 shadow-lg ring-black'>
+                                <div className='absolute right-0 mt-2 w-64 rounded-md border border-[#222] bg-black/95 shadow-lg backdrop-blur-lg'>
                                     <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
-                                        <Link href='/account' className='block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]' role='menuitem'>
+                                        <Link href='/account' className='block px-4 py-2 text-sm text-gray-100 transition-colors hover:bg-white/5' role='menuitem'>
                                             Account
                                         </Link>
-                                        {/* <Link
-                      href="/settings"
-                      className="block px-4 py-2 text-sm text-gray-100 hover:bg-[#181818]"
-                      role="menuitem"
-                    >
-                      Settings
-                    </Link> */}
                                         <button
                                             onClick={handleSignOut}
                                             disabled={isSigningOut}
-                                            className='block w-full px-4 py-2 text-left text-sm text-gray-100 hover:bg-[#181818]'
+                                            className='block w-full px-4 py-2 text-left text-sm text-gray-100 transition-colors hover:bg-white/5'
                                             role='menuitem'>
                                             {isSigningOut ? 'Signing out...' : 'Sign out'}
                                         </button>

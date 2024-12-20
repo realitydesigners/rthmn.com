@@ -1,8 +1,6 @@
 import React from 'react';
 import DashboardClient from './client';
 
-const DashboardPage: React.FC = () => {
+export default function DashboardPage() {
     return <DashboardClient />;
-};
-
-export default DashboardPage;
+}

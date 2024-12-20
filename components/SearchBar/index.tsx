@@ -90,7 +90,7 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
     };
 
     return (
-        <div className='relative hidden flex-1 px-32' ref={searchRef}>
+        <div className='relative flex-1 px-32' ref={searchRef}>
             {showResults && <div className='fixed inset-0 z-[85] mt-14 bg-black/50 backdrop-blur-sm' onClick={() => setShowResults(false)} />}
 
             <div className='relative mx-auto max-w-60'>

@@ -1,11 +1,12 @@
 'use client';
 import React, { useState } from 'react';
-import { LuChevronRight, LuPipette } from 'react-icons/lu';
+import { LuChevronRight, LuPipette, LuRotateCcw } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider';
-import { colorPresets } from '@/utils/colorPresets';
-import { BoxColors } from '@/utils/localStorage';
+import { colorPresets } from '@/utils/localStorage';
+import { BoxColors, setBoxColors, setSelectedPairs, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
+import { useQueryClient } from '@tanstack/react-query';
 
 type SettingsSection = 'colors' | 'boxStyles' | null;
 
@@ -56,103 +57,149 @@ const ColorPicker = ({ label, color, onChange }: { label: string; color: string;
 );
 
 export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
-    const { boxColors, updateBoxColors } = useDashboard();
+    const { boxColors, updateBoxColors, togglePair, selectedPairs } = useDashboard();
     const [activeSection, setActiveSection] = useState<SettingsSection>(null);
+    const queryClient = useQueryClient();
 
     const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
-        updateBoxColors({
+        if (!boxColors.styles) return;
+        console.log('Style change:', property, value);
+        const newColors = {
             ...boxColors,
             styles: {
                 ...boxColors.styles,
                 [property]: value,
             },
+        };
+        console.log('New colors object:', newColors);
+        updateBoxColors(newColors);
+    };
+
+    const handleColorChange = (type: 'positive' | 'negative', color: string) => {
+        console.log('Color change:', type, color);
+        const newColors = {
+            ...boxColors,
+            [type]: color,
+        };
+        console.log('New colors object:', newColors);
+        updateBoxColors(newColors);
+    };
+
+    const handlePresetClick = (preset: { positive: string; negative: string }) => {
+        updateBoxColors({
+            ...boxColors,
+            positive: preset.positive,
+            negative: preset.negative,
         });
+    };
+
+    const handleResetSettings = () => {
+        // Reset to defaults
+        updateBoxColors(DEFAULT_BOX_COLORS);
+
+        // Reset selected pairs
+        selectedPairs.forEach((pair) => {
+            if (!DEFAULT_PAIRS.includes(pair)) {
+                togglePair(pair);
+            }
+        });
+        DEFAULT_PAIRS.forEach((pair) => {
+            if (!selectedPairs.includes(pair)) {
+                togglePair(pair);
+            }
+        });
+
+        setActiveSection(null);
     };
 
     return (
         <>
-            <div className='fixed bottom-0 left-1/2 z-[1000] h-[95vh] w-screen -translate-x-1/2 bg-black'>
-                <div className='absolute -top-4 right-0 left-0 h-20 rounded-[10em] border-t border-[#222] bg-black' />
+            <div className='fixed inset-0 z-[1000] flex items-center justify-center'>
+                <div className='fixed inset-0 bg-black/80 backdrop-blur-sm' onClick={onToggle} />
+                <div className='relative z-[1001] w-full max-w-xl rounded-2xl border border-[#222] bg-black shadow-2xl'>
+                    <div className='flex items-center justify-between border-b border-[#222] px-6 py-4'>
+                        <h2 className='text-lg font-medium'>Settings</h2>
+                        <div className='flex items-center gap-2'>
+                            <button
+                                onClick={handleResetSettings}
+                                className='group flex items-center gap-2 rounded-lg border border-[#333] bg-[#111] px-3 py-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-500'>
+                                <LuRotateCcw size={16} className='transition-transform group-hover:rotate-180' />
+                                <span className='text-sm'>Reset All</span>
+                            </button>
+                            <button onClick={onToggle} className='rounded-lg p-2 text-[#818181] transition-colors hover:bg-white/5 hover:text-white'>
+                                <svg
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    width='24'
+                                    height='24'
+                                    viewBox='0 0 24 24'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    strokeWidth='2'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'>
+                                    <path d='M18 6 6 18' />
+                                    <path d='m6 6 12 12' />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
 
-                <div className='relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4'>
-                    <div className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'>
-                        <div className='mb-[25vh] space-y-2 pt-2'>
-                            <MenuButton label='Colors' isActive={activeSection === 'colors'} onClick={() => setActiveSection(activeSection === 'colors' ? null : 'colors')} />
+                    <div className='relative h-[calc(100vh-20rem)] overflow-hidden px-6 py-4'>
+                        <div className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'>
+                            <div className='space-y-4'>
+                                <MenuButton label='Colors' isActive={activeSection === 'colors'} onClick={() => setActiveSection(activeSection === 'colors' ? null : 'colors')} />
 
-                            {activeSection === 'colors' && (
-                                <div className='space-y-4 px-2 py-3'>
-                                    <div className='space-y-2'>
-                                        <ColorPicker
-                                            label='Positive Color'
-                                            color={boxColors.positive}
-                                            onChange={(color) =>
-                                                updateBoxColors({
-                                                    ...boxColors,
-                                                    positive: color,
-                                                })
-                                            }
-                                        />
-                                        <ColorPicker
-                                            label='Negative Color'
-                                            color={boxColors.negative}
-                                            onChange={(color) =>
-                                                updateBoxColors({
-                                                    ...boxColors,
-                                                    negative: color,
-                                                })
-                                            }
-                                        />
-                                    </div>
+                                {activeSection === 'colors' && (
+                                    <div className='space-y-4 rounded-xl border border-[#222] bg-[#111] p-4'>
+                                        <div className='space-y-2'>
+                                            <ColorPicker label='Positive Color' color={boxColors.positive} onChange={(color) => handleColorChange('positive', color)} />
+                                            <ColorPicker label='Negative Color' color={boxColors.negative} onChange={(color) => handleColorChange('negative', color)} />
+                                        </div>
 
-                                    <div className='relative py-3'>
-                                        <div className='absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#222]' />
-                                    </div>
+                                        <div className='relative py-3'>
+                                            <div className='absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-[#222]' />
+                                        </div>
 
-                                    <div className='space-y-1'>
-                                        <p className='px-1 text-xs font-medium text-gray-500'>Color Presets</p>
-                                        <div className='grid grid-cols-1 gap-2'>
-                                            {colorPresets.map((preset) => (
-                                                <ColorPresetButton
-                                                    key={preset.name}
-                                                    preset={preset}
-                                                    isSelected={boxColors.positive === preset.positive && boxColors.negative === preset.negative}
-                                                    onClick={() => {
-                                                        updateBoxColors({
-                                                            ...boxColors,
-                                                            positive: preset.positive,
-                                                            negative: preset.negative,
-                                                        });
-                                                    }}
-                                                />
-                                            ))}
+                                        <div className='space-y-2'>
+                                            <p className='px-1 text-xs font-medium text-gray-500'>Color Presets</p>
+                                            <div className='grid grid-cols-2 gap-2'>
+                                                {colorPresets.map((preset) => (
+                                                    <ColorPresetButton
+                                                        key={preset.name}
+                                                        preset={preset}
+                                                        isSelected={boxColors.positive === preset.positive && boxColors.negative === preset.negative}
+                                                        onClick={() => handlePresetClick(preset)}
+                                                    />
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
+                                )}
 
-                            <MenuButton
-                                label='Box Styles'
-                                isActive={activeSection === 'boxStyles'}
-                                onClick={() => setActiveSection(activeSection === 'boxStyles' ? null : 'boxStyles')}
-                            />
+                                <MenuButton
+                                    label='Box Styles'
+                                    isActive={activeSection === 'boxStyles'}
+                                    onClick={() => setActiveSection(activeSection === 'boxStyles' ? null : 'boxStyles')}
+                                />
 
-                            {activeSection === 'boxStyles' && (
-                                <div className='space-y-6 px-2 py-3'>
-                                    <PatternVisualizer
-                                        startIndex={boxColors.styles?.startIndex ?? 0}
-                                        maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
-                                        boxes={[]}
-                                        onStyleChange={handleStyleChange}
-                                    />
-                                    <BoxVisualizer
-                                        borderRadius={boxColors.styles?.borderRadius ?? 8}
-                                        shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
-                                        opacity={boxColors.styles?.opacity ?? 1}
-                                        showBorder={boxColors.styles?.showBorder ?? true}
-                                        onStyleChange={handleStyleChange}
-                                    />
-                                </div>
-                            )}
+                                {activeSection === 'boxStyles' && (
+                                    <div className='space-y-6 rounded-xl border border-[#222] bg-[#111] p-4'>
+                                        <PatternVisualizer
+                                            startIndex={boxColors.styles?.startIndex ?? 0}
+                                            maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                                            boxes={[]}
+                                            onStyleChange={handleStyleChange}
+                                        />
+                                        <BoxVisualizer
+                                            borderRadius={boxColors.styles?.borderRadius ?? 8}
+                                            shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
+                                            opacity={boxColors.styles?.opacity ?? 1}
+                                            showBorder={boxColors.styles?.showBorder ?? true}
+                                            onStyleChange={handleStyleChange}
+                                        />
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
