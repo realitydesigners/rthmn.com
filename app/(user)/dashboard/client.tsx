@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { BoxDetailsRow } from '@/components/BoxDetailsRow';
 import { PairResoBox } from './PairResoBox';
@@ -8,22 +8,29 @@ import { NoInstruments } from './LoadingSkeleton';
 export default function Dashboard() {
     const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } = useDashboard();
 
-    const filteredPairData = selectedPairs
-        .map((pair) => {
-            const data = pairData[pair];
-            if (!data?.boxes?.length) {
-                return null;
-            }
-            return data.boxes.map((boxSlice, index) => ({
-                pair,
-                boxSlice,
-                currentOHLC: data.currentOHLC,
+    // Log when boxColors changes
+    useEffect(() => {
+        console.log('Dashboard received new boxColors:', boxColors);
+    }, [boxColors]);
 
-                index,
-            }));
-        })
-        .filter(Boolean)
-        .flat();
+    // Memoize the filtered data
+    const filteredPairData = useMemo(() => {
+        return selectedPairs
+            .map((pair) => {
+                const data = pairData[pair];
+                if (!data?.boxes?.length) {
+                    return null;
+                }
+                return data.boxes.map((boxSlice, index) => ({
+                    pair,
+                    boxSlice,
+                    currentOHLC: data.currentOHLC,
+                    index,
+                }));
+            })
+            .filter(Boolean)
+            .flat();
+    }, [selectedPairs, pairData]);
 
     return (
         <main className='w-full'>
@@ -32,28 +39,19 @@ export default function Dashboard() {
                     {selectedPairs.length > 0 ? (
                         <div className='grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] justify-center'>
                             {filteredPairData.map(({ pair, boxSlice, currentOHLC }) => (
-                                <PairResoBox key={`${pair}-${boxSlice.timestamp}`} pair={pair} boxSlice={boxSlice} currentOHLC={currentOHLC} />
+                                <PairResoBox
+                                    key={`${pair}-${boxSlice.timestamp}-${JSON.stringify(boxColors)}`}
+                                    pair={pair}
+                                    boxSlice={boxSlice}
+                                    currentOHLC={currentOHLC}
+                                    boxColors={boxColors}
+                                />
                             ))}
                         </div>
                     ) : (
                         <NoInstruments />
                     )}
                 </div>
-                {/* {selectedPairs.length > 0 && (
-          <div className="mx-8 mt-8 rounded-lg border border-[#181818] p-4">
-            <div className="flex flex-col gap-2">
-              {filteredPairData.map(({ pair, boxes, index }, pairIndex) => (
-                <BoxDetailsRow
-                  key={`details-${pair}-${index}`}
-                  boxes={boxes}
-                  maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
-                  pairName={pair}
-                  showSizes={pairIndex === 0 && index === 0}
-                />
-              ))}
-            </div>
-          </div>
-        )} */}
             </div>
         </main>
     );

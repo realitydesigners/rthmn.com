@@ -4,6 +4,7 @@ import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { Providers } from '@/providers/Providers';
 import { DashboardNavigation } from '@/components/DashboardNavigation';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
+import { Sidebar } from '@/components/Sidebar';
 
 export default async function UserLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
     const supabase = await createClient();
@@ -25,6 +26,7 @@ export default async function UserLayout({ children, modal }: { children: React.
                     {modal}
                 </div>
                 <DashboardNavigation />
+                <Sidebar />
             </BackgroundGrid>
         </Providers>
     );
