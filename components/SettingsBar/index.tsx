@@ -58,7 +58,6 @@ const ColorPicker = ({ label, color, onChange }: { label: string; color: string;
 
 export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: boolean; onToggle: () => void; variant?: 'modal' | 'sidebar' }) => {
     const { boxColors, updateBoxColors, togglePair, selectedPairs } = useDashboard();
-    const [activeSection, setActiveSection] = useState<SettingsSection>(null);
     const queryClient = useQueryClient();
 
     const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
@@ -94,10 +93,7 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
     };
 
     const handleResetSettings = () => {
-        // Reset to defaults
         updateBoxColors(DEFAULT_BOX_COLORS);
-
-        // Reset selected pairs
         selectedPairs.forEach((pair) => {
             if (!DEFAULT_PAIRS.includes(pair)) {
                 togglePair(pair);
@@ -108,8 +104,6 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
                 togglePair(pair);
             }
         });
-
-        setActiveSection(null);
     };
 
     return (
@@ -148,10 +142,10 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
 
             <div className={cn('relative overflow-hidden px-6 py-4', variant === 'modal' && 'h-[calc(100vh-20rem)]', variant === 'sidebar' && 'h-[calc(100vh-5rem)]')}>
                 <div className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'>
-                    <div className='space-y-4'>
-                        <MenuButton label='Colors' isActive={activeSection === 'colors'} onClick={() => setActiveSection(activeSection === 'colors' ? null : 'colors')} />
-
-                        {activeSection === 'colors' && (
+                    <div className='space-y-6'>
+                        {/* Colors Section */}
+                        <div>
+                            <h3 className='mb-4 text-sm font-medium text-gray-400'>Colors</h3>
                             <div className='space-y-4 rounded-xl border border-[#222] bg-[#111] p-4'>
                                 <div className='space-y-2'>
                                     <ColorPicker label='Positive Color' color={boxColors.positive} onChange={(color) => handleColorChange('positive', color)} />
@@ -176,15 +170,11 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
                                     </div>
                                 </div>
                             </div>
-                        )}
+                        </div>
 
-                        <MenuButton
-                            label='Box Styles'
-                            isActive={activeSection === 'boxStyles'}
-                            onClick={() => setActiveSection(activeSection === 'boxStyles' ? null : 'boxStyles')}
-                        />
-
-                        {activeSection === 'boxStyles' && (
+                        {/* Box Styles Section */}
+                        <div>
+                            <h3 className='mb-4 text-sm font-medium text-gray-400'>Box Styles</h3>
                             <div className='space-y-6 rounded-xl border border-[#222] bg-[#111] p-4'>
                                 <PatternVisualizer
                                     startIndex={boxColors.styles?.startIndex ?? 0}
@@ -200,7 +190,7 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
                                     onStyleChange={handleStyleChange}
                                 />
                             </div>
-                        )}
+                        </div>
                     </div>
                 </div>
             </div>
