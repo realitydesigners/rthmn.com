@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { Box, BoxSlice } from '@/types/types';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { BoxColors } from '@/utils/localStorage';
 
 // Types
 
@@ -11,7 +11,7 @@ const Box: React.FC<{
     box: Box;
     index: number;
     prevColor: string | null;
-    boxColors: any;
+    boxColors: BoxColors;
     containerSize: number;
     maxSize: number;
     slice: BoxSlice | null;
@@ -108,16 +108,7 @@ const Box: React.FC<{
 };
 
 export const ResoBox = React.memo(
-    ({
-        slice,
-
-        className = '',
-    }: {
-        slice: BoxSlice | null;
-
-        className?: string;
-    }) => {
-        const { boxColors } = useDashboard();
+    ({ slice, boxColors, className = '' }: { slice: BoxSlice | null; boxColors: BoxColors; className?: string }) => {
         const boxRef = useRef<HTMLDivElement>(null);
         const [containerSize, setContainerSize] = useState(0);
 
@@ -208,6 +199,11 @@ export const ResoBox = React.memo(
         );
     },
     (prevProps, nextProps) => {
-        return prevProps.slice?.timestamp === nextProps.slice?.timestamp && prevProps.className === nextProps.className;
+        return (
+            prevProps.slice?.timestamp === nextProps.slice?.timestamp &&
+            prevProps.className === nextProps.className &&
+            prevProps.boxColors.positive === nextProps.boxColors.positive &&
+            prevProps.boxColors.negative === nextProps.boxColors.negative
+        );
     }
 );

@@ -1,13 +1,17 @@
 'use client';
 import React, { useState } from 'react';
-import { LuChevronRight, LuPipette } from 'react-icons/lu';
+import { LuChevronRight, LuPipette, LuRotateCcw } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider';
-import { colorPresets } from '@/utils/colorPresets';
-import { BoxColors } from '@/utils/localStorage';
+import { colorPresets } from '@/utils/localStorage';
+import { BoxColors, setBoxColors, setSelectedPairs, DEFAULT_BOX_COLORS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
+import { useQueryClient } from '@tanstack/react-query';
 
 type SettingsSection = 'colors' | 'boxStyles' | null;
+
+// Default pairs from DashboardProvider
+const defaultPairs = ['GBPUSD', 'USDJPY', 'AUDUSD'];
 
 const MenuButton = ({ label, isActive, onClick }: { label: string; isActive: boolean; onClick: () => void }) => (
     <button
@@ -56,17 +60,78 @@ const ColorPicker = ({ label, color, onChange }: { label: string; color: string;
 );
 
 export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: () => void }) => {
-    const { boxColors, updateBoxColors } = useDashboard();
+    const { boxColors, updateBoxColors, togglePair, selectedPairs } = useDashboard();
     const [activeSection, setActiveSection] = useState<SettingsSection>(null);
+    const queryClient = useQueryClient();
+
+    const updateColorsAndRefresh = (newColors: BoxColors) => {
+        // Update the state in DashboardProvider first
+        updateBoxColors(newColors);
+
+        // // Log the current settings
+        // console.log('Current Settings:', {
+        //     positive: newColors.positive,
+        //     negative: newColors.negative,
+        //     styles: {
+        //         borderRadius: newColors.styles?.borderRadius,
+        //         maxBoxCount: newColors.styles?.maxBoxCount,
+        //         startIndex: newColors.styles?.startIndex,
+        //         shadowIntensity: newColors.styles?.shadowIntensity,
+        //         showBorder: newColors.styles?.showBorder,
+        //         opacity: newColors.styles?.opacity,
+        //     },
+        // });
+
+        // Force a refresh of the data
+        queryClient.refetchQueries({ queryKey: ['allPairData'] });
+    };
 
     const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
-        updateBoxColors({
+        if (!boxColors.styles) return;
+        const newColors = {
             ...boxColors,
             styles: {
                 ...boxColors.styles,
                 [property]: value,
             },
+        };
+        updateColorsAndRefresh(newColors);
+    };
+
+    const handleColorChange = (type: 'positive' | 'negative', color: string) => {
+        const newColors = {
+            ...boxColors,
+            [type]: color,
+        };
+        updateColorsAndRefresh(newColors);
+    };
+
+    const handlePresetClick = (preset: { positive: string; negative: string }) => {
+        const newColors = {
+            ...boxColors,
+            positive: preset.positive,
+            negative: preset.negative,
+        };
+        updateColorsAndRefresh(newColors);
+    };
+
+    const handleResetSettings = () => {
+        // Reset to defaults from localStorage.ts
+        updateColorsAndRefresh(DEFAULT_BOX_COLORS);
+
+        // Reset selected pairs
+        selectedPairs.forEach((pair) => {
+            if (!defaultPairs.includes(pair)) {
+                togglePair(pair);
+            }
         });
+        defaultPairs.forEach((pair) => {
+            if (!selectedPairs.includes(pair)) {
+                togglePair(pair);
+            }
+        });
+
+        setActiveSection(null);
     };
 
     return (
@@ -76,21 +141,29 @@ export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (
                 <div className='relative z-[1001] w-full max-w-4xl rounded-2xl border border-[#222] bg-black shadow-2xl'>
                     <div className='flex items-center justify-between border-b border-[#222] px-6 py-4'>
                         <h2 className='text-lg font-medium'>Settings</h2>
-                        <button onClick={onToggle} className='rounded-lg p-2 text-[#818181] transition-colors hover:bg-white/5 hover:text-white'>
-                            <svg
-                                xmlns='http://www.w3.org/2000/svg'
-                                width='24'
-                                height='24'
-                                viewBox='0 0 24 24'
-                                fill='none'
-                                stroke='currentColor'
-                                strokeWidth='2'
-                                strokeLinecap='round'
-                                strokeLinejoin='round'>
-                                <path d='M18 6 6 18' />
-                                <path d='m6 6 12 12' />
-                            </svg>
-                        </button>
+                        <div className='flex items-center gap-2'>
+                            <button
+                                onClick={handleResetSettings}
+                                className='group flex items-center gap-2 rounded-lg border border-[#333] bg-[#111] px-3 py-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/10 hover:text-red-500'>
+                                <LuRotateCcw size={16} className='transition-transform group-hover:rotate-180' />
+                                <span className='text-sm'>Reset All</span>
+                            </button>
+                            <button onClick={onToggle} className='rounded-lg p-2 text-[#818181] transition-colors hover:bg-white/5 hover:text-white'>
+                                <svg
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    width='24'
+                                    height='24'
+                                    viewBox='0 0 24 24'
+                                    fill='none'
+                                    stroke='currentColor'
+                                    strokeWidth='2'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'>
+                                    <path d='M18 6 6 18' />
+                                    <path d='m6 6 12 12' />
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <div className='relative h-[calc(100vh-20rem)] overflow-hidden px-6 py-4'>
@@ -101,26 +174,8 @@ export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (
                                 {activeSection === 'colors' && (
                                     <div className='space-y-4 rounded-xl border border-[#222] bg-[#111] p-4'>
                                         <div className='space-y-2'>
-                                            <ColorPicker
-                                                label='Positive Color'
-                                                color={boxColors.positive}
-                                                onChange={(color) =>
-                                                    updateBoxColors({
-                                                        ...boxColors,
-                                                        positive: color,
-                                                    })
-                                                }
-                                            />
-                                            <ColorPicker
-                                                label='Negative Color'
-                                                color={boxColors.negative}
-                                                onChange={(color) =>
-                                                    updateBoxColors({
-                                                        ...boxColors,
-                                                        negative: color,
-                                                    })
-                                                }
-                                            />
+                                            <ColorPicker label='Positive Color' color={boxColors.positive} onChange={(color) => handleColorChange('positive', color)} />
+                                            <ColorPicker label='Negative Color' color={boxColors.negative} onChange={(color) => handleColorChange('negative', color)} />
                                         </div>
 
                                         <div className='relative py-3'>
@@ -135,13 +190,7 @@ export const SettingsBar = ({ isOpen, onToggle }: { isOpen: boolean; onToggle: (
                                                         key={preset.name}
                                                         preset={preset}
                                                         isSelected={boxColors.positive === preset.positive && boxColors.negative === preset.negative}
-                                                        onClick={() => {
-                                                            updateBoxColors({
-                                                                ...boxColors,
-                                                                positive: preset.positive,
-                                                                negative: preset.negative,
-                                                            });
-                                                        }}
+                                                        onClick={() => handlePresetClick(preset)}
                                                     />
                                                 ))}
                                             </div>
