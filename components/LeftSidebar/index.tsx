@@ -5,7 +5,6 @@ import { cn } from '@/utils/cn';
 import Link from 'next/link';
 import { LuMenu, LuOrbit, LuLayoutDashboard, LuLineChart, LuPin, LuPinOff } from 'react-icons/lu';
 import { FaTimes } from 'react-icons/fa';
-import { useScrollLock } from '@/hooks/useScrollLock';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { useDashboard } from '@/providers/DashboardProvider';
 
@@ -193,7 +192,7 @@ interface SidebarContentProps {
 }
 
 export const SidebarContent = ({ isOpen, onClose, children }: SidebarContentProps) => {
-    const [width, setWidth] = useState(250);
+    const [width, setWidth] = useState(200);
 
     const handleResize = useCallback((newWidth: number) => {
         const constrainedWidth = Math.max(360, Math.min(600, newWidth));

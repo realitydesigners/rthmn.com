@@ -133,21 +133,8 @@ export const SettingsBar = () => {
 
     return (
         <div className='flex h-full flex-col'>
-            <div className='flex h-12 items-center justify-between border-b border-[#222] px-3'>
-                <div className='flex items-center gap-2'>
-                    <h2 className='text-sm font-medium'>Settings</h2>
-                    <div className='h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]' />
-                </div>
-                <button
-                    onClick={handleResetSettings}
-                    className='group flex h-7 items-center gap-1.5 rounded-md border border-[#333] bg-gradient-to-b from-[#111] to-[#0A0A0A] px-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/5 hover:text-red-500'>
-                    <LuRotateCcw size={12} className='transition-transform group-hover:rotate-180' />
-                    <span className='text-[11px] font-medium'>Reset</span>
-                </button>
-            </div>
-
             <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth p-3'>
-                <div className='space-y-4'>
+                <div className='space-y-4 pb-20'>
                     {/* Full Presets Section */}
                     <div>
                         <div className='grid grid-cols-2 gap-2'>
@@ -172,6 +159,14 @@ export const SettingsBar = () => {
                             showBorder={localBoxColors.styles?.showBorder ?? true}
                             onStyleChange={handleStyleChange}
                         />
+                    </div>
+                    <div className='flex h-12 items-center justify-between px-3'>
+                        <button
+                            onClick={handleResetSettings}
+                            className='group flex h-7 items-center gap-1.5 rounded-md border border-[#333] bg-gradient-to-b from-[#111] to-[#0A0A0A] px-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/5 hover:text-red-500'>
+                            <LuRotateCcw size={12} className='transition-transform group-hover:rotate-180' />
+                            <span className='text-[11px] font-medium'>Reset</span>
+                        </button>
                     </div>
                 </div>
             </div>

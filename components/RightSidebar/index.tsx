@@ -5,7 +5,6 @@ import { cn } from '@/utils/cn';
 import { LuSettings, LuGraduationCap, LuLock, LuUnlock } from 'react-icons/lu';
 import { SettingsBar } from '@/components/SettingsBar';
 import { Tutorial } from './Tutorial';
-import { useScrollLock } from '@/hooks/useScrollLock';
 
 type ActivePanel = 'settings' | 'tutorial' | null;
 
@@ -13,7 +12,6 @@ export const RightSidebar = () => {
     const [activePanel, setActivePanel] = useState<ActivePanel>(null);
     const [isLocked, setIsLocked] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
-    useScrollLock(activePanel !== null);
 
     const handlePanelToggle = (panel: ActivePanel) => {
         setActivePanel((prev) => {
