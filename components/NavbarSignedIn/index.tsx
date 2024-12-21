@@ -101,7 +101,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                             <div className='flex h-7 w-7 items-center transition-transform duration-200 group-hover:scale-105'>
                                 <LogoIcon />
                             </div>
-                            <span className='font-outfit text-[14px] font-bold tracking-wider text-white'>RTHMN</span>
+                            <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
                         </Link>
                         {/* Breadcrumb */}
                         <div className='flex items-center gap-1.5 text-[#818181]'>

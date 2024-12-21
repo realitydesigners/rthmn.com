@@ -25,9 +25,9 @@ export default async function UserLayout({ children, modal }: { children: React.
         <QueryProvider>
             <WebSocketProvider>
                 <DashboardProvider initialSignalsData={[]}>
-                    <div className='relative flex min-h-screen' id='app-container'>
+                    <div className='relative h-screen overflow-hidden overflow-x-hidden' id='app-container'>
                         <NavbarSignedIn user={user} />
-                        <main className='flex-1 overflow-y-auto pt-14 transition-[margin] duration-300 ease-in-out'>{children}</main>
+                        <main className='px-4transition-all w-full duration-300 ease-in-out'>{children}</main>
                         <LeftSidebar />
                         <RightSidebar />
                         <DashboardNavigation />

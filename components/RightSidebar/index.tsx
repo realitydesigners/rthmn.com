@@ -1,9 +1,8 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
+import { LuSettings } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
-import { LuSettings, LuGraduationCap } from 'react-icons/lu';
 import { SettingsBar } from '@/components/SettingsBar';
-
 import { SidebarContent } from '@/components/SidebarContent';
 
 type ActivePanel = 'settings' | null;
@@ -27,7 +26,6 @@ export const RightSidebar = () => {
         switch (activePanel) {
             case 'settings':
                 return <SettingsBar />;
-
             default:
                 return null;
         }
@@ -78,7 +76,7 @@ export const RightSidebar = () => {
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar fixed top-14 right-0 bottom-0 z-[90] flex w-16 flex-col items-center justify-between py-4'>
+            <div className='fixed-sidebar fixed top-14 right-0 bottom-0 z-[100] flex w-16 flex-col items-center justify-between py-4'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}

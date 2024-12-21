@@ -13,48 +13,73 @@ interface SidebarContentProps {
 }
 
 export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position }: SidebarContentProps) => {
-    const [width, setWidth] = useState(250);
+    const [width, setWidth] = useState(300);
 
     const handleResize = useCallback((newWidth: number) => {
-        const constrainedWidth = Math.max(360, Math.min(600, newWidth));
+        const constrainedWidth = Math.max(300, Math.min(450, newWidth));
         setWidth(constrainedWidth);
     }, []);
 
-    // Update main content margin when sidebar opens/closes or resizes
+    // Update main content margin and width when sidebar opens/closes or resizes
     useEffect(() => {
         const main = document.querySelector('main');
-        if (main) {
-            if (isOpen) {
-                main.style[position === 'left' ? 'marginLeft' : 'marginRight'] = `${width + 56}px`; // 56px = w-14 (sidebar width)
+        const container = document.getElementById('app-container');
+
+        if (main && container) {
+            // Find both sidebars
+            const leftSidebar = document.querySelector('.sidebar-content [data-position="left"]');
+            const rightSidebar = document.querySelector('.sidebar-content [data-position="right"]');
+
+            // Calculate widths for both sidebars if they're open and locked
+            const leftWidth = leftSidebar?.getAttribute('data-locked') === 'true' ? parseInt(leftSidebar?.getAttribute('data-width') || '0') + 16 : 0;
+            const rightWidth = rightSidebar?.getAttribute('data-locked') === 'true' ? parseInt(rightSidebar?.getAttribute('data-width') || '0') + 16 : 0;
+
+            if (isOpen && isLocked) {
+                // When locked, adjust content width and margin
+                const sidebarWidth = width + 0; // Add padding
+                if (position === 'left') {
+                    main.style.marginLeft = `${sidebarWidth}px`;
+                    main.style.width = `calc(100vw - ${sidebarWidth + rightWidth}px)`;
+                } else {
+                    main.style.marginRight = `${sidebarWidth}px`;
+                    main.style.width = `calc(100vw - ${leftWidth + sidebarWidth}px)`;
+                }
             } else {
-                main.style[position === 'left' ? 'marginLeft' : 'marginRight'] = '56px'; // w-14
+                // When unlocked or closed, only respect the other locked sidebar
+                if (position === 'left') {
+                    main.style.marginLeft = '0';
+                    main.style.width = rightWidth > 0 ? `calc(100vw - ${rightWidth}px)` : '100%';
+                } else {
+                    main.style.marginRight = '0';
+                    main.style.width = leftWidth > 0 ? `calc(100vw - ${leftWidth}px)` : '100%';
+                }
             }
+            container.style.overflowX = 'hidden';
         }
-        return () => {
-            if (main) {
-                main.style[position === 'left' ? 'marginLeft' : 'marginRight'] = '0';
-            }
-        };
-    }, [isOpen, width, position]);
+    }, [isOpen, width, position, isLocked]);
 
     return (
         <div
             className={cn(
-                'fixed top-14 bottom-0 z-[90] flex transform transition-all duration-300',
-                position === 'left' ? 'left-12' : 'right-12',
+                'fixed top-14 bottom-0 flex transform transition-all duration-300',
+                position === 'left' ? 'left-0' : 'right-0',
                 isOpen
                     ? 'translate-x-0 opacity-100'
                     : position === 'left'
                       ? 'pointer-events-none -translate-x-[150%] opacity-0'
-                      : 'pointer-events-none translate-x-[150%] opacity-0'
+                      : 'pointer-events-none translate-x-[150%] opacity-0',
+                isLocked ? 'z-[90]' : 'z-[110]' // Higher z-index when floating
             )}
+            data-position={position}
+            data-locked={isLocked}
+            data-width={width}
             style={{ width: `${width}px` }}>
             <div
                 className={cn(
-                    'group relative my-4 flex h-[calc(100%-2rem)] w-full rounded-2xl bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
-                    position === 'left' ? 'ml-4' : 'mr-4'
+                    'group relative my-4 flex h-[calc(100%-2rem)] w-full rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
+                    position === 'left' ? 'ml-16' : 'mr-16'
                 )}>
-                <div className='relative flex h-full w-full flex-col rounded-2xl bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
+                <div className='relative flex h-full w-full flex-col rounded-lg bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
                     {/* Header Section */}
                     <div className='relative z-10 mb-2 flex h-12 items-center justify-between px-4'>
                         <div className='flex items-center gap-2'>
