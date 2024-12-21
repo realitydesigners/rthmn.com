@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { LuMenu, LuOrbit, LuLayoutDashboard, LuLineChart, LuPin, LuPinOff } from 'react-icons/lu';
 import { FaTimes } from 'react-icons/fa';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 
 interface InstrumentGroup {
     label: string;

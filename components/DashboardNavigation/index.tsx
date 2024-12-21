@@ -8,7 +8,7 @@ import { SettingsBar } from '@/components/SettingsBar';
 import { PairNavigator } from '@/components/DashboardNavigation/PairNavigator';
 import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import Image from 'next/image';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { ProfilePanel } from '@/components/DashboardNavigation/ProfilePanel';

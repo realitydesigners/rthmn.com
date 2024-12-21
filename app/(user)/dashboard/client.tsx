@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, useEffect } from 'react';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { BoxDetailsRow } from '@/components/BoxDetailsRow';
 import { PairResoBox } from './PairResoBox';
 import { NoInstruments } from './LoadingSkeleton';

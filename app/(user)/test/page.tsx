@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 import PairUniverse from './PairUniverse';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import App from '@/app/(user)/test/SplineScene';
 
 export default function TestPage() {

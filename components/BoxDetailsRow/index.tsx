@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import type { Box } from '@/types/types';
 import { formatNumber } from '@/utils/formatters';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 
 interface BoxDetailsRowProps {
     boxes: Box[];

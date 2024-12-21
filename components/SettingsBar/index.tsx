@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { LuRotateCcw } from 'react-icons/lu';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { fullPresets, type FullPreset } from '@/utils/localStorage';
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import styles from './styles.module.css';
 
 const ConnectionBar: React.FC = () => {
