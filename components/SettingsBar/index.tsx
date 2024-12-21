@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { LuRotateCcw, LuChevronDown, LuChevronUp } from 'react-icons/lu';
+import { LuRotateCcw, LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { fullPresets, type FullPreset } from '@/utils/localStorage';
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
@@ -60,6 +60,8 @@ export const SettingsBar = () => {
     const [mounted, setMounted] = useState(false);
     const [localBoxColors, setLocalBoxColors] = useState(boxColors);
     const [showColors, setShowColors] = useState(true);
+    const [showPattern, setShowPattern] = useState(true);
+    const [showBoxStyle, setShowBoxStyle] = useState(true);
 
     const debouncedBoxColors = useDebounce(localBoxColors, 150);
 
@@ -126,7 +128,7 @@ export const SettingsBar = () => {
     return (
         <div className='flex h-full flex-col'>
             <div className='flex-1 overflow-y-visible'>
-                <div className='flex flex-col gap-6'>
+                <div className='flex flex-col gap-2'>
                     {/* Colors Section Toggle */}
                     <div className='flex flex-col gap-2'>
                         <button
@@ -168,20 +170,67 @@ export const SettingsBar = () => {
                     </div>
 
                     {/* Box Styles Section */}
-                    <div className='flex flex-col gap-8'>
-                        <PatternVisualizer
-                            startIndex={localBoxColors.styles?.startIndex ?? 0}
-                            maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
-                            boxes={[]}
-                            onStyleChange={handleStyleChange}
-                        />
-                        <BoxVisualizer
-                            borderRadius={localBoxColors.styles?.borderRadius ?? 8}
-                            shadowIntensity={localBoxColors.styles?.shadowIntensity ?? 0.25}
-                            opacity={localBoxColors.styles?.opacity ?? 1}
-                            showBorder={localBoxColors.styles?.showBorder ?? true}
-                            onStyleChange={handleStyleChange}
-                        />
+                    <div className='flex flex-col gap-2'>
+                        {/* Pattern Section */}
+                        <div className='flex flex-col gap-2'>
+                            <button
+                                onClick={() => setShowPattern(!showPattern)}
+                                className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                                <div className='flex items-center gap-3'>
+                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
+                                        <LuLayoutGrid size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                    </div>
+                                    <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                                        Pattern
+                                    </span>
+                                </div>
+                                {showPattern ? (
+                                    <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                ) : (
+                                    <LuChevronDown size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                )}
+                            </button>
+
+                            {showPattern && (
+                                <PatternVisualizer
+                                    startIndex={localBoxColors.styles?.startIndex ?? 0}
+                                    maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
+                                    boxes={[]}
+                                    onStyleChange={handleStyleChange}
+                                />
+                            )}
+                        </div>
+
+                        {/* Box Style Section */}
+                        <div className='flex flex-col gap-2'>
+                            <button
+                                onClick={() => setShowBoxStyle(!showBoxStyle)}
+                                className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                                <div className='flex items-center gap-3'>
+                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
+                                        <LuBox size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                    </div>
+                                    <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                                        Box Style
+                                    </span>
+                                </div>
+                                {showBoxStyle ? (
+                                    <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                ) : (
+                                    <LuChevronDown size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                )}
+                            </button>
+
+                            {showBoxStyle && (
+                                <BoxVisualizer
+                                    borderRadius={localBoxColors.styles?.borderRadius ?? 8}
+                                    shadowIntensity={localBoxColors.styles?.shadowIntensity ?? 0.25}
+                                    opacity={localBoxColors.styles?.opacity ?? 1}
+                                    showBorder={localBoxColors.styles?.showBorder ?? true}
+                                    onStyleChange={handleStyleChange}
+                                />
+                            )}
+                        </div>
                     </div>
 
                     <div className='flex h-12 items-center justify-between'>
