@@ -23,19 +23,6 @@ export const RightSidebar = () => {
         });
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (!isLocked && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
-                setActivePanel(null);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isLocked]);
-
     const renderPanelContent = () => {
         switch (activePanel) {
             case 'settings':
@@ -83,22 +70,35 @@ export const RightSidebar = () => {
         }
     };
 
+    useEffect(() => {
+        const handleCloseSidebars = () => {
+            if (!isLocked) {
+                setActivePanel(null);
+            }
+        };
+
+        window.addEventListener('closeSidebars', handleCloseSidebars);
+        return () => {
+            window.removeEventListener('closeSidebars', handleCloseSidebars);
+        };
+    }, [isLocked]);
+
     return (
         <>
             {/* Panel Content */}
-            <div ref={sidebarRef}>
+            <div ref={sidebarRef} className='sidebar-content'>
                 <SidebarContent isOpen={activePanel !== null} onClose={() => !isLocked && setActivePanel(null)}>
                     {renderPanelContent()}
                 </SidebarContent>
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 right-0 bottom-0 z-[90] flex w-14 flex-col items-center justify-between border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
+            <div className='fixed-sidebar fixed top-14 right-0 bottom-0 z-[90] flex w-14 flex-col items-center justify-between border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
                 <div className='flex flex-col gap-2'>
                     <button
                         onClick={() => handlePanelToggle('tutorial')}
                         className={cn(
-                            'group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                            'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
                             activePanel === 'tutorial'
                                 ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
                                 : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
@@ -110,7 +110,7 @@ export const RightSidebar = () => {
                 <button
                     onClick={() => handlePanelToggle('settings')}
                     className={cn(
-                        'group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                        'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
                         activePanel === 'settings'
                             ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
                             : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'

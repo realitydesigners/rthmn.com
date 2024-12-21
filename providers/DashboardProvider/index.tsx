@@ -16,9 +16,18 @@ interface DashboardContextType {
     boxColors: BoxColors;
     updateBoxColors: (colors: BoxColors) => void;
     isAuthenticated: boolean;
+    handleSidebarClick: (e: React.MouseEvent) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
+
+export const useDashboard = () => {
+    const context = useContext(DashboardContext);
+    if (!context) {
+        throw new Error('useDashboard must be used within a DashboardProvider');
+    }
+    return context;
+};
 
 export const AVAILABLE_PAIRS = [...FOREX_PAIRS, ...CRYPTO_PAIRS] as const;
 
@@ -140,6 +149,22 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         console.log('DashboardProvider state updated');
     };
 
+    // Add sidebar click handler
+    const handleSidebarClick = (e: React.MouseEvent) => {
+        const target = e.target as HTMLElement;
+        // If clicking a toggle button or within sidebar content, do nothing
+        if (
+            target.closest('.sidebar-toggle') || // Clicking a toggle button
+            target.closest('.sidebar-content') || // Clicking within sidebar content
+            target.closest('.fixed-sidebar') // Clicking within the fixed sidebar area
+        ) {
+            return;
+        }
+
+        // Otherwise, close all unpinned sidebars
+        window.dispatchEvent(new Event('closeSidebars'));
+    };
+
     const value = {
         pairData,
         selectedPairs,
@@ -149,15 +174,12 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         boxColors: boxColorsState,
         updateBoxColors,
         isAuthenticated,
+        handleSidebarClick,
     };
 
-    return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
-};
-
-export const useDashboard = () => {
-    const context = useContext(DashboardContext);
-    if (context === undefined) {
-        throw new Error('useDashboard must be used within a DashboardProvider');
-    }
-    return context;
+    return (
+        <DashboardContext.Provider value={value}>
+            <div onClick={handleSidebarClick}>{children}</div>
+        </DashboardContext.Provider>
+    );
 };

@@ -41,6 +41,19 @@ export const LeftSidebar = () => {
         };
     }, [isPinned]);
 
+    useEffect(() => {
+        const handleCloseSidebars = () => {
+            if (!isPinned) {
+                setIsOpen(false);
+            }
+        };
+
+        window.addEventListener('closeSidebars', handleCloseSidebars);
+        return () => {
+            window.removeEventListener('closeSidebars', handleCloseSidebars);
+        };
+    }, [isPinned]);
+
     const handleToggleSidebar = () => {
         setIsOpen(!isOpen);
         if (!isOpen) {
@@ -51,7 +64,7 @@ export const LeftSidebar = () => {
     return (
         <>
             {/* Sidebar Content */}
-            <div ref={sidebarRef}>
+            <div ref={sidebarRef} className='sidebar-content'>
                 <SidebarContent isOpen={isOpen} onClose={() => !isPinned && setIsOpen(false)}>
                     <div className='flex h-full flex-col'>
                         <div className='flex h-12 items-center justify-between border-b border-[#222] px-3'>
@@ -146,7 +159,7 @@ export const LeftSidebar = () => {
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 bottom-0 left-0 z-[90] flex w-14 flex-col items-center justify-between border-r border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
+            <div className='fixed-sidebar fixed top-14 bottom-0 left-0 z-[90] flex w-14 flex-col items-center justify-between border-r border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
                 <div className='flex flex-col gap-2'>
                     <Link href='/dashboard'>
                         <button className='group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
@@ -161,7 +174,7 @@ export const LeftSidebar = () => {
                     <button
                         onClick={handleToggleSidebar}
                         className={cn(
-                            'group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                            'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
                             isOpen
                                 ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
                                 : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
@@ -173,7 +186,7 @@ export const LeftSidebar = () => {
                 <button
                     onClick={handleToggleSidebar}
                     className={cn(
-                        'group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                        'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
                         isOpen
                             ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
                             : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'

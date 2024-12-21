@@ -21,7 +21,7 @@ export default async function UserLayout({ children, modal }: { children: React.
 
     return (
         <Providers>
-            <div className='relative flex min-h-screen'>
+            <div className='relative flex min-h-screen' id='app-container'>
                 <NavbarSignedIn user={user} />
                 <main className='flex-1 overflow-y-auto pt-14 transition-[margin] duration-300 ease-in-out'>{children}</main>
                 <LeftSidebar />
