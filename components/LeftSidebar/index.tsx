@@ -3,82 +3,51 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { DraggableBorder } from '@/components/DraggableBorder';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
-import { LuMenu, LuOrbit, LuLayoutDashboard, LuLineChart, LuPin, LuPinOff } from 'react-icons/lu';
+import { LuMenu, LuOrbit, LuLayoutDashboard, LuLineChart, LuLock, LuUnlock } from 'react-icons/lu';
 import { FaTimes } from 'react-icons/fa';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 
-interface InstrumentGroup {
-    label: string;
-    items: readonly string[];
-}
-
-const instrumentGroups: readonly InstrumentGroup[] = [
-    { label: 'FX', items: FOREX_PAIRS },
-    { label: 'CRYPTO', items: CRYPTO_PAIRS },
-] as const;
+type ActivePanel = 'menu' | 'chart' | null;
 
 export const LeftSidebar = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isPinned, setIsPinned] = useState(false);
-    const { selectedPairs, togglePair, pairData } = useDashboard();
+    const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+    const [isLocked, setIsLocked] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const { selectedPairs, togglePair, pairData } = useDashboard();
+
+    const handlePanelToggle = (panel: ActivePanel) => {
+        setActivePanel((prev) => {
+            if (prev === panel) {
+                setIsLocked(false);
+                return null;
+            }
+            return panel;
+        });
+    };
 
     const formatPrice = (price: number) => {
         return price.toFixed(price >= 100 ? 2 : 5);
     };
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (!isPinned && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isPinned]);
-
-    useEffect(() => {
-        const handleCloseSidebars = () => {
-            if (!isPinned) {
-                setIsOpen(false);
-            }
-        };
-
-        window.addEventListener('closeSidebars', handleCloseSidebars);
-        return () => {
-            window.removeEventListener('closeSidebars', handleCloseSidebars);
-        };
-    }, [isPinned]);
-
-    const handleToggleSidebar = () => {
-        setIsOpen(!isOpen);
-        if (!isOpen) {
-            setIsPinned(false); // Reset pin state when opening
-        }
-    };
-
-    return (
-        <>
-            {/* Sidebar Content */}
-            <div ref={sidebarRef} className='sidebar-content'>
-                <SidebarContent isOpen={isOpen} onClose={() => !isPinned && setIsOpen(false)}>
+    const renderPanelContent = () => {
+        switch (activePanel) {
+            case 'menu':
+            case 'chart':
+                return (
                     <div className='flex h-full flex-col'>
                         <div className='flex h-12 items-center justify-between border-b border-[#222] px-3'>
                             <div className='flex items-center gap-2'>
-                                <h2 className='text-sm font-medium'>Menu</h2>
+                                <h2 className='text-sm font-medium'>{activePanel === 'menu' ? 'Menu' : 'Chart'}</h2>
                                 <div className='h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]' />
                             </div>
                             <button
-                                onClick={() => setIsPinned(!isPinned)}
+                                onClick={() => setIsLocked(!isLocked)}
                                 className={cn(
                                     'group flex h-7 w-7 items-center justify-center rounded-md transition-all',
-                                    isPinned ? 'bg-blue-500/10 text-blue-400' : 'text-[#666] hover:bg-white/5'
+                                    isLocked ? 'bg-blue-500/10 text-blue-400' : 'text-[#666] hover:bg-white/5'
                                 )}>
-                                {isPinned ? <LuPin size={14} /> : <LuPinOff size={14} />}
+                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
                             </button>
                         </div>
 
@@ -117,7 +86,10 @@ export const LeftSidebar = () => {
                             )}
 
                             {/* Available Pairs Sections */}
-                            {instrumentGroups.map((group) => {
+                            {[
+                                { label: 'FX', items: FOREX_PAIRS },
+                                { label: 'CRYPTO', items: CRYPTO_PAIRS },
+                            ].map((group) => {
                                 const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
                                 if (availablePairs.length === 0) return null;
 
@@ -155,6 +127,48 @@ export const LeftSidebar = () => {
                             })}
                         </div>
                     </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (!isLocked && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+                // Check if the click was inside any sidebar or sidebar toggle
+                const isClickInAnySidebar = (event.target as Element).closest('.sidebar-content, .fixed-sidebar');
+                if (!isClickInAnySidebar) {
+                    setActivePanel(null);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isLocked]);
+
+    useEffect(() => {
+        const handleCloseSidebars = () => {
+            if (!isLocked) {
+                setActivePanel(null);
+            }
+        };
+
+        window.addEventListener('closeSidebars', handleCloseSidebars);
+        return () => {
+            window.removeEventListener('closeSidebars', handleCloseSidebars);
+        };
+    }, [isLocked]);
+
+    return (
+        <>
+            {/* Panel Content */}
+            <div ref={sidebarRef} className='sidebar-content'>
+                <SidebarContent isOpen={activePanel !== null} onClose={() => !isLocked && setActivePanel(null)}>
+                    {renderPanelContent()}
                 </SidebarContent>
             </div>
 
@@ -172,10 +186,10 @@ export const LeftSidebar = () => {
                         </button>
                     </Link>
                     <button
-                        onClick={handleToggleSidebar}
+                        onClick={() => handlePanelToggle('chart')}
                         className={cn(
                             'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
-                            isOpen
+                            activePanel === 'chart'
                                 ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
                                 : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
                         )}>
@@ -184,10 +198,10 @@ export const LeftSidebar = () => {
                 </div>
                 {/* Menu button */}
                 <button
-                    onClick={handleToggleSidebar}
+                    onClick={() => handlePanelToggle('menu')}
                     className={cn(
                         'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
-                        isOpen
+                        activePanel === 'menu'
                             ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
                             : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
                     )}>
@@ -205,7 +219,7 @@ interface SidebarContentProps {
 }
 
 export const SidebarContent = ({ isOpen, onClose, children }: SidebarContentProps) => {
-    const [width, setWidth] = useState(200);
+    const [width, setWidth] = useState(300);
 
     const handleResize = useCallback((newWidth: number) => {
         const constrainedWidth = Math.max(360, Math.min(600, newWidth));
