@@ -29,7 +29,7 @@ export const StyleControl: React.FC<StyleControlProps> = ({ label, value, onChan
                 </div>
             )}
             <div className='group relative'>
-                {preview && <div className='mb-2 h-12 rounded-lg border border-white/[0.08] bg-gradient-to-b from-black to-[#0A0A0A]'>{preview}</div>}
+                {preview && <div className='mb-2 h-12 rounded-lg border border-white/[0.08]'>{preview}</div>}
                 <div className='absolute inset-y-0 left-0 flex w-full items-center px-3'>
                     <div className='relative h-[2px] w-full bg-white/[0.08]'>
                         <div className='absolute h-full bg-white/20' style={{ width: `${percentage}%` }} />

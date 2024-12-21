@@ -13,7 +13,7 @@ interface SidebarContentProps {
 }
 
 export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position }: SidebarContentProps) => {
-    const [width, setWidth] = useState(275);
+    const [width, setWidth] = useState(250);
 
     const handleResize = useCallback((newWidth: number) => {
         const constrainedWidth = Math.max(360, Math.min(600, newWidth));
@@ -41,7 +41,7 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
         <div
             className={cn(
                 'fixed top-14 bottom-0 z-[90] flex transform transition-all duration-300',
-                position === 'left' ? 'left-12' : 'right-16',
+                position === 'left' ? 'left-12' : 'right-12',
                 isOpen
                     ? 'translate-x-0 opacity-100'
                     : position === 'left'
@@ -58,7 +58,7 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
                     {/* Header Section */}
                     <div className='relative z-10 mb-2 flex h-12 items-center justify-between px-4'>
                         <div className='flex items-center gap-2'>
-                            <h2 className='text-sm font-medium tracking-wide'>{title}</h2>
+                            <h2 className='font-kodemono text-xs font-medium tracking-widest uppercase'>{title}</h2>
                             <div className='h-1.5 w-1.5 animate-pulse rounded-full bg-white/20'></div>
                         </div>
                         <button
@@ -74,7 +74,7 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
                     </div>
 
                     {/* Content Section */}
-                    <div className='relative flex-1 touch-pan-y overflow-y-scroll px-4 pb-4 [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.1)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-thumb:hover]:bg-white/[0.12] [&::-webkit-scrollbar-track]:bg-transparent'>
+                    <div className='relative flex-1 touch-pan-y overflow-y-scroll px-2 pb-4 [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.1)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-thumb:hover]:bg-white/[0.12] [&::-webkit-scrollbar-track]:bg-transparent'>
                         {children}
                     </div>
                 </div>

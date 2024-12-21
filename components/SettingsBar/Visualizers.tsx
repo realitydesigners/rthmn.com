@@ -102,7 +102,7 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
 
     return (
         <div className='space-y-4'>
-            <div className='relative h-28 overflow-hidden rounded-lg px-2'>
+            <div className='relative h-28 overflow-hidden rounded-lg bg-black/25 px-2'>
                 {/* Enhanced Ambient Background Effects */}
                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.12),transparent_70%)]' />
                 <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:12px_12px]' />
@@ -256,7 +256,7 @@ interface BoxVisualizerProps {
 export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }) => {
     return (
         <div className='space-y-4'>
-            <div className='overflow-hidden rounded-lg'>
+            <div className='overflow-hidden rounded-lg bg-black/25'>
                 <div className='relative'>
                     {/* Refined Grid background */}
                     <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
@@ -264,7 +264,7 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
                     <div className='relative flex h-full items-center justify-center p-8'>
                         {/* Enhanced Preview Box */}
                         <div
-                            className='relative h-48 w-48 border border-white/[0.15] transition-all duration-300'
+                            className='relative h-24 w-24 border border-white/[0.15] transition-all duration-300'
                             style={{
                                 borderRadius: `${borderRadius}px`,
                                 boxShadow: `
@@ -290,17 +290,17 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
                         {/* Enhanced Parameter Labels */}
                         <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
                             {/* Labels with consistent styling */}
-                            <div className='absolute top-4 left-4 rounded-md border border-white/[0.08] bg-black/90 px-2 py-1 backdrop-blur'>
+                            <div className='absolute top-4 left-4 rounded-md border border-white/[0.08] px-2 py-1 backdrop-blur'>
                                 <div className='font-mono text-[10px] font-medium text-white/40'>RADIUS</div>
                                 <span className='font-mono text-sm text-white/90'>{borderRadius}px</span>
                             </div>
 
-                            <div className='absolute right-4 bottom-4 rounded-md border border-white/[0.08] bg-black/90 px-2 py-1 backdrop-blur'>
+                            <div className='absolute right-4 bottom-4 rounded-md border border-white/[0.08] px-2 py-1 backdrop-blur'>
                                 <div className='font-mono text-[10px] font-medium text-white/40'>SHADOW</div>
                                 <span className='font-mono text-sm text-white/90'>{(shadowIntensity * 100).toFixed(0)}%</span>
                             </div>
 
-                            <div className='absolute top-4 right-4 rounded-md border border-white/[0.08] bg-black/90 px-2 py-1 backdrop-blur'>
+                            <div className='0 absolute top-4 right-4 rounded-md border border-white/[0.08] px-2 py-1 backdrop-blur'>
                                 <div className='font-mono text-[10px] font-medium text-white/40'>OPACITY</div>
                                 <span className='font-mono text-sm text-white/90'>{(opacity * 100).toFixed(0)}%</span>
                             </div>
@@ -310,7 +310,7 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
             </div>
 
             {/* Enhanced Controls Container */}
-            <div className='space-y-3 rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black p-4'>
+            <div className='space-y-3 rounded-lg bg-black/25 p-4'>
                 <StyleControl label='Border Radius' value={borderRadius} onChange={(value) => onStyleChange('borderRadius', value)} min={0} max={16} step={1} unit='px' />
                 <StyleControl label='Shadow Depth' value={shadowIntensity} onChange={(value) => onStyleChange('shadowIntensity', value)} min={0} max={1} step={0.05} />
                 <StyleControl label='Opacity' value={opacity} onChange={(value) => onStyleChange('opacity', value)} min={0.01} max={1} step={0.05} />

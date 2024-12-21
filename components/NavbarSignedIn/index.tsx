@@ -95,16 +95,13 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     return (
         <nav className='top-0 right-0 left-0 z-[100] mt-2 hidden h-16 px-2 lg:fixed lg:flex lg:h-14'>
             <div className='group relative z-[110] h-full w-full rounded-lg bg-gradient-to-b from-[#1A1A1A]/40 via-[#151515]/40 to-[#111]/40 p-[1px] transition-all duration-300 hover:from-[#1A1A1A]/50 hover:via-[#151515]/50 hover:to-[#111]/50'>
-                <div className='relative flex h-full w-full items-center justify-between rounded-lg bg-[linear-gradient(to_bottom,rgba(15,15,15,0.95),rgba(17,17,17,0.95))] px-4 backdrop-blur-md'>
-                    <div className='pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_50%_-20%,rgba(38,38,38,0.08),transparent_70%)]'></div>
-                    <div className='pointer-events-none absolute inset-[-1px] rounded-lg bg-[radial-gradient(circle_at_50%_-20%,rgba(100,100,100,0.03),transparent_70%)]'></div>
-                    <div className='pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.06)_50%,rgba(0,0,0,0.12))]'></div>
-
+                <div className='bg[linear-gradient(to_bottom,rgba(15,15,15,1),rgba(17,17,17,1))] relative flex h-full w-full items-center justify-between rounded-lg px-2'>
                     <div className='relative z-[1] flex items-center gap-3'>
                         <Link href='/dashboard' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/[0.03]'>
                             <div className='flex h-7 w-7 items-center transition-transform duration-200 group-hover:scale-105'>
                                 <LogoIcon />
                             </div>
+                            <span className='font-outfit text-[14px] font-bold tracking-wider text-white'>RTHMN</span>
                         </Link>
                         {/* Breadcrumb */}
                         <div className='flex items-center gap-1.5 text-[#818181]'>
@@ -125,8 +122,9 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                             )}
                         </div>
                     </div>
-
-                    <SearchBar selectedPairs={selectedPairs} />
+                    <div className='absolute w-full justify-center'>
+                        <SearchBar selectedPairs={selectedPairs} />
+                    </div>
 
                     <div className='relative z-[110] flex items-center space-x-4'>
                         <div className='relative' ref={dropdownRef}>
