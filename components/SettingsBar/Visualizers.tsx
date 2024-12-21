@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 import { BoxColors } from '@/utils/localStorage';
 import { StyleControl } from './StyleControl';
@@ -10,111 +10,235 @@ interface PatternVisualizerProps {
     onStyleChange: (property: keyof BoxColors['styles'], value: number | boolean) => void;
 }
 
+// Helper function to convert index to timeframe
+const getTimeframeRange = (start: number, end: number) => {
+    // Define timeframe ranges (these can be adjusted)
+    const timeframes = [
+        { min: '1m', max: '15m' },
+        { min: '5m', max: '30m' },
+        { min: '15m', max: '1H' },
+        { min: '30m', max: '2H' },
+        { min: '1H', max: '4H' },
+        { min: '2H', max: '6H' },
+        { min: '4H', max: '8H' },
+        { min: '6H', max: '12H' },
+        { min: '8H', max: 'D' },
+        { min: '12H', max: '2D' },
+        { min: 'D', max: '3D' },
+    ];
+
+    const startRange = Math.floor(start / 3.5);
+    const endRange = Math.floor(end / 3.5);
+
+    return {
+        start: timeframes[Math.min(startRange, timeframes.length - 1)]?.min || 'D',
+        end: timeframes[Math.min(endRange, timeframes.length - 1)]?.max || '3D',
+    };
+};
+
 export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange }) => {
+    const barContainerRef = useRef<HTMLDivElement>(null);
+    const [dragState, setDragState] = useState<{
+        isDragging: boolean;
+        dragType: 'left' | 'right' | 'position' | null;
+    }>({
+        isDragging: false,
+        dragType: null,
+    });
+
+    // Get current timeframe range
+    const timeframeRange = getTimeframeRange(startIndex, startIndex + maxBoxCount);
+
+    const handleMouseDown = (e: React.MouseEvent, type: 'left' | 'right' | 'position') => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (!barContainerRef.current) return;
+
+        const rect = barContainerRef.current.getBoundingClientRect();
+        const barWidth = rect.width / 38;
+        const startX = e.clientX;
+        let previousIndex = type === 'left' ? startIndex : type === 'right' ? maxBoxCount : startIndex;
+
+        const handleGlobalMouseMove = (e: MouseEvent) => {
+            if (!barContainerRef.current) return;
+
+            const totalDeltaX = e.clientX - startX;
+            const newIndex = Math.round(totalDeltaX / barWidth);
+
+            if (newIndex === 0) return;
+
+            switch (type) {
+                case 'left': {
+                    const newStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 36));
+                    const rightEdge = startIndex + maxBoxCount;
+                    const newMaxBoxCount = Math.max(2, rightEdge - newStartIndex);
+                    onStyleChange('startIndex', newStartIndex);
+                    onStyleChange('maxBoxCount', newMaxBoxCount);
+                    break;
+                }
+                case 'right': {
+                    const newMaxBoxCount = Math.max(2, Math.min(previousIndex + newIndex, 38 - startIndex));
+                    onStyleChange('maxBoxCount', newMaxBoxCount);
+                    break;
+                }
+                case 'position': {
+                    const newPosition = Math.max(0, Math.min(previousIndex + newIndex, 38 - maxBoxCount));
+                    onStyleChange('startIndex', newPosition);
+                    break;
+                }
+            }
+        };
+
+        const handleGlobalMouseUp = () => {
+            setDragState({ isDragging: false, dragType: null });
+            window.removeEventListener('mousemove', handleGlobalMouseMove);
+            window.removeEventListener('mouseup', handleGlobalMouseUp);
+        };
+
+        window.addEventListener('mousemove', handleGlobalMouseMove);
+        window.addEventListener('mouseup', handleGlobalMouseUp);
+    };
+
     return (
         <div className='space-y-4'>
-            {/* Enhanced Header */}
-            {/* <div className='flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#0A0A0A] p-3'>
-                <div className='space-y-1'>
-                    <span className='text-[10px] font-medium tracking-wider text-white/50 uppercase'>Pattern Configuration</span>
-                    <div className='flex items-center gap-2'>
-                        <span className='font-mono text-sm font-medium text-white/90'>
-                            {startIndex} → {startIndex + maxBoxCount - 1}
-                        </span>
-                        <div className='h-3 w-[1px] bg-white/10' />
-                        <span className='font-mono text-[10px] tracking-wider text-white/30'>RANGE</span>
-                    </div>
-                </div>
-                <div className='flex h-8 items-center gap-2 rounded-md border border-white/[0.05] bg-white/[0.02] px-3 backdrop-blur'>
-                    <div className='h-1 w-1 rounded-full bg-white/50 shadow-[0_0_10px_rgba(255,255,255,0.2)]' />
-                    <span className='font-mono text-xs text-white/50'>ACTIVE</span>
-                </div>
-            </div> */}
+            <div className='relative h-28 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black px-2'>
+                {/* Enhanced Ambient Background Effects */}
+                <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.12),transparent_70%)]' />
+                <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:12px_12px]' />
+                <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.4),transparent_70%)]' />
+                <div className='absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-transparent' />
 
-            {/* Enhanced Visualization Container */}
-            <div className='relative h-36 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-black to-[#0A0A0A] p-4'>
-                {/* Refined Grid overlay */}
-                <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
+                {/* Main visualization area */}
+                <div className='relative h-full px-6 pt-4 pb-1'>
+                    <div ref={barContainerRef} className='group/bars relative flex h-14 items-center rounded-lg bg-white/[0.02]'>
+                        {Array.from({ length: 38 }).map((_, i) => {
+                            const isSelected = i >= startIndex && i < startIndex + maxBoxCount;
+                            const isLeftEdge = i === startIndex;
+                            const isRightEdge = i === startIndex + maxBoxCount - 1;
+                            const isNearEdge = Math.abs(i - startIndex) <= 1 || Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1;
 
-                {/* Enhanced Background bars */}
-                <div className='relative mt-4 flex h-[calc(100%-24px)] items-center'>
-                    {Array.from({ length: 38 }).map((_, i) => (
-                        <div key={i} className='flex h-full flex-1 items-center px-[0.5px]'>
+                            return (
+                                <div
+                                    key={i}
+                                    className='flex h-full flex-1 items-center'
+                                    onMouseDown={(e) => {
+                                        if (isSelected) {
+                                            handleMouseDown(e, 'position');
+                                        } else if (Math.abs(i - startIndex) <= 1) {
+                                            handleMouseDown(e, 'left');
+                                        } else if (Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1) {
+                                            handleMouseDown(e, 'right');
+                                        }
+                                    }}>
+                                    <div
+                                        className={cn(
+                                            'relative h-full w-full transition-all duration-300',
+                                            isSelected
+                                                ? cn(
+                                                      'bg-gradient-to-b from-white/[0.15] to-white/[0.08] shadow-[inset_0_0_20px_rgba(255,255,255,0.08)]',
+                                                      isLeftEdge && 'rounded-l-md',
+                                                      isRightEdge && 'rounded-r-md'
+                                                  )
+                                                : cn(
+                                                      'cursor-pointer',
+                                                      isNearEdge && 'bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_0_10px_rgba(255,255,255,0.04)]'
+                                                  )
+                                        )}>
+                                        {/* Unselected state visualization */}
+                                        {!isSelected && (
+                                            <div className='absolute inset-0 flex flex-col justify-between py-1.5'>
+                                                <div className={cn('h-1.5 w-full rounded-sm transition-all duration-300', isNearEdge ? 'bg-white/[0.06]' : 'bg-white/[0.02]')} />
+                                                <div className={cn('h-1.5 w-full rounded-sm transition-all duration-300', isNearEdge ? 'bg-white/[0.06]' : 'bg-white/[0.02]')} />
+                                            </div>
+                                        )}
+
+                                        {/* Selected state effects */}
+                                        {isSelected && (
+                                            <>
+                                                <div className='absolute inset-0 overflow-hidden'>
+                                                    <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]' />
+                                                </div>
+                                                <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/30 to-transparent' />
+                                                <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-black/50 to-transparent' />
+
+                                                {/* Box pattern for selected state */}
+                                                <div className='absolute inset-0 flex flex-col justify-between py-1.5'>
+                                                    <div className='h-1.5 w-full rounded-sm bg-white/[0.1]' />
+                                                    <div className='h-1.5 w-full rounded-sm bg-white/[0.1]' />
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        {/* Selection overlay with timeframe display */}
+                        <div
+                            className='pointer-events-none absolute inset-y-0 z-100 transition-all duration-300'
+                            style={{
+                                left: `${(startIndex / 38) * 100}%`,
+                                width: `${(maxBoxCount / 38) * 100}%`,
+                            }}>
+                            {/* Edge handles with enhanced glow */}
+                            <div className='group/left pointer-events-auto absolute -inset-y-3 -left-2 z-50 w-4 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'left')}>
+                                <div className='absolute inset-y-3 right-[8px] w-[2px] bg-gradient-to-b from-white/50 via-white/40 to-white/50 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-all duration-150 group-hover/left:from-white/70 group-hover/left:via-white/60 group-hover/left:to-white/70 group-hover/left:shadow-[0_0_15px_rgba(255,255,255,0.4)]' />
+                                <div className='absolute inset-y-3 right-[7px] w-[3px] bg-gradient-to-r from-white/0 to-white/10 opacity-0 transition-all duration-150 group-hover/left:opacity-100' />
+                            </div>
+
                             <div
-                                className={cn(
-                                    'z-90 h-12 w-full rounded-[1px] transition-all duration-300',
-                                    i >= startIndex && i < startIndex + maxBoxCount ? 'bg-gradient-to-b from-white/[0.25] to-white/[0.05]' : 'bg-white/[0.05]'
-                                )}
+                                className='group/right pointer-events-auto absolute -inset-y-3 -right-2 z-50 w-4 cursor-ew-resize'
+                                onMouseDown={(e) => handleMouseDown(e, 'right')}>
+                                <div className='absolute inset-y-3 left-[8px] w-[2px] bg-gradient-to-b from-white/50 via-white/40 to-white/50 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-all duration-150 group-hover/right:from-white/70 group-hover/right:via-white/60 group-hover/right:to-white/70 group-hover/right:shadow-[0_0_15px_rgba(255,255,255,0.4)]' />
+                                <div className='absolute inset-y-3 left-[7px] w-[3px] bg-gradient-to-l from-white/0 to-white/10 opacity-0 transition-all duration-150 group-hover/right:opacity-100' />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Integrated Timeframe Scale with Active Indicator */}
+                    <div className='absolute inset-x-0 bottom-1 flex justify-between px-4'>
+                        <div className='relative flex w-full justify-between text-[11px] font-medium'>
+                            {['1m', '5m', '15m', '1H', '2H', '4H', '12H', 'D'].map((time, i) => {
+                                // More accurate position calculation
+                                const segmentWidth = 38 / 9; // Width of each timeframe segment
+                                const position = Math.round(i * segmentWidth);
+                                const nextPosition = Math.round((i + 1) * segmentWidth);
+
+                                // More precise range check
+                                const isInRange =
+                                    (position >= startIndex && position <= startIndex + maxBoxCount) ||
+                                    (nextPosition > startIndex && nextPosition <= startIndex + maxBoxCount) ||
+                                    (position <= startIndex && nextPosition >= startIndex + maxBoxCount);
+
+                                return (
+                                    <div key={time} className='relative flex flex-col items-center'>
+                                        <div
+                                            className={cn(
+                                                'mb-1 h-3 w-[1px] transition-all duration-300',
+                                                isInRange
+                                                    ? 'bg-gradient-to-b from-white/60 to-transparent shadow-[0_0_10px_rgba(255,255,255,0.3)]'
+                                                    : 'bg-gradient-to-b from-white/20 to-transparent'
+                                            )}
+                                        />
+                                        <span className={cn('transition-all duration-300', isInRange ? 'font-medium text-white' : 'text-white/30')}>{time}</span>
+                                    </div>
+                                );
+                            })}
+
+                            {/* Sliding highlight effect */}
+                            <div
+                                className='absolute -top-1 h-8 rounded-md bg-gradient-to-t from-white/[0.08] to-transparent transition-all duration-300'
+                                style={{
+                                    left: `${(startIndex / 38) * 100}%`,
+                                    width: `${(maxBoxCount / 38) * 100}%`,
+                                    boxShadow: '0 0 20px rgba(255,255,255,0.1)',
+                                }}
                             />
                         </div>
-                    ))}
-                </div>
-
-                {/* Enhanced Selection indicator */}
-                <div
-                    className='absolute inset-y-0 ml-1 transition-all duration-300'
-                    style={{
-                        left: `${(startIndex / 38) * 100}%`,
-                        width: `${(maxBoxCount / 38) * 100}%`,
-                    }}>
-                    {/* Refined vertical lines */}
-                    <div className='absolute inset-y-8 left-0 w-[1px] bg-white/20 shadow-[0_0_8px_rgba(255,255,255,0.1)]' />
-                    <div className='absolute inset-y-8 right-0 w-[1px] bg-white/20 shadow-[0_0_8px_rgba(255,255,255,0.1)]' />
-
-                    {/* Value Labels (Top) */}
-                    <div className='absolute top-2 left-0 -translate-x-1/2 text-center'>
-                        <div className='rounded-md px-2 py-0.5'>
-                            <span className='font-mono text-sm font-medium text-white/90'>{startIndex}</span>
-                        </div>
-                    </div>
-                    <div className='absolute top-2 right-0 translate-x-1/2 text-center'>
-                        <div className='rounded-md px-2 py-0.5'>
-                            <span className='font-mono text-sm font-medium text-white/90'>{startIndex + maxBoxCount - 1}</span>
-                        </div>
                     </div>
 
-                    {/* Start/End Labels (Bottom) */}
-                    <div className='absolute bottom-4 left-0 -translate-x-1/2 text-center'>
-                        <div className='font-mono text-[10px] font-medium tracking-wider text-white/40'>START</div>
-                    </div>
-                    <div className='absolute right-0 bottom-4 translate-x-1/2 text-center'>
-                        <div className='font-mono text-[10px] font-medium tracking-wider text-white/40'>END</div>
-                    </div>
-                </div>
-            </div>
-
-            {/* Enhanced Controls */}
-            <div className='grid grid-cols-2 gap-4'>
-                <div className='space-y-2 rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black p-3'>
-                    <div className='flex items-center justify-between'>
-                        <span className='text-[10px] font-medium tracking-wider text-white/50 uppercase'>Length</span>
-                        <div className='flex items-center gap-2'>
-                            <span className='font-mono text-sm text-white/90'>{maxBoxCount}</span>
-                            <span className='font-mono text-[10px] tracking-wider text-white/30'>UNITS</span>
-                        </div>
-                    </div>
-                    <StyleControl value={maxBoxCount} onChange={(value) => onStyleChange('maxBoxCount', value)} min={2} max={38} step={1} hideLabel />
-                </div>
-
-                <div className='space-y-2 rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black p-3'>
-                    <div className='flex items-center justify-between'>
-                        <span className='text-[10px] font-medium tracking-wider text-white/50 uppercase'>Start</span>
-                        <div className='flex items-center gap-2'>
-                            <span className='font-mono text-sm text-white/90'>{startIndex}</span>
-                            <span className='font-mono text-[10px] tracking-wider text-white/30'>INDEX</span>
-                        </div>
-                    </div>
-                    <StyleControl
-                        value={startIndex}
-                        onChange={(value) => {
-                            const maxStartIndex = Math.min(value, 38 - maxBoxCount);
-                            onStyleChange('startIndex', maxStartIndex);
-                        }}
-                        min={0}
-                        max={Math.min(36, 38 - maxBoxCount)}
-                        step={1}
-                        hideLabel
-                    />
+                    {/* Vertical highlight lines */}
                 </div>
             </div>
         </div>
