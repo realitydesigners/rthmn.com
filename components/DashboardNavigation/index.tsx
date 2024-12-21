@@ -12,15 +12,13 @@ import { useDashboard } from '@/providers/DashboardProvider';
 import Image from 'next/image';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { ProfilePanel } from '@/components/DashboardNavigation/ProfilePanel';
-import { useUser } from '@/providers/UserProvider';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | null;
 
 const ProfileIcon = ({ setActivePanel }: { setActivePanel: (panel: Panel) => void }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const { signOut, user } = useAuth();
-    const { userDetails } = useUser();
+    const { signOut, user, userDetails } = useAuth();
 
     const userInitial = user?.user_metadata?.full_name?.[0].toUpperCase() || user?.email?.[0].toUpperCase() || '?';
 
@@ -108,7 +106,7 @@ export const DashboardNavigation = () => {
 
         const panels = {
             pairs: <PairNavigator isModalOpen={isPairModalOpen} />,
-            settings: <SettingsBar isOpen={true} onToggle={handleClose} />,
+            settings: <SettingsBar />,
             profile: <ProfilePanel />,
         };
 

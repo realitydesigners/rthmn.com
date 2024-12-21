@@ -11,7 +11,6 @@ import { GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
 import { kodeMono, outfit, oxanium, russo } from '@/components/Fonts/fonts';
 import { Analytics } from '@vercel/analytics/react';
-import UserProvider from '@/providers/UserProvider';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -51,15 +50,13 @@ export default async function RootLayout({ children, modal }: { children: React.
             <GoogleTagManager gtmId='GTM-XYZ' />
             <body className='bg-black'>
                 <SupabaseProvider initialUser={user}>
-                    <UserProvider initialUser={user}>
-                        <NavbarSignedOut user={user} />
-                        {children}
-                        {modal}
-                        <div id='modal-root' />
-                        <Suspense>
-                            <Toaster />
-                        </Suspense>
-                    </UserProvider>
+                    <NavbarSignedOut user={user} />
+                    {children}
+                    {modal}
+                    <div id='modal-root' />
+                    <Suspense>
+                        <Toaster />
+                    </Suspense>
                 </SupabaseProvider>
                 <Analytics />
                 {/* Google Analytics */}
