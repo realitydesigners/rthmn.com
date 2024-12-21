@@ -1,8 +1,8 @@
 'use client';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { DraggableBorder } from '@/components/DraggableBorder';
 import { cn } from '@/utils/cn';
-import { LuSettings, LuGraduationCap } from 'react-icons/lu';
+import { LuSettings, LuGraduationCap, LuLock, LuUnlock } from 'react-icons/lu';
 import { SettingsBar } from '@/components/SettingsBar';
 import { Tutorial } from './Tutorial';
 import { useScrollLock } from '@/hooks/useScrollLock';
@@ -11,23 +11,88 @@ type ActivePanel = 'settings' | 'tutorial' | null;
 
 export const RightSidebar = () => {
     const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+    const [isLocked, setIsLocked] = useState(false);
+    const sidebarRef = useRef<HTMLDivElement>(null);
     useScrollLock(activePanel !== null);
 
     const handlePanelToggle = (panel: ActivePanel) => {
-        setActivePanel((prev) => (prev === panel ? null : panel));
+        setActivePanel((prev) => {
+            if (prev === panel) {
+                setIsLocked(false); // Reset lock state when closing
+                return null;
+            }
+            return panel;
+        });
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (!isLocked && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+                setActivePanel(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isLocked]);
+
+    const renderPanelContent = () => {
+        switch (activePanel) {
+            case 'settings':
+                return (
+                    <div className='flex h-full flex-col'>
+                        <div className='flex h-12 items-center justify-between border-b border-[#222] px-3'>
+                            <div className='flex items-center gap-2'>
+                                <h2 className='text-sm font-medium'>Settings</h2>
+                                <div className='h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]' />
+                            </div>
+                            <button
+                                onClick={() => setIsLocked(!isLocked)}
+                                className={cn(
+                                    'group flex h-7 w-7 items-center justify-center rounded-md transition-all',
+                                    isLocked ? 'bg-blue-500/10 text-blue-400' : 'text-[#666] hover:bg-white/5'
+                                )}>
+                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
+                            </button>
+                        </div>
+                        <SettingsBar />
+                    </div>
+                );
+            case 'tutorial':
+                return (
+                    <div className='flex h-full flex-col'>
+                        <div className='flex h-12 items-center justify-between border-b border-[#222] px-3'>
+                            <div className='flex items-center gap-2'>
+                                <h2 className='text-sm font-medium'>Tutorial</h2>
+                                <div className='h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]' />
+                            </div>
+                            <button
+                                onClick={() => setIsLocked(!isLocked)}
+                                className={cn(
+                                    'group flex h-7 w-7 items-center justify-center rounded-md transition-all',
+                                    isLocked ? 'bg-blue-500/10 text-blue-400' : 'text-[#666] hover:bg-white/5'
+                                )}>
+                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
+                            </button>
+                        </div>
+                        <Tutorial />
+                    </div>
+                );
+            default:
+                return null;
+        }
     };
 
     return (
         <>
-            {/* Settings Panel */}
-            <SidebarContent isOpen={activePanel === 'settings'} onClose={() => setActivePanel(null)}>
-                <SettingsBar />
-            </SidebarContent>
-
-            {/* Tutorial Panel */}
-            <SidebarContent isOpen={activePanel === 'tutorial'} onClose={() => setActivePanel(null)}>
-                <Tutorial />
-            </SidebarContent>
+            {/* Panel Content */}
+            <div ref={sidebarRef}>
+                <SidebarContent isOpen={activePanel !== null} onClose={() => !isLocked && setActivePanel(null)}>
+                    {renderPanelContent()}
+                </SidebarContent>
+            </div>
 
             {/* Fixed Sidebar */}
             <div className='fixed top-14 right-0 bottom-0 z-[90] flex w-14 flex-col items-center justify-between border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
@@ -35,20 +100,24 @@ export const RightSidebar = () => {
                     <button
                         onClick={() => handlePanelToggle('tutorial')}
                         className={cn(
-                            'group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]',
-                            activePanel === 'tutorial' && 'border-blue-500/20 from-blue-500/10 to-blue-500/5'
+                            'group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                            activePanel === 'tutorial'
+                                ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
+                                : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
                         )}>
-                        <LuGraduationCap size={20} className={cn('transition-colors', activePanel === 'tutorial' ? 'text-blue-400' : 'text-[#818181] group-hover:text-white')} />
+                        <LuGraduationCap size={20} className='transition-colors' />
                     </button>
                 </div>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}
                     className={cn(
-                        'group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]',
-                        activePanel === 'settings' && 'border-blue-500/20 from-blue-500/10 to-blue-500/5'
+                        'group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                        activePanel === 'settings'
+                            ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
+                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
                     )}>
-                    <LuSettings size={20} className={cn('transition-colors', activePanel === 'settings' ? 'text-blue-400' : 'text-[#818181] group-hover:text-white')} />
+                    <LuSettings size={20} className='transition-colors' />
                 </button>
             </div>
         </>
