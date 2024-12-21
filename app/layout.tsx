@@ -1,4 +1,4 @@
-import { Navbar } from '@/components/Navbar';
+import { NavbarSignedOut } from '@/components/NavbarSignedOut';
 import { Toaster } from '@/components/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata, Viewport } from 'next';
@@ -52,7 +52,7 @@ export default async function RootLayout({ children, modal }: { children: React.
             <body className='bg-black'>
                 <SupabaseProvider initialUser={user}>
                     <UserProvider initialUser={user}>
-                        <Navbar />
+                        <NavbarSignedOut />
                         {children}
                         {modal}
                         <div id='modal-root' />
