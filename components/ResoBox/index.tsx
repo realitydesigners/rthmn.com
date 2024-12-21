@@ -43,67 +43,45 @@ const Box: React.FC<{
         margin: boxColors.styles?.showBorder ? '-1px' : '0',
         borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
         borderWidth: boxColors.styles?.showBorder ? '1px' : '0',
+        transition: 'all 0.15s ease-out',
     };
 
     return (
-        <motion.div
-            key={`${slice?.timestamp}-${index}`}
-            className='absolute border border-black'
-            style={baseStyles}
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0.8 }}
-            transition={{ duration: 0.2 }}>
-            {/* Base color layer */}
-
-            {/* Gradient overlay */}
-            {/* <div
-        className="absolute inset-0"
-        style={{
-          background: `linear-gradient(to bottom right, ${baseColor.replace(')', `, ${opacity})`)} 0%, transparent 100%)`,
-          borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`
-        }}
-      /> */}
-
-            {/* Shadow effect */}
+        <div key={`${slice?.timestamp}-${index}`} className='absolute border border-black' style={baseStyles}>
             <div
                 className='absolute inset-0'
                 style={{
                     borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
                     boxShadow: `inset 0 ${shadowY}px ${shadowBlur}px ${shadowColor(shadowIntensity)}`,
+                    transition: 'all 0.15s ease-out',
                 }}
             />
 
-            {/* Additional gradient layer */}
             <div
                 className='absolute inset-0'
                 style={{
                     borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
                     background: `linear-gradient(to bottom right, ${baseColor.replace(')', `, ${opacity}`)} 100%, transparent 100%)`,
                     opacity: opacity,
+                    transition: 'all 0.15s ease-out',
                 }}
             />
 
-            {/* Enhanced effects for first different box */}
             {isFirstDifferent && (
-                <>
-                    {/* Base color layer for first different */}
-                    <div
-                        className='absolute inset-0'
-                        style={{
-                            borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-                            backgroundColor: baseColor,
-                            opacity: opacity * 0.5,
-                            boxShadow: `inset 0 2px 15px ${shadowColor(0.2)}`,
-                        }}
-                    />
-                    {/* Gradient fade */}
-                </>
+                <div
+                    className='absolute inset-0'
+                    style={{
+                        borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+                        backgroundColor: baseColor,
+                        opacity: opacity * 0.5,
+                        boxShadow: `inset 0 2px 15px ${shadowColor(0.2)}`,
+                        transition: 'all 0.15s ease-out',
+                    }}
+                />
             )}
 
-            {/* Recursive rendering of next box */}
             {index < sortedBoxes.length - 1 && renderBox(sortedBoxes[index + 1], index + 1, baseColor)}
-        </motion.div>
+        </div>
     );
 };
 
@@ -134,14 +112,8 @@ export const ResoBox = React.memo(
 
         const sortedBoxes = useMemo(() => {
             if (!slice?.boxes?.length) return [];
-
-            // First slice the array based on startIndex and maxBoxCount
             const selectedBoxes = slice.boxes.slice(boxColors.styles?.startIndex ?? 0, (boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? slice.boxes.length));
-
-            // Then sort the selected boxes by absolute value
-            const sorted = selectedBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
-
-            return sorted;
+            return selectedBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
         }, [slice?.boxes, boxColors.styles?.maxBoxCount, boxColors.styles?.startIndex]);
 
         const maxSize = useMemo(() => {
@@ -175,27 +147,9 @@ export const ResoBox = React.memo(
         );
 
         return (
-            <motion.div
-                ref={boxRef}
-                className={`relative aspect-square h-full w-full overflow-hidden border border-[#181818] bg-black ${className}`}
-                initial={{ opacity: 1 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 1 }}
-                transition={{ duration: 0 }}>
-                <AnimatePresence>
-                    {slice?.boxes && slice.boxes.length > 0 && (
-                        <motion.div
-                            key='box-container'
-                            className='relative h-full w-full'
-                            initial={{ opacity: 1 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 1 }}
-                            transition={{ duration: 0 }}>
-                            {renderShiftedBoxes(sortedBoxes)}
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </motion.div>
+            <div ref={boxRef} className={`relative aspect-square h-full w-full overflow-hidden border border-[#181818] bg-black ${className}`}>
+                {slice?.boxes && slice.boxes.length > 0 && <div className='relative h-full w-full'>{renderShiftedBoxes(sortedBoxes)}</div>}
+            </div>
         );
     },
     (prevProps, nextProps) => {

@@ -17,9 +17,9 @@ export const PairResoBox = React.memo(
         const closePrice = currentOHLC?.close || 'N/A';
 
         return (
-            <div className='group m-auto flex w-full flex-col items-center justify-center gap-4 p-12 text-center text-white shadow-md transition-all duration-500 ease-in-out lg:p-16'>
-                <div className='w-full transition-transform duration-300 ease-in-out'>
-                    <ResoBox key={`${pair}-${boxSlice.timestamp}-${JSON.stringify(boxColors)}`} slice={boxSlice} className='h-full w-full' boxColors={boxColors} />
+            <div className='group m-auto flex w-full flex-col items-center justify-center gap-4 p-12 text-center text-white shadow-md lg:p-16'>
+                <div className='w-full'>
+                    <ResoBox key={`${pair}-${boxSlice.timestamp}`} slice={boxSlice} className='h-full w-full' boxColors={boxColors} />
                 </div>
                 <div className='flex w-full items-center gap-4'>
                     <div className='font-outfit text-lg font-bold tracking-wider'>{pair.toUpperCase()}</div>
@@ -33,7 +33,9 @@ export const PairResoBox = React.memo(
             prevProps.pair === nextProps.pair &&
             prevProps.boxSlice.timestamp === nextProps.boxSlice.timestamp &&
             prevProps.currentOHLC?.close === nextProps.currentOHLC?.close &&
-            JSON.stringify(prevProps.boxColors) === JSON.stringify(nextProps.boxColors)
+            prevProps.boxColors.positive === nextProps.boxColors.positive &&
+            prevProps.boxColors.negative === nextProps.boxColors.negative &&
+            JSON.stringify(prevProps.boxColors.styles) === JSON.stringify(nextProps.boxColors.styles)
         );
     }
 );

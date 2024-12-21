@@ -1,11 +1,27 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LuChevronRight, LuPipette, LuRotateCcw } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider';
 import { colorPresets, fullPresets, type FullPreset } from '@/utils/localStorage';
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
+
+const useDebounce = (value: any, delay: number) => {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value);
+        }, delay);
+
+        return () => {
+            clearTimeout(handler);
+        };
+    }, [value, delay]);
+
+    return debouncedValue;
+};
 
 const ColorPicker = ({ label, color, onChange }: { label: string; color: string; onChange: (color: string) => void }) => (
     <div className='group relative flex h-8 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-2.5 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
@@ -77,10 +93,19 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
 export const SettingsBar = () => {
     const { boxColors, updateBoxColors, togglePair, selectedPairs } = useDashboard();
     const [mounted, setMounted] = useState(false);
+    const [localBoxColors, setLocalBoxColors] = useState(boxColors);
+
+    const debouncedBoxColors = useDebounce(localBoxColors, 150);
 
     useEffect(() => {
         setMounted(true);
     }, []);
+
+    useEffect(() => {
+        if (mounted) {
+            updateBoxColors(debouncedBoxColors);
+        }
+    }, [debouncedBoxColors, mounted, updateBoxColors]);
 
     // Don't render anything until mounted to prevent hydration mismatch
     if (!mounted) {
@@ -88,35 +113,41 @@ export const SettingsBar = () => {
     }
 
     const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
-        if (!boxColors.styles) return;
-        const newColors = {
-            ...boxColors,
+        if (!localBoxColors.styles) return;
+        setLocalBoxColors((prev) => ({
+            ...prev,
             styles: {
-                ...boxColors.styles,
+                ...prev.styles,
                 [property]: value,
             },
-        };
-        updateBoxColors(newColors);
+        }));
     };
 
     const handleColorChange = (type: 'positive' | 'negative', color: string) => {
-        const newColors = {
-            ...boxColors,
+        setLocalBoxColors((prev) => ({
+            ...prev,
             [type]: color,
-        };
-        updateBoxColors(newColors);
+        }));
     };
 
     const handlePresetClick = (preset: { positive: string; negative: string }) => {
-        updateBoxColors({
-            ...boxColors,
+        setLocalBoxColors((prev) => ({
+            ...prev,
             positive: preset.positive,
             negative: preset.negative,
+        }));
+    };
+
+    const handleFullPresetClick = (preset: FullPreset) => {
+        setLocalBoxColors({
+            positive: preset.positive,
+            negative: preset.negative,
+            styles: preset.styles,
         });
     };
 
     const handleResetSettings = () => {
-        updateBoxColors(DEFAULT_BOX_COLORS);
+        setLocalBoxColors(DEFAULT_BOX_COLORS);
         selectedPairs.forEach((pair) => {
             if (!DEFAULT_PAIRS.includes(pair)) {
                 togglePair(pair);
@@ -129,23 +160,15 @@ export const SettingsBar = () => {
         });
     };
 
-    const handleFullPresetClick = (preset: FullPreset) => {
-        updateBoxColors({
-            positive: preset.positive,
-            negative: preset.negative,
-            styles: preset.styles,
-        });
-    };
-
     const isFullPresetSelected = (preset: FullPreset) => {
         return (
-            boxColors.positive === preset.positive &&
-            boxColors.negative === preset.negative &&
-            boxColors.styles?.borderRadius === preset.styles.borderRadius &&
-            boxColors.styles?.maxBoxCount === preset.styles.maxBoxCount &&
-            boxColors.styles?.shadowIntensity === preset.styles.shadowIntensity &&
-            boxColors.styles?.opacity === preset.styles.opacity &&
-            boxColors.styles?.showBorder === preset.styles.showBorder
+            localBoxColors.positive === preset.positive &&
+            localBoxColors.negative === preset.negative &&
+            localBoxColors.styles?.borderRadius === preset.styles.borderRadius &&
+            localBoxColors.styles?.maxBoxCount === preset.styles.maxBoxCount &&
+            localBoxColors.styles?.shadowIntensity === preset.styles.shadowIntensity &&
+            localBoxColors.styles?.opacity === preset.styles.opacity &&
+            localBoxColors.styles?.showBorder === preset.styles.showBorder
         );
     };
 
@@ -187,16 +210,16 @@ export const SettingsBar = () => {
                         </div>
                         <div className='p-2.5'>
                             <PatternVisualizer
-                                startIndex={boxColors.styles?.startIndex ?? 0}
-                                maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                                startIndex={localBoxColors.styles?.startIndex ?? 0}
+                                maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
                                 boxes={[]}
                                 onStyleChange={handleStyleChange}
                             />
                             <BoxVisualizer
-                                borderRadius={boxColors.styles?.borderRadius ?? 8}
-                                shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
-                                opacity={boxColors.styles?.opacity ?? 1}
-                                showBorder={boxColors.styles?.showBorder ?? true}
+                                borderRadius={localBoxColors.styles?.borderRadius ?? 8}
+                                shadowIntensity={localBoxColors.styles?.shadowIntensity ?? 0.25}
+                                opacity={localBoxColors.styles?.opacity ?? 1}
+                                showBorder={localBoxColors.styles?.showBorder ?? true}
                                 onStyleChange={handleStyleChange}
                             />
                         </div>
