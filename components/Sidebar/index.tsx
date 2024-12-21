@@ -1,22 +1,21 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { LuSettings } from 'react-icons/lu';
 import { SettingsBar } from '@/components/SettingsBar';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { DraggableBorder } from '@/components/DraggableBorder';
+import { cn } from '@/utils/cn';
 
 export const Sidebar = () => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    const [width, setWidth] = useState(480);
+    const [width, setWidth] = useState(320);
     useScrollLock(isSettingsOpen);
 
-    const handleResize = (newWidth: number) => {
-        // Constrain width between 320px and 640px
-        const constrainedWidth = Math.max(320, Math.min(640, newWidth));
+    const handleResize = useCallback((newWidth: number) => {
+        const constrainedWidth = Math.max(280, Math.min(400, newWidth));
         setWidth(constrainedWidth);
-        // Update CSS variable for content pushing
         document.documentElement.style.setProperty('--sidebar-width', `${constrainedWidth}px`);
-    };
+    }, []);
 
     // Set initial CSS variable
     useEffect(() => {
@@ -48,10 +47,11 @@ export const Sidebar = () => {
 
             {/* Desktop: Slide-out sidebar */}
             <div
-                style={{ width: `${width}px` }}
-                className={`fixed top-0 right-0 z-[90] hidden h-full transform bg-black transition-transform duration-300 ease-in-out lg:block ${
+                className={cn(
+                    'fixed inset-y-0 right-0 z-[90] hidden transform bg-black transition-transform duration-300 lg:block',
                     isSettingsOpen ? 'translate-x-0' : 'translate-x-full'
-                }`}>
+                )}
+                style={{ width: `${width}px` }}>
                 <DraggableBorder onResize={(delta) => handleResize(width - delta)} />
                 <SettingsBar isOpen={true} onToggle={() => setIsSettingsOpen(false)} variant='sidebar' />
             </div>

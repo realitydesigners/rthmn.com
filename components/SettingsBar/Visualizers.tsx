@@ -76,116 +76,85 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
 
     return (
         <div className='space-y-4'>
-            <div className='relative h-36 overflow-hidden rounded-lg border border-[#1a1a1a] bg-black p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]'>
-                {/* Enhanced Grid overlay */}
-                <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px]' />
+            <div className='relative h-24 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-black to-[#0A0A0A]'>
+                {/* Refined Grid background */}
+                <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
 
-                {/* Scanner line effect */}
-                <div className='absolute inset-0 overflow-hidden'>
-                    <div
-                        className='animate-scan absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.01] to-transparent'
-                        style={{
-                            transform: 'translateY(-100%)',
-                            animation: 'scan 4s linear infinite',
-                        }}
-                    />
-                </div>
+                {/* Enhanced ambient effects */}
+                <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_70%)]' />
 
-                {/* Enhanced Background bars */}
-                <div ref={barContainerRef} className='group/bars relative mt-4 flex h-[calc(100%-24px)] items-center'>
-                    {Array.from({ length: 38 }).map((_, i) => (
-                        <div
-                            key={i}
-                            className='flex h-full flex-1 items-center px-[0.5px]'
-                            onMouseDown={(e) => {
-                                if (i >= startIndex && i < startIndex + maxBoxCount) {
-                                    handleMouseDown(e, 'position');
-                                } else if (Math.abs(i - startIndex) <= 1) {
-                                    handleMouseDown(e, 'left');
-                                } else if (Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1) {
-                                    handleMouseDown(e, 'right');
-                                }
-                            }}>
+                {/* Main visualization area */}
+                <div className='relative h-full p-3'>
+                    {/* Enhanced Background bars */}
+                    <div ref={barContainerRef} className='group/bars relative flex h-full items-center'>
+                        {Array.from({ length: 38 }).map((_, i) => (
                             <div
-                                className={cn(
-                                    'z-90 h-12 w-full rounded-[1px] transition-all duration-300',
-                                    i >= startIndex && i < startIndex + maxBoxCount
-                                        ? 'bg-gradient-to-b from-[#222] to-[#111] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
-                                        : 'cursor-pointer bg-[#0A0A0A] hover:bg-[#111]'
-                                )}
-                            />
-                        </div>
-                    ))}
-
-                    {/* Selection overlay with drag handles */}
-                    <div
-                        className='pointer-events-none absolute inset-y-0 z-100 ml-1 transition-all duration-300 group-hover/bars:shadow-[0_0_0_1px_rgba(59,130,246,0.3),0_0_15px_rgba(59,130,246,0.2)]'
-                        style={{
-                            left: `${(startIndex / 38) * 100}%`,
-                            width: `${(maxBoxCount / 38) * 100}%`,
-                        }}>
-                        {/* Selection overlay */}
-                        <div className='absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] to-transparent opacity-30' />
-
-                        {/* Left edge line */}
-                        <div className='group/left pointer-events-auto absolute -inset-y-4 -left-5 z-50 w-10 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'left')}>
-                            <div className='absolute inset-y-4 right-[18px] w-[2px] rounded-full bg-[#333] transition-all duration-150 group-hover/left:bg-blue-500/50 group-hover/left:shadow-[0_0_10px_rgba(59,130,246,0.5)]' />
-                            <div className='absolute inset-y-4 right-3 w-[20px] opacity-0 transition-all duration-150 group-hover/left:opacity-100'>
-                                <div className='absolute inset-0 rounded-l-lg bg-gradient-to-r from-blue-500/20 to-transparent' />
+                                key={i}
+                                className='flex h-full flex-1 items-center px-[0.5px]'
+                                onMouseDown={(e) => {
+                                    if (i >= startIndex && i < startIndex + maxBoxCount) {
+                                        handleMouseDown(e, 'position');
+                                    } else if (Math.abs(i - startIndex) <= 1) {
+                                        handleMouseDown(e, 'left');
+                                    } else if (Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1) {
+                                        handleMouseDown(e, 'right');
+                                    }
+                                }}>
+                                <div
+                                    className={cn(
+                                        'relative h-full w-full transition-all duration-300',
+                                        i >= startIndex && i < startIndex + maxBoxCount
+                                            ? 'bg-white/[0.08] shadow-[inset_0_0_20px_rgba(255,255,255,0.05)]'
+                                            : 'cursor-pointer bg-white/[0.02] hover:bg-white/[0.04]'
+                                    )}>
+                                    {i >= startIndex && i < startIndex + maxBoxCount && (
+                                        <div className='absolute inset-0 overflow-hidden'>
+                                            <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent_70%)]' />
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        ))}
 
-                        {/* Right edge line */}
-                        <div className='group/right pointer-events-auto absolute -inset-y-4 -right-5 z-50 w-10 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'right')}>
-                            <div className='absolute inset-y-4 left-[18px] w-[2px] rounded-full bg-[#333] transition-all duration-150 group-hover/right:bg-blue-500/50 group-hover/right:shadow-[0_0_10px_rgba(59,130,246,0.5)]' />
-                            <div className='absolute inset-y-4 left-3 w-[20px] opacity-0 transition-all duration-150 group-hover/right:opacity-100'>
-                                <div className='absolute inset-0 rounded-r-lg bg-gradient-to-l from-blue-500/20 to-transparent' />
+                        {/* Selection overlay with enhanced drag handles */}
+                        <div
+                            className='pointer-events-none absolute inset-y-0 z-100 transition-all duration-300'
+                            style={{
+                                left: `${(startIndex / 38) * 100}%`,
+                                width: `${(maxBoxCount / 38) * 100}%`,
+                            }}>
+                            {/* Enhanced edge lines */}
+                            <div className='group/left pointer-events-auto absolute -inset-y-4 -left-3 z-50 w-6 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'left')}>
+                                <div className='absolute inset-y-4 right-[10px] w-[2px] bg-gradient-to-b from-white/30 via-white/20 to-white/30 transition-all duration-150 group-hover/left:bg-white/40 group-hover/left:shadow-[0_0_10px_rgba(255,255,255,0.2)]' />
+                                <div className='absolute inset-y-4 right-[9px] w-[4px] bg-gradient-to-r from-white/0 to-white/5 opacity-0 transition-all duration-150 group-hover/left:opacity-100' />
                             </div>
-                        </div>
 
-                        {/* Corner indicators */}
-                        <div className='absolute -top-0.5 -left-0.5 h-2 w-2 border-t border-l border-[#222]' />
-                        <div className='absolute -top-0.5 -right-0.5 h-2 w-2 border-t border-r border-[#222]' />
-                        <div className='absolute -bottom-0.5 -left-0.5 h-2 w-2 border-b border-l border-[#222]' />
-                        <div className='absolute -right-0.5 -bottom-0.5 h-2 w-2 border-r border-b border-[#222]' />
+                            <div
+                                className='group/right pointer-events-auto absolute -inset-y-4 -right-3 z-50 w-6 cursor-ew-resize'
+                                onMouseDown={(e) => handleMouseDown(e, 'right')}>
+                                <div className='absolute inset-y-4 left-[10px] w-[2px] bg-gradient-to-b from-white/30 via-white/20 to-white/30 transition-all duration-150 group-hover/right:bg-white/40 group-hover/right:shadow-[0_0_10px_rgba(255,255,255,0.2)]' />
+                                <div className='absolute inset-y-4 left-[9px] w-[4px] bg-gradient-to-l from-white/0 to-white/5 opacity-0 transition-all duration-150 group-hover/right:opacity-100' />
+                            </div>
 
-                        {/* Labels */}
-                        <div className='absolute -top-3 left-0 z-30 -translate-x-1/2 text-center'>
-                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm group-hover/bars:border-blue-500/20'>
-                                <span className='font-mono text-sm font-medium text-[#666] group-hover/bars:text-blue-400'>{startIndex}</span>
+                            {/* Enhanced minimal labels */}
+                            <div className='absolute -top-1 left-0 z-30 -translate-x-1/2'>
+                                <div className='rounded-md border border-white/[0.08] bg-black/90 px-1.5 py-0.5 backdrop-blur'>
+                                    <div className='font-mono text-xs font-medium text-white/90'>{startIndex}</div>
+                                </div>
                             </div>
-                        </div>
-                        <div className='absolute -top-3 right-0 z-30 translate-x-1/2 text-center'>
-                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm group-hover/bars:border-blue-500/20'>
-                                <span className='font-mono text-sm font-medium text-[#666] group-hover/bars:text-blue-400'>{startIndex + maxBoxCount - 1}</span>
+                            <div className='absolute -top-1 right-0 z-30 translate-x-1/2'>
+                                <div className='rounded-md border border-white/[0.08] bg-black/90 px-1.5 py-0.5 backdrop-blur'>
+                                    <div className='font-mono text-xs font-medium text-white/90'>{startIndex + maxBoxCount - 1}</div>
+                                </div>
                             </div>
-                        </div>
 
-                        {/* Start/End Labels */}
-                        <div className='absolute -bottom-3 left-0 z-30 -translate-x-1/2 text-center'>
-                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm'>
-                                <div className='font-mono text-[10px] font-medium tracking-wider text-[#444]'>START</div>
-                            </div>
-                        </div>
-                        <div className='absolute right-0 -bottom-3 z-30 translate-x-1/2 text-center'>
-                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm'>
-                                <div className='font-mono text-[10px] font-medium tracking-wider text-[#444]'>END</div>
-                            </div>
+                            {/* Selection highlight effect */}
+                            <div className='absolute inset-x-0 -top-[1px] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover/bars:opacity-100' />
+                            <div className='absolute inset-x-0 -bottom-[1px] h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 transition-opacity duration-300 group-hover/bars:opacity-100' />
                         </div>
                     </div>
                 </div>
             </div>
-
-            <style jsx global>{`
-                @keyframes scan {
-                    0% {
-                        transform: translateY(-100%);
-                    }
-                    100% {
-                        transform: translateY(100%);
-                    }
-                }
-            `}</style>
         </div>
     );
 };

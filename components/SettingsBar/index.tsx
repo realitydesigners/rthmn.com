@@ -226,7 +226,7 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
                                 <h3 className='text-[11px] font-medium text-gray-400'>Box Styles</h3>
                                 <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
                             </div>
-                            <div className='space-y-3 rounded-lg border border-[#222] bg-gradient-to-b from-[#0F0F0F] to-[#0A0A0A] p-2.5'>
+                            <div className='p-2.5'>
                                 <PatternVisualizer
                                     startIndex={boxColors.styles?.startIndex ?? 0}
                                     maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
