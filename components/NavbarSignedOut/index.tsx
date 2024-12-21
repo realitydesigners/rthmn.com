@@ -78,11 +78,6 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     const { session, signOut } = useAuth();
     const isproduction = process.env.NODE_ENV === 'production';
 
-    // Don't render navbar for user routes
-    if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/test') || pathname?.startsWith('/pair')) {
-        return null;
-    }
-
     useEffect(() => {
         const fetchUserDetails = async () => {
             if (!user) return;
@@ -121,6 +116,11 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             document.body.classList.remove('no-scroll');
         };
     }, [isNavOpen]);
+
+    // Don't render navbar for user routes
+    if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/test') || pathname?.startsWith('/pair')) {
+        return null;
+    }
 
     const handleBackdropClick = () => {
         setIsNavOpen(false);
