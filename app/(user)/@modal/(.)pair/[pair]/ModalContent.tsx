@@ -33,6 +33,7 @@ export function ModalContent({ pair }: ModalContentProps) {
         <div className='fixed inset-0 z-[100] h-full w-full bg-transparent'>
             <div className='animate-in fade-in slide-in-from-top-4 fixed inset-x-0 top-4 z-[100] mx-auto w-full max-w-2xl px-4 duration-300'>
                 <div className='overflow-hidden rounded-2xl border border-[#222] bg-black shadow-2xl'>
+                    {/* h-[calc(100vh-190px)] */}
                     <div className='h-auto overflow-y-auto'>
                         <div className='flex items-center justify-between border-b border-[#222] px-4 py-3'>
                             <div className='flex w-full items-center justify-center gap-3'>
@@ -53,6 +54,15 @@ export function ModalContent({ pair }: ModalContentProps) {
                                 <div className='text-center text-white'>No data available</div>
                             </div>
                         )}
+                        {/* {isLoading ? (
+              <div className="flex h-[200px] items-center justify-center border-t border-[#222] bg-[#111]">
+                <div className="text-sm text-gray-400">Loading chart...</div>
+              </div>
+            ) : (
+              <div className="h-[200px] w-full">
+                <LineChart pair={pair} candles={candleData} height={200} />
+              </div>
+            )} */}
                     </div>
                 </div>
             </div>

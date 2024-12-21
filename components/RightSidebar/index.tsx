@@ -157,7 +157,7 @@ export const SidebarContent = ({ isOpen, onClose, children }: SidebarContentProp
         <div
             className={cn('fixed top-14 right-14 bottom-0 z-[90] flex transform transition-transform duration-300', isOpen ? 'translate-x-0' : 'translate-x-full')}
             style={{ width: `${width}px` }}>
-            <DraggableBorder onResize={(delta) => handleResize(width - delta)} position='left' />
+            <DraggableBorder onResize={(delta) => handleResize(width - delta)} direction='left' />
             <div className='relative flex h-full w-full flex-col border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] shadow-2xl'>{children}</div>
         </div>
     );

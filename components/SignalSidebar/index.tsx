@@ -1,12 +1,12 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { Signal } from '@/types/types';
-import { useSignals } from '@/providers/SignalProvider/client';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { getTimeAgo } from '@/utils/dateUtils';
 import { CondensedIcon, DetailedIcon } from '@/components/Icons/icons';
 
 export function SignalSidebar() {
-    const { signalsData } = useSignals();
+    const { signalsData } = useDashboard();
     const [viewMode, setViewMode] = useState<'condensed' | 'detailed'>('detailed');
     const [interactedSignals, setInteractedSignals] = useState<Set<string>>(new Set());
     const [isCondensedHovered, setIsCondensedHovered] = useState(false);
