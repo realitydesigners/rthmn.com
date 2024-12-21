@@ -5,9 +5,10 @@ interface DraggableBorderProps {
     onDragStart?: (e: React.MouseEvent) => void;
     onResize?: (delta: number) => void;
     direction?: 'top' | 'bottom' | 'left' | 'right';
+    className?: string;
 }
 
-export const DraggableBorder: React.FC<DraggableBorderProps> = ({ isDragging: externalIsDragging, onDragStart, onResize, direction = 'left' }) => {
+export const DraggableBorder: React.FC<DraggableBorderProps> = ({ isDragging: externalIsDragging, onDragStart, onResize, direction = 'left', className }) => {
     const [internalIsDragging, setInternalIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState(0);
 
@@ -66,9 +67,10 @@ export const DraggableBorder: React.FC<DraggableBorderProps> = ({ isDragging: ex
 
     return (
         <div
-            className={`absolute ${cursorClass} ${dimensionClass} ${positionClass} z-[91] rounded-full bg-[#181818] transition-all duration-200 hover:bg-blue-400 ${
-                isDragging ? 'shadow-2xl shadow-blue-500' : 'hover:shadow-2xl hover:shadow-blue-500'
-            }`}
+            className={`absolute ${cursorClass} ${dimensionClass} ${positionClass} z-[91] rounded-full bg-gradient-to-b from-[#333]/20 via-[#222]/20 to-[#111]/20 transition-all duration-200 hover:bg-gradient-to-b hover:from-blue-500/30 hover:via-blue-400/20 hover:to-blue-300/10 ${
+                isDragging ? 'shadow-2xl shadow-blue-500/30' : 'hover:shadow-2xl hover:shadow-blue-500/20'
+            } ${className || ''}`}
+            data-dragging={isDragging}
             onMouseDown={handleMouseDown}
             style={{
                 [isVertical ? 'width' : 'height']: isDragging ? '3px' : '1px',
