@@ -129,7 +129,7 @@ interface SidebarContentProps {
 }
 
 export const SidebarContent = ({ isOpen, onClose, children }: SidebarContentProps) => {
-    const [width, setWidth] = useState(300);
+    const [width, setWidth] = useState(275);
 
     const handleResize = useCallback((newWidth: number) => {
         const constrainedWidth = Math.max(360, Math.min(600, newWidth));

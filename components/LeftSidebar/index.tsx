@@ -196,17 +196,6 @@ export const LeftSidebar = () => {
                         <LuLineChart size={20} className='transition-colors' />
                     </button>
                 </div>
-                {/* Menu button */}
-                <button
-                    onClick={() => handlePanelToggle('menu')}
-                    className={cn(
-                        'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
-                        activePanel === 'menu'
-                            ? 'border-blue-500/20 from-blue-500/10 to-blue-500/5 text-blue-400'
-                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
-                    )}>
-                    <LuMenu size={20} className='transition-colors' />
-                </button>
             </div>
         </>
     );
@@ -219,7 +208,7 @@ interface SidebarContentProps {
 }
 
 export const SidebarContent = ({ isOpen, onClose, children }: SidebarContentProps) => {
-    const [width, setWidth] = useState(300);
+    const [width, setWidth] = useState(275);
 
     const handleResize = useCallback((newWidth: number) => {
         const constrainedWidth = Math.max(360, Math.min(600, newWidth));
