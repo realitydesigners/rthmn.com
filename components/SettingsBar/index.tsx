@@ -6,7 +6,6 @@ import { colorPresets, fullPresets, type FullPreset } from '@/utils/localStorage
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
-import { useQueryClient } from '@tanstack/react-query';
 
 const ColorPicker = ({ label, color, onChange }: { label: string; color: string; onChange: (color: string) => void }) => (
     <div className='group relative flex h-8 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-2.5 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
@@ -75,9 +74,8 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
     </button>
 );
 
-export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: boolean; onToggle: () => void; variant?: 'modal' | 'sidebar' }) => {
+export const SettingsBar = () => {
     const { boxColors, updateBoxColors, togglePair, selectedPairs } = useDashboard();
-    const queryClient = useQueryClient();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -91,7 +89,6 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
 
     const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
         if (!boxColors.styles) return;
-        console.log('Style change:', property, value);
         const newColors = {
             ...boxColors,
             styles: {
@@ -99,17 +96,14 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
                 [property]: value,
             },
         };
-        console.log('New colors object:', newColors);
         updateBoxColors(newColors);
     };
 
     const handleColorChange = (type: 'positive' | 'negative', color: string) => {
-        console.log('Color change:', type, color);
         const newColors = {
             ...boxColors,
             [type]: color,
         };
-        console.log('New colors object:', newColors);
         updateBoxColors(newColors);
     };
 
@@ -156,91 +150,67 @@ export const SettingsBar = ({ isOpen, onToggle, variant = 'modal' }: { isOpen: b
     };
 
     return (
-        <div
-            className={cn(
-                'relative z-[1001] w-full border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] shadow-2xl',
-                variant === 'modal' && 'max-w-xl rounded-2xl border',
-                variant === 'sidebar' && 'h-full'
-            )}>
+        <div className='flex h-full flex-col'>
             <div className='flex h-12 items-center justify-between border-b border-[#222] px-3'>
                 <div className='flex items-center gap-2'>
                     <h2 className='text-sm font-medium'>Settings</h2>
                     <div className='h-1 w-1 rounded-full bg-blue-400 shadow-[0_0_10px_rgba(96,165,250,0.5)]' />
                 </div>
-                <div className='flex items-center gap-1.5'>
-                    <button
-                        onClick={handleResetSettings}
-                        className='group flex h-7 items-center gap-1.5 rounded-md border border-[#333] bg-gradient-to-b from-[#111] to-[#0A0A0A] px-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/5 hover:text-red-500'>
-                        <LuRotateCcw size={12} className='transition-transform group-hover:rotate-180' />
-                        <span className='text-[11px] font-medium'>Reset</span>
-                    </button>
-                    <button onClick={onToggle} className='rounded-md p-1.5 text-[#818181] transition-colors hover:bg-white/5 hover:text-white'>
-                        <svg
-                            xmlns='http://www.w3.org/2000/svg'
-                            width='16'
-                            height='16'
-                            viewBox='0 0 24 24'
-                            fill='none'
-                            stroke='currentColor'
-                            strokeWidth='2'
-                            strokeLinecap='round'
-                            strokeLinejoin='round'>
-                            <path d='M18 6 6 18' />
-                            <path d='m6 6 12 12' />
-                        </svg>
-                    </button>
-                </div>
+                <button
+                    onClick={handleResetSettings}
+                    className='group flex h-7 items-center gap-1.5 rounded-md border border-[#333] bg-gradient-to-b from-[#111] to-[#0A0A0A] px-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/5 hover:text-red-500'>
+                    <LuRotateCcw size={12} className='transition-transform group-hover:rotate-180' />
+                    <span className='text-[11px] font-medium'>Reset</span>
+                </button>
             </div>
 
-            <div className={cn('relative overflow-hidden px-3 py-3', variant === 'modal' && 'h-[calc(100vh-20rem)]', variant === 'sidebar' && 'h-[calc(100vh-3rem)]')}>
-                <div className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'>
-                    <div className='space-y-4'>
-                        {/* Full Presets Section */}
-                        <div>
-                            <div className='mb-2 flex items-center gap-2'>
-                                <h3 className='text-[11px] font-medium text-gray-400'>Presets</h3>
-                                <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
-                            </div>
-                            <div className='grid grid-cols-2 gap-2'>
-                                {fullPresets.map((preset) => (
-                                    <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
-                                ))}
-                            </div>
+            <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth p-3'>
+                <div className='space-y-4'>
+                    {/* Full Presets Section */}
+                    <div>
+                        <div className='mb-2 flex items-center gap-2'>
+                            <h3 className='text-[11px] font-medium text-gray-400'>Presets</h3>
+                            <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
                         </div>
-
-                        {/* Colors Section */}
-                        <div>
-                            <div className='mb-2 flex items-center gap-2'>
-                                <h3 className='text-[11px] font-medium text-gray-400'>Colors</h3>
-                                <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
-                            </div>
-                            <div className='flex gap-2'>
-                                <ColorPicker label='Positive' color={boxColors.positive} onChange={(color) => handleColorChange('positive', color)} />
-                                <ColorPicker label='Negative' color={boxColors.negative} onChange={(color) => handleColorChange('negative', color)} />
-                            </div>
+                        <div className='grid grid-cols-2 gap-2'>
+                            {fullPresets.map((preset) => (
+                                <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
+                            ))}
                         </div>
+                    </div>
 
-                        {/* Box Styles Section */}
-                        <div>
-                            <div className='mb-2 flex items-center gap-2'>
-                                <h3 className='text-[11px] font-medium text-gray-400'>Box Styles</h3>
-                                <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
-                            </div>
-                            <div className='p-2.5'>
-                                <PatternVisualizer
-                                    startIndex={boxColors.styles?.startIndex ?? 0}
-                                    maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
-                                    boxes={[]}
-                                    onStyleChange={handleStyleChange}
-                                />
-                                <BoxVisualizer
-                                    borderRadius={boxColors.styles?.borderRadius ?? 8}
-                                    shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
-                                    opacity={boxColors.styles?.opacity ?? 1}
-                                    showBorder={boxColors.styles?.showBorder ?? true}
-                                    onStyleChange={handleStyleChange}
-                                />
-                            </div>
+                    {/* Colors Section */}
+                    <div>
+                        <div className='mb-2 flex items-center gap-2'>
+                            <h3 className='text-[11px] font-medium text-gray-400'>Colors</h3>
+                            <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
+                        </div>
+                        <div className='flex gap-2'>
+                            <ColorPicker label='Positive' color={boxColors.positive} onChange={(color) => handleColorChange('positive', color)} />
+                            <ColorPicker label='Negative' color={boxColors.negative} onChange={(color) => handleColorChange('negative', color)} />
+                        </div>
+                    </div>
+
+                    {/* Box Styles Section */}
+                    <div>
+                        <div className='mb-2 flex items-center gap-2'>
+                            <h3 className='text-[11px] font-medium text-gray-400'>Box Styles</h3>
+                            <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
+                        </div>
+                        <div className='p-2.5'>
+                            <PatternVisualizer
+                                startIndex={boxColors.styles?.startIndex ?? 0}
+                                maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
+                                boxes={[]}
+                                onStyleChange={handleStyleChange}
+                            />
+                            <BoxVisualizer
+                                borderRadius={boxColors.styles?.borderRadius ?? 8}
+                                shadowIntensity={boxColors.styles?.shadowIntensity ?? 0.25}
+                                opacity={boxColors.styles?.opacity ?? 1}
+                                showBorder={boxColors.styles?.showBorder ?? true}
+                                onStyleChange={handleStyleChange}
+                            />
                         </div>
                     </div>
                 </div>

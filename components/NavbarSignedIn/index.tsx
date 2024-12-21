@@ -87,8 +87,8 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     }, []);
 
     return (
-        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 lg:fixed lg:flex lg:h-14'>
-            <div className='relative z-[110] h-full w-full px-4'>
+        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 border-b border-[#222] lg:fixed lg:flex lg:h-14'>
+            <div className='relative z-[110] h-full w-full bg-gradient-to-b from-black to-[#0A0A0A] px-4'>
                 <div className='flex h-full items-center justify-between'>
                     <Link href='/dashboard' className='relative z-[110] flex items-center gap-2'>
                         <div className='flex h-8 w-8 items-center'>
