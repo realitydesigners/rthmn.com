@@ -1,47 +1,53 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 
-export const DraggableBorder: React.FC<{
+interface DraggableBorderProps {
     onResize: (delta: number) => void;
-}> = React.memo(({ onResize }) => {
-    const [isDragging, setIsDragging] = useState(false);
+    position?: 'left' | 'right';
+}
 
-    const handleDragStart = useCallback((e: React.MouseEvent) => {
-        setIsDragging(true);
+export const DraggableBorder: React.FC<DraggableBorderProps> = ({ onResize, position = 'left' }) => {
+    const [isDragging, setIsDragging] = useState(false);
+    const [startX, setStartX] = useState(0);
+
+    const handleMouseDown = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
+        setIsDragging(true);
+        setStartX(e.clientX);
+    }, []);
+
+    const handleMouseMove = useCallback(
+        (e: MouseEvent) => {
+            if (!isDragging) return;
+
+            const delta = e.clientX - startX;
+            onResize(position === 'left' ? delta : -delta);
+            setStartX(e.clientX);
+        },
+        [isDragging, startX, onResize, position]
+    );
+
+    const handleMouseUp = useCallback(() => {
+        setIsDragging(false);
     }, []);
 
     useEffect(() => {
-        if (!isDragging) return;
-
-        const startX = window.innerWidth;
-        let lastX = startX;
-
-        const handleMouseMove = (e: MouseEvent) => {
-            const currentX = e.clientX;
-            const delta = lastX - currentX;
-            lastX = currentX;
-            onResize(delta);
-        };
-
-        const handleMouseUp = () => {
-            setIsDragging(false);
-        };
-
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
+        if (isDragging) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        }
 
         return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isDragging, onResize]);
+    }, [isDragging, handleMouseMove, handleMouseUp]);
 
     return (
         <div
-            className={`absolute top-0 bottom-0 left-0 z-10 w-[1px] cursor-ew-resize rounded-full bg-[#181818] transition-all duration-200 hover:w-[3px] hover:bg-blue-400 ${
+            onMouseDown={handleMouseDown}
+            className={`absolute top-0 bottom-0 ${position === 'left' ? '-left-[1px]' : '-right-[1px]'} z-[91] w-[1px] cursor-ew-resize rounded-full bg-[#181818] transition-all duration-200 hover:w-[3px] hover:bg-blue-400 ${
                 isDragging ? 'shadow-2xl shadow-blue-500' : 'hover:shadow-2xl hover:shadow-blue-500'
             }`}
-            onMouseDown={handleDragStart}
         />
     );
-});
+};

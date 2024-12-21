@@ -52,7 +52,8 @@ export const Sidebar = () => {
                     isSettingsOpen ? 'translate-x-0' : 'translate-x-full'
                 )}
                 style={{ width: `${width}px` }}>
-                <DraggableBorder onResize={(delta) => handleResize(width - delta)} />
+                <DraggableBorder onResize={(delta) => handleResize(width - delta)} position='left' />
+                <DraggableBorder onResize={(delta) => handleResize(width + delta)} position='right' />
                 <SettingsBar isOpen={true} onToggle={() => setIsSettingsOpen(false)} variant='sidebar' />
             </div>
 
