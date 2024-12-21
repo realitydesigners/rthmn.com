@@ -1,8 +1,8 @@
 'use client';
-import React, { useState, useEffect, useCallback } from 'react';
-import { LuChevronRight, LuPipette, LuRotateCcw } from 'react-icons/lu';
+import React, { useState, useEffect } from 'react';
+import { LuRotateCcw } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider';
-import { colorPresets, fullPresets, type FullPreset } from '@/utils/localStorage';
+import { fullPresets, type FullPreset } from '@/utils/localStorage';
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
@@ -22,25 +22,6 @@ const useDebounce = (value: any, delay: number) => {
 
     return debouncedValue;
 };
-
-const ColorPicker = ({ label, color, onChange }: { label: string; color: string; onChange: (color: string) => void }) => (
-    <div className='group relative flex h-8 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-2.5 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
-        <div className='flex items-center gap-2'>
-            <div className='relative'>
-                <div
-                    className='h-5 w-5 rounded-full shadow-lg transition-transform group-hover:scale-105'
-                    style={{
-                        background: `linear-gradient(45deg, ${color}, ${color}dd)`,
-                        boxShadow: `0 0 10px ${color}33`,
-                    }}
-                />
-                <LuPipette className='absolute -right-1 -bottom-1 h-2.5 w-2.5 text-gray-500' />
-            </div>
-            <span className='font-mono text-[11px] font-medium tracking-wide text-gray-400 group-hover:text-gray-300'>{label}</span>
-        </div>
-        <input type='color' value={color} onChange={(e) => onChange(e.target.value)} className='invisible absolute h-5 w-5 cursor-pointer group-hover:visible' />
-    </div>
-);
 
 const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset; isSelected: boolean; onClick: () => void }) => (
     <button
@@ -123,21 +104,6 @@ export const SettingsBar = () => {
         }));
     };
 
-    const handleColorChange = (type: 'positive' | 'negative', color: string) => {
-        setLocalBoxColors((prev) => ({
-            ...prev,
-            [type]: color,
-        }));
-    };
-
-    const handlePresetClick = (preset: { positive: string; negative: string }) => {
-        setLocalBoxColors((prev) => ({
-            ...prev,
-            positive: preset.positive,
-            negative: preset.negative,
-        }));
-    };
-
     const handleFullPresetClick = (preset: FullPreset) => {
         setLocalBoxColors({
             positive: preset.positive,
@@ -191,10 +157,6 @@ export const SettingsBar = () => {
                 <div className='space-y-4'>
                     {/* Full Presets Section */}
                     <div>
-                        <div className='mb-2 flex items-center gap-2'>
-                            <h3 className='text-[11px] font-medium text-gray-400'>Presets</h3>
-                            <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
-                        </div>
                         <div className='grid grid-cols-2 gap-2'>
                             {fullPresets.map((preset) => (
                                 <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
@@ -204,25 +166,19 @@ export const SettingsBar = () => {
 
                     {/* Box Styles Section */}
                     <div>
-                        <div className='mb-2 flex items-center gap-2'>
-                            <h3 className='text-[11px] font-medium text-gray-400'>Box Styles</h3>
-                            <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
-                        </div>
-                        <div className='p-2.5'>
-                            <PatternVisualizer
-                                startIndex={localBoxColors.styles?.startIndex ?? 0}
-                                maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
-                                boxes={[]}
-                                onStyleChange={handleStyleChange}
-                            />
-                            <BoxVisualizer
-                                borderRadius={localBoxColors.styles?.borderRadius ?? 8}
-                                shadowIntensity={localBoxColors.styles?.shadowIntensity ?? 0.25}
-                                opacity={localBoxColors.styles?.opacity ?? 1}
-                                showBorder={localBoxColors.styles?.showBorder ?? true}
-                                onStyleChange={handleStyleChange}
-                            />
-                        </div>
+                        <PatternVisualizer
+                            startIndex={localBoxColors.styles?.startIndex ?? 0}
+                            maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
+                            boxes={[]}
+                            onStyleChange={handleStyleChange}
+                        />
+                        <BoxVisualizer
+                            borderRadius={localBoxColors.styles?.borderRadius ?? 8}
+                            shadowIntensity={localBoxColors.styles?.shadowIntensity ?? 0.25}
+                            opacity={localBoxColors.styles?.opacity ?? 1}
+                            showBorder={localBoxColors.styles?.showBorder ?? true}
+                            onStyleChange={handleStyleChange}
+                        />
                     </div>
                 </div>
             </div>
