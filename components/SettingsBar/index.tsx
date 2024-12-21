@@ -179,18 +179,6 @@ export const SettingsBar = () => {
                         </div>
                     </div>
 
-                    {/* Colors Section */}
-                    <div>
-                        <div className='mb-2 flex items-center gap-2'>
-                            <h3 className='text-[11px] font-medium text-gray-400'>Colors</h3>
-                            <div className='h-px flex-1 bg-gradient-to-r from-blue-500/20 to-transparent' />
-                        </div>
-                        <div className='flex gap-2'>
-                            <ColorPicker label='Positive' color={boxColors.positive} onChange={(color) => handleColorChange('positive', color)} />
-                            <ColorPicker label='Negative' color={boxColors.negative} onChange={(color) => handleColorChange('negative', color)} />
-                        </div>
-                    </div>
-
                     {/* Box Styles Section */}
                     <div>
                         <div className='mb-2 flex items-center gap-2'>
