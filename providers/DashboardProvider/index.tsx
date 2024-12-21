@@ -4,7 +4,7 @@ import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { BoxSlice, PairData, OHLC } from '@/types/types';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { getSelectedPairs, setSelectedPairs, getBoxColors, setBoxColors, BoxColors } from '@/utils/localStorage';
+import { BoxColors, getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS } from '@/utils/localStorage';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 
 interface DashboardContextType {
@@ -24,21 +24,29 @@ export const AVAILABLE_PAIRS = [...FOREX_PAIRS, ...CRYPTO_PAIRS] as const;
 
 export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const queryClient = useQueryClient();
-    const [selectedPairs, setSelected] = useState<string[]>([]);
+    const [selectedPairs, setSelectedPairs] = useState<string[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(true);
-    const [boxColors, setBoxColorsState] = useState<BoxColors>(getBoxColors());
+    const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
 
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
 
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices } = useWebSocket();
 
+    // Initialize state from localStorage after mount
+    useEffect(() => {
+        const storedColors = getBoxColors();
+        const storedPairs = getSelectedPairs();
+        setBoxColorsState(storedColors);
+        setSelectedPairs(storedPairs);
+    }, []);
+
     // Load selected pairs from localStorage
     useEffect(() => {
         if (!isAuthenticated) return;
         const stored = getSelectedPairs();
         const initialPairs = stored.length > 0 ? stored : ['GBPUSD', 'USDJPY', 'AUDUSD'];
-        setSelected(initialPairs);
+        setSelectedPairs(initialPairs);
         if (stored.length === 0) {
             setSelectedPairs(initialPairs);
         }
@@ -109,7 +117,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         const wasSelected = selectedPairs.includes(pair);
         const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
 
-        setSelected(newSelected);
+        setSelectedPairs(newSelected);
         setSelectedPairs(newSelected);
 
         if (wasSelected) {
@@ -138,7 +146,7 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         isLoading: pairDataQuery.isLoading,
         togglePair,
         isConnected,
-        boxColors,
+        boxColors: boxColorsState,
         updateBoxColors,
         isAuthenticated,
     };

@@ -258,3 +258,8 @@
     right: 12px;
     transform: rotate(180deg);
 }
+
+/* Hide navbar in user layout */
+:is([class*='dashboard'], [class*='test']) .user-layout-hidden {
+    display: none;
+}
