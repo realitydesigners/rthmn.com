@@ -34,7 +34,7 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
             backgroundImage: isSelected ? `linear-gradient(135deg, #181818, #0A0A0A)` : `linear-gradient(135deg, ${preset.positive}11, ${preset.negative}11)`,
         }}>
         {/* Main gradient preview */}
-        <div className='relative h-10 w-10 shrink-0 overflow-hidden rounded-full shadow-xl'>
+        <div className='relative h-8 w-8 shrink-0 overflow-hidden rounded-full shadow-xl'>
             <div
                 className='absolute inset-0 transition-transform group-hover:scale-110'
                 style={{
@@ -59,13 +59,6 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
             <div className='flex items-center justify-between'>
                 <span className='font-mono text-xs font-medium tracking-wider text-gray-300 group-hover:text-white'>{preset.name}</span>
                 {isSelected && <div className='h-1.5 w-1.5 rounded-full bg-blue-400/80 ring-2 shadow-[0_0_10px_rgba(96,165,250,0.5)] ring-blue-400/20' />}
-            </div>
-            <div className='flex items-center gap-2 text-[10px] tracking-wider text-gray-500'>
-                <span>{preset.styles.maxBoxCount}×</span>
-                <span>•</span>
-                <span>{preset.styles.borderRadius}r</span>
-                <span>•</span>
-                <span>{Math.round(preset.styles.opacity * 100)}%</span>
             </div>
         </div>
     </button>

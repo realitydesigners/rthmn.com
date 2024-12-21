@@ -102,33 +102,15 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
 
     return (
         <div className='space-y-4'>
-            <div className='relative h-40 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black'>
+            <div className='relative h-28 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black px-2'>
                 {/* Enhanced Ambient Background Effects */}
                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.12),transparent_70%)]' />
                 <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:12px_12px]' />
                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.4),transparent_70%)]' />
                 <div className='absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-transparent' />
 
-                {/* Trading Style Indicators */}
-                <div className='absolute inset-x-0 top-3 flex justify-between px-6'>
-                    <div className='flex w-full justify-between text-[11px] font-medium'>
-                        <div className='flex flex-col items-center'>
-                            <span className='text-white/60'>Scalping</span>
-                            <div className='mt-1 h-[2px] w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                        </div>
-                        <div className='flex flex-col items-center'>
-                            <span className='text-white/60'>Intraday</span>
-                            <div className='mt-1 h-[2px] w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                        </div>
-                        <div className='flex flex-col items-center'>
-                            <span className='text-white/60'>Swing</span>
-                            <div className='mt-1 h-[2px] w-16 bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                        </div>
-                    </div>
-                </div>
-
                 {/* Main visualization area */}
-                <div className='relative h-full px-6 pt-14 pb-16'>
+                <div className='relative h-full px-6 pt-4 pb-1'>
                     <div ref={barContainerRef} className='group/bars relative flex h-14 items-center rounded-lg bg-white/[0.02]'>
                         {Array.from({ length: 38 }).map((_, i) => {
                             const isSelected = i >= startIndex && i < startIndex + maxBoxCount;
@@ -139,7 +121,7 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
                             return (
                                 <div
                                     key={i}
-                                    className='flex h-full flex-1 items-center px-[0.5px]'
+                                    className='flex h-full flex-1 items-center'
                                     onMouseDown={(e) => {
                                         if (isSelected) {
                                             handleMouseDown(e, 'position');
@@ -211,33 +193,29 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
                                 <div className='absolute inset-y-3 left-[8px] w-[2px] bg-gradient-to-b from-white/50 via-white/40 to-white/50 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-all duration-150 group-hover/right:from-white/70 group-hover/right:via-white/60 group-hover/right:to-white/70 group-hover/right:shadow-[0_0_15px_rgba(255,255,255,0.4)]' />
                                 <div className='absolute inset-y-3 left-[7px] w-[3px] bg-gradient-to-l from-white/0 to-white/10 opacity-0 transition-all duration-150 group-hover/right:opacity-100' />
                             </div>
-
-                            {/* Vertical highlight lines with enhanced glow */}
-                            <div className='absolute -bottom-14 left-0 h-14 w-[2px] bg-gradient-to-b from-white/40 via-white/30 to-transparent shadow-[0_0_10px_rgba(255,255,255,0.2)]' />
-                            <div className='absolute right-0 -bottom-14 h-14 w-[2px] bg-gradient-to-b from-white/40 via-white/30 to-transparent shadow-[0_0_10px_rgba(255,255,255,0.2)]' />
                         </div>
                     </div>
 
                     {/* Integrated Timeframe Scale with Active Indicator */}
-                    <div className='absolute inset-x-0 bottom-4 flex justify-between px-0'>
+                    <div className='absolute inset-x-0 bottom-1 flex justify-between px-4'>
                         <div className='relative flex w-full justify-between text-[11px] font-medium'>
-                            {['1m', '5m', '15m', '30m', '1H', '2H', '4H', '8H', '12H', 'D'].map((time, i) => {
-                                // Improved calculation for timeframe positions
-                                const totalPositions = 38;
-                                const position = Math.floor((i / 9) * totalPositions);
-                                const nextPosition = Math.floor(((i + 1) / 9) * totalPositions);
+                            {['1m', '5m', '15m', '1H', '2H', '4H', '12H', 'D'].map((time, i) => {
+                                // More accurate position calculation
+                                const segmentWidth = 38 / 9; // Width of each timeframe segment
+                                const position = Math.round(i * segmentWidth);
+                                const nextPosition = Math.round((i + 1) * segmentWidth);
 
-                                // Check if any part of this timeframe's range is selected
+                                // More precise range check
                                 const isInRange =
                                     (position >= startIndex && position <= startIndex + maxBoxCount) ||
-                                    (nextPosition >= startIndex && nextPosition <= startIndex + maxBoxCount) ||
+                                    (nextPosition > startIndex && nextPosition <= startIndex + maxBoxCount) ||
                                     (position <= startIndex && nextPosition >= startIndex + maxBoxCount);
 
                                 return (
                                     <div key={time} className='relative flex flex-col items-center'>
                                         <div
                                             className={cn(
-                                                'mb-1 h-1 w-[1px] transition-all duration-300',
+                                                'mb-1 h-3 w-[1px] transition-all duration-300',
                                                 isInRange
                                                     ? 'bg-gradient-to-b from-white/60 to-transparent shadow-[0_0_10px_rgba(255,255,255,0.3)]'
                                                     : 'bg-gradient-to-b from-white/20 to-transparent'
