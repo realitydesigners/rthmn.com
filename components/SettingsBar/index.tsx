@@ -127,7 +127,7 @@ export const SettingsBar = () => {
 
     return (
         <div className='flex h-full flex-col'>
-            <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth pb-4'>
+            <div className='flex-1 overflow-y-visible'>
                 <div className='flex flex-col gap-4'>
                     {/* Full Presets Section */}
 
