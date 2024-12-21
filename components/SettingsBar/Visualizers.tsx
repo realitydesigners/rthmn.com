@@ -12,28 +12,14 @@ interface PatternVisualizerProps {
 
 export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange }) => {
     const barContainerRef = useRef<HTMLDivElement>(null);
+    const lastXRef = useRef(0);
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
         dragType: 'left' | 'right' | 'position' | null;
-        startX: number;
-        initialStartIndex: number;
-        initialMaxBoxCount: number;
     }>({
         isDragging: false,
         dragType: null,
-        startX: 0,
-        initialStartIndex: startIndex,
-        initialMaxBoxCount: maxBoxCount,
     });
-
-    // Update dragState when props change
-    useEffect(() => {
-        setDragState((prev) => ({
-            ...prev,
-            initialStartIndex: startIndex,
-            initialMaxBoxCount: maxBoxCount,
-        }));
-    }, [startIndex, maxBoxCount]);
 
     const handleMouseDown = (e: React.MouseEvent, type: 'left' | 'right' | 'position') => {
         e.preventDefault();
@@ -42,41 +28,36 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
         if (!barContainerRef.current) return;
 
         const rect = barContainerRef.current.getBoundingClientRect();
-        setDragState({
-            isDragging: true,
-            dragType: type,
-            startX: e.clientX,
-            initialStartIndex: startIndex,
-            initialMaxBoxCount: maxBoxCount,
-        });
+        const barWidth = rect.width / 38;
+        const startX = e.clientX;
+        let previousIndex = type === 'left' ? startIndex : type === 'right' ? maxBoxCount : startIndex;
 
         const handleGlobalMouseMove = (e: MouseEvent) => {
             if (!barContainerRef.current) return;
 
-            const rect = barContainerRef.current.getBoundingClientRect();
-            const deltaX = e.clientX - dragState.startX;
-            const barWidth = rect.width / 38;
-            const deltaIndex = Math.round(deltaX / barWidth);
+            // Calculate total movement from start position
+            const totalDeltaX = e.clientX - startX;
+            const newIndex = Math.round(totalDeltaX / barWidth);
+
+            // Only update if there's a change
+            if (newIndex === 0) return;
 
             switch (type) {
                 case 'left': {
-                    // Adjust start index and max box count while keeping right edge fixed
-                    const newStartIndex = Math.max(0, Math.min(dragState.initialStartIndex + deltaIndex, 36));
-                    const rightEdge = dragState.initialStartIndex + dragState.initialMaxBoxCount;
+                    const newStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 36));
+                    const rightEdge = startIndex + maxBoxCount;
                     const newMaxBoxCount = Math.max(2, rightEdge - newStartIndex);
                     onStyleChange('startIndex', newStartIndex);
                     onStyleChange('maxBoxCount', newMaxBoxCount);
                     break;
                 }
                 case 'right': {
-                    // Adjust max box count while keeping left edge fixed
-                    const newMaxBoxCount = Math.max(2, Math.min(dragState.initialMaxBoxCount + deltaIndex, 38 - startIndex));
+                    const newMaxBoxCount = Math.max(2, Math.min(previousIndex + newIndex, 38 - startIndex));
                     onStyleChange('maxBoxCount', newMaxBoxCount);
                     break;
                 }
                 case 'position': {
-                    // Move the entire selection
-                    const newPosition = Math.max(0, Math.min(dragState.initialStartIndex + deltaIndex, 38 - maxBoxCount));
+                    const newPosition = Math.max(0, Math.min(previousIndex + newIndex, 38 - maxBoxCount));
                     onStyleChange('startIndex', newPosition);
                     break;
                 }
@@ -84,7 +65,7 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
         };
 
         const handleGlobalMouseUp = () => {
-            setDragState((prev) => ({ ...prev, isDragging: false, dragType: null }));
+            setDragState({ isDragging: false, dragType: null });
             window.removeEventListener('mousemove', handleGlobalMouseMove);
             window.removeEventListener('mouseup', handleGlobalMouseUp);
         };
@@ -95,73 +76,116 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
 
     return (
         <div className='space-y-4'>
-            <div className='relative h-36 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-black to-[#0A0A0A] p-4'>
-                {/* Refined Grid overlay */}
-                <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
+            <div className='relative h-36 overflow-hidden rounded-lg border border-[#1a1a1a] bg-black p-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.02)]'>
+                {/* Enhanced Grid overlay */}
+                <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.01)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.01)_1px,transparent_1px)] bg-[size:16px_16px]' />
+
+                {/* Scanner line effect */}
+                <div className='absolute inset-0 overflow-hidden'>
+                    <div
+                        className='animate-scan absolute inset-0 bg-gradient-to-b from-transparent via-white/[0.01] to-transparent'
+                        style={{
+                            transform: 'translateY(-100%)',
+                            animation: 'scan 4s linear infinite',
+                        }}
+                    />
+                </div>
 
                 {/* Enhanced Background bars */}
-                <div ref={barContainerRef} className='relative mt-4 flex h-[calc(100%-24px)] items-center'>
+                <div ref={barContainerRef} className='group/bars relative mt-4 flex h-[calc(100%-24px)] items-center'>
                     {Array.from({ length: 38 }).map((_, i) => (
-                        <div key={i} className='flex h-full flex-1 items-center px-[0.5px]'>
+                        <div
+                            key={i}
+                            className='flex h-full flex-1 items-center px-[0.5px]'
+                            onMouseDown={(e) => {
+                                if (i >= startIndex && i < startIndex + maxBoxCount) {
+                                    handleMouseDown(e, 'position');
+                                } else if (Math.abs(i - startIndex) <= 1) {
+                                    handleMouseDown(e, 'left');
+                                } else if (Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1) {
+                                    handleMouseDown(e, 'right');
+                                }
+                            }}>
                             <div
                                 className={cn(
                                     'z-90 h-12 w-full rounded-[1px] transition-all duration-300',
-                                    i >= startIndex && i < startIndex + maxBoxCount ? 'bg-gradient-to-b from-white/[0.25] to-white/[0.05]' : 'bg-white/[0.05]'
+                                    i >= startIndex && i < startIndex + maxBoxCount
+                                        ? 'bg-gradient-to-b from-[#222] to-[#111] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)]'
+                                        : 'cursor-pointer bg-[#0A0A0A] hover:bg-[#111]'
                                 )}
                             />
                         </div>
                     ))}
-                </div>
 
-                {/* Enhanced Selection indicator with drag handles */}
-                <div
-                    className='absolute inset-y-0 ml-1 transition-all duration-300'
-                    style={{
-                        left: `${(startIndex / 38) * 100}%`,
-                        width: `${(maxBoxCount / 38) * 100}%`,
-                    }}>
-                    {/* Left drag handle */}
-                    <div className='group absolute inset-y-4 left-0 -ml-3 w-6 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'left')}>
-                        <div className='absolute inset-0 rounded transition-colors group-hover:bg-white/10' />
-                        <div className='absolute inset-y-0 right-0 w-[1px] bg-white/20 shadow-[0_0_8px_rgba(255,255,255,0.1)] group-hover:bg-white/40' />
-                    </div>
+                    {/* Selection overlay with drag handles */}
+                    <div
+                        className='pointer-events-none absolute inset-y-0 z-100 ml-1 transition-all duration-300 group-hover/bars:shadow-[0_0_0_1px_rgba(59,130,246,0.3),0_0_15px_rgba(59,130,246,0.2)]'
+                        style={{
+                            left: `${(startIndex / 38) * 100}%`,
+                            width: `${(maxBoxCount / 38) * 100}%`,
+                        }}>
+                        {/* Selection overlay */}
+                        <div className='absolute inset-0 bg-gradient-to-b from-blue-500/[0.02] to-transparent opacity-30' />
 
-                    {/* Right drag handle */}
-                    <div className='group absolute inset-y-4 right-0 -mr-3 w-6 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'right')}>
-                        <div className='absolute inset-0 rounded transition-colors group-hover:bg-white/10' />
-                        <div className='absolute inset-y-0 left-0 w-[1px] bg-white/20 shadow-[0_0_8px_rgba(255,255,255,0.1)] group-hover:bg-white/40' />
-                    </div>
-
-                    {/* Middle drag area */}
-                    <div className='group absolute inset-y-4 right-6 left-6 cursor-move' onMouseDown={(e) => handleMouseDown(e, 'position')}>
-                        <div className='absolute inset-0 rounded transition-colors group-hover:bg-white/5' />
-                        <div className='absolute inset-0 rounded opacity-0 transition-opacity group-hover:opacity-100'>
-                            <div className='absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                            <div className='absolute inset-x-0 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent' />
+                        {/* Left edge line */}
+                        <div className='group/left pointer-events-auto absolute -inset-y-4 -left-5 z-50 w-10 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'left')}>
+                            <div className='absolute inset-y-4 right-[18px] w-[2px] rounded-full bg-[#333] transition-all duration-150 group-hover/left:bg-blue-500/50 group-hover/left:shadow-[0_0_10px_rgba(59,130,246,0.5)]' />
+                            <div className='absolute inset-y-4 right-3 w-[20px] opacity-0 transition-all duration-150 group-hover/left:opacity-100'>
+                                <div className='absolute inset-0 rounded-l-lg bg-gradient-to-r from-blue-500/20 to-transparent' />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Value Labels (Top) */}
-                    <div className='absolute top-2 left-0 -translate-x-1/2 text-center'>
-                        <div className='rounded-md px-2 py-0.5'>
-                            <span className='font-mono text-sm font-medium text-white/90'>{startIndex}</span>
+                        {/* Right edge line */}
+                        <div className='group/right pointer-events-auto absolute -inset-y-4 -right-5 z-50 w-10 cursor-ew-resize' onMouseDown={(e) => handleMouseDown(e, 'right')}>
+                            <div className='absolute inset-y-4 left-[18px] w-[2px] rounded-full bg-[#333] transition-all duration-150 group-hover/right:bg-blue-500/50 group-hover/right:shadow-[0_0_10px_rgba(59,130,246,0.5)]' />
+                            <div className='absolute inset-y-4 left-3 w-[20px] opacity-0 transition-all duration-150 group-hover/right:opacity-100'>
+                                <div className='absolute inset-0 rounded-r-lg bg-gradient-to-l from-blue-500/20 to-transparent' />
+                            </div>
                         </div>
-                    </div>
-                    <div className='absolute top-2 right-0 translate-x-1/2 text-center'>
-                        <div className='rounded-md px-2 py-0.5'>
-                            <span className='font-mono text-sm font-medium text-white/90'>{startIndex + maxBoxCount - 1}</span>
-                        </div>
-                    </div>
 
-                    {/* Start/End Labels (Bottom) */}
-                    <div className='absolute bottom-4 left-0 -translate-x-1/2 text-center'>
-                        <div className='font-mono text-[10px] font-medium tracking-wider text-white/40'>START</div>
-                    </div>
-                    <div className='absolute right-0 bottom-4 translate-x-1/2 text-center'>
-                        <div className='font-mono text-[10px] font-medium tracking-wider text-white/40'>END</div>
+                        {/* Corner indicators */}
+                        <div className='absolute -top-0.5 -left-0.5 h-2 w-2 border-t border-l border-[#222]' />
+                        <div className='absolute -top-0.5 -right-0.5 h-2 w-2 border-t border-r border-[#222]' />
+                        <div className='absolute -bottom-0.5 -left-0.5 h-2 w-2 border-b border-l border-[#222]' />
+                        <div className='absolute -right-0.5 -bottom-0.5 h-2 w-2 border-r border-b border-[#222]' />
+
+                        {/* Labels */}
+                        <div className='absolute -top-3 left-0 z-30 -translate-x-1/2 text-center'>
+                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm group-hover/bars:border-blue-500/20'>
+                                <span className='font-mono text-sm font-medium text-[#666] group-hover/bars:text-blue-400'>{startIndex}</span>
+                            </div>
+                        </div>
+                        <div className='absolute -top-3 right-0 z-30 translate-x-1/2 text-center'>
+                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm group-hover/bars:border-blue-500/20'>
+                                <span className='font-mono text-sm font-medium text-[#666] group-hover/bars:text-blue-400'>{startIndex + maxBoxCount - 1}</span>
+                            </div>
+                        </div>
+
+                        {/* Start/End Labels */}
+                        <div className='absolute -bottom-3 left-0 z-30 -translate-x-1/2 text-center'>
+                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm'>
+                                <div className='font-mono text-[10px] font-medium tracking-wider text-[#444]'>START</div>
+                            </div>
+                        </div>
+                        <div className='absolute right-0 -bottom-3 z-30 translate-x-1/2 text-center'>
+                            <div className='rounded-md border border-[#222] bg-black/90 px-2.5 py-1.5 shadow-lg backdrop-blur-sm'>
+                                <div className='font-mono text-[10px] font-medium tracking-wider text-[#444]'>END</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            <style jsx global>{`
+                @keyframes scan {
+                    0% {
+                        transform: translateY(-100%);
+                    }
+                    100% {
+                        transform: translateY(100%);
+                    }
+                }
+            `}</style>
         </div>
     );
 };
