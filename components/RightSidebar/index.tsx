@@ -2,30 +2,53 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { DraggableBorder } from '@/components/DraggableBorder';
 import { cn } from '@/utils/cn';
-
-import { LuSettings } from 'react-icons/lu';
+import { LuSettings, LuGraduationCap } from 'react-icons/lu';
 import { SettingsBar } from '@/components/SettingsBar';
+import { Tutorial } from './Tutorial';
 import { useScrollLock } from '@/hooks/useScrollLock';
 
+type ActivePanel = 'settings' | 'tutorial' | null;
+
 export const RightSidebar = () => {
-    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-    useScrollLock(isSettingsOpen);
+    const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+    useScrollLock(activePanel !== null);
+
+    const handlePanelToggle = (panel: ActivePanel) => {
+        setActivePanel((prev) => (prev === panel ? null : panel));
+    };
 
     return (
         <>
             {/* Settings Panel */}
-            <SidebarContent isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)}>
+            <SidebarContent isOpen={activePanel === 'settings'} onClose={() => setActivePanel(null)}>
                 <SettingsBar />
+            </SidebarContent>
+
+            {/* Tutorial Panel */}
+            <SidebarContent isOpen={activePanel === 'tutorial'} onClose={() => setActivePanel(null)}>
+                <Tutorial />
             </SidebarContent>
 
             {/* Fixed Sidebar */}
             <div className='fixed top-14 right-0 bottom-0 z-[90] flex w-14 flex-col items-center justify-between border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
-                <div>{/* Top content if needed */}</div>
+                <div className='flex flex-col gap-2'>
+                    <button
+                        onClick={() => handlePanelToggle('tutorial')}
+                        className={cn(
+                            'group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]',
+                            activePanel === 'tutorial' && 'border-blue-500/20 from-blue-500/10 to-blue-500/5'
+                        )}>
+                        <LuGraduationCap size={20} className={cn('transition-colors', activePanel === 'tutorial' ? 'text-blue-400' : 'text-[#818181] group-hover:text-white')} />
+                    </button>
+                </div>
                 {/* Settings button */}
                 <button
-                    onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-                    className='group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
-                    <LuSettings size={20} className='text-[#818181] transition-colors group-hover:text-white' />
+                    onClick={() => handlePanelToggle('settings')}
+                    className={cn(
+                        'group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]',
+                        activePanel === 'settings' && 'border-blue-500/20 from-blue-500/10 to-blue-500/5'
+                    )}>
+                    <LuSettings size={20} className={cn('transition-colors', activePanel === 'settings' ? 'text-blue-400' : 'text-[#818181] group-hover:text-white')} />
                 </button>
             </div>
         </>
