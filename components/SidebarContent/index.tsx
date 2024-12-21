@@ -31,18 +31,17 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
             const rightSidebar = document.querySelector('.sidebar-content [data-position="right"]');
 
             // Calculate widths for both sidebars if they're open and locked
-            const leftWidth = leftSidebar?.getAttribute('data-locked') === 'true' ? parseInt(leftSidebar?.getAttribute('data-width') || '0') + 16 : 0;
-            const rightWidth = rightSidebar?.getAttribute('data-locked') === 'true' ? parseInt(rightSidebar?.getAttribute('data-width') || '0') + 16 : 0;
+            const leftWidth = leftSidebar?.getAttribute('data-locked') === 'true' ? parseInt(leftSidebar?.getAttribute('data-width') || '0') : 0;
+            const rightWidth = rightSidebar?.getAttribute('data-locked') === 'true' ? parseInt(rightSidebar?.getAttribute('data-width') || '0') : 0;
 
             if (isOpen && isLocked) {
                 // When locked, adjust content width and margin
-                const sidebarWidth = width + 0; // Add padding
                 if (position === 'left') {
-                    main.style.marginLeft = `${sidebarWidth}px`;
-                    main.style.width = `calc(100vw - ${sidebarWidth + rightWidth}px)`;
+                    main.style.marginLeft = `${width}px`;
+                    main.style.width = `calc(100vw - ${width + rightWidth}px)`;
                 } else {
-                    main.style.marginRight = `${sidebarWidth}px`;
-                    main.style.width = `calc(100vw - ${leftWidth + sidebarWidth}px)`;
+                    main.style.marginRight = `${width}px`;
+                    main.style.width = `calc(100vw - ${leftWidth + width}px)`;
                 }
             } else {
                 // When unlocked or closed, only respect the other locked sidebar
