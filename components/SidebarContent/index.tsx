@@ -80,21 +80,34 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
                 )}>
                 <div className='relative flex h-full w-full flex-col rounded-lg bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
                     {/* Header Section */}
-                    <div className='relative z-10 mb-2 flex h-12 items-center justify-between px-4'>
-                        <div className='flex items-center gap-2'>
-                            <h2 className='font-kodemono text-xs font-medium tracking-widest uppercase'>{title}</h2>
-                            <div className='h-1.5 w-1.5 animate-pulse rounded-full bg-white/20'></div>
+                    <div className='relative z-10 flex h-12 items-center justify-between px-2'>
+                        {position === 'right' && (
+                            <button
+                                onClick={onLockToggle}
+                                className={cn(
+                                    'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
+                                    isLocked
+                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                                        : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
+                                )}>
+                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
+                            </button>
+                        )}
+                        <div className={cn('flex items-center justify-center gap-2', position === 'right' && 'flex-1 justify-end')}>
+                            <h2 className='font-kodemono text-[10px] font-medium tracking-widest uppercase'>{title}</h2>
                         </div>
-                        <button
-                            onClick={onLockToggle}
-                            className={cn(
-                                'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
-                                isLocked
-                                    ? 'from-white/10 to-white/5 text-white'
-                                    : 'from-[#1A1A1A]/40 via-[#151515]/40 to-[#111]/40 text-[#666] hover:from-[#1A1A1A]/50 hover:via-[#151515]/50 hover:to-[#111]/50 hover:text-white/90'
-                            )}>
-                            {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
-                        </button>
+                        {position === 'left' && (
+                            <button
+                                onClick={onLockToggle}
+                                className={cn(
+                                    'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
+                                    isLocked
+                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                                        : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
+                                )}>
+                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
+                            </button>
+                        )}
                     </div>
 
                     {/* Content Section */}

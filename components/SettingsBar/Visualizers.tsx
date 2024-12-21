@@ -197,8 +197,8 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
                     </div>
 
                     {/* Integrated Timeframe Scale with Active Indicator */}
-                    <div className='absolute inset-x-0 bottom-1 flex justify-between px-4'>
-                        <div className='relative flex w-full justify-between text-[11px] font-medium'>
+                    <div className='absolute inset-x-0 bottom-1 flex justify-between px-2'>
+                        <div className='font-kodemono relative flex w-full justify-between text-[11px] font-medium'>
                             {['1m', '5m', '15m', '1H', '2H', '4H', '12H', 'D'].map((time, i) => {
                                 // More accurate position calculation
                                 const segmentWidth = 38 / 9; // Width of each timeframe segment

@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { LuRotateCcw } from 'react-icons/lu';
+import { LuRotateCcw, LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { fullPresets, type FullPreset } from '@/utils/localStorage';
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
@@ -27,16 +27,15 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
     <button
         onClick={onClick}
         className={cn(
-            'group relative flex h-12 items-center gap-3 overflow-hidden rounded-lg border border-[#222] p-3 text-left transition-all hover:border-[#333]',
-            isSelected ? 'from-[#181818] to-[#0A0A0A] shadow-[0_0_30px_rgba(0,0,0,0.5)]' : 'from-[#141414] to-[#0A0A0A]'
-        )}
-        style={{
-            backgroundImage: isSelected ? `linear-gradient(135deg, #181818, #0A0A0A)` : `linear-gradient(135deg, ${preset.positive}11, ${preset.negative}11)`,
-        }}>
+            'group relative flex h-[72px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border bg-gradient-to-b p-2 transition-all duration-200',
+            isSelected
+                ? 'border-[#333] from-[#181818] to-[#0F0F0F] shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414]'
+                : 'border-[#222] from-[#141414] to-[#0A0A0A] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
+        )}>
         {/* Main gradient preview */}
-        <div className='relative h-8 w-8 shrink-0 overflow-hidden rounded-full shadow-xl'>
+        <div className='relative h-8 w-8 overflow-hidden rounded-full shadow-xl'>
             <div
-                className='absolute inset-0 transition-transform group-hover:scale-110'
+                className='absolute inset-0 transition-transform duration-200 group-hover:scale-110'
                 style={{
                     background: `radial-gradient(circle at 30% 30%, ${preset.positive}, ${preset.negative})`,
                     boxShadow: `
@@ -49,11 +48,9 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
         </div>
 
         {/* Content */}
-        <div className='relative flex flex-1 flex-col justify-between gap-1'>
-            <div className='flex items-center justify-between'>
-                <span className='font-mono text-xs font-medium tracking-wider text-gray-300 group-hover:text-white'>{preset.name}</span>
-                {isSelected && <div className='h-1.5 w-1.5 rounded-full bg-blue-400/80 ring-2 shadow-[0_0_10px_rgba(96,165,250,0.5)] ring-blue-400/20' />}
-            </div>
+        <div className='relative flex items-center gap-1.5'>
+            <span className='font-kodemono text-[9px] font-medium tracking-widest text-[#666] uppercase transition-colors group-hover:text-[#818181]'>{preset.name}</span>
+            {isSelected && <div className='h-1 w-1 rounded-full bg-blue-400/80 ring-1 shadow-[0_0_10px_rgba(96,165,250,0.5)] ring-blue-400/20' />}
         </div>
     </button>
 );
@@ -62,6 +59,7 @@ export const SettingsBar = () => {
     const { boxColors, updateBoxColors, togglePair, selectedPairs } = useDashboard();
     const [mounted, setMounted] = useState(false);
     const [localBoxColors, setLocalBoxColors] = useState(boxColors);
+    const [showColors, setShowColors] = useState(true);
 
     const debouncedBoxColors = useDebounce(localBoxColors, 150);
 
@@ -128,13 +126,45 @@ export const SettingsBar = () => {
     return (
         <div className='flex h-full flex-col'>
             <div className='flex-1 overflow-y-visible'>
-                <div className='flex flex-col gap-4'>
-                    {/* Full Presets Section */}
+                <div className='flex flex-col gap-6'>
+                    {/* Colors Section Toggle */}
+                    <div className='flex flex-col gap-2'>
+                        <button
+                            onClick={() => setShowColors(!showColors)}
+                            className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                            <div className='flex items-center gap-3'>
+                                <div className='relative h-6 w-6 overflow-hidden rounded-full shadow-xl'>
+                                    <div
+                                        className='absolute inset-0'
+                                        style={{
+                                            background: `radial-gradient(circle at 30% 30%, ${localBoxColors.positive}, ${localBoxColors.negative})`,
+                                            boxShadow: `
+                                                inset 0 0 15px ${localBoxColors.positive}66,
+                                                inset 2px 2px 4px ${localBoxColors.positive}33,
+                                                0 0 20px ${localBoxColors.positive}22
+                                            `,
+                                        }}
+                                    />
+                                </div>
+                                <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                                    Colors
+                                </span>
+                            </div>
+                            {showColors ? (
+                                <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                            ) : (
+                                <LuChevronDown size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                            )}
+                        </button>
 
-                    <div className='grid grid-cols-1 gap-2'>
-                        {fullPresets.map((preset) => (
-                            <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
-                        ))}
+                        {/* Full Presets Grid */}
+                        {showColors && (
+                            <div className='grid grid-cols-3 gap-2'>
+                                {fullPresets.map((preset) => (
+                                    <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* Box Styles Section */}
@@ -153,6 +183,7 @@ export const SettingsBar = () => {
                             onStyleChange={handleStyleChange}
                         />
                     </div>
+
                     <div className='flex h-12 items-center justify-between'>
                         <button
                             onClick={handleResetSettings}
