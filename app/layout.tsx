@@ -52,7 +52,7 @@ export default async function RootLayout({ children, modal }: { children: React.
             <body className='bg-black'>
                 <SupabaseProvider initialUser={user}>
                     <UserProvider initialUser={user}>
-                        <NavbarSignedOut />
+                        <NavbarSignedOut user={user} />
                         {children}
                         {modal}
                         <div id='modal-root' />

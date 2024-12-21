@@ -1,7 +1,8 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './styles.module.css';
 import { AnimatePresence } from 'motion/react';
 import { User } from '@supabase/supabase-js';
@@ -10,6 +11,7 @@ import { motion } from 'framer-motion';
 import { NavButton } from '@/components/NavButton';
 import { LogoIcon, MenuIcon } from '@/components/Icons/icons';
 import { allLinks, LinkItem } from './allLinks';
+import { createClient } from '@/utils/supabase/client';
 
 interface NavbarSignedOutProps {
     user: User | null;
@@ -70,6 +72,9 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({ title, desc
 export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     const pathname = usePathname();
     const [isNavOpen, setIsNavOpen] = useState(false);
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+    const dropdownRef = useRef<HTMLDivElement>(null);
     const { session, signOut } = useAuth();
     const isproduction = process.env.NODE_ENV === 'production';
 
@@ -77,6 +82,34 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/test') || pathname?.startsWith('/pair')) {
         return null;
     }
+
+    useEffect(() => {
+        const fetchUserDetails = async () => {
+            if (!user) return;
+
+            const supabase = createClient();
+            const { data: userDetails } = await supabase.from('users').select('avatar_url').eq('id', user.id).single();
+
+            if (userDetails?.avatar_url) {
+                setAvatarUrl(userDetails.avatar_url);
+            }
+        };
+
+        fetchUserDetails();
+    }, [user]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         if (isNavOpen) {
@@ -115,10 +148,11 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         }),
     };
 
-    const handleSignOut = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSignOut = async () => {
         await signOut();
     };
+
+    const userInitial = user?.user_metadata?.full_name?.[0].toUpperCase() || user?.email?.[0].toUpperCase() || '?';
 
     return (
         <>
@@ -156,16 +190,48 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                         <div className='flex items-center space-x-4 pr-2'>
                             <motion.div className='mr-2 flex' variants={linkVariants} custom={3}>
                                 {user ? (
-                                    <form onSubmit={handleSignOut}>
-                                        <input type='hidden' name='pathName' value={pathname} />
-                                        <button
-                                            type='submit'
+                                    <div className='flex items-center gap-3'>
+                                        <Link
+                                            href='/dashboard'
                                             className='font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
                                             <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
-                                                Sign out
+                                                Dashboard
                                             </span>
-                                        </button>
-                                    </form>
+                                        </Link>
+                                        <div className='relative' ref={dropdownRef}>
+                                            <button
+                                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                                className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                                <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]'>
+                                                    <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black'>
+                                                        {avatarUrl ? (
+                                                            <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
+                                                        ) : (
+                                                            <span className='text-xs font-bold'>{userInitial}</span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </button>
+                                            {isDropdownOpen && (
+                                                <div className='animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl'>
+                                                    <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
+                                                        <Link
+                                                            href='/account'
+                                                            className='flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                            role='menuitem'>
+                                                            Account
+                                                        </Link>
+                                                        <button
+                                                            onClick={handleSignOut}
+                                                            className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                            role='menuitem'>
+                                                            Sign out
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 ) : (
                                     <Link
                                         href='/signin'
@@ -205,16 +271,48 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                 <MobileMenuContent />
                                 <div className='mt-8'>
                                     {user ? (
-                                        <form onSubmit={handleSignOut}>
-                                            <input type='hidden' name='pathName' value={pathname} />
-                                            <button
-                                                type='submit'
+                                        <div className='flex items-center gap-3'>
+                                            <Link
+                                                href='/dashboard'
                                                 className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
-                                                <span className='py flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 text-sm font-medium'>
-                                                    Sign out
+                                                <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-sm font-medium'>
+                                                    Dashbaord
                                                 </span>
-                                            </button>
-                                        </form>
+                                            </Link>
+                                            <div className='relative' ref={dropdownRef}>
+                                                <button
+                                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                                    className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                                    <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]'>
+                                                        <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black'>
+                                                            {avatarUrl ? (
+                                                                <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
+                                                            ) : (
+                                                                <span className='text-xs font-bold'>{userInitial}</span>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </button>
+                                                {isDropdownOpen && (
+                                                    <div className='animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl'>
+                                                        <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
+                                                            <Link
+                                                                href='/account'
+                                                                className='flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                                role='menuitem'>
+                                                                Account
+                                                            </Link>
+                                                            <button
+                                                                onClick={handleSignOut}
+                                                                className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                                role='menuitem'>
+                                                                Sign out
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     ) : (
                                         <Link
                                             href='/signin'
