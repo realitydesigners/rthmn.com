@@ -84,25 +84,25 @@ export const LeftSidebar = () => {
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar fixed top-14 bottom-0 left-0 z-[100] flex w-16 flex-col items-center justify-center py-4'>
+            <div className='fixed-sidebar fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-center py-4'>
                 <div className='flex flex-col gap-2'>
                     <Link href='/dashboard'>
-                        <button className='group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                        <button className='group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all duration-200 hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20'>
                             <LuLayoutDashboard size={20} className='text-[#818181] transition-colors group-hover:text-white' />
                         </button>
                     </Link>
                     <Link href='/test'>
-                        <button className='group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                        <button className='group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all duration-200 hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20'>
                             <LuOrbit size={20} className='text-[#818181] transition-colors group-hover:text-white' />
                         </button>
                     </Link>
                     <button
                         onClick={() => handlePanelToggle('chart')}
                         className={cn(
-                            'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                            'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all duration-200',
                             activePanel === 'chart'
-                                ? 'border-white/10 from-white/5 to-transparent text-white'
-                                : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
+                                ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                                : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
                         )}>
                         <LuLineChart size={20} className='transition-colors' />
                     </button>

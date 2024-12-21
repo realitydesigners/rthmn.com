@@ -76,15 +76,15 @@ export const RightSidebar = () => {
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar fixed top-14 right-0 bottom-0 z-[100] flex w-16 flex-col items-center justify-between py-4'>
+            <div className='fixed-sidebar fixed top-14 right-0 bottom-0 z-[120] flex w-16 flex-col items-center justify-between py-4'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}
                     className={cn(
-                        'sidebar-toggle group flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all',
+                        'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all duration-200',
                         activePanel === 'settings'
-                            ? 'border-white/10 from-white/5 to-transparent text-white'
-                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white'
+                            ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
                     )}>
                     <LuSettings size={20} className='transition-colors' />
                 </button>
