@@ -3,12 +3,30 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { DraggableBorder } from '@/components/DraggableBorder';
 import { cn } from '@/utils/cn';
 import Link from 'next/link';
-import { LuMenu, LuOrbit, LuLayoutDashboard } from 'react-icons/lu';
+import { LuMenu, LuOrbit, LuLayoutDashboard, LuLineChart } from 'react-icons/lu';
+import { FaTimes } from 'react-icons/fa';
 import { useScrollLock } from '@/hooks/useScrollLock';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { useDashboard } from '@/providers/DashboardProvider';
+
+interface InstrumentGroup {
+    label: string;
+    items: readonly string[];
+}
+
+const instrumentGroups: readonly InstrumentGroup[] = [
+    { label: 'FX', items: FOREX_PAIRS },
+    { label: 'CRYPTO', items: CRYPTO_PAIRS },
+] as const;
 
 export const LeftSidebar = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const { selectedPairs, togglePair, pairData } = useDashboard();
     useScrollLock(isOpen);
+
+    const formatPrice = (price: number) => {
+        return price.toFixed(price >= 100 ? 2 : 5);
+    };
 
     return (
         <>
@@ -22,7 +40,78 @@ export const LeftSidebar = () => {
                         </div>
                     </div>
 
-                    <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth p-3'>{/* Add your menu content here */}</div>
+                    <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth p-3'>
+                        {/* Selected Pairs Section */}
+                        {selectedPairs.length > 0 && (
+                            <div className='mb-4'>
+                                <div className='font-kodemono mb-2 flex h-8 items-center text-xs font-medium tracking-wider text-[#818181]'>
+                                    <span className='uppercase'>My Symbols</span>
+                                </div>
+                                <div className='space-y-1'>
+                                    {selectedPairs.map((item) => (
+                                        <div
+                                            key={item}
+                                            className='group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-[#333]'>
+                                            <div className='flex items-center overflow-hidden'>
+                                                <span className='font-outfit truncate text-[13px] font-bold tracking-wider text-white'>{item}</span>
+                                            </div>
+                                            <div className='flex shrink-0 items-center'>
+                                                <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-3'>
+                                                    {pairData[item]?.currentOHLC?.close ? formatPrice(pairData[item]?.currentOHLC?.close) : 'N/A'}
+                                                </span>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        togglePair(item);
+                                                    }}
+                                                    className='flex h-5 w-5 items-center justify-center rounded border border-red-400 bg-red-400/80 opacity-0 transition-all group-hover:opacity-100 hover:text-white'>
+                                                    <FaTimes size={10} className='text-black' />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Available Pairs Sections */}
+                        {instrumentGroups.map((group) => {
+                            const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
+                            if (availablePairs.length === 0) return null;
+
+                            return (
+                                <div key={group.label} className='mb-4'>
+                                    <div className='font-kodemono mb-2 flex h-8 items-center text-xs font-medium tracking-wider text-[#818181]'>
+                                        <span className='uppercase'>{group.label}</span>
+                                    </div>
+                                    <div className='space-y-1'>
+                                        {availablePairs.map((item) => (
+                                            <div
+                                                key={item}
+                                                className='group flex h-9 cursor-default items-center justify-between border-l-2 border-transparent px-2 transition-all select-none hover:border-[#333] hover:bg-[#111]'>
+                                                <div className='flex items-center'>
+                                                    <span className='font-outfit text-[13px] font-bold tracking-wider text-white'>{item}</span>
+                                                </div>
+                                                <div className='flex items-center'>
+                                                    <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-3'>
+                                                        {pairData[item]?.currentOHLC?.close ? formatPrice(pairData[item]?.currentOHLC?.close) : 'N/A'}
+                                                    </span>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            togglePair(item);
+                                                        }}
+                                                        className='flex h-5 w-5 items-center justify-center rounded border border-emerald-400 bg-emerald-400/80 opacity-0 transition-all group-hover:opacity-100 hover:text-white'>
+                                                        <span className='text-[12px] font-bold text-black'>+</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
                 </div>
             </SidebarContent>
 
@@ -39,6 +128,11 @@ export const LeftSidebar = () => {
                             <LuOrbit size={20} className='text-[#818181] transition-colors group-hover:text-white' />
                         </button>
                     </Link>
+                    <button
+                        onClick={() => setIsOpen(!isOpen)}
+                        className='group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                        <LuLineChart size={20} className='text-[#818181] transition-colors group-hover:text-white' />
+                    </button>
                 </div>
                 {/* Menu button */}
                 <button
