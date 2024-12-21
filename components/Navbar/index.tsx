@@ -1,25 +1,16 @@
 'use client';
-import { useAuth } from '@/providers/SupabaseProvider';
-import { NavbarSignedIn } from '@/components/NavbarSignedIn';
 import { NavbarSignedOut } from './NavbarSignedOut';
-import { QueryProvider } from '@/providers/QueryProvider';
-import { WebSocketProvider } from '@/providers/WebsocketProvider';
-import { DashboardProvider } from '@/providers/DashboardProvider';
+import { usePathname } from 'next/navigation';
 
 export const Navbar = () => {
-    const { user } = useAuth();
+    const pathname = usePathname();
 
-    if (!user) {
-        return <NavbarSignedOut user={null} />;
+    // Don't render navbar for user routes
+    if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/test') || pathname?.startsWith('/pair')) {
+        return null;
     }
 
-    return (
-        <QueryProvider>
-            <WebSocketProvider>
-                <DashboardProvider>
-                    <NavbarSignedIn user={user} />
-                </DashboardProvider>
-            </WebSocketProvider>
-        </QueryProvider>
-    );
+    return <NavbarSignedOut user={null} />;
 };
+
+export { NavbarSignedOut };
