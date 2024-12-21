@@ -27,7 +27,7 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
     <button
         onClick={onClick}
         className={cn(
-            'group relative flex h-16 items-center gap-3 overflow-hidden rounded-lg border border-[#222] p-3 text-left transition-all hover:border-[#333]',
+            'group relative flex h-12 items-center gap-3 overflow-hidden rounded-lg border border-[#222] p-3 text-left transition-all hover:border-[#333]',
             isSelected ? 'from-[#181818] to-[#0A0A0A] shadow-[0_0_30px_rgba(0,0,0,0.5)]' : 'from-[#141414] to-[#0A0A0A]'
         )}
         style={{
@@ -44,12 +44,6 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
                         inset 2px 2px 4px ${preset.positive}33,
                         0 0 20px ${preset.positive}22
                     `,
-                }}
-            />
-            <div
-                className='absolute inset-0 opacity-60'
-                style={{
-                    background: `conic-gradient(from 225deg at 40% 40%, transparent 0deg, ${preset.positive}22 90deg, transparent 180deg)`,
                 }}
             />
         </div>
@@ -133,19 +127,18 @@ export const SettingsBar = () => {
 
     return (
         <div className='flex h-full flex-col'>
-            <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth p-3'>
-                <div className='space-y-4 pb-20'>
+            <div className='scrollbar-none flex-1 touch-pan-y overflow-y-scroll scroll-smooth pb-4'>
+                <div className='flex flex-col gap-4'>
                     {/* Full Presets Section */}
-                    <div>
-                        <div className='grid grid-cols-2 gap-2'>
-                            {fullPresets.map((preset) => (
-                                <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
-                            ))}
-                        </div>
+
+                    <div className='grid grid-cols-1 gap-2'>
+                        {fullPresets.map((preset) => (
+                            <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
+                        ))}
                     </div>
 
                     {/* Box Styles Section */}
-                    <div>
+                    <div className='flex flex-col gap-8'>
                         <PatternVisualizer
                             startIndex={localBoxColors.styles?.startIndex ?? 0}
                             maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
@@ -160,7 +153,7 @@ export const SettingsBar = () => {
                             onStyleChange={handleStyleChange}
                         />
                     </div>
-                    <div className='flex h-12 items-center justify-between px-3'>
+                    <div className='flex h-12 items-center justify-between'>
                         <button
                             onClick={handleResetSettings}
                             className='group flex h-7 items-center gap-1.5 rounded-md border border-[#333] bg-gradient-to-b from-[#111] to-[#0A0A0A] px-2 text-[#818181] transition-all hover:border-red-500/20 hover:bg-red-500/5 hover:text-red-500'>

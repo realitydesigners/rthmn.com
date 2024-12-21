@@ -102,7 +102,7 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
 
     return (
         <div className='space-y-4'>
-            <div className='relative h-28 overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-[#0A0A0A] to-black px-2'>
+            <div className='relative h-28 overflow-hidden rounded-lg px-2'>
                 {/* Enhanced Ambient Background Effects */}
                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.12),transparent_70%)]' />
                 <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:12px_12px]' />
@@ -256,22 +256,7 @@ interface BoxVisualizerProps {
 export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }) => {
     return (
         <div className='space-y-4'>
-            {/* Enhanced Header */}
-            {/* <div className='flex items-center justify-between rounded-lg border border-white/[0.08] bg-[#0A0A0A] p-3'>
-                <div className='space-y-1'>
-                    <span className='text-[10px] font-medium tracking-wider text-white/50 uppercase'>Visual Parameters</span>
-                    <div className='flex items-center gap-2'>
-                        <span className='font-mono text-sm font-medium text-white/90'>Box Appearance</span>
-                    </div>
-                </div>
-                <div className='flex h-8 items-center gap-2 rounded-md border border-white/[0.05] bg-white/[0.02] px-3 backdrop-blur'>
-                    <div className='h-1 w-1 rounded-full bg-white/50 shadow-[0_0_10px_rgba(255,255,255,0.2)]' />
-                    <span className='font-mono text-xs text-white/50'>PREVIEW</span>
-                </div>
-            </div> */}
-
-            {/* Enhanced Preview Container */}
-            <div className='overflow-hidden rounded-lg border border-white/[0.08] bg-gradient-to-b from-black to-[#0A0A0A]'>
+            <div className='overflow-hidden rounded-lg'>
                 <div className='relative'>
                     {/* Refined Grid background */}
                     <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />

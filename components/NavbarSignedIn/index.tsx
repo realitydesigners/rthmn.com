@@ -93,11 +93,15 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const userInitial = user?.user_metadata?.full_name?.[0].toUpperCase() || user?.email?.[0].toUpperCase() || '?';
 
     return (
-        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 border-b border-[#222] lg:fixed lg:flex lg:h-14'>
-            <div className='relative z-[110] h-full w-full bg-gradient-to-b from-black to-[#0A0A0A] px-4 shadow-lg'>
-                <div className='flex h-full items-center justify-between'>
-                    <div className='flex items-center gap-3'>
-                        <Link href='/dashboard' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/5'>
+        <nav className='top-0 right-0 left-0 z-[100] mt-2 hidden h-16 px-2 lg:fixed lg:flex lg:h-14'>
+            <div className='group relative z-[110] h-full w-full rounded-lg bg-gradient-to-b from-[#1A1A1A]/40 via-[#151515]/40 to-[#111]/40 p-[1px] transition-all duration-300 hover:from-[#1A1A1A]/50 hover:via-[#151515]/50 hover:to-[#111]/50'>
+                <div className='relative flex h-full w-full items-center justify-between rounded-lg bg-[linear-gradient(to_bottom,rgba(15,15,15,0.95),rgba(17,17,17,0.95))] px-4 backdrop-blur-md'>
+                    <div className='pointer-events-none absolute inset-0 rounded-lg bg-[radial-gradient(circle_at_50%_-20%,rgba(38,38,38,0.08),transparent_70%)]'></div>
+                    <div className='pointer-events-none absolute inset-[-1px] rounded-lg bg-[radial-gradient(circle_at_50%_-20%,rgba(100,100,100,0.03),transparent_70%)]'></div>
+                    <div className='pointer-events-none absolute inset-0 rounded-lg bg-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.06)_50%,rgba(0,0,0,0.12))]'></div>
+
+                    <div className='relative z-[1] flex items-center gap-3'>
+                        <Link href='/dashboard' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/[0.03]'>
                             <div className='flex h-7 w-7 items-center transition-transform duration-200 group-hover:scale-105'>
                                 <LogoIcon />
                             </div>
@@ -107,7 +111,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                             {Array.isArray(pathSegments) ? (
                                 pathSegments.map((segment, index) => (
                                     <div key={index} className='flex items-center gap-1.5'>
-                                        <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors hover:bg-white/5'>
+                                        <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors hover:bg-white/[0.03]'>
                                             {getSegmentIcon(segment) && <span className='text-[#666] transition-colors group-hover:text-[#818181]'>{getSegmentIcon(segment)}</span>}
                                             <span className='font-mono text-[10px] font-bold font-medium tracking-widest text-gray-200/50 uppercase transition-colors hover:text-gray-300'>
                                                 {segment}
