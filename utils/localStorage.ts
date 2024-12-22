@@ -107,7 +107,7 @@ export const DEFAULT_BOX_COLORS: BoxColors = {
         shadowIntensity: 0.45,
         opacity: 0.25,
         showBorder: false,
-        globalTimeframeControl: true,
+        globalTimeframeControl: false,
     },
 };
 

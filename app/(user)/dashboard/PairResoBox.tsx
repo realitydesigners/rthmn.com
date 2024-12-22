@@ -59,7 +59,7 @@ const ResoBoxSkeleton = () => (
 const TimeFrameVisualizerSkeleton = () => <div className='h-10 w-full max-w-lg rounded-lg bg-[#222]/20' />;
 
 export const PairResoBox = React.memo(
-    ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
+    ({ pair = '', boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
         // Local state for individual timeframe control
         const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
         const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
@@ -74,12 +74,27 @@ export const PairResoBox = React.memo(
         const timeframeRange = useMemo(() => {
             if (boxColors?.styles?.globalTimeframeControl) {
                 const startIndex = boxColors.styles?.startIndex ?? 0;
-                const maxBoxCount = boxColors.styles?.maxBoxCount ?? boxSlice?.boxes.length;
+                const maxBoxCount = boxColors.styles?.maxBoxCount ?? boxSlice?.boxes?.length ?? 10;
                 return getTimeframeRange(startIndex, startIndex + maxBoxCount);
             } else {
                 return getTimeframeRange(localStartIndex, localStartIndex + localMaxBoxCount);
             }
-        }, [boxColors?.styles?.globalTimeframeControl, boxColors?.styles?.startIndex, boxColors?.styles?.maxBoxCount, localStartIndex, localMaxBoxCount, boxSlice?.boxes.length]);
+        }, [boxColors?.styles?.globalTimeframeControl, boxColors?.styles?.startIndex, boxColors?.styles?.maxBoxCount, localStartIndex, localMaxBoxCount, boxSlice?.boxes?.length]);
+
+        // If we don't have the required data yet, show loading state
+        if (!boxSlice || !boxColors) {
+            return (
+                <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
+                    <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a] pb-14'>
+                        <div className='relative flex flex-col items-center justify-center gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
+                            <PriceDisplaySkeleton />
+                            <ResoBoxSkeleton />
+                            <TimeFrameVisualizerSkeleton />
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
         // Handle local style changes
         const handleLocalStyleChange = (property: string, value: number | boolean) => {
@@ -92,7 +107,7 @@ export const PairResoBox = React.memo(
 
         return (
             <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
-                <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a] pb-14'>
+                <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
                     <div className='relative flex flex-col items-center justify-center gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
                         {/* Price Display Section */}
                         <div className='relative h-[42px] w-full'>
@@ -100,7 +115,7 @@ export const PairResoBox = React.memo(
                                 <PriceDisplaySkeleton />
                             </div>
                             <div className={`absolute inset-0 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <PriceDisplay pair={pair!} closePrice={closePrice} timeframeRange={timeframeRange} />
+                                <PriceDisplay pair={pair} closePrice={closePrice} timeframeRange={timeframeRange} />
                             </div>
                         </div>
 
@@ -112,14 +127,14 @@ export const PairResoBox = React.memo(
                             <div className={`absolute inset-0 transition-opacity delay-100 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <ResoBox
                                     key={boxKey}
-                                    slice={boxSlice!}
+                                    slice={boxSlice}
                                     className='h-full w-full'
                                     boxColors={{
-                                        ...boxColors!,
+                                        ...boxColors,
                                         styles: {
-                                            ...boxColors!.styles,
-                                            startIndex: boxColors!.styles?.globalTimeframeControl ? boxColors!.styles.startIndex : localStartIndex,
-                                            maxBoxCount: boxColors!.styles?.globalTimeframeControl ? boxColors!.styles.maxBoxCount : localMaxBoxCount,
+                                            ...boxColors.styles,
+                                            startIndex: boxColors.styles?.globalTimeframeControl ? boxColors.styles.startIndex : localStartIndex,
+                                            maxBoxCount: boxColors.styles?.globalTimeframeControl ? boxColors.styles.maxBoxCount : localMaxBoxCount,
                                         },
                                     }}
                                 />
@@ -127,8 +142,8 @@ export const PairResoBox = React.memo(
                         </div>
 
                         {/* TimeFrame Visualizer Section */}
-                        {!boxColors?.styles?.globalTimeframeControl && (
-                            <div className='relative h-10 w-full'>
+                        {!boxColors.styles?.globalTimeframeControl && (
+                            <div className='relative h-24 w-full'>
                                 <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
                                     <TimeFrameVisualizerSkeleton />
                                 </div>
@@ -136,7 +151,7 @@ export const PairResoBox = React.memo(
                                     <TimeFrameVisualizer
                                         startIndex={localStartIndex}
                                         maxBoxCount={localMaxBoxCount}
-                                        boxes={boxSlice!.boxes}
+                                        boxes={boxSlice.boxes}
                                         onStyleChange={handleLocalStyleChange}
                                         timeframeRange={timeframeRange}
                                     />
