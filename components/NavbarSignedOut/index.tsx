@@ -118,7 +118,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     }, [isNavOpen]);
 
     // Don't render navbar for user routes
-    if (pathname?.startsWith('/dashboard') || pathname?.startsWith('/test') || pathname?.startsWith('/pair')) {
+    if (
+        pathname?.startsWith('/dashboard') ||
+        pathname?.startsWith('/test') ||
+        pathname?.startsWith('/pair') ||
+        pathname?.startsWith('/account') ||
+        pathname?.startsWith('/studio')
+    ) {
         return null;
     }
 
