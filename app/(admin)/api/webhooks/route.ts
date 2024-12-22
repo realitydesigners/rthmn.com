@@ -6,7 +6,7 @@ import { createClient } from '@/utils/supabase/server';
 import { manageDiscordAccess } from '@/utils/discord/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
-    apiVersion: '2024-11-20.acacia',
+    apiVersion: '2024-12-18.acacia',
     appInfo: {
         name: 'ai2saas',
         version: '0.1.0',

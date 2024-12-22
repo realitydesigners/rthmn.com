@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import { FaChevronDown, FaTimes } from 'react-icons/fa';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 
 export const SelectedPairs = () => {
     const { selectedPairs, togglePair, pairData } = useDashboard();
