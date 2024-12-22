@@ -141,7 +141,7 @@ export const SettingsBar = () => {
                     <div className='flex flex-col gap-2'>
                         <button
                             onClick={() => setShowColors(!showColors)}
-                            className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                            className='group flex h-10 items-center justify-between rounded-lg border border-[#222] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
                             <div className='flex items-center gap-3'>
                                 <div className='relative h-6 w-6 overflow-hidden rounded-full shadow-xl'>
                                     <div

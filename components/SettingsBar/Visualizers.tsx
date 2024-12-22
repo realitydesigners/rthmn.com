@@ -75,16 +75,11 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
 
     return (
         <div className='space-y-4'>
-            <div className='group relative flex flex-col overflow-hidden rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] p-[1px] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+            <div className='group relative flex flex-col overflow-hidden rounded-lg bg-black/30 p-[1px] transition-all'>
                 <div className='relative flex flex-col rounded-lg bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
-                    {/* Enhanced Ambient Background Effects */}
-                    <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.12),transparent_70%)]' />
-                    <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
-                    <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.4),transparent_70%)]' />
-
                     {/* Main visualization area */}
                     <div className='relative h-full px-4 pt-4 pb-9'>
-                        <div ref={barContainerRef} className='group/bars relative flex h-16 items-center rounded-lg bg-white/[0.02]'>
+                        <div ref={barContainerRef} className='group/bars relative flex h-10 items-center rounded-lg bg-white/[0.02]'>
                             {Array.from({ length: 38 }).map((_, i) => {
                                 const isSelected = i >= startIndex && i < startIndex + maxBoxCount;
                                 const isLeftEdge = i === startIndex;
@@ -204,16 +199,16 @@ interface BoxVisualizerProps {
 
 export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }) => {
     return (
-        <div className='space-y-4'>
-            <div className='group relative flex flex-col overflow-hidden rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] p-[1px] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
-                <div className='relative flex flex-col rounded-lg bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
+        <div className='space-y-2'>
+            <div className='group relative flex flex-col overflow-hidden rounded-lg p-[1px] transition-all'>
+                <div className='relative flex flex-col rounded-lg'>
                     {/* Refined Grid background */}
                     <div className='absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
 
-                    <div className='relative flex h-full items-center justify-center p-8'>
+                    <div className='relative flex h-full items-center justify-center bg-black/30 p-8'>
                         {/* Enhanced Preview Box */}
                         <div
-                            className='relative h-24 w-24 border border-white/[0.15] transition-all duration-300'
+                            className='relative h-24 w-24 transition-all duration-300'
                             style={{
                                 borderRadius: `${borderRadius}px`,
                                 boxShadow: `
@@ -235,31 +230,12 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
                                 }}
                             />
                         </div>
-
-                        {/* Enhanced Parameter Labels */}
-                        <div className='pointer-events-none absolute inset-0 flex items-center justify-center'>
-                            {/* Labels with consistent styling */}
-                            <div className='absolute top-4 left-4 rounded-md border border-white/[0.08] px-2 py-1 backdrop-blur'>
-                                <div className='font-mono text-[10px] font-medium text-white/40'>RADIUS</div>
-                                <span className='font-mono text-sm text-white/90'>{borderRadius}px</span>
-                            </div>
-
-                            <div className='absolute right-4 bottom-4 rounded-md border border-white/[0.08] px-2 py-1 backdrop-blur'>
-                                <div className='font-mono text-[10px] font-medium text-white/40'>SHADOW</div>
-                                <span className='font-mono text-sm text-white/90'>{(shadowIntensity * 100).toFixed(0)}%</span>
-                            </div>
-
-                            <div className='0 absolute top-4 right-4 rounded-md border border-white/[0.08] px-2 py-1 backdrop-blur'>
-                                <div className='font-mono text-[10px] font-medium text-white/40'>OPACITY</div>
-                                <span className='font-mono text-sm text-white/90'>{(opacity * 100).toFixed(0)}%</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
 
             {/* Enhanced Controls Container */}
-            <div className='space-y-3 rounded-lg bg-black/25 p-4'>
+            <div className='space-y-2 rounded-lg bg-black/30 p-4'>
                 <StyleControl label='Border Radius' value={borderRadius} onChange={(value) => onStyleChange('borderRadius', value)} min={0} max={16} step={1} unit='px' />
                 <StyleControl label='Shadow Depth' value={shadowIntensity} onChange={(value) => onStyleChange('shadowIntensity', value)} min={0} max={1} step={0.05} />
                 <StyleControl label='Opacity' value={opacity} onChange={(value) => onStyleChange('opacity', value)} min={0.01} max={1} step={0.05} />
