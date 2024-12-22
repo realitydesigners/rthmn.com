@@ -191,7 +191,7 @@ export const ResoBox = React.memo(
         }
 
         return (
-            <div ref={boxRef} className={`relative aspect-square h-full w-full overflow-hidden border border-[#181818] bg-black ${className}`}>
+            <div ref={boxRef} className={`relative aspect-square h-full w-full ${className}`}>
                 <div className='relative h-full w-full'>{renderShiftedBoxes(sortedBoxes)}</div>
             </div>
         );

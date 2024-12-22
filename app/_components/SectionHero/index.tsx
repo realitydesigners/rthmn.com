@@ -1,7 +1,7 @@
 'use client';
 import type React from 'react';
 
-import { StartButton } from '@/components/StartNowButton';
+import { StartButton } from '@/app/_components/StartNowButton';
 import { MarketWall } from './MarketWall';
 import { motion } from 'framer-motion';
 

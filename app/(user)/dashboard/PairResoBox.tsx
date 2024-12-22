@@ -8,10 +8,11 @@ import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
 import React, { useMemo, useState } from 'react';
 
 interface PairResoBoxProps {
-    pair: string;
-    boxSlice: BoxSlice;
-    currentOHLC: OHLC;
-    boxColors: BoxColors;
+    pair?: string;
+    boxSlice?: BoxSlice;
+    currentOHLC?: OHLC;
+    boxColors?: BoxColors;
+    isLoading?: boolean;
 }
 
 // Memoize the price display to prevent unnecessary re-renders
@@ -36,28 +37,49 @@ const PriceDisplay = React.memo(({ pair, closePrice, timeframeRange }: { pair: s
 
 PriceDisplay.displayName = 'PriceDisplay';
 
+// Loading skeletons for each component
+const PriceDisplaySkeleton = () => (
+    <div className='flex w-full flex-col items-center gap-2'>
+        <div className='flex w-full items-center justify-between'>
+            <div className='flex items-center gap-4'>
+                <div className='h-5 w-20 rounded-md bg-[#222]/50' />
+                <div className='h-4 w-16 rounded-md bg-[#222]/50' />
+            </div>
+            <div className='h-4 w-32 rounded-md bg-[#222]/50' />
+        </div>
+    </div>
+);
+
+const ResoBoxSkeleton = () => (
+    <div className='relative aspect-square h-full w-full'>
+        <div className='h-full w-full rounded-lg bg-[#222]/20' />
+    </div>
+);
+
+const TimeFrameVisualizerSkeleton = () => <div className='h-10 w-full max-w-lg rounded-lg bg-[#222]/20' />;
+
 export const PairResoBox = React.memo(
-    ({ pair, boxSlice, currentOHLC, boxColors }: PairResoBoxProps) => {
+    ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
         // Local state for individual timeframe control
-        const [localStartIndex, setLocalStartIndex] = useState(boxColors.styles?.startIndex ?? 0);
-        const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors.styles?.maxBoxCount ?? 10);
+        const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
+        const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
 
         // Memoize the close price calculation
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
 
         // Create a stable key for ResoBox that only changes when necessary
-        const boxKey = useMemo(() => `${pair}-${boxSlice.timestamp}`, [pair, boxSlice.timestamp]);
+        const boxKey = useMemo(() => `${pair}-${boxSlice?.timestamp}`, [pair, boxSlice?.timestamp]);
 
         // Calculate timeframe range based on whether we're using global or individual control
         const timeframeRange = useMemo(() => {
-            if (boxColors.styles?.globalTimeframeControl) {
+            if (boxColors?.styles?.globalTimeframeControl) {
                 const startIndex = boxColors.styles?.startIndex ?? 0;
-                const maxBoxCount = boxColors.styles?.maxBoxCount ?? boxSlice.boxes.length;
+                const maxBoxCount = boxColors.styles?.maxBoxCount ?? boxSlice?.boxes.length;
                 return getTimeframeRange(startIndex, startIndex + maxBoxCount);
             } else {
                 return getTimeframeRange(localStartIndex, localStartIndex + localMaxBoxCount);
             }
-        }, [boxColors.styles?.globalTimeframeControl, boxColors.styles?.startIndex, boxColors.styles?.maxBoxCount, localStartIndex, localMaxBoxCount, boxSlice.boxes.length]);
+        }, [boxColors?.styles?.globalTimeframeControl, boxColors?.styles?.startIndex, boxColors?.styles?.maxBoxCount, localStartIndex, localMaxBoxCount, boxSlice?.boxes.length]);
 
         // Handle local style changes
         const handleLocalStyleChange = (property: string, value: number | boolean) => {
@@ -69,38 +91,56 @@ export const PairResoBox = React.memo(
         };
 
         return (
-            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300'>
-                <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
-                    {/* Background Effects */}
-
-                    {/* Main content */}
-                    <div className='relative flex flex-col items-center justify-center gap-4 p-6 lg:p-8'>
-                        <PriceDisplay pair={pair} closePrice={closePrice} timeframeRange={timeframeRange} />
-                        <div className='w-full'>
-                            <ResoBox
-                                key={boxKey}
-                                slice={boxSlice}
-                                className='h-full w-full'
-                                boxColors={{
-                                    ...boxColors,
-                                    styles: {
-                                        ...boxColors.styles,
-                                        startIndex: boxColors.styles?.globalTimeframeControl ? boxColors.styles.startIndex : localStartIndex,
-                                        maxBoxCount: boxColors.styles?.globalTimeframeControl ? boxColors.styles.maxBoxCount : localMaxBoxCount,
-                                    },
-                                }}
-                            />
+            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
+                <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a] pb-14'>
+                    <div className='relative flex flex-col items-center justify-center gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
+                        {/* Price Display Section */}
+                        <div className='relative h-[42px] w-full'>
+                            <div className={`absolute inset-0 transition-opacity duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
+                                <PriceDisplaySkeleton />
+                            </div>
+                            <div className={`absolute inset-0 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                                <PriceDisplay pair={pair!} closePrice={closePrice} timeframeRange={timeframeRange} />
+                            </div>
                         </div>
 
-                        {!boxColors.styles?.globalTimeframeControl && (
-                            <div className='w-full max-w-lg'>
-                                <TimeFrameVisualizer
-                                    startIndex={localStartIndex}
-                                    maxBoxCount={localMaxBoxCount}
-                                    boxes={boxSlice.boxes}
-                                    onStyleChange={handleLocalStyleChange}
-                                    timeframeRange={timeframeRange}
+                        {/* ResoBox Section */}
+                        <div className='relative aspect-square w-full'>
+                            <div className={`absolute inset-0 transition-opacity delay-100 duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
+                                <ResoBoxSkeleton />
+                            </div>
+                            <div className={`absolute inset-0 transition-opacity delay-100 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                                <ResoBox
+                                    key={boxKey}
+                                    slice={boxSlice!}
+                                    className='h-full w-full'
+                                    boxColors={{
+                                        ...boxColors!,
+                                        styles: {
+                                            ...boxColors!.styles,
+                                            startIndex: boxColors!.styles?.globalTimeframeControl ? boxColors!.styles.startIndex : localStartIndex,
+                                            maxBoxCount: boxColors!.styles?.globalTimeframeControl ? boxColors!.styles.maxBoxCount : localMaxBoxCount,
+                                        },
+                                    }}
                                 />
+                            </div>
+                        </div>
+
+                        {/* TimeFrame Visualizer Section */}
+                        {!boxColors?.styles?.globalTimeframeControl && (
+                            <div className='relative h-10 w-full'>
+                                <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
+                                    <TimeFrameVisualizerSkeleton />
+                                </div>
+                                <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                                    <TimeFrameVisualizer
+                                        startIndex={localStartIndex}
+                                        maxBoxCount={localMaxBoxCount}
+                                        boxes={boxSlice!.boxes}
+                                        onStyleChange={handleLocalStyleChange}
+                                        timeframeRange={timeframeRange}
+                                    />
+                                </div>
                             </div>
                         )}
                     </div>
@@ -109,22 +149,25 @@ export const PairResoBox = React.memo(
         );
     },
     (prevProps, nextProps) => {
-        // Fast equality checks first
+        if (prevProps.isLoading !== nextProps.isLoading) return false;
+        if (prevProps.isLoading || nextProps.isLoading) return true;
+
+        // Only do the rest of the checks if neither is loading
         if (
             prevProps.pair !== nextProps.pair ||
-            prevProps.boxSlice.timestamp !== nextProps.boxSlice.timestamp ||
+            prevProps.boxSlice?.timestamp !== nextProps.boxSlice?.timestamp ||
             prevProps.currentOHLC?.close !== nextProps.currentOHLC?.close ||
-            prevProps.boxColors.styles?.globalTimeframeControl !== nextProps.boxColors.styles?.globalTimeframeControl
+            prevProps.boxColors?.styles?.globalTimeframeControl !== nextProps.boxColors?.styles?.globalTimeframeControl
         ) {
             return false;
         }
 
         // Color equality checks
-        const colorsDiff = prevProps.boxColors.positive === nextProps.boxColors.positive && prevProps.boxColors.negative === nextProps.boxColors.negative;
+        const colorsDiff = prevProps.boxColors?.positive === nextProps.boxColors?.positive && prevProps.boxColors?.negative === nextProps.boxColors?.negative;
 
         if (!colorsDiff) return false;
 
         // Only do the expensive JSON.stringify if everything else matches
-        return JSON.stringify(prevProps.boxColors.styles) === JSON.stringify(nextProps.boxColors.styles);
+        return JSON.stringify(prevProps.boxColors?.styles) === JSON.stringify(nextProps.boxColors?.styles);
     }
 );

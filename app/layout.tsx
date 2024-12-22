@@ -9,7 +9,7 @@ import { createClient } from '@/utils/supabase/server';
 import './main.css';
 import { GoogleTagManager } from '@next/third-parties/google';
 import Script from 'next/script';
-import { kodeMono, outfit, oxanium, russo } from '@/components/Fonts/fonts';
+import { kodeMono, outfit, oxanium, russo } from '@/app/fonts';
 import { Analytics } from '@vercel/analytics/react';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';

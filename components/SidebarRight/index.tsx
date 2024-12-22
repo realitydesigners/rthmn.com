@@ -2,27 +2,43 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuSettings } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
-import { SidebarContent } from '../SidebarContent';
+import { SidebarWrapper } from '../SidebarWrapper';
 import { SettingsBar } from '../SettingsBar';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
-export const RightSidebar = () => {
+export const SidebarRight = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
     const [mounted, setMounted] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
+
+    // Handle screen size changes
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024); // lg breakpoint
+        };
+
+        // Initial check
+        checkMobile();
+
+        // Add resize listener
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         setMounted(true);
-        // Load initial state only if it was locked
+        // Load initial state only if it was locked and not mobile
         const state = getSidebarState();
-        if (state.right.isOpen && state.right.locked) {
+        if (state.right.isOpen && state.right.locked && !isMobile) {
             setIsOpen(true);
             setIsLocked(true);
             setActivePanel(state.right.activePanel);
         }
-    }, []);
+    }, [isMobile]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -42,11 +58,13 @@ export const RightSidebar = () => {
         };
     }, [isLocked]);
 
+    // Prevent sidebar from opening on mobile
     const handlePanelToggle = (panel: string) => {
+        if (isMobile) return;
+
         if (activePanel === panel) {
             setIsOpen(false);
             setActivePanel(undefined);
-            // Only save state if locked
             if (isLocked) {
                 const state = getSidebarState();
                 setSidebarState({
@@ -61,7 +79,6 @@ export const RightSidebar = () => {
         } else {
             setIsOpen(true);
             setActivePanel(panel);
-            // Only save state if locked
             if (isLocked) {
                 const state = getSidebarState();
                 setSidebarState({
@@ -106,11 +123,12 @@ export const RightSidebar = () => {
     };
 
     if (!mounted) return null;
+    if (isMobile) return null; // Don't render anything on mobile
 
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar top-14 right-0 bottom-0 z-[120] w-16 flex-col items-center justify-center py-4 pb-14 lg:fixed lg:flex'>
+            <div className='fixed top-14 right-0 bottom-0 z-[120] flex w-16 flex-col items-center justify-center py-4 pb-14'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}
@@ -125,7 +143,7 @@ export const RightSidebar = () => {
             </div>
 
             {/* Settings Panel */}
-            <SidebarContent
+            <SidebarWrapper
                 isOpen={isOpen && activePanel === 'settings'}
                 onClose={handleClose}
                 title='Settings'
@@ -133,7 +151,7 @@ export const RightSidebar = () => {
                 onLockToggle={handleLockToggle}
                 position='right'>
                 <SettingsBar />
-            </SidebarContent>
+            </SidebarWrapper>
         </div>
     );
 };
