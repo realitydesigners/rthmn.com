@@ -69,8 +69,8 @@ export const PairResoBox = React.memo(
         };
 
         return (
-            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 to-[#111]/30 p-[1px] transition-all duration-300'>
-                <div className='relative flex flex-col rounded-lg'>
+            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300'>
+                <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
                     {/* Background Effects */}
 
                     {/* Main content */}
