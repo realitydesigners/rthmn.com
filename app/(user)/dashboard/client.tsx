@@ -1,6 +1,6 @@
 'use client';
 import React, { useMemo, useEffect } from 'react';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { BoxDetailsRow } from '@/components/BoxDetailsRow';
 import { PairResoBox } from './PairResoBox';
 import { NoInstruments } from './LoadingSkeleton';
@@ -28,20 +28,16 @@ export default function Dashboard() {
     }, [selectedPairs, pairData]);
 
     return (
-        <main className='w-full'>
-            <div className='flex-overflow-hidden'>
-                <div className='pt-13'>
-                    {selectedPairs.length > 0 ? (
-                        <div className='grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] justify-center'>
-                            {filteredPairData.map(({ pair, boxSlice, currentOHLC, index }) => (
-                                <PairResoBox key={`${pair}-${boxSlice.timestamp}-${index}`} pair={pair} boxSlice={boxSlice} currentOHLC={currentOHLC} boxColors={boxColors} />
-                            ))}
-                        </div>
-                    ) : (
-                        <NoInstruments />
-                    )}
+        <main className='w-full px-4 pt-18'>
+            {selectedPairs.length > 0 ? (
+                <div className='grid grid-cols-[repeat(auto-fit,minmax(400px,1fr))] gap-4'>
+                    {filteredPairData.map(({ pair, boxSlice, currentOHLC, index }) => (
+                        <PairResoBox key={`${pair}-${boxSlice.timestamp}-${index}`} pair={pair} boxSlice={boxSlice} currentOHLC={currentOHLC} boxColors={boxColors} />
+                    ))}
                 </div>
-            </div>
+            ) : (
+                <NoInstruments />
+            )}
         </main>
     );
 }

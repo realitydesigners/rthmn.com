@@ -5,7 +5,7 @@ import { LuX } from 'react-icons/lu';
 import { ResoBox } from '@/components/ResoBox';
 import { LineChart } from '@/components/LineChart';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useBoxSliceData } from '@/hooks/useBoxSliceData';
 
@@ -15,7 +15,7 @@ interface ModalContentProps {
 
 export function ModalContent({ pair }: ModalContentProps) {
     const router = useRouter();
-    const { pairData } = useDashboard();
+    const { pairData, boxColors } = useDashboard();
     const { session } = useAuth();
     const data = pairData[pair];
     const [initialData, setInitialData] = useState<BoxSlice[]>([]);
@@ -46,7 +46,7 @@ export function ModalContent({ pair }: ModalContentProps) {
                         {hasData ? (
                             <div className='flex h-auto flex-col'>
                                 <div className='flex-1 p-4'>
-                                    <ResoBox key={`${pair}-${data.boxes[0].timestamp}`} slice={data.boxes[0]} className='h-auto w-full' />
+                                    <ResoBox key={`${pair}-${data.boxes[0].timestamp}`} slice={data.boxes[0]} boxColors={boxColors} className='h-auto w-full' />
                                 </div>
                             </div>
                         ) : (

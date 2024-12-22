@@ -5,7 +5,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LuUser, LuCreditCard, LuLogOut, LuSettings } from 'react-icons/lu';
 import { FaDiscord } from 'react-icons/fa';
-import { useUser } from '@/providers/UserProvider';
 
 const menuItems = [
     {
@@ -63,8 +62,7 @@ const MenuButton = ({ icon: Icon, label, href, onClick, variant = 'default' }: M
 };
 
 export const ProfilePanel = () => {
-    const { user, signOut } = useAuth();
-    const { userDetails } = useUser();
+    const { user, signOut, userDetails } = useAuth();
     const [isSigningOut, setIsSigningOut] = useState(false);
 
     const handleSignOut = async () => {

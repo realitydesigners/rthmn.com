@@ -1,97 +1,139 @@
 'use client';
-import React, { useState, useCallback, useEffect } from 'react';
-import { DraggableBorder } from '@/components/DraggableBorder';
+import React, { useState, useEffect, useRef } from 'react';
+import { LuSettings } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
-import { LuSettings, LuGraduationCap } from 'react-icons/lu';
-import { SettingsBar } from '@/components/SettingsBar';
-import { Tutorial } from './Tutorial';
-import { useScrollLock } from '@/hooks/useScrollLock';
-
-type ActivePanel = 'settings' | 'tutorial' | null;
+import { SidebarContent } from '../SidebarContent';
+import { SettingsBar } from '../SettingsBar';
+import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
 export const RightSidebar = () => {
-    const [activePanel, setActivePanel] = useState<ActivePanel>(null);
-    useScrollLock(activePanel !== null);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isLocked, setIsLocked] = useState(false);
+    const [activePanel, setActivePanel] = useState<string | undefined>();
+    const [mounted, setMounted] = useState(false);
+    const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const handlePanelToggle = (panel: ActivePanel) => {
-        setActivePanel((prev) => (prev === panel ? null : panel));
+    useEffect(() => {
+        setMounted(true);
+        // Load initial state only if it was locked
+        const state = getSidebarState();
+        if (state.right.isOpen && state.right.locked) {
+            setIsOpen(true);
+            setIsLocked(true);
+            setActivePanel(state.right.activePanel);
+        }
+    }, []);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (!isLocked && sidebarRef.current && !sidebarRef.current.contains(event.target as Node)) {
+                // Check if the click was inside any sidebar or sidebar toggle
+                const isClickInAnySidebar = (event.target as Element).closest('.sidebar-content, .fixed-sidebar');
+                if (!isClickInAnySidebar) {
+                    setIsOpen(false);
+                    setActivePanel(undefined);
+                }
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [isLocked]);
+
+    const handlePanelToggle = (panel: string) => {
+        if (activePanel === panel) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+            // Only save state if locked
+            if (isLocked) {
+                const state = getSidebarState();
+                setSidebarState({
+                    ...state,
+                    right: {
+                        isOpen: false,
+                        activePanel: undefined,
+                        locked: isLocked,
+                    },
+                });
+            }
+        } else {
+            setIsOpen(true);
+            setActivePanel(panel);
+            // Only save state if locked
+            if (isLocked) {
+                const state = getSidebarState();
+                setSidebarState({
+                    ...state,
+                    right: {
+                        isOpen: true,
+                        activePanel: panel,
+                        locked: isLocked,
+                    },
+                });
+            }
+        }
     };
 
+    const handleClose = () => {
+        if (!isLocked) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+        }
+    };
+
+    const handleLockToggle = () => {
+        const newLockedState = !isLocked;
+        setIsLocked(newLockedState);
+
+        // Save state only when locking/unlocking
+        const state = getSidebarState();
+        setSidebarState({
+            ...state,
+            right: {
+                isOpen: isOpen,
+                activePanel: activePanel,
+                locked: newLockedState,
+            },
+        });
+
+        // If unlocking, close the panel
+        if (!newLockedState) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+        }
+    };
+
+    if (!mounted) return null;
+
     return (
-        <>
-            {/* Settings Panel */}
-            <SidebarContent isOpen={activePanel === 'settings'} onClose={() => setActivePanel(null)}>
-                <SettingsBar />
-            </SidebarContent>
-
-            {/* Tutorial Panel */}
-            <SidebarContent isOpen={activePanel === 'tutorial'} onClose={() => setActivePanel(null)}>
-                <Tutorial />
-            </SidebarContent>
-
+        <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 right-0 bottom-0 z-[90] flex w-14 flex-col items-center justify-between border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] py-4'>
-                <div className='flex flex-col gap-2'>
-                    <button
-                        onClick={() => handlePanelToggle('tutorial')}
-                        className={cn(
-                            'group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]',
-                            activePanel === 'tutorial' && 'border-blue-500/20 from-blue-500/10 to-blue-500/5'
-                        )}>
-                        <LuGraduationCap size={20} className={cn('transition-colors', activePanel === 'tutorial' ? 'text-blue-400' : 'text-[#818181] group-hover:text-white')} />
-                    </button>
-                </div>
+            <div className='fixed-sidebar top-14 right-0 bottom-0 z-[120] w-16 flex-col items-center justify-center py-4 pb-14 lg:fixed lg:flex'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}
                     className={cn(
-                        'group flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]',
-                        activePanel === 'settings' && 'border-blue-500/20 from-blue-500/10 to-blue-500/5'
+                        'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all duration-200',
+                        activePanel === 'settings'
+                            ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
                     )}>
-                    <LuSettings size={20} className={cn('transition-colors', activePanel === 'settings' ? 'text-blue-400' : 'text-[#818181] group-hover:text-white')} />
+                    <LuSettings size={20} className='transition-colors' />
                 </button>
             </div>
-        </>
-    );
-};
 
-interface SidebarContentProps {
-    isOpen: boolean;
-    onClose: () => void;
-    children: React.ReactNode;
-}
-
-export const SidebarContent = ({ isOpen, onClose, children }: SidebarContentProps) => {
-    const [width, setWidth] = useState(300);
-
-    const handleResize = useCallback((newWidth: number) => {
-        const constrainedWidth = Math.max(360, Math.min(600, newWidth));
-        setWidth(constrainedWidth);
-    }, []);
-
-    // Update main content margin when sidebar opens/closes or resizes
-    useEffect(() => {
-        const main = document.querySelector('main');
-        if (main) {
-            if (isOpen) {
-                main.style.marginRight = `${width + 56}px`; // 56px = w-14 (sidebar width)
-            } else {
-                main.style.marginRight = '56px'; // w-14
-            }
-        }
-        return () => {
-            if (main) {
-                main.style.marginRight = '0';
-            }
-        };
-    }, [isOpen, width]);
-
-    return (
-        <div
-            className={cn('fixed top-14 right-14 bottom-0 z-[90] flex transform transition-transform duration-300', isOpen ? 'translate-x-0' : 'translate-x-full')}
-            style={{ width: `${width}px` }}>
-            <DraggableBorder onResize={(delta) => handleResize(width - delta)} position='left' />
-            <div className='relative flex h-full w-full flex-col border-l border-[#222] bg-gradient-to-b from-black to-[#0A0A0A] shadow-2xl'>{children}</div>
+            {/* Settings Panel */}
+            <SidebarContent
+                isOpen={isOpen && activePanel === 'settings'}
+                onClose={handleClose}
+                title='Settings'
+                isLocked={isLocked}
+                onLockToggle={handleLockToggle}
+                position='right'>
+                <SettingsBar />
+            </SidebarContent>
         </div>
     );
 };

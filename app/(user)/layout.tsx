@@ -1,11 +1,14 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
-import { Providers } from '@/providers/Providers';
 import { DashboardNavigation } from '@/components/DashboardNavigation';
 import { RightSidebar } from '@/components/RightSidebar';
 import { LeftSidebar } from '@/components/LeftSidebar';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';
+import { WebSocketProvider } from '@/providers/WebsocketProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { DashboardProvider } from '@/providers/DashboardProvider/client';
+import { BackgroundPerspectiveGrid } from '@/components/BackgroundPerspectiveGrid';
 
 export default async function UserLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
     const supabase = await createClient();
@@ -20,14 +23,20 @@ export default async function UserLayout({ children, modal }: { children: React.
     }
 
     return (
-        <Providers>
-            <div className='relative flex min-h-screen'>
-                <NavbarSignedIn user={user} />
-                <main className='flex-1 transition-[margin] duration-300 ease-in-out'>{children}</main>
-                <LeftSidebar />
-                <RightSidebar />
-                <DashboardNavigation />
-            </div>
-        </Providers>
+        <QueryProvider>
+            <WebSocketProvider>
+                <DashboardProvider initialSignalsData={[]}>
+                    <BackgroundPerspectiveGrid />
+                    <div id='app-container' className='relative min-h-screen overflow-y-auto'>
+                        <NavbarSignedIn user={user} />
+                        <main className='w-full transition-all duration-300 ease-in-out'>{children}</main>
+                        <LeftSidebar />
+                        <RightSidebar />
+                        <DashboardNavigation />
+                        {modal}
+                    </div>
+                </DashboardProvider>
+            </WebSocketProvider>
+        </QueryProvider>
     );
 }

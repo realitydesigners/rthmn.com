@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaTimes, FaChevronDown } from 'react-icons/fa';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
-import { useDashboard } from '@/providers/DashboardProvider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 
 interface SearchBarProps {
     selectedPairs: string[];
@@ -95,7 +95,7 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
 
             <div className='relative mx-auto max-w-60'>
                 <div className='relative z-[95] flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                    <div className='flex h-9 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]'>
+                    <div className='flex h-9 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#121212]'>
                         <FaSearch className='ml-4 text-[#666]' />
                         <input
                             type='text'
