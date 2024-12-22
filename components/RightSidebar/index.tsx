@@ -76,7 +76,7 @@ export const RightSidebar = () => {
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar fixed top-14 right-0 bottom-0 z-[120] flex w-16 flex-col items-center justify-between py-4'>
+            <div className='fixed-sidebar top-14 right-0 bottom-0 z-[120] w-16 flex-col items-center justify-between py-4 lg:fixed lg:flex'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}

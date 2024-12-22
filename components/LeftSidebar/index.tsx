@@ -84,7 +84,7 @@ export const LeftSidebar = () => {
             </div>
 
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-center py-4'>
+            <div className='fixed-sidebar top-14 bottom-0 left-0 z-[120] hidden w-16 flex-col items-center justify-center py-4 lg:fixed lg:flex'>
                 <div className='flex flex-col gap-2'>
                     <Link href='/dashboard'>
                         <button className='group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all duration-200 hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20'>
