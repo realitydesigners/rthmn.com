@@ -85,19 +85,6 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
     }, [currentPairs, scrollRef, setActiveIndex, play]);
 };
 
-const EmptyFavorites = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
-    <div className='fixed bottom-24 left-1/2 h-[500px] w-[1000px] -translate-x-1/2 border-t border-[#222] bg-black backdrop-blur-sm'>
-        <div className='flex h-full flex-col px-3'>
-            <div className='flex flex-1 flex-col items-center justify-center text-sm text-[#818181]'>
-                <span>No instruments added to watchlist</span>
-                <span className='mt-1 text-xs'>Use the search bar to add pairs</span>
-            </div>
-
-            <PairFilters viewMode={viewMode} setViewMode={setViewMode} />
-        </div>
-    </div>
-);
-
 const PairFilters = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
     <div className='absolute right-0 bottom-22 left-0 z-[1000] flex items-center justify-center gap-2 py-2'>
         {navigationButtons.map((button) => (
@@ -177,7 +164,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     return (
         <div
             className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-300 ${
-                isModalOpen ? 'h-[175px] lg:hidden' : 'h-[66vh]'
+                isModalOpen ? 'h-[175px] lg:hidden' : 'h-[50vh]'
             }`}>
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
@@ -192,7 +179,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
                         WebkitOverflowScrolling: 'touch',
                     }}>
                     {/* Top spacer */}
-                    <div className='h-[calc(50vh-32px)]' />
+                    <div className='h-[calc(40vh-32px)]' />
 
                     {/* Pairs list */}
                     <div className='space-y-0 px-4'>
@@ -226,7 +213,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
                                     onViewClick={() => {}}
                                     onLongPressReset={() => {}}
                                     style={{
-                                        height: '64px',
+                                        height: '50px',
                                         opacity: activeIndex === index ? 1 : 0.3,
                                         transform: `scale(${activeIndex === index ? 1 : 0.95})`,
                                         transition: 'all 0.2s ease-out',
@@ -237,7 +224,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
                     </div>
 
                     {/* Bottom spacer */}
-                    <div className='h-[calc(50vh-32px)]' />
+                    <div className='h-[calc(40vh-32px)]' />
                 </div>
             </div>
 
@@ -250,11 +237,11 @@ export const PairFilterButtons = ({ icon: Icon, isActive, onClick, label }: { ic
     return (
         <button onClick={onClick} className='group relative flex items-center'>
             <div
-                className={`group flex h-10 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
+                className={`group flex h-9 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
                     isActive ? 'from-[#444444] to-[#282828]' : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
                 }`}>
                 <div
-                    className={`font-outfit flex h-full w-full items-center justify-center gap-2 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] py-2 pr-4 pl-3 text-sm font-medium ${
+                    className={`font-outfit flex h-full w-full items-center justify-center gap-1 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] py-2 pr-4 pl-3 text-sm font-medium ${
                         isActive ? 'text-gray-200' : 'text-[#818181]'
                     }`}>
                     <Icon size={14} />
@@ -424,16 +411,14 @@ export const PairItem = ({
             {...handlers}>
             <div className='relative z-10 flex flex-col'>
                 <div className='group flex w-full items-center justify-between'>
-                    <div className='flex items-baseline gap-3'>
-                        <h3 className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ${isActive ? 'scale-105 text-white' : 'scale-90 text-[#222]'}`}>
+                    <div className='flex items-baseline gap-2'>
+                        <h3 className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ${isActive ? 'scale-105 text-white' : 'scale-90 text-[#444]'}`}>
                             {pair.replace('_', '/')}
                         </h3>
 
                         {currentPrice && <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} isActive={isActive} />}
 
-                        {isFavorite && viewMode !== 'favorites' && (
-                            <LuBookmark size={15} className='ml-1 inline-block text-blue-400/70' style={{ transform: 'translateY(-2px)' }} />
-                        )}
+                        {isFavorite && viewMode !== 'favorites' && <LuBookmark size={15} className='ml-1 inline-block text-blue-400/70' />}
                     </div>
 
                     <div className='flex items-center gap-3'>{renderActions()}</div>
