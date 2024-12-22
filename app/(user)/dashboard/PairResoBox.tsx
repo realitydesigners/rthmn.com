@@ -69,11 +69,9 @@ export const PairResoBox = React.memo(
         };
 
         return (
-            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40'>
-                <div className='relative flex flex-col rounded-lg bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
+            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 to-[#111]/30 p-[1px] transition-all duration-300'>
+                <div className='relative flex flex-col rounded-lg'>
                     {/* Background Effects */}
-
-                    <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
 
                     {/* Main content */}
                     <div className='relative flex flex-col items-center justify-center gap-4 p-6 lg:p-8'>

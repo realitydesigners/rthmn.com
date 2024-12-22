@@ -110,7 +110,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                     <div key={index} className='flex items-center gap-1.5'>
                                         <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors hover:bg-white/[0.03]'>
                                             {getSegmentIcon(segment) && <span className='text-[#666] transition-colors group-hover:text-[#818181]'>{getSegmentIcon(segment)}</span>}
-                                            <span className='font-mono text-[10px] font-bold font-medium tracking-widest text-gray-200/50 uppercase transition-colors hover:text-gray-300'>
+                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-gray-200/50 uppercase transition-colors hover:text-gray-300'>
                                                 {segment}
                                             </span>
                                         </div>

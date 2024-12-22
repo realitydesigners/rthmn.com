@@ -101,7 +101,7 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
             <div
                 className={cn(
                     'group relative my-4 flex h-[calc(100%-2rem)] w-full rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
-                    position === 'left' ? 'ml-14' : 'mr-14'
+                    position === 'left' ? 'ml-16' : 'mr-16'
                 )}>
                 <div className='relative flex h-full w-full flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a] backdrop-blur-md'>
                     {/* Header Section */}

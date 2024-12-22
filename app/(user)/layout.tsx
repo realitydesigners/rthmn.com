@@ -8,6 +8,7 @@ import { NavbarSignedIn } from '@/components/NavbarSignedIn';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { DashboardProvider } from '@/providers/DashboardProvider/client';
+import { BackgroundPerspectiveGrid } from '@/components/BackgroundPerspectiveGrid';
 
 export default async function UserLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
     const supabase = await createClient();
@@ -25,12 +26,14 @@ export default async function UserLayout({ children, modal }: { children: React.
         <QueryProvider>
             <WebSocketProvider>
                 <DashboardProvider initialSignalsData={[]}>
-                    <div className='relative h-screen overflow-x-hidden overflow-y-auto' id='app-container'>
+                    <BackgroundPerspectiveGrid />
+                    <div id='app-container' className='relative min-h-screen overflow-y-auto'>
                         <NavbarSignedIn user={user} />
                         <main className='w-full transition-all duration-300 ease-in-out'>{children}</main>
                         <LeftSidebar />
                         <RightSidebar />
                         <DashboardNavigation />
+                        {modal}
                     </div>
                 </DashboardProvider>
             </WebSocketProvider>

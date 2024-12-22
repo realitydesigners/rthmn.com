@@ -49,9 +49,9 @@ const FullPresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset;
         </div>
 
         {/* Content */}
-        <div className='relative flex items-center gap-1.5'>
-            <span className='font-kodemono text-[9px] font-medium tracking-widest text-[#666] uppercase transition-colors group-hover:text-[#818181]'>{preset.name}</span>
-            {isSelected && <div className='h-1 w-1 rounded-full bg-blue-400/80 ring-1 shadow-[0_0_10px_rgba(96,165,250,0.5)] ring-blue-400/20' />}
+        <div className='relative flex flex-col items-center'>
+            <span className='font-kodemono text-[8px] font-medium tracking-widest text-[#666] uppercase transition-colors group-hover:text-[#818181]'>{preset.name}</span>
+            {isSelected && <div className='mt-1 h-1 w-1 rounded-full bg-blue-400/80 ring-1 shadow-[0_0_10px_rgba(96,165,250,0.5)] ring-blue-400/20' />}
         </div>
     </button>
 );
