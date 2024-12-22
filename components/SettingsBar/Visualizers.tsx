@@ -12,7 +12,7 @@ interface PatternVisualizerProps {
     timeframeRange: { start: string; end: string };
 }
 
-export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange, timeframeRange }) => {
+export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange, timeframeRange }) => {
     const barContainerRef = useRef<HTMLDivElement>(null);
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
