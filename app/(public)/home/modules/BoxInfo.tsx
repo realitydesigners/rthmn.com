@@ -1,5 +1,5 @@
 'use client';
-import { StartButton } from '@/components/StartNowButton';
+import { StartButton } from '@/app/_components/StartNowButton';
 import { motion } from 'framer-motion';
 
 import { FaCode, FaCube, FaChartLine, FaBrain } from 'react-icons/fa';

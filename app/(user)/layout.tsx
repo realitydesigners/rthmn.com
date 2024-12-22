@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { DashboardNavigation } from '@/components/DashboardNavigation';
-import { RightSidebar } from '@/components/RightSidebar';
-import { LeftSidebar } from '@/components/LeftSidebar';
+import { SidebarRight } from '@/components/SidebarRight';
+import { SidebarLeft } from '@/components/SidebarLeft';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
@@ -30,8 +30,8 @@ export default async function UserLayout({ children, modal }: { children: React.
                     <div id='app-container' className='relative min-h-screen overflow-y-auto'>
                         <NavbarSignedIn user={user} />
                         <main className='w-full transition-all duration-300 ease-in-out'>{children}</main>
-                        <LeftSidebar />
-                        <RightSidebar />
+                        <SidebarLeft />
+                        <SidebarRight />
                         <DashboardNavigation />
                         {modal}
                     </div>

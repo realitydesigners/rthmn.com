@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LuLayoutGrid, LuLayoutDashboard, LuOrbit, LuLineChart } from 'react-icons/lu';
 import Link from 'next/link';
 import { cn } from '@/utils/cn';
-import { SidebarContent } from '../SidebarContent';
+import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
 import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
-export const LeftSidebar = () => {
+export const SidebarLeft = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
@@ -173,7 +173,7 @@ export const LeftSidebar = () => {
             </div>
 
             {/* Pairs Panel */}
-            <SidebarContent
+            <SidebarWrapper
                 isOpen={isOpen && (activePanel === 'instruments' || activePanel === 'chart')}
                 onClose={handleClose}
                 title='Instruments'
@@ -181,7 +181,7 @@ export const LeftSidebar = () => {
                 onLockToggle={handleLockToggle}
                 position='left'>
                 {renderPanelContent()}
-            </SidebarContent>
+            </SidebarWrapper>
         </div>
     );
 };

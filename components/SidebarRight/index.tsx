@@ -2,11 +2,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuSettings } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
-import { SidebarContent } from '../SidebarContent';
+import { SidebarWrapper } from '../SidebarWrapper';
 import { SettingsBar } from '../SettingsBar';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
-export const RightSidebar = () => {
+export const SidebarRight = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
@@ -143,7 +143,7 @@ export const RightSidebar = () => {
             </div>
 
             {/* Settings Panel */}
-            <SidebarContent
+            <SidebarWrapper
                 isOpen={isOpen && activePanel === 'settings'}
                 onClose={handleClose}
                 title='Settings'
@@ -151,7 +151,7 @@ export const RightSidebar = () => {
                 onLockToggle={handleLockToggle}
                 position='right'>
                 <SettingsBar />
-            </SidebarContent>
+            </SidebarWrapper>
         </div>
     );
 };

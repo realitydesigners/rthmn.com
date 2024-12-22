@@ -14,7 +14,7 @@ interface SidebarContentProps {
     position: 'left' | 'right';
 }
 
-export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position }: SidebarContentProps) => {
+export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position }: SidebarContentProps) => {
     const [width, setWidth] = useState(300);
     const [mounted, setMounted] = useState(false);
 
