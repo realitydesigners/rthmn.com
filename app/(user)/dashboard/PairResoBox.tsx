@@ -4,7 +4,7 @@ import { BoxSlice, OHLC } from '@/types/types';
 import { ResoBox } from '@/components/ResoBox';
 import { BoxColors } from '@/utils/localStorage';
 import { getTimeframeRange } from '@/utils/timeframe';
-import { PatternVisualizer } from '@/components/SettingsBar/Visualizers';
+import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
 import React, { useMemo, useState } from 'react';
 
 interface PairResoBoxProps {
@@ -94,7 +94,7 @@ export const PairResoBox = React.memo(
 
                         {!boxColors.styles?.globalTimeframeControl && (
                             <div className='w-full max-w-lg'>
-                                <PatternVisualizer
+                                <TimeFrameVisualizer
                                     startIndex={localStartIndex}
                                     maxBoxCount={localMaxBoxCount}
                                     boxes={boxSlice.boxes}
