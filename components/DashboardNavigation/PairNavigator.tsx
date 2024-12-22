@@ -7,6 +7,31 @@ import { useSwipeable } from 'react-swipeable';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { LuDollarSign, LuBitcoin, LuList, LuBookmark, LuSearch, LuTrash2, LuArrowRight, LuPlus } from 'react-icons/lu';
 
+const useSound = () => {
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    useEffect(() => {
+        audioRef.current = new Audio('/click.wav');
+        audioRef.current.volume = 0.5;
+        return () => {
+            if (audioRef.current) {
+                audioRef.current = null;
+            }
+        };
+    }, []);
+
+    const play = useCallback(() => {
+        if (audioRef.current) {
+            audioRef.current.currentTime = 0;
+            audioRef.current.play().catch(() => {
+                // Ignore errors (e.g. if user hasn't interacted with page yet)
+            });
+        }
+    }, []);
+
+    return { play };
+};
+
 const navigationButtons = [
     { mode: 'favorites', label: 'Favorites', icon: LuBookmark },
     { mode: 'fx', label: 'FX', icon: LuDollarSign },
@@ -15,20 +40,41 @@ const navigationButtons = [
 ];
 
 const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, currentPairs: string[], setActiveIndex: (index: number) => void) => {
+    const { play } = useSound();
+
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
+                if (!scrollRef.current) return;
+
+                // Find the entry closest to the center of the viewport
+                let closestEntry = null;
+                let minDistance = Infinity;
+
                 entries.forEach((entry) => {
-                    if (entry.isIntersecting && entry.intersectionRatio > 0.7) {
-                        const index = parseInt(entry.target.getAttribute('data-index') || '0');
-                        setActiveIndex(index);
+                    const rect = entry.boundingClientRect;
+                    const viewportHeight = window.innerHeight;
+                    const centerY = viewportHeight / 2;
+                    const elementCenterY = rect.top + rect.height / 2;
+                    const distance = Math.abs(centerY - elementCenterY);
+
+                    if (distance < minDistance && entry.isIntersecting) {
+                        minDistance = distance;
+                        closestEntry = entry;
                     }
                 });
+
+                if (closestEntry && minDistance < 10) {
+                    // Only trigger if very close to center
+                    const index = parseInt(closestEntry.target.getAttribute('data-index') || '0');
+                    setActiveIndex(index);
+                    play();
+                }
             },
             {
                 root: scrollRef.current,
-                threshold: 0.7,
-                rootMargin: '-35% 0px -35% 0px',
+                threshold: [0.5, 0.6, 0.7, 0.8, 0.9, 1],
+                rootMargin: '-40% 0px -40% 0px', // Tighter margin for more precise center detection
             }
         );
 
@@ -36,7 +82,7 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
         pairElements.forEach((element) => observer.observe(element));
 
         return () => observer.disconnect();
-    }, [currentPairs, scrollRef, setActiveIndex]);
+    }, [currentPairs, scrollRef, setActiveIndex, play]);
 };
 
 const EmptyFavorites = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
@@ -69,16 +115,10 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [viewMode, setViewMode] = useState<string>('favorites');
     const scrollRef = useRef<HTMLDivElement>(null);
+    const { play } = useSound();
     const [showRemoveForPair, setShowRemoveForPair] = useState<string | null>(null);
     const [showAddForPair, setShowAddForPair] = useState<string | null>(null);
-    const [selectedPairForModal, setSelectedPairForModal] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
-    const lastScrollPosition = useRef(0);
-    const [isScrolling, setIsScrolling] = useState(false);
-    const [resetStates, setResetStates] = useState(() => () => {
-        setShowRemoveForPair(null);
-        setShowAddForPair(null);
-    });
 
     const currentPairs =
         viewMode === 'favorites'
@@ -89,211 +129,118 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
                 ? [...CRYPTO_PAIRS]
                 : ([...FOREX_PAIRS, ...CRYPTO_PAIRS] as string[]);
 
-    const handleScroll = useCallback(() => {
-        if (scrollRef.current) {
-            resetStates();
+    const handleIndexChange = (index: number) => {
+        if (index >= 0 && index < currentPairs.length) {
+            setActiveIndex(index);
+            play();
         }
-    }, [resetStates]);
+    };
+
+    // Handle scroll events to determine active item
+    const handleScroll = useCallback(() => {
+        if (!scrollRef.current) return;
+
+        const container = scrollRef.current;
+        const containerRect = container.getBoundingClientRect();
+        const centerY = containerRect.top + containerRect.height / 2;
+
+        // Find the item closest to the center
+        const items = container.getElementsByClassName('pair-item');
+        let closestItem = null;
+        let minDistance = Infinity;
+
+        Array.from(items).forEach((item) => {
+            const rect = item.getBoundingClientRect();
+            const distance = Math.abs(rect.top + rect.height / 2 - centerY);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestItem = item;
+            }
+        });
+
+        if (closestItem) {
+            const index = parseInt(closestItem.getAttribute('data-index') || '0');
+            if (index !== activeIndex) {
+                handleIndexChange(index);
+            }
+        }
+    }, [activeIndex, handleIndexChange]);
 
     useEffect(() => {
-        const scrollElement = scrollRef.current;
-        if (scrollElement) {
-            scrollElement.addEventListener('scroll', handleScroll, { passive: true });
-            scrollElement.addEventListener('touchmove', handleScroll, {
-                passive: true,
-            });
-
-            return () => {
-                scrollElement.removeEventListener('scroll', handleScroll);
-                scrollElement.removeEventListener('touchmove', handleScroll);
-            };
+        const container = scrollRef.current;
+        if (container) {
+            container.addEventListener('scroll', handleScroll);
+            return () => container.removeEventListener('scroll', handleScroll);
         }
     }, [handleScroll]);
 
-    const handleIndexChange = (index: number) => {
-        setActiveIndex(index);
-
-        requestAnimationFrame(() => {
-            const element = document.querySelector(`[data-index="${index}"]`);
-            const container = scrollRef.current;
-
-            if (element && container) {
-                const elementRect = element.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-
-                const scrollTop = container.scrollTop + elementRect.top - containerRect.top - (containerRect.height - elementRect.height) / 2;
-
-                container.scrollTo({
-                    top: scrollTop,
-                    behavior: 'smooth',
-                });
-            }
-        });
-    };
-
-    const handlers = useSwipeable({
-        onSwipedUp: () => {
-            resetStates();
-            const nextIndex = Math.min(activeIndex + 1, currentPairs.length - 1);
-            handleIndexChange(nextIndex);
-        },
-        onSwipedDown: () => {
-            resetStates();
-            const prevIndex = Math.max(activeIndex - 1, 0);
-            handleIndexChange(prevIndex);
-        },
-        onSwiping: () => {
-            resetStates();
-        },
-        onTouchStartOrOnMouseDown: () => {
-            // Reset on any touch/mouse interaction
-            resetStates();
-        },
-        trackMouse: true,
-        swipeDuration: 500,
-        preventScrollOnSwipe: true,
-        delta: 50,
-    });
-
-    useEffect(() => {
-        setActiveIndex(0);
-    }, [viewMode]);
-
-    useIntersectionObserver(scrollRef, currentPairs, setActiveIndex);
-
-    useEffect(() => {
-        setShowRemoveForPair(null);
-    }, [viewMode]);
-
-    useEffect(() => {
-        const scrollElement = scrollRef.current;
-
-        const handleScroll = () => {
-            if (scrollElement) {
-                const currentScroll = scrollElement.scrollTop;
-                const scrollDiff = Math.abs(currentScroll - lastScrollPosition.current);
-
-                // If scrolled more than 2px, reset states
-                if (scrollDiff > 2) {
-                    resetStates();
-                }
-
-                lastScrollPosition.current = currentScroll;
-            }
-        };
-
-        scrollElement?.addEventListener('scroll', handleScroll);
-
-        // Also handle touch events
-        const handleTouch = () => {
-            resetStates();
-        };
-
-        scrollElement?.addEventListener('touchstart', handleTouch);
-        scrollElement?.addEventListener('touchmove', handleTouch);
-
-        return () => {
-            scrollElement?.removeEventListener('scroll', handleScroll);
-            scrollElement?.removeEventListener('touchstart', handleTouch);
-            scrollElement?.removeEventListener('touchmove', handleTouch);
-        };
-    }, [resetStates]);
-
-    useEffect(() => {
-        const scrollElement = scrollRef.current;
-        let scrollTimeout: NodeJS.Timeout;
-
-        const handleScroll = () => {
-            console.log('🔄 Scrolling detected');
-            setIsScrolling(true);
-            resetStates();
-
-            // Clear previous timeout
-            clearTimeout(scrollTimeout);
-
-            // Set new timeout
-            scrollTimeout = setTimeout(() => {
-                console.log('⏹️ Scroll ended');
-                setIsScrolling(false);
-            }, 150);
-        };
-
-        if (scrollElement) {
-            scrollElement.addEventListener('scroll', handleScroll, { passive: true });
-            scrollElement.addEventListener('touchmove', handleScroll, {
-                passive: true,
-            });
-        }
-
-        return () => {
-            if (scrollElement) {
-                scrollElement.removeEventListener('scroll', handleScroll);
-                scrollElement.removeEventListener('touchmove', handleScroll);
-            }
-            clearTimeout(scrollTimeout);
-        };
-    }, [resetStates]);
-
-    if (viewMode === 'favorites' && selectedPairs.length === 0) {
-        return <EmptyFavorites viewMode={viewMode} setViewMode={setViewMode} />;
-    }
-
     return (
         <div
-            className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-black/95 pt-4 transition-all duration-300 ${
+            className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-300 ${
                 isModalOpen ? 'h-[175px] lg:hidden' : 'h-[66vh]'
             }`}>
-            <div className='pointer-events-none absolute top-2 right-0 left-0 z-[98] h-24 rounded-t-[3em] bg-gradient-to-b from-black via-black/95 to-transparent' />
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-            <div ref={scrollRef} className='scrollbar-none relative z-[96] h-[calc(100%-60px)] w-full overflow-hidden px-4' {...handlers}>
-                <div className='pointer-events-none absolute top-1/2 right-0 left-0 z-[97] flex -translate-y-1/2 items-center justify-between'>
-                    <div className='h-[2px] w-4 bg-gradient-to-r from-white/20 to-transparent' />
-                    <div className='h-[2px] w-4 bg-gradient-to-l from-white/20 to-transparent' />
-                </div>
 
+            {/* Main container */}
+            <div className='relative h-[calc(100%-120px)]'>
+                {/* Scrollable list */}
                 <div
-                    className='scrollbar-none h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'
+                    ref={scrollRef}
+                    className='scrollbar-none absolute inset-0 overflow-y-scroll'
                     style={{
-                        WebkitOverflowScrolling: 'touch',
                         scrollSnapType: 'y mandatory',
-                        scrollPaddingTop: '50%',
-                        scrollPaddingBottom: '50%',
+                        WebkitOverflowScrolling: 'touch',
                     }}>
-                    <div className='h-[50vh]' />
+                    {/* Top spacer */}
+                    <div className='h-[calc(50vh-32px)]' />
 
-                    {currentPairs.map((pair, index) => (
-                        <PairItem
-                            key={pair}
-                            pair={pair}
-                            index={index}
-                            isActive={activeIndex === index}
-                            isFavorite={selectedPairs.includes(pair)}
-                            currentPrice={pairData[pair]?.currentOHLC?.close}
-                            showRemove={showRemoveForPair === pair}
-                            showAdd={showAddForPair === pair}
-                            onIndexChange={handleIndexChange}
-                            onRemove={() => {
-                                togglePair(pair);
-                                setShowRemoveForPair(null);
-                            }}
-                            onCancelRemove={() => setShowRemoveForPair(null)}
-                            setShowRemoveForPair={setShowRemoveForPair}
-                            setShowAddForPair={setShowAddForPair}
-                            toggleFavorite={() => togglePair(pair)}
-                            viewMode={viewMode}
-                            onViewClick={() => {}}
-                            onLongPressReset={resetStates}
-                            style={{
-                                scrollSnapAlign: 'center',
-                                height: '64px',
-                            }}
-                        />
-                    ))}
+                    {/* Pairs list */}
+                    <div className='space-y-0 px-4'>
+                        {currentPairs.map((pair, index) => (
+                            <div
+                                key={pair}
+                                data-index={index}
+                                className='pair-item'
+                                style={{
+                                    scrollSnapAlign: 'center',
+                                    scrollSnapStop: 'always',
+                                }}>
+                                <PairItem
+                                    pair={pair}
+                                    index={index}
+                                    isActive={activeIndex === index}
+                                    isFavorite={selectedPairs.includes(pair)}
+                                    currentPrice={pairData[pair]?.currentOHLC?.close}
+                                    showRemove={showRemoveForPair === pair}
+                                    showAdd={showAddForPair === pair}
+                                    onIndexChange={handleIndexChange}
+                                    onRemove={() => {
+                                        togglePair(pair);
+                                        setShowRemoveForPair(null);
+                                    }}
+                                    onCancelRemove={() => setShowRemoveForPair(null)}
+                                    setShowRemoveForPair={setShowRemoveForPair}
+                                    setShowAddForPair={setShowAddForPair}
+                                    toggleFavorite={() => togglePair(pair)}
+                                    viewMode={viewMode}
+                                    onViewClick={() => {}}
+                                    onLongPressReset={() => {}}
+                                    style={{
+                                        height: '64px',
+                                        opacity: activeIndex === index ? 1 : 0.3,
+                                        transform: `scale(${activeIndex === index ? 1 : 0.95})`,
+                                        transition: 'all 0.2s ease-out',
+                                    }}
+                                />
+                            </div>
+                        ))}
+                    </div>
 
-                    <div className='h-[50vh]' />
+                    {/* Bottom spacer */}
+                    <div className='h-[calc(50vh-32px)]' />
                 </div>
             </div>
-            <div className='pointer-events-none absolute right-0 bottom-0 left-0 z-[180] h-40 bg-gradient-to-t from-black via-black/95 to-transparent' />
+
             {!isModalOpen && <PairFilters viewMode={viewMode} setViewMode={setViewMode} />}
         </div>
     );
