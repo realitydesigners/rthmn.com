@@ -13,18 +13,34 @@ export const LeftSidebar = () => {
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
     const [mounted, setMounted] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
+
+    // Handle screen size changes
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024); // lg breakpoint
+        };
+
+        // Initial check
+        checkMobile();
+
+        // Add resize listener
+        window.addEventListener('resize', checkMobile);
+
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     useEffect(() => {
         setMounted(true);
-        // Load initial state only if it was locked
+        // Load initial state only if it was locked and not mobile
         const state = getSidebarState();
-        if (state.left.isOpen && state.left.locked) {
+        if (state.left.isOpen && state.left.locked && !isMobile) {
             setIsOpen(true);
             setIsLocked(true);
             setActivePanel(state.left.activePanel);
         }
-    }, []);
+    }, [isMobile]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -44,11 +60,13 @@ export const LeftSidebar = () => {
         };
     }, [isLocked]);
 
+    // Prevent sidebar from opening on mobile
     const handlePanelToggle = (panel: string) => {
+        if (isMobile) return;
+
         if (activePanel === panel) {
             setIsOpen(false);
             setActivePanel(undefined);
-            // Only save state if locked
             if (isLocked) {
                 const state = getSidebarState();
                 setSidebarState({
@@ -63,7 +81,6 @@ export const LeftSidebar = () => {
         } else {
             setIsOpen(true);
             setActivePanel(panel);
-            // Only save state if locked
             if (isLocked) {
                 const state = getSidebarState();
                 setSidebarState({
@@ -124,11 +141,12 @@ export const LeftSidebar = () => {
     };
 
     if (!mounted) return null;
+    if (isMobile) return null; // Don't render anything on mobile
 
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar top-14 bottom-0 left-0 z-[120] w-16 flex-col items-center justify-center py-4 pb-14 lg:fixed lg:flex'>
+            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-center py-4 pb-14'>
                 {/* Navigation Buttons */}
                 <div className='flex flex-col gap-2'>
                     <Link href='/dashboard'>

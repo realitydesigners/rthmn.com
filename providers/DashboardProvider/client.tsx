@@ -14,6 +14,7 @@ interface DashboardContextType {
     pairData: Record<string, PairData>;
     selectedPairs: string[];
     isLoading: boolean;
+    isSidebarInitialized: boolean;
     togglePair: (pair: string) => void;
     isConnected: boolean;
     boxColors: BoxColors;
@@ -74,8 +75,8 @@ interface DashboardProviderClientProps {
 export function DashboardProviderClient({ children, initialSignalsData }: DashboardProviderClientProps) {
     const queryClient = useQueryClient();
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
+    const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
     // Signal state
     const [signalsData, setSignalsData] = useState<Signal[] | null>(initialSignalsData);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
@@ -91,6 +92,7 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
         const storedPairs = getSelectedPairs();
         setBoxColorsState(storedColors);
         setSelectedPairsState(storedPairs);
+        setIsSidebarInitialized(true);
     }, []);
 
     // Load selected pairs from localStorage
@@ -102,7 +104,6 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
         if (stored.length === 0) {
             setSelectedPairsState(initialPairs);
         }
-        setIsLoading(false);
     }, [isAuthenticated]);
 
     // Single query for all pair data
@@ -126,13 +127,16 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
                         )
                     );
                 },
-                enabled: isConnected && isAuthenticated,
+                enabled: isConnected && isAuthenticated && selectedPairs.length > 0,
                 staleTime: Infinity,
                 gcTime: Infinity,
                 refetchInterval: 0 as const,
             },
         ],
     })[0];
+
+    // Calculate loading state including sidebar initialization
+    const isLoading = !isAuthenticated || pairDataQuery.isLoading || !isConnected || !isSidebarInitialized;
 
     // WebSocket subscription management
     useEffect(() => {
@@ -199,7 +203,8 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
             value={{
                 pairData,
                 selectedPairs,
-                isLoading: pairDataQuery.isLoading,
+                isLoading,
+                isSidebarInitialized,
                 togglePair,
                 isConnected,
                 boxColors: boxColorsState,
