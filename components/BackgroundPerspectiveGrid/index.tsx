@@ -1,7 +1,9 @@
 'use client';
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 
 export const BackgroundPerspectiveGrid = React.memo(() => {
+    const pathname = usePathname();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimensionsRef = useRef({ width: 0, height: 0 });
 
@@ -71,6 +73,8 @@ export const BackgroundPerspectiveGrid = React.memo(() => {
     );
 
     useEffect(() => {
+        if (pathname === '/test') return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -112,7 +116,9 @@ export const BackgroundPerspectiveGrid = React.memo(() => {
             clearTimeout(resizeTimeout);
             cancelAnimationFrame(rafId);
         };
-    }, [drawGrid]);
+    }, [drawGrid, pathname]);
+
+    if (pathname === '/test') return null;
 
     return <canvas ref={canvasRef} className='fixed inset-0 h-screen w-screen bg-black' />;
 });

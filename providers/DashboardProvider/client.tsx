@@ -1,16 +1,13 @@
 'use client';
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
-import { BoxSlice, PairData, Signal } from '@/types/types';
+import { BoxSlice, PairData, Signal, BoxColors, FullPreset } from '@/types/types';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { BoxColors, getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS } from '@/utils/localStorage';
+import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 
 interface DashboardContextType {
-    // Original Dashboard State
     pairData: Record<string, PairData>;
     selectedPairs: string[];
     isLoading: boolean;
@@ -21,10 +18,12 @@ interface DashboardContextType {
     updateBoxColors: (colors: BoxColors) => void;
     isAuthenticated: boolean;
     handleSidebarClick: (e: React.MouseEvent) => void;
-    // Signal State
     signalsData: Signal[] | null;
     selectedSignal: Signal | null;
     setSelectedSignal: (signal: Signal | null) => void;
+    DEFAULT_BOX_COLORS: BoxColors;
+    DEFAULT_PAIRS: string[];
+    fullPresets: FullPreset[];
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -211,10 +210,13 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
                 updateBoxColors,
                 isAuthenticated,
                 handleSidebarClick,
-                // Signal values
+
                 signalsData,
                 selectedSignal,
                 setSelectedSignal,
+                DEFAULT_BOX_COLORS,
+                DEFAULT_PAIRS: ['GBPUSD', 'USDJPY', 'AUDUSD'],
+                fullPresets,
             }}>
             <div onClick={handleSidebarClick}>{children}</div>
         </DashboardContext.Provider>

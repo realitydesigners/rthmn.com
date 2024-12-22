@@ -4,6 +4,7 @@ import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { DashboardNavigation } from '@/components/DashboardNavigation';
 import { SidebarRight } from '@/components/SidebarRight';
 import { SidebarLeft } from '@/components/SidebarLeft';
+import { BottomSidebar } from '@/components/BottomSidebar';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
@@ -32,6 +33,7 @@ export default async function UserLayout({ children, modal }: { children: React.
                         <main className='w-full transition-all duration-300 ease-in-out'>{children}</main>
                         <SidebarLeft />
                         <SidebarRight />
+                        <BottomSidebar />
                         <DashboardNavigation />
                         {modal}
                     </div>
