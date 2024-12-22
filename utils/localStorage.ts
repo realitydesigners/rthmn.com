@@ -17,27 +17,29 @@ export interface BoxColors {
     positive: string;
     negative: string;
     styles?: {
-        borderRadius: number;
-        maxBoxCount: number;
         startIndex: number;
+        maxBoxCount: number;
+        borderRadius: number;
         shadowIntensity: number;
-        showBorder: boolean;
         opacity: number;
+        showBorder: boolean;
+        globalTimeframeControl: boolean;
     };
 }
 
 export const DEFAULT_PAIRS = ['GBPUSD', 'USDJPY', 'AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD'];
 
 export const DEFAULT_BOX_COLORS: BoxColors = {
-    positive: '#58ffa0',
-    negative: '#d61d61',
+    positive: '#00FF00',
+    negative: '#FF0000',
     styles: {
-        borderRadius: 6,
-        maxBoxCount: 12,
-        shadowIntensity: 0.35,
-        opacity: 0.31,
-        showBorder: false,
         startIndex: 0,
+        maxBoxCount: 10,
+        borderRadius: 8,
+        shadowIntensity: 0.25,
+        opacity: 1,
+        showBorder: true,
+        globalTimeframeControl: true,
     },
 };
 
@@ -121,81 +123,87 @@ export interface FullPreset extends ColorPreset {
 
 export const fullPresets: FullPreset[] = [
     {
-        name: 'CYBER.01',
-        positive: '#00ffd5',
-        negative: '#ff2975',
-        styles: {
-            borderRadius: 4,
-            maxBoxCount: 12,
-            shadowIntensity: 0.45,
-            opacity: 0.25,
-            showBorder: false,
-            startIndex: 0,
-        },
-    },
-    {
-        name: 'HOLO.02',
-        positive: '#85ffbd',
-        negative: '#ff3eec',
+        name: 'Emerald',
+        positive: '#58ffa0',
+        negative: '#d61d61',
         styles: {
             borderRadius: 6,
             maxBoxCount: 12,
-            shadowIntensity: 0.5,
-            opacity: 0.3,
-            showBorder: false,
             startIndex: 0,
-        },
-    },
-    {
-        name: 'NEO.03',
-        positive: '#4deeea',
-        negative: '#f000ff',
-        styles: {
-            borderRadius: 8,
-            maxBoxCount: 10,
-            shadowIntensity: 0.4,
-            opacity: 0.35,
-            showBorder: false,
-            startIndex: 0,
-        },
-    },
-    {
-        name: 'PLSM.04',
-        positive: '#7af7ff',
-        negative: '#ff34d2',
-        styles: {
-            borderRadius: 5,
-            maxBoxCount: 12,
-            shadowIntensity: 0.45,
-            opacity: 0.28,
-            showBorder: false,
-            startIndex: 0,
-        },
-    },
-    {
-        name: 'SNTH.05',
-        positive: '#00ffcc',
-        negative: '#fc0fc0',
-        styles: {
-            borderRadius: 6,
-            maxBoxCount: 12,
-            shadowIntensity: 0.4,
-            opacity: 0.32,
-            showBorder: false,
-            startIndex: 0,
-        },
-    },
-    {
-        name: 'VPR.06',
-        positive: '#00fff0',
-        negative: '#ff71ce',
-        styles: {
-            borderRadius: 7,
-            maxBoxCount: 12,
             shadowIntensity: 0.35,
-            opacity: 0.3,
+            opacity: 0.31,
             showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'Ocean',
+        positive: '#4cc9f0',
+        negative: '#480ca8',
+        styles: {
+            borderRadius: 6,
+            maxBoxCount: 12,
             startIndex: 0,
+            shadowIntensity: 0.35,
+            opacity: 0.31,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'Sunset',
+        positive: '#ff9e00',
+        negative: '#9b2226',
+        styles: {
+            borderRadius: 6,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.35,
+            opacity: 0.31,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'Neon',
+        positive: '#39ff14',
+        negative: '#ff0080',
+        styles: {
+            borderRadius: 6,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.35,
+            opacity: 0.31,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'Pastel',
+        positive: '#90e0ef',
+        negative: '#ff758f',
+        styles: {
+            borderRadius: 6,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.35,
+            opacity: 0.31,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'Mono',
+        positive: '#ffffff',
+        negative: '#000000',
+        styles: {
+            borderRadius: 6,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.35,
+            opacity: 0.31,
+            showBorder: false,
+            globalTimeframeControl: true,
         },
     },
 ];

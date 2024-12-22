@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { LuRotateCcw, LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { fullPresets, type FullPreset } from '@/utils/localStorage';
 import { BoxColors, DEFAULT_BOX_COLORS, DEFAULT_PAIRS } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { PatternVisualizer, BoxVisualizer } from './Visualizers';
+import { getTimeframeRange } from '@/utils/timeframe';
 
 const useDebounce = (value: any, delay: number) => {
     const [debouncedValue, setDebouncedValue] = useState(value);
@@ -64,6 +65,13 @@ export const SettingsBar = () => {
     const [showBoxStyle, setShowBoxStyle] = useState(true);
 
     const debouncedBoxColors = useDebounce(localBoxColors, 150);
+
+    // Calculate timeframe range based on current settings
+    const timeframeRange = useMemo(() => {
+        const startIndex = localBoxColors.styles?.startIndex ?? 0;
+        const maxBoxCount = localBoxColors.styles?.maxBoxCount ?? 10;
+        return getTimeframeRange(startIndex, startIndex + maxBoxCount);
+    }, [localBoxColors.styles?.startIndex, localBoxColors.styles?.maxBoxCount]);
 
     useEffect(() => {
         setMounted(true);
@@ -192,12 +200,31 @@ export const SettingsBar = () => {
                             </button>
 
                             {showPattern && (
-                                <PatternVisualizer
-                                    startIndex={localBoxColors.styles?.startIndex ?? 0}
-                                    maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
-                                    boxes={[]}
-                                    onStyleChange={handleStyleChange}
-                                />
+                                <>
+                                    <div className='flex items-center justify-between px-1 py-2'>
+                                        <div className='space-y-1'>
+                                            <span className='text-[10px] font-medium tracking-wider text-white/50 uppercase'>Global Control</span>
+                                        </div>
+                                        <button
+                                            onClick={() => handleStyleChange('globalTimeframeControl', !localBoxColors.styles?.globalTimeframeControl)}
+                                            className={`relative h-6 w-11 rounded-full transition-all duration-300 ${
+                                                localBoxColors.styles?.globalTimeframeControl ? 'bg-white/20' : 'bg-white/[0.03]'
+                                            }`}>
+                                            <div
+                                                className={`absolute top-1 h-4 w-4 rounded-full transition-all duration-300 ${
+                                                    localBoxColors.styles?.globalTimeframeControl ? 'left-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'left-1 bg-white/50'
+                                                }`}
+                                            />
+                                        </button>
+                                    </div>
+                                    <PatternVisualizer
+                                        startIndex={localBoxColors.styles?.startIndex ?? 0}
+                                        maxBoxCount={localBoxColors.styles?.maxBoxCount ?? 10}
+                                        boxes={[]}
+                                        onStyleChange={handleStyleChange}
+                                        timeframeRange={timeframeRange}
+                                    />
+                                </>
                             )}
                         </div>
 

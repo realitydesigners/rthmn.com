@@ -1,42 +1,18 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { cn } from '@/utils/cn';
+import { Box } from '@/types/types';
 import { BoxColors } from '@/utils/localStorage';
 import { StyleControl } from './StyleControl';
 
 interface PatternVisualizerProps {
     startIndex: number;
     maxBoxCount: number;
-    boxes: number[];
-    onStyleChange: (property: keyof BoxColors['styles'], value: number | boolean) => void;
+    boxes: Box[];
+    onStyleChange: (property: string, value: number | boolean) => void;
+    timeframeRange: { start: string; end: string };
 }
 
-// Helper function to convert index to timeframe
-const getTimeframeRange = (start: number, end: number) => {
-    // Define timeframe ranges (these can be adjusted)
-    const timeframes = [
-        { min: '1m', max: '15m' },
-        { min: '5m', max: '30m' },
-        { min: '15m', max: '1H' },
-        { min: '30m', max: '2H' },
-        { min: '1H', max: '4H' },
-        { min: '2H', max: '6H' },
-        { min: '4H', max: '8H' },
-        { min: '6H', max: '12H' },
-        { min: '8H', max: 'D' },
-        { min: '12H', max: '2D' },
-        { min: 'D', max: '3D' },
-    ];
-
-    const startRange = Math.floor(start / 3.5);
-    const endRange = Math.floor(end / 3.5);
-
-    return {
-        start: timeframes[Math.min(startRange, timeframes.length - 1)]?.min || 'D',
-        end: timeframes[Math.min(endRange, timeframes.length - 1)]?.max || '3D',
-    };
-};
-
-export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange }) => {
+export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex, maxBoxCount, boxes, onStyleChange, timeframeRange }) => {
     const barContainerRef = useRef<HTMLDivElement>(null);
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
@@ -45,9 +21,6 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
         isDragging: false,
         dragType: null,
     });
-
-    // Get current timeframe range
-    const timeframeRange = getTimeframeRange(startIndex, startIndex + maxBoxCount);
 
     const handleMouseDown = (e: React.MouseEvent, type: 'left' | 'right' | 'position') => {
         e.preventDefault();
@@ -145,9 +118,6 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
                                                           isNearEdge && 'bg-gradient-to-b from-white/[0.06] to-white/[0.02] shadow-[inset_0_0_10px_rgba(255,255,255,0.04)]'
                                                       )
                                             )}>
-                                            {/* Unselected state visualization */}
-
-                                            {/* Selected state effects */}
                                             {isSelected && (
                                                 <>
                                                     <div className='absolute inset-0 overflow-hidden'>
@@ -215,12 +185,8 @@ export const PatternVisualizer: React.FC<PatternVisualizerProps> = ({ startIndex
                                         </div>
                                     );
                                 })}
-
-                                {/* Sliding highlight effect */}
                             </div>
                         </div>
-
-                        {/* Vertical highlight lines */}
                     </div>
                 </div>
             </div>
