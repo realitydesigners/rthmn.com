@@ -10,6 +10,11 @@ import { FaDiscord } from 'react-icons/fa';
 export default function AccountContent() {
     const { user, userDetails, subscription, discordConnection, isLoading } = useAuth();
 
+    // Debug logging
+    console.log('User:', user);
+    console.log('Subscription:', subscription);
+    console.log('UserDetails:', userDetails);
+
     if (isLoading) {
         return (
             <div className='flex min-h-screen items-center justify-center'>
