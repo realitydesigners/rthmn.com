@@ -1,35 +1,28 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LuSettings } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
-import { SettingsBar } from '@/components/SettingsBar';
-import { SidebarContent } from '@/components/SidebarContent';
-
-type ActivePanel = 'settings' | null;
+import { SidebarContent } from '../SidebarContent';
+import { SettingsBar } from '../SettingsBar';
+import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
 export const RightSidebar = () => {
-    const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+    const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
+    const [activePanel, setActivePanel] = useState<string | undefined>();
+    const [mounted, setMounted] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const handlePanelToggle = (panel: ActivePanel) => {
-        setActivePanel((prev) => {
-            if (prev === panel) {
-                setIsLocked(false);
-                return null;
-            }
-            return panel;
-        });
-    };
-
-    const renderPanelContent = () => {
-        switch (activePanel) {
-            case 'settings':
-                return <SettingsBar />;
-            default:
-                return null;
+    useEffect(() => {
+        setMounted(true);
+        // Load initial state only if it was locked
+        const state = getSidebarState();
+        if (state.right.isOpen && state.right.locked) {
+            setIsOpen(true);
+            setIsLocked(true);
+            setActivePanel(state.right.activePanel);
         }
-    };
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -37,7 +30,8 @@ export const RightSidebar = () => {
                 // Check if the click was inside any sidebar or sidebar toggle
                 const isClickInAnySidebar = (event.target as Element).closest('.sidebar-content, .fixed-sidebar');
                 if (!isClickInAnySidebar) {
-                    setActivePanel(null);
+                    setIsOpen(false);
+                    setActivePanel(undefined);
                 }
             }
         };
@@ -48,35 +42,75 @@ export const RightSidebar = () => {
         };
     }, [isLocked]);
 
-    useEffect(() => {
-        const handleCloseSidebars = () => {
-            if (!isLocked) {
-                setActivePanel(null);
+    const handlePanelToggle = (panel: string) => {
+        if (activePanel === panel) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+            // Only save state if locked
+            if (isLocked) {
+                const state = getSidebarState();
+                setSidebarState({
+                    ...state,
+                    right: {
+                        isOpen: false,
+                        activePanel: undefined,
+                        locked: isLocked,
+                    },
+                });
             }
-        };
+        } else {
+            setIsOpen(true);
+            setActivePanel(panel);
+            // Only save state if locked
+            if (isLocked) {
+                const state = getSidebarState();
+                setSidebarState({
+                    ...state,
+                    right: {
+                        isOpen: true,
+                        activePanel: panel,
+                        locked: isLocked,
+                    },
+                });
+            }
+        }
+    };
 
-        window.addEventListener('closeSidebars', handleCloseSidebars);
-        return () => {
-            window.removeEventListener('closeSidebars', handleCloseSidebars);
-        };
-    }, [isLocked]);
+    const handleClose = () => {
+        if (!isLocked) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+        }
+    };
+
+    const handleLockToggle = () => {
+        const newLockedState = !isLocked;
+        setIsLocked(newLockedState);
+
+        // Save state only when locking/unlocking
+        const state = getSidebarState();
+        setSidebarState({
+            ...state,
+            right: {
+                isOpen: isOpen,
+                activePanel: activePanel,
+                locked: newLockedState,
+            },
+        });
+
+        // If unlocking, close the panel
+        if (!newLockedState) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+        }
+    };
+
+    if (!mounted) return null;
 
     return (
-        <>
-            <div ref={sidebarRef} className='sidebar-content'>
-                <SidebarContent
-                    isOpen={activePanel !== null}
-                    onClose={() => !isLocked && setActivePanel(null)}
-                    title={activePanel === 'settings' ? 'Settings' : 'Tutorial'}
-                    isLocked={isLocked}
-                    onLockToggle={() => setIsLocked(!isLocked)}
-                    position='right'>
-                    {renderPanelContent()}
-                </SidebarContent>
-            </div>
-
+        <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar top-14 right-0 bottom-0 z-[120] w-16 flex-col items-center justify-between py-4 lg:fixed lg:flex'>
+            <div className='fixed-sidebar top-14 right-0 bottom-0 z-[120] w-16 flex-col items-center justify-center py-4 pb-14 lg:fixed lg:flex'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}
@@ -89,6 +123,17 @@ export const RightSidebar = () => {
                     <LuSettings size={20} className='transition-colors' />
                 </button>
             </div>
-        </>
+
+            {/* Settings Panel */}
+            <SidebarContent
+                isOpen={isOpen && activePanel === 'settings'}
+                onClose={handleClose}
+                title='Settings'
+                isLocked={isLocked}
+                onLockToggle={handleLockToggle}
+                position='right'>
+                <SettingsBar />
+            </SidebarContent>
+        </div>
     );
 };

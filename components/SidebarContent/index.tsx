@@ -1,6 +1,8 @@
+'use client';
 import React, { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 import { LuLock, LuUnlock } from 'react-icons/lu';
+import { getSidebarLocks, setSidebarLocks } from '@/utils/localStorage';
 
 interface SidebarContentProps {
     isOpen: boolean;
@@ -14,14 +16,35 @@ interface SidebarContentProps {
 
 export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position }: SidebarContentProps) => {
     const [width, setWidth] = useState(300);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        // Load initial lock state
+        const locks = getSidebarLocks();
+        if (locks[position] !== isLocked) {
+            onLockToggle();
+        }
+    }, []);
 
     const handleResize = useCallback((newWidth: number) => {
         const constrainedWidth = Math.max(300, Math.min(450, newWidth));
         setWidth(constrainedWidth);
     }, []);
 
+    const handleLockToggle = useCallback(() => {
+        const locks = getSidebarLocks();
+        setSidebarLocks({
+            ...locks,
+            [position]: !isLocked,
+        });
+        onLockToggle();
+    }, [isLocked, onLockToggle, position]);
+
     // Update main content margin and width when sidebar opens/closes or resizes
     useEffect(() => {
+        if (!mounted) return;
+
         const main = document.querySelector('main');
         const container = document.getElementById('app-container');
 
@@ -55,12 +78,14 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
             }
             container.style.overflowX = 'hidden';
         }
-    }, [isOpen, width, position, isLocked]);
+    }, [isOpen, width, position, isLocked, mounted]);
+
+    if (!mounted) return null;
 
     return (
         <div
             className={cn(
-                'fixed top-14 bottom-0 flex transform transition-all duration-300',
+                'top-14 bottom-0 hidden transform transition-all duration-300 lg:fixed lg:flex',
                 position === 'left' ? 'left-0' : 'right-0',
                 isOpen
                     ? 'translate-x-0 opacity-100'
@@ -73,19 +98,17 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
             data-locked={isLocked}
             data-width={width}
             style={{ width: `${width}px` }}>
-            <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]' />
-
             <div
                 className={cn(
-                    'group relative my-4 flex h-[calc(100%-2rem)] w-full rounded-lg p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
-                    position === 'left' ? 'ml-16' : 'mr-16'
+                    'group relative my-4 flex h-[calc(100%-2rem)] w-full rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
+                    position === 'left' ? 'ml-14' : 'mr-14'
                 )}>
                 <div className='relative flex h-full w-full flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a] backdrop-blur-md'>
                     {/* Header Section */}
                     <div className='relative z-10 flex h-12 items-center justify-between px-2'>
                         {position === 'right' && (
                             <button
-                                onClick={onLockToggle}
+                                onClick={handleLockToggle}
                                 className={cn(
                                     'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
                                     isLocked
@@ -100,7 +123,7 @@ export const SidebarContent = ({ isOpen, onClose, children, title, isLocked, onL
                         </div>
                         {position === 'left' && (
                             <button
-                                onClick={onLockToggle}
+                                onClick={handleLockToggle}
                                 className={cn(
                                     'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
                                     isLocked

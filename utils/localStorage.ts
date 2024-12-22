@@ -1,4 +1,72 @@
 const SELECTED_PAIRS_KEY = 'selectedPairs';
+const SIDEBAR_LOCKS_KEY = 'sidebarLocks';
+const SIDEBAR_STATE_KEY = 'sidebarState';
+
+export interface SidebarLocks {
+    left: boolean;
+    right: boolean;
+}
+
+export interface SidebarState {
+    left: {
+        isOpen: boolean;
+        activePanel?: string;
+        locked: boolean;
+    };
+    right: {
+        isOpen: boolean;
+        activePanel?: string;
+        locked: boolean;
+    };
+}
+
+export const DEFAULT_SIDEBAR_LOCKS: SidebarLocks = {
+    left: false,
+    right: false,
+};
+
+export const DEFAULT_SIDEBAR_STATE: SidebarState = {
+    left: {
+        isOpen: false,
+        activePanel: undefined,
+        locked: false,
+    },
+    right: {
+        isOpen: false,
+        activePanel: undefined,
+        locked: false,
+    },
+};
+
+export const getSidebarState = (): SidebarState => {
+    if (typeof window === 'undefined') return DEFAULT_SIDEBAR_STATE;
+    try {
+        const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
+        return stored ? JSON.parse(stored) : DEFAULT_SIDEBAR_STATE;
+    } catch {
+        return DEFAULT_SIDEBAR_STATE;
+    }
+};
+
+export const setSidebarState = (state: SidebarState) => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(state));
+};
+
+export const getSidebarLocks = (): SidebarLocks => {
+    if (typeof window === 'undefined') return DEFAULT_SIDEBAR_LOCKS;
+    try {
+        const stored = localStorage.getItem(SIDEBAR_LOCKS_KEY);
+        return stored ? JSON.parse(stored) : DEFAULT_SIDEBAR_LOCKS;
+    } catch {
+        return DEFAULT_SIDEBAR_LOCKS;
+    }
+};
+
+export const setSidebarLocks = (locks: SidebarLocks) => {
+    if (typeof window === 'undefined') return;
+    localStorage.setItem(SIDEBAR_LOCKS_KEY, JSON.stringify(locks));
+};
 
 export const getSelectedPairs = (): string[] => {
     if (typeof window === 'undefined') return [];
@@ -64,144 +132,133 @@ export interface ColorPreset {
     negative: string;
 }
 
-export const colorPresets: ColorPreset[] = [
-    {
-        name: 'RTHMN',
-        positive: '#58ffa0',
-        negative: '#d61d61',
-    },
-    {
-        name: 'Classic',
-        positive: '#ffffff',
-        negative: '#ff1414',
-    },
-    {
-        name: 'Ocean',
-        positive: '#00ced1',
-        negative: '#191970',
-    },
-    {
-        name: 'Forest',
-        positive: '#228b22',
-        negative: '#8b4513',
-    },
-    {
-        name: 'Sunset',
-        positive: '#ff8c00',
-        negative: '#8a2be2',
-    },
-    {
-        name: 'Neon',
-        positive: '#00ffff',
-        negative: '#ff00ff',
-    },
-    {
-        name: 'Monochrome',
-        positive: '#ffffff',
-        negative: '#404040',
-    },
-    {
-        name: 'Fire',
-        positive: '#ffa500',
-        negative: '#b22222',
-    },
-    {
-        name: 'Arctic',
-        positive: '#87ceeb',
-        negative: '#191970',
-    },
-    {
-        name: 'Matrix',
-        positive: '#00ff00',
-        negative: '#006400',
-    },
-];
-
 export interface FullPreset extends ColorPreset {
     styles: BoxColors['styles'];
 }
 
 export const fullPresets: FullPreset[] = [
     {
-        name: 'Emerald',
-        positive: '#58ffa0',
-        negative: '#d61d61',
+        name: 'CYBER.01',
+        positive: '#00ffd5', // Cyan
+        negative: '#ff2975', // Hot pink
         styles: {
-            borderRadius: 6,
+            borderRadius: 4,
             maxBoxCount: 12,
             startIndex: 0,
-            shadowIntensity: 0.35,
-            opacity: 0.31,
+            shadowIntensity: 0.45,
+            opacity: 0.25,
             showBorder: false,
             globalTimeframeControl: true,
         },
     },
     {
-        name: 'Ocean',
-        positive: '#4cc9f0',
-        negative: '#480ca8',
+        name: 'HOLO.02',
+        positive: '#39ff14', // Matrix green
+        negative: '#b91dff', // Electric purple
         styles: {
             borderRadius: 6,
             maxBoxCount: 12,
             startIndex: 0,
-            shadowIntensity: 0.35,
-            opacity: 0.31,
+            shadowIntensity: 0.5,
+            opacity: 0.3,
             showBorder: false,
             globalTimeframeControl: true,
         },
     },
     {
-        name: 'Sunset',
-        positive: '#ff9e00',
-        negative: '#9b2226',
+        name: 'VOID.03',
+        positive: '#e6e6ff', // Soft white
+        negative: '#6600cc', // Deep purple
         styles: {
-            borderRadius: 6,
+            borderRadius: 8,
             maxBoxCount: 12,
             startIndex: 0,
-            shadowIntensity: 0.35,
-            opacity: 0.31,
+            shadowIntensity: 0.4,
+            opacity: 0.28,
             showBorder: false,
             globalTimeframeControl: true,
         },
     },
     {
-        name: 'Neon',
-        positive: '#39ff14',
-        negative: '#ff0080',
+        name: 'PLSM.04',
+        positive: '#ff9933', // Orange
+        negative: '#6600ff', // Royal purple
         styles: {
-            borderRadius: 6,
+            borderRadius: 5,
             maxBoxCount: 12,
             startIndex: 0,
-            shadowIntensity: 0.35,
-            opacity: 0.31,
+            shadowIntensity: 0.45,
+            opacity: 0.28,
             showBorder: false,
             globalTimeframeControl: true,
         },
     },
     {
-        name: 'Pastel',
-        positive: '#90e0ef',
-        negative: '#ff758f',
+        name: 'CRYO.05',
+        positive: '#ffffff', // Pure white
+        negative: '#0066ff', // Bright blue
         styles: {
             borderRadius: 6,
             maxBoxCount: 12,
             startIndex: 0,
-            shadowIntensity: 0.35,
-            opacity: 0.31,
+            shadowIntensity: 0.4,
+            opacity: 0.25,
             showBorder: false,
             globalTimeframeControl: true,
         },
     },
     {
-        name: 'Mono',
-        positive: '#ffffff',
-        negative: '#000000',
+        name: 'PRPL.06',
+        positive: '#b3b3ff', // Light purple
+        negative: '#4d0099', // Deep purple
+        styles: {
+            borderRadius: 7,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.35,
+            opacity: 0.3,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'FLUX.07',
+        positive: '#1aff1a', // Bright green
+        negative: '#ff1a1a', // Bright red
         styles: {
             borderRadius: 6,
             maxBoxCount: 12,
             startIndex: 0,
-            shadowIntensity: 0.35,
-            opacity: 0.31,
+            shadowIntensity: 0.42,
+            opacity: 0.27,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'FRST.08',
+        positive: '#e6ffff', // Ice white
+        negative: '#0099ff', // Sky blue
+        styles: {
+            borderRadius: 5,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.38,
+            opacity: 0.26,
+            showBorder: false,
+            globalTimeframeControl: true,
+        },
+    },
+    {
+        name: 'ZERO.09',
+        positive: '#ffffff', // Pure white
+        negative: '#ff0000', // Pure red
+        styles: {
+            borderRadius: 4,
+            maxBoxCount: 12,
+            startIndex: 0,
+            shadowIntensity: 0.45,
+            opacity: 0.28,
             showBorder: false,
             globalTimeframeControl: true,
         },

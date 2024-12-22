@@ -1,43 +1,30 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
+import { LuLayoutGrid, LuLayoutDashboard, LuOrbit, LuLineChart } from 'react-icons/lu';
 import Link from 'next/link';
-import { LuLayoutDashboard, LuOrbit, LuLineChart } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
-import { SidebarContent } from '@/components/SidebarContent';
-import { SelectedPairs } from '@/components/LeftSidebar/SelectedPairs';
-import { AvailablePairs } from '@/components/LeftSidebar/AvailablePairs';
-
-type ActivePanel = 'menu' | 'chart' | null;
+import { SidebarContent } from '../SidebarContent';
+import { SelectedPairs } from './SelectedPairs';
+import { AvailablePairs } from './AvailablePairs';
+import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
 export const LeftSidebar = () => {
-    const [activePanel, setActivePanel] = useState<ActivePanel>(null);
+    const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
+    const [activePanel, setActivePanel] = useState<string | undefined>();
+    const [mounted, setMounted] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
 
-    const handlePanelToggle = (panel: ActivePanel) => {
-        setActivePanel((prev) => {
-            if (prev === panel) {
-                setIsLocked(false);
-                return null;
-            }
-            return panel;
-        });
-    };
-
-    const renderPanelContent = () => {
-        switch (activePanel) {
-            case 'menu':
-            case 'chart':
-                return (
-                    <>
-                        <SelectedPairs />
-                        <AvailablePairs />
-                    </>
-                );
-            default:
-                return null;
+    useEffect(() => {
+        setMounted(true);
+        // Load initial state only if it was locked
+        const state = getSidebarState();
+        if (state.left.isOpen && state.left.locked) {
+            setIsOpen(true);
+            setIsLocked(true);
+            setActivePanel(state.left.activePanel);
         }
-    };
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -45,7 +32,8 @@ export const LeftSidebar = () => {
                 // Check if the click was inside any sidebar or sidebar toggle
                 const isClickInAnySidebar = (event.target as Element).closest('.sidebar-content, .fixed-sidebar');
                 if (!isClickInAnySidebar) {
-                    setActivePanel(null);
+                    setIsOpen(false);
+                    setActivePanel(undefined);
                 }
             }
         };
@@ -56,35 +44,92 @@ export const LeftSidebar = () => {
         };
     }, [isLocked]);
 
-    useEffect(() => {
-        const handleCloseSidebars = () => {
-            if (!isLocked) {
-                setActivePanel(null);
+    const handlePanelToggle = (panel: string) => {
+        if (activePanel === panel) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+            // Only save state if locked
+            if (isLocked) {
+                const state = getSidebarState();
+                setSidebarState({
+                    ...state,
+                    left: {
+                        isOpen: false,
+                        activePanel: undefined,
+                        locked: isLocked,
+                    },
+                });
             }
-        };
+        } else {
+            setIsOpen(true);
+            setActivePanel(panel);
+            // Only save state if locked
+            if (isLocked) {
+                const state = getSidebarState();
+                setSidebarState({
+                    ...state,
+                    left: {
+                        isOpen: true,
+                        activePanel: panel,
+                        locked: isLocked,
+                    },
+                });
+            }
+        }
+    };
 
-        window.addEventListener('closeSidebars', handleCloseSidebars);
-        return () => {
-            window.removeEventListener('closeSidebars', handleCloseSidebars);
-        };
-    }, [isLocked]);
+    const handleClose = () => {
+        if (!isLocked) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+        }
+    };
+
+    const handleLockToggle = () => {
+        const newLockedState = !isLocked;
+        setIsLocked(newLockedState);
+
+        // Save state only when locking/unlocking
+        const state = getSidebarState();
+        setSidebarState({
+            ...state,
+            left: {
+                isOpen: isOpen,
+                activePanel: activePanel,
+                locked: newLockedState,
+            },
+        });
+
+        // If unlocking, close the panel
+        if (!newLockedState) {
+            setIsOpen(false);
+            setActivePanel(undefined);
+        }
+    };
+
+    const renderPanelContent = () => {
+        switch (activePanel) {
+            case 'menu':
+            case 'chart':
+            case 'instruments':
+                return (
+                    <div className='space-y-4'>
+                        <SelectedPairs />
+                        <AvailablePairs />
+                    </div>
+                );
+            default:
+                return null;
+        }
+    };
+
+    if (!mounted) return null;
 
     return (
-        <>
-            <div ref={sidebarRef} className='sidebar-content'>
-                <SidebarContent
-                    isOpen={activePanel !== null}
-                    onClose={() => !isLocked && setActivePanel(null)}
-                    title={activePanel === 'menu' ? 'Menu' : 'Chart'}
-                    isLocked={isLocked}
-                    onLockToggle={() => setIsLocked(!isLocked)}
-                    position='left'>
-                    {renderPanelContent()}
-                </SidebarContent>
-            </div>
-
+        <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed-sidebar top-14 bottom-0 left-0 z-[120] hidden w-16 flex-col items-center justify-center py-4 lg:fixed lg:flex'>
+            <div className='fixed-sidebar top-14 bottom-0 left-0 z-[120] w-16 flex-col items-center justify-center py-4 pb-14 lg:fixed lg:flex'>
+                {/* Navigation Buttons */}
                 <div className='flex flex-col gap-2'>
                     <Link href='/dashboard'>
                         <button className='group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all duration-200 hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20'>
@@ -97,7 +142,7 @@ export const LeftSidebar = () => {
                         </button>
                     </Link>
                     <button
-                        onClick={() => handlePanelToggle('chart')}
+                        onClick={() => handlePanelToggle('instruments')}
                         className={cn(
                             'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all duration-200',
                             activePanel === 'chart'
@@ -108,6 +153,17 @@ export const LeftSidebar = () => {
                     </button>
                 </div>
             </div>
-        </>
+
+            {/* Pairs Panel */}
+            <SidebarContent
+                isOpen={isOpen && (activePanel === 'instruments' || activePanel === 'chart')}
+                onClose={handleClose}
+                title='Instruments'
+                isLocked={isLocked}
+                onLockToggle={handleLockToggle}
+                position='left'>
+                {renderPanelContent()}
+            </SidebarContent>
+        </div>
     );
 };
