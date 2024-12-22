@@ -1,12 +1,14 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { LuSettings } from 'react-icons/lu';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SettingsBar } from '../SettingsBar';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
 export const SidebarRight = () => {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
@@ -57,6 +59,10 @@ export const SidebarRight = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isLocked]);
+
+    if (!mounted) return null;
+    if (isMobile) return null; // Don't render anything on mobile
+    if (pathname === '/account') return null; // Don't show on account page
 
     // Prevent sidebar from opening on mobile
     const handlePanelToggle = (panel: string) => {
@@ -121,9 +127,6 @@ export const SidebarRight = () => {
             setActivePanel(undefined);
         }
     };
-
-    if (!mounted) return null;
-    if (isMobile) return null; // Don't render anything on mobile
 
     return (
         <div className='sidebar-content' ref={sidebarRef}>
