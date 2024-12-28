@@ -18,27 +18,12 @@ interface PairResoBoxProps {
 
 // Memoize the price display to prevent unnecessary re-renders
 const PriceDisplay = React.memo(
-    ({
-        pair,
-        closePrice,
-        timeframeRange,
-        onToggleView,
-        isBoxView,
-    }: {
-        pair: string;
-        closePrice: string | number;
-        timeframeRange: { start: string; end: string };
-        onToggleView: () => void;
-        isBoxView: boolean;
-    }) => (
+    ({ pair, closePrice, timeframeRange, isBoxView }: { pair: string; closePrice: string | number; timeframeRange: { start: string; end: string }; isBoxView: boolean }) => (
         <div className='flex w-full flex-col items-center gap-2'>
             <div className='flex w-full items-center justify-between'>
                 <div className='flex items-center gap-4'>
                     <div className='font-outfit text-lg font-bold tracking-wider'>{pair.toUpperCase()}</div>
                     <div className='font-kodemono text-sm font-medium text-gray-200'>{closePrice}</div>
-                    <button onClick={onToggleView} className='rounded bg-[#222] px-2 py-1 font-mono text-xs text-gray-300 transition-colors hover:bg-[#333]'>
-                        {isBoxView ? 'Show Line' : 'Show Boxes'}
-                    </button>
                 </div>
                 <div className='flex items-center gap-2'>
                     <div className='font-kodemono text-xs text-gray-400'>
@@ -82,7 +67,9 @@ export const PairResoBox = React.memo(
         // Local state for individual timeframe control
         const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
         const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
-        const [isBoxView, setIsBoxView] = useState(true);
+
+        // Use global chart style setting instead of local state
+        const isBoxView = !boxColors?.styles?.showLineChart;
 
         // Memoize the close price calculation
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
@@ -110,8 +97,6 @@ export const PairResoBox = React.memo(
             }
         };
 
-        const toggleView = () => setIsBoxView(!isBoxView);
-
         return (
             <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
                 <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
@@ -122,7 +107,7 @@ export const PairResoBox = React.memo(
                                 <PriceDisplaySkeleton />
                             </div>
                             <div className={`absolute inset-0 transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <PriceDisplay pair={pair} closePrice={closePrice} timeframeRange={timeframeRange} onToggleView={toggleView} isBoxView={isBoxView} />
+                                <PriceDisplay pair={pair} closePrice={closePrice} timeframeRange={timeframeRange} isBoxView={isBoxView} />
                             </div>
                         </div>
 
@@ -188,7 +173,8 @@ export const PairResoBox = React.memo(
             prevProps.pair !== nextProps.pair ||
             prevProps.boxSlice?.timestamp !== nextProps.boxSlice?.timestamp ||
             prevProps.currentOHLC?.close !== nextProps.currentOHLC?.close ||
-            prevProps.boxColors?.styles?.globalTimeframeControl !== nextProps.boxColors?.styles?.globalTimeframeControl
+            prevProps.boxColors?.styles?.globalTimeframeControl !== nextProps.boxColors?.styles?.globalTimeframeControl ||
+            prevProps.boxColors?.styles?.showLineChart !== nextProps.boxColors?.styles?.showLineChart
         ) {
             return false;
         }

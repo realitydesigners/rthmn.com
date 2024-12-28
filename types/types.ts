@@ -237,6 +237,7 @@ export interface BoxColors {
         opacity: number;
         showBorder: boolean;
         globalTimeframeControl: boolean;
+        showLineChart: boolean;
     };
 }
 
