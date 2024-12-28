@@ -131,7 +131,7 @@ export const PairResoBox = React.memo(
                                 <ResoChart
                                     key={`chart-${boxKey}`}
                                     slice={boxSlice}
-                                    className='h-full w-full'
+                                    className='w-full'
                                     boxColors={{
                                         ...boxColors,
                                         styles: {

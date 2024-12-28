@@ -81,7 +81,7 @@ const useLinePoints = (boxes: Box[], containerHeight: number, containerWidth: nu
 
         // Scale x coordinates
         const maxX = Math.max(...points.map((p) => p[0]));
-        const xScale = maxX > 0 ? containerWidth / maxX : 1;
+        const xScale = maxX > 0 ? (containerWidth * 0.85) / maxX : 1; // Scale to 85% to leave room for padding
         const normalizedPoints = points.map(([x, y]) => {
             const scaledX = x * xScale;
             if (isNaN(scaledX) || isNaN(y)) {
@@ -116,7 +116,7 @@ const useLinePoints = (boxes: Box[], containerHeight: number, containerWidth: nu
                 price,
                 y,
                 x1: intersectX,
-                x2: containerWidth,
+                x2: containerWidth, // Extend horizontal lines to 95% of width
                 isPositive: info.isPositive,
                 intersectX,
             };
@@ -182,10 +182,21 @@ export const ResoChart = React.memo(
         }, '');
 
         return (
-            <div ref={containerRef} className={`relative flex h-full w-full ${className}`}>
+            <div ref={containerRef} className={`relative flex h-[400px] w-full ${className}`}>
                 {/* Chart Area */}
                 <div className='relative h-full flex-1'>
                     <svg className='h-full w-full' preserveAspectRatio='none'>
+                        {/* Define gradients */}
+                        <defs>
+                            <linearGradient id='positiveGradient' x1='0' y1='1' x2='0' y2='0'>
+                                <stop offset='0%' stopColor={boxColors.positive} stopOpacity='0.25' />
+                                <stop offset='100%' stopColor={boxColors.positive} stopOpacity='0.6' />
+                            </linearGradient>
+                            <linearGradient id='negativeGradient' x1='0' y1='0' x2='0' y2='1'>
+                                <stop offset='0%' stopColor={boxColors.negative} stopOpacity='0.25' />
+                                <stop offset='100%' stopColor={boxColors.negative} stopOpacity='0.6' />
+                            </linearGradient>
+                        </defs>
                         {/* Price level lines */}
                         {priceLines.map((line, index) => (
                             <line
@@ -195,20 +206,40 @@ export const ResoChart = React.memo(
                                 x2={line.x2}
                                 y2={!isNaN(line.y) ? line.y : 0}
                                 stroke={line.isPositive ? boxColors.positive : boxColors.negative}
-                                strokeWidth='0.5'
-                                strokeDasharray='2,2'
+                                strokeWidth='.5'
+                                strokeDasharray='1,3'
                             />
                         ))}
-                        {/* Line chart */}
-                        <path d={pathData} fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' />
+                        {/* Line chart with fills */}
+                        {points.map(([x, y], index, arr) => {
+                            if (index === arr.length - 1) return null; // Skip last point
+                            const nextPoint = arr[index + 1];
+                            const isUp = y > nextPoint[1];
+                            const gradientColor = isUp ? 'url(#positiveGradient)' : 'url(#negativeGradient)';
+
+                            // Find the corresponding price line to get the correct end x position
+                            const currentPriceLine = priceLines.find((line) => Math.abs(line.y - y) < 1);
+                            const nextPriceLine = priceLines.find((line) => Math.abs(line.y - nextPoint[1]) < 1);
+                            const endX = Math.max(currentPriceLine?.x2 ?? x, nextPriceLine?.x2 ?? nextPoint[0]);
+
+                            return (
+                                <path
+                                    key={`segment-${index}`}
+                                    d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`}
+                                    fill={gradientColor}
+                                />
+                            );
+                        })}
+                        {/* White line on top */}
+                        <path d={pathData} fill='none' stroke='white' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
                         {points.map(([x, y], index) => (
-                            <circle key={`point-${index}`} cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='2' fill='white' />
+                            <circle key={`point-${index}`} cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='4' fill='white' />
                         ))}
                     </svg>
                 </div>
 
                 {/* Price Sidebar */}
-                <div className='relative w-20 border-l border-[#222] pl-2'>
+                <div className='relative w-12 border-l border-[#222] pl-2'>
                     {priceLines.map((line, index) => (
                         <div
                             key={`price-${index}`}
