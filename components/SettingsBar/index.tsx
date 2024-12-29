@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
-import { LuRotateCcw, LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid } from 'react-icons/lu';
+import { LuRotateCcw, LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid, LuLineChart } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import type { BoxColors, FullPreset } from '@/types/types';
 import { cn } from '@/utils/cn';
@@ -56,6 +56,7 @@ export const SettingsBar = () => {
     const [showColors, setShowColors] = useState(true);
     const [showtimeframe, setShowtimeframe] = useState(true);
     const [showBoxStyle, setShowBoxStyle] = useState(true);
+    const [showChartStyle, setShowChartStyle] = useState(true);
 
     // Calculate timeframe range based on current settings
     const timeframeRange = useMemo(() => {
@@ -158,6 +159,65 @@ export const SettingsBar = () => {
                                 {fullPresets.map((preset) => (
                                     <FullPresetButton key={preset.name} preset={preset} isSelected={isFullPresetSelected(preset)} onClick={() => handleFullPresetClick(preset)} />
                                 ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Chart Style Section */}
+                    <div className='flex flex-col gap-2'>
+                        <button
+                            onClick={() => setShowChartStyle(!showChartStyle)}
+                            className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                            <div className='flex items-center gap-3'>
+                                <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
+                                    <LuLineChart size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                                </div>
+                                <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                                    Chart Style
+                                </span>
+                            </div>
+                            {showChartStyle ? (
+                                <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                            ) : (
+                                <LuChevronDown size={14} className='text-[#666] transition-colors group-hover:text-white' />
+                            )}
+                        </button>
+
+                        {showChartStyle && (
+                            <div className='grid grid-cols-2 gap-2'>
+                                {/* Box Style Option */}
+                                <button
+                                    onClick={() => handleStyleChange('showLineChart', false)}
+                                    className={cn(
+                                        'group relative flex h-[72px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border bg-gradient-to-b p-2 transition-all duration-200',
+                                        !boxColors.styles?.showLineChart
+                                            ? 'border-[#333] from-[#181818]/80 to-[#0F0F0F]/90 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#444] hover:from-[#1c1c1c]/80 hover:to-[#141414]/90'
+                                            : 'border-[#222] from-[#141414]/30 to-[#0A0A0A]/40 hover:border-[#333] hover:from-[#181818]/40 hover:to-[#0F0F0F]/50'
+                                    )}>
+                                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
+                                        <LuBox size={20} className={cn('transition-colors', !boxColors.styles?.showLineChart ? 'text-white' : 'text-[#666]')} />
+                                    </div>
+                                    <span className='font-kodemono text-[8px] font-medium tracking-widest text-[#666] uppercase transition-colors group-hover:text-[#818181]'>
+                                        Box
+                                    </span>
+                                </button>
+
+                                {/* Line Style Option */}
+                                <button
+                                    onClick={() => handleStyleChange('showLineChart', true)}
+                                    className={cn(
+                                        'group relative flex h-[72px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border bg-gradient-to-b p-2 transition-all duration-200',
+                                        boxColors.styles?.showLineChart
+                                            ? 'border-[#333] from-[#181818]/80 to-[#0F0F0F]/90 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#444] hover:from-[#1c1c1c]/80 hover:to-[#141414]/90'
+                                            : 'border-[#222] from-[#141414]/30 to-[#0A0A0A]/40 hover:border-[#333] hover:from-[#181818]/40 hover:to-[#0F0F0F]/50'
+                                    )}>
+                                    <div className='flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
+                                        <LuLineChart size={20} className={cn('transition-colors', boxColors.styles?.showLineChart ? 'text-white' : 'text-[#666]')} />
+                                    </div>
+                                    <span className='font-kodemono text-[8px] font-medium tracking-widest text-[#666] uppercase transition-colors group-hover:text-[#818181]'>
+                                        Line
+                                    </span>
+                                </button>
                             </div>
                         )}
                     </div>
