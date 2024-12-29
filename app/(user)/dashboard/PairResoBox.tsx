@@ -19,7 +19,7 @@ export const PairResoBox = React.memo(
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
         const boxKey = useMemo(() => `${pair}-${boxSlice?.timestamp}`, [pair, boxSlice?.timestamp]);
         const digits = useMemo(() => {
-            const formattedPair = pair.replace(/^(.{3})(.{3})$/, '$1_$2');
+            const formattedPair = pair;
             return symbolsToDigits[formattedPair]?.digits ?? 5;
         }, [pair]);
 
@@ -57,7 +57,7 @@ export const PairResoBox = React.memo(
                         </div>
 
                         {/* Visualization Section */}
-                        <div className='relative flex aspect-square h-full w-full'>
+                        <div className='relative flex h-full w-full'>
                             {isBoxView ? (
                                 <ResoBox
                                     key={`box-${boxKey}`}
@@ -73,7 +73,7 @@ export const PairResoBox = React.memo(
                                     }}
                                 />
                             ) : (
-                                <div className='relative w-full'>
+                                <div className='relative aspect-[2/1] w-full'>
                                     <ResoChart
                                         key={`chart-${boxKey}`}
                                         slice={boxSlice}
@@ -151,14 +151,6 @@ const PriceDisplay = React.memo(
                 <div className='flex items-center gap-4'>
                     <div className='font-outfit text-lg font-bold tracking-wider'>{pair.toUpperCase()}</div>
                     <div className='font-kodemono text-sm font-medium text-gray-200'>{closePrice}</div>
-                </div>
-                <div className='flex items-center gap-2'>
-                    <div className='font-kodemono text-xs text-gray-400'>
-                        <span className='mr-1 text-gray-500'>Range:</span>
-                        <span className='font-medium text-gray-300'>{timeframeRange.start}</span>
-                        <span className='mx-1 text-gray-500'>→</span>
-                        <span className='font-medium text-gray-300'>{timeframeRange.end}</span>
-                    </div>
                 </div>
             </div>
         </div>

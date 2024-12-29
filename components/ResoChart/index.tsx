@@ -68,7 +68,7 @@ export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, classNam
     }
 
     return (
-        <div ref={containerRef} className={`relative flex h-[400px] w-full ${className}`}>
+        <div ref={containerRef} className={`relative flex h-full w-full ${className}`}>
             <div className='relative h-full flex-1 overflow-visible'>
                 <svg className='h-full w-full overflow-visible' preserveAspectRatio='none'>
                     <ChartGradients boxColors={boxColors} />
