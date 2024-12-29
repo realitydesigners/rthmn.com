@@ -47,25 +47,41 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
 
             switch (type) {
                 case 'left': {
-                    const newReversedStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 36));
-                    const newMaxBoxCount = Math.max(2, reversedMaxBoxCount);
-                    // Convert back to original index
-                    const newStartIndex = 37 - (newReversedStartIndex + newMaxBoxCount - 1);
-                    onStyleChange('startIndex', newStartIndex);
-                    onStyleChange('maxBoxCount', newMaxBoxCount);
+                    if (newIndex < 0) {
+                        // Dragging left - increase size
+                        const newReversedStartIndex = Math.max(0, previousIndex + newIndex);
+                        const newMaxBoxCount = reversedMaxBoxCount + Math.abs(newIndex);
+                        const newStartIndex = 37 - (newReversedStartIndex + newMaxBoxCount - 1);
+                        onStyleChange('startIndex', newStartIndex);
+                        onStyleChange('maxBoxCount', Math.min(newMaxBoxCount, 38 - newReversedStartIndex));
+                    } else {
+                        // Dragging right - decrease size
+                        const newReversedStartIndex = Math.min(previousIndex + newIndex, 36);
+                        const newMaxBoxCount = Math.max(2, reversedMaxBoxCount - newIndex);
+                        const newStartIndex = 37 - (newReversedStartIndex + newMaxBoxCount - 1);
+                        onStyleChange('startIndex', newStartIndex);
+                        onStyleChange('maxBoxCount', newMaxBoxCount);
+                    }
                     break;
                 }
                 case 'right': {
-                    const newMaxBoxCount = Math.max(2, Math.min(previousIndex + newIndex, 38 - reversedStartIndex));
-                    // Convert back to original index
-                    const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
-                    onStyleChange('startIndex', newStartIndex);
-                    onStyleChange('maxBoxCount', newMaxBoxCount);
+                    if (newIndex > 0) {
+                        // Dragging right - increase size
+                        const newMaxBoxCount = Math.min(previousIndex + newIndex, 38 - reversedStartIndex);
+                        const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
+                        onStyleChange('startIndex', newStartIndex);
+                        onStyleChange('maxBoxCount', newMaxBoxCount);
+                    } else {
+                        // Dragging left - decrease size
+                        const newMaxBoxCount = Math.max(2, previousIndex + newIndex);
+                        const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
+                        onStyleChange('startIndex', newStartIndex);
+                        onStyleChange('maxBoxCount', newMaxBoxCount);
+                    }
                     break;
                 }
                 case 'position': {
                     const newReversedStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 38 - reversedMaxBoxCount));
-                    // Convert back to original index
                     const newStartIndex = 37 - (newReversedStartIndex + reversedMaxBoxCount - 1);
                     onStyleChange('startIndex', newStartIndex);
                     break;
