@@ -73,7 +73,6 @@ export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, classNam
                 <svg className='h-full w-full overflow-visible' preserveAspectRatio='none'>
                     <ChartSegments points={points} priceLines={priceLines} boxColors={boxColors} />
                     <PriceLines priceLines={priceLines} boxColors={boxColors} />
-                    <ChartPoints points={points} boxColors={boxColors} prices={prices} digits={digits} />
                 </svg>
             </div>
             {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={boxColors} digits={digits} prices={prices} />}
@@ -309,125 +308,92 @@ export const PriceLines = ({ priceLines, boxColors }: { priceLines: PriceLine[];
 );
 
 export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point[]; priceLines: PriceLine[]; boxColors: BoxColors }) => {
+    const allPrices = priceLines.map((line) => line.price);
+    const minPrice = Math.min(...allPrices);
+    const maxPrice = Math.max(...allPrices);
+    const priceRange = maxPrice - minPrice;
+    const gridInterval = priceRange / 100;
+    const minGridLine = Math.floor(minPrice / gridInterval) * gridInterval;
+    const maxGridLine = Math.ceil(maxPrice / gridInterval) * gridInterval;
+    const gridLines = [];
+
+    for (let price = minGridLine; price <= maxGridLine; price += gridInterval) {
+        const matchingLine = priceLines.find((line) => Math.abs(line.price - price) < gridInterval / 2);
+        if (matchingLine) {
+            gridLines.push({
+                y: matchingLine.y,
+                price,
+                isMajor: Math.abs(price % (gridInterval * 5)) < 0.0001,
+            });
+        }
+    }
+
     return (
         <>
-            {/* Draw grid lines first */}
-            <g className='price-grid'>
-                {priceLines.map((line, index) => (
-                    <line
-                        key={`grid-${index}`}
-                        x1='0'
-                        y1={line.y}
-                        x2={line.intersectX}
-                        y2={line.y}
-                        stroke={line.isPositive ? boxColors.positive : boxColors.negative}
-                        strokeWidth='0.5'
-                        strokeDasharray='2,4'
-                        strokeOpacity='0.2'
-                    />
-                ))}
-            </g>
-
-            {/* Draw a layer for each value */}
-            {points.map(([x, y], index, arr) => {
-                if (index === arr.length - 1) return null;
-                const nextPoint = arr[index + 1];
-                const isUp = y > nextPoint[1];
-
-                // Find the price lines this segment spans
-                const startLine = priceLines.find((line) => Math.abs(line.y - y) < 1);
-                const endLine = priceLines.find((line) => Math.abs(line.y - nextPoint[1]) < 1);
-                if (!startLine || !endLine) return null;
-
-                // Get all price lines between start and end
-                const relevantLines = priceLines.filter((line) => {
-                    const isInRange = (y <= line.y && line.y <= nextPoint[1]) || (nextPoint[1] <= line.y && line.y <= y);
-                    return isInRange && line.isPositive === isUp;
-                });
-
-                // Draw a segment for each relevant line
-                return relevantLines.map((line, lineIndex) => {
-                    const baseOpacity = 0.08; // Reduced base opacity
-                    const opacityIncrement = 0.05; // Smaller increment per layer
-                    const opacity = Math.min(baseOpacity + lineIndex * opacityIncrement, 0.4); // Lower max opacity
-                    const color = line.isPositive ? boxColors.positive : boxColors.negative;
-
-                    // Calculate intersection with white line
-                    const slope = (nextPoint[1] - y) / (nextPoint[0] - x);
-                    const intersectX = x + (line.y - y) / slope;
-
+            <defs>
+                {/* Create multiple gradients with increasing brightness */}
+                {[...Array(10)].map((_, i) => {
+                    // Exponential increase in intensity for more dramatic stacking effect
+                    const intensity = Math.pow((i + 1) / 5, 1.5);
                     return (
-                        <g key={`segment-${index}-line-${lineIndex}`}>
-                            {/* Fill from the white line to the right edge */}
-                            <path
-                                d={`M ${intersectX},${line.y} 
-                                   L ${line.x2},${line.y}
-                                   L ${line.x2},${nextPoint[1]}
-                                   L ${nextPoint[0]},${nextPoint[1]} Z`}
-                                fill={color}
-                                opacity={opacity}
-                                className='transition-all duration-300'
-                            />
-                        </g>
+                        <React.Fragment key={i}>
+                            <linearGradient id={`positiveGradient-${i}`} x1='0' y1='1' x2='0' y2='0'>
+                                <stop offset='0%' stopColor={boxColors.positive} stopOpacity={Math.min(0.8 * intensity, 1)} />
+                                <stop offset='50%' stopColor={boxColors.positive} stopOpacity={Math.min(0.5 * intensity, 0.8)} />
+                                <stop offset='100%' stopColor={boxColors.positive} stopOpacity={Math.min(0.2 * intensity, 0.4)} />
+                            </linearGradient>
+                            <linearGradient id={`negativeGradient-${i}`} x1='0' y1='0' x2='0' y2='1'>
+                                <stop offset='0%' stopColor={boxColors.negative} stopOpacity={Math.min(0.8 * intensity, 1)} />
+                                <stop offset='50%' stopColor={boxColors.negative} stopOpacity={Math.min(0.5 * intensity, 0.8)} />
+                                <stop offset='100%' stopColor={boxColors.negative} stopOpacity={Math.min(0.2 * intensity, 0.4)} />
+                            </linearGradient>
+                        </React.Fragment>
                     );
-                });
-            })}
+                })}
+            </defs>
 
-            {/* Draw the connecting lines */}
             {points.map(([x, y], index, arr) => {
                 if (index === arr.length - 1) return null;
                 const nextPoint = arr[index + 1];
                 const isUp = y > nextPoint[1];
-                const color = isUp ? boxColors.positive : boxColors.negative;
+
+                // Calculate intensity based on consecutive segments in same direction
+                let intensityIndex = 0;
+                let consecutiveCount = 0;
+                for (let i = 0; i <= index; i++) {
+                    if (i === arr.length - 1) continue;
+                    const currentIsUp = arr[i][1] > arr[i + 1][1];
+                    if (currentIsUp === isUp) {
+                        consecutiveCount++;
+                    } else {
+                        consecutiveCount = 0;
+                    }
+                }
+                intensityIndex = Math.min(consecutiveCount, 9);
+
+                const gradientColor = isUp ? `url(#positiveGradient-${intensityIndex})` : `url(#negativeGradient-${intensityIndex})`;
+
+                const lineColor = isUp ? boxColors.positive : boxColors.negative;
+                const currentPriceLine = priceLines.find((line) => Math.abs(line.y - y) < 1);
+                const nextPriceLine = priceLines.find((line) => Math.abs(line.y - nextPoint[1]) < 1);
+                const endX = Math.max(currentPriceLine?.x2 ?? x, nextPriceLine?.x2 ?? nextPoint[0]);
 
                 return (
-                    <path
-                        key={`line-${index}`}
-                        d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]}`}
-                        stroke={color}
-                        strokeWidth='1'
-                        fill='none'
-                        className='transition-all duration-300'
-                    />
+                    <g key={`segment-${index}`}>
+                        <path
+                            d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`}
+                            fill={gradientColor}
+                            className='transition-all duration-300'
+                        />
+                        <path d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]}`} stroke={lineColor} strokeWidth='3' fill='none' className='relative z-[1000]' />
+                    </g>
                 );
             })}
         </>
     );
 };
 
-// Chart points component
-// Chart points component
-export const ChartPoints = ({ points, boxColors, prices, digits = 5 }: { points: Point[]; boxColors: BoxColors; prices: number[]; digits?: number }) => {
-    const pathData = points.reduce((acc, [x, y], index) => {
-        return index === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
-    }, '');
-
-    return (
-        <>
-            {/* Draw the line path with glow */}
-            <path d={pathData} fill='none' stroke='rgba(255,255,255,0.3)' strokeWidth='4' strokeLinecap='round' strokeLinejoin='round' filter='url(#glow)' />
-            <path d={pathData} fill='none' stroke='white' strokeWidth='1.5' strokeLinecap='round' strokeLinejoin='round' />
-
-            {/* Draw points with technical indicators */}
-            {points.map(([x, y], index) => (
-                <g key={`point-${index}`}>
-                    {/* Middle ring */}
-                    <circle cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='6' fill='none' stroke='rgba(255,255,255,0.4)' strokeWidth='1' />
-
-                    {/* Center point with glow */}
-                    <circle cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='3' fill='white' filter='url(#glow)' />
-
-                    {/* Crosshair lines */}
-                    <line x1={x - 10} y1={y} x2={x + 10} y2={y} stroke='rgba(255,255,255,0.3)' strokeWidth='1' />
-                    <line x1={x} y1={y - 10} x2={x} y2={y + 10} stroke='rgba(255,255,255,0.3)' strokeWidth='1' />
-                </g>
-            ))}
-        </>
-    );
-};
-
-// Price sidebar component
-export const PriceSidebar = ({ priceLines, boxColors, digits = 5, prices = [] }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
+export const PriceSidebar = ({ priceLines, digits = 5, prices = [] }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
     <div className='relative w-18 border-l border-[#222] pl-2'>
         {priceLines.map((line, index) => {
             const isHighlightedPrice = prices.includes(line.price);
