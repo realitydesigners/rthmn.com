@@ -7,60 +7,7 @@ import { getTimeframeRange } from '@/utils/timeframe';
 import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
 import React, { useMemo, useState } from 'react';
 import { ResoChart } from '@/components/ResoChart';
-
-interface PairResoBoxProps {
-    pair?: string;
-    boxSlice?: BoxSlice;
-    currentOHLC?: OHLC;
-    boxColors?: BoxColors;
-    isLoading?: boolean;
-}
-
-// Memoize the price display to prevent unnecessary re-renders
-const PriceDisplay = React.memo(
-    ({ pair, closePrice, timeframeRange, isBoxView }: { pair: string; closePrice: string | number; timeframeRange: { start: string; end: string }; isBoxView: boolean }) => (
-        <div className='flex w-full flex-col items-center gap-2'>
-            <div className='flex w-full items-center justify-between'>
-                <div className='flex items-center gap-4'>
-                    <div className='font-outfit text-lg font-bold tracking-wider'>{pair.toUpperCase()}</div>
-                    <div className='font-kodemono text-sm font-medium text-gray-200'>{closePrice}</div>
-                </div>
-                <div className='flex items-center gap-2'>
-                    <div className='font-kodemono text-xs text-gray-400'>
-                        <span className='mr-1 text-gray-500'>Range:</span>
-                        <span className='font-medium text-gray-300'>{timeframeRange.start}</span>
-                        <span className='mx-1 text-gray-500'>→</span>
-                        <span className='font-medium text-gray-300'>{timeframeRange.end}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    )
-);
-
-PriceDisplay.displayName = 'PriceDisplay';
-
-// Loading skeletons for each component
-const PriceDisplaySkeleton = () => (
-    <div className='flex w-full flex-col items-center gap-2'>
-        <div className='flex w-full items-center justify-between'>
-            <div className='flex items-center gap-4'>
-                <div className='h-5 w-20 rounded-md bg-[#222]/50' />
-                <div className='h-4 w-16 rounded-md bg-[#222]/50' />
-                <div className='h-6 w-20 rounded-md bg-[#222]/50' />
-            </div>
-            <div className='h-4 w-32 rounded-md bg-[#222]/50' />
-        </div>
-    </div>
-);
-
-const ResoBoxSkeleton = () => (
-    <div className='relative aspect-square h-full w-full'>
-        <div className='h-full w-full rounded-lg bg-[#222]/20' />
-    </div>
-);
-
-const TimeFrameVisualizerSkeleton = () => <div className='h-10 w-full max-w-lg rounded-lg bg-[#222]/20' />;
+import { symbolsToDigits } from '@/utils/Constants';
 
 export const PairResoBox = React.memo(
     ({ pair = '', boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
@@ -76,6 +23,13 @@ export const PairResoBox = React.memo(
 
         // Create a stable key for ResoBox that only changes when necessary
         const boxKey = useMemo(() => `${pair}-${boxSlice?.timestamp}`, [pair, boxSlice?.timestamp]);
+
+        // Get the digits for the currency pair
+        const digits = useMemo(() => {
+            // Convert USDJPY to USD_JPY format
+            const formattedPair = pair.replace(/^(.{3})(.{3})$/, '$1_$2');
+            return symbolsToDigits[formattedPair]?.digits ?? 5;
+        }, [pair]);
 
         // Calculate timeframe range based on whether we're using global or individual control
         const timeframeRange = useMemo(() => {
@@ -132,6 +86,7 @@ export const PairResoBox = React.memo(
                                     key={`chart-${boxKey}`}
                                     slice={boxSlice}
                                     className='w-full'
+                                    digits={digits}
                                     boxColors={{
                                         ...boxColors,
                                         styles: {
@@ -188,3 +143,50 @@ export const PairResoBox = React.memo(
 );
 
 PairResoBox.displayName = 'PairResoBox';
+
+// Memoize the price display to prevent unnecessary re-renders
+const PriceDisplay = React.memo(
+    ({ pair, closePrice, timeframeRange, isBoxView }: { pair: string; closePrice: string | number; timeframeRange: { start: string; end: string }; isBoxView: boolean }) => (
+        <div className='flex w-full flex-col items-center gap-2'>
+            <div className='flex w-full items-center justify-between'>
+                <div className='flex items-center gap-4'>
+                    <div className='font-outfit text-lg font-bold tracking-wider'>{pair.toUpperCase()}</div>
+                    <div className='font-kodemono text-sm font-medium text-gray-200'>{closePrice}</div>
+                </div>
+                <div className='flex items-center gap-2'>
+                    <div className='font-kodemono text-xs text-gray-400'>
+                        <span className='mr-1 text-gray-500'>Range:</span>
+                        <span className='font-medium text-gray-300'>{timeframeRange.start}</span>
+                        <span className='mx-1 text-gray-500'>→</span>
+                        <span className='font-medium text-gray-300'>{timeframeRange.end}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+);
+
+PriceDisplay.displayName = 'PriceDisplay';
+
+interface PairResoBoxProps {
+    pair?: string;
+    boxSlice?: BoxSlice;
+    currentOHLC?: OHLC;
+    boxColors?: BoxColors;
+    isLoading?: boolean;
+}
+
+const PriceDisplaySkeleton = () => (
+    <div className='flex w-full flex-col items-center gap-2'>
+        <div className='flex w-full items-center justify-between'>
+            <div className='flex items-center gap-4'>
+                <div className='h-5 w-20 rounded-md bg-[#222]/50' />
+                <div className='h-4 w-16 rounded-md bg-[#222]/50' />
+                <div className='h-6 w-20 rounded-md bg-[#222]/50' />
+            </div>
+            <div className='h-4 w-32 rounded-md bg-[#222]/50' />
+        </div>
+    </div>
+);
+
+const TimeFrameVisualizerSkeleton = () => <div className='h-10 w-full max-w-lg rounded-lg bg-[#222]/20' />;
