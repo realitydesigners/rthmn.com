@@ -13,13 +13,13 @@ export const PairResoBox = React.memo(
     ({ pair = '', boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
         const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
         const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
-        const [showSidebar, setShowSidebar] = useState(false);
+        const [showSidebar, setShowSidebar] = useState(true);
 
         const isBoxView = !boxColors?.styles?.showLineChart;
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
         const boxKey = useMemo(() => `${pair}-${boxSlice?.timestamp}`, [pair, boxSlice?.timestamp]);
         const digits = useMemo(() => {
-            const formattedPair = pair.replace(/^(.{3})(.{3})$/, '$1_$2');
+            const formattedPair = pair;
             return symbolsToDigits[formattedPair]?.digits ?? 5;
         }, [pair]);
 
@@ -57,7 +57,7 @@ export const PairResoBox = React.memo(
                         </div>
 
                         {/* Visualization Section */}
-                        <div className='relative flex aspect-square h-full w-full'>
+                        <div className='relative flex h-full w-full'>
                             {isBoxView ? (
                                 <ResoBox
                                     key={`box-${boxKey}`}
@@ -73,7 +73,7 @@ export const PairResoBox = React.memo(
                                     }}
                                 />
                             ) : (
-                                <div className='relative w-full'>
+                                <div className='relative aspect-[2/1] w-full'>
                                     <ResoChart
                                         key={`chart-${boxKey}`}
                                         slice={boxSlice}
@@ -92,11 +92,11 @@ export const PairResoBox = React.memo(
                                 </div>
                             )}
                         </div>
-                        <button
+                        {/* <button
                             onClick={() => setShowSidebar(!showSidebar)}
                             className='relative z-10 rounded bg-[#222] px-2 py-1 text-xs text-white opacity-50 transition-opacity hover:opacity-100'>
                             {showSidebar ? 'Hide' : 'Show'} Prices
-                        </button>
+                        </button> */}
 
                         {!boxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
                             <div className='relative h-24 w-full'>
@@ -151,14 +151,6 @@ const PriceDisplay = React.memo(
                 <div className='flex items-center gap-4'>
                     <div className='font-outfit text-lg font-bold tracking-wider'>{pair.toUpperCase()}</div>
                     <div className='font-kodemono text-sm font-medium text-gray-200'>{closePrice}</div>
-                </div>
-                <div className='flex items-center gap-2'>
-                    <div className='font-kodemono text-xs text-gray-400'>
-                        <span className='mr-1 text-gray-500'>Range:</span>
-                        <span className='font-medium text-gray-300'>{timeframeRange.start}</span>
-                        <span className='mx-1 text-gray-500'>→</span>
-                        <span className='font-medium text-gray-300'>{timeframeRange.end}</span>
-                    </div>
                 </div>
             </div>
         </div>
