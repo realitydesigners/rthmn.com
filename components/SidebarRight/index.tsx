@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { LuSettings } from 'react-icons/lu';
+import { LuSettings, LuRotateCcw, LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid, LuLineChart } from 'react-icons/lu';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { SidebarWrapper } from '../SidebarWrapper';

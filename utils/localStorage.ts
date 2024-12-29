@@ -92,6 +92,7 @@ export interface BoxColors {
         opacity: number;
         showBorder: boolean;
         globalTimeframeControl: boolean;
+        showLineChart: boolean;
     };
 }
 
@@ -108,6 +109,7 @@ export const DEFAULT_BOX_COLORS: BoxColors = {
         opacity: 0.25,
         showBorder: false,
         globalTimeframeControl: false,
+        showLineChart: false,
     },
 };
 
@@ -149,6 +151,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.25,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -163,6 +166,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.3,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -177,6 +181,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.28,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -191,6 +196,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.28,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -205,6 +211,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.25,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -219,6 +226,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.3,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -233,6 +241,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.27,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -247,6 +256,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.26,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
     {
@@ -261,6 +271,7 @@ export const fullPresets: FullPreset[] = [
             opacity: 0.28,
             showBorder: false,
             globalTimeframeControl: true,
+            showLineChart: false,
         },
     },
 ];
