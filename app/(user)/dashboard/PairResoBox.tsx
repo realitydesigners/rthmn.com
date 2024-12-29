@@ -11,22 +11,14 @@ import { symbolsToDigits } from '@/utils/Constants';
 
 export const PairResoBox = React.memo(
     ({ pair = '', boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
-        // Local state for individual timeframe control
         const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
         const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
+        const [showSidebar, setShowSidebar] = useState(false);
 
-        // Use global chart style setting instead of local state
         const isBoxView = !boxColors?.styles?.showLineChart;
-
-        // Memoize the close price calculation
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
-
-        // Create a stable key for ResoBox that only changes when necessary
         const boxKey = useMemo(() => `${pair}-${boxSlice?.timestamp}`, [pair, boxSlice?.timestamp]);
-
-        // Get the digits for the currency pair
         const digits = useMemo(() => {
-            // Convert USDJPY to USD_JPY format
             const formattedPair = pair.replace(/^(.{3})(.{3})$/, '$1_$2');
             return symbolsToDigits[formattedPair]?.digits ?? 5;
         }, [pair]);
@@ -42,7 +34,6 @@ export const PairResoBox = React.memo(
             }
         }, [boxColors?.styles?.globalTimeframeControl, boxColors?.styles?.startIndex, boxColors?.styles?.maxBoxCount, localStartIndex, localMaxBoxCount, boxSlice?.boxes?.length]);
 
-        // Handle local style changes
         const handleLocalStyleChange = (property: string, value: number | boolean) => {
             if (property === 'startIndex') {
                 setLocalStartIndex(value as number);
@@ -82,22 +73,30 @@ export const PairResoBox = React.memo(
                                     }}
                                 />
                             ) : (
-                                <ResoChart
-                                    key={`chart-${boxKey}`}
-                                    slice={boxSlice}
-                                    className='w-full'
-                                    digits={digits}
-                                    boxColors={{
-                                        ...boxColors,
-                                        styles: {
-                                            ...boxColors.styles,
-                                            startIndex: boxColors.styles?.globalTimeframeControl ? boxColors.styles.startIndex : localStartIndex,
-                                            maxBoxCount: boxColors.styles?.globalTimeframeControl ? boxColors.styles.maxBoxCount : localMaxBoxCount,
-                                        },
-                                    }}
-                                />
+                                <div className='relative w-full'>
+                                    <ResoChart
+                                        key={`chart-${boxKey}`}
+                                        slice={boxSlice}
+                                        className='w-full'
+                                        digits={digits}
+                                        showSidebar={showSidebar}
+                                        boxColors={{
+                                            ...boxColors,
+                                            styles: {
+                                                ...boxColors.styles,
+                                                startIndex: boxColors.styles?.globalTimeframeControl ? boxColors.styles.startIndex : localStartIndex,
+                                                maxBoxCount: boxColors.styles?.globalTimeframeControl ? boxColors.styles.maxBoxCount : localMaxBoxCount,
+                                            },
+                                        }}
+                                    />
+                                </div>
                             )}
                         </div>
+                        <button
+                            onClick={() => setShowSidebar(!showSidebar)}
+                            className='relative z-10 rounded bg-[#222] px-2 py-1 text-xs text-white opacity-50 transition-opacity hover:opacity-100'>
+                            {showSidebar ? 'Hide' : 'Show'} Prices
+                        </button>
 
                         {!boxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
                             <div className='relative h-24 w-full'>

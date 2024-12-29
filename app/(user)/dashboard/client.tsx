@@ -96,6 +96,8 @@ export default function Dashboard() {
             .flat();
     }, [selectedPairs, pairData, isLoading]);
 
+    console.log(filteredPairData);
+
     if (!selectedPairs.length && !isLoading) {
         return (
             <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
