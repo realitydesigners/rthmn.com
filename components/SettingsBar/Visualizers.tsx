@@ -22,6 +22,10 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
         dragType: null,
     });
 
+    // Convert to reversed index for calculations
+    const reversedStartIndex = 37 - (startIndex + maxBoxCount - 1);
+    const reversedMaxBoxCount = maxBoxCount;
+
     const handleMouseDown = (e: React.MouseEvent, type: 'left' | 'right' | 'position') => {
         e.preventDefault();
         e.stopPropagation();
@@ -31,7 +35,7 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
         const rect = barContainerRef.current.getBoundingClientRect();
         const barWidth = rect.width / 38;
         const startX = e.clientX;
-        let previousIndex = type === 'left' ? startIndex : type === 'right' ? maxBoxCount : startIndex;
+        let previousIndex = type === 'left' ? reversedStartIndex : type === 'right' ? reversedMaxBoxCount : reversedStartIndex;
 
         const handleGlobalMouseMove = (e: MouseEvent) => {
             if (!barContainerRef.current) return;
@@ -43,21 +47,27 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
 
             switch (type) {
                 case 'left': {
-                    const newStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 36));
-                    const rightEdge = startIndex + maxBoxCount;
-                    const newMaxBoxCount = Math.max(2, rightEdge - newStartIndex);
+                    const newReversedStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 36));
+                    const newMaxBoxCount = Math.max(2, reversedMaxBoxCount);
+                    // Convert back to original index
+                    const newStartIndex = 37 - (newReversedStartIndex + newMaxBoxCount - 1);
                     onStyleChange('startIndex', newStartIndex);
                     onStyleChange('maxBoxCount', newMaxBoxCount);
                     break;
                 }
                 case 'right': {
-                    const newMaxBoxCount = Math.max(2, Math.min(previousIndex + newIndex, 38 - startIndex));
+                    const newMaxBoxCount = Math.max(2, Math.min(previousIndex + newIndex, 38 - reversedStartIndex));
+                    // Convert back to original index
+                    const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
+                    onStyleChange('startIndex', newStartIndex);
                     onStyleChange('maxBoxCount', newMaxBoxCount);
                     break;
                 }
                 case 'position': {
-                    const newPosition = Math.max(0, Math.min(previousIndex + newIndex, 38 - maxBoxCount));
-                    onStyleChange('startIndex', newPosition);
+                    const newReversedStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 38 - reversedMaxBoxCount));
+                    // Convert back to original index
+                    const newStartIndex = 37 - (newReversedStartIndex + reversedMaxBoxCount - 1);
+                    onStyleChange('startIndex', newStartIndex);
                     break;
                 }
             }
@@ -81,10 +91,11 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
                     <div className='relative h-full px-4 pt-4 pb-9'>
                         <div ref={barContainerRef} className='group/bars relative flex h-10 items-center rounded-lg bg-white/[0.02]'>
                             {Array.from({ length: 38 }).map((_, i) => {
-                                const isSelected = i >= startIndex && i < startIndex + maxBoxCount;
-                                const isLeftEdge = i === startIndex;
-                                const isRightEdge = i === startIndex + maxBoxCount - 1;
-                                const isNearEdge = Math.abs(i - startIndex) <= 1 || Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1;
+                                const reversedI = i; // No need to reverse i anymore since we're already in reversed space
+                                const isSelected = reversedI >= reversedStartIndex && reversedI < reversedStartIndex + reversedMaxBoxCount;
+                                const isLeftEdge = reversedI === reversedStartIndex;
+                                const isRightEdge = reversedI === reversedStartIndex + reversedMaxBoxCount - 1;
+                                const isNearEdge = Math.abs(reversedI - reversedStartIndex) <= 1 || Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
 
                                 return (
                                     <div
@@ -93,9 +104,9 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
                                         onMouseDown={(e) => {
                                             if (isSelected) {
                                                 handleMouseDown(e, 'position');
-                                            } else if (Math.abs(i - startIndex) <= 1) {
+                                            } else if (Math.abs(reversedI - reversedStartIndex) <= 1) {
                                                 handleMouseDown(e, 'left');
-                                            } else if (Math.abs(i - (startIndex + maxBoxCount - 1)) <= 1) {
+                                            } else if (Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1) {
                                                 handleMouseDown(e, 'right');
                                             }
                                         }}>
@@ -131,8 +142,8 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
                             <div
                                 className='pointer-events-none absolute inset-y-0 z-100 transition-all duration-300'
                                 style={{
-                                    left: `${(startIndex / 38) * 100}%`,
-                                    width: `${(maxBoxCount / 38) * 100}%`,
+                                    left: `${(reversedStartIndex / 38) * 100}%`,
+                                    width: `${(reversedMaxBoxCount / 38) * 100}%`,
                                 }}>
                                 {/* Edge handles with enhanced glow */}
                                 <div
@@ -154,17 +165,17 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
                         {/* Integrated Timeframe Scale with Active Indicator */}
                         <div className='absolute inset-x-0 bottom-2 flex justify-between px-[10px]'>
                             <div className='font-kodemono font- relative flex w-full justify-between text-[8px] uppercase'>
-                                {['1m', '5m', '15m', '1H', '2H', '4H', '12H', 'D'].map((time, i) => {
+                                {['D', '12H', '4H', '2H', '1H', '15m', '5m', '1m'].map((time, i) => {
                                     // More accurate position calculation
                                     const segmentWidth = 38 / 9; // Width of each timeframe segment
-                                    const position = Math.round(i * segmentWidth);
+                                    const position = Math.round(i * segmentWidth); // Use normal i for position
                                     const nextPosition = Math.round((i + 1) * segmentWidth);
 
-                                    // More precise range check
+                                    // Check if this timeframe is in range in the reversed space
                                     const isInRange =
-                                        (position >= startIndex && position <= startIndex + maxBoxCount) ||
-                                        (nextPosition > startIndex && nextPosition <= startIndex + maxBoxCount) ||
-                                        (position <= startIndex && nextPosition >= startIndex + maxBoxCount);
+                                        (position >= reversedStartIndex && position <= reversedStartIndex + reversedMaxBoxCount) ||
+                                        (nextPosition > reversedStartIndex && nextPosition <= reversedStartIndex + reversedMaxBoxCount) ||
+                                        (position <= reversedStartIndex && nextPosition >= reversedStartIndex + reversedMaxBoxCount);
 
                                     return (
                                         <div key={time} className='relative flex flex-col items-center'>

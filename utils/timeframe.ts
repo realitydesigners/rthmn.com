@@ -1,5 +1,5 @@
 // Constants
-export const TIMEFRAMES = ['1m', '5m', '15m', '1H', '2H', '4H', '12H', 'D'] as const;
+export const TIMEFRAMES = ['D', '12H', '4H', '2H', '1H', '15m', '5m', '1m'] as const;
 export const SEGMENT_WIDTH = 38 / 9; // Width of each timeframe segment
 
 export interface TimeframeRange {
