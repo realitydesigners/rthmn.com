@@ -13,7 +13,7 @@ export const PairResoBox = React.memo(
     ({ pair = '', boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
         const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
         const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
-        const [showSidebar, setShowSidebar] = useState(false);
+        const [showSidebar, setShowSidebar] = useState(true);
 
         const isBoxView = !boxColors?.styles?.showLineChart;
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
@@ -92,11 +92,11 @@ export const PairResoBox = React.memo(
                                 </div>
                             )}
                         </div>
-                        <button
+                        {/* <button
                             onClick={() => setShowSidebar(!showSidebar)}
                             className='relative z-10 rounded bg-[#222] px-2 py-1 text-xs text-white opacity-50 transition-opacity hover:opacity-100'>
                             {showSidebar ? 'Hide' : 'Show'} Prices
-                        </button>
+                        </button> */}
 
                         {!boxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
                             <div className='relative h-24 w-full'>
