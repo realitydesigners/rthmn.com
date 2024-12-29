@@ -76,7 +76,7 @@ export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, classNam
                     <ChartPoints points={points} boxColors={boxColors} prices={prices} digits={digits} />
                 </svg>
             </div>
-            {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={boxColors} digits={digits} />}
+            {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={boxColors} digits={digits} prices={prices} />}
         </div>
     );
 };
@@ -377,9 +377,6 @@ export const ChartPoints = ({ points, boxColors, prices, digits = 5 }: { points:
         return index === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
     }, '');
 
-    // Find the maximum x value for positioning labels
-    const maxX = Math.max(...points.map(([x]) => x));
-
     return (
         <>
             {/* Draw the line path */}
@@ -389,29 +386,25 @@ export const ChartPoints = ({ points, boxColors, prices, digits = 5 }: { points:
             {points.map(([x, y], index) => (
                 <circle key={`point-${index}`} cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='4' fill='white' />
             ))}
-
-            {/* Draw all price labels on the right side */}
-            {points.map(([_, y], index) => (
-                <text key={`price-${index}`} x={maxX + 24} y={!isNaN(y) ? y + 4 : 0} fill='white' fontSize='11' fontFamily='monospace' textAnchor='start'>
-                    {prices[index].toFixed(digits)}
-                </text>
-            ))}
         </>
     );
 };
 
 // Price sidebar component
-export const PriceSidebar = ({ priceLines, boxColors, digits = 5 }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number }) => (
+export const PriceSidebar = ({ priceLines, boxColors, digits = 5, prices = [] }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
     <div className='relative w-18 border-l border-[#222] pl-2'>
-        {priceLines.map((line, index) => (
-            <div
-                key={`price-${index}`}
-                className='absolute left-0 w-full pl-2 font-mono text-[10px] text-white'
-                style={{
-                    top: !isNaN(line.y) ? line.y - 6 : 0,
-                }}>
-                {line.price.toFixed(digits)}
-            </div>
-        ))}
+        {priceLines.map((line, index) => {
+            const isHighlightedPrice = prices.includes(line.price);
+            return (
+                <div
+                    key={`price-${index}`}
+                    className={`absolute left-0 w-full pl-2 font-mono text-[10px] transition-colors ${isHighlightedPrice ? 'font-bold text-white' : 'text-[#222]'}`}
+                    style={{
+                        top: !isNaN(line.y) ? line.y - 6 : 0,
+                    }}>
+                    {line.price.toFixed(digits)}
+                </div>
+            );
+        })}
     </div>
 );
