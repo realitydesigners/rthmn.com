@@ -106,6 +106,7 @@ const TestCandles = () => {
         styles: {
             startIndex: 0,
             maxBoxCount: 38,
+            showLineChart: false,
             globalTimeframeControl: false,
             borderRadius: 0,
             shadowIntensity: 0.5,
