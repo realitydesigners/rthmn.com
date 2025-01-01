@@ -225,3 +225,28 @@ export interface ChangelogEntry {
         };
     }[];
 }
+
+export interface BoxColors {
+    positive: string;
+    negative: string;
+    styles?: {
+        startIndex: number;
+        maxBoxCount: number;
+        borderRadius: number;
+        shadowIntensity: number;
+        opacity: number;
+        showBorder: boolean;
+        globalTimeframeControl: boolean;
+        showLineChart: boolean;
+    };
+}
+
+export interface ColorPreset {
+    name: string;
+    positive: string;
+    negative: string;
+}
+
+export interface FullPreset extends ColorPreset {
+    styles: BoxColors['styles'];
+}

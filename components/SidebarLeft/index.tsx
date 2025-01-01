@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { LuLayoutGrid, LuLayoutDashboard, LuOrbit, LuLineChart } from 'react-icons/lu';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { cn } from '@/utils/cn';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
@@ -9,6 +10,7 @@ import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 
 export const SidebarLeft = () => {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
@@ -35,10 +37,10 @@ export const SidebarLeft = () => {
         setMounted(true);
         // Load initial state only if it was locked and not mobile
         const state = getSidebarState();
-        if (state.left.isOpen && state.left.locked && !isMobile) {
+        if (state.left.locked && !isMobile) {
             setIsOpen(true);
             setIsLocked(true);
-            setActivePanel(state.left.activePanel);
+            setActivePanel(state.left.activePanel || 'instruments'); // Set a default panel if none is stored
         }
     }, [isMobile]);
 
@@ -59,6 +61,10 @@ export const SidebarLeft = () => {
             document.removeEventListener('mousedown', handleClickOutside);
         };
     }, [isLocked]);
+
+    if (!mounted) return null;
+    if (isMobile) return null; // Don't render anything on mobile
+    if (pathname === '/account') return null; // Don't show on account page
 
     // Prevent sidebar from opening on mobile
     const handlePanelToggle = (panel: string) => {
@@ -140,25 +146,12 @@ export const SidebarLeft = () => {
         }
     };
 
-    if (!mounted) return null;
-    if (isMobile) return null; // Don't render anything on mobile
-
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-center py-4 pb-14'>
+            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start py-4 pb-14'>
                 {/* Navigation Buttons */}
                 <div className='flex flex-col gap-2'>
-                    <Link href='/dashboard'>
-                        <button className='group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all duration-200 hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20'>
-                            <LuLayoutDashboard size={20} className='text-[#818181] transition-colors group-hover:text-white' />
-                        </button>
-                    </Link>
-                    <Link href='/test'>
-                        <button className='group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] transition-all duration-200 hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20'>
-                            <LuOrbit size={20} className='text-[#818181] transition-colors group-hover:text-white' />
-                        </button>
-                    </Link>
                     <button
                         onClick={() => handlePanelToggle('instruments')}
                         className={cn(

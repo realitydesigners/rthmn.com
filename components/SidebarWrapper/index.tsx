@@ -2,7 +2,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 import { LuLock, LuUnlock } from 'react-icons/lu';
-import { getSidebarLocks, setSidebarLocks } from '@/utils/localStorage';
+import { getSidebarLocks, setSidebarLocks, getSidebarState, setSidebarState } from '@/utils/localStorage';
 
 interface SidebarContentProps {
     isOpen: boolean;
@@ -20,9 +20,21 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
 
     useEffect(() => {
         setMounted(true);
-        // Load initial lock state
+        // Load initial state
+        const state = getSidebarState();
         const locks = getSidebarLocks();
-        if (locks[position] !== isLocked) {
+
+        // If the sidebar is locked but not open, we need to sync the states
+        if (locks[position] && !state[position].isOpen) {
+            setSidebarState({
+                ...state,
+                [position]: {
+                    ...state[position],
+                    isOpen: true,
+                    locked: true,
+                },
+            });
+            // Force the parent to update its state
             onLockToggle();
         }
     }, []);
@@ -34,10 +46,23 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
 
     const handleLockToggle = useCallback(() => {
         const locks = getSidebarLocks();
+        const state = getSidebarState();
+
+        // Update both locks and state
         setSidebarLocks({
             ...locks,
             [position]: !isLocked,
         });
+
+        setSidebarState({
+            ...state,
+            [position]: {
+                ...state[position],
+                isOpen: !isLocked, // Ensure open state matches lock state
+                locked: !isLocked,
+            },
+        });
+
         onLockToggle();
     }, [isLocked, onLockToggle, position]);
 

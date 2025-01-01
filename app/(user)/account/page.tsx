@@ -10,6 +10,11 @@ import { FaDiscord } from 'react-icons/fa';
 export default function AccountContent() {
     const { user, userDetails, subscription, discordConnection, isLoading } = useAuth();
 
+    // Debug logging
+    console.log('User:', user);
+    console.log('Subscription:', subscription);
+    console.log('UserDetails:', userDetails);
+
     if (isLoading) {
         return (
             <div className='flex min-h-screen items-center justify-center'>
@@ -24,7 +29,7 @@ export default function AccountContent() {
 
     return (
         <div className='min-h-screen'>
-            <div className='mx-auto max-w-7xl px-4 py-16'>
+            <div className='mx-auto max-w-7xl px-4 pt-30'>
                 {/* Profile Header */}
                 <div className='mb-16 text-center'>
                     <div className='mx-auto mb-6 w-32'>

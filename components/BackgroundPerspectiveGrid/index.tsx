@@ -1,7 +1,9 @@
 'use client';
-import React, { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useRef, useEffect, useMemo, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 
 export const BackgroundPerspectiveGrid = React.memo(() => {
+    const pathname = usePathname();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const dimensionsRef = useRef({ width: 0, height: 0 });
 
@@ -20,6 +22,9 @@ export const BackgroundPerspectiveGrid = React.memo(() => {
     // Separate drawing function for better performance
     const drawGrid = useCallback(
         (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+            // Reset dimensions to force redraw when navigating back
+            dimensionsRef.current = { width: 0, height: 0 };
+
             // Skip if dimensions haven't changed
             if (width === dimensionsRef.current.width && height === dimensionsRef.current.height) {
                 return;
@@ -71,6 +76,9 @@ export const BackgroundPerspectiveGrid = React.memo(() => {
     );
 
     useEffect(() => {
+        // Skip initialization for test page
+        if (pathname === '/test') return;
+
         const canvas = canvasRef.current;
         if (!canvas) return;
 
@@ -104,6 +112,7 @@ export const BackgroundPerspectiveGrid = React.memo(() => {
             resizeTimeout = setTimeout(updateSize, 100);
         };
 
+        // Force immediate update
         updateSize();
         window.addEventListener('resize', debouncedResize, { passive: true });
 
@@ -111,8 +120,14 @@ export const BackgroundPerspectiveGrid = React.memo(() => {
             window.removeEventListener('resize', debouncedResize);
             clearTimeout(resizeTimeout);
             cancelAnimationFrame(rafId);
+            // Clear the canvas on cleanup
+            const context = ctx as CanvasRenderingContext2D;
+            context.clearRect(0, 0, canvas.width, canvas.height);
         };
-    }, [drawGrid]);
+    }, [drawGrid, pathname]); // Add pathname to dependencies
+
+    // Only return null for test page
+    if (pathname === '/test') return null;
 
     return <canvas ref={canvasRef} className='fixed inset-0 h-screen w-screen bg-black' />;
 });

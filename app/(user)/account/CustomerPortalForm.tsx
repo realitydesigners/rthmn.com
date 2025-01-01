@@ -11,11 +11,7 @@ type Price = any;
 type Product = any;
 
 type SubscriptionWithPriceAndProduct = Subscription & {
-    prices:
-        | (Price & {
-              products: Product | null;
-          })
-        | null;
+    prices: Price;
 };
 
 interface Props {
@@ -28,12 +24,12 @@ export default function CustomerPortalForm({ subscription }: Props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const subscriptionPrice =
-        subscription &&
+        subscription?.prices &&
         new Intl.NumberFormat('en-US', {
             style: 'currency',
-            currency: subscription?.prices?.currency!,
+            currency: subscription.prices.currency!,
             minimumFractionDigits: 0,
-        }).format((subscription?.prices?.unit_amount || 0) / 100);
+        }).format((subscription.prices.unit_amount || 0) / 100);
 
     const handleStripePortalRequest = async () => {
         setIsSubmitting(true);
@@ -50,9 +46,11 @@ export default function CustomerPortalForm({ subscription }: Props) {
                         <LuCreditCard className='h-5 w-5 text-white' />
                     </div>
                     <div>
-                        <h3 className='font-outfit text-lg font-semibold text-white'>{subscription ? `${subscription?.prices?.products?.name} Plan` : 'No active subscription'}</h3>
+                        <h3 className='font-outfit text-lg font-semibold text-white'>
+                            {subscription?.prices ? `${subscription.prices.name || 'Pro'} Plan` : 'No active subscription'}
+                        </h3>
                         <p className='font-outfit text-sm text-zinc-400'>
-                            {subscription ? `${subscriptionPrice}/${subscription?.prices?.interval}` : 'Choose a plan to get started'}
+                            {subscription ? `${subscriptionPrice}/${subscription.prices.interval}` : 'Choose a plan to get started'}
                         </p>
                     </div>
                 </div>
