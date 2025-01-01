@@ -73,7 +73,6 @@ export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, classNam
                 <svg className='h-full w-full overflow-visible' preserveAspectRatio='none'>
                     <ChartSegments points={points} priceLines={priceLines} boxColors={boxColors} />
                     <PriceLines priceLines={priceLines} boxColors={boxColors} />
-                    <ChartPoints points={points} boxColors={boxColors} prices={prices} digits={digits} />
                 </svg>
             </div>
             {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={boxColors} digits={digits} prices={prices} />}
@@ -332,38 +331,61 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
     return (
         <>
             <defs>
-                <linearGradient id='positiveGradient' x1='0' y1='1' x2='0' y2='0'>
-                    <stop offset='0%' stopColor={boxColors.positive} stopOpacity='0.4' />
-                    <stop offset='100%' stopColor={boxColors.positive} stopOpacity='0' />
-                </linearGradient>
-                <linearGradient id='negativeGradient' x1='0' y1='0' x2='0' y2='1'>
-                    <stop offset='0%' stopColor={boxColors.negative} stopOpacity='0.4' />
-                    <stop offset='100%' stopColor={boxColors.negative} stopOpacity='0' />
-                </linearGradient>
+                {/* Create multiple gradients with increasing brightness */}
+                {[...Array(10)].map((_, i) => {
+                    // Exponential increase in intensity for more dramatic stacking effect
+                    const intensity = Math.pow((i + 1) / 5, 1.5);
+                    return (
+                        <React.Fragment key={i}>
+                            <linearGradient id={`positiveGradient-${i}`} x1='0' y1='1' x2='0' y2='0'>
+                                <stop offset='0%' stopColor={boxColors.positive} stopOpacity={Math.min(0.8 * intensity, 1)} />
+                                <stop offset='50%' stopColor={boxColors.positive} stopOpacity={Math.min(0.5 * intensity, 0.8)} />
+                                <stop offset='100%' stopColor={boxColors.positive} stopOpacity={Math.min(0.2 * intensity, 0.4)} />
+                            </linearGradient>
+                            <linearGradient id={`negativeGradient-${i}`} x1='0' y1='0' x2='0' y2='1'>
+                                <stop offset='0%' stopColor={boxColors.negative} stopOpacity={Math.min(0.8 * intensity, 1)} />
+                                <stop offset='50%' stopColor={boxColors.negative} stopOpacity={Math.min(0.5 * intensity, 0.8)} />
+                                <stop offset='100%' stopColor={boxColors.negative} stopOpacity={Math.min(0.2 * intensity, 0.4)} />
+                            </linearGradient>
+                        </React.Fragment>
+                    );
+                })}
             </defs>
-            <g className='price-grid'>
-                {gridLines.map((line, i) => (
-                    <g key={`grid-${i}`}>
-                        <line x1='0' y1={line.y} x2='100%' y2={line.y} stroke='#222' strokeWidth='1' strokeDasharray='1,6' />
-                    </g>
-                ))}
-            </g>
+
             {points.map(([x, y], index, arr) => {
                 if (index === arr.length - 1) return null;
                 const nextPoint = arr[index + 1];
                 const isUp = y > nextPoint[1];
-                const gradientColor = isUp ? 'url(#positiveGradient)' : 'url(#negativeGradient)';
-                const glowGradient = isUp ? 'url(#positiveGlow)' : 'url(#negativeGlow)';
-                const solidColor = isUp ? boxColors.positive : boxColors.negative;
+
+                // Calculate intensity based on consecutive segments in same direction
+                let intensityIndex = 0;
+                let consecutiveCount = 0;
+                for (let i = 0; i <= index; i++) {
+                    if (i === arr.length - 1) continue;
+                    const currentIsUp = arr[i][1] > arr[i + 1][1];
+                    if (currentIsUp === isUp) {
+                        consecutiveCount++;
+                    } else {
+                        consecutiveCount = 0;
+                    }
+                }
+                intensityIndex = Math.min(consecutiveCount, 9);
+
+                const gradientColor = isUp ? `url(#positiveGradient-${intensityIndex})` : `url(#negativeGradient-${intensityIndex})`;
+
+                const lineColor = isUp ? boxColors.positive : boxColors.negative;
                 const currentPriceLine = priceLines.find((line) => Math.abs(line.y - y) < 1);
                 const nextPriceLine = priceLines.find((line) => Math.abs(line.y - nextPoint[1]) < 1);
                 const endX = Math.max(currentPriceLine?.x2 ?? x, nextPriceLine?.x2 ?? nextPoint[0]);
 
                 return (
                     <g key={`segment-${index}`}>
-                        <path d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`} fill={gradientColor} />
-                        <path d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`} fill={glowGradient} />
-                        <path d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]}`} stroke={solidColor} strokeWidth='1' fill='none' />
+                        <path
+                            d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`}
+                            fill={gradientColor}
+                            className='transition-all duration-300'
+                        />
+                        <path d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]}`} stroke={lineColor} strokeWidth='3' fill='none' className='relative z-[1000]' />
                     </g>
                 );
             })}
@@ -371,27 +393,7 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
     );
 };
 
-// Chart points component
-export const ChartPoints = ({ points, boxColors, prices, digits = 5 }: { points: Point[]; boxColors: BoxColors; prices: number[]; digits?: number }) => {
-    const pathData = points.reduce((acc, [x, y], index) => {
-        return index === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
-    }, '');
-
-    return (
-        <>
-            {/* Draw the line path */}
-            <path d={pathData} fill='none' stroke='white' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
-
-            {/* Draw points without labels */}
-            {points.map(([x, y], index) => (
-                <circle key={`point-${index}`} cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='4' fill='white' />
-            ))}
-        </>
-    );
-};
-
-// Price sidebar component
-export const PriceSidebar = ({ priceLines, boxColors, digits = 5, prices = [] }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
+export const PriceSidebar = ({ priceLines, digits = 5, prices = [] }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
     <div className='relative w-18 border-l border-[#222] pl-2'>
         {priceLines.map((line, index) => {
             const isHighlightedPrice = prices.includes(line.price);
