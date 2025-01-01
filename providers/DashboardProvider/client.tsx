@@ -25,6 +25,7 @@ interface DashboardContextType {
     signalsData: Signal[] | null;
     selectedSignal: Signal | null;
     setSelectedSignal: (signal: Signal | null) => void;
+    candlesData: Record<string, any[]>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -138,11 +139,33 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
     // Calculate loading state including sidebar initialization
     const isLoading = !isAuthenticated || pairDataQuery.isLoading || !isConnected || !isSidebarInitialized;
 
+    // Candles queries - single fetch, no refetching
+    const candlesQueries = useQueries({
+        queries: selectedPairs.map((pair) => ({
+            queryKey: ['candles', pair],
+            queryFn: async () => {
+                const response = await fetch(`/api/getCandles?pair=${pair}&limit=10000&token=${session?.access_token}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const { data } = await response.json();
+                return data;
+            },
+            enabled: isConnected && isAuthenticated && !!session?.access_token,
+            staleTime: Infinity,
+            gcTime: Infinity,
+            refetchInterval: 0,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+        })),
+    });
+
     // WebSocket subscription management
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
         const handleBulkUpdate = (pair: string, wsData: BoxSlice) => {
+            // Update box data
             queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => ({
                 ...oldData,
                 [pair]: {
@@ -150,6 +173,41 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
                     currentOHLC: wsData.currentOHLC,
                 },
             }));
+
+            // Update candle data with proper candle formation logic
+            if (wsData.currentOHLC) {
+                queryClient.setQueryData(['candles', pair], (oldData: any[] | undefined) => {
+                    if (!oldData?.length) return oldData;
+
+                    const [latestCandle, ...rest] = oldData;
+                    const currentTime = new Date(wsData.timestamp);
+                    const candleTime = new Date(latestCandle.timestamp);
+
+                    // Check if we need to create a new candle (every minute)
+                    if (currentTime.getMinutes() !== candleTime.getMinutes()) {
+                        // Create new candle
+                        const newCandle = {
+                            timestamp: wsData.timestamp,
+                            open: wsData.currentOHLC.open,
+                            high: wsData.currentOHLC.high,
+                            low: wsData.currentOHLC.low,
+                            close: wsData.currentOHLC.close,
+                            volume: 0, // If you have volume data, include it here
+                        };
+                        return [newCandle, latestCandle, ...rest];
+                    }
+
+                    // Update existing candle
+                    const updatedCandle = {
+                        ...latestCandle,
+                        high: Math.max(latestCandle.high, wsData.currentOHLC.close),
+                        low: Math.min(latestCandle.low, wsData.currentOHLC.close),
+                        close: wsData.currentOHLC.close,
+                    };
+
+                    return [updatedCandle, ...rest];
+                });
+            }
         };
 
         selectedPairs.forEach((pair) => {
@@ -165,6 +223,20 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
             });
         };
     }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, queryClient]);
+
+    // Combine candles data for all pairs
+    const candlesData = React.useMemo(() => {
+        return selectedPairs.reduce(
+            (acc, pair, index) => {
+                const queryData = candlesQueries[index].data;
+                if (queryData) {
+                    acc[pair] = queryData;
+                }
+                return acc;
+            },
+            {} as Record<string, any[]>
+        );
+    }, [selectedPairs, candlesQueries]);
 
     const pairData = pairDataQuery.data || {};
 
@@ -215,6 +287,7 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
                 signalsData,
                 selectedSignal,
                 setSelectedSignal,
+                candlesData,
             }}>
             <div onClick={handleSidebarClick}>{children}</div>
         </DashboardContext.Provider>
