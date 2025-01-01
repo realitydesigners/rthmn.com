@@ -27,7 +27,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
             const token = session.access_token;
 
             // Fetch initial data
-            fetch(`/api/getBoxSlices?pair=${pair}&token=${token}`)
+            fetch(`/api/getBoxSlice?pair=${pair}&token=${token}`)
                 .then((response) => response.json())
                 .then((data) => setInitialData(data))
                 .catch((error) => console.error('Error fetching initial data:', error));

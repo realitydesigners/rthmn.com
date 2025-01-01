@@ -10,7 +10,7 @@ async function fetchBoxSlices(pair: string, lastTimestamp: string | undefined, c
     if (lastTimestamp) params.append('lastTimestamp', lastTimestamp);
     if (count) params.append('count', count.toString());
 
-    const response = await fetch(`/api/getBoxSlices?${params.toString()}`);
+    const response = await fetch(`/api/getBoxSlice?${params.toString()}`);
     if (!response.ok) {
         throw new Error('Failed to fetch box slices');
     }
