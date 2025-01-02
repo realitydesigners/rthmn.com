@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useMemo, useEffect, useState } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { ResoBox } from '@/components/ResoBox';
@@ -68,19 +68,16 @@ const LiveCandleFeed = ({ pair }: { pair: string }) => {
     const { candlesData, pairData } = useDashboard();
 
     useEffect(() => {
-        // Initialize with latest 10 candles from candlesData
         if (candlesData[pair]?.length > 0) {
             setCandleHistory(candlesData[pair].slice(0, 10));
         }
     }, [pair, candlesData]);
 
-    // Update when new OHLC data comes in
     useEffect(() => {
         const currentOHLC = pairData[pair]?.currentOHLC;
         if (!currentOHLC) return;
 
         setCandleHistory((prev) => {
-            // Only update if we have previous candles
             if (!prev.length) return prev;
 
             const [latestCandle, ...rest] = prev;
@@ -115,7 +112,7 @@ const LiveCandleFeed = ({ pair }: { pair: string }) => {
     );
 };
 
-export const PairPanel = ({ pair }: { pair: string }) => {
+const PairPanel = ({ pair }: { pair: string }) => {
     const { session } = useAuth();
     const { pairData } = useDashboard();
     const [limit, setLimit] = useState(100);
@@ -152,7 +149,6 @@ export const PairPanel = ({ pair }: { pair: string }) => {
     return (
         <CollapsiblePanel title={pair} defaultOpen={true}>
             <div className='grid gap-4 md:grid-cols-2'>
-                {/* Left column - ResoBox and controls */}
                 <div className='space-y-4'>
                     <div className='relative aspect-square w-full max-w-[300px]'>
                         {boxData ? (
@@ -189,7 +185,6 @@ export const PairPanel = ({ pair }: { pair: string }) => {
                     )}
                 </div>
 
-                {/* Right column - Live data and historical candles */}
                 <div className='space-y-4'>
                     <div className='rounded-lg border border-gray-700 bg-gray-800/50 p-2'>
                         <h4 className='mb-2 text-sm font-semibold'>Live Feed</h4>
@@ -222,7 +217,7 @@ export const PairPanel = ({ pair }: { pair: string }) => {
                             {error && <div className='text-sm text-red-500'>Error: {error}</div>}
                             {isLoading ? (
                                 <div>Loading...</div>
-                            ) : candles.length > 0 ? (
+                            ) : candles?.length > 0 ? (
                                 <div className='space-y-2'>
                                     <pre className='max-h-[200px] overflow-auto text-xs text-green-400'>{JSON.stringify(displayCandles, null, 2)}</pre>
                                     <div className='text-xs text-gray-300'>Total: {candles.length}</div>
@@ -258,7 +253,6 @@ export default function TestCandles() {
 
     return (
         <div className='min-h-screen bg-gray-900 p-4 text-white'>
-            {/* Header */}
             <div className='mb-4 flex items-center justify-between rounded-lg bg-gray-800 p-3'>
                 <h1 className='text-xl font-bold'>Trading Dashboard</h1>
                 <div className={`flex items-center gap-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
@@ -267,7 +261,6 @@ export default function TestCandles() {
                 </div>
             </div>
 
-            {/* Latest Box Slices Display - simplified fetch control */}
             <CollapsiblePanel title={`All Pairs Latest Box Slices ${latestBoxSlices ? `(${Object.keys(latestBoxSlices).length} pairs)` : ''}`} defaultOpen={isBoxSlicesOpen}>
                 <div className='mb-4'>
                     <button onClick={handleFetchLatestBoxSlices} className='rounded bg-blue-600 px-3 py-1 text-sm'>
@@ -288,7 +281,6 @@ export default function TestCandles() {
                 )}
             </CollapsiblePanel>
 
-            {/* Grid of Pair Panels */}
             <div className='mt-4 grid gap-4 xl:grid-cols-2'>
                 {selectedPairs.map((pair) => (
                     <PairPanel key={pair} pair={pair} />
