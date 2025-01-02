@@ -2,7 +2,7 @@
 import Spline from '@splinetool/react-spline';
 import React, { useRef, useState, useEffect } from 'react';
 import { Modal } from './Modal';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 
 type Position3D = { x: number; y: number; z: number };
 type PairOHLC = { open: number; high: number; low: number; close: number };

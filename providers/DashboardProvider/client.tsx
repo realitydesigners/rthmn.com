@@ -1,11 +1,11 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
 import { BoxSlice, PairData, Signal, BoxColors, FullPreset } from '@/types/types';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
+import { INSTRUMENTS } from '@/utils/instruments';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;
@@ -65,7 +65,7 @@ export function useSignals() {
     return context;
 }
 
-export const AVAILABLE_PAIRS = [...FOREX_PAIRS, ...CRYPTO_PAIRS] as const;
+export const AVAILABLE_PAIRS = [...Object.keys(INSTRUMENTS.FOREX), ...Object.keys(INSTRUMENTS.CRYPTO)] as const;
 
 interface DashboardProviderClientProps {
     children: React.ReactNode;

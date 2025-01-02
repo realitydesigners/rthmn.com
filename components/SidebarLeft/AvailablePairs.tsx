@@ -1,5 +1,5 @@
 import React from 'react';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 
 const formatPrice = (price: number) => {

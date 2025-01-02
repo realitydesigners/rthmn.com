@@ -7,7 +7,7 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import { User } from '@supabase/supabase-js';
 import { createClient } from '@/utils/supabase/client';
 import { LogoIcon, BellIcon } from '@/components/Icons/icons';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { SearchBar } from '../SearchBar';
 import { LuChevronRight, LuLayoutDashboard, LuOrbit } from 'react-icons/lu';

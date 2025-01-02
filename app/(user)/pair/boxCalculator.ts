@@ -1,5 +1,5 @@
 import { CandleData } from '@/types/types';
-import { symbolsToDigits, BoxSizes } from '@/utils/Constants';
+import { INSTRUMENTS, BoxSizes } from '@/utils/instruments';
 
 export class BoxCalculator {
     private boxSizes: Float64Array;
@@ -8,8 +8,9 @@ export class BoxCalculator {
     private boxLows: Float64Array;
 
     constructor(pair: string) {
-        const { point, digits } = symbolsToDigits[pair] || { point: 0.00001, digits: 5 };
-        this.boxSizes = new Float64Array(BoxSizes.map((size) => this.roundToDigits(size * point, digits)));
+        const details = Object.values(INSTRUMENTS).find((category) => pair in category)?.[pair] || { point: 0.00001, digits: 5 };
+
+        this.boxSizes = new Float64Array(BoxSizes.map((size) => this.roundToDigits(size * details.point, details.digits)));
         this.boxValues = new Int32Array(BoxSizes);
         this.boxHighs = new Float64Array(BoxSizes.length);
         this.boxLows = new Float64Array(BoxSizes.length);

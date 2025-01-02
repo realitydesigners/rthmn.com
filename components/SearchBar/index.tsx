@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaTimes, FaChevronDown } from 'react-icons/fa';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 
 interface SearchBarProps {
