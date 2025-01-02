@@ -8,6 +8,7 @@ import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useBoxSliceData } from '@/hooks/useBoxSliceData';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
+import { createBoxCalculator } from '../boxCalculator';
 
 interface DashboardClientProps {
     pair: string;
@@ -34,18 +35,27 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
                     const { data } = await response.json();
                     console.log('Fetched candle data:', data);
 
+                    // Create a reversed copy of the data
+                    const reversedData = [...data].reverse();
+
                     // Transform the data to match LineChart's expected format
                     const formattedCandles =
-                        data?.map((candle) => ({
+                        reversedData.map((candle) => ({
                             close: Number(candle.close),
                             high: Number(candle.high),
                             low: Number(candle.low),
                             open: Number(candle.open),
-                            time: new Date(candle.timestamp).getTime(), // Convert timestamp to milliseconds
+                            time: new Date(candle.timestamp).getTime(),
                             symbol: candle.symbol,
                         })) || [];
 
+                    // Calculate boxes using BoxCalculator
+                    const boxCalculator = createBoxCalculator(pair.toUpperCase());
+                    const boxResults = boxCalculator.calculateBoxArrays(reversedData);
+                    console.log('Box calculations:', boxResults);
+
                     setCandleData(formattedCandles);
+                    setBoxData(boxResults);
                 } catch (error) {
                     console.error('Error fetching candles:', error);
                 }
@@ -56,6 +66,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
     }, [session, pair]);
 
     const [viewType, setViewType] = useState<ViewType>('oscillator');
+    const [boxData, setBoxData] = useState<any>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({
         width: 0,
@@ -97,9 +108,38 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
         };
     }, [histogramHeight]);
 
+    const BoxTable = () => {
+        if (!boxData) return null;
+
+        return (
+            <div className='overflow-x-auto'>
+                <table className='w-full text-left text-sm text-gray-300'>
+                    <thead className='bg-gray-900 text-xs uppercase'>
+                        <tr>
+                            <th className='px-6 py-3'>Box Size</th>
+                            <th className='px-6 py-3'>High</th>
+                            <th className='px-6 py-3'>Low</th>
+                            <th className='px-6 py-3'>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {Object.entries(boxData).map(([size, data]: [string, any]) => (
+                            <tr key={size} className='border-b border-gray-800 bg-black'>
+                                <td className='px-6 py-4'>{size}</td>
+                                <td className='px-6 py-4'>{data.high.toFixed(5)}</td>
+                                <td className='px-6 py-4'>{data.low.toFixed(5)}</td>
+                                <td className='px-6 py-4'>{data.value}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        );
+    };
+
     return (
-        <div className='flex h-screen w-full flex-col overflow-hidden bg-black'>
-            <div className='min-h-[400px] grow overflow-hidden'>
+        <div className='flex h-screen w-full flex-col bg-black'>
+            <div className='min-h-[400px]'>
                 {candleData && candleData.length > 0 ? (
                     <LineChart pair={pair} candles={candleData} />
                 ) : (
@@ -107,6 +147,10 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
                 )}
             </div>
 
+            <div className='h-full px-4 py-2'>
+                <BoxTable />
+            </div>
+            {/* 
             <div
                 className='shrink-0'
                 style={{
@@ -127,7 +171,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
                     onDragStart={handleDragStart}
                     containerWidth={rthmnVisionDimensions.width}
                 />
-            </div>
+            </div> */}
         </div>
     );
 };
