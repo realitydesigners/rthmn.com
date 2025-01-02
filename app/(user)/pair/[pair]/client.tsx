@@ -171,7 +171,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
     };
 
     return (
-        <div className='flex h-screen w-full flex-col'>
+        <div className='flex h-screen w-full flex-col px-20 pt-32'>
             <div className='min-h-[400px]'>
                 {candleData && candleData.length > 0 ? (
                     <LineChart pair={pair} candles={candleData} />
