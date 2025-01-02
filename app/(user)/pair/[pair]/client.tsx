@@ -16,31 +16,44 @@ interface DashboardClientProps {
 const Client: React.FC<DashboardClientProps> = ({ pair }) => {
     const { session } = useAuth();
     const [initialData, setInitialData] = useState<BoxSlice[]>([]);
-    const [allPairsData, setAllPairsData] = useState<Record<string, PairData>>({});
+    const [candleData, setCandleData] = useState<any[]>([]);
     const { boxOffset, handleOffsetChange } = useUrlParams(pair);
     const { selectedFrame, selectedFrameIndex, handleFrameSelect } = useSelectedFrame();
     const [visibleBoxesCount, setVisibleBoxesCount] = useState(16);
-    const { data, filteredData, candleData, error, isLoading } = useBoxSliceData(pair, session, initialData, boxOffset, visibleBoxesCount);
+    const { data, filteredData, error, isLoading } = useBoxSliceData(pair.toUpperCase(), session, initialData, boxOffset, visibleBoxesCount);
 
     useEffect(() => {
         if (session && session.access_token) {
             const token = session.access_token;
+            const CANDLE_LIMIT = 1000;
 
-            // Fetch initial data
-            fetch(`/api/getBoxSlice?pair=${pair}&token=${token}`)
-                .then((response) => response.json())
-                .then((data) => setInitialData(data))
-                .catch((error) => console.error('Error fetching initial data:', error));
+            const fetchCandles = async () => {
+                try {
+                    const response = await fetch(`/api/getCandles?pair=${pair.toUpperCase()}&limit=${CANDLE_LIMIT}&token=${token}`);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    const { data } = await response.json();
+                    console.log('Fetched candle data:', data);
 
-            // Fetch all pairs data
-            fetch(`/api/getLatestBoxSlices?token=${token}`)
-                .then((response) => response.json())
-                .then((data) => setAllPairsData(data))
-                .catch((error) => console.error('Error fetching all pairs data:', error));
+                    // Transform the data to match LineChart's expected format
+                    const formattedCandles =
+                        data?.map((candle) => ({
+                            close: Number(candle.close),
+                            high: Number(candle.high),
+                            low: Number(candle.low),
+                            open: Number(candle.open),
+                            time: new Date(candle.timestamp).getTime(), // Convert timestamp to milliseconds
+                            symbol: candle.symbol,
+                        })) || [];
+
+                    setCandleData(formattedCandles);
+                } catch (error) {
+                    console.error('Error fetching candles:', error);
+                }
+            };
+
+            fetchCandles();
         }
     }, [session, pair]);
-
-    console.log(candleData);
 
     const [viewType, setViewType] = useState<ViewType>('oscillator');
     const containerRef = useRef<HTMLDivElement>(null);
@@ -86,32 +99,35 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
 
     return (
         <div className='flex h-screen w-full flex-col overflow-hidden bg-black'>
-            <div className='min-h-[400px] grow overflow-hidden'>{candleData.length > 0 ? <LineChart pair={pair} candles={candleData} /> : <div>No candle data available</div>}</div>
-            {/* 
-      
-      KEEP THIS
-      <div
-        className="shrink-0"
-        style={{
-          height: `${histogramHeight + 40}px`
-        }}
-      >
-        <HistogramManager
-          data={filteredData}
-          height={histogramHeight}
-          boxOffset={boxOffset}
-          onOffsetChange={handleOffsetChange}
-          visibleBoxesCount={visibleBoxesCount}
-          viewType={viewType}
-          onViewChange={handleViewChange}
-          selectedFrame={selectedFrame}
-          selectedFrameIndex={selectedFrameIndex}
-          onFrameSelect={handleFrameSelect}
-          isDragging={isDragging}
-          onDragStart={handleDragStart}
-          containerWidth={rthmnVisionDimensions.width}
-        />
-      </div> */}
+            <div className='min-h-[400px] grow overflow-hidden'>
+                {candleData && candleData.length > 0 ? (
+                    <LineChart pair={pair} candles={candleData} />
+                ) : (
+                    <div className='flex h-full items-center justify-center text-gray-400'>Loading candle data...</div>
+                )}
+            </div>
+
+            <div
+                className='shrink-0'
+                style={{
+                    height: `${histogramHeight + 40}px`,
+                }}>
+                <HistogramManager
+                    data={filteredData}
+                    height={histogramHeight}
+                    boxOffset={boxOffset}
+                    onOffsetChange={handleOffsetChange}
+                    visibleBoxesCount={visibleBoxesCount}
+                    viewType={viewType}
+                    onViewChange={handleViewChange}
+                    selectedFrame={selectedFrame}
+                    selectedFrameIndex={selectedFrameIndex}
+                    onFrameSelect={handleFrameSelect}
+                    isDragging={isDragging}
+                    onDragStart={handleDragStart}
+                    containerWidth={rthmnVisionDimensions.width}
+                />
+            </div>
         </div>
     );
 };
