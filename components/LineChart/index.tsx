@@ -72,12 +72,13 @@ const PathGenerator = {
 const processCandles = (candles: Candle[], buffer: OptimizedPriceBuffer) => {
     buffer.clear();
     candles.forEach((candle) => {
-        buffer.push({
-            price: candle.close,
-            timestamp: new Date(candle.time).getTime(),
+        const point: ChartDataPoint = {
+            price: Number(candle.close),
+            timestamp: typeof candle.time === 'string' ? new Date(candle.time).getTime() : candle.time,
             scaledX: 0,
             scaledY: 0,
-        });
+        };
+        buffer.push(point);
     });
 };
 
@@ -276,10 +277,10 @@ export const LineChart = ({ pair, candles = [], height = 400 }: LineChartProps) 
         return candles.map((candle) => ({
             ...candle,
             timestamp: new Date(candle.timestamp).getTime(),
-            close: Number(candle.currentOHLC.close),
-            open: Number(candle.currentOHLC.open),
-            high: Number(candle.currentOHLC.high),
-            low: Number(candle.currentOHLC.low),
+            close: Number(candle.close),
+            open: Number(candle.open),
+            high: Number(candle.high),
+            low: Number(candle.low),
         }));
     }, [candles]);
 

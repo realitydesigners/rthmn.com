@@ -1,10 +1,10 @@
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import debounce from 'lodash/debounce';
 
 export const useUrlParams = (pair: string) => {
     const searchParams = useSearchParams();
-    const router = useRouter();
+    const pathname = usePathname();
     const [boxOffset, setBoxOffset] = useState(() => {
         const offsetParam = searchParams.get('offset');
         return offsetParam ? parseInt(offsetParam, 10) : 0;
@@ -14,9 +14,9 @@ export const useUrlParams = (pair: string) => {
         (newOffset: number) => {
             const params = new URLSearchParams(searchParams.toString());
             params.set('offset', newOffset.toString());
-            router.push(`/${pair}?${params.toString()}`, { scroll: false });
+            window.history.replaceState({}, '', `${pathname}?${params.toString()}`);
         },
-        [searchParams, router, pair]
+        [searchParams, pathname]
     );
 
     const debouncedUpdateURL = useMemo(() => debounce(updateURL, 300), [updateURL]);
@@ -24,10 +24,9 @@ export const useUrlParams = (pair: string) => {
     const handleOffsetChange = useCallback(
         (newOffset: number) => {
             setBoxOffset(newOffset);
-            updateURL(newOffset);
             debouncedUpdateURL(newOffset);
         },
-        [updateURL, debouncedUpdateURL]
+        [debouncedUpdateURL]
     );
 
     return { boxOffset, handleOffsetChange };

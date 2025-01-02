@@ -2,11 +2,53 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { BoxSlice } from '@/types/types';
-import { BoxColors } from '@/utils/localStorage';
 import { ResoBox } from '@/components/ResoBox';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
+
+const fetchCandles = async (pair: string, limit: number, token: string) => {
+    const response = await fetch(`/api/getCandles?pair=${pair}&limit=${limit}&token=${token}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const { data } = await response.json();
+    return data;
+};
+
+const fetchPairBoxSlices = async (pair: string, count: number, token: string) => {
+    const response = await fetch(`/api/getBoxSlice?pair=${pair}&token=${token}&count=${count}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    const data = await response.json();
+    return data.data;
+};
+
+const fetchLatestBoxSlices = async (token: string, count: number) => {
+    const response = await fetch(`/api/getLatestBoxSlices?token=${token}&count=${count}`);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return response.json();
+};
+
+const useFetchState = <T,>(initialState: T | null = null) => {
+    const [data, setData] = useState<T | null>(initialState);
+    const [error, setError] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleFetch = async (fetchFn: () => Promise<T>) => {
+        setIsLoading(true);
+        setError('');
+        try {
+            const result = await fetchFn();
+            setData(result);
+            return result;
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to fetch data';
+            setError(errorMessage);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return { data, error, isLoading, handleFetch, setData };
+};
 
 const CollapsiblePanel = ({ title, children, defaultOpen = true }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -73,64 +115,39 @@ const LiveCandleFeed = ({ pair }: { pair: string }) => {
     );
 };
 
-// Add this new component for a single pair's data
-const PairPanel = ({ pair }: { pair: string }) => {
+export const PairPanel = ({ pair }: { pair: string }) => {
     const { session } = useAuth();
     const { pairData } = useDashboard();
-    const [candles, setCandles] = useState<any[]>([]);
-    const [error, setError] = useState<string>('');
-    const [isLoading, setIsLoading] = useState(true);
     const [limit, setLimit] = useState(100);
     const [isChronological, setIsChronological] = useState(false);
-    const [pairBoxSlices, setPairBoxSlices] = useState<any>(null);
     const [boxCount, setBoxCount] = useState<number>(500);
+    const { data: candles, error, isLoading, handleFetch: fetchWithState } = useFetchState<any[]>([]);
+    const { data: pairBoxSlices, handleFetch: fetchBoxSlicesWithState } = useFetchState<any>(null);
 
     const boxData = pairData[pair]?.boxes?.[0] || null;
-    const currentOHLC = pairData[pair]?.currentOHLC || null;
 
-    const fetchCandles = async (candleLimit: number) => {
+    const displayCandles = isChronological ? [...(candles || [])].reverse() : candles;
+
+    const handleFetchCandles = async (candleLimit: number) => {
         if (!session?.access_token) {
-            setError('No authentication token available');
-            setIsLoading(false);
-            return;
+            throw new Error('No authentication token available');
         }
-
-        try {
-            setError('');
-            setIsLoading(true);
-            const response = await fetch(`/api/getCandles?pair=${pair}&limit=${candleLimit}&token=${session.access_token}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const { data } = await response.json();
-            setCandles(data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to fetch candles');
-        } finally {
-            setIsLoading(false);
-        }
+        await fetchWithState(() => fetchCandles(pair, candleLimit, session.access_token));
     };
 
-    const fetchPairBoxSlices = async () => {
+    const handleFetchBoxSlices = async () => {
         if (!session?.access_token) {
-            setError('No authentication token available');
-            return;
+            throw new Error('No authentication token available');
         }
-
-        try {
-            const response = await fetch(`/api/getBoxSlice?pair=${pair}&token=${session.access_token}&count=${boxCount}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const data = await response.json();
-            console.log(`Received ${data.data.length} box slices for ${pair} (total: ${data.count})`);
-            setPairBoxSlices(data.data);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to fetch pair box slices');
-        }
+        const data = await fetchBoxSlicesWithState(() => fetchPairBoxSlices(pair, boxCount, session.access_token));
+        console.log(`Received ${data.length} box slices for ${pair}`);
     };
 
     useEffect(() => {
-        fetchCandles(limit);
+        if (session?.access_token) {
+            handleFetchCandles(limit).catch(console.error);
+        }
     }, [session, limit, pair]);
-
-    const displayCandles = isChronological ? [...candles].reverse() : candles;
 
     return (
         <CollapsiblePanel title={pair} defaultOpen={true}>
@@ -161,7 +178,7 @@ const PairPanel = ({ pair }: { pair: string }) => {
                             <div className='flex h-full items-center justify-center text-gray-400'>Loading...</div>
                         )}
                     </div>
-                    <button onClick={fetchPairBoxSlices} className='rounded bg-purple-600 px-3 py-1 text-sm'>
+                    <button onClick={handleFetchBoxSlices} className='rounded bg-purple-600 px-3 py-1 text-sm'>
                         Fetch Box Slices
                     </button>
                     {pairBoxSlices && (
@@ -194,7 +211,7 @@ const PairPanel = ({ pair }: { pair: string }) => {
                                         max={10000}
                                     />
                                 </label>
-                                <button onClick={() => fetchCandles(limit)} className='rounded bg-blue-600 px-2 py-0.5 text-sm'>
+                                <button onClick={() => handleFetchCandles(limit)} className='rounded bg-blue-600 px-2 py-0.5 text-sm'>
                                     Fetch
                                 </button>
                                 <label className='flex items-center gap-1 text-sm'>
@@ -221,19 +238,17 @@ const PairPanel = ({ pair }: { pair: string }) => {
     );
 };
 
-const TestCandles = () => {
+export default function TestCandles() {
     const { session } = useAuth();
     const { isConnected, selectedPairs } = useDashboard();
     const [latestBoxSlices, setLatestBoxSlices] = useState<any>(null);
     const [isBoxSlicesOpen, setIsBoxSlicesOpen] = useState(false);
     const [boxCount, setBoxCount] = useState(500);
 
-    const fetchLatestBoxSlices = async () => {
+    const handleFetchLatestBoxSlices = async () => {
         if (!session?.access_token) return;
         try {
-            const response = await fetch(`/api/getLatestBoxSlices?token=${session.access_token}&count=${boxCount}`);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            const data = await response.json();
+            const data = await fetchLatestBoxSlices(session.access_token, boxCount);
             setLatestBoxSlices(data);
             setIsBoxSlicesOpen(true);
         } catch (err) {
@@ -255,7 +270,7 @@ const TestCandles = () => {
             {/* Latest Box Slices Display - simplified fetch control */}
             <CollapsiblePanel title={`All Pairs Latest Box Slices ${latestBoxSlices ? `(${Object.keys(latestBoxSlices).length} pairs)` : ''}`} defaultOpen={isBoxSlicesOpen}>
                 <div className='mb-4'>
-                    <button onClick={fetchLatestBoxSlices} className='rounded bg-blue-600 px-3 py-1 text-sm'>
+                    <button onClick={handleFetchLatestBoxSlices} className='rounded bg-blue-600 px-3 py-1 text-sm'>
                         Fetch Latest Boxes
                     </button>
                 </div>
@@ -281,6 +296,4 @@ const TestCandles = () => {
             </div>
         </div>
     );
-};
-
-export default TestCandles;
+}
