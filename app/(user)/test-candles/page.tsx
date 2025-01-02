@@ -101,6 +101,7 @@ const PairPanel = ({ pair }: { pair: string }) => {
             const response = await fetch(`/api/getCandles?pair=${pair}&limit=${candleLimit}&token=${session.access_token}`);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const { data } = await response.json();
+            console.log(data);
             setCandles(data);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to fetch candles');
