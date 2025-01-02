@@ -14,20 +14,8 @@ async function fetchBoxSlices(pair: string, lastTimestamp: string | undefined, c
     if (!response.ok) {
         throw new Error('Failed to fetch box slices');
     }
-    return response.json();
-}
-
-function compareSlices(slice1: BoxSlice, slice2: BoxSlice, offset: number, visibleBoxesCount: number): boolean {
-    const boxes1 = slice1.boxes.slice(offset, offset + visibleBoxesCount);
-    const boxes2 = slice2.boxes.slice(offset, offset + visibleBoxesCount);
-
-    if (boxes1.length !== boxes2.length) return false;
-
-    for (let i = 0; i < boxes1.length; i++) {
-        if (boxes1[i].value !== boxes2[i].value) return false;
-    }
-
-    return true;
+    const data = await response.json();
+    return Array.isArray(data) ? data : [];
 }
 
 export const useBoxSliceData = (pair: string, session: any, initialData: BoxSlice[], boxOffset: number, visibleBoxesCount: number) => {
@@ -46,7 +34,11 @@ export const useBoxSliceData = (pair: string, session: any, initialData: BoxSlic
         }
     }, [pair, session]);
 
-    const { data, error, isLoading } = useQuery<BoxSlice[]>({
+    const {
+        data = [],
+        error,
+        isLoading,
+    } = useQuery<BoxSlice[]>({
         queryKey: ['boxSlices', pair, session?.access_token],
         queryFn: fetchData,
         initialData: initialData,
@@ -55,25 +47,38 @@ export const useBoxSliceData = (pair: string, session: any, initialData: BoxSlic
     });
 
     const filteredData = useMemo(() => {
-        if (!data) return [];
-        return data.reduce((acc: BoxSlice[], currentSlice, index) => {
-            if (index === 0 || !compareSlices(currentSlice, acc[acc.length - 1], boxOffset, visibleBoxesCount)) {
-                acc.push(currentSlice);
+        if (!Array.isArray(data)) return [];
+
+        let lastUniqueSlice: BoxSlice | null = null;
+        return data.filter((currentSlice, index) => {
+            if (index === 0) {
+                lastUniqueSlice = currentSlice;
+                return true;
             }
-            return acc;
-        }, []);
+
+            const boxes1 = currentSlice.boxes.slice(boxOffset, boxOffset + visibleBoxesCount);
+            const boxes2 = lastUniqueSlice!.boxes.slice(boxOffset, boxOffset + visibleBoxesCount);
+
+            const isUnique = boxes1.some((box, i) => box.value !== boxes2[i]?.value);
+
+            if (isUnique) {
+                lastUniqueSlice = currentSlice;
+                return true;
+            }
+            return false;
+        });
     }, [data, boxOffset, visibleBoxesCount]);
 
     const formattedCandleData = useMemo(() => {
-        if (!data) return [];
+        if (!Array.isArray(data)) return [];
 
         return data.map((item) => ({
             ...item,
             time: new Date(item.timestamp).getTime(),
-            open: Number(item.currentOHLC.open),
-            high: Number(item.currentOHLC.high),
-            low: Number(item.currentOHLC.low),
-            close: Number(item.currentOHLC.close),
+            open: Number(item.currentOHLC?.open || 0),
+            high: Number(item.currentOHLC?.high || 0),
+            low: Number(item.currentOHLC?.low || 0),
+            close: Number(item.currentOHLC?.close || 0),
         }));
     }, [data]);
 
