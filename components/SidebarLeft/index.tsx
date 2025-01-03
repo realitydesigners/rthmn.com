@@ -149,7 +149,7 @@ export const SidebarLeft = () => {
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start py-4 pb-14'>
+            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start border-r border-[#121212] bg-[#0a0a0a] py-4 pb-14'>
                 {/* Navigation Buttons */}
                 <div className='flex flex-col gap-2'>
                     <button

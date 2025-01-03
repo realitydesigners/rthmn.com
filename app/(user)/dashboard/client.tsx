@@ -63,6 +63,7 @@ const useGridLayout = () => {
 
 export default function Dashboard() {
     const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } = useDashboard();
+    console.log(pairData);
     const gridClass = useGridLayout();
 
     // Memoize the filtered data
@@ -107,7 +108,7 @@ export default function Dashboard() {
     }
 
     return (
-        <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
+        <main className='w-full px-2 pt-16 sm:px-4 lg:pt-18'>
             <div className={gridClass}>
                 {filteredPairData.map(({ pair, boxSlice, currentOHLC, index }) => (
                     <PairResoBox

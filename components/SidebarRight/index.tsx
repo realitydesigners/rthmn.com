@@ -131,7 +131,7 @@ export const SidebarRight = () => {
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 right-0 bottom-0 z-[120] flex w-16 flex-col items-center justify-end py-4'>
+            <div className='border-r=l fixed top-14 right-0 bottom-0 z-[120] flex w-16 flex-col items-center justify-end border-l border-[#121212] bg-[#0a0a0a] py-4'>
                 {/* Settings button */}
                 <button
                     onClick={() => handlePanelToggle('settings')}
