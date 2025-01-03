@@ -122,12 +122,6 @@ export const SidebarLeft = () => {
                 locked: newLockedState,
             },
         });
-
-        // If unlocking, close the panel
-        if (!newLockedState) {
-            setIsOpen(false);
-            setActivePanel(undefined);
-        }
     };
 
     const renderPanelContent = () => {

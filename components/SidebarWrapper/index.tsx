@@ -48,7 +48,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
         const locks = getSidebarLocks();
         const state = getSidebarState();
 
-        // Update both locks and state
+        // Update both locks and state, but keep isOpen unchanged
         setSidebarLocks({
             ...locks,
             [position]: !isLocked,
@@ -58,13 +58,13 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
             ...state,
             [position]: {
                 ...state[position],
-                isOpen: !isLocked, // Ensure open state matches lock state
+                isOpen: isOpen, // Keep current open state
                 locked: !isLocked,
             },
         });
 
         onLockToggle();
-    }, [isLocked, onLockToggle, position]);
+    }, [isLocked, onLockToggle, position, isOpen]);
 
     // Update main content margin and width when sidebar opens/closes or resizes
     useEffect(() => {

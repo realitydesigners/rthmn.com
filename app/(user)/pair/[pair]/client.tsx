@@ -5,7 +5,6 @@ import HistogramManager from '@/components/Histogram/HistogramManager';
 import { LineChart } from '../../../../components/LineChart';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
-import { useBoxSliceData } from '@/hooks/useBoxSliceData';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
 import { createBoxCalculator } from '../boxCalculator';
@@ -171,8 +170,8 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
     };
 
     return (
-        <div className='flex h-screen w-full flex-col px-20 pt-32'>
-            <div className='min-h-[400px]'>
+        <div className='w-full px-2 pt-16 sm:px-4 lg:pt-18'>
+            <div className='min-h-[600px]'>
                 {candleData && candleData.length > 0 ? (
                     <LineChart pair={pair} candles={candleData} />
                 ) : (
