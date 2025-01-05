@@ -27,8 +27,6 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     const { session } = useAuth();
     const subscriptionsRef = useRef<Map<string, (data: BoxSlice) => void>>(new Map());
     const [priceData, setPriceData] = useState<Record<string, PriceData>>({});
-    console.log(priceData, 'priceData');
-
     // Connection management
     useEffect(() => {
         if (session?.access_token && !isConnected) {

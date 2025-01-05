@@ -89,7 +89,6 @@ const DEFAULT_PAIRS = ['GBPUSD', 'USDJPY', 'AUDUSD'];
 export default async function DashboardProvider({ children }: { children: React.ReactNode }) {
     const { signalsData } = await fetchSignalsServer();
     const { boxData } = await fetchBoxData(DEFAULT_PAIRS);
-    console.log('boxData', boxData);
 
     return (
         <DashboardProviderClient initialSignalsData={signalsData} initialBoxData={boxData}>

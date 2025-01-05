@@ -72,19 +72,14 @@ interface DashboardProviderClientProps {
 
 export function DashboardProviderClient({ children, initialSignalsData, initialBoxData = {} }: DashboardProviderClientProps) {
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
-
-    console.log('initialBoxData', initialBoxData);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
     const [signalsData, setSignalsData] = useState<Signal[] | null>(initialSignalsData);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
     const [pairData, setPairData] = useState<Record<string, PairData>>(initialBoxData);
-
     const gridCalculators = React.useRef<Map<string, GridCalculator>>(new Map());
-
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
-
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
 
     // Initialize state from localStorage after mount

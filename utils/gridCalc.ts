@@ -10,8 +10,10 @@ export class GridCalculator {
     private boxMap: Map<string, BoxState[]> = new Map();
 
     initializeBoxes(pair: string, initialBoxes: BoxState[]) {
-        const boxes = initialBoxes.map((box) => ({
-            ...box,
+        // Sort boxes by absolute value before initializing
+        const sortedBoxes = [...initialBoxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+
+        const boxes = sortedBoxes.map((box) => ({
             high: box.high,
             low: box.value > 0 ? box.high - Math.abs(box.value) : box.low,
             value: box.value,
@@ -39,14 +41,19 @@ export class GridCalculator {
                 }
             }
         });
+
+        // Re-sort boxes after updating
+        boxes.sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
     }
 
     getBoxes(pair: string): BoxState[] | undefined {
-        return this.boxMap.get(pair);
+        const boxes = this.boxMap.get(pair);
+        if (!boxes) return undefined;
+        return [...boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
     }
 
     getPairData(pair: string, currentOHLC: any): { boxes: BoxSlice[]; currentOHLC: any } | undefined {
-        const boxes = this.boxMap.get(pair);
+        const boxes = this.getBoxes(pair); // This will return sorted boxes
         if (!boxes) return undefined;
 
         return {

@@ -63,7 +63,6 @@ const useGridLayout = () => {
 
 export default function Dashboard() {
     const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } = useDashboard();
-    console.log(pairData);
     const gridClass = useGridLayout();
 
     // Memoize the filtered data
@@ -96,8 +95,6 @@ export default function Dashboard() {
             .filter(Boolean)
             .flat();
     }, [selectedPairs, pairData, isLoading]);
-
-    console.log(filteredPairData);
 
     if (!selectedPairs.length && !isLoading) {
         return (
