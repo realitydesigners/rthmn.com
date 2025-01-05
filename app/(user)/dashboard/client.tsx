@@ -112,12 +112,12 @@ export default function Dashboard() {
             <div className={gridClass}>
                 {filteredPairData.map(({ pair, boxSlice, currentOHLC, index }) => (
                     <PairResoBox
-                        key={isLoading ? index : `${pair}-${boxSlice?.timestamp}-${index}`}
+                        key={isLoading ? index : `${pair}-${index}`}
                         pair={pair}
                         boxSlice={boxSlice}
-                        currentOHLC={currentOHLC}
                         boxColors={boxColors}
                         isLoading={isLoading}
+                        currentOHLC={currentOHLC}
                     />
                 ))}
             </div>
