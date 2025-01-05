@@ -7,7 +7,7 @@ import { getTimeframeRange } from '@/utils/timeframe';
 import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
 import React, { useMemo, useState } from 'react';
 import { ResoChart } from '@/components/ResoChart';
-import { symbolsToDigits } from '@/utils/Constants';
+import { INSTRUMENTS } from '@/utils/instruments';
 
 export const PairResoBox = React.memo(
     ({ pair = '', boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
@@ -19,8 +19,9 @@ export const PairResoBox = React.memo(
         const closePrice = useMemo(() => currentOHLC?.close || 'N/A', [currentOHLC?.close]);
         const boxKey = useMemo(() => `${pair}-${boxSlice?.timestamp}`, [pair, boxSlice?.timestamp]);
         const digits = useMemo(() => {
-            const formattedPair = pair;
-            return symbolsToDigits[formattedPair]?.digits ?? 5;
+            // Find the pair in any of the instrument categories
+            const details = Object.values(INSTRUMENTS).find((category) => pair in category)?.[pair];
+            return details?.digits ?? 5;
         }, [pair]);
 
         // Calculate timeframe range based on whether we're using global or individual control

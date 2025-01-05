@@ -1,6 +1,6 @@
 'use client';
-import React, { createContext, useContext, useEffect, useRef } from 'react';
-import { BoxSlice } from '@/types/types';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { BoxSlice, PriceData } from '@/types/types';
 import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
 import { useAuth } from '@/providers/SupabaseProvider';
 
@@ -11,6 +11,7 @@ interface WebSocketContextType {
     unsubscribeFromBoxSlices: (pair: string) => void;
     isConnected: boolean;
     disconnect: () => void;
+    priceData: Record<string, PriceData>;
 }
 
 interface WebSocketHandlers {
@@ -25,6 +26,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     const [isConnected, setIsConnected] = React.useState(false);
     const { session } = useAuth();
     const subscriptionsRef = useRef<Map<string, (data: BoxSlice) => void>>(new Map());
+    const [priceData, setPriceData] = useState<Record<string, PriceData>>({});
 
     // Connection management
     useEffect(() => {
@@ -55,6 +57,15 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             const data = JSON.parse(event.data);
             if (data.type === 'boxSlice') {
                 handleBoxSliceMessage(data);
+            } else if (data.type === 'price' && data.pair) {
+                setPriceData((prev) => ({
+                    ...prev,
+                    [data.pair]: {
+                        price: data.data.price,
+                        timestamp: data.data.timestamp,
+                        volume: data.data.volume,
+                    },
+                }));
             }
         },
     });
@@ -93,6 +104,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         },
         isConnected,
         disconnect: () => wsClient.disconnect(),
+        priceData,
     };
 
     return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>;

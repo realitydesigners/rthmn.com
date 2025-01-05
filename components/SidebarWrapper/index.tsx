@@ -48,7 +48,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
         const locks = getSidebarLocks();
         const state = getSidebarState();
 
-        // Update both locks and state
+        // Update both locks and state, but keep isOpen unchanged
         setSidebarLocks({
             ...locks,
             [position]: !isLocked,
@@ -58,13 +58,13 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
             ...state,
             [position]: {
                 ...state[position],
-                isOpen: !isLocked, // Ensure open state matches lock state
+                isOpen: isOpen, // Keep current open state
                 locked: !isLocked,
             },
         });
 
         onLockToggle();
-    }, [isLocked, onLockToggle, position]);
+    }, [isLocked, onLockToggle, position, isOpen]);
 
     // Update main content margin and width when sidebar opens/closes or resizes
     useEffect(() => {
@@ -87,18 +87,22 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                 if (position === 'left') {
                     main.style.marginLeft = `${width}px`;
                     main.style.width = `calc(100vw - ${width + rightWidth}px)`;
+                    main.style.paddingLeft = '0'; // Reset padding when locked
                 } else {
                     main.style.marginRight = `${width}px`;
                     main.style.width = `calc(100vw - ${leftWidth + width}px)`;
+                    main.style.paddingRight = '0'; // Reset padding when locked
                 }
             } else {
                 // When unlocked or closed, only respect the other locked sidebar
                 if (position === 'left') {
                     main.style.marginLeft = '0';
                     main.style.width = rightWidth > 0 ? `calc(100vw - ${rightWidth}px)` : '100%';
+                    main.style.paddingLeft = '64px'; // 16 * 4 = 64px for the fixed sidebar
                 } else {
                     main.style.marginRight = '0';
                     main.style.width = leftWidth > 0 ? `calc(100vw - ${leftWidth}px)` : '100%';
+                    main.style.paddingRight = '64px'; // 16 * 4 = 64px for the fixed sidebar
                 }
             }
             container.style.overflowX = 'hidden';
@@ -125,10 +129,10 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
             style={{ width: `${width}px` }}>
             <div
                 className={cn(
-                    'group relative my-4 flex h-[calc(100%-2rem)] w-full rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px] transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
+                    'group my- relative flex h-screen w-full transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
                     position === 'left' ? 'ml-16' : 'mr-16'
                 )}>
-                <div className='relative flex h-full w-full flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a] backdrop-blur-md'>
+                <div className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a]', position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]')}>
                     {/* Header Section */}
                     <div className='relative z-10 flex h-12 items-center justify-between px-2'>
                         {position === 'right' && (

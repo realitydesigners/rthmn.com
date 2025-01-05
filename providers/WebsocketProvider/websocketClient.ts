@@ -1,8 +1,8 @@
-import { BoxSlice } from '@/types/types';
+import { BoxSlice, PriceData } from '@/types/types';
 import { decode } from '@msgpack/msgpack';
 
 interface WebSocketMessage {
-    type: 'boxSlice' | 'subscribeAll' | 'ack' | 'updateAll';
+    type: 'boxSlice' | 'ack' | 'price';
     pair?: string;
     data?: any;
     message?: string;
@@ -11,7 +11,7 @@ interface WebSocketMessage {
 class WebSocketClient {
     private socket: WebSocket | null = null;
     private subscriptions: Set<string> = new Set();
-    private messageHandlers: Map<string, (data: BoxSlice) => void> = new Map();
+    private messageHandlers: Map<string, (data: BoxSlice | PriceData) => void> = new Map();
     private openHandlers: Set<() => void> = new Set();
     private closeHandlers: Set<() => void> = new Set();
     private globalMessageHandlers: Set<(event: MessageEvent) => void> = new Set();
@@ -88,66 +88,19 @@ class WebSocketClient {
 
     private processMessage(message: WebSocketMessage) {
         const timestamp = new Date().toISOString();
-        this.logMessage(message, timestamp);
 
         switch (message.type) {
             case 'boxSlice':
                 this.handleBoxSliceMessage(message, timestamp);
                 break;
-            case 'subscribeAll':
-                this.handleSubscribeAllMessage(message);
-                break;
             case 'ack':
                 this.handleAckMessage(message);
                 break;
-            case 'updateAll':
-                this.handleUpdateAllMessage(message);
+            case 'price':
+                // Just pass the message to global handlers
+                this.globalMessageHandlers.forEach((handler) => handler(new MessageEvent('message', { data: JSON.stringify(message) })));
                 break;
         }
-    }
-
-    private handleSubscribeAllMessage(message: WebSocketMessage) {
-        if (!message.data) return;
-
-        console.log('📊 Initial data received:', {
-            pairs: Object.keys(message.data).join(', '),
-            timestamp: new Date().toISOString(),
-        });
-
-        Object.entries(message.data).forEach(([pair, data]) => {
-            const handler = this.messageHandlers.get(pair);
-            if (handler) {
-                const boxSlice = this.formatBoxSliceData(data, new Date().toISOString());
-                handler(boxSlice);
-            }
-        });
-    }
-
-    private handleUpdateAllMessage(message: WebSocketMessage) {
-        if (!message.data) return;
-
-        const now = Date.now();
-        if (now - this.lastUpdateLog > 1000) {
-            console.log('🔄 Bulk update received:', {
-                pairs: Object.keys(message.data).join(', '),
-                timestamp: new Date().toISOString(),
-            });
-            this.lastUpdateLog = now;
-        }
-
-        // Process all updates in a single batch
-        const updates = Object.entries(message.data).map(([pair, data]) => ({
-            pair,
-            boxSlice: this.formatBoxSliceData(data, new Date().toISOString()),
-        }));
-
-        // Notify handlers of all updates at once
-        updates.forEach(({ pair, boxSlice }) => {
-            const handler = this.messageHandlers.get(pair);
-            if (handler) {
-                handler(boxSlice);
-            }
-        });
     }
 
     private handleAckMessage(message: any) {
@@ -162,7 +115,6 @@ class WebSocketClient {
         console.log('🟢 Authentication successful');
         this.isAuthenticated = true;
         this.openHandlers.forEach((handler) => handler());
-        this.subscribeAll();
         this.processPendingOperations();
     }
 
@@ -274,46 +226,12 @@ class WebSocketClient {
     }
 
     private logMessage(message: any, timestamp: string) {
-        // console.log('📥 WebSocket message:', {
-        //   type: message.type,
-        //   pair: message.pair,
-        //   timestamp,
-        //   dataTimestamp: message.data?.timestamp
-        // });
-    }
-
-    private async subscribeAll(retryCount = 3) {
-        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-            if (retryCount > 0) {
-                console.log(`Retrying subscribeAll in 1s (${retryCount} attempts left)`);
-                setTimeout(() => this.subscribeAll(retryCount - 1), 1000);
-                return;
-            }
-            console.error('Failed to subscribe to all pairs after retries');
-            return;
-        }
-
-        try {
-            this.socket.send(JSON.stringify({ type: 'subscribeAll' }));
-        } catch (error) {
-            console.error('Failed to send subscribeAll message:', error);
-            if (retryCount > 0) {
-                setTimeout(() => this.subscribeAll(retryCount - 1), 1000);
-            }
-        }
-    }
-
-    private formatBoxSliceData(data: any, timestamp: string): BoxSlice {
-        return {
-            boxes: data.boxes || [],
-            timestamp: data.timestamp || timestamp,
-            currentOHLC: data.currentOHLC || {
-                open: 0,
-                high: 0,
-                low: 0,
-                close: 0,
-            },
-        };
+        console.log('📥 WebSocket message:', {
+            type: message.type,
+            pair: message.pair,
+            timestamp,
+            dataTimestamp: message.data?.timestamp,
+        });
     }
 }
 

@@ -4,7 +4,7 @@ import { useLongPress } from '@/hooks/useLongPress';
 import Link from 'next/link';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useSwipeable } from 'react-swipeable';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 import { LuDollarSign, LuBitcoin, LuList, LuBookmark, LuSearch, LuTrash2, LuArrowRight, LuPlus } from 'react-icons/lu';
 
 const useSound = () => {

@@ -1,19 +1,31 @@
 import React from 'react';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/components/Constants/instruments';
+import { FOREX_PAIRS, CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, INSTRUMENTS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 
-const formatPrice = (price: number) => {
-    return price.toFixed(price >= 100 ? 2 : 5);
+const formatPrice = (price: number, instrument: string) => {
+    // Get the digits for formatting from the INSTRUMENTS configuration
+    let digits = 2; // default
+    for (const category of Object.values(INSTRUMENTS)) {
+        if (instrument in category) {
+            digits = category[instrument].digits;
+            break;
+        }
+    }
+    return price.toFixed(digits);
 };
 
 export const AvailablePairs = () => {
-    const { selectedPairs, togglePair, pairData } = useDashboard();
+    const { selectedPairs, togglePair } = useDashboard();
+    const { priceData } = useWebSocket();
 
     return (
         <>
             {[
                 { label: 'FX', items: FOREX_PAIRS },
                 { label: 'CRYPTO', items: CRYPTO_PAIRS },
+                { label: 'STOCKS', items: EQUITY_PAIRS },
+                { label: 'ETF', items: ETF_PAIRS },
             ].map((group) => {
                 const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
                 if (availablePairs.length === 0) return null;
@@ -33,7 +45,7 @@ export const AvailablePairs = () => {
                                     </div>
                                     <div className='flex items-center'>
                                         <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-3'>
-                                            {pairData[item]?.currentOHLC?.close ? formatPrice(pairData[item]?.currentOHLC?.close) : 'N/A'}
+                                            {priceData[item]?.price ? formatPrice(priceData[item].price, item) : 'N/A'}
                                         </span>
                                         <button
                                             onClick={(e) => {

@@ -27,10 +27,9 @@ export default async function UserLayout({ children, modal }: { children: React.
         <QueryProvider>
             <WebSocketProvider>
                 <DashboardProvider initialSignalsData={[]}>
-                    <BackgroundPerspectiveGrid />
                     <div id='app-container' className='relative min-h-screen overflow-y-auto'>
                         <NavbarSignedIn user={user} />
-                        <main className='w-full transition-all duration-300 ease-in-out'>{children}</main>
+                        <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
                         <SidebarLeft />
                         <SidebarRight />
                         <BottomSidebar />

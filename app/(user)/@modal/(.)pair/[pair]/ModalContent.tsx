@@ -7,7 +7,6 @@ import { LineChart } from '@/components/LineChart';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { useBoxSliceData } from '@/hooks/useBoxSliceData';
 
 interface ModalContentProps {
     pair: string;
@@ -16,12 +15,11 @@ interface ModalContentProps {
 export function ModalContent({ pair }: ModalContentProps) {
     const router = useRouter();
     const { pairData, boxColors } = useDashboard();
-    const { session } = useAuth();
+
     const data = pairData[pair];
     const [initialData, setInitialData] = useState<BoxSlice[]>([]);
     const [boxOffset] = useState(0);
     const [visibleBoxesCount] = useState(16);
-    const { candleData, isLoading } = useBoxSliceData(pair, session, initialData, boxOffset, visibleBoxesCount);
 
     function onDismiss() {
         router.back();
