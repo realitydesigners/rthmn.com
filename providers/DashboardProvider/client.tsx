@@ -1,11 +1,12 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { BoxSlice, PairData, Signal, BoxColors, FullPreset } from '@/types/types';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
 import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { INSTRUMENTS } from '@/utils/instruments';
+import { GridCalculator } from '@/utils/gridCalc';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;
@@ -77,14 +78,14 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
-    // Signal state
     const [signalsData, setSignalsData] = useState<Signal[] | null>(initialSignalsData);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
+    const gridCalculator = useRef(new GridCalculator());
 
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
 
-    const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices } = useWebSocket();
+    const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
 
     // Initialize state from localStorage after mount
     useEffect(() => {
@@ -138,6 +139,78 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
     // Calculate loading state including sidebar initialization
     const isLoading = !isAuthenticated || pairDataQuery.isLoading || !isConnected || !isSidebarInitialized;
 
+    // Initialize grid calculator with server data and update with price data
+    useEffect(() => {
+        if (!isLoading && pairDataQuery.data) {
+            Object.entries(pairDataQuery.data).forEach(([pair, data]) => {
+                if (data.boxes?.[0]?.boxes) {
+                    gridCalculator.current.initializeBoxes(pair, data.boxes[0].boxes);
+                }
+            });
+        }
+    }, [pairDataQuery.data, isLoading]);
+
+    // Update grid calculator with price data
+    useEffect(() => {
+        if (priceData && Object.keys(priceData).length > 0) {
+            Object.entries(priceData).forEach(([pair, data]) => {
+                if (data.price) {
+                    gridCalculator.current.updateWithPrice(pair, data.price);
+
+                    // Update query data with new box values
+                    const currentOHLC = {
+                        open: data.price,
+                        high: data.price,
+                        low: data.price,
+                        close: data.price,
+                    };
+
+                    const updatedPairData = gridCalculator.current.getPairData(pair, currentOHLC);
+                    if (updatedPairData) {
+                        queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => ({
+                            ...oldData,
+                            [pair]: updatedPairData,
+                        }));
+                    }
+                }
+            });
+        }
+    }, [priceData, queryClient]);
+
+    // WebSocket subscription management
+    useEffect(() => {
+        if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
+
+        const handleBulkUpdate = (pair: string, wsData: BoxSlice) => {
+            // Initialize grid calculator if needed
+            if ('boxes' in wsData && Array.isArray(wsData.boxes) && wsData.boxes.length > 0) {
+                gridCalculator.current.initializeBoxes(pair, wsData.boxes);
+            }
+
+            // Update query data
+            queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => ({
+                ...oldData,
+                [pair]: {
+                    boxes: [wsData],
+                    currentOHLC: wsData.currentOHLC,
+                },
+            }));
+        };
+
+        selectedPairs.forEach((pair) => {
+            subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
+                handleBulkUpdate(pair, wsData);
+            });
+        });
+
+        return () => {
+            console.log('🧹 Cleaning up WebSocket subscriptions');
+            selectedPairs.forEach((pair) => {
+                unsubscribeFromBoxSlices(pair);
+            });
+        };
+    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, queryClient]);
+
     // Candles queries - single fetch, no refetching
     const candlesQueries = useQueries({
         queries: selectedPairs.map((pair) => ({
@@ -159,70 +232,6 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
         })),
     });
 
-    // WebSocket subscription management
-    useEffect(() => {
-        if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
-
-        const handleBulkUpdate = (pair: string, wsData: BoxSlice) => {
-            // Update box data
-            queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => ({
-                ...oldData,
-                [pair]: {
-                    boxes: [wsData],
-                    currentOHLC: wsData.currentOHLC,
-                },
-            }));
-
-            // Update candle data with proper candle formation logic
-            if (wsData.currentOHLC) {
-                queryClient.setQueryData(['candles', pair], (oldData: any[] | undefined) => {
-                    if (!oldData?.length) return oldData;
-
-                    const [latestCandle, ...rest] = oldData;
-                    const currentTime = new Date(wsData.timestamp);
-                    const candleTime = new Date(latestCandle.timestamp);
-
-                    // Check if we need to create a new candle (every minute)
-                    if (currentTime.getMinutes() !== candleTime.getMinutes()) {
-                        // Create new candle
-                        const newCandle = {
-                            timestamp: wsData.timestamp,
-                            open: wsData.currentOHLC.open,
-                            high: wsData.currentOHLC.high,
-                            low: wsData.currentOHLC.low,
-                            close: wsData.currentOHLC.close,
-                            volume: 0, // If you have volume data, include it here
-                        };
-                        return [newCandle, latestCandle, ...rest];
-                    }
-
-                    // Update existing candle
-                    const updatedCandle = {
-                        ...latestCandle,
-                        high: Math.max(latestCandle.high, wsData.currentOHLC.close),
-                        low: Math.min(latestCandle.low, wsData.currentOHLC.close),
-                        close: wsData.currentOHLC.close,
-                    };
-
-                    return [updatedCandle, ...rest];
-                });
-            }
-        };
-
-        selectedPairs.forEach((pair) => {
-            subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
-                handleBulkUpdate(pair, wsData);
-            });
-        });
-
-        return () => {
-            console.log('🧹 Cleaning up WebSocket subscriptions');
-            selectedPairs.forEach((pair) => {
-                unsubscribeFromBoxSlices(pair);
-            });
-        };
-    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, queryClient]);
-
     // Combine candles data for all pairs
     const candlesData = React.useMemo(() => {
         return selectedPairs.reduce(
@@ -239,6 +248,8 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
 
     const pairData = pairDataQuery.data || {};
 
+    console.log(pairData, 'pairData');
+
     const togglePair = (pair: string) => {
         const wasSelected = selectedPairs.includes(pair);
         const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
@@ -248,6 +259,7 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
 
         if (wasSelected) {
             unsubscribeFromBoxSlices(pair);
+            gridCalculator.current.clearPair(pair);
             queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => {
                 if (!oldData) return {};
                 const { [pair]: removed, ...rest } = oldData;

@@ -147,6 +147,59 @@ const LivePriceFeed = ({ pair }: { pair: string }) => {
     );
 };
 
+const BoxValuesTable = ({ pair }: { pair: string }) => {
+    const { pairData } = useDashboard();
+    const [boxHistory, setBoxHistory] = useState<any[]>([]);
+
+    // Update box history when pairData changes
+    useEffect(() => {
+        const boxes = pairData[pair]?.boxes?.[0]?.boxes;
+        if (boxes) {
+            setBoxHistory((prev) => {
+                const newEntry = {
+                    boxes,
+                    timestamp: new Date().toISOString(),
+                };
+                return [newEntry, ...prev].slice(0, 50); // Keep last 50 updates
+            });
+        }
+    }, [pair, pairData]);
+
+    if (!boxHistory.length) {
+        return <div className='text-gray-400'>No box data available...</div>;
+    }
+
+    const latestBoxes = boxHistory[0].boxes;
+
+    return (
+        <div className='space-y-2'>
+            <div className='overflow-auto'>
+                <table className='w-full text-left text-sm'>
+                    <thead className='bg-gray-800 text-xs text-gray-300 uppercase'>
+                        <tr>
+                            <th className='p-2'>Box #</th>
+                            <th className='p-2'>High</th>
+                            <th className='p-2'>Low</th>
+                            <th className='p-2'>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody className='divide-y divide-gray-800'>
+                        {latestBoxes.map((box, index) => (
+                            <tr key={index} className='bg-gray-900/30'>
+                                <td className='p-2 text-gray-400'>{index + 1}</td>
+                                <td className='p-2 font-mono text-green-400'>{box.high.toFixed(5)}</td>
+                                <td className='p-2 font-mono text-red-400'>{box.low.toFixed(5)}</td>
+                                <td className={`p-2 font-mono ${box.value > 0 ? 'text-green-400' : 'text-red-400'}`}>{box.value}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className='text-xs text-gray-400'>Last updated: {new Date(boxHistory[0].timestamp).toLocaleTimeString()}</div>
+        </div>
+    );
+};
+
 const MemoizedResoBox = React.memo(ResoBox, (prevProps, nextProps) => {
     const areEqual = JSON.stringify(prevProps.slice) === JSON.stringify(nextProps.slice);
     console.log('ResoBox memo check:', areEqual);
@@ -223,7 +276,7 @@ const PairPanel = React.memo(({ pair }: { pair: string }) => {
 
     return (
         <CollapsiblePanel title={pair} defaultOpen={true}>
-            <div className='grid gap-4 md:grid-cols-2'>
+            <div className='grid gap-4'>
                 <div className='space-y-4'>
                     <BoxContainer boxData={boxData} />
                     <button onClick={handleFetchBoxSlices} className='rounded bg-purple-600 px-3 py-1 text-sm'>
@@ -241,6 +294,11 @@ const PairPanel = React.memo(({ pair }: { pair: string }) => {
                     <div className='rounded-lg border border-gray-700 bg-gray-800/50 p-2'>
                         <h4 className='mb-2 text-sm font-semibold'>Price Feed</h4>
                         <LivePriceFeed pair={pair} />
+                    </div>
+
+                    <div className='rounded-lg border border-gray-700 bg-gray-800/50 p-2'>
+                        <h4 className='mb-2 text-sm font-semibold'>Box Values</h4>
+                        <BoxValuesTable pair={pair} />
                     </div>
 
                     <div className='rounded-lg border border-gray-700 bg-gray-800/50 p-2'>
