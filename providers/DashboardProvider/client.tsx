@@ -4,8 +4,6 @@ import { BoxSlice, PairData, Signal, BoxColors, FullPreset } from '@/types/types
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
-import { useQueries, useQueryClient } from '@tanstack/react-query';
-import { INSTRUMENTS } from '@/utils/instruments';
 import { GridCalculator } from '@/utils/gridCalc';
 
 interface DashboardContextType {
@@ -66,21 +64,23 @@ export function useSignals() {
     return context;
 }
 
-export const AVAILABLE_PAIRS = [...Object.keys(INSTRUMENTS.FOREX), ...Object.keys(INSTRUMENTS.CRYPTO)] as const;
-
 interface DashboardProviderClientProps {
     children: React.ReactNode;
     initialSignalsData: Signal[] | null;
+    initialBoxData?: Record<string, PairData>;
 }
 
-export function DashboardProviderClient({ children, initialSignalsData }: DashboardProviderClientProps) {
-    const queryClient = useQueryClient();
+export function DashboardProviderClient({ children, initialSignalsData, initialBoxData = {} }: DashboardProviderClientProps) {
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
+
+    console.log('initialBoxData', initialBoxData);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
     const [signalsData, setSignalsData] = useState<Signal[] | null>(initialSignalsData);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
-    const gridCalculator = useRef(new GridCalculator());
+    const [pairData, setPairData] = useState<Record<string, PairData>>(initialBoxData);
+
+    const gridCalculators = React.useRef<Map<string, GridCalculator>>(new Map());
 
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
@@ -107,95 +107,81 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
         }
     }, [isAuthenticated]);
 
-    // Single query for all pair data
-    const pairDataQuery = useQueries({
-        queries: [
-            {
-                queryKey: ['allPairData'],
-                queryFn: () => {
-                    const existingData = queryClient.getQueryData(['allPairData']) as Record<string, PairData>;
-                    return (
-                        existingData ||
-                        selectedPairs.reduce(
-                            (acc, pair) => ({
-                                ...acc,
-                                [pair]: {
-                                    boxes: [],
-                                    currentOHLC: { open: 0, high: 0, low: 0, close: 0 },
-                                },
-                            }),
-                            {}
-                        )
-                    );
-                },
-                enabled: isConnected && isAuthenticated && selectedPairs.length > 0,
-                staleTime: Infinity,
-                gcTime: Infinity,
-                refetchInterval: 0 as const,
-            },
-        ],
-    })[0];
-
     // Calculate loading state including sidebar initialization
-    const isLoading = !isAuthenticated || pairDataQuery.isLoading || !isConnected || !isSidebarInitialized;
+    const isLoading = !isAuthenticated || !isConnected || !isSidebarInitialized;
 
     // Initialize grid calculator with server data and update with price data
     useEffect(() => {
-        if (!isLoading && pairDataQuery.data) {
-            Object.entries(pairDataQuery.data).forEach(([pair, data]) => {
+        if (!isLoading && pairData) {
+            Object.entries(pairData).forEach(([pair, data]) => {
                 if (data.boxes?.[0]?.boxes) {
-                    gridCalculator.current.initializeBoxes(pair, data.boxes[0].boxes);
+                    const calculator = new GridCalculator();
+                    calculator.initializeBoxes(pair, data.boxes[0].boxes);
+                    gridCalculators.current.set(pair, calculator);
                 }
             });
         }
-    }, [pairDataQuery.data, isLoading]);
+    }, [pairData, isLoading]);
 
     // Update grid calculator with price data
     useEffect(() => {
         if (priceData && Object.keys(priceData).length > 0) {
             Object.entries(priceData).forEach(([pair, data]) => {
                 if (data.price) {
-                    gridCalculator.current.updateWithPrice(pair, data.price);
+                    const calculator = gridCalculators.current.get(pair);
+                    if (calculator) {
+                        calculator.updateWithPrice(pair, data.price);
 
-                    // Update query data with new box values
-                    const currentOHLC = {
-                        open: data.price,
-                        high: data.price,
-                        low: data.price,
-                        close: data.price,
-                    };
+                        // Update pair data with new box values
+                        const currentOHLC = {
+                            open: data.price,
+                            high: data.price,
+                            low: data.price,
+                            close: data.price,
+                        };
 
-                    const updatedPairData = gridCalculator.current.getPairData(pair, currentOHLC);
-                    if (updatedPairData) {
-                        queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => ({
-                            ...oldData,
-                            [pair]: updatedPairData,
-                        }));
+                        const updatedPairData = calculator.getPairData(pair, currentOHLC);
+                        if (updatedPairData) {
+                            setPairData((prev) => ({
+                                ...prev,
+                                [pair]: updatedPairData,
+                            }));
+                        }
                     }
                 }
             });
         }
-    }, [priceData, queryClient]);
+    }, [priceData]);
+
+    const handleBulkUpdate = React.useCallback((pair: string, wsData: BoxSlice) => {
+        // Initialize or get grid calculator for this pair
+        if (!gridCalculators.current.has(pair)) {
+            const calculator = new GridCalculator();
+            calculator.initializeBoxes(pair, wsData.boxes);
+            gridCalculators.current.set(pair, calculator);
+        }
+
+        const calculator = gridCalculators.current.get(pair)!;
+
+        // Update grid calculator with new price
+        if (wsData.currentOHLC) {
+            calculator.updateWithPrice(pair, wsData.currentOHLC.close);
+        }
+
+        // Get updated box data
+        const updatedPairData = calculator.getPairData(pair, wsData.currentOHLC);
+        if (!updatedPairData) return;
+
+        // Update box data with calculated values
+        setPairData((prev) => ({
+            ...prev,
+            [pair]: updatedPairData,
+        }));
+    }, []);
 
     // WebSocket subscription management
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
-
-        const handleBulkUpdate = (pair: string, wsData: BoxSlice) => {
-            // Initialize grid calculator if needed
-            if ('boxes' in wsData && Array.isArray(wsData.boxes) && wsData.boxes.length > 0) {
-                gridCalculator.current.initializeBoxes(pair, wsData.boxes);
-            }
-
-            // Update query data
-            queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => ({
-                ...oldData,
-                [pair]: {
-                    boxes: [wsData],
-                    currentOHLC: wsData.currentOHLC,
-                },
-            }));
-        };
 
         selectedPairs.forEach((pair) => {
             subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
@@ -207,102 +193,70 @@ export function DashboardProviderClient({ children, initialSignalsData }: Dashbo
             console.log('🧹 Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
+                gridCalculators.current.delete(pair);
             });
         };
-    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, queryClient]);
+    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, handleBulkUpdate]);
 
-    // Candles queries - single fetch, no refetching
-    const candlesQueries = useQueries({
-        queries: selectedPairs.map((pair) => ({
-            queryKey: ['candles', pair],
-            queryFn: async () => {
-                const response = await fetch(`/api/getCandles?pair=${pair}&limit=10000&token=${session?.access_token}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const { data } = await response.json();
-                return data;
-            },
-            enabled: isConnected && isAuthenticated && !!session?.access_token,
-            staleTime: Infinity,
-            gcTime: Infinity,
-            refetchInterval: 0,
-            refetchOnWindowFocus: false,
-            refetchOnReconnect: false,
-        })),
-    });
+    const togglePair = React.useCallback(
+        (pair: string) => {
+            const wasSelected = selectedPairs.includes(pair);
+            const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
 
-    // Combine candles data for all pairs
-    const candlesData = React.useMemo(() => {
-        return selectedPairs.reduce(
-            (acc, pair, index) => {
-                const queryData = candlesQueries[index].data;
-                if (queryData) {
-                    acc[pair] = queryData;
-                }
-                return acc;
-            },
-            {} as Record<string, any[]>
-        );
-    }, [selectedPairs, candlesQueries]);
+            setSelectedPairsState(newSelected);
+            setSelectedPairs(newSelected);
 
-    const pairData = pairDataQuery.data || {};
+            if (wasSelected) {
+                unsubscribeFromBoxSlices(pair);
+                gridCalculators.current.delete(pair);
+                setPairData((prev) => {
+                    const { [pair]: removed, ...rest } = prev;
+                    return rest;
+                });
+            }
+        },
+        [selectedPairs, unsubscribeFromBoxSlices]
+    );
 
-    console.log(pairData, 'pairData');
-
-    const togglePair = (pair: string) => {
-        const wasSelected = selectedPairs.includes(pair);
-        const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
-
-        setSelectedPairsState(newSelected);
-        setSelectedPairs(newSelected);
-
-        if (wasSelected) {
-            unsubscribeFromBoxSlices(pair);
-            gridCalculator.current.clearPair(pair);
-            queryClient.setQueryData(['allPairData'], (oldData: Record<string, PairData> | undefined) => {
-                if (!oldData) return {};
-                const { [pair]: removed, ...rest } = oldData;
-                return rest;
-            });
-        }
-    };
-
-    const updateBoxColors = (colors: BoxColors) => {
+    const updateBoxColors = React.useCallback((colors: BoxColors) => {
         setBoxColors(colors);
         setBoxColorsState(colors);
-    };
+    }, []);
 
-    const handleSidebarClick = (e: React.MouseEvent) => {
+    const handleSidebarClick = React.useCallback((e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
         if (target.closest('.sidebar-toggle') || target.closest('.sidebar-content') || target.closest('.fixed-sidebar')) {
             return;
         }
         window.dispatchEvent(new Event('closeSidebars'));
-    };
+    }, []);
+
+    // Memoize context value
+    const contextValue = React.useMemo(
+        () => ({
+            pairData,
+            selectedPairs,
+            isLoading,
+            isSidebarInitialized,
+            togglePair,
+            isConnected,
+            boxColors: boxColorsState,
+            updateBoxColors,
+            isAuthenticated,
+            handleSidebarClick,
+            signalsData,
+            selectedSignal,
+            setSelectedSignal,
+            candlesData: {},
+            DEFAULT_BOX_COLORS,
+            DEFAULT_PAIRS: ['GBPUSD', 'USDJPY', 'AUDUSD'],
+            fullPresets,
+        }),
+        [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal]
+    );
 
     return (
-        <DashboardContext.Provider
-            value={{
-                pairData,
-                selectedPairs,
-                isLoading,
-                isSidebarInitialized,
-                togglePair,
-                isConnected,
-                boxColors: boxColorsState,
-                updateBoxColors,
-                isAuthenticated,
-                handleSidebarClick,
-
-                signalsData,
-                selectedSignal,
-                setSelectedSignal,
-                candlesData,
-                DEFAULT_BOX_COLORS,
-                DEFAULT_PAIRS: ['GBPUSD', 'USDJPY', 'AUDUSD'],
-                fullPresets,
-            }}>
+        <DashboardContext.Provider value={contextValue}>
             <div onClick={handleSidebarClick}>{children}</div>
         </DashboardContext.Provider>
     );
