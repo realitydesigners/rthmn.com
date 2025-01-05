@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { FaSearch, FaTimes, FaChevronDown } from 'react-icons/fa';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 
 interface SearchBarProps {
     selectedPairs: string[];
@@ -31,7 +32,8 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showResults, setShowResults] = useState(false);
     const searchRef = useRef<HTMLDivElement>(null);
-    const { selectedPairs, togglePair, pairData } = useDashboard();
+    const { selectedPairs, togglePair } = useDashboard();
+    const { priceData } = useWebSocket();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -61,7 +63,7 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
 
     const renderPairRow = (item: string) => {
         const isSelected = selectedPairs.includes(item);
-        const currentPrice = pairData[item]?.currentOHLC?.close;
+        const currentPrice = priceData[item]?.price;
 
         return (
             <div
@@ -128,7 +130,7 @@ export const SearchBar: React.FC<SearchBarProps> = () => {
                                                 </div>
                                                 <div className='flex shrink-0 items-center'>
                                                     <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-3'>
-                                                        {pairData[item]?.currentOHLC?.close ? formatPrice(pairData[item]?.currentOHLC?.close) : 'N/A'}
+                                                        {priceData[item]?.price ? formatPrice(priceData[item].price) : 'N/A'}
                                                     </span>
                                                     <button
                                                         onClick={(e) => {
