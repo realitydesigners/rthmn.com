@@ -1,13 +1,15 @@
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 
 const formatPrice = (price: number) => {
     return price.toFixed(price >= 100 ? 2 : 5);
 };
 
 export const SelectedPairs = () => {
-    const { selectedPairs, togglePair, pairData } = useDashboard();
+    const { selectedPairs, togglePair } = useDashboard();
+    const { priceData } = useWebSocket();
 
     if (selectedPairs.length === 0) return null;
 
@@ -26,7 +28,7 @@ export const SelectedPairs = () => {
                         </div>
                         <div className='flex shrink-0 items-center'>
                             <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-3'>
-                                {pairData[item]?.currentOHLC?.close ? formatPrice(pairData[item]?.currentOHLC?.close) : 'N/A'}
+                                {priceData[item]?.price ? formatPrice(priceData[item].price) : 'N/A'}
                             </span>
                             <button
                                 onClick={(e) => {
