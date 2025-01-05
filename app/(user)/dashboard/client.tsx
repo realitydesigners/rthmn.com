@@ -63,7 +63,6 @@ const useGridLayout = () => {
 
 export default function Dashboard() {
     const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } = useDashboard();
-    console.log(pairData);
     const gridClass = useGridLayout();
 
     // Memoize the filtered data
@@ -97,8 +96,6 @@ export default function Dashboard() {
             .flat();
     }, [selectedPairs, pairData, isLoading]);
 
-    console.log(filteredPairData);
-
     if (!selectedPairs.length && !isLoading) {
         return (
             <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
@@ -112,12 +109,12 @@ export default function Dashboard() {
             <div className={gridClass}>
                 {filteredPairData.map(({ pair, boxSlice, currentOHLC, index }) => (
                     <PairResoBox
-                        key={isLoading ? index : `${pair}-${boxSlice?.timestamp}-${index}`}
+                        key={isLoading ? index : `${pair}-${index}`}
                         pair={pair}
                         boxSlice={boxSlice}
-                        currentOHLC={currentOHLC}
                         boxColors={boxColors}
                         isLoading={isLoading}
+                        currentOHLC={currentOHLC}
                     />
                 ))}
             </div>
