@@ -250,3 +250,9 @@ export interface ColorPreset {
 export interface FullPreset extends ColorPreset {
     styles: BoxColors['styles'];
 }
+
+export interface PriceData {
+    price: number;
+    timestamp: string;
+    volume?: number;
+}

@@ -112,7 +112,82 @@ const LiveCandleFeed = ({ pair }: { pair: string }) => {
     );
 };
 
-const PairPanel = ({ pair }: { pair: string }) => {
+const LivePriceFeed = ({ pair }: { pair: string }) => {
+    const { priceData } = useWebSocket();
+    const [priceHistory, setPriceHistory] = useState<any[]>([]);
+
+    useEffect(() => {
+        if (priceData[pair]) {
+            setPriceHistory((prev) => {
+                const newPrice = {
+                    ...priceData[pair],
+                    pair,
+                    displayTime: new Date().toISOString().split('.')[0],
+                };
+                return [newPrice, ...prev].slice(0, 10);
+            });
+        }
+    }, [pair, priceData]);
+
+    if (!priceHistory.length) {
+        return <div className='text-gray-400'>Waiting for price updates...</div>;
+    }
+
+    return (
+        <div className='space-y-1'>
+            {priceHistory.map((update, index) => (
+                <div key={`${update.displayTime}-${index}`} className='flex justify-between rounded bg-gray-900/30 p-1'>
+                    <span className='font-mono text-xs text-gray-400'>{update.displayTime}</span>
+                    <span className='font-mono text-xs text-blue-400'>
+                        {update.price.toFixed(5)} ({update.exchange})
+                    </span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
+const MemoizedResoBox = React.memo(ResoBox, (prevProps, nextProps) => {
+    const areEqual = JSON.stringify(prevProps.slice) === JSON.stringify(nextProps.slice);
+    console.log('ResoBox memo check:', areEqual);
+    return areEqual;
+});
+
+const boxColors = {
+    positive: '#00ff00',
+    negative: '#ff0000',
+    styles: {
+        startIndex: 0,
+        maxBoxCount: 38,
+        showLineChart: false,
+        globalTimeframeControl: false,
+        borderRadius: 0,
+        shadowIntensity: 0.5,
+        opacity: 0.5,
+        showBorder: true,
+    },
+} as const;
+
+const BoxContainer = React.memo(
+    ({ boxData }: { boxData: any }) => {
+        return (
+            <div className='relative aspect-square w-full max-w-[300px]'>
+                {boxData ? (
+                    <MemoizedResoBox slice={boxData} boxColors={boxColors} className='h-full w-full' />
+                ) : (
+                    <div className='flex h-full items-center justify-center text-gray-400'>Loading...</div>
+                )}
+            </div>
+        );
+    },
+    (prev, next) => {
+        const areEqual = JSON.stringify(prev.boxData) === JSON.stringify(next.boxData);
+        console.log('BoxContainer memo check:', areEqual);
+        return areEqual;
+    }
+);
+
+const PairPanel = React.memo(({ pair }: { pair: string }) => {
     const { session } = useAuth();
     const { pairData } = useDashboard();
     const [limit, setLimit] = useState(100);
@@ -150,30 +225,7 @@ const PairPanel = ({ pair }: { pair: string }) => {
         <CollapsiblePanel title={pair} defaultOpen={true}>
             <div className='grid gap-4 md:grid-cols-2'>
                 <div className='space-y-4'>
-                    <div className='relative aspect-square w-full max-w-[300px]'>
-                        {boxData ? (
-                            <ResoBox
-                                slice={boxData}
-                                boxColors={{
-                                    positive: '#00ff00',
-                                    negative: '#ff0000',
-                                    styles: {
-                                        startIndex: 0,
-                                        maxBoxCount: 38,
-                                        showLineChart: false,
-                                        globalTimeframeControl: false,
-                                        borderRadius: 0,
-                                        shadowIntensity: 0.5,
-                                        opacity: 0.5,
-                                        showBorder: true,
-                                    },
-                                }}
-                                className='h-full w-full'
-                            />
-                        ) : (
-                            <div className='flex h-full items-center justify-center text-gray-400'>Loading...</div>
-                        )}
-                    </div>
+                    <BoxContainer boxData={boxData} />
                     <button onClick={handleFetchBoxSlices} className='rounded bg-purple-600 px-3 py-1 text-sm'>
                         Fetch Box Slices
                     </button>
@@ -186,6 +238,11 @@ const PairPanel = ({ pair }: { pair: string }) => {
                 </div>
 
                 <div className='space-y-4'>
+                    <div className='rounded-lg border border-gray-700 bg-gray-800/50 p-2'>
+                        <h4 className='mb-2 text-sm font-semibold'>Price Feed</h4>
+                        <LivePriceFeed pair={pair} />
+                    </div>
+
                     <div className='rounded-lg border border-gray-700 bg-gray-800/50 p-2'>
                         <h4 className='mb-2 text-sm font-semibold'>Live Feed</h4>
                         <LiveCandleFeed pair={pair} />
@@ -231,7 +288,9 @@ const PairPanel = ({ pair }: { pair: string }) => {
             </div>
         </CollapsiblePanel>
     );
-};
+});
+
+PairPanel.displayName = 'PairPanel';
 
 export default function TestCandles() {
     const { session } = useAuth();
