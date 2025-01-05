@@ -1,4 +1,4 @@
-import { BoxSlice, PriceData } from '@/types/types';
+import { BoxSlice } from '@/types/types';
 
 interface BoxState {
     high: number;
@@ -10,7 +10,13 @@ export class GridCalculator {
     private boxMap: Map<string, BoxState[]> = new Map();
 
     initializeBoxes(pair: string, initialBoxes: BoxState[]) {
-        this.boxMap.set(pair, [...initialBoxes]);
+        const boxes = initialBoxes.map((box) => ({
+            ...box,
+            high: box.high,
+            low: box.value > 0 ? box.high - Math.abs(box.value) : box.low,
+            value: box.value,
+        }));
+        this.boxMap.set(pair, boxes);
     }
 
     updateWithPrice(pair: string, price: number) {
@@ -18,21 +24,18 @@ export class GridCalculator {
         if (!boxes) return;
 
         boxes.forEach((box) => {
-            const boxSize = box.high - box.low;
             // If price breaks high
             if (price > box.high) {
                 box.high = price;
-                box.low = price - boxSize;
+                box.low = price - Math.abs(box.value);
                 if (box.value < 0) {
-                    box.value = Math.abs(box.value); // Make positive when breaking high
+                    box.value = Math.abs(box.value);
                 }
-            }
-            // If price breaks low
-            else if (price < box.low) {
+            } else if (price < box.low) {
                 box.low = price;
-                box.high = price + boxSize;
+                box.high = price + Math.abs(box.value);
                 if (box.value > 0) {
-                    box.value = -Math.abs(box.value); // Make negative when breaking low
+                    box.value = -Math.abs(box.value);
                 }
             }
         });
