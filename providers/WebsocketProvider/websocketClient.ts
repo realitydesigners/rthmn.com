@@ -114,8 +114,11 @@ class WebSocketClient {
     private handleAuthSuccess() {
         console.log('🟢 Authentication successful');
         this.isAuthenticated = true;
-        this.openHandlers.forEach((handler) => handler());
-        this.processPendingOperations();
+        // Delay the open handlers slightly to ensure price data is loaded
+        setTimeout(() => {
+            this.openHandlers.forEach((handler) => handler());
+            this.processPendingOperations();
+        }, 100);
     }
 
     private handleError(error: Event) {

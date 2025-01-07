@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useRef, useState } from 'r
 import { BoxSlice, PriceData } from '@/types/types';
 import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { API_ROUTES } from '@/app/api/config';
 
 const PROVIDER_ERROR = 'useWebSocket must be used within a WebSocketProvider';
 
@@ -30,6 +31,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     // Connection management
     useEffect(() => {
         if (session?.access_token && !isConnected) {
+            fetchInitialCandleData();
             initializeConnection();
         }
     }, [session, isConnected]);
@@ -90,6 +92,50 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         const { handleMessage } = createHandlers();
         wsClient.onMessage(handleMessage);
         return () => wsClient.offMessage(handleMessage);
+    };
+
+    const fetchInitialCandleData = async () => {
+        try {
+            console.log('Fetching initial candle data...');
+            const response = await fetch(`${window.location.origin}${API_ROUTES.LATEST_CANDLES}?token=${session!.access_token}`);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                console.error('Candle data fetch failed:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    details: errorData,
+                });
+                return;
+            }
+
+            const data = await response.json();
+            console.log('Received candle data:', {
+                pairs: Object.keys(data),
+                dataSize: JSON.stringify(data).length,
+            });
+
+            // Transform candle data into price data format
+            const initialPriceData: Record<string, PriceData> = {};
+            Object.entries(data).forEach(([pair, candle]: [string, any]) => {
+                if (candle && typeof candle.close !== 'undefined') {
+                    initialPriceData[pair] = {
+                        price: candle.close,
+                        timestamp: candle.timestamp || new Date().toISOString(),
+                        volume: 0, // Server doesn't provide volume data
+                    };
+                }
+            });
+
+            if (Object.keys(initialPriceData).length > 0) {
+                console.log('Setting initial price data for pairs:', Object.keys(initialPriceData));
+                setPriceData(initialPriceData);
+            } else {
+                console.warn('No valid price data found in response');
+            }
+        } catch (error) {
+            console.error('Failed to fetch initial candle data:', error);
+        }
     };
 
     const contextValue = {
