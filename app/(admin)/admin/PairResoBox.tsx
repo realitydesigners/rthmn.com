@@ -5,7 +5,7 @@ import { ResoBox } from '@/components/ResoBox';
 import { BoxColors } from '@/utils/localStorage';
 import { getTimeframeRange } from '@/utils/timeframe';
 import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { ResoChart } from '@/components/ResoChart';
 
 const PriceDisplay = React.memo(
@@ -72,6 +72,16 @@ export const PairResoBox = React.memo(
                 setLocalMaxBoxCount(value as number);
             }
         };
+
+        // Add debug logging
+        useEffect(() => {
+            console.log('PairResoBox Props:', {
+                pair,
+                hasBoxSlice: Boolean(boxSlice),
+                hasCurrentOHLC: Boolean(currentOHLC),
+                boxSliceData: boxSlice,
+            });
+        }, [pair, boxSlice, currentOHLC]);
 
         return (
             <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>

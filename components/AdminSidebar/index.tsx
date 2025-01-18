@@ -7,6 +7,8 @@ import { PriceData } from '@/types/types';
 interface AdminSidebarProps {
     priceData: Record<string, PriceData>;
     selectedPairs: string[];
+    onPairSelect: (pair: string) => void;
+    selectedPair: string | null;
 }
 
 interface PairPriceSection {
@@ -42,7 +44,7 @@ const getInstrumentDigits = (pair: string): number => {
     return 5;
 };
 
-export function AdminSidebar({ priceData, selectedPairs }: AdminSidebarProps) {
+export function AdminSidebar({ priceData, selectedPairs, onPairSelect, selectedPair }: AdminSidebarProps) {
     const [pairSections, setPairSections] = useState<PairPriceSection[]>([]);
 
     // Initialize sections when selectedPairs changes
@@ -103,8 +105,13 @@ export function AdminSidebar({ priceData, selectedPairs }: AdminSidebarProps) {
 
             <div className='space-y-2'>
                 {pairSections.map((section) => (
-                    <div key={section.pair} className='rounded-lg border border-[#181818]'>
-                        <button onClick={() => toggleSection(section.pair)} className='flex w-full items-center justify-between p-3 hover:bg-[#111111]'>
+                    <div key={section.pair} className={`rounded-lg border border-[#181818] ${selectedPair === section.pair ? 'bg-[#181818]' : ''}`}>
+                        <button
+                            onClick={() => {
+                                toggleSection(section.pair);
+                                onPairSelect(section.pair);
+                            }}
+                            className='flex w-full items-center justify-between p-3 hover:bg-[#111111]'>
                             <span className='text-sm font-medium text-gray-300'>{section.pair}</span>
                             <div className='flex items-center gap-3'>
                                 <span
