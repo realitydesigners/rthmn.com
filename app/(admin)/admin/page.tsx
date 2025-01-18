@@ -5,6 +5,8 @@ import { useWebSocket } from '@/providers/WebsocketProvider';
 import { ResoBox } from '@/components/ResoBox';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
+import { AdminSidebar } from '@/components/AdminSidebar';
+import { PairResoBox } from './PairResoBox';
 
 const fetchCandles = async (pair: string, limit: number, token: string) => {
     const response = await fetch(`/api/getCandles?pair=${pair}&limit=${limit}&token=${token}`);
@@ -134,39 +136,6 @@ const LiveCandleFeed = ({ pair }: { pair: string }) => {
     );
 };
 
-const LivePriceFeed = ({ pair }: { pair: string }) => {
-    const { priceData } = useWebSocket();
-    const [priceHistory, setPriceHistory] = useState<any[]>([]);
-
-    useEffect(() => {
-        if (priceData[pair]) {
-            setPriceHistory((prev) => {
-                const newPrice = {
-                    ...priceData[pair],
-                    pair,
-                    displayTime: new Date().toISOString().split('.')[0],
-                };
-                return [newPrice, ...prev].slice(0, 10);
-            });
-        }
-    }, [pair, priceData]);
-
-    if (!priceHistory.length) {
-        return <div className='text-gray-400'>Waiting for price updates...</div>;
-    }
-
-    return (
-        <div className='space-y-0.5'>
-            {priceHistory.map((update, index) => (
-                <div key={`${update.displayTime}-${index}`} className='flex justify-between font-mono text-[11px]'>
-                    <span className='text-gray-500'>{update.displayTime.split('T')[1]}</span>
-                    <span className='text-gray-300'>{update.price.toFixed(5)}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
-
 const BoxValuesTable = ({ pair }: { pair: string }) => {
     const { pairData } = useDashboard();
     const [boxHistory, setBoxHistory] = useState<any[]>([]);
@@ -216,12 +185,6 @@ const BoxValuesTable = ({ pair }: { pair: string }) => {
     );
 };
 
-const MemoizedResoBox = React.memo(ResoBox, (prevProps, nextProps) => {
-    const areEqual = JSON.stringify(prevProps.slice) === JSON.stringify(nextProps.slice);
-    console.log('ResoBox memo check:', areEqual);
-    return areEqual;
-});
-
 const boxColors = {
     positive: '#00ff00',
     negative: '#ff0000',
@@ -237,27 +200,6 @@ const boxColors = {
     },
 } as const;
 
-const BoxContainer = React.memo(
-    ({ boxData }: { boxData: any }) => {
-        return (
-            <div className='h-full overflow-auto'>
-                <div className='relative aspect-square w-full'>
-                    {boxData ? (
-                        <MemoizedResoBox slice={boxData} boxColors={boxColors} className='h-full w-full' />
-                    ) : (
-                        <div className='flex h-full items-center justify-center text-gray-400'>Loading...</div>
-                    )}
-                </div>
-            </div>
-        );
-    },
-    (prev, next) => {
-        const areEqual = JSON.stringify(prev.boxData) === JSON.stringify(next.boxData);
-        console.log('BoxContainer memo check:', areEqual);
-        return areEqual;
-    }
-);
-
 const PairPanel = React.memo(({ pair }: { pair: string }) => {
     const { session } = useAuth();
     const { pairData } = useDashboard();
@@ -268,6 +210,7 @@ const PairPanel = React.memo(({ pair }: { pair: string }) => {
     const { data: pairBoxSlices, handleFetch: fetchBoxSlicesWithState } = useFetchState<any>(null);
 
     const boxData = pairData[pair]?.boxes?.[0] || null;
+    const currentOHLC = pairData[pair]?.currentOHLC;
 
     const displayCandles = isChronological ? [...(candles || [])].reverse() : candles;
 
@@ -299,7 +242,7 @@ const PairPanel = React.memo(({ pair }: { pair: string }) => {
                 <div className='flex flex-col rounded border border-[#181818] bg-[#0a0a0a] p-2'>
                     <h4 className='mb-2 text-[11px] font-medium text-gray-300'>Box Visualization</h4>
                     <div className='min-h-0 flex-1 overflow-auto'>
-                        <BoxContainer boxData={boxData} />
+                        <PairResoBox pair={pair} boxSlice={boxData} currentOHLC={currentOHLC} boxColors={boxColors} isLoading={false} />
                     </div>
                 </div>
 
@@ -307,13 +250,6 @@ const PairPanel = React.memo(({ pair }: { pair: string }) => {
                     <h4 className='mb-2 text-[11px] font-medium text-gray-300'>Box Values</h4>
                     <div className='min-h-0 flex-1 overflow-auto'>
                         <BoxValuesTable pair={pair} />
-                    </div>
-                </div>
-
-                <div className='flex h-[400px] flex-col rounded border border-[#181818] bg-[#0a0a0a] p-2'>
-                    <h4 className='mb-2 text-[11px] font-medium text-gray-300'>Price Feed</h4>
-                    <div className='min-h-0 flex-1 overflow-auto'>
-                        <LivePriceFeed pair={pair} />
                     </div>
                 </div>
 
@@ -387,9 +323,10 @@ const PairPanel = React.memo(({ pair }: { pair: string }) => {
 
 PairPanel.displayName = 'PairPanel';
 
-export default function TestCandles() {
+export default function AdminPage() {
     const { session } = useAuth();
     const { isConnected, selectedPairs } = useDashboard();
+    const { priceData } = useWebSocket();
     const [latestBoxSlices, setLatestBoxSlices] = useState<any>(null);
     const [isBoxSlicesOpen, setIsBoxSlicesOpen] = useState(false);
     const [boxCount, setBoxCount] = useState(500);
@@ -406,41 +343,44 @@ export default function TestCandles() {
     };
 
     return (
-        <div className='min-h-screen bg-black p-4 pt-20 text-white'>
-            <div className='mb-4 flex items-center justify-between overflow-y-auto rounded border border-[#181818] p-2'>
-                <h1 className='text-xl font-bold'>Trading Dashboard</h1>
-                <div className={`flex items-center gap-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-                    <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
-                    {isConnected ? 'Connected' : 'Disconnected'}
-                </div>
-            </div>
-
-            <CollapsiblePanel title={`All Pairs Latest Box Slices ${latestBoxSlices ? `(${Object.keys(latestBoxSlices).length} pairs)` : ''}`} defaultOpen={isBoxSlicesOpen}>
-                <div className='mb-4'>
-                    <button
-                        onClick={handleFetchLatestBoxSlices}
-                        className='border border-[#181818] bg-black px-2 py-1 text-[11px] text-gray-300 transition-colors hover:bg-[#181818]'>
-                        Fetch Latest Boxes
-                    </button>
-                </div>
-                {latestBoxSlices ? (
-                    <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
-                        {Object.entries(latestBoxSlices).map(([pair, data]) => (
-                            <div key={pair} className='rounded border border-[#181818] p-2'>
-                                <h4 className='mb-2 text-[11px] font-medium text-purple-400'>{pair}</h4>
-                                <pre className='max-h-[200px] overflow-auto text-[11px] text-green-400'>{JSON.stringify(data, null, 2)}</pre>
-                            </div>
-                        ))}
+        <div className='flex'>
+            <AdminSidebar priceData={priceData} selectedPairs={selectedPairs} />
+            <div className='ml-[300px] min-h-screen flex-1 bg-black p-4 pt-20 text-white'>
+                <div className='mb-4 flex items-center justify-between overflow-y-auto rounded border border-[#181818] p-2'>
+                    <h1 className='text-xl font-bold'>Trading Dashboard</h1>
+                    <div className={`flex items-center gap-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
+                        <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
+                        {isConnected ? 'Connected' : 'Disconnected'}
                     </div>
-                ) : (
-                    <div className='text-gray-400'>Click "Fetch Latest Boxes" to load data</div>
-                )}
-            </CollapsiblePanel>
+                </div>
 
-            <div className='mt-4'>
-                {selectedPairs.map((pair) => (
-                    <PairPanel key={pair} pair={pair} />
-                ))}
+                <CollapsiblePanel title={`All Pairs Latest Box Slices ${latestBoxSlices ? `(${Object.keys(latestBoxSlices).length} pairs)` : ''}`} defaultOpen={isBoxSlicesOpen}>
+                    <div className='mb-4'>
+                        <button
+                            onClick={handleFetchLatestBoxSlices}
+                            className='border border-[#181818] bg-black px-2 py-1 text-[11px] text-gray-300 transition-colors hover:bg-[#181818]'>
+                            Fetch Latest Boxes
+                        </button>
+                    </div>
+                    {latestBoxSlices ? (
+                        <div className='grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
+                            {Object.entries(latestBoxSlices).map(([pair, data]) => (
+                                <div key={pair} className='rounded border border-[#181818] p-2'>
+                                    <h4 className='mb-2 text-[11px] font-medium text-purple-400'>{pair}</h4>
+                                    <pre className='max-h-[200px] overflow-auto text-[11px] text-green-400'>{JSON.stringify(data, null, 2)}</pre>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className='text-gray-400'>Click "Fetch Latest Boxes" to load data</div>
+                    )}
+                </CollapsiblePanel>
+
+                <div className='mt-4'>
+                    {selectedPairs.map((pair) => (
+                        <PairPanel key={pair} pair={pair} />
+                    ))}
+                </div>
             </div>
         </div>
     );
