@@ -91,17 +91,9 @@ export default function AdminPage() {
     }, [session, selectedPair]);
 
     return (
-        <div className='flex'>
+        <div className='mt-10 flex'>
             <AdminSidebar priceData={priceData} selectedPairs={selectedPairs} onPairSelect={setSelectedPair} selectedPair={selectedPair} />
             <div className='ml-[300px] min-h-screen flex-1 bg-black p-4 text-white lg:mr-[400px]'>
-                <div className='mb-4 flex items-center justify-between overflow-y-auto rounded border border-[#181818] p-2'>
-                    <h1 className='text-xl font-bold'>Trading Dashboard</h1>
-                    <div className={`flex items-center gap-2 ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-                        <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-400' : 'bg-red-400'}`} />
-                        {isConnected ? 'Connected' : 'Disconnected'}
-                    </div>
-                </div>
-
                 <div className='mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3'>
                     {selectedPairs.map((pair) => {
                         const boxData = pairData[pair]?.boxes?.[0] || null;

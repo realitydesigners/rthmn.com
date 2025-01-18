@@ -126,7 +126,7 @@ export function RightSidebar({
     };
 
     return (
-        <div className='fixed top-0 right-0 hidden h-screen w-[400px] overflow-y-auto border-l border-[#181818] bg-black p-4 lg:block'>
+        <div className='fixed top-0 right-0 mt-14 hidden h-screen w-[400px] overflow-y-auto border-l border-[#181818] bg-black p-4 lg:block'>
             <div className='flex flex-col gap-4 pb-4'>
                 <CollapsibleSection title='Box Values'>
                     <BoxValuesTable pair={selectedPair} />

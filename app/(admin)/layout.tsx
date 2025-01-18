@@ -4,6 +4,7 @@ import { getUser } from '@/utils/supabase/queries';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { DashboardProvider } from '@/providers/DashboardProvider/client';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
+import { AdminNavbar } from '@/components/AdminNavbar';
 
 const AUTHORIZED_IDS = [
     '8ad039b3-d3a5-447b-bdda-80b9f854b0fe',
@@ -25,7 +26,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <WebSocketProvider>
                 <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
                     <div id='app-container' className='relative min-h-screen overflow-y-auto'>
-                        {children}
+                        <AdminNavbar />
+                        <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
                     </div>
                 </DashboardProvider>
             </WebSocketProvider>
