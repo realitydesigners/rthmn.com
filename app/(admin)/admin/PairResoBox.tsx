@@ -31,21 +31,6 @@ interface PairResoBoxProps {
     isLoading?: boolean;
 }
 
-const PriceDisplaySkeleton = () => (
-    <div className='flex w-full flex-col items-center gap-2'>
-        <div className='flex w-full items-center justify-between'>
-            <div className='flex items-center gap-4'>
-                <div className='h-5 w-20 rounded-md bg-[#222]/50' />
-                <div className='h-4 w-16 rounded-md bg-[#222]/50' />
-                <div className='h-6 w-20 rounded-md bg-[#222]/50' />
-            </div>
-            <div className='h-4 w-32 rounded-md bg-[#222]/50' />
-        </div>
-    </div>
-);
-
-const TimeFrameVisualizerSkeleton = () => <div className='h-24 w-full rounded-md bg-[#222]/50' />;
-
 export const PairResoBox = React.memo(
     ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
         const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
@@ -84,8 +69,8 @@ export const PairResoBox = React.memo(
         }, [pair, boxSlice, currentOHLC]);
 
         return (
-            <div className='group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
-                <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
+            <div className='group relative flex w-full flex-col overflow-hidden'>
+                <div className='relative flex flex-col'>
                     <div className='relative flex h-auto flex-col items-center justify-center gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
                         {/* Price Display */}
                         <div className='flex w-full flex-col items-center gap-2'>

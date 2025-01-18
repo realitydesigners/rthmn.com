@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { useAuth } from '@/providers/SupabaseProvider';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
 
 interface RightSidebarProps {
@@ -17,13 +16,6 @@ interface RightSidebarProps {
     pairBoxSlices: any | null;
     handleFetchBoxSlices: () => void;
 }
-
-const fetchPairBoxSlices = async (pair: string, count: number, token: string) => {
-    const response = await fetch(`/api/getBoxSlice?pair=${pair}&token=${token}&count=${count}`);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const data = await response.json();
-    return data.data;
-};
 
 const BoxValuesTable = ({ pair }: { pair: string }) => {
     const { pairData } = useDashboard();
@@ -96,103 +88,6 @@ const formatTime = (timestamp: string) => {
     }
 };
 
-const LiveCandleFeed = ({ pair }: { pair: string }) => {
-    const { session } = useAuth();
-    const [candleHistory, setCandleHistory] = useState<any[]>([]);
-    const { candlesData, pairData } = useDashboard();
-    const [limit, setLimit] = useState(100);
-    const [showOldest, setShowOldest] = useState(false);
-    const [historicalCandles, setHistoricalCandles] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleFetchCandles = async () => {
-        if (!session?.access_token) return;
-        setIsLoading(true);
-        try {
-            const data = await fetchCandles(pair, limit, session.access_token);
-            setHistoricalCandles(showOldest ? data : data.reverse());
-        } catch (err) {
-            console.error('Failed to fetch candles:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        if (pair) {
-            handleFetchCandles();
-        }
-    }, [pair, limit, showOldest]);
-
-    useEffect(() => {
-        const currentOHLC = pairData[pair]?.currentOHLC;
-        if (!currentOHLC) return;
-
-        setCandleHistory((prev) => {
-            if (!prev.length) return prev;
-
-            const [latestCandle, ...rest] = prev;
-            const updatedLatest = {
-                ...latestCandle,
-                close: currentOHLC.close,
-                high: Math.max(latestCandle.high, currentOHLC.close),
-                low: Math.min(latestCandle.low, currentOHLC.close),
-            };
-
-            return [updatedLatest, ...rest].slice(0, 10);
-        });
-    }, [pair, pairData]);
-
-    if (!candleHistory.length) {
-        return <div className='text-gray-400'>Waiting for candle data...</div>;
-    }
-
-    return (
-        <div className='space-y-2'>
-            <div className='flex items-center gap-2'>
-                <div className='flex items-center gap-2 text-[11px]'>
-                    <span className='text-gray-400'>Limit:</span>
-                    <input
-                        type='number'
-                        value={limit}
-                        onChange={(e) => setLimit(Number(e.target.value))}
-                        className='w-16 rounded border border-[#181818] bg-black px-1 py-0.5 text-gray-300'
-                    />
-                </div>
-                <button onClick={handleFetchCandles} className='border border-[#181818] bg-black px-2 py-1 text-[11px] text-gray-300 hover:bg-[#111111]'>
-                    Fetch
-                </button>
-                <label className='flex items-center gap-1 text-[11px] text-gray-400'>
-                    <input type='checkbox' checked={showOldest} onChange={(e) => setShowOldest(e.target.checked)} className='rounded border-gray-700' />
-                    Show oldest first
-                </label>
-            </div>
-
-            <div className='space-y-0.5'>
-                {isLoading ? (
-                    <div className='text-[11px] text-gray-400'>Loading...</div>
-                ) : (
-                    historicalCandles.map((candle, index) => (
-                        <div key={index} className='flex justify-between font-mono text-[11px]'>
-                            <span className='text-gray-500'>{formatTime(candle.timestamp)}</span>
-                            <div className='flex gap-2'>
-                                <span className='text-gray-500'>O:</span>
-                                <span className={candle.close >= candle.open ? 'text-green-400' : 'text-red-400'}>{candle.open.toFixed(5)}</span>
-                                <span className='text-gray-500'>H:</span>
-                                <span className='text-green-400'>{candle.high.toFixed(5)}</span>
-                                <span className='text-gray-500'>L:</span>
-                                <span className='text-red-400'>{candle.low.toFixed(5)}</span>
-                                <span className='text-gray-500'>C:</span>
-                                <span className={candle.close >= candle.open ? 'text-green-400' : 'text-red-400'}>{candle.close.toFixed(5)}</span>
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
-        </div>
-    );
-};
-
 const CollapsibleSection = ({ title, children, defaultOpen = false, count = null }) => {
     const [isOpen, setIsOpen] = useState(defaultOpen);
     return (
@@ -231,7 +126,7 @@ export function RightSidebar({
     };
 
     return (
-        <div className='fixed top-0 right-0 hidden h-screen w-[400px] overflow-y-auto border-l border-[#181818] bg-[#0a0a0a] p-4 pt-20 lg:block'>
+        <div className='fixed top-0 right-0 hidden h-screen w-[400px] overflow-y-auto border-l border-[#181818] bg-black p-4 lg:block'>
             <div className='flex flex-col gap-4 pb-4'>
                 <CollapsibleSection title='Box Values'>
                     <BoxValuesTable pair={selectedPair} />

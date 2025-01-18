@@ -91,7 +91,7 @@ export function AdminSidebar({ priceData, selectedPairs, onPairSelect, selectedP
 
     if (pairSections.length === 0) {
         return (
-            <div className='fixed top-0 left-0 h-screen w-[300px] border-r border-[#181818] bg-[#0a0a0a] p-4 pt-20'>
+            <div className='fixed top-0 left-0 h-screen w-[300px] border-r border-[#181818] bg-black p-4'>
                 <h3 className='mb-4 text-lg font-medium text-gray-200'>Market Prices</h3>
                 <div className='text-gray-400'>Loading pairs data...</div>
                 <div className='mt-2 text-xs text-gray-500'>Selected Pairs: {selectedPairs.join(', ')}</div>
@@ -100,7 +100,7 @@ export function AdminSidebar({ priceData, selectedPairs, onPairSelect, selectedP
     }
 
     return (
-        <div className='fixed top-0 left-0 h-screen w-[300px] border-r border-[#181818] bg-[#0a0a0a] p-4 pt-20'>
+        <div className='fixed top-0 left-0 h-screen w-[300px] border-r border-[#181818] bg-black p-4'>
             <h3 className='mb-4 text-lg font-medium text-gray-200'>Market Prices</h3>
 
             <div className='space-y-2'>
