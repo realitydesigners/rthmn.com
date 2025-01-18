@@ -121,6 +121,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     if (
         pathname?.startsWith('/dashboard') ||
         pathname?.startsWith('/test') ||
+        pathname?.startsWith('/admin') ||
         pathname?.startsWith('/pair') ||
         pathname?.startsWith('/account') ||
         pathname?.startsWith('/studio') ||

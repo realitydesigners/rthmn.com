@@ -1,6 +1,9 @@
 import { redirect } from 'next/navigation';
 import { createClient } from '@/utils/supabase/server';
 import { getUser } from '@/utils/supabase/queries';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { DashboardProvider } from '@/providers/DashboardProvider/client';
+import { WebSocketProvider } from '@/providers/WebsocketProvider';
 
 const AUTHORIZED_IDS = [
     '8ad039b3-d3a5-447b-bdda-80b9f854b0fe',
@@ -17,5 +20,15 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         redirect('/dashboard');
     }
 
-    return <>{children}</>;
+    return (
+        <QueryProvider>
+            <WebSocketProvider>
+                <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
+                    <div id='app-container' className='relative min-h-screen overflow-y-auto'>
+                        {children}
+                    </div>
+                </DashboardProvider>
+            </WebSocketProvider>
+        </QueryProvider>
+    );
 }
