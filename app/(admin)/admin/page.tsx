@@ -3,9 +3,9 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { AdminSidebar } from '@/components/AdminSidebar';
+import { AdminSidebar } from '@/app/(admin)/_components/AdminSidebar';
 import { PairResoBox } from './PairResoBox';
-import { RightSidebar } from '@/components/RightSidebar';
+import { RightSidebar } from '@/app/(admin)/_components/RightSidebar';
 
 const fetchCandles = async (pair: string, limit: number, token: string) => {
     const response = await fetch(`/api/getCandles?pair=${pair}&limit=${limit}&token=${token}`);
@@ -100,10 +100,8 @@ export default function AdminPage() {
                         const currentOHLC = pairData[pair]?.currentOHLC;
 
                         return (
-                            <div key={pair} className='flex aspect-square flex-col rounded border border-[#181818] bg-[#0a0a0a]'>
-                                <div className='relative flex-1'>
-                                    <PairResoBox pair={pair} boxSlice={boxData} currentOHLC={currentOHLC} boxColors={boxColors} isLoading={false} />
-                                </div>
+                            <div key={pair} className='flex flex-col rounded border border-[#181818] bg-[#0a0a0a]'>
+                                <PairResoBox pair={pair} boxSlice={boxData} currentOHLC={currentOHLC} boxColors={boxColors} isLoading={false} />
                             </div>
                         );
                     })}
