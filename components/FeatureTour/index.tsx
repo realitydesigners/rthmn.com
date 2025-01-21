@@ -30,12 +30,7 @@ interface FeatureTourProps {
 export function FeatureTour({ featureId, children, tooltipContent, isActive = false, onComplete, className, tooltipClassName }: FeatureTourProps) {
     const [showTooltip, setShowTooltip] = useState(false);
     const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
-    const [hasCompleted, setHasCompleted] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return localStorage.getItem(`tour_${featureId}_completed`) === 'true';
-        }
-        return false;
-    });
+    const [hasCompleted, setHasCompleted] = useState(false);
 
     useEffect(() => {
         if (!isActive || hasCompleted) return;
@@ -76,7 +71,6 @@ export function FeatureTour({ featureId, children, tooltipContent, isActive = fa
     const handleComplete = () => {
         setShowTooltip(false);
         setHasCompleted(true);
-        localStorage.setItem(`tour_${featureId}_completed`, 'true');
         onComplete?.();
     };
 

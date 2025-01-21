@@ -18,7 +18,7 @@ export function SidebarButton({
     tourId: string;
     tourContent: { title: string; description: string; items?: string[] };
 }) {
-    const { currentStepId, completeStep, isStepCompleted } = useOnboardingStore();
+    const { currentStepId, completeStep, goToNextStep, isStepCompleted } = useOnboardingStore();
     const isCurrentTour = currentStepId === tourId;
     const isCompleted = isStepCompleted(tourId);
     const pathname = usePathname();
@@ -26,6 +26,7 @@ export function SidebarButton({
 
     const handleComplete = () => {
         completeStep(tourId);
+        goToNextStep();
     };
 
     return (
