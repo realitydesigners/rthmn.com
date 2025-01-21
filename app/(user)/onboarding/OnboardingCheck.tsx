@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useOnboardingStore } from '@/utils/tourStore';
+import { useOnboardingStore } from './onboarding';
 
 export function OnboardingCheck() {
     const router = useRouter();

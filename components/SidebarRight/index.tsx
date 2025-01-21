@@ -6,7 +6,7 @@ import { cn } from '@/utils/cn';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SettingsBar } from '../SettingsBar';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
-import { useOnboardingStore, ONBOARDING_STEPS } from '@/utils/tourStore';
+import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
 
 export const SidebarRight = () => {
     const pathname = usePathname();

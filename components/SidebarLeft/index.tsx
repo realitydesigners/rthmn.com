@@ -10,7 +10,7 @@ import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '@/components/FeatureTour';
 import { SidebarButton } from './SidebarButton';
-import { useOnboardingStore, ONBOARDING_STEPS } from '@/utils/tourStore';
+import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ProfileUpload from './ProfileUpload';
 import ExperienceStep from './ExperienceStep';
 import PairsStep from './PairsStep';
-import { useOnboardingStore, ONBOARDING_STEPS } from '@/utils/tourStore';
+import { useOnboardingStore, ONBOARDING_STEPS } from './onboarding';
 import { useEffect } from 'react';
 import { ComponentType } from 'react';
 

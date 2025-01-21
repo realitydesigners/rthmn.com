@@ -90,7 +90,7 @@ export function FeatureTour({ featureId, children, tooltipContent, isActive = fa
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className='absolute inset-0 rounded-lg ring-1 shadow-[inset_0_0_30px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.2)] ring-blue-500/50 ring-offset-1 ring-offset-black/10 transition-all duration-300'
+                        className='absolute inset-0 rounded-lg shadow-[inset_0_0_30px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.2)] ring-1 ring-blue-500/50 ring-offset-1 ring-offset-black/10 transition-all duration-300'
                     />
                 )}
             </div>

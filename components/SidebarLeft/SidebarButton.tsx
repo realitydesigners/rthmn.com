@@ -2,7 +2,7 @@
 import { IconType } from 'react-icons';
 import { cn } from '@/utils/cn';
 import { FeatureTour } from '@/components/FeatureTour';
-import { useOnboardingStore } from '@/utils/tourStore';
+import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { usePathname } from 'next/navigation';
 
 export function SidebarButton({
