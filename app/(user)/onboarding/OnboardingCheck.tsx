@@ -2,10 +2,13 @@
 
 import { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { useOnboardingStore } from '@/utils/tourStore';
 
 export function OnboardingCheck() {
     const router = useRouter();
     const pathname = usePathname();
+    const { getCurrentStep, hasCompletedInitialOnboarding } = useOnboardingStore();
+    const currentStep = getCurrentStep();
 
     useEffect(() => {
         // Skip check if we're already on onboarding page
@@ -18,18 +21,12 @@ export function OnboardingCheck() {
             return;
         }
 
-        try {
-            // Check if onboarding is completed
-            const hasCompletedOnboarding = localStorage.getItem('has_completed_onboarding') === 'true';
-
-            if (!hasCompletedOnboarding) {
-                // Use replace to avoid adding to history stack
-                router.replace('/onboarding');
-            }
-        } catch (error) {
-            console.error('Error checking onboarding status:', error);
+        // If we haven't completed initial onboarding and we're not on a public page,
+        // redirect to onboarding
+        if (!hasCompletedInitialOnboarding()) {
+            router.replace('/onboarding');
         }
-    }, [pathname, router]);
+    }, [pathname, router, hasCompletedInitialOnboarding]);
 
     return null;
 }

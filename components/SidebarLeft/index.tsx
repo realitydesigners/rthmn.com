@@ -10,7 +10,7 @@ import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '@/components/FeatureTour';
 import { SidebarButton } from './SidebarButton';
-import { useTourStore } from '@/utils/tourStore';
+import { useOnboardingStore, ONBOARDING_STEPS } from '@/utils/tourStore';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -20,7 +20,7 @@ export const SidebarLeft = () => {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
-    const { setCurrentTour, currentTourId, completedTours } = useTourStore();
+    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding } = useOnboardingStore();
 
     // Handle screen size changes
     useEffect(() => {
@@ -66,12 +66,12 @@ export const SidebarLeft = () => {
         };
     }, [isLocked]);
 
-    // Initialize the first tour if no tour is active and none are completed
+    // Initialize the first feature tour if initial onboarding is completed
     useEffect(() => {
-        if (!currentTourId && completedTours.length === 0) {
-            setCurrentTour('instruments');
+        if (hasCompletedInitialOnboarding() && !currentStepId) {
+            setCurrentStep('instruments');
         }
-    }, [currentTourId, completedTours.length, setCurrentTour]);
+    }, [hasCompletedInitialOnboarding, currentStepId, setCurrentStep]);
 
     // Don't render on mobile or account page
     if (!mounted || isMobile || pathname === '/account') {
@@ -158,8 +158,8 @@ export const SidebarLeft = () => {
             icon: LuLineChart,
             onClick: () => handlePanelToggle('instruments'),
             tourContent: {
-                title: 'Welcome to Your Dashboard',
-                description: 'This is where you can manage your currency pairs and view their performance.',
+                title: ONBOARDING_STEPS.find((step) => step.id === 'instruments')?.title || 'Instruments Panel',
+                description: ONBOARDING_STEPS.find((step) => step.id === 'instruments')?.description || 'Manage your currency pairs and view performance',
                 items: ['View your selected pairs', 'Add new currency pairs', "Remove pairs you don't want"],
             },
         },
@@ -168,30 +168,25 @@ export const SidebarLeft = () => {
             icon: LuTestTube,
             onClick: () => handlePanelToggle('test'),
             tourContent: {
-                title: 'Test Your Strategies',
-                description: 'Use our testing environment to practice and refine your trading strategies.',
+                title: ONBOARDING_STEPS.find((step) => step.id === 'test')?.title || 'Test Environment',
+                description: ONBOARDING_STEPS.find((step) => step.id === 'test')?.description || 'Practice and refine your trading strategies',
                 items: ['Practice trading strategies', 'Test with historical data', 'Analyze performance metrics'],
             },
         },
     ];
+
+    // Render buttons with feature tour
+    const renderButtons = () =>
+        buttons.map((button) => (
+            <SidebarButton key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} tourId={button.id} tourContent={button.tourContent} />
+        ));
 
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
             <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start border-r border-[#121212] bg-[#0a0a0a] py-4'>
                 {/* Navigation Buttons */}
-                <div className='flex flex-col gap-2'>
-                    {buttons.map((button) => (
-                        <SidebarButton
-                            key={button.id}
-                            icon={button.icon}
-                            onClick={button.onClick}
-                            isActive={activePanel === button.id}
-                            tourId={button.id}
-                            tourContent={button.tourContent}
-                        />
-                    ))}
-                </div>
+                <div className='flex flex-col gap-2'>{renderButtons()}</div>
             </div>
 
             {/* Pairs Panel */}

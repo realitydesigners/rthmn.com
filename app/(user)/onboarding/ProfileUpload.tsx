@@ -6,7 +6,11 @@ import { LuImagePlus, LuUpload } from 'react-icons/lu';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function ProfileUpload() {
+interface Props {
+    onPhotoUpload: (url: string) => void;
+}
+
+export default function ProfileUpload({ onPhotoUpload }: Props) {
     const [isLoading, setIsLoading] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);
@@ -38,6 +42,7 @@ export default function ProfileUpload() {
             reader.onloadend = () => {
                 const base64String = reader.result as string;
                 localStorage.setItem('avatar_url', base64String);
+                onPhotoUpload(base64String);
                 router.refresh();
             };
             reader.readAsDataURL(file);

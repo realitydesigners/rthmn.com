@@ -1,7 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { LuArrowUpDown } from 'react-icons/lu';
+import { useDashboard } from '@/providers/DashboardProvider/client';
+import { setSelectedPairs as saveToLocalStorage } from '@/utils/localStorage';
 
 interface Props {
     selectedPairs: string[];
@@ -9,15 +10,28 @@ interface Props {
 }
 
 const pairs = [
-    { id: 'EUR/USD', name: 'Euro / US Dollar', flag1: '🇪🇺', flag2: '🇺🇸' },
-    { id: 'GBP/USD', name: 'British Pound / US Dollar', flag1: '🇬🇧', flag2: '🇺🇸' },
-    { id: 'USD/JPY', name: 'US Dollar / Japanese Yen', flag1: '🇺🇸', flag2: '🇯🇵' },
-    { id: 'USD/CHF', name: 'US Dollar / Swiss Franc', flag1: '🇺🇸', flag2: '🇨🇭' },
-    { id: 'USD/CAD', name: 'US Dollar / Canadian Dollar', flag1: '🇺🇸', flag2: '🇨🇦' },
-    { id: 'AUD/USD', name: 'Australian Dollar / US Dollar', flag1: '🇦🇺', flag2: '🇺🇸' },
+    { id: 'EURUSD', name: 'Euro / US Dollar', flag1: '🇪🇺', flag2: '🇺🇸' },
+    { id: 'GBPUSD', name: 'British Pound / US Dollar', flag1: '🇬🇧', flag2: '🇺🇸' },
+    { id: 'USDJPY', name: 'US Dollar / Japanese Yen', flag1: '🇺🇸', flag2: '🇯🇵' },
+    { id: 'USDCHF', name: 'US Dollar / Swiss Franc', flag1: '🇺🇸', flag2: '🇨🇭' },
+    { id: 'USDCAD', name: 'US Dollar / Canadian Dollar', flag1: '🇺🇸', flag2: '🇨🇦' },
+    { id: 'AUDUSD', name: 'Australian Dollar / US Dollar', flag1: '🇦🇺', flag2: '🇺🇸' },
 ];
 
 export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
+    const { togglePair } = useDashboard();
+
+    const handlePairClick = (pair: string) => {
+        // Update onboarding state
+        const newSelectedPairs = selectedPairs.includes(pair) ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
+
+        setSelectedPairs(newSelectedPairs);
+        saveToLocalStorage(newSelectedPairs);
+
+        // Update dashboard state
+        togglePair(pair);
+    };
+
     return (
         <div className='space-y-8'>
             <div className='space-y-2'>
@@ -43,7 +57,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 + index * 0.1 }}
                             onClick={() => {
-                                setSelectedPairs(selectedPairs.includes(pair.id) ? selectedPairs.filter((p) => p !== pair.id) : [...selectedPairs, pair.id]);
+                                handlePairClick(pair.id);
                             }}
                             className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b p-0.5 transition-all duration-300 ${
                                 isSelected

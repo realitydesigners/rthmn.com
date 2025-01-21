@@ -12,10 +12,11 @@ interface SidebarContentProps {
     isLocked: boolean;
     onLockToggle: () => void;
     position: 'left' | 'right';
+    initialWidth?: number;
 }
 
-export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position }: SidebarContentProps) => {
-    const [width, setWidth] = useState(300);
+export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 300 }: SidebarContentProps) => {
+    const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
