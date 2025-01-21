@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { LuLayoutGrid, LuLayoutDashboard, LuOrbit, LuLineChart } from 'react-icons/lu';
+import { LuLayoutGrid, LuLayoutDashboard, LuOrbit, LuLineChart, LuTestTube } from 'react-icons/lu';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/utils/cn';
@@ -8,6 +8,9 @@ import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
 import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
+import { FeatureTour } from '@/components/FeatureTour';
+import { SidebarButton } from './SidebarButton';
+import { useTourStore } from '@/utils/tourStore';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -17,6 +20,7 @@ export const SidebarLeft = () => {
     const [mounted, setMounted] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const sidebarRef = useRef<HTMLDivElement>(null);
+    const { setCurrentTour, currentTourId, completedTours } = useTourStore();
 
     // Handle screen size changes
     useEffect(() => {
@@ -62,9 +66,17 @@ export const SidebarLeft = () => {
         };
     }, [isLocked]);
 
-    if (!mounted) return null;
-    if (isMobile) return null; // Don't render anything on mobile
-    if (pathname === '/account') return null; // Don't show on account page
+    // Initialize the first tour if no tour is active and none are completed
+    useEffect(() => {
+        if (!currentTourId && completedTours.length === 0) {
+            setCurrentTour('instruments');
+        }
+    }, [currentTourId, completedTours.length, setCurrentTour]);
+
+    // Don't render on mobile or account page
+    if (!mounted || isMobile || pathname === '/account') {
+        return null;
+    }
 
     // Prevent sidebar from opening on mobile
     const handlePanelToggle = (panel: string) => {
@@ -140,30 +152,53 @@ export const SidebarLeft = () => {
         }
     };
 
+    const buttons = [
+        {
+            id: 'instruments',
+            icon: LuLineChart,
+            onClick: () => handlePanelToggle('instruments'),
+            tourContent: {
+                title: 'Welcome to Your Dashboard',
+                description: 'This is where you can manage your currency pairs and view their performance.',
+                items: ['View your selected pairs', 'Add new currency pairs', "Remove pairs you don't want"],
+            },
+        },
+        {
+            id: 'test',
+            icon: LuTestTube,
+            onClick: () => handlePanelToggle('test'),
+            tourContent: {
+                title: 'Test Your Strategies',
+                description: 'Use our testing environment to practice and refine your trading strategies.',
+                items: ['Practice trading strategies', 'Test with historical data', 'Analyze performance metrics'],
+            },
+        },
+    ];
+
     return (
         <div className='sidebar-content' ref={sidebarRef}>
             {/* Fixed Sidebar */}
-            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start border-r border-[#121212] bg-[#0a0a0a] py-4 pb-14'>
+            <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start border-r border-[#121212] bg-[#0a0a0a] py-4'>
                 {/* Navigation Buttons */}
                 <div className='flex flex-col gap-2'>
-                    <button
-                        onClick={() => handlePanelToggle('instruments')}
-                        className={cn(
-                            'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg border bg-gradient-to-b transition-all duration-200',
-                            activePanel === 'chart'
-                                ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
-                                : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
-                        )}>
-                        <LuLineChart size={20} className='transition-colors' />
-                    </button>
+                    {buttons.map((button) => (
+                        <SidebarButton
+                            key={button.id}
+                            icon={button.icon}
+                            onClick={button.onClick}
+                            isActive={activePanel === button.id}
+                            tourId={button.id}
+                            tourContent={button.tourContent}
+                        />
+                    ))}
                 </div>
             </div>
 
             {/* Pairs Panel */}
             <SidebarWrapper
-                isOpen={isOpen && (activePanel === 'instruments' || activePanel === 'chart')}
+                isOpen={isOpen && (activePanel === 'instruments' || activePanel === 'test')}
                 onClose={handleClose}
-                title='Instruments'
+                title={activePanel === 'test' ? 'Test Environment' : 'Instruments'}
                 isLocked={isLocked}
                 onLockToggle={handleLockToggle}
                 position='left'>

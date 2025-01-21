@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { FaTimes } from 'react-icons/fa';
 import { useDashboard } from '@/providers/DashboardProvider/client';
@@ -16,7 +18,8 @@ export const SelectedPairs = () => {
     return (
         <div className='mb-4'>
             <div className='font-kodemono mb-2 flex h-8 items-center text-xs font-medium tracking-wider text-[#818181]'>
-                <span className='uppercase'>My Symbols</span>
+                <span className='uppercase'>Selected Pairs</span>
+                <span className='ml-auto text-[#444]'>{selectedPairs.length}</span>
             </div>
             <div className='space-y-1'>
                 {selectedPairs.map((item) => (

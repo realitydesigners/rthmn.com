@@ -96,7 +96,7 @@ export interface BoxColors {
     };
 }
 
-export const DEFAULT_PAIRS = ['GBPUSD', 'USDJPY', 'AUDUSD', 'EURUSD', 'GBPUSD', 'USDCAD'];
+export const DEFAULT_PAIRS = ['GBPUSD', 'USDJPY', 'AUDUSD', 'EURUSD', 'USDCAD'];
 
 export const DEFAULT_BOX_COLORS: BoxColors = {
     positive: '#00ffd5', // Cyan
