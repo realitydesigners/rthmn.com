@@ -1,118 +1,76 @@
 'use client';
-
+import React from 'react';
 import { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/utils/cn';
+import { IconType } from 'react-icons';
+import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 
-interface TooltipPosition {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-}
-
-interface TourState {
+export function FeatureTour({
+    icon: Icon,
+    onClick,
+    isActive,
+    tourId,
+    className,
+    children,
+}: {
+    icon: IconType;
+    onClick: () => void;
     isActive: boolean;
-    hasCompleted: boolean;
-}
-
-interface FeatureTourProps {
-    featureId: string;
-    children: React.ReactNode | ((state: TourState) => React.ReactNode);
-    tooltipContent: React.ReactNode;
-    isActive?: boolean;
-    onComplete?: () => void;
+    tourId: string;
     className?: string;
-    tooltipClassName?: string;
-}
-
-export function FeatureTour({ featureId, children, tooltipContent, isActive = false, onComplete, className, tooltipClassName }: FeatureTourProps) {
+    children: any;
+}) {
+    const { currentStepId, completeStep, goToNextStep, isStepCompleted } = useOnboardingStore();
     const [showTooltip, setShowTooltip] = useState(false);
-    const [tooltipPosition, setTooltipPosition] = useState<TooltipPosition | null>(null);
-    const [hasCompleted, setHasCompleted] = useState(false);
+    const isCurrentTour = currentStepId === tourId;
+    const isCompleted = isStepCompleted(tourId);
 
     useEffect(() => {
-        if (!isActive || hasCompleted) return;
+        if (!isCurrentTour || isCompleted) return;
 
         const timer = setTimeout(() => {
             setShowTooltip(true);
         }, 500);
 
         return () => clearTimeout(timer);
-    }, [isActive, hasCompleted]);
-
-    useEffect(() => {
-        if (!showTooltip) return;
-
-        const updatePosition = () => {
-            const element = document.querySelector(`[data-feature="${featureId}"]`);
-            if (!element) return;
-
-            const rect = element.getBoundingClientRect();
-            setTooltipPosition({
-                top: rect.top,
-                left: rect.left,
-                width: rect.width,
-                height: rect.height,
-            });
-        };
-
-        updatePosition();
-        window.addEventListener('resize', updatePosition);
-        window.addEventListener('scroll', updatePosition);
-
-        return () => {
-            window.removeEventListener('resize', updatePosition);
-            window.removeEventListener('scroll', updatePosition);
-        };
-    }, [showTooltip, featureId]);
+    }, [isCurrentTour, isCompleted]);
 
     const handleComplete = () => {
+        completeStep(tourId);
+        goToNextStep();
         setShowTooltip(false);
-        setHasCompleted(true);
-        onComplete?.();
-    };
-
-    const renderChildren = () => {
-        if (typeof children === 'function') {
-            return children({ isActive, hasCompleted });
-        }
-        return children;
     };
 
     return (
         <>
-            <div data-feature={featureId} className={cn(`relative ${isActive && !hasCompleted ? 'z-50' : ''}`, className)}>
-                {renderChildren()}
-                {isActive && !hasCompleted && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className='absolute inset-0 rounded-lg shadow-[inset_0_0_30px_rgba(59,130,246,0.3),0_0_20px_rgba(59,130,246,0.2)] ring-1 ring-blue-500/50 ring-offset-1 ring-offset-black/10 transition-all duration-300'
-                    />
-                )}
-            </div>
-
-            {typeof window !== 'undefined' &&
-                createPortal(
-                    <AnimatePresence>
-                        {showTooltip && tooltipPosition && !hasCompleted && (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.9 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                className={cn('fixed z-50 w-64 rounded-lg border border-[#181818] bg-[#0a0a0a] p-4 shadow-xl', tooltipClassName)}>
-                                <div className='mb-4 text-gray-300'>{tooltipContent}</div>
-                                <button onClick={handleComplete} className='w-full rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors hover:bg-blue-400'>
-                                    Got it
-                                </button>
-                            </motion.div>
-                        )}
-                    </AnimatePresence>,
-                    document.body
-                )}
+            <button
+                onClick={onClick}
+                className={cn(
+                    'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-200',
+                    'border border-transparent bg-transparent',
+                    'hover:border-[#333] hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20',
+                    isActive && 'text-white hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414]',
+                    isCurrentTour && !isCompleted && 'shadow-[inset_0_0_30px_rgba(59,130,246,0.3)] hover:shadow-[inset_0_0_50px_rgba(96,165,250,0.5)]',
+                    className
+                )}>
+                <Icon
+                    size={20}
+                    className={cn('transition-colors', {
+                        'text-blue-500/70 group-hover:text-blue-400/90': isCurrentTour && !isCompleted,
+                        'text-[#818181] group-hover:text-white': !isCurrentTour || isCompleted,
+                    })}
+                />
+            </button>
+            {typeof window !== 'undefined' && (
+                <AnimatePresence>
+                    {showTooltip && !isCompleted && (
+                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className='fixed top-18 left-20 z-50'>
+                            {React.cloneElement(children, { onComplete: handleComplete })}
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            )}
         </>
     );
 }

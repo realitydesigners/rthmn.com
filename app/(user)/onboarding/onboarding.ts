@@ -48,11 +48,18 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         order: 4,
     },
     {
+        id: 'universe',
+        title: 'Universe Panel',
+        description: 'Explore the universe of trading pairs',
+        type: 'feature-tour',
+        order: 5,
+    },
+    {
         id: 'test',
         title: 'Test Environment',
         description: 'Practice and refine your trading strategies',
         type: 'feature-tour',
-        order: 5,
+        order: 6,
     },
 ];
 

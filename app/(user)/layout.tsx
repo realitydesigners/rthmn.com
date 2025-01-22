@@ -26,9 +26,9 @@ export default async function UserLayout({ children, modal }: { children: React.
     return (
         <QueryProvider>
             <WebSocketProvider>
+                <OnboardingCheck />
                 <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
                     <div id='app-container' className='relative min-h-screen overflow-y-auto'>
-                        <OnboardingCheck />
                         <NavbarSignedIn user={user} />
                         <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
                         <SidebarLeft />
