@@ -93,7 +93,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                     Welcome to Rthmn
                 </motion.h2>
                 <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-gray-400'>
-                    Let's start by adding a profile photo to personalize your experience.
+                    You can add a profile photo to personalize your experience, or skip this step.
                 </motion.p>
             </div>
 

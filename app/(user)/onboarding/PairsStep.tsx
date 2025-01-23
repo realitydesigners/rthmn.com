@@ -46,16 +46,19 @@ export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
                 </motion.p>
             </div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className='grid grid-cols-2 gap-4'>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className='grid grid-cols-2 gap-4'>
                 {pairs.map((pair, index) => {
                     const isSelected = selectedPairs.includes(pair.id);
 
                     return (
                         <motion.button
                             key={pair.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 + index * 0.1 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                                duration: 0.3,
+                                delay: index * 0.05,
+                            }}
                             onClick={() => {
                                 handlePairClick(pair.id);
                             }}
@@ -65,10 +68,18 @@ export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
                                     : 'border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-blue-500/30 hover:from-[#1A1A1A] hover:to-[#111]'
                             }`}>
                             {/* Highlight Effect */}
-                            <div
-                                className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-300 ${
-                                    isSelected ? 'from-blue-500/10 to-transparent opacity-100' : 'from-white/5 to-transparent opacity-0 group-hover:opacity-100'
-                                }`}
+                            <motion.div
+                                initial={false}
+                                animate={{
+                                    opacity: isSelected ? 1 : 0,
+                                    scale: isSelected ? 1 : 0.98,
+                                }}
+                                transition={{
+                                    type: 'spring',
+                                    stiffness: 200,
+                                    damping: 20,
+                                }}
+                                className={`absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent`}
                             />
 
                             {/* Content Container */}
@@ -87,7 +98,19 @@ export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
                                 </div>
 
                                 {/* Selection Indicator */}
-                                <div className={`h-2 w-2 rounded-full transition-colors duration-300 ${isSelected ? 'bg-blue-500' : 'bg-[#333] group-hover:bg-[#444]'}`} />
+                                <motion.div
+                                    initial={false}
+                                    animate={{
+                                        scale: isSelected ? 1.2 : 1,
+                                        backgroundColor: isSelected ? 'rgb(59, 130, 246)' : 'rgb(51, 51, 51)',
+                                    }}
+                                    transition={{
+                                        type: 'spring',
+                                        stiffness: 200,
+                                        damping: 20,
+                                    }}
+                                    className={`h-2 w-2 rounded-full`}
+                                />
                             </div>
                         </motion.button>
                     );

@@ -111,18 +111,28 @@ export default function OnboardingPage() {
     return (
         <div className='flex min-h-screen items-center justify-center bg-black p-4'>
             <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`relative w-full ${currentStep?.id === 'pairs' ? 'max-w-4xl' : 'max-w-md'} rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}>
+                initial={false}
+                animate={{
+                    maxWidth: currentStep?.id === 'pairs' ? '48rem' : '28rem',
+                }}
+                transition={{
+                    maxWidth: {
+                        type: 'spring',
+                        stiffness: 100,
+                        damping: 30,
+                        duration: 0.5,
+                    },
+                }}
+                className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}>
                 {/* Progress indicator */}
                 <div className='absolute -top-3 left-1/2 -translate-x-1/2'>
                     <div className='flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 text-xs font-medium shadow-xl'>
                         <div className='flex h-1.5 w-12 items-center rounded-full bg-[#222]'>
                             <motion.div
                                 className='h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400'
-                                initial={{ width: '0%' }}
+                                initial={false}
                                 animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
-                                transition={{ duration: 0.3 }}
+                                transition={{ duration: 0.5, ease: 'easeInOut' }}
                             />
                         </div>
                         <span className='bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent'>
@@ -135,10 +145,10 @@ export default function OnboardingPage() {
                 <AnimatePresence mode='wait'>
                     <motion.div
                         key={currentStepId}
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -20 }}
-                        transition={{ duration: 0.3 }}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
                         className='relative py-4'>
                         {renderStep()}
                     </motion.div>
@@ -156,11 +166,7 @@ export default function OnboardingPage() {
                     )}
                     <button
                         onClick={handleNext}
-                        disabled={
-                            (currentStep.id === 'profile' && !userData.photoUrl) ||
-                            (currentStep.id === 'experience' && !userData.experience) ||
-                            (currentStep.id === 'pairs' && userData.selectedPairs.length === 0)
-                        }
+                        disabled={(currentStep.id === 'experience' && !userData.experience) || (currentStep.id === 'pairs' && userData.selectedPairs.length === 0)}
                         className='group relative rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:hover:shadow-none'>
                         <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
                         {ONBOARDING_STEPS[ONBOARDING_STEPS.findIndex((step) => step.id === currentStepId) + 1]?.type === 'feature-tour' ? 'Complete' : 'Next'}
