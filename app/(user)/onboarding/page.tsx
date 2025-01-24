@@ -7,27 +7,12 @@ import ExperienceStep from './ExperienceStep';
 import PairsStep from './PairsStep';
 import { useOnboardingStore, ONBOARDING_STEPS } from './onboarding';
 import { useEffect, useState } from 'react';
-import { ComponentType } from 'react';
 import IntroSequence from './IntroSequence';
 
-interface ProfileUploadProps {
-    onPhotoUpload: (url: string) => void;
-}
-
-interface ExperienceStepProps {
-    experience: string;
-    setExperience: (exp: string) => void;
-}
-
-interface PairsStepProps {
-    selectedPairs: string[];
-    setSelectedPairs: (pairs: string[]) => void;
-}
-
 const COMPONENTS: {
-    ProfileUpload: ComponentType<ProfileUploadProps>;
-    ExperienceStep: ComponentType<ExperienceStepProps>;
-    PairsStep: ComponentType<PairsStepProps>;
+    ProfileUpload: any;
+    ExperienceStep: any;
+    PairsStep: any;
 } = {
     ProfileUpload,
     ExperienceStep,
