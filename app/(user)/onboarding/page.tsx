@@ -101,7 +101,7 @@ export default function OnboardingPage() {
             <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: showIntro ? 0 : 1 }}
-                transition={{ duration: 2 }}
+                transition={{ duration: 0.3 }}
                 className='flex min-h-screen items-center justify-center p-4'>
                 <motion.div
                     initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
@@ -111,17 +111,7 @@ export default function OnboardingPage() {
                         filter: showIntro ? 'blur(10px)' : 'blur(0px)',
                         maxWidth: currentStep?.id === 'pairs' ? '48rem' : '28rem',
                     }}
-                    transition={{
-                        maxWidth: {
-                            type: 'spring',
-                            stiffness: 100,
-                            damping: 30,
-                            duration: 0.5,
-                        },
-                        opacity: { duration: 0.8, delay: 1 },
-                        scale: { duration: 0.8, delay: 1 },
-                        filter: { duration: 0.8, delay: 1 },
-                    }}
+                    transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                     className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}>
                     {/* Progress indicator */}
                     <div className='absolute -top-3 left-1/2 -translate-x-1/2'>
