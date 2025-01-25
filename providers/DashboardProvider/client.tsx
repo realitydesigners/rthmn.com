@@ -5,6 +5,8 @@ import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
 import { GridCalculator } from '@/utils/gridCalc';
+import { useRouter, usePathname } from 'next/navigation';
+import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;
@@ -71,6 +73,9 @@ interface DashboardProviderClientProps {
 }
 
 export function DashboardProviderClient({ children, initialSignalsData, initialBoxData = {} }: DashboardProviderClientProps) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const { hasCompletedInitialOnboarding } = useOnboardingStore();
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
@@ -81,6 +86,15 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
+
+    // Onboarding check
+    useEffect(() => {
+        if (!pathname || pathname.includes('/onboarding')) return;
+        if (pathname === '/signin' || pathname === '/signup' || pathname === '/pricing') return;
+        if (!hasCompletedInitialOnboarding()) {
+            router.replace('/onboarding');
+        }
+    }, [pathname, router, hasCompletedInitialOnboarding]);
 
     // Initialize state from localStorage after mount
     useEffect(() => {

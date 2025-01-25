@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback } from 'react';
-import { LogoIcon } from '@/components/Icons/icons';
 
 interface Props {
     onComplete: () => void;
@@ -374,7 +373,7 @@ export default function IntroSequence({ onComplete }: Props) {
                 <AuroraBackground isExiting={isExiting} />
                 <LightShadows isExiting={isExiting} />
                 <StarField isExiting={isExiting} />
-                <motion.div className='relative z-10 flex h-full items-center justify-center'>{renderCurrentStep()}</motion.div>
+                <motion.div className='no-select relative z-10 flex h-full items-center justify-center'>{renderCurrentStep()}</motion.div>
             </motion.div>
         </AnimatePresence>
     );

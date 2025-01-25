@@ -6,10 +6,10 @@ import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
 import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
-import { FeatureTour } from '../FeatureTour';
+import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import { InstrumentsContent } from '../FeatureTour/InstrumentsContent';
-import { TestContent } from '../FeatureTour/TestContent';
+import { InstrumentsContent } from '../../app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
+import { TestContent } from '../../app/(user)/onboarding/_components/FeatureTour/TestContent';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();

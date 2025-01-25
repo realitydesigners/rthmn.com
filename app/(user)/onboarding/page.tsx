@@ -1,13 +1,12 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProfileUpload from './ProfileUpload';
-import ExperienceStep from './ExperienceStep';
-import PairsStep from './PairsStep';
+import ProfileUpload from './_components/Steps/ProfileUpload';
+import ExperienceStep from './_components/Steps/ExperienceStep';
+import PairsStep from './_components/Steps/PairsStep';
 import { useOnboardingStore, ONBOARDING_STEPS } from './onboarding';
 import { useEffect, useState } from 'react';
-import IntroSequence from './IntroSequence';
+import IntroSequence from './_components/Steps/IntroSequence';
 
 const COMPONENTS: {
     ProfileUpload: any;
@@ -114,7 +113,7 @@ export default function OnboardingPage() {
                     transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                     className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}>
                     {/* Progress indicator */}
-                    <div className='absolute -top-3 left-1/2 -translate-x-1/2'>
+                    <div className='no-select absolute -top-3 left-1/2 -translate-x-1/2'>
                         <div className='flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 text-xs font-medium shadow-xl'>
                             <div className='flex h-1.5 w-12 items-center rounded-full bg-[#222]'>
                                 <motion.div
@@ -138,7 +137,7 @@ export default function OnboardingPage() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className='relative py-4'>
+                            className='no-select relative py-4'>
                             {renderStep()}
                         </motion.div>
                     </AnimatePresence>
@@ -156,7 +155,7 @@ export default function OnboardingPage() {
                         <button
                             onClick={handleNext}
                             disabled={(currentStep.id === 'experience' && !userData.experience) || (currentStep.id === 'pairs' && userData.selectedPairs.length === 0)}
-                            className='group relative rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:hover:shadow-none'>
+                            className='no-select group relative rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:hover:shadow-none'>
                             <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
                             {ONBOARDING_STEPS[ONBOARDING_STEPS.findIndex((step) => step.id === currentStepId) + 1]?.type === 'feature-tour' ? 'Complete' : 'Next'}
                         </button>
@@ -166,6 +165,25 @@ export default function OnboardingPage() {
                     <div className='pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent opacity-50' />
                 </motion.div>
             </motion.div>
+
+            {/* Step title with enhanced styling */}
+            <div className='absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4'>
+                <div className='group no-select relative flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-500/20 hover:shadow-blue-500/10'>
+                    <div className='flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-500/20 to-blue-600/10'>
+                        <div className='h-1.5 w-1.5 rounded-full bg-blue-400' />
+                    </div>
+                    <span className='no-select text-sm font-medium text-white/70 transition-colors group-hover:text-white'>
+                        {currentStep?.id === 'profile'
+                            ? 'Upload Profile Photo'
+                            : currentStep?.id === 'experience'
+                              ? 'Trading Experience'
+                              : currentStep?.id === 'pairs'
+                                ? 'Select Trading Pairs'
+                                : ''}
+                    </span>
+                    <div className='absolute inset-0 -z-10 rounded-full bg-blue-400 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10' />
+                </div>
+            </div>
 
             {/* Intro sequence overlay */}
             {showIntro && <IntroSequence onComplete={() => setShowIntro(false)} />}

@@ -34,6 +34,14 @@
     @apply bg-linear-to-b from-white via-white to-white/50 bg-clip-text py-2 text-transparent;
 }
 
+@utility no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
 @utility text-gray {
     @apply bg-linear-to-b from-white to-gray-200/50 bg-clip-text text-transparent;
 }
