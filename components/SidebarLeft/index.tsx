@@ -120,7 +120,7 @@ export const SidebarLeft = () => {
         {
             id: 'universe',
             icon: LuOrbit,
-            onClick: () => handlePanelToggle('instruments'),
+            onClick: () => handlePanelToggle('universe'),
             tourContent: <InstrumentsContent />,
             panelContent: null,
         },
@@ -135,7 +135,7 @@ export const SidebarLeft = () => {
 
     const renderButtons = () =>
         buttons.map((button) => (
-            <FeatureTour key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} tourId={button.id}>
+            <FeatureTour key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} isOpen={isOpen} tourId={button.id}>
                 {button.tourContent}
             </FeatureTour>
         ));

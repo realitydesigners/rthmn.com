@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/utils/cn';
 import { IconType } from 'react-icons';
@@ -10,6 +10,7 @@ export function FeatureTour({
     icon: Icon,
     onClick,
     isActive,
+    isOpen,
     tourId,
     className,
     children,
@@ -17,14 +18,17 @@ export function FeatureTour({
     icon: IconType;
     onClick: () => void;
     isActive: boolean;
+    isOpen: boolean;
     tourId: string;
     className?: string;
     children: any;
 }) {
     const { currentStepId, completeStep, goToNextStep, isStepCompleted } = useOnboardingStore();
     const [showTooltip, setShowTooltip] = useState(false);
+    const [sidebarWidth, setSidebarWidth] = useState(0);
     const isCurrentTour = currentStepId === tourId;
     const isCompleted = isStepCompleted(tourId);
+    const observerRef = useRef<ResizeObserver | null>(null);
 
     useEffect(() => {
         if (!isCurrentTour || isCompleted) return;
@@ -35,6 +39,34 @@ export function FeatureTour({
 
         return () => clearTimeout(timer);
     }, [isCurrentTour, isCompleted]);
+
+    // Track sidebar width changes
+    useEffect(() => {
+        if (!showTooltip) return;
+
+        const sidebar = document.querySelector('.sidebar-content');
+        if (!sidebar) return;
+
+        const updateTooltipPosition = () => {
+            const sidebarElement = sidebar.querySelector('[data-position="left"]');
+            if (sidebarElement) {
+                const width = parseInt(sidebarElement.getAttribute('data-width') || '0');
+                setSidebarWidth(width);
+            }
+        };
+
+        updateTooltipPosition();
+
+        observerRef.current = new ResizeObserver(updateTooltipPosition);
+        const sidebarElement = sidebar.querySelector('[data-position="left"]');
+        if (sidebarElement) {
+            observerRef.current.observe(sidebarElement);
+        }
+
+        return () => {
+            observerRef.current?.disconnect();
+        };
+    }, [showTooltip]);
 
     const handleComplete = () => {
         completeStep(tourId);
@@ -92,7 +124,19 @@ export function FeatureTour({
             {typeof window !== 'undefined' && (
                 <AnimatePresence>
                     {showTooltip && !isCompleted && (
-                        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className='fixed top-18 left-20 z-50'>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, x: 0 }}
+                            animate={{
+                                opacity: 1,
+                                scale: 1,
+                                x: isOpen ? sidebarWidth : 0,
+                            }}
+                            exit={{ opacity: 0, scale: 0.9 }}
+                            transition={{
+                                duration: 0.3,
+                                ease: [0.19, 1, 0.22, 1],
+                            }}
+                            className={cn('fixed top-18 z-50', isOpen ? 'left-4' : 'left-20')}>
                             {React.cloneElement(children, { onComplete: handleComplete })}
                         </motion.div>
                     )}
