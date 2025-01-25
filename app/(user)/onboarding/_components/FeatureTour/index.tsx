@@ -125,16 +125,16 @@ export function FeatureTour({
                 <AnimatePresence>
                     {showTooltip && !isCompleted && (
                         <motion.div
-                            initial={{ opacity: 0, scale: 0.9, x: 0 }}
+                            initial={{ opacity: 0, scale: 0.98, x: 0 }}
                             animate={{
                                 opacity: 1,
                                 scale: 1,
                                 x: isOpen ? sidebarWidth : 0,
                             }}
-                            exit={{ opacity: 0, scale: 0.9 }}
+                            exit={{ opacity: 0, scale: 0.98 }}
                             transition={{
-                                duration: 0.3,
-                                ease: [0.19, 1, 0.22, 1],
+                                duration: 0.2,
+                                ease: [0.2, 1, 0.2, 1],
                             }}
                             className={cn('fixed top-18 z-50', isOpen ? 'left-4' : 'left-20')}>
                             {React.cloneElement(children, { onComplete: handleComplete })}

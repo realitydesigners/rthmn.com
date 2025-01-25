@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/utils/cn';
 import { LuLock, LuUnlock } from 'react-icons/lu';
 import { getSidebarLocks, setSidebarLocks, getSidebarState, setSidebarState } from '@/utils/localStorage';
+import { motion } from 'framer-motion';
 
 interface SidebarContentProps {
     isOpen: boolean;
@@ -114,27 +115,47 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
     if (!mounted) return null;
 
     return (
-        <div
+        <motion.div
+            initial={false}
+            animate={{
+                x: isOpen ? 0 : position === 'left' ? -width : width,
+                opacity: isOpen ? 1 : 0,
+                transition: {
+                    x: {
+                        type: 'tween',
+                        duration: 0.2,
+                        ease: [0.2, 1, 0.2, 1],
+                    },
+                    opacity: {
+                        duration: 0.15,
+                    },
+                },
+            }}
             className={cn(
-                'top-14 bottom-0 hidden transform transition-all duration-300 lg:fixed lg:flex',
+                'sidebar-content top-14 bottom-0 hidden transform lg:fixed lg:flex',
                 position === 'left' ? 'left-0' : 'right-0',
-                isOpen
-                    ? 'translate-x-0 opacity-100'
-                    : position === 'left'
-                      ? 'pointer-events-none -translate-x-[150%] opacity-0'
-                      : 'pointer-events-none translate-x-[150%] opacity-0',
+                isOpen ? 'pointer-events-auto' : 'pointer-events-none',
                 isLocked ? 'z-[90]' : 'z-[110]' // Higher z-index when floating
             )}
             data-position={position}
             data-locked={isLocked}
             data-width={width}
             style={{ width: `${width}px` }}>
-            <div
+            <motion.div
                 className={cn(
                     'group my- relative flex h-screen w-full transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
                     position === 'left' ? 'ml-16' : 'mr-16'
                 )}>
-                <div
+                <motion.div
+                    initial={false}
+                    animate={{
+                        scale: isOpen ? 1 : 0.98,
+                        opacity: isOpen ? 1 : 0.8,
+                        transition: {
+                            duration: 0.2,
+                            ease: [0.2, 1, 0.2, 1],
+                        },
+                    }}
                     className={cn(
                         'relative flex h-full w-full flex-col bg-[#0a0a0a]',
                         position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]',
@@ -196,7 +217,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                     <div className='relative flex-1 touch-pan-y overflow-y-scroll px-2 pb-4 [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.1)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-thumb:hover]:bg-white/[0.12] [&::-webkit-scrollbar-track]:bg-transparent'>
                         {children}
                     </div>
-                </div>
+                </motion.div>
 
                 <div
                     className={cn(
@@ -223,7 +244,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                         window.addEventListener('mouseup', handleMouseUp);
                     }}
                 />
-            </div>
-        </div>
+            </motion.div>
+        </motion.div>
     );
 };
