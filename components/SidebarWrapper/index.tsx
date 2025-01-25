@@ -18,7 +18,7 @@ interface SidebarContentProps {
     isCompleted: boolean;
 }
 
-export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 300, isCurrentTourStep, isCompleted }: SidebarContentProps) => {
+export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 350, isCurrentTourStep, isCompleted }: SidebarContentProps) => {
     const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
 
@@ -44,7 +44,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
     }, []);
 
     const handleResize = useCallback((newWidth: number) => {
-        const constrainedWidth = Math.max(300, Math.min(600, newWidth));
+        const constrainedWidth = Math.max(350, Math.min(600, newWidth));
         setWidth(constrainedWidth);
     }, []);
 
@@ -203,7 +203,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                             </button>
                         )}
                         <div className={cn('flex items-center justify-center gap-2', position === 'right' && 'flex-1 justify-end')}>
-                            <h2 className='font-kodemono text-[10px] font-medium tracking-widest uppercase'>{title}</h2>
+                            <h2 className='font-kodemono px-2 text-[8px] font-medium tracking-widest uppercase'>{title}</h2>
                         </div>
                         {position === 'left' && (
                             <button
@@ -237,7 +237,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
 
                         const handleMouseMove = (e: MouseEvent) => {
                             const delta = e.clientX - startX;
-                            const newWidth = Math.max(300, Math.min(600, startWidth + (position === 'left' ? delta : -delta)));
+                            const newWidth = Math.max(350, Math.min(600, startWidth + (position === 'left' ? delta : -delta)));
                             handleResize(newWidth);
                         };
 

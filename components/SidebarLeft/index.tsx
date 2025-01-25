@@ -123,13 +123,6 @@ export const SidebarLeft = () => {
             tourContent: <InstrumentsContent />,
             panelContent: null,
         },
-        {
-            id: 'test',
-            icon: LuTestTube,
-            onClick: () => handlePanelToggle('test'),
-            tourContent: <TestContent />,
-            panelContent: null,
-        },
     ];
 
     const renderButtons = () =>
