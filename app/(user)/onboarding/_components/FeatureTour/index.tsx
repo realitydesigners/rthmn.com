@@ -46,11 +46,8 @@ export function FeatureTour({
     useEffect(() => {
         if (!showTooltip) return;
 
-        const sidebar = document.querySelector('.sidebar-content');
-        if (!sidebar) return;
-
         const updateTooltipPosition = () => {
-            const sidebarElement = sidebar.querySelector(`[data-position="${position}"]`);
+            const sidebarElement = document.querySelector(`[data-position="${position}"]`);
             if (sidebarElement) {
                 const width = parseInt(sidebarElement.getAttribute('data-width') || '0');
                 setSidebarWidth(width);
@@ -59,13 +56,31 @@ export function FeatureTour({
 
         updateTooltipPosition();
 
+        // Create a mutation observer to watch for attribute changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-width') {
+                    updateTooltipPosition();
+                }
+            });
+        });
+
+        const sidebarElement = document.querySelector(`[data-position="${position}"]`);
+        if (sidebarElement) {
+            observer.observe(sidebarElement, {
+                attributes: true,
+                attributeFilter: ['data-width'],
+            });
+        }
+
+        // Also use ResizeObserver as a backup
         observerRef.current = new ResizeObserver(updateTooltipPosition);
-        const sidebarElement = sidebar.querySelector(`[data-position="${position}"]`);
         if (sidebarElement) {
             observerRef.current.observe(sidebarElement);
         }
 
         return () => {
+            observer.disconnect();
             observerRef.current?.disconnect();
         };
     }, [showTooltip, position]);
@@ -131,14 +146,14 @@ export function FeatureTour({
                             animate={{
                                 opacity: 1,
                                 scale: 1,
-                                x: isOpen ? sidebarWidth : 0,
+                                x: isOpen ? (position === 'left' ? sidebarWidth : -sidebarWidth) : 0,
                             }}
                             exit={{ opacity: 0, scale: 0.98, x: 0 }}
                             transition={{
                                 duration: 0.2,
                                 ease: [0.2, 1, 0.2, 1],
                             }}
-                            className={cn('fixed top-18 z-50', position === 'left' ? (isOpen ? 'left-4' : 'left-20') : isOpen ? 'right-20' : 'right-4')}>
+                            className={cn('fixed top-18 z-50', position === 'left' ? (isOpen ? 'left-4' : 'left-20') : isOpen ? 'right-4' : 'right-20')}>
                             {React.cloneElement(children, { onComplete: handleComplete })}
                         </motion.div>
                     )}
