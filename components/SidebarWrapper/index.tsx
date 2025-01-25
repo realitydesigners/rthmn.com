@@ -44,7 +44,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
     }, []);
 
     const handleResize = useCallback((newWidth: number) => {
-        const constrainedWidth = Math.max(300, Math.min(450, newWidth));
+        const constrainedWidth = Math.max(300, Math.min(600, newWidth));
         setWidth(constrainedWidth);
     }, []);
 
@@ -115,7 +115,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
             }
             container.style.overflowX = 'hidden';
         }
-    }, [isOpen, width, position, isLocked, mounted]);
+    }, [isOpen, width, position, isLocked, mounted, title]);
 
     if (!mounted) return null;
 
@@ -237,7 +237,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
 
                         const handleMouseMove = (e: MouseEvent) => {
                             const delta = e.clientX - startX;
-                            const newWidth = Math.max(360, Math.min(600, startWidth + (position === 'left' ? delta : -delta)));
+                            const newWidth = Math.max(300, Math.min(600, startWidth + (position === 'left' ? delta : -delta)));
                             handleResize(newWidth);
                         };
 
