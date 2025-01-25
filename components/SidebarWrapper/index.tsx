@@ -13,9 +13,10 @@ interface SidebarContentProps {
     onLockToggle: () => void;
     position: 'left' | 'right';
     initialWidth?: number;
+    isCurrentTourStep?: boolean;
 }
 
-export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 300 }: SidebarContentProps) => {
+export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 300, isCurrentTourStep }: SidebarContentProps) => {
     const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
 
@@ -133,7 +134,33 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                     'group my- relative flex h-screen w-full transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
                     position === 'left' ? 'ml-16' : 'mr-16'
                 )}>
-                <div className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a]', position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]')}>
+                <div
+                    className={cn(
+                        'relative flex h-full w-full flex-col bg-[#0a0a0a]',
+                        position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]',
+                        isCurrentTourStep &&
+                            [
+                                // Inner glow layers with increased depth
+                                'shadow-[inset_0_0_60px_rgba(59,130,246,0.1)]',
+                                'shadow-[inset_0_0_30px_rgba(59,130,246,0.25)]',
+                                'shadow-[inset_0_0_15px_rgba(59,130,246,0.1)]',
+                                // Edge glow with even distribution
+                                'before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-r before:from-blue-500/10 before:via-transparent before:to-transparent',
+                                'after:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-blue-500/20 after:via-transparent after:to-transparent',
+                                // Ambient glow
+                                'bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_50%)]',
+                                // Outer glow for depth
+                                'shadow-[0_0_40px_rgba(59,130,246,0.2)]',
+
+                                'bg-gradient-to-b from-blue-500/[0.1] via-transparent to-blue-500/[0.05]',
+                                'relative overflow-hidden',
+                                // Extra edge highlights
+                                'before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(to_right,rgba(59,130,246,0.2),transparent_10%,transparent_90%,rgba(59,130,246,0.2))]',
+                                'after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(to_bottom,rgba(59,130,246,0.2),transparent_10%,transparent_90%,rgba(59,130,246,0.2))]',
+                                // Pulsing animation
+                                'animate-pulse-subtle',
+                            ].join(' ')
+                    )}>
                     {/* Header Section */}
                     <div className='relative z-10 flex h-12 items-center justify-between px-2'>
                         {position === 'right' && (

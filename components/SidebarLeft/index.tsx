@@ -150,7 +150,14 @@ export const SidebarLeft = () => {
             <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start border-r border-[#121212] bg-[#0a0a0a] py-4'>
                 <div className='flex flex-col gap-2'>{renderButtons()}</div>
             </div>
-            <SidebarWrapper isOpen={isOpen && !!activePanel} onClose={handleClose} title={activePanel} isLocked={isLocked} onLockToggle={handleLockToggle} position='left'>
+            <SidebarWrapper
+                isOpen={isOpen && !!activePanel}
+                onClose={handleClose}
+                title={activePanel}
+                isLocked={isLocked}
+                onLockToggle={handleLockToggle}
+                position='left'
+                isCurrentTourStep={currentStepId === activePanel}>
                 {renderPanelContent()}
             </SidebarWrapper>
         </div>
