@@ -91,9 +91,11 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                     main.style.marginLeft = `${width}px`;
                     main.style.width = `calc(100vw - ${width + rightWidth}px)`;
                     main.style.paddingLeft = '0'; // Reset padding when locked
-                } else {
+                }
+
+                if (position === 'right') {
                     main.style.marginRight = `${width}px`;
-                    main.style.width = `calc(100vw - ${leftWidth + width}px)`;
+                    main.style.width = `calc(100vw - ${width + leftWidth}px)`;
                     main.style.paddingRight = '0'; // Reset padding when locked
                 }
             } else {
@@ -102,7 +104,9 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                     main.style.marginLeft = '0';
                     main.style.width = rightWidth > 0 ? `calc(100vw - ${rightWidth}px)` : '100%';
                     main.style.paddingLeft = '64px'; // 16 * 4 = 64px for the fixed sidebar
-                } else {
+                }
+
+                if (position === 'right') {
                     main.style.marginRight = '0';
                     main.style.width = leftWidth > 0 ? `calc(100vw - ${leftWidth}px)` : '100%';
                     main.style.paddingRight = '64px'; // 16 * 4 = 64px for the fixed sidebar

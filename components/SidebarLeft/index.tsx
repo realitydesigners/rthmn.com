@@ -19,7 +19,6 @@ export const SidebarLeft = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
-
     const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding } = useOnboardingStore();
 
     useEffect(() => {
@@ -135,7 +134,7 @@ export const SidebarLeft = () => {
 
     const renderButtons = () =>
         buttons.map((button) => (
-            <FeatureTour key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} isOpen={isOpen} tourId={button.id}>
+            <FeatureTour key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} isOpen={isOpen} tourId={button.id} position='left'>
                 {button.tourContent}
             </FeatureTour>
         ));

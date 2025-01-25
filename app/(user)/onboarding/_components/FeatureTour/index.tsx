@@ -14,6 +14,7 @@ export function FeatureTour({
     tourId,
     className,
     children,
+    position,
 }: {
     icon: IconType;
     onClick: () => void;
@@ -22,6 +23,7 @@ export function FeatureTour({
     tourId: string;
     className?: string;
     children: any;
+    position?: 'left' | 'right';
 }) {
     const { currentStepId, completeStep, goToNextStep, isStepCompleted } = useOnboardingStore();
     const [showTooltip, setShowTooltip] = useState(false);
@@ -48,7 +50,7 @@ export function FeatureTour({
         if (!sidebar) return;
 
         const updateTooltipPosition = () => {
-            const sidebarElement = sidebar.querySelector('[data-position="left"]');
+            const sidebarElement = sidebar.querySelector(`[data-position="${position}"]`);
             if (sidebarElement) {
                 const width = parseInt(sidebarElement.getAttribute('data-width') || '0');
                 setSidebarWidth(width);
@@ -58,7 +60,7 @@ export function FeatureTour({
         updateTooltipPosition();
 
         observerRef.current = new ResizeObserver(updateTooltipPosition);
-        const sidebarElement = sidebar.querySelector('[data-position="left"]');
+        const sidebarElement = sidebar.querySelector(`[data-position="${position}"]`);
         if (sidebarElement) {
             observerRef.current.observe(sidebarElement);
         }
@@ -66,7 +68,7 @@ export function FeatureTour({
         return () => {
             observerRef.current?.disconnect();
         };
-    }, [showTooltip]);
+    }, [showTooltip, position]);
 
     const handleComplete = () => {
         completeStep(tourId);
@@ -131,12 +133,12 @@ export function FeatureTour({
                                 scale: 1,
                                 x: isOpen ? sidebarWidth : 0,
                             }}
-                            exit={{ opacity: 0, scale: 0.98 }}
+                            exit={{ opacity: 0, scale: 0.98, x: 0 }}
                             transition={{
                                 duration: 0.2,
                                 ease: [0.2, 1, 0.2, 1],
                             }}
-                            className={cn('fixed top-18 z-50', isOpen ? 'left-4' : 'left-20')}>
+                            className={cn('fixed top-18 z-50', position === 'left' ? (isOpen ? 'left-4' : 'left-20') : isOpen ? 'right-20' : 'right-4')}>
                             {React.cloneElement(children, { onComplete: handleComplete })}
                         </motion.div>
                     )}

@@ -61,6 +61,20 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         type: 'feature-tour',
         order: 6,
     },
+    {
+        id: 'onboarding',
+        title: 'Trading Instruments',
+        description: 'Access your selected trading pairs and available markets',
+        type: 'feature-tour',
+        order: 7,
+    },
+    {
+        id: 'settings',
+        title: 'Analysis Panel',
+        description: 'View detailed market analysis and trading insights',
+        type: 'feature-tour',
+        order: 8,
+    },
 ];
 
 interface OnboardingState {
