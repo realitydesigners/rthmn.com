@@ -15,9 +15,10 @@ interface SidebarContentProps {
     position: 'left' | 'right';
     initialWidth?: number;
     isCurrentTourStep?: boolean;
+    isCompleted: boolean;
 }
 
-export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 300, isCurrentTourStep }: SidebarContentProps) => {
+export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 300, isCurrentTourStep, isCompleted }: SidebarContentProps) => {
     const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
 
@@ -164,6 +165,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                         'relative flex h-full w-full flex-col bg-[#0a0a0a]',
                         position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]',
                         isCurrentTourStep &&
+                            !isCompleted &&
                             [
                                 // Inner glow layers with increased depth
                                 'shadow-[inset_0_0_60px_rgba(59,130,246,0.1)]',

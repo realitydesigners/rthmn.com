@@ -154,7 +154,11 @@ export function FeatureTour({
                                 ease: [0.2, 1, 0.2, 1],
                             }}
                             className={cn('fixed top-18 z-50', position === 'left' ? (isOpen ? 'left-4' : 'left-20') : isOpen ? 'right-4' : 'right-20')}>
-                            {React.cloneElement(children, { onComplete: handleComplete })}
+                            {React.cloneElement(children, {
+                                onComplete: handleComplete,
+                                isCompleted: isCompleted,
+                                isCurrentTourStep: isCurrentTour,
+                            })}
                         </motion.div>
                     )}
                 </AnimatePresence>

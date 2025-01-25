@@ -18,7 +18,7 @@ export const SidebarRight = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
-    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding } = useOnboardingStore();
+    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, isStepCompleted } = useOnboardingStore();
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -143,7 +143,8 @@ export const SidebarRight = () => {
                 isLocked={isLocked}
                 onLockToggle={handleLockToggle}
                 position='right'
-                isCurrentTourStep={currentStepId === activePanel}>
+                isCurrentTourStep={currentStepId === activePanel}
+                isCompleted={isStepCompleted(activePanel)}>
                 {renderPanelContent()}
             </SidebarWrapper>
         </div>

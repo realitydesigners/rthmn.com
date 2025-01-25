@@ -109,10 +109,24 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             completeStep: (stepId, data) => {
-                set((state) => ({
-                    completedSteps: [...state.completedSteps, stepId],
-                    userData: data ? { ...state.userData, ...data } : state.userData,
-                }));
+                console.log(`Completing step: ${stepId}`);
+                const step = ONBOARDING_STEPS.find((s) => s.id === stepId);
+                console.log(`Step details:`, step);
+
+                set((state) => {
+                    const newCompletedSteps = [...state.completedSteps, stepId];
+                    console.log('Updated completed steps:', newCompletedSteps);
+
+                    // Check if this is the last step
+                    const isLastStep = stepId === ONBOARDING_STEPS[ONBOARDING_STEPS.length - 1].id;
+
+                    return {
+                        completedSteps: newCompletedSteps,
+                        userData: data ? { ...state.userData, ...data } : state.userData,
+                        // Clear currentStepId if this is the last step
+                        currentStepId: isLastStep ? '' : state.currentStepId,
+                    };
+                });
             },
 
             goToNextStep: () => {
@@ -155,7 +169,11 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             isStepCompleted: (stepId) => {
-                return get().completedSteps.includes(stepId);
+                const state = get();
+                const isCompleted = state.completedSteps.includes(stepId);
+                console.log(`Checking if step ${stepId} is completed:`, isCompleted);
+                console.log('Current completed steps:', state.completedSteps);
+                return isCompleted;
             },
 
             hasCompletedInitialOnboarding: () => {
