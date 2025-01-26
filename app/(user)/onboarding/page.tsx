@@ -21,7 +21,7 @@ const COMPONENTS: {
 export default function OnboardingPage() {
     const router = useRouter();
     const { currentStepId, completeStep, goToNextStep, userData, updateUserData, setCurrentStep } = useOnboardingStore();
-    const [showIntro, setShowIntro] = useState(true);
+    const [showIntro, setShowIntro] = useState(false);
 
     const currentStep = ONBOARDING_STEPS.find((step) => step.id === currentStepId);
 

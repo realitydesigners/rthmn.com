@@ -3,117 +3,218 @@
 import { motion } from 'framer-motion';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { setSelectedPairs as saveToLocalStorage } from '@/utils/localStorage';
+import { useState, useEffect } from 'react';
+import { FaSearch } from 'react-icons/fa';
+import { FOREX_PAIRS, CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, INSTRUMENTS } from '@/utils/instruments';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 
 interface Props {
     selectedPairs: string[];
     setSelectedPairs: (pairs: string[]) => void;
+    onValidationChange?: (isValid: boolean) => void;
 }
 
-const pairs = [
-    { id: 'EURUSD', name: 'Euro / US Dollar', flag1: '🇪🇺', flag2: '🇺🇸' },
-    { id: 'GBPUSD', name: 'British Pound / US Dollar', flag1: '🇬🇧', flag2: '🇺🇸' },
-    { id: 'USDJPY', name: 'US Dollar / Japanese Yen', flag1: '🇺🇸', flag2: '🇯🇵' },
-    { id: 'USDCHF', name: 'US Dollar / Swiss Franc', flag1: '🇺🇸', flag2: '🇨🇭' },
-    { id: 'USDCAD', name: 'US Dollar / Canadian Dollar', flag1: '🇺🇸', flag2: '🇨🇦' },
-    { id: 'AUDUSD', name: 'Australian Dollar / US Dollar', flag1: '🇦🇺', flag2: '🇺🇸' },
-];
+const MIN_PAIRS_REQUIRED = 4;
 
-export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
+const formatPrice = (price: number, instrument: string) => {
+    let digits = 2; // default
+    for (const category of Object.values(INSTRUMENTS)) {
+        if (instrument in category) {
+            digits = category[instrument].digits;
+            break;
+        }
+    }
+    return price.toFixed(digits);
+};
+
+export default function PairsStep({ selectedPairs, setSelectedPairs, onValidationChange }: Props) {
     const { togglePair } = useDashboard();
+    const [searchQuery, setSearchQuery] = useState('');
+    const { priceData } = useWebSocket();
+
+    // Update validation whenever selected pairs change
+    useEffect(() => {
+        onValidationChange?.(selectedPairs.length >= MIN_PAIRS_REQUIRED);
+    }, [selectedPairs, onValidationChange]);
 
     const handlePairClick = (pair: string) => {
-        // Update onboarding state
         const newSelectedPairs = selectedPairs.includes(pair) ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
 
-        // Update both onboarding state and local storage
         setSelectedPairs(newSelectedPairs);
         saveToLocalStorage(newSelectedPairs);
-
-        // Update dashboard state - this will now be the source of truth
         togglePair(pair);
     };
 
+    const groups = [
+        { label: 'FX', items: FOREX_PAIRS },
+        { label: 'CRYPTO', items: CRYPTO_PAIRS },
+        { label: 'STOCKS', items: EQUITY_PAIRS },
+        { label: 'ETF', items: ETF_PAIRS },
+    ];
+
+    const getFilteredGroups = () => {
+        if (!searchQuery) return groups;
+
+        return groups
+            .map((group) => ({
+                ...group,
+                items: group.items.filter((item) => item.toLowerCase().includes(searchQuery.toLowerCase())),
+            }))
+            .filter((group) => group.items.length > 0);
+    };
+
     return (
-        <div className='space-y-8'>
-            <div className='space-y-2'>
-                <motion.h2
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
-                    Select Currency Pairs
-                </motion.h2>
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-gray-400'>
-                    Choose the currency pairs you want to trade. You can always modify this later.
-                </motion.p>
+        <div className='flex h-[60vh] flex-col'>
+            <div className='flex-shrink-0 space-y-8'>
+                <div className='space-y-2'>
+                    <motion.h2
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
+                        Select Trading Pairs
+                    </motion.h2>
+                    <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-gray-400'>
+                        Choose at least {MIN_PAIRS_REQUIRED} pairs you want to trade. You can always modify this later.
+                    </motion.p>
+
+                    {/* Selection Counter */}
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className={`text-sm ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-green-400' : 'text-blue-400'}`}>
+                        Selected: {selectedPairs.length} / {MIN_PAIRS_REQUIRED} required
+                    </motion.div>
+                </div>
+
+                {/* Search Bar */}
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className='relative'>
+                    <div className='relative flex items-center rounded-xl bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                        <div className='flex h-10 w-full items-center rounded-xl bg-gradient-to-b from-[#0A0A0A] to-[#121212]'>
+                            <FaSearch className='ml-4 text-[#666]' />
+                            <input
+                                type='text'
+                                placeholder='Search pairs...'
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className='font-outfit w-full bg-transparent px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none'
+                            />
+                        </div>
+                    </div>
+                </motion.div>
+
+                {/* Selected Pairs */}
+                {selectedPairs.length > 0 && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className='flex flex-wrap gap-2'>
+                        {selectedPairs.map((pair) => (
+                            <motion.button
+                                key={pair}
+                                onClick={() => handlePairClick(pair)}
+                                className='group relative overflow-hidden rounded-lg border border-blue-500/50 bg-gradient-to-b from-blue-500/20 to-blue-500/0 px-3 py-1.5'
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}>
+                                <div className='absolute inset-0 bg-blue-500/10 blur-md' />
+                                <div className='relative flex items-center gap-2'>
+                                    <span className='font-outfit text-sm font-medium text-white'>{pair}</span>
+                                    <span className='font-kodemono text-sm text-blue-400'>{priceData[pair]?.price ? formatPrice(priceData[pair].price, pair) : 'N/A'}</span>
+                                </div>
+                            </motion.button>
+                        ))}
+                    </motion.div>
+                )}
             </div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.3 }} className='grid grid-cols-2 gap-4'>
-                {pairs.map((pair, index) => {
-                    const isSelected = selectedPairs.includes(pair.id);
+            {/* Scrollable Pairs Grid */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.3 }}
+                className='mt-4 flex-1 space-y-2 overflow-y-auto pr-2'
+                style={{
+                    scrollbarWidth: 'thin',
+                    scrollbarColor: '#333 transparent',
+                }}>
+                {/* Scrollbar Styles */}
+                <style jsx global>{`
+                    .overflow-y-auto::-webkit-scrollbar {
+                        width: 4px;
+                    }
+                    .overflow-y-auto::-webkit-scrollbar-track {
+                        background: transparent;
+                    }
+                    .overflow-y-auto::-webkit-scrollbar-thumb {
+                        background-color: #333;
+                        border-radius: 20px;
+                    }
+                `}</style>
+
+                {getFilteredGroups().map((group, groupIndex) => {
+                    const pairs = group.items;
+                    if (pairs.length === 0) return null;
 
                     return (
-                        <motion.button
-                            key={pair.id}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{
-                                duration: 0.3,
-                                delay: index * 0.05,
-                            }}
-                            onClick={() => {
-                                handlePairClick(pair.id);
-                            }}
-                            className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b p-0.5 transition-all duration-300 ${
-                                isSelected
-                                    ? 'border-blue-500/50 from-blue-500/20 to-blue-500/0'
-                                    : 'border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-blue-500/30 hover:from-[#1A1A1A] hover:to-[#111]'
-                            }`}>
-                            {/* Highlight Effect */}
-                            <motion.div
-                                initial={false}
-                                animate={{
-                                    opacity: isSelected ? 1 : 0,
-                                    scale: isSelected ? 1 : 0.98,
-                                }}
-                                transition={{
-                                    type: 'spring',
-                                    stiffness: 200,
-                                    damping: 20,
-                                }}
-                                className={`absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent`}
-                            />
+                        <div key={group.label}>
+                            <h3 className='font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#666] uppercase'>{group.label}</h3>
+                            <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
+                                {pairs.map((item, index) => {
+                                    const isSelected = selectedPairs.includes(item);
 
-                            {/* Content Container */}
-                            <div className='relative flex items-center gap-4 rounded-xl p-4'>
-                                {/* Text Content */}
-                                <div className='flex-1 text-left'>
-                                    <div className={`flex items-center gap-2 font-medium transition-colors duration-300 ${isSelected ? 'text-white' : 'text-gray-300'}`}>
-                                        <span>{pair.id}</span>
-                                        <span className='text-sm text-gray-500'>•</span>
-                                        <span className='flex gap-1 text-lg'>
-                                            {pair.flag1}
-                                            {pair.flag2}
-                                        </span>
-                                    </div>
-                                    <div className={`text-sm transition-colors duration-300 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>{pair.name}</div>
-                                </div>
+                                    return (
+                                        <motion.button
+                                            key={item}
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            transition={{
+                                                duration: 0.3,
+                                                delay: (groupIndex * pairs.length + index) * 0.05,
+                                            }}
+                                            onClick={() => handlePairClick(item)}
+                                            className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b transition-all duration-300 ${
+                                                isSelected
+                                                    ? 'border-blue-500/50 from-blue-500/20 to-blue-500/0'
+                                                    : 'border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-blue-500/30 hover:from-[#1A1A1A] hover:to-[#111]'
+                                            }`}>
+                                            <motion.div
+                                                initial={false}
+                                                animate={{
+                                                    opacity: isSelected ? 1 : 0,
+                                                    scale: isSelected ? 1 : 0.98,
+                                                }}
+                                                transition={{
+                                                    type: 'spring',
+                                                    stiffness: 200,
+                                                    damping: 20,
+                                                }}
+                                                className={`absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent`}
+                                            />
 
-                                {/* Selection Indicator */}
-                                <motion.div
-                                    initial={false}
-                                    animate={{
-                                        scale: isSelected ? 1.2 : 1,
-                                        backgroundColor: isSelected ? 'rgb(59, 130, 246)' : 'rgb(51, 51, 51)',
-                                    }}
-                                    transition={{
-                                        type: 'spring',
-                                        stiffness: 200,
-                                        damping: 20,
-                                    }}
-                                    className={`h-2 w-2 rounded-full`}
-                                />
+                                            <div className='relative flex items-center justify-between rounded-xl p-4'>
+                                                <div className='flex items-center'>
+                                                    <span className='font-outfit text-[13px] font-bold tracking-wider text-white'>{item}</span>
+                                                </div>
+                                                <div className='flex items-center'>
+                                                    <span className='font-kodemono mr-3 text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-4'>
+                                                        {priceData[item]?.price ? formatPrice(priceData[item].price, item) : 'N/A'}
+                                                    </span>
+                                                    <motion.div
+                                                        initial={false}
+                                                        animate={{
+                                                            scale: isSelected ? 1.2 : 1,
+                                                            backgroundColor: isSelected ? 'rgb(59, 130, 246)' : 'rgb(51, 51, 51)',
+                                                        }}
+                                                        transition={{
+                                                            type: 'spring',
+                                                            stiffness: 200,
+                                                            damping: 20,
+                                                        }}
+                                                        className={`h-2 w-2 rounded-full`}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </motion.button>
+                                    );
+                                })}
                             </div>
-                        </motion.button>
+                        </div>
                     );
                 })}
             </motion.div>
