@@ -14,10 +14,8 @@ const AuroraBackground = ({ isExiting }: { isExiting: boolean }) => (
             filter: isExiting ? 'blur(50px)' : 'blur(30px)',
         }}
         transition={{
-            opacity: { duration: 2.5 },
-            filter: { duration: 2.5 },
             backgroundPosition: {
-                duration: 25,
+                duration: 60,
                 repeat: Infinity,
                 ease: 'linear',
             },
@@ -42,10 +40,8 @@ const LightShadows = ({ isExiting }: { isExiting: boolean }) =>
                 repeat: Infinity,
                 ease: 'linear',
                 delay: i * 1,
-                opacity: { duration: 2.5 },
-                filter: { duration: 2.5 },
             }}
-            className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-blue-500/20 via-violet-500/10 to-transparent blur-3xl`}
+            className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-cyan-500/20 via-violet-500/10 to-transparent blur-3xl`}
         />
     ));
 
@@ -109,114 +105,167 @@ const BASE_ANIMATIONS = {
         ease: [0.19, 1, 0.22, 1],
     },
     fade: {
-        initial: { opacity: 0, filter: 'blur(10px)' },
-        animate: { opacity: 1, filter: 'blur(0px)' },
-        exit: { opacity: 0, filter: 'blur(15px)', y: -20 },
+        initial: {
+            opacity: 0,
+            scale: 0.95,
+            filter: 'blur(10px)',
+            y: 20,
+        },
+        animate: {
+            opacity: 1,
+            scale: 1,
+            filter: 'blur(0px)',
+            y: 0,
+        },
+        exit: {
+            opacity: 0,
+            scale: 0.95,
+            filter: 'blur(10px)',
+            y: -20,
+            transition: {
+                duration: 0.8,
+                ease: [0.19, 1, 0.22, 1],
+            },
+        },
     },
 };
 
 type StepProps = {
-    duration: number;
     delay: number;
     onComplete: () => void;
+    duration?: number;
+    isInteractive?: boolean;
 };
 
-const WelcomeStep = ({ duration, delay, onComplete }: StepProps) => (
+const WelcomeStep = ({ duration = 4000, delay, onComplete }: StepProps) => (
     <motion.div
         key='welcome'
-        initial={{ opacity: 0, filter: 'blur(10px)' }}
-        animate={{
-            opacity: 1,
-            filter: 'blur(0px)',
-            transitionEnd: { opacity: 0, y: -20, filter: 'blur(15px)' },
-        }}
+        {...BASE_ANIMATIONS.fade}
         transition={{
             ...BASE_ANIMATIONS.transition,
             delay,
-            duration: duration / 1000,
         }}
-        onAnimationComplete={onComplete}
-        className='space-y-4'>
+        onAnimationComplete={() => {
+            setTimeout(onComplete, duration);
+        }}
+        className='flex flex-col items-center justify-center space-y-4'>
         {/* Logo */}
-        <motion.div
-            initial={{ scale: 0.8, opacity: 0, filter: 'brightness(0.5) blur(10px)' }}
-            animate={{ scale: 1, opacity: 1, filter: 'brightness(1) blur(0px)' }}
-            exit={{ scale: 0.9, opacity: 0, filter: 'brightness(1.2) blur(15px)' }}
-            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-            className='relative mx-auto mb-6 h-24 w-24'>
+        <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative mx-auto mb-6 flex h-24 w-24'>
             {/* Holographic glow effect */}
             <motion.div
                 animate={{
                     boxShadow: ['0 0 20px rgba(255,255,255,0.1)', '0 0 60px rgba(255,255,255,0.2)', '0 0 20px rgba(255,255,255,0.1)'],
                     filter: ['brightness(1) blur(8px)', 'brightness(1.2) blur(12px)', 'brightness(1) blur(8px)'],
                 }}
+                exit={{
+                    boxShadow: '0 0 0px rgba(255,255,255,0)',
+                    filter: 'brightness(0.5) blur(20px)',
+                }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-                className='absolute inset-0 rounded-2xl bg-gradient-to-br from-white/20 to-white/5'
+                className='absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5'
             />
-            <div className='absolute inset-0 flex items-center justify-center rounded-2xl bg-gradient-to-br from-white/20 to-transparent p-2'>
-                <svg width='80' height='80' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg' aria-labelledby='logoTitle'>
-                    <title id='logoTitle'>Logo</title>
-                    <g clipPath='url(#clip0_1208_27417)'>
-                        <path
-                            d='M27.512 73.5372L27.512 28.512C27.512 27.9597 27.9597 27.512 28.512 27.512L70.4597 27.512C71.0229 27.512 71.475 27.9769 71.4593 28.54L70.8613 49.9176C70.8462 50.4588 70.4031 50.8896 69.8617 50.8896L50.7968 50.8896C49.891 50.8896 49.4519 51.9975 50.1117 52.618L92.25 92.25M92.25 92.25L48.2739 92.25L7.75002 92.25C7.19773 92.25 6.75002 91.8023 6.75002 91.25L6.75 7.75C6.75 7.19771 7.19772 6.75 7.75 6.75L91.25 6.75003C91.8023 6.75003 92.25 7.19775 92.25 7.75003L92.25 92.25Z'
-                            stroke='white'
-                            strokeWidth='8'
-                        />
-                    </g>
-                    <defs>
-                        <clipPath id='clip0_1208_27417'>
-                            <rect width='100' height='100' fill='white' />
-                        </clipPath>
-                    </defs>
-                </svg>
-            </div>
+            <svg className='relative' width='80' height='80' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg' aria-labelledby='logoTitle'>
+                <title id='logoTitle'>Logo</title>
+                <g clipPath='url(#clip0_1208_27417)'>
+                    <path
+                        d='M27.512 73.5372L27.512 28.512C27.512 27.9597 27.9597 27.512 28.512 27.512L70.4597 27.512C71.0229 27.512 71.475 27.9769 71.4593 28.54L70.8613 49.9176C70.8462 50.4588 70.4031 50.8896 69.8617 50.8896L50.7968 50.8896C49.891 50.8896 49.4519 51.9975 50.1117 52.618L92.25 92.25M92.25 92.25L48.2739 92.25L7.75002 92.25C7.19773 92.25 6.75002 91.8023 6.75002 91.25L6.75 7.75C6.75 7.19771 7.19772 6.75 7.75 6.75L91.25 6.75003C91.8023 6.75003 92.25 7.19775 92.25 7.75003L92.25 92.25Z'
+                        stroke='white'
+                        strokeWidth='8'
+                    />
+                </g>
+                <defs>
+                    <clipPath id='clip0_1208_27417'>
+                        <rect width='100' height='100' fill='white' />
+                    </clipPath>
+                </defs>
+            </svg>
         </motion.div>
         {/* Title */}
         <motion.h1
-            initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -20, filter: 'blur(10px)' }}
+            {...BASE_ANIMATIONS.fade}
             transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
             className='font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-7xl font-bold text-transparent'>
             Welcome to Rthmn
         </motion.h1>
         {/* Subtitle */}
+        <motion.p {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }} className='font-outfit text-lg text-white/60'>
+            The future of trading and first gamified trading platform.
+        </motion.p>
     </motion.div>
 );
 
-const PatternRecognitionStep = ({ duration, delay, onComplete }: StepProps) => (
+const PatternRecognitionStep = ({ duration = 8000, delay, onComplete }: StepProps) => (
     <motion.div
         key='description1'
-        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-        animate={{
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            transitionEnd: { opacity: 0, scale: 0.95, y: -20, filter: 'blur(15px)' },
-        }}
+        {...BASE_ANIMATIONS.fade}
         transition={{
             ...BASE_ANIMATIONS.transition,
             delay,
-            duration: duration / 1000,
         }}
-        onAnimationComplete={onComplete}
-        className='max-w-2xl space-y-6'>
-        <motion.p
-            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-            className='font-outfit text-2xl font-medium text-white/90 [text-shadow:_0_0_30px_rgba(255,255,255,0.2)]'>
-            Universal Pattern Recognition
-        </motion.p>
-        <motion.p
-            initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-            animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-            className='font-mono text-lg text-white/60'>
-            Discover hidden market patterns with our advanced algorithms
-        </motion.p>
+        onAnimationComplete={() => {
+            setTimeout(onComplete, duration);
+        }}
+        className='max-w-3xl space-y-12 text-center'>
+        {/* Main Heading with Gradient Container */}
+        <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative space-y-6'>
+            {/* Decorative line */}
+            <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                exit={{ scaleX: 0 }}
+                transition={{ duration: 1.5, delay: delay + 0.4 }}
+                className='mx-auto h-px w-24 bg-gradient-to-r from-transparent via-white/50 to-transparent'
+            />
+
+            {/* Main title split into two lines for better readability */}
+            <div className='space-y-2'>
+                <motion.div
+                    {...BASE_ANIMATIONS.fade}
+                    transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.5 }}
+                    className='font-outfit text-4xl leading-tight font-bold tracking-tight'>
+                    <span className='bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent'>Rthmn is a tool designed to</span>
+                </motion.div>
+                <motion.div
+                    {...BASE_ANIMATIONS.fade}
+                    transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
+                    className='font-outfit text-4xl leading-tight font-bold tracking-tight'>
+                    <span className='bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent'>compress time</span>
+                </motion.div>
+            </div>
+
+            {/* Subtitle with gradient background */}
+            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.7 }} className='relative mx-auto max-w-2xl rounded-2xl p-6'>
+                <div className='absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent' />
+                <p className='font-outfit relative text-xl leading-relaxed font-medium text-white/80'>
+                    allowing you to see the position of the market in a way that is not possible with traditional tools
+                </p>
+            </motion.div>
+        </motion.div>
+
+        {/* Development Stage Note */}
+        <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.8 }} className='relative space-y-6'>
+            <p className='font-outfit text-xl font-medium text-white/70'>
+                We are still in the early stages of development,
+                <br />
+                but we are excited to share our vision with you.
+            </p>
+
+            {/* Feature highlight with animated border */}
+            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.9 }} className='relative mx-auto w-fit'>
+                <div className='absolute inset-0 rounded-xl bg-gradient-to-r from-white/0 via-white/10 to-white/0 blur-xl' />
+                <motion.div
+                    animate={{
+                        boxShadow: ['0 0 20px rgba(255,255,255,0.0)', '0 0 20px rgba(255,255,255,0.1)', '0 0 20px rgba(255,255,255,0.0)'],
+                    }}
+                    exit={{
+                        boxShadow: '0 0 0px rgba(255,255,255,0)',
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                    className='relative rounded-xl border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-sm'>
+                    <span className='font-mono text-sm text-white/60'>Discover hidden market patterns with our advanced algorithms</span>
+                </motion.div>
+            </motion.div>
+        </motion.div>
     </motion.div>
 );
 
