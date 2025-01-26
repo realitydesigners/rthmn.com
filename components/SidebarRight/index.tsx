@@ -9,6 +9,8 @@ import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
 import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { Onboarding } from './Onboarding';
+import { OnboardingContent } from '@/app/(user)/onboarding/_components/FeatureTour/OnboardingContent';
+import { SettingsContent } from '@/app/(user)/onboarding/_components/FeatureTour/SettingsContent';
 
 export const SidebarRight = () => {
     const pathname = usePathname();
@@ -107,14 +109,14 @@ export const SidebarRight = () => {
             id: 'onboarding',
             icon: LuGraduationCap,
             onClick: () => handlePanelToggle('onboarding'),
-            tourContent: <InstrumentsContent />,
+            tourContent: <OnboardingContent />,
             panelContent: <Onboarding />,
         },
         {
             id: 'settings',
             icon: LuSettings,
             onClick: () => handlePanelToggle('settings'),
-            tourContent: <InstrumentsContent />,
+            tourContent: <SettingsContent />,
             panelContent: <SettingsBar />,
         },
     ];

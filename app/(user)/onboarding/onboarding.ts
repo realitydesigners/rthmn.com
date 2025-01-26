@@ -48,25 +48,18 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         order: 4,
     },
     {
-        id: 'universe',
-        title: 'Universe Panel',
-        description: 'Explore the universe of trading pairs',
-        type: 'feature-tour',
-        order: 5,
-    },
-    {
         id: 'onboarding',
         title: 'Trading Instruments',
         description: 'Access your selected trading pairs and available markets',
         type: 'feature-tour',
-        order: 6,
+        order: 5,
     },
     {
         id: 'settings',
         title: 'Analysis Panel',
         description: 'View detailed market analysis and trading insights',
         type: 'feature-tour',
-        order: 7,
+        order: 6,
     },
 ];
 

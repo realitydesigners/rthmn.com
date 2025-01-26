@@ -167,24 +167,12 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                         isCurrentTourStep &&
                             !isCompleted &&
                             [
-                                // Inner glow layers with increased depth
-                                'shadow-[inset_0_0_60px_rgba(59,130,246,0.1)]',
-                                'shadow-[inset_0_0_30px_rgba(59,130,246,0.25)]',
-                                'shadow-[inset_0_0_15px_rgba(59,130,246,0.1)]',
                                 // Edge glow with even distribution
                                 'before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-r before:from-blue-500/10 before:via-transparent before:to-transparent',
                                 'after:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-blue-500/20 after:via-transparent after:to-transparent',
-                                // Ambient glow
-                                'bg-[radial-gradient(ellipse_at_center,rgba(59,130,246,0.15),transparent_50%)]',
-                                // Outer glow for depth
-                                'shadow-[0_0_40px_rgba(59,130,246,0.2)]',
+                                'bg-gradient-to-b from-blue-500/[0.1] via-transparent to-blue-500/[0.1]',
+                                'before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(to_right,rgba(59,130,246,0.05),transparent_20%,transparent_90%,rgba(59,130,246,0.05))]',
 
-                                'bg-gradient-to-b from-blue-500/[0.1] via-transparent to-blue-500/[0.05]',
-                                'relative overflow-hidden',
-                                // Extra edge highlights
-                                'before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(to_right,rgba(59,130,246,0.2),transparent_10%,transparent_90%,rgba(59,130,246,0.2))]',
-                                'after:pointer-events-none after:absolute after:inset-0 after:bg-[linear-gradient(to_bottom,rgba(59,130,246,0.2),transparent_10%,transparent_90%,rgba(59,130,246,0.2))]',
-                                // Pulsing animation
                                 'animate-pulse-subtle',
                             ].join(' ')
                     )}>
@@ -194,12 +182,12 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                             <button
                                 onClick={handleLockToggle}
                                 className={cn(
-                                    'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
+                                    'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
                                     isLocked
-                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
                                         : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
                                 )}>
-                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
+                                <LuUnlock size={12} />
                             </button>
                         )}
                         <div className={cn('flex items-center justify-center gap-2', position === 'right' && 'flex-1 justify-end')}>
@@ -209,12 +197,12 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                             <button
                                 onClick={handleLockToggle}
                                 className={cn(
-                                    'group flex h-7 w-7 items-center justify-center rounded-md bg-gradient-to-b transition-all duration-300',
+                                    'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
                                     isLocked
-                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414] hover:shadow-lg hover:shadow-black/20'
+                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
                                         : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
                                 )}>
-                                {isLocked ? <LuLock size={14} /> : <LuUnlock size={14} />}
+                                <LuUnlock size={12} />
                             </button>
                         )}
                     </div>

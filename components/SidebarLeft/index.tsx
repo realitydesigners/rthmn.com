@@ -9,7 +9,6 @@ import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { InstrumentsContent } from '../../app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
-import { TestContent } from '../../app/(user)/onboarding/_components/FeatureTour/TestContent';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -115,13 +114,6 @@ export const SidebarLeft = () => {
                     <AvailablePairs />
                 </>
             ),
-        },
-        {
-            id: 'universe',
-            icon: LuOrbit,
-            onClick: () => handlePanelToggle('universe'),
-            tourContent: <InstrumentsContent />,
-            panelContent: null,
         },
     ];
 
