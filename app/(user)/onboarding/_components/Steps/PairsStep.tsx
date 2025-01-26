@@ -25,10 +25,11 @@ export default function PairsStep({ selectedPairs, setSelectedPairs }: Props) {
         // Update onboarding state
         const newSelectedPairs = selectedPairs.includes(pair) ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
 
+        // Update both onboarding state and local storage
         setSelectedPairs(newSelectedPairs);
         saveToLocalStorage(newSelectedPairs);
 
-        // Update dashboard state
+        // Update dashboard state - this will now be the source of truth
         togglePair(pair);
     };
 

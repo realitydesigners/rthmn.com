@@ -24,7 +24,6 @@ interface DashboardContextType {
     setSelectedSignal: (signal: Signal | null) => void;
     candlesData: Record<string, any[]>;
     DEFAULT_BOX_COLORS: BoxColors;
-    DEFAULT_PAIRS: string[];
     fullPresets: FullPreset[];
 }
 
@@ -109,11 +108,8 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
     useEffect(() => {
         if (!isAuthenticated) return;
         const stored = getSelectedPairs();
-        const initialPairs = stored.length > 0 ? stored : ['GBPUSD', 'USDJPY', 'AUDUSD'];
-        setSelectedPairsState(initialPairs);
-        if (stored.length === 0) {
-            setSelectedPairsState(initialPairs);
-        }
+        // Only use what's in storage, no defaults
+        setSelectedPairsState(stored);
     }, [isAuthenticated]);
 
     // Calculate loading state including sidebar initialization
@@ -199,7 +195,7 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
         });
 
         return () => {
-            console.log('🧹 Cleaning up WebSocket subscriptions');
+            // console.log('🧹 Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
                 gridCalculators.current.delete(pair);
@@ -258,7 +254,6 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
             setSelectedSignal,
             candlesData: {},
             DEFAULT_BOX_COLORS,
-            DEFAULT_PAIRS: ['GBPUSD', 'USDJPY', 'AUDUSD'],
             fullPresets,
         }),
         [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal]

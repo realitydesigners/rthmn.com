@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { DashboardProviderClient } from './client';
 import { PairData } from '@/types/types';
+import { getSelectedPairs } from '@/utils/localStorage';
 
 async function fetchBoxData(pairs: string[]) {
     const cookieStore = await cookies();
@@ -76,19 +77,13 @@ async function fetchSignalsServer() {
 
     const { data: signalsData, error: signalsError } = await supabase.from('signals').select('*').order('created_at', { ascending: false }).limit(20);
 
-    if (signalsError) {
-        console.error('Error fetching signals:', signalsError);
-        return { signalsData: null };
-    }
-
     return { signalsData };
 }
 
-const DEFAULT_PAIRS = ['GBPUSD', 'USDJPY', 'AUDUSD'];
-
 export default async function DashboardProvider({ children }: { children: React.ReactNode }) {
     const { signalsData } = await fetchSignalsServer();
-    const { boxData } = await fetchBoxData(DEFAULT_PAIRS);
+    const initialPairs: string[] = [];
+    const { boxData } = await fetchBoxData(initialPairs);
 
     return (
         <DashboardProviderClient initialSignalsData={signalsData} initialBoxData={boxData}>

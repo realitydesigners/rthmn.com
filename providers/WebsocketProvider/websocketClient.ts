@@ -63,7 +63,7 @@ class WebSocketClient {
     }
 
     private handleOpen() {
-        console.log('🟢 WebSocket connection opened');
+        // console.log('🟢 WebSocket connection opened');
         this.authenticate();
     }
 
@@ -112,7 +112,7 @@ class WebSocketClient {
     }
 
     private handleAuthSuccess() {
-        console.log('🟢 Authentication successful');
+        // console.log('🟢 Authentication successful');
         this.isAuthenticated = true;
         // Delay the open handlers slightly to ensure price data is loaded
         setTimeout(() => {
@@ -135,13 +135,6 @@ class WebSocketClient {
     }
 
     private scheduleReconnect(event: CloseEvent) {
-        console.log('🔴 WebSocket connection closed:', {
-            code: event.code,
-            reason: event.reason,
-            wasClean: event.wasClean,
-            timestamp: new Date().toISOString(),
-        });
-
         setTimeout(() => this.connect(), 5000);
     }
 
@@ -196,7 +189,7 @@ class WebSocketClient {
 
     private authenticate() {
         if (this.socket?.readyState === WebSocket.OPEN && this.accessToken) {
-            console.log(' Sending authentication message');
+            // console.log(' Sending authentication message');
             this.socket.send(JSON.stringify({ type: 'auth', token: this.accessToken }));
         } else {
             console.warn('��️ Cannot authenticate - socket not ready or no token', {
@@ -226,15 +219,6 @@ class WebSocketClient {
                 handler(boxSlice);
             }
         }
-    }
-
-    private logMessage(message: any, timestamp: string) {
-        console.log('📥 WebSocket message:', {
-            type: message.type,
-            pair: message.pair,
-            timestamp,
-            dataTimestamp: message.data?.timestamp,
-        });
     }
 }
 

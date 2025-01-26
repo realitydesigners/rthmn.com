@@ -72,7 +72,7 @@ export const Onboarding = () => {
     };
 
     return (
-        <div className='space-y-6 p-4 pb-16'>
+        <div className='no-select space-y-6 p-4 pb-16'>
             {/* Header */}
             <div className='mb-6 flex flex-col'>
                 <div className='flex flex-col'>
@@ -97,12 +97,15 @@ export const Onboarding = () => {
                     <OnboardingCard key={step.id} step={step} isCompleted={completedSteps.includes(step.id)} isCurrent={currentStepId === step.id} stepNumber={index + 1} />
                 ))}
             </div>
-            <button
-                onClick={handleClearOnboarding}
-                className='group relative mt-2 w-full rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20'>
-                <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
-                Clear Progress
-            </button>
+            {/* Only show Clear Progress button in development */}
+            {process.env.NODE_ENV === 'development' && (
+                <button
+                    onClick={handleClearOnboarding}
+                    className='group relative mt-2 w-full rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-3 py-1.5 text-xs font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20'>
+                    <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
+                    Clear Progress
+                </button>
+            )}
         </div>
     );
 };

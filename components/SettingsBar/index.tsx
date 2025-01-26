@@ -8,7 +8,7 @@ import { TimeFrameVisualizer, BoxVisualizer } from './Visualizers';
 import { getTimeframeRange } from '@/utils/timeframe';
 
 export const SettingsBar = () => {
-    const { boxColors, updateBoxColors, togglePair, selectedPairs, DEFAULT_BOX_COLORS, DEFAULT_PAIRS, fullPresets } = useDashboard();
+    const { boxColors, updateBoxColors, togglePair, selectedPairs, DEFAULT_BOX_COLORS, fullPresets } = useDashboard();
     const [mounted, setMounted] = useState(false);
     const [showColors, setShowColors] = useState(true);
     const [showtimeframe, setShowtimeframe] = useState(true);
@@ -51,17 +51,8 @@ export const SettingsBar = () => {
     };
 
     const handleResetSettings = () => {
+        // Only reset box colors, not the pairs since they're set during onboarding
         updateBoxColors(DEFAULT_BOX_COLORS);
-        selectedPairs.forEach((pair) => {
-            if (!DEFAULT_PAIRS.includes(pair)) {
-                togglePair(pair);
-            }
-        });
-        DEFAULT_PAIRS.forEach((pair) => {
-            if (!selectedPairs.includes(pair)) {
-                togglePair(pair);
-            }
-        });
     };
 
     const isFullPresetSelected = (preset: FullPreset) => {
