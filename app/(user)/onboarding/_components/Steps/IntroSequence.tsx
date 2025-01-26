@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 
 interface Props {
     onComplete: () => void;
@@ -145,10 +145,7 @@ const WelcomeStep = ({ duration = 4000, delay, onComplete }: StepProps) => (
             ...BASE_ANIMATIONS.transition,
             delay,
         }}
-        onAnimationComplete={() => {
-            setTimeout(onComplete, duration);
-        }}
-        className='flex flex-col items-center justify-center space-y-4'>
+        className='flex flex-col items-center justify-center space-y-8'>
         {/* Logo */}
         <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative mx-auto mb-6 flex h-24 w-24'>
             {/* Holographic glow effect */}
@@ -191,12 +188,21 @@ const WelcomeStep = ({ duration = 4000, delay, onComplete }: StepProps) => (
         <motion.p {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }} className='font-outfit text-lg text-white/60'>
             The future of trading and first gamified trading platform.
         </motion.p>
+        {/* Begin Button */}
+        <motion.button
+            {...BASE_ANIMATIONS.fade}
+            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
+            onClick={onComplete}
+            className='group relative mt-4 overflow-hidden rounded-xl bg-white/10 px-6 py-3 font-mono text-sm text-white/90 hover:bg-white/20'>
+            <div className='absolute inset-0 bg-gradient-to-r from-white/10 to-white/0 opacity-0 transition-opacity group-hover:opacity-100' />
+            <span className='relative'>Begin</span>
+        </motion.button>
     </motion.div>
 );
 
 const PatternRecognitionStep = ({ duration = 8000, delay, onComplete }: StepProps) => (
     <motion.div
-        key='description1'
+        key='pattern'
         {...BASE_ANIMATIONS.fade}
         transition={{
             ...BASE_ANIMATIONS.transition,
@@ -271,7 +277,7 @@ const PatternRecognitionStep = ({ duration = 8000, delay, onComplete }: StepProp
 
 const MultiMarketStep = ({ duration, delay, onComplete }: StepProps) => (
     <motion.div
-        key='description2'
+        key='market'
         initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
         animate={{
             opacity: 1,
@@ -303,7 +309,7 @@ const MultiMarketStep = ({ duration, delay, onComplete }: StepProps) => (
                 className='flex justify-center gap-8 font-mono text-white/60'>
                 {['Forex', '•', 'Stocks', '•', 'Crypto'].map((text, i) => (
                     <motion.span
-                        key={text}
+                        key={`${text}-${i}`}
                         initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
                         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
@@ -326,7 +332,7 @@ const MultiMarketStep = ({ duration, delay, onComplete }: StepProps) => (
 
 const IntelligenceStep = ({ duration, delay, onComplete }: StepProps) => (
     <motion.div
-        key='description3'
+        key='intelligence'
         initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
         animate={{
             opacity: 1,
@@ -366,7 +372,7 @@ const IntelligenceStep = ({ duration, delay, onComplete }: StepProps) => (
                 className='flex justify-center gap-6 font-mono text-white/50'>
                 {['Pattern Detection', '•', 'Price Action', '•', 'Momentum'].map((text, i) => (
                     <motion.span
-                        key={text}
+                        key={`${text}-${i}`}
                         initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
                         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
                         exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
@@ -379,20 +385,149 @@ const IntelligenceStep = ({ duration, delay, onComplete }: StepProps) => (
     </motion.div>
 );
 
+const LegalStep = ({ delay, onComplete }: Omit<StepProps, 'duration'>) => {
+    const [accepted, setAccepted] = useState(false);
+
+    return (
+        <motion.div
+            key='legal'
+            initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
+            animate={{
+                opacity: 1,
+                scale: 1,
+                filter: 'blur(0px)',
+            }}
+            transition={{
+                ...BASE_ANIMATIONS.transition,
+                delay,
+            }}
+            className='max-w-xl space-y-6'>
+            <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='font-outfit mb-8 bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent'>
+                Terms of Service
+            </motion.h1>
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='space-y-6 rounded-xl border border-white/10 bg-white/5 p-6'>
+                <p className='font-mono text-sm leading-relaxed text-white/60'>
+                    By checking this box, I acknowledge that I have read and agree to Rthmn's{' '}
+                    <a href='/terms' target='_blank' rel='noopener noreferrer' className='font-bold text-white underline'>
+                        Terms of Service
+                    </a>{' '}
+                    and{' '}
+                    <a href='/privacy' target='_blank' rel='noopener noreferrer' className='font-bold text-white underline'>
+                        Privacy Policy
+                    </a>
+                    . I understand that my use of the platform is subject to these agreements.
+                </p>
+
+                <div className='flex items-center gap-3'>
+                    <button
+                        onClick={() => setAccepted(!accepted)}
+                        className={`group relative h-6 w-6 overflow-hidden rounded-md border transition-all ${
+                            accepted ? 'border-white-500 bg-white-500/20' : 'border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                        }`}>
+                        <motion.div
+                            initial={false}
+                            animate={{
+                                opacity: accepted ? 1 : 0,
+                                scale: accepted ? 1 : 0.8,
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className='text-white-400 absolute inset-0 flex items-center justify-center'>
+                            <svg width='14' height='14' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
+                                <path d='M20 6L9 17L4 12' stroke='currentColor' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round' />
+                            </svg>
+                        </motion.div>
+                    </button>
+                    <label className='cursor-pointer font-mono text-sm text-white/70 select-none'>I agree to the terms and conditions</label>
+                </div>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.4 }} className='flex justify-center'>
+                <button
+                    onClick={() => {
+                        if (accepted) {
+                            setAccepted(true);
+                            onComplete();
+                        }
+                    }}
+                    disabled={!accepted}
+                    className={`group relative overflow-hidden rounded-xl px-8 py-3 transition-all ${
+                        accepted ? 'bg-white/10 hover:bg-white/20' : 'cursor-not-allowed bg-white/5 text-white/30'
+                    }`}>
+                    <div className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/0 opacity-0 transition-opacity ${accepted ? '' : ''}`} />
+                    <span className='relative font-mono text-sm text-white/90'>Continue</span>
+                </button>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+const AudioButton = ({ audioRef, isMuted, onToggleMute }: { audioRef: React.RefObject<HTMLAudioElement>; isMuted: boolean; onToggleMute: () => void }) => {
+    if (!audioRef.current) return null;
+
+    return (
+        <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={onToggleMute}
+            className='group absolute right-8 bottom-2 z-50 flex h-8 items-center'>
+            <div className='flex items-center gap-[2px]'>
+                {[...Array(4)].map((_, i) => (
+                    <motion.div
+                        key={i}
+                        animate={{
+                            height: isMuted ? 10 : [10, 18, 10],
+                            opacity: isMuted ? 0.3 : 1,
+                        }}
+                        transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            delay: i * 0.15,
+                            ease: 'easeInOut',
+                        }}
+                        className='w-[1px] rounded-full bg-gradient-to-b from-white/60 to-white/20'
+                    />
+                ))}
+            </div>
+
+            <motion.div
+                className='absolute inset-0 rounded-full bg-gradient-to-r from-white/10 via-white/5 to-transparent opacity-0 transition-opacity group-hover:opacity-100'
+                initial={false}
+                animate={{
+                    opacity: isMuted ? 0 : [0, 0.1, 0],
+                }}
+                transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                }}
+            />
+        </motion.button>
+    );
+};
+
 export default function IntroSequence({ onComplete }: Props) {
     const [currentStep, setCurrentStep] = useState(0);
     const [isExiting, setIsExiting] = useState(false);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const [isMuted, setIsMuted] = useState(false);
 
     const renderCurrentStep = () => {
         switch (currentStep) {
             case 0:
-                return <WelcomeStep duration={4000} delay={1} onComplete={handleStepComplete} />;
+                return <WelcomeStep key='welcome' duration={5000} delay={1} onComplete={handleStepComplete} />;
             case 1:
-                return <PatternRecognitionStep duration={4000} delay={0} onComplete={handleStepComplete} />;
+                return <PatternRecognitionStep key='pattern' duration={8000} delay={0} onComplete={handleStepComplete} />;
             case 2:
-                return <MultiMarketStep duration={4000} delay={0} onComplete={handleStepComplete} />;
+                return <MultiMarketStep key='market' duration={6000} delay={0} onComplete={handleStepComplete} />;
             case 3:
-                return <IntelligenceStep duration={4000} delay={0} onComplete={handleStepComplete} />;
+                return <IntelligenceStep key='intelligence' duration={6000} delay={0} onComplete={handleStepComplete} />;
+            case 4:
+                return <LegalStep key='legal' delay={0} onComplete={handleStepComplete} />;
             default:
                 return null;
         }
@@ -400,14 +535,64 @@ export default function IntroSequence({ onComplete }: Props) {
 
     const totalSteps = Object.keys(Object.fromEntries(Object.entries(renderCurrentStep.toString().match(/case \d+:/g) || []))).length;
 
+    const playAudio = useCallback(() => {
+        if (!audioRef.current) {
+            const audio = new Audio('/onboarding.mp3');
+            audio.loop = true;
+            audio.volume = 0;
+            audioRef.current = audio;
+        }
+
+        audioRef.current
+            .play()
+            .then(() => {
+                // Fade in
+                let volume = 0;
+                const fadeIn = setInterval(() => {
+                    if (volume < 0.3) {
+                        volume += 0.01;
+                        if (audioRef.current) {
+                            audioRef.current.volume = volume;
+                        }
+                    } else {
+                        clearInterval(fadeIn);
+                    }
+                }, 50);
+            })
+            .catch((e) => console.log('Audio playback failed:', e));
+    }, []);
+
+    const toggleMute = useCallback(() => {
+        if (!audioRef.current) return;
+        setIsMuted((prev) => {
+            const newMuted = !prev;
+            audioRef.current!.volume = newMuted ? 0 : 0.3;
+            return newMuted;
+        });
+    }, []);
+
     const handleStepComplete = useCallback(() => {
+        // Start audio on first step completion
+        if (currentStep === 0) {
+            playAudio();
+        }
+
         if (currentStep < totalSteps - 1) {
             setCurrentStep(currentStep + 1);
         } else {
             setIsExiting(true);
             setTimeout(onComplete, 1000);
         }
-    }, [currentStep, onComplete, totalSteps]);
+    }, [currentStep, onComplete, totalSteps, playAudio]);
+
+    useEffect(() => {
+        return () => {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+        };
+    }, []);
 
     return (
         <AnimatePresence mode='wait'>
@@ -422,6 +607,7 @@ export default function IntroSequence({ onComplete }: Props) {
                 <AuroraBackground isExiting={isExiting} />
                 <LightShadows isExiting={isExiting} />
                 <StarField isExiting={isExiting} />
+                <AudioButton audioRef={audioRef} isMuted={isMuted} onToggleMute={toggleMute} />
                 <motion.div className='no-select relative z-10 flex h-full items-center justify-center'>{renderCurrentStep()}</motion.div>
             </motion.div>
         </AnimatePresence>
