@@ -71,31 +71,44 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
-                        Select Trading Pairs
+                        Select Trading Instruments
                     </motion.h2>
-                    <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-gray-400'>
-                        Choose at least {MIN_PAIRS_REQUIRED} pairs you want to trade. You can always modify this later.
-                    </motion.p>
+                    <div className='flex items-center justify-between'>
+                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='pr-4 text-base text-gray-400'>
+                            Choose your favorite trading pairs, you can always add more later
+                        </motion.p>
 
-                    {/* Selection Counter */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`text-sm ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-green-400' : 'text-blue-400'}`}>
-                        Selected: {selectedPairs.length} / {MIN_PAIRS_REQUIRED} required
-                    </motion.div>
+                        {/* Refined Selection Counter */}
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='flex items-center gap-2'>
+                            <div className='flex gap-1'>
+                                {[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
+                                    <motion.div
+                                        key={i}
+                                        className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? 'bg-blue-500/80' : 'bg-[#333]'}`}
+                                        initial={false}
+                                        animate={{
+                                            scale: i < selectedPairs.length ? 1 : 0.95,
+                                        }}
+                                    />
+                                ))}
+                            </div>
+                            <span className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-blue-400' : 'text-[#666]'}`}>
+                                {selectedPairs.length}/{MIN_PAIRS_REQUIRED}
+                            </span>
+                        </motion.div>
+                    </div>
                 </div>
 
                 {/* Search Bar */}
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className='relative'>
-                    <div className='relative flex items-center rounded-xl bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                        <div className='flex h-10 w-full items-center rounded-xl bg-gradient-to-b from-[#0A0A0A] to-[#121212]'>
+                    <div className='relative flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                        <div className='flex h-10 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#121212]'>
                             <FaSearch className='ml-4 text-[#666]' />
                             <input
                                 type='text'
-                                placeholder='Search pairs...'
+                                placeholder='Search instruments...'
                                 value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onChange={(e) => setSearchQuery(e.target.value.replace(/\s/g, '').toUpperCase())}
                                 className='font-outfit w-full bg-transparent px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none'
                             />
                         </div>

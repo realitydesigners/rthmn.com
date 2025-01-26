@@ -21,7 +21,7 @@ const COMPONENTS: {
 export default function OnboardingPage() {
     const router = useRouter();
     const { currentStepId, completeStep, goToNextStep, userData, updateUserData, setCurrentStep } = useOnboardingStore();
-    const [showIntro, setShowIntro] = useState(false);
+    const [showIntro, setShowIntro] = useState(true);
 
     const currentStep = ONBOARDING_STEPS.find((step) => step.id === currentStepId);
 
@@ -154,7 +154,7 @@ export default function OnboardingPage() {
                         )}
                         <button
                             onClick={handleNext}
-                            disabled={(currentStep.id === 'experience' && !userData.experience) || (currentStep.id === 'pairs' && userData.selectedPairs.length === 0)}
+                            disabled={(currentStep.id === 'experience' && !userData.experience) || (currentStep.id === 'pairs' && userData.selectedPairs.length < 4)}
                             className='no-select group relative rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:hover:shadow-none'>
                             <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
                             {ONBOARDING_STEPS[ONBOARDING_STEPS.findIndex((step) => step.id === currentStepId) + 1]?.type === 'feature-tour' ? 'Complete' : 'Next'}
@@ -184,8 +184,6 @@ export default function OnboardingPage() {
                     <div className='absolute inset-0 -z-10 rounded-full bg-blue-400 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10' />
                 </div>
             </div>
-
-            {/* Intro sequence overlay */}
             {showIntro && <IntroSequence onComplete={() => setShowIntro(false)} />}
         </div>
     );
