@@ -120,7 +120,9 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     // Don't render navbar for user routes
     if (
         pathname?.startsWith('/dashboard') ||
+        pathname?.startsWith('/onboarding') ||
         pathname?.startsWith('/test') ||
+        pathname?.startsWith('/admin') ||
         pathname?.startsWith('/pair') ||
         pathname?.startsWith('/account') ||
         pathname?.startsWith('/studio') ||

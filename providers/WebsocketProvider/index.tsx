@@ -48,11 +48,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     const createHandlers = (): WebSocketHandlers => ({
         handleOpen: () => {
             setIsConnected(true);
-            console.log('🟢 WebSocket connected');
+            // console.log('🟢 WebSocket connected');
         },
         handleClose: () => {
             setIsConnected(false);
-            console.log('🔴 WebSocket disconnected');
+            // console.log('🔴 WebSocket disconnected');
         },
         handleMessage: (event: MessageEvent) => {
             const data = JSON.parse(event.data);
@@ -96,7 +96,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
     const fetchInitialCandleData = async () => {
         try {
-            console.log('Fetching initial candle data...');
+            // console.log('Fetching initial candle data...');
             const response = await fetch(`${window.location.origin}${API_ROUTES.LATEST_CANDLES}?token=${session!.access_token}`);
 
             if (!response.ok) {
@@ -110,10 +110,10 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             }
 
             const data = await response.json();
-            console.log('Received candle data:', {
-                pairs: Object.keys(data),
-                dataSize: JSON.stringify(data).length,
-            });
+            // console.log('Received candle data:', {
+            //     pairs: Object.keys(data),
+            //     dataSize: JSON.stringify(data).length,
+            // });
 
             // Transform candle data into price data format
             const initialPriceData: Record<string, PriceData> = {};
@@ -128,7 +128,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             });
 
             if (Object.keys(initialPriceData).length > 0) {
-                console.log('Setting initial price data for pairs:', Object.keys(initialPriceData));
+                // console.log('Setting initial price data for pairs:', Object.keys(initialPriceData));
                 setPriceData(initialPriceData);
             } else {
                 console.warn('No valid price data found in response');

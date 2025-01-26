@@ -5,6 +5,8 @@ import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
 import { GridCalculator } from '@/utils/gridCalc';
+import { useRouter, usePathname } from 'next/navigation';
+import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;
@@ -22,7 +24,6 @@ interface DashboardContextType {
     setSelectedSignal: (signal: Signal | null) => void;
     candlesData: Record<string, any[]>;
     DEFAULT_BOX_COLORS: BoxColors;
-    DEFAULT_PAIRS: string[];
     fullPresets: FullPreset[];
 }
 
@@ -71,6 +72,9 @@ interface DashboardProviderClientProps {
 }
 
 export function DashboardProviderClient({ children, initialSignalsData, initialBoxData = {} }: DashboardProviderClientProps) {
+    const router = useRouter();
+    const pathname = usePathname();
+    const { hasCompletedInitialOnboarding } = useOnboardingStore();
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
@@ -81,6 +85,15 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
+
+    // Onboarding check
+    useEffect(() => {
+        if (!pathname || pathname.includes('/onboarding')) return;
+        if (pathname === '/signin' || pathname === '/signup' || pathname === '/pricing') return;
+        if (!hasCompletedInitialOnboarding()) {
+            router.replace('/onboarding');
+        }
+    }, [pathname, router, hasCompletedInitialOnboarding]);
 
     // Initialize state from localStorage after mount
     useEffect(() => {
@@ -95,11 +108,8 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
     useEffect(() => {
         if (!isAuthenticated) return;
         const stored = getSelectedPairs();
-        const initialPairs = stored.length > 0 ? stored : ['GBPUSD', 'USDJPY', 'AUDUSD'];
-        setSelectedPairsState(initialPairs);
-        if (stored.length === 0) {
-            setSelectedPairsState(initialPairs);
-        }
+        // Only use what's in storage, no defaults
+        setSelectedPairsState(stored);
     }, [isAuthenticated]);
 
     // Calculate loading state including sidebar initialization
@@ -185,7 +195,7 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
         });
 
         return () => {
-            console.log('🧹 Cleaning up WebSocket subscriptions');
+            // console.log('🧹 Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
                 gridCalculators.current.delete(pair);
@@ -244,7 +254,6 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
             setSelectedSignal,
             candlesData: {},
             DEFAULT_BOX_COLORS,
-            DEFAULT_PAIRS: ['GBPUSD', 'USDJPY', 'AUDUSD'],
             fullPresets,
         }),
         [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal]

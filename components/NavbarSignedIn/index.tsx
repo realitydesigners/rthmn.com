@@ -93,7 +93,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const userInitial = user?.user_metadata?.full_name?.[0].toUpperCase() || user?.email?.[0].toUpperCase() || '?';
 
     return (
-        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 border-b border-[#121212] bg-[#0a0a0a] px-2 lg:fixed lg:flex lg:h-14'>
+        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:fixed lg:flex lg:h-14'>
             <div className='group relative z-[110] h-full w-full rounded-lg p-[1px] transition-all duration-300 hover:from-[#1A1A1A]/50 hover:via-[#151515]/50 hover:to-[#111]/50'>
                 <div className='bg[linear-gradient(to_bottom,rgba(15,15,15,1),rgba(17,17,17,1))] relative flex h-full w-full items-center justify-between rounded-lg px-2'>
                     <div className='relative z-[1] flex items-center gap-3'>

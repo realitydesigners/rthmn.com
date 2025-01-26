@@ -1,7 +1,6 @@
 'use client';
 import React, { useMemo, useEffect, useState } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { BoxDetailsRow } from '@/components/BoxDetailsRow';
 import { PairResoBox } from './PairResoBox';
 import { NoInstruments } from './LoadingSkeleton';
 import { getSidebarState } from '@/utils/localStorage';
@@ -67,18 +66,6 @@ export default function Dashboard() {
 
     // Memoize the filtered data
     const filteredPairData = useMemo(() => {
-        if (isLoading) {
-            // Return placeholder data for loading state
-            return Array(3)
-                .fill(null)
-                .map((_, i) => ({
-                    pair: '',
-                    boxSlice: null,
-                    currentOHLC: null,
-                    index: i,
-                }));
-        }
-
         return selectedPairs
             .map((pair) => {
                 const data = pairData[pair];
@@ -100,6 +87,7 @@ export default function Dashboard() {
         return (
             <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
                 <NoInstruments />
+                <div className='mt-4 text-center text-sm text-gray-400'>Please complete the onboarding process to select your trading pairs.</div>
             </main>
         );
     }

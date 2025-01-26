@@ -21,12 +21,11 @@ export class GridCalculator {
         this.boxMap.set(pair, boxes);
     }
 
-    updateWithPrice(pair: string, price: number) {
+    updateWithPrice(pair: string, price: number): BoxState[] {
         const boxes = this.boxMap.get(pair);
-        if (!boxes) return;
+        if (!boxes) return [];
 
         boxes.forEach((box) => {
-            // If price breaks high
             if (price > box.high) {
                 box.high = price;
                 box.low = price - Math.abs(box.value);
@@ -42,8 +41,8 @@ export class GridCalculator {
             }
         });
 
-        // Re-sort boxes after updating
         boxes.sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+        return [...boxes];
     }
 
     getBoxes(pair: string): BoxState[] | undefined {
