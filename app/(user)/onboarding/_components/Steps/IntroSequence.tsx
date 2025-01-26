@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState, useCallback, useRef } from 'react';
+import { client } from '@/utils/sanity/lib/client';
+import Image from 'next/image';
 
 interface Props {
     onComplete: () => void;
@@ -200,7 +202,7 @@ const WelcomeStep = ({ duration = 4000, delay, onComplete }: StepProps) => (
     </motion.div>
 );
 
-const PatternRecognitionStep = ({ duration = 8000, delay, onComplete }: StepProps) => (
+const PatternRecognitionStep = ({ duration = 8000, delay, onComplete, team }: StepProps & { team: any[] }) => (
     <motion.div
         key='pattern'
         {...BASE_ANIMATIONS.fade}
@@ -228,6 +230,54 @@ const PatternRecognitionStep = ({ duration = 8000, delay, onComplete }: StepProp
             <p className='font-outfit w-full max-w-xl text-center text-xl font-normal text-white/70'>
                 We are still in the early stages of development, and we are excited to share our vision with you.
             </p>
+        </motion.div>
+
+        {/* Team members */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 1 }} className='flex justify-center gap-6'>
+            {team.map((member, i) => (
+                <motion.div
+                    key={member.slug}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: delay + 1 + i * 0.1 }}
+                    className='group relative flex flex-col items-center'>
+                    <div className='relative h-14 w-14 overflow-hidden rounded-full border border-white/10 bg-white/5 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105'>
+                        {member.image && (
+                            <Image
+                                src={member.image.url}
+                                alt={member.name}
+                                width={56}
+                                height={56}
+                                className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-110'
+                            />
+                        )}
+                        {/* Glow effect */}
+                        <motion.div
+                            className='absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100'
+                            animate={{
+                                opacity: [0, 0.2, 0],
+                            }}
+                            transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                ease: 'easeInOut',
+                            }}
+                        />
+                    </div>
+                    <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: delay + 1.2 + i * 0.1 }} className='mt-3 text-center'>
+                        <span className='font-mono text-sm text-white/40 transition-colors duration-300 group-hover:text-white/90'>{member.name}</span>
+                        {member.role && (
+                            <motion.span
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: delay + 1.4 + i * 0.1 }}
+                                className='mt-0.5 block font-mono text-[10px] text-white/30'>
+                                {member.role}
+                            </motion.span>
+                        )}
+                    </motion.div>
+                </motion.div>
+            ))}
         </motion.div>
     </motion.div>
 );
@@ -455,13 +505,35 @@ export default function IntroSequence({ onComplete }: Props) {
     const [isExiting, setIsExiting] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const [isMuted, setIsMuted] = useState(false);
+    const [team, setTeam] = useState<any[]>([]);
+
+    useEffect(() => {
+        const query = `*[_type == "team"] {
+            name,
+            "slug": slug.current,
+            role,
+            "image": {
+                "url": image.asset->url
+            }
+        }`;
+
+        client
+            .fetch(query)
+            .then((data) => setTeam(data))
+            .catch((err) => console.error('Error fetching team:', err));
+    }, []);
+
+    // Image preloader component
+    const ImagePreloader = () => (
+        <div className='hidden'>{team.map((member) => member.image && <Image key={member.slug} src={member.image.url} alt='' width={56} height={56} priority />)}</div>
+    );
 
     const renderCurrentStep = () => {
         switch (currentStep) {
             case 0:
                 return <WelcomeStep key='welcome' duration={5000} delay={1} onComplete={handleStepComplete} />;
             case 1:
-                return <PatternRecognitionStep key='pattern' duration={10000} delay={0} onComplete={handleStepComplete} />;
+                return <PatternRecognitionStep key='pattern' duration={10000} delay={0} onComplete={handleStepComplete} team={team} />;
             case 2:
                 return <IntelligenceStep key='intelligence' duration={8000} delay={0} onComplete={handleStepComplete} />;
             case 3:
@@ -548,6 +620,7 @@ export default function IntroSequence({ onComplete }: Props) {
                 <LightShadows isExiting={isExiting} />
                 <StarField isExiting={isExiting} />
                 <AudioButton audioRef={audioRef} isMuted={isMuted} onToggleMute={toggleMute} />
+                <ImagePreloader />
                 <motion.div className='no-select relative z-10 flex h-full items-center justify-center'>{renderCurrentStep()}</motion.div>
             </motion.div>
         </AnimatePresence>
