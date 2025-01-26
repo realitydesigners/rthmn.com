@@ -64,20 +64,17 @@ export default function SupabaseProvider({ children, initialUser }: { children: 
             }
 
             try {
-                console.log('Starting to fetch user data for:', user.id);
-
-                // Fetch user details
                 const { data: details } = await supabaseClient.from('users').select('*').eq('id', user.id).single();
-                console.log('User details fetched:', details);
+                // console.log('User details fetched:', details);
 
                 // Fetch subscription using the same query as queries.ts
                 const { data: sub, error: subError } = await supabaseClient.from('subscriptions').select('*, prices(*)').in('status', ['trialing', 'active']).maybeSingle();
 
-                console.log('Subscription query:', {
-                    userId: user.id,
-                    subscription: sub,
-                    error: subError?.message,
-                });
+                // console.log('Subscription query:', {
+                //     userId: user.id,
+                //     subscription: sub,
+                //     error: subError?.message,
+                // });
 
                 setSubscription(sub);
 
@@ -87,15 +84,14 @@ export default function SupabaseProvider({ children, initialUser }: { children: 
                 setUserDetails(details);
                 setDiscordConnection(discord);
             } catch (error) {
-                console.error('Error in fetchUserData:', error);
-                // Set states to null on error
+                // console.error('Error in fetchUserData:', error);
                 setSubscription(null);
                 setUserDetails(null);
                 setDiscordConnection(null);
             }
         };
 
-        console.log('useEffect triggered with user:', user?.id);
+        // console.log('useEffect triggered with user:', user?.id);
         fetchUserData();
     }, [user, supabaseClient]);
 

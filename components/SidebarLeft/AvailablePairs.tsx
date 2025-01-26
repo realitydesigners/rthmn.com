@@ -2,6 +2,7 @@ import React from 'react';
 import { FOREX_PAIRS, CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, INSTRUMENTS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useWebSocket } from '@/providers/WebsocketProvider';
+import { LoadingSpinner } from './SelectedPairs';
 
 const formatPrice = (price: number, instrument: string) => {
     // Get the digits for formatting from the INSTRUMENTS configuration
@@ -45,7 +46,11 @@ export const AvailablePairs = () => {
                                     </div>
                                     <div className='flex items-center'>
                                         <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-3'>
-                                            {priceData[item]?.price ? formatPrice(priceData[item].price, item) : 'N/A'}
+                                            {priceData[item]?.price ? (
+                                                formatPrice(priceData[item].price, item)
+                                            ) : (
+                                                <LoadingSpinner key={`${item}-loading`} itemId={item} color='#666666' />
+                                            )}
                                         </span>
                                         <button
                                             onClick={(e) => {

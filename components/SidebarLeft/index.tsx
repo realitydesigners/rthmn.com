@@ -6,10 +6,9 @@ import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
 import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
-import { FeatureTour } from '../FeatureTour';
+import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import { InstrumentsContent } from '../FeatureTour/InstrumentsContent';
-import { TestContent } from '../FeatureTour/TestContent';
+import { InstrumentsContent } from '../../app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -19,8 +18,7 @@ export const SidebarLeft = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
-
-    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding } = useOnboardingStore();
+    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, isStepCompleted } = useOnboardingStore();
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -117,25 +115,11 @@ export const SidebarLeft = () => {
                 </>
             ),
         },
-        {
-            id: 'universe',
-            icon: LuOrbit,
-            onClick: () => handlePanelToggle('instruments'),
-            tourContent: <InstrumentsContent />,
-            panelContent: null,
-        },
-        {
-            id: 'test',
-            icon: LuTestTube,
-            onClick: () => handlePanelToggle('test'),
-            tourContent: <TestContent />,
-            panelContent: null,
-        },
     ];
 
     const renderButtons = () =>
         buttons.map((button) => (
-            <FeatureTour key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} tourId={button.id}>
+            <FeatureTour key={button.id} icon={button.icon} onClick={button.onClick} isActive={activePanel === button.id} isOpen={isOpen} tourId={button.id} position='left'>
                 {button.tourContent}
             </FeatureTour>
         ));
@@ -150,7 +134,15 @@ export const SidebarLeft = () => {
             <div className='fixed top-14 bottom-0 left-0 z-[120] flex w-16 flex-col items-center justify-start border-r border-[#121212] bg-[#0a0a0a] py-4'>
                 <div className='flex flex-col gap-2'>{renderButtons()}</div>
             </div>
-            <SidebarWrapper isOpen={isOpen && !!activePanel} onClose={handleClose} title={activePanel} isLocked={isLocked} onLockToggle={handleLockToggle} position='left'>
+            <SidebarWrapper
+                isOpen={isOpen && !!activePanel}
+                onClose={handleClose}
+                title={activePanel}
+                isLocked={isLocked}
+                onLockToggle={handleLockToggle}
+                position='left'
+                isCurrentTourStep={currentStepId === activePanel}
+                isCompleted={isStepCompleted(activePanel)}>
                 {renderPanelContent()}
             </SidebarWrapper>
         </div>

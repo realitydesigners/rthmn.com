@@ -34,7 +34,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     },
     {
         id: 'pairs',
-        title: 'Select Trading Pairs',
+        title: 'Select Instruments',
         description: 'Choose your preferred trading pairs',
         type: 'page',
         order: 3,
@@ -42,22 +42,22 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     },
     {
         id: 'instruments',
-        title: 'Instruments Panel',
+        title: 'Instruments',
         description: 'Manage your currency pairs and view performance',
         type: 'feature-tour',
         order: 4,
     },
     {
-        id: 'universe',
-        title: 'Universe Panel',
-        description: 'Explore the universe of trading pairs',
+        id: 'onboarding',
+        title: 'Learning Center',
+        description: 'Access your selected trading pairs and available markets',
         type: 'feature-tour',
         order: 5,
     },
     {
-        id: 'test',
-        title: 'Test Environment',
-        description: 'Practice and refine your trading strategies',
+        id: 'settings',
+        title: 'Settings',
+        description: 'View detailed market analysis and trading insights',
         type: 'feature-tour',
         order: 6,
     },
@@ -95,10 +95,24 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             completeStep: (stepId, data) => {
-                set((state) => ({
-                    completedSteps: [...state.completedSteps, stepId],
-                    userData: data ? { ...state.userData, ...data } : state.userData,
-                }));
+                // console.log(`Completing step: ${stepId}`);
+                const step = ONBOARDING_STEPS.find((s) => s.id === stepId);
+                // console.log(`Step details:`, step);
+
+                set((state) => {
+                    const newCompletedSteps = [...state.completedSteps, stepId];
+                    // console.log('Updated completed steps:', newCompletedSteps);
+
+                    // Check if this is the last step
+                    const isLastStep = stepId === ONBOARDING_STEPS[ONBOARDING_STEPS.length - 1].id;
+
+                    return {
+                        completedSteps: newCompletedSteps,
+                        userData: data ? { ...state.userData, ...data } : state.userData,
+                        // Clear currentStepId if this is the last step
+                        currentStepId: isLastStep ? '' : state.currentStepId,
+                    };
+                });
             },
 
             goToNextStep: () => {
@@ -141,7 +155,11 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             isStepCompleted: (stepId) => {
-                return get().completedSteps.includes(stepId);
+                const state = get();
+                const isCompleted = state.completedSteps.includes(stepId);
+                // console.log(`Checking if step ${stepId} is completed:`, isCompleted);
+                // console.log('Current completed steps:', state.completedSteps);
+                return isCompleted;
             },
 
             hasCompletedInitialOnboarding: () => {

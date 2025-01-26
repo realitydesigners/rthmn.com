@@ -1,32 +1,17 @@
 'use client';
-
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import ProfileUpload from './ProfileUpload';
-import ExperienceStep from './ExperienceStep';
-import PairsStep from './PairsStep';
+import ProfileUpload from './_components/Steps/ProfileUpload';
+import ExperienceStep from './_components/Steps/ExperienceStep';
+import PairsStep from './_components/Steps/PairsStep';
 import { useOnboardingStore, ONBOARDING_STEPS } from './onboarding';
-import { useEffect } from 'react';
-import { ComponentType } from 'react';
-
-interface ProfileUploadProps {
-    onPhotoUpload: (url: string) => void;
-}
-
-interface ExperienceStepProps {
-    experience: string;
-    setExperience: (exp: string) => void;
-}
-
-interface PairsStepProps {
-    selectedPairs: string[];
-    setSelectedPairs: (pairs: string[]) => void;
-}
+import { useEffect, useState } from 'react';
+import IntroSequence from './_components/Steps/IntroSequence';
 
 const COMPONENTS: {
-    ProfileUpload: ComponentType<ProfileUploadProps>;
-    ExperienceStep: ComponentType<ExperienceStepProps>;
-    PairsStep: ComponentType<PairsStepProps>;
+    ProfileUpload: any;
+    ExperienceStep: any;
+    PairsStep: any;
 } = {
     ProfileUpload,
     ExperienceStep,
@@ -36,6 +21,7 @@ const COMPONENTS: {
 export default function OnboardingPage() {
     const router = useRouter();
     const { currentStepId, completeStep, goToNextStep, userData, updateUserData, setCurrentStep } = useOnboardingStore();
+    const [showIntro, setShowIntro] = useState(true);
 
     const currentStep = ONBOARDING_STEPS.find((step) => step.id === currentStepId);
 
@@ -109,73 +95,96 @@ export default function OnboardingPage() {
     const totalSteps = ONBOARDING_STEPS.filter((step) => step.type === 'page').length;
 
     return (
-        <div className='flex min-h-screen items-center justify-center bg-black p-4'>
+        <div className='relative min-h-screen bg-black'>
+            {/* Main onboarding content */}
             <motion.div
-                initial={false}
-                animate={{
-                    maxWidth: currentStep?.id === 'pairs' ? '48rem' : '28rem',
-                }}
-                transition={{
-                    maxWidth: {
-                        type: 'spring',
-                        stiffness: 100,
-                        damping: 30,
-                        duration: 0.5,
-                    },
-                }}
-                className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}>
-                {/* Progress indicator */}
-                <div className='absolute -top-3 left-1/2 -translate-x-1/2'>
-                    <div className='flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 text-xs font-medium shadow-xl'>
-                        <div className='flex h-1.5 w-12 items-center rounded-full bg-[#222]'>
-                            <motion.div
-                                className='h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400'
-                                initial={false}
-                                animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
-                                transition={{ duration: 0.5, ease: 'easeInOut' }}
-                            />
+                initial={{ opacity: 0 }}
+                animate={{ opacity: showIntro ? 0 : 1 }}
+                transition={{ duration: 0.3 }}
+                className='flex min-h-screen items-center justify-center p-4'>
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.98, filter: 'blur(10px)' }}
+                    animate={{
+                        opacity: showIntro ? 0 : 1,
+                        scale: showIntro ? 0.98 : 1,
+                        filter: showIntro ? 'blur(10px)' : 'blur(0px)',
+                        maxWidth: currentStep?.id === 'pairs' ? '48rem' : '28rem',
+                    }}
+                    transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                    className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}>
+                    {/* Progress indicator */}
+                    <div className='no-select absolute -top-3 left-1/2 -translate-x-1/2'>
+                        <div className='flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 text-xs font-medium shadow-xl'>
+                            <div className='flex h-1.5 w-12 items-center rounded-full bg-[#222]'>
+                                <motion.div
+                                    className='h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-400'
+                                    initial={false}
+                                    animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
+                                    transition={{ duration: 0.5, ease: 'easeInOut' }}
+                                />
+                            </div>
+                            <span className='bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent'>
+                                Step {stepNumber} of {totalSteps}
+                            </span>
                         </div>
-                        <span className='bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent'>
-                            Step {stepNumber} of {totalSteps}
-                        </span>
                     </div>
-                </div>
 
-                {/* Step content */}
-                <AnimatePresence mode='wait'>
-                    <motion.div
-                        key={currentStepId}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className='relative py-4'>
-                        {renderStep()}
-                    </motion.div>
-                </AnimatePresence>
+                    {/* Step content */}
+                    <AnimatePresence mode='wait'>
+                        <motion.div
+                            key={currentStepId}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.2 }}
+                            className='no-select relative py-4'>
+                            {renderStep()}
+                        </motion.div>
+                    </AnimatePresence>
 
-                {/* Navigation */}
-                <div className='flex justify-end space-x-3'>
-                    {stepNumber > 1 && (
+                    {/* Navigation */}
+                    <div className='flex justify-end space-x-3'>
+                        {stepNumber > 1 && (
+                            <button
+                                onClick={handleBack}
+                                className='group relative rounded-lg border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#0F0F0F] px-4 py-2 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20'>
+                                <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
+                                Back
+                            </button>
+                        )}
                         <button
-                            onClick={handleBack}
-                            className='group relative rounded-lg border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#0F0F0F] px-4 py-2 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20'>
-                            <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
-                            Back
+                            onClick={handleNext}
+                            disabled={(currentStep.id === 'experience' && !userData.experience) || (currentStep.id === 'pairs' && userData.selectedPairs.length < 4)}
+                            className='no-select group relative rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:hover:shadow-none'>
+                            <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
+                            {ONBOARDING_STEPS[ONBOARDING_STEPS.findIndex((step) => step.id === currentStepId) + 1]?.type === 'feature-tour' ? 'Complete' : 'Next'}
                         </button>
-                    )}
-                    <button
-                        onClick={handleNext}
-                        disabled={(currentStep.id === 'experience' && !userData.experience) || (currentStep.id === 'pairs' && userData.selectedPairs.length === 0)}
-                        className='group relative rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20 disabled:opacity-50 disabled:hover:shadow-none'>
-                        <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
-                        {ONBOARDING_STEPS[ONBOARDING_STEPS.findIndex((step) => step.id === currentStepId) + 1]?.type === 'feature-tour' ? 'Complete' : 'Next'}
-                    </button>
-                </div>
+                    </div>
 
-                {/* Bottom pattern */}
-                <div className='pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent opacity-50' />
+                    {/* Bottom pattern */}
+                    <div className='pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent opacity-50' />
+                </motion.div>
             </motion.div>
+
+            {/* Step title with enhanced styling */}
+            <div className='absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4'>
+                <div className='group no-select relative flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-500/20 hover:shadow-blue-500/10'>
+                    <div className='flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-500/20 to-blue-600/10'>
+                        <div className='h-1.5 w-1.5 rounded-full bg-blue-400' />
+                    </div>
+                    <span className='no-select text-sm font-medium text-white/70 transition-colors group-hover:text-white'>
+                        {currentStep?.id === 'profile'
+                            ? 'Upload Profile Photo'
+                            : currentStep?.id === 'experience'
+                              ? 'Trading Experience'
+                              : currentStep?.id === 'pairs'
+                                ? 'Select Trading Pairs'
+                                : ''}
+                    </span>
+                    <div className='absolute inset-0 -z-10 rounded-full bg-blue-400 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10' />
+                </div>
+            </div>
+            {showIntro && <IntroSequence onComplete={() => setShowIntro(false)} />}
         </div>
     );
 }
