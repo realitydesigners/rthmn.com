@@ -211,122 +211,79 @@ const PatternRecognitionStep = ({ duration = 8000, delay, onComplete }: StepProp
         onAnimationComplete={() => {
             setTimeout(onComplete, duration);
         }}
-        className='max-w-3xl space-y-12 text-center'>
-        {/* Main Heading with Gradient Container */}
+        className='flex max-w-3xl flex-col items-center justify-center space-y-12'>
         <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative space-y-6'>
-            {/* Decorative line */}
-            <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                exit={{ scaleX: 0 }}
-                transition={{ duration: 1.5, delay: delay + 0.4 }}
-                className='mx-auto h-px w-24 bg-gradient-to-r from-transparent via-white/50 to-transparent'
-            />
-
-            {/* Main title split into two lines for better readability */}
             <div className='space-y-2'>
                 <motion.div
                     {...BASE_ANIMATIONS.fade}
                     transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.5 }}
-                    className='font-outfit text-4xl leading-tight font-bold tracking-tight'>
-                    <span className='bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent'>Rthmn is a tool designed to</span>
-                </motion.div>
-                <motion.div
-                    {...BASE_ANIMATIONS.fade}
-                    transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
-                    className='font-outfit text-4xl leading-tight font-bold tracking-tight'>
-                    <span className='bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent'>compress time</span>
+                    className='font-outfit text-center text-4xl leading-tight font-bold tracking-tight text-balance'>
+                    <span className='bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent'>
+                        Rthmn is a tool designed to compress time allowing you to see the position of the market in a way that is not possible with traditional tools
+                    </span>
                 </motion.div>
             </div>
-
-            {/* Subtitle with gradient background */}
-            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.7 }} className='relative mx-auto max-w-2xl rounded-2xl p-6'>
-                <div className='absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.03] to-transparent' />
-                <p className='font-outfit relative text-xl leading-relaxed font-medium text-white/80'>
-                    allowing you to see the position of the market in a way that is not possible with traditional tools
-                </p>
-            </motion.div>
         </motion.div>
-
-        {/* Development Stage Note */}
         <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.8 }} className='relative space-y-6'>
-            <p className='font-outfit text-xl font-medium text-white/70'>
-                We are still in the early stages of development,
-                <br />
-                but we are excited to share our vision with you.
+            <p className='font-outfit w-full max-w-xl text-center text-xl font-normal text-white/70'>
+                We are still in the early stages of development, and we are excited to share our vision with you.
             </p>
-
-            {/* Feature highlight with animated border */}
-            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.9 }} className='relative mx-auto w-fit'>
-                <div className='absolute inset-0 rounded-xl bg-gradient-to-r from-white/0 via-white/10 to-white/0 blur-xl' />
-                <motion.div
-                    animate={{
-                        boxShadow: ['0 0 20px rgba(255,255,255,0.0)', '0 0 20px rgba(255,255,255,0.1)', '0 0 20px rgba(255,255,255,0.0)'],
-                    }}
-                    exit={{
-                        boxShadow: '0 0 0px rgba(255,255,255,0)',
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-                    className='relative rounded-xl border border-white/10 bg-white/5 px-6 py-3 backdrop-blur-sm'>
-                    <span className='font-mono text-sm text-white/60'>Discover hidden market patterns with our advanced algorithms</span>
-                </motion.div>
-            </motion.div>
         </motion.div>
     </motion.div>
 );
 
-const MultiMarketStep = ({ duration, delay, onComplete }: StepProps) => (
+const VisionStep = ({ duration, delay, onComplete }: StepProps) => (
     <motion.div
-        key='market'
-        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-        animate={{
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            transitionEnd: { opacity: 0, scale: 0.95, y: -20, filter: 'blur(15px)' },
-        }}
+        key='vision'
+        {...BASE_ANIMATIONS.fade}
         transition={{
             ...BASE_ANIMATIONS.transition,
             delay,
-            duration: duration / 1000,
         }}
-        onAnimationComplete={onComplete}
-        className='max-w-2xl space-y-6'>
-        <div className='space-y-4'>
-            <motion.p
-                initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-                className='font-outfit text-2xl text-white/90 [text-shadow:_0_0_30px_rgba(255,255,255,0.2)]'>
-                Multi-Market Analysis
-            </motion.p>
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
-                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-                className='flex justify-center gap-8 font-mono text-white/60'>
-                {['Forex', '•', 'Stocks', '•', 'Crypto'].map((text, i) => (
-                    <motion.span
-                        key={`${text}-${i}`}
-                        initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
-                        transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 + i * 0.1 }}>
-                        {text}
-                    </motion.span>
-                ))}
+        onAnimationComplete={() => {
+            setTimeout(onComplete, duration);
+        }}
+        className='max-w-3xl space-y-16 text-center'>
+        <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative space-y-8'>
+            {/* Main heading with gradient */}
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='relative'>
+                <h2 className='font-outfit relative bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-6xl leading-tight font-bold tracking-tight text-transparent'>
+                    Trading from another dimension
+                </h2>
+                <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: '40%' }}
+                    transition={{ duration: 1.5, delay: delay + 0.4 }}
+                    className='mx-auto mt-6 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent'
+                />
             </motion.div>
-            <motion.p
-                initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.8 }}
-                className='font-mono text-white/50'>
-                Unified analysis across all major markets
-            </motion.p>
-        </div>
+
+            {/* Subtitle with gradient background */}
+            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.5 }} className='relative mx-auto max-w-xl'>
+                <p className='font-outfit text-2xl leading-relaxed tracking-wide text-white/70'>Multi-dimensional wave analysis across any timeframe</p>
+            </motion.div>
+        </motion.div>
+
+        {/* Markets list */}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.8 }}
+            className='relative mx-auto flex max-w-lg flex-col items-center gap-10'>
+            <div className='flex items-center gap-10 font-mono text-sm tracking-wider'>
+                {['Forex', 'Stocks', 'Crypto', 'Metals', 'Indices'].map((market, i) => (
+                    <motion.div
+                        key={market}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: delay + 0.8 + i * 0.1 }}
+                        className='group relative'>
+                        <motion.div className='absolute -inset-4 rounded-lg bg-white/0 transition-all duration-300 group-hover:bg-white/5' whileHover={{ scale: 1.1 }} />
+                        <span className='relative text-white/40 transition-all duration-300 group-hover:text-white/90'>{market}</span>
+                    </motion.div>
+                ))}
+            </div>
+        </motion.div>
     </motion.div>
 );
 
@@ -354,7 +311,7 @@ const IntelligenceStep = ({ duration, delay, onComplete }: StepProps) => (
                 exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
                 transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
                 className='font-outfit text-2xl text-white/90 [text-shadow:_0_0_30px_rgba(255,255,255,0.2)]'>
-                Real-Time Intelligence
+                Our high-performance algorithms process large amounts of data and perform complex calculations in real time.
             </motion.p>
             <motion.p
                 initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
@@ -362,25 +319,8 @@ const IntelligenceStep = ({ duration, delay, onComplete }: StepProps) => (
                 exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
                 transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
                 className='font-mono text-lg text-white/60'>
-                83% accuracy in major market moves
+                With Rthmn, the past and present are guides to the future.
             </motion.p>
-            <motion.div
-                initial={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, scale: 0.95, filter: 'blur(8px)' }}
-                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
-                className='flex justify-center gap-6 font-mono text-white/50'>
-                {['Pattern Detection', '•', 'Price Action', '•', 'Momentum'].map((text, i) => (
-                    <motion.span
-                        key={`${text}-${i}`}
-                        initial={{ opacity: 0, y: 15, filter: 'blur(5px)' }}
-                        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                        exit={{ opacity: 0, y: -10, filter: 'blur(5px)' }}
-                        transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 + i * 0.1 }}>
-                        {text}
-                    </motion.span>
-                ))}
-            </motion.div>
         </div>
     </motion.div>
 );
@@ -521,11 +461,11 @@ export default function IntroSequence({ onComplete }: Props) {
             case 0:
                 return <WelcomeStep key='welcome' duration={5000} delay={1} onComplete={handleStepComplete} />;
             case 1:
-                return <PatternRecognitionStep key='pattern' duration={8000} delay={0} onComplete={handleStepComplete} />;
+                return <PatternRecognitionStep key='pattern' duration={10000} delay={0} onComplete={handleStepComplete} />;
             case 2:
-                return <MultiMarketStep key='market' duration={6000} delay={0} onComplete={handleStepComplete} />;
+                return <IntelligenceStep key='intelligence' duration={8000} delay={0} onComplete={handleStepComplete} />;
             case 3:
-                return <IntelligenceStep key='intelligence' duration={6000} delay={0} onComplete={handleStepComplete} />;
+                return <VisionStep key='vision' duration={6000} delay={0} onComplete={handleStepComplete} />;
             case 4:
                 return <LegalStep key='legal' delay={0} onComplete={handleStepComplete} />;
             default:
