@@ -93,6 +93,7 @@ export interface BoxColors {
         showBorder: boolean;
         globalTimeframeControl: boolean;
         showLineChart: boolean;
+        perspective?: boolean;
     };
 }
 
@@ -108,6 +109,7 @@ export const DEFAULT_BOX_COLORS: BoxColors = {
         showBorder: true,
         globalTimeframeControl: false,
         showLineChart: false,
+        perspective: false,
     },
 };
 
