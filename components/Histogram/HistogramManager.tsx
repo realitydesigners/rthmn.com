@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState, forwardRef, useImperativeHandle, type JSX } from 'react';
-import HistogramControls from './HistogramControls';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SelectedFrameDetails from './SelectedFrameDetails';
 import type { BoxSlice, ViewType, Box } from '@/types/types';
 import { COLORS } from './Colors';
@@ -7,6 +6,7 @@ import { DraggableBorder } from '@/components/DraggableBorder';
 import { formatTime } from '@/utils/dateUtils';
 import { MeetingPoint } from './Oscillator/MeetingPoint';
 import { PulseWave } from './Oscillator/PulseWave';
+import { PlusIcon, MinusIcon } from '../Icons/icons';
 
 const ZOOMED_BAR_WIDTH = 0;
 const INITIAL_BAR_WIDTH = 20;
@@ -26,6 +26,8 @@ type HoverInfo = {
     low: number;
     linePrice: number;
 } | null;
+
+type GetColorAndY = (x: number) => { y: number; color: string; high: number; low: number; linePrice: number };
 
 const useHistogramData = (data: BoxSlice[], selectedFrame: BoxSlice | null, selectedFrameIndex: number | null, boxOffset: number, visibleBoxesCount: number, height: number) => {
     const currentFrame = useMemo(() => {
@@ -98,36 +100,30 @@ const HistogramChart: React.FC<{
     scrollContainerRef: React.RefObject<HTMLDivElement | null>;
     onScroll: () => void;
 }> = React.memo(({ data, framesWithPoints, height, onFrameSelect, renderNestedBoxes, onMouseMove, onMouseLeave, hoverInfo, scrollContainerRef, onScroll }) => {
-    const HoverInfo: React.FC<{
-        x: number;
-        y: number;
-        color: string;
-        linePrice: number;
-        high: number;
-        low: number;
-    }> = ({ x, y, color, linePrice, high, low }) => (
-        <div
-            className='pointer-events-none absolute z-1000'
-            style={{
-                left: `${x}px`,
-                top: `${y}px`,
-                transform: 'translate(-50%, -100%)',
-            }}>
-            <div className='shadow-x mb-4 rounded-sm px-2 py-1 text-xs font-bold text-black' style={{ backgroundColor: color }}>
-                <div>{linePrice.toFixed(3)}</div>
+    // Memoize the hover info component
+    const HoverInfo = useMemo(() => {
+        return ({ x, y, color, linePrice, high, low }: { x: number; y: number; color: string; linePrice: number; high: number; low: number }) => (
+            <div
+                className='pointer-events-none absolute z-1000'
+                style={{
+                    left: `${x}px`,
+                    top: `${y}px`,
+                    transform: 'translate(-50%, -100%)',
+                }}>
+                <div className='shadow-x mb-4 rounded-sm px-2 py-1 text-xs font-bold text-black' style={{ backgroundColor: color }}>
+                    <div>{linePrice}</div>
+                </div>
             </div>
-        </div>
-    );
+        );
+    }, []);
 
     return (
         <div className='relative h-full w-full pr-16' onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
             <div ref={scrollContainerRef} className='hide-scrollbar flex h-full w-full items-end overflow-x-auto' onScroll={onScroll}>
                 <div
+                    className='flex h-full'
                     style={{
-                        display: 'inline-flex',
                         width: `${data.length * INITIAL_BAR_WIDTH}px`,
-                        height: '100%',
-                        flexDirection: 'row',
                     }}>
                     {framesWithPoints.map((frameWithPoint, index) => {
                         const { frameData, meetingPointY, sliceWidth } = frameWithPoint;
@@ -141,7 +137,6 @@ const HistogramChart: React.FC<{
                                 style={{
                                     width: sliceWidth,
                                     height: `${height}px`,
-                                    position: 'relative',
                                 }}
                                 onClick={() => onFrameSelect(data[index], index)}>
                                 {renderNestedBoxes(
@@ -199,11 +194,15 @@ const TimeBar: React.FC<{
         const indexes: number[] = [];
         let previousColor: 'green' | 'red' | null = null;
 
+        // Add indexes where color changes (trend changes)
         data.forEach((slice, index) => {
             const totalBoxes = slice.boxes.length;
             const start = Math.max(0, boxOffset);
             const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
             const visibleBoxes = slice.boxes.slice(start, end);
+
+            if (visibleBoxes.length === 0) return;
+
             const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
             const currentColor = largestBox.value > 0 ? 'green' : 'red';
 
@@ -213,11 +212,12 @@ const TimeBar: React.FC<{
             }
         });
 
-        return indexes;
+        // Return array of unique indexes
+        return Array.from(new Set(indexes)).sort((a, b) => a - b);
     }, [data, boxOffset, visibleBoxesCount]);
 
     return (
-        <div className='relative h-10 w-full overflow-hidden bg-black' style={{ width: `${width}px` }}>
+        <div className='relative h-10 w-full border-t border-gray-800 bg-black' style={{ width: `${width}px` }}>
             <div
                 className='absolute flex h-full w-full items-center'
                 style={{
@@ -225,18 +225,27 @@ const TimeBar: React.FC<{
                     transform: `translateX(-${scrollLeft}px)`,
                 }}>
                 {significantTimeIndexes.map((index) => {
+                    if (!data[index]) return null;
+
                     const slice = data[index];
                     const localTime = new Date(slice.timestamp);
                     const totalBoxes = slice.boxes.length;
                     const start = Math.max(0, boxOffset);
                     const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
                     const visibleBoxes = slice.boxes.slice(start, end);
+
+                    if (visibleBoxes.length === 0) return null;
+
                     const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
                     const color = largestBox.value > 0 ? '#22FFE7' : '#FF6E86';
+
+                    // Create a unique key using timestamp and index
+                    const uniqueKey = `${slice.timestamp}-${index}`;
+
                     return (
                         <div
-                            key={index}
-                            className='absolute shrink-0 text-center text-[11px] font-bold whitespace-nowrap'
+                            key={uniqueKey}
+                            className='absolute top-2 shrink-0 text-center text-[11px] font-bold whitespace-nowrap'
                             style={{
                                 left: `${index * INITIAL_BAR_WIDTH}px`,
                                 width: `${INITIAL_BAR_WIDTH}px`,
@@ -252,23 +261,21 @@ const TimeBar: React.FC<{
     );
 });
 
-const Oscillator = forwardRef<
-    OscillatorRef,
-    {
-        boxArray: Box[];
-        height: number;
-        visibleBoxesCount: number;
-        meetingPointY: number;
-        prevMeetingPointY: number | null;
-        nextMeetingPointY: number | null;
-        sliceWidth: number;
-        price: number;
-        high: number;
-        low: number;
-    }
->(({ boxArray, height, visibleBoxesCount, meetingPointY, prevMeetingPointY, nextMeetingPointY, sliceWidth, price, high, low }, ref) => {
+const Oscillator: React.FC<{
+    boxArray: Box[];
+    height: number;
+    visibleBoxesCount: number;
+    meetingPointY: number;
+    prevMeetingPointY: number | null;
+    nextMeetingPointY: number | null;
+    sliceWidth: number;
+    onGetColorAndY?: (getColorAndY: GetColorAndY) => void;
+}> = ({ boxArray, height, visibleBoxesCount, meetingPointY, prevMeetingPointY, nextMeetingPointY, sliceWidth, onGetColorAndY }) => {
     const boxHeight = height / visibleBoxesCount;
-    const sortedBoxes = boxArray.slice(0, visibleBoxesCount);
+    const sortedBoxes = useMemo(() => boxArray.slice(0, visibleBoxesCount), [boxArray, visibleBoxesCount]);
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+    const gradientRef = useRef<CanvasGradient | null>(null);
+    const lastDrawnPropsRef = useRef<string>('');
 
     const sectionColor = useMemo(() => {
         if (sortedBoxes.length === 0) return 'NEUTRAL';
@@ -278,7 +285,6 @@ const Oscillator = forwardRef<
 
     const colors = COLORS[sectionColor as keyof typeof COLORS];
     const isGreen = sectionColor === 'GREEN';
-    const canvasRef = useRef<HTMLCanvasElement>(null);
 
     const meetingPoints = useMemo(() => {
         return [
@@ -292,99 +298,130 @@ const Oscillator = forwardRef<
         ];
     }, [prevMeetingPointY, meetingPointY, nextMeetingPointY, sliceWidth]);
 
-    const interpolateY = (x: number) => {
-        for (let i = 0; i < meetingPoints.length - 1; i++) {
-            const start = meetingPoints[i];
-            const end = meetingPoints[i + 1];
-            if (x >= start.x && x <= end.x) {
-                const t = (x - start.x) / (end.x - start.x);
-                return start.y + t * (end.y - start.y);
+    // Pre-calculate box positions and dimensions
+    const boxData = useMemo(() => {
+        return sortedBoxes.map((box, index) => {
+            const y = Math.round(index * boxHeight);
+            const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
+            const rangeY = Math.round(box.value > 0 ? y + boxHeight - rangeHeight : y);
+            const centerX = sliceWidth / 2;
+            const centerY = Math.round(y + boxHeight / 2);
+
+            return {
+                y,
+                rangeY,
+                rangeHeight,
+                centerX,
+                centerY,
+                value: box.value,
+            };
+        });
+    }, [sortedBoxes, boxHeight, sliceWidth]);
+
+    const interpolateY = useCallback(
+        (x: number) => {
+            for (let i = 0; i < meetingPoints.length - 1; i++) {
+                const start = meetingPoints[i];
+                const end = meetingPoints[i + 1];
+                if (x >= start.x && x <= end.x) {
+                    const t = (x - start.x) / (end.x - start.x);
+                    return start.y + t * (end.y - start.y);
+                }
             }
-        }
-        return meetingPointY;
-    };
+            return meetingPointY;
+        },
+        [meetingPoints, meetingPointY]
+    );
 
     const getColorAndY = useCallback(
         (x: number) => {
             const y = interpolateY(x);
-
-            // Find the smallest box based on absolute value
-            const smallestBox = boxArray.reduce((smallest, current) => (Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest));
-
-            // Determine the LinePrice, high, and low based on the smallest box
-            const linePrice = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
-            const boxHigh = smallestBox.high;
-            const boxLow = smallestBox.low;
+            const smallestBox = sortedBoxes.reduce((smallest, current) => (Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest));
 
             return {
                 y: Math.round(y),
                 color: colors.LIGHT,
-                high: boxHigh,
-                low: boxLow,
-                linePrice,
+                high: smallestBox.high,
+                low: smallestBox.low,
+                linePrice: smallestBox.value >= 0 ? smallestBox.high : smallestBox.low,
             };
         },
-        [boxArray, colors.LIGHT, interpolateY]
+        [sortedBoxes, colors.LIGHT, interpolateY]
     );
 
-    useImperativeHandle(ref, () => ({
-        getColorAndY,
-        meetingPoints,
-        sliceWidth,
-        visibleBoxesCount,
-    }));
-
+    // Expose getColorAndY through prop
     useEffect(() => {
+        if (onGetColorAndY) {
+            onGetColorAndY(getColorAndY);
+        }
+    }, [onGetColorAndY, getColorAndY]);
+
+    const drawCanvas = useCallback(() => {
         const canvas = canvasRef.current;
         if (!canvas) return;
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext('2d', { alpha: false });
         if (!ctx) return;
 
-        const drawCanvas = () => {
-            ctx.clearRect(0, 0, sliceWidth, height);
+        // Check if we need to redraw
+        const currentProps = JSON.stringify({ boxData, colors, height, sliceWidth });
+        if (currentProps === lastDrawnPropsRef.current) return;
+        lastDrawnPropsRef.current = currentProps;
 
+        // Create gradient once
+        if (!gradientRef.current) {
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, colors.DARK);
             gradient.addColorStop(1, colors.MEDIUM);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, sliceWidth, height);
+            gradientRef.current = gradient;
+        }
 
+        // Clear and fill background
+        ctx.fillStyle = gradientRef.current;
+        ctx.fillRect(0, 0, sliceWidth, height);
+
+        // Draw grid in a single pass
+        ctx.beginPath();
+        ctx.strokeStyle = colors.GRID;
+        ctx.lineWidth = 0.3;
+
+        // Draw horizontal grid lines
+        for (let i = 0; i <= visibleBoxesCount; i++) {
+            const y = Math.round(i * boxHeight);
+            ctx.moveTo(0, y);
+            ctx.lineTo(sliceWidth, y);
+        }
+        ctx.stroke();
+
+        // Draw boxes and dots in a single pass
+        boxData.forEach(({ y, rangeY, rangeHeight, centerX, centerY }) => {
+            // Draw range
+            ctx.fillStyle = colors.MEDIUM;
+            ctx.fillRect(sliceWidth * 0.25, rangeY, sliceWidth * 0.5, rangeHeight);
+
+            // Draw center dot
             ctx.beginPath();
-            for (let i = 0; i <= visibleBoxesCount; i++) {
-                const y = Math.round(i * boxHeight);
-                ctx.moveTo(0, y);
-                ctx.lineTo(sliceWidth, y);
-            }
-            ctx.strokeStyle = colors.GRID;
+            ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
+            ctx.fillStyle = colors.DOT;
+            ctx.fill();
+        });
+    }, [boxData, colors, height, sliceWidth, visibleBoxesCount, boxHeight]);
 
-            ctx.stroke();
-
-            sortedBoxes.forEach((box, index) => {
-                const y = Math.round(index * boxHeight);
-
-                ctx.beginPath();
-                ctx.rect(0, y, sliceWidth, boxHeight);
-                ctx.strokeStyle = colors.GRID;
-                ctx.lineWidth = 0.3;
-                ctx.stroke();
-
-                const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
-                const rangeY = Math.round(box.value > 0 ? y + boxHeight - rangeHeight : y);
-                ctx.fillStyle = colors.MEDIUM;
-                ctx.fillRect(sliceWidth * 0.25, rangeY, sliceWidth * 0.5, rangeHeight);
-
-                const centerX = sliceWidth / 2;
-                const centerY = Math.round(y + boxHeight / 2);
-                ctx.beginPath();
-                ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
-                ctx.fillStyle = colors.DOT;
-                ctx.fill();
-            });
+    // Use RAF for smooth rendering
+    useEffect(() => {
+        let animationFrame: number;
+        const animate = () => {
+            drawCanvas();
+            animationFrame = requestAnimationFrame(animate);
         };
 
-        drawCanvas();
-    }, [boxArray, height, sliceWidth, boxHeight, colors, visibleBoxesCount, sortedBoxes, meetingPoints]);
+        animationFrame = requestAnimationFrame(animate);
+
+        return () => {
+            cancelAnimationFrame(animationFrame);
+            gradientRef.current = null; // Clear gradient cache on unmount
+        };
+    }, [drawCanvas]);
 
     return (
         <div
@@ -394,14 +431,13 @@ const Oscillator = forwardRef<
                 height: `${height}px`,
             }}>
             <canvas ref={canvasRef} width={sliceWidth} height={height} className='absolute inset-0' />
-
             <svg className='pointer-events-none absolute top-0 left-0 h-full w-full' style={{ zIndex: 200, overflow: 'visible' }}>
                 <PulseWave meetingPoints={meetingPoints} colors={colors} height={height} sliceWidth={sliceWidth} isGreen={isGreen} />
                 <MeetingPoint prevMeetingPointY={prevMeetingPointY} nextMeetingPointY={nextMeetingPointY} meetingPointY={meetingPointY} sliceWidth={sliceWidth} colors={colors} />
             </svg>
         </div>
     );
-});
+};
 
 const HistogramManager: React.FC<{
     data: BoxSlice[];
@@ -450,16 +486,16 @@ const HistogramManager: React.FC<{
     const handleMouseMove = useCallback(
         (e: React.MouseEvent<HTMLDivElement>) => {
             const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left + scrollLeft;
-            const frameIndex = Math.floor(x / INITIAL_BAR_WIDTH);
-            const frameX = x % INITIAL_BAR_WIDTH;
+            const x = e.clientX - rect.left;
+            const frameIndex = Math.floor((x + scrollLeft) / INITIAL_BAR_WIDTH);
+            const frameX = (x + scrollLeft) % INITIAL_BAR_WIDTH;
 
             if (frameIndex >= 0 && frameIndex < framesWithPoints.length) {
                 const oscillator = oscillatorRefs.current[frameIndex];
-                if (oscillator) {
+                if (oscillator?.getColorAndY) {
                     const { y, color, high, low, linePrice } = oscillator.getColorAndY(frameX);
                     setHoverInfo({
-                        x: frameIndex * INITIAL_BAR_WIDTH + frameX - scrollLeft,
+                        x,
                         y,
                         color,
                         high,
@@ -484,37 +520,32 @@ const HistogramManager: React.FC<{
             prevMeetingPointY: number | null,
             nextMeetingPointY: number | null,
             sliceWidth: number,
-            index: number,
-            price: number,
-            high: number,
-            low: number
-        ): JSX.Element | null => {
+            index: number
+        ): any | null => {
             const totalBoxes = boxArray.length;
             const start = boxOffset;
             const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
             const visibleBoxArray = boxArray.slice(start, end);
-            switch (viewType) {
-                case 'oscillator':
-                    return (
-                        <Oscillator
-                            ref={(ref: OscillatorRef | null) => {
-                                oscillatorRefs.current[index] = ref;
-                            }}
-                            boxArray={visibleBoxArray}
-                            height={height}
-                            visibleBoxesCount={visibleBoxesCount}
-                            meetingPointY={meetingPointY}
-                            prevMeetingPointY={prevMeetingPointY}
-                            nextMeetingPointY={nextMeetingPointY}
-                            sliceWidth={sliceWidth}
-                            price={price}
-                            high={high}
-                            low={low}
-                        />
-                    );
-                default:
-                    return null;
-            }
+
+            return (
+                <Oscillator
+                    boxArray={visibleBoxArray}
+                    height={height}
+                    visibleBoxesCount={visibleBoxesCount}
+                    meetingPointY={meetingPointY}
+                    prevMeetingPointY={prevMeetingPointY}
+                    nextMeetingPointY={nextMeetingPointY}
+                    sliceWidth={sliceWidth}
+                    onGetColorAndY={(getColorAndY) => {
+                        oscillatorRefs.current[index] = {
+                            getColorAndY,
+                            meetingPoints: [],
+                            sliceWidth,
+                            visibleBoxesCount,
+                        };
+                    }}
+                />
+            );
         },
         [viewType, height, boxOffset, visibleBoxesCount]
     );
@@ -570,11 +601,7 @@ const HistogramManager: React.FC<{
                 low: box.low,
                 value: box.value,
             }));
-
-            // Find the smallest box by absolute value
             const smallestBox = visibleBoxes.reduce((smallest, current) => (Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest));
-
-            // Calculate the LinePrice
             const linePrice = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
 
             return { visibleBoxes, linePrice };
@@ -584,36 +611,34 @@ const HistogramManager: React.FC<{
 
     return (
         <>
-            <div className='relative flex h-[200px] w-full pr-16' style={{ height: `${height}px`, transition: 'height 0.1s ease-out' }} ref={containerRef}>
-                <DraggableBorder isDragging={isDragging} onDragStart={onDragStart} direction='top' />
-                {data && data.length > 0 && (
-                    <div className='flex h-full w-full'>
-                        <HistogramChart
-                            data={data}
-                            framesWithPoints={framesWithPoints}
-                            height={height}
-                            onFrameSelect={handleFrameClick}
-                            renderNestedBoxes={renderNestedBoxes}
-                            onMouseMove={handleMouseMove}
-                            onMouseLeave={handleMouseLeave}
-                            hoverInfo={hoverInfo}
-                            scrollContainerRef={scrollContainerRef}
-                            onScroll={handleScroll}
-                        />
-                        <HistogramControls
-                            boxOffset={boxOffset}
-                            onOffsetChange={onOffsetChange}
-                            totalBoxes={data[0]?.boxes.length || 0}
-                            visibleBoxesCount={visibleBoxesCount}
-                            viewType={viewType}
-                            onViewChange={onViewChange}
-                            selectedFrame={selectedFrame}
-                            height={height}
-                        />
-                    </div>
-                )}
+            <div className='relative flex w-full flex-col'>
+                <div className='relative flex w-full' style={{ height: `${height}px`, transition: 'height 0.1s ease-out' }} ref={containerRef}>
+                    <DraggableBorder isDragging={isDragging} onDragStart={onDragStart} direction='top' />
+                    {data && data.length > 0 && (
+                        <div className='flex h-full w-full'>
+                            <HistogramChart
+                                data={data}
+                                framesWithPoints={framesWithPoints}
+                                height={height}
+                                onFrameSelect={handleFrameClick}
+                                renderNestedBoxes={renderNestedBoxes}
+                                onMouseMove={handleMouseMove}
+                                onMouseLeave={handleMouseLeave}
+                                hoverInfo={hoverInfo}
+                                scrollContainerRef={scrollContainerRef}
+                                onScroll={handleScroll}
+                            />
+                            <HistogramControls
+                                boxOffset={boxOffset}
+                                onOffsetChange={onOffsetChange}
+                                totalBoxes={data[0]?.boxes.length || 0}
+                                visibleBoxesCount={visibleBoxesCount}
+                            />
+                        </div>
+                    )}
+                </div>
+                <TimeBar data={data} scrollLeft={scrollLeft} width={containerWidth} visibleBoxesCount={visibleBoxesCount} boxOffset={boxOffset} />
             </div>
-            <TimeBar data={data} scrollLeft={scrollLeft} width={containerWidth} visibleBoxesCount={visibleBoxesCount} boxOffset={boxOffset} />
             {selectedFrame && (
                 <SelectedFrameDetails
                     selectedFrame={selectedFrame}
@@ -623,6 +648,39 @@ const HistogramManager: React.FC<{
                 />
             )}
         </>
+    );
+};
+
+const HistogramControls = ({
+    boxOffset,
+    onOffsetChange,
+    totalBoxes,
+    visibleBoxesCount,
+}: {
+    boxOffset: number;
+    onOffsetChange: (newOffset: number) => void;
+    totalBoxes: number;
+    visibleBoxesCount: number;
+}) => {
+    return (
+        <div className='absolute top-0 right-0 flex h-full w-16 flex-col items-center justify-center border-l border-[#181818] bg-black'>
+            <button
+                onClick={() => onOffsetChange(Math.max(0, boxOffset - 1))}
+                disabled={boxOffset === 0}
+                className='flex h-8 w-8 items-center justify-center rounded-sm border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50'>
+                <PlusIcon />
+            </button>
+            <div className='text-center text-white'>
+                <div>{boxOffset}</div>
+                <div>{totalBoxes - 1}</div>
+            </div>
+            <button
+                onClick={() => onOffsetChange(Math.min(totalBoxes - visibleBoxesCount, boxOffset + 1))}
+                disabled={boxOffset >= totalBoxes - visibleBoxesCount}
+                className='flex h-8 w-8 items-center justify-center rounded-sm border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50'>
+                <MinusIcon />
+            </button>
+        </div>
     );
 };
 

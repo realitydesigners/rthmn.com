@@ -23,12 +23,6 @@ export const PulseWave: React.FC<{
 
     return (
         <g>
-            <defs>
-                <linearGradient id={gradientId} x1='0%' y1={isGreen ? '100%' : '0%'} x2='0%' y2={isGreen ? '0%' : '100%'}>
-                    <stop offset='0%' stopColor={colors.LIGHT} stopOpacity='0.7' />
-                    <stop offset='100%' stopColor={colors.LIGHT} stopOpacity='0' />
-                </linearGradient>
-            </defs>
             <path d={`${pathData} L ${sliceWidth} ${isGreen ? 0 : height} Z`} fill={`url(#${gradientId})`} stroke='none'>
                 <animate attributeName='opacity' values='0.7;0.3;0.7' dur='8s' repeatCount='indefinite' />
             </path>
