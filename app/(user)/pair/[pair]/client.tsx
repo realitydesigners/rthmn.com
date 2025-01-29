@@ -2,22 +2,27 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BoxSlice, PairData, ViewType } from '@/types/types';
 import HistogramManager from '@/components/Histogram/HistogramManager';
-import { LineChart } from '../../../../components/LineChart';
+import { LineChart, ChartDataPoint } from '@/components/LineChart';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
 import { createBoxCalculator } from '../boxCalculator';
 
-interface DashboardClientProps {
-    pair: string;
-    initialCandleData: any[];
+interface ChartData {
+    processedCandles: ChartDataPoint[];
+    initialVisibleData: ChartDataPoint[];
 }
 
-const Client: React.FC<DashboardClientProps> = ({ pair, initialCandleData }) => {
+interface DashboardClientProps {
+    pair: string;
+    chartData: ChartData;
+}
+
+const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
     const { session } = useAuth();
     const [initialData, setInitialData] = useState<BoxSlice[]>([]);
-    const [candleData, setCandleData] = useState<any[]>(initialCandleData);
+    const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [boxData, setBoxData] = useState<any>(null);
     const [histogramData, setHistogramData] = useState<BoxSlice[]>([]);
     const { boxOffset, handleOffsetChange } = useUrlParams(pair);
@@ -66,7 +71,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair, initialCandleData }) => 
     }, [histogramHeight]);
 
     useEffect(() => {
-        if (session && session.access_token) {
+        if (session?.access_token) {
             const token = session.access_token;
             const CANDLE_LIMIT = 200;
 
@@ -75,19 +80,24 @@ const Client: React.FC<DashboardClientProps> = ({ pair, initialCandleData }) => 
                     const response = await fetch(`/api/getCandles?pair=${pair.toUpperCase()}&limit=${CANDLE_LIMIT}&token=${token}`);
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     const { data } = await response.json();
-                    console.log('Fetched candle data:', data);
 
                     // Create a reversed copy of the data
                     const reversedData = [...data].reverse();
 
                     // Transform the data to match LineChart's expected format
                     const formattedCandles = reversedData.map((candle) => ({
+                        timestamp: new Date(candle.timestamp).getTime(),
                         close: Number(candle.close),
                         high: Number(candle.high),
                         low: Number(candle.low),
                         open: Number(candle.open),
-                        time: new Date(candle.timestamp).getTime(),
-                        symbol: candle.symbol,
+                        volume: Number(candle.volume),
+                        scaledX: 0,
+                        scaledY: 0,
+                        scaledOpen: 0,
+                        scaledHigh: 0,
+                        scaledLow: 0,
+                        scaledClose: 0,
                     }));
 
                     // Calculate boxes for each timestamp
@@ -125,13 +135,15 @@ const Client: React.FC<DashboardClientProps> = ({ pair, initialCandleData }) => 
                     setBoxData(boxTimeseriesData);
                     setHistogramData(histogramBoxes);
                 } catch (error) {
-                    console.error('Error fetching candles:', error);
+                    console.error('Error fetching candle data:', error);
+                    // On error, keep using the server-processed data
+                    setCandleData(chartData.processedCandles);
                 }
             };
 
             fetchCandles();
         }
-    }, [session, pair]);
+    }, [session, pair, chartData.processedCandles]);
 
     const BoxTable = () => {
         if (!boxData?.length) return null;
@@ -171,15 +183,8 @@ const Client: React.FC<DashboardClientProps> = ({ pair, initialCandleData }) => 
     };
 
     return (
-        <div className='w-full px-2'>
-            <div className='h-screen p-8'>
-                {candleData && candleData.length > 0 ? (
-                    <LineChart candles={candleData} />
-                ) : (
-                    <div className='flex h-full items-center justify-center text-gray-400'>Loading candle data...</div>
-                )}
-            </div>
-
+        <div className='relative flex h-screen w-full'>
+            <LineChart candles={candleData} initialVisibleData={chartData.initialVisibleData} />
             {/* <div className='relative bottom-0 z-90 shrink-0'>
                 <HistogramManager
                     data={histogramData}

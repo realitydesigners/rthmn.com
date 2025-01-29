@@ -3,6 +3,7 @@ import Client from './client';
 import { getSubscription } from '@/utils/supabase/queries';
 import { pairSnapshotQuery } from '@/utils/sanity/lib/queries';
 import { sanityFetch } from '@/utils/sanity/lib/client';
+import { processInitialChartData } from '@/utils/chartDataProcessor';
 
 interface PageProps {
     params: Promise<{
@@ -10,37 +11,35 @@ interface PageProps {
     }>;
 }
 
-interface SanityPairSnapshot {
-    _type: 'pairSnapshot';
-    pair: string;
-    candleData: string;
-    lastUpdated: string;
-}
-
 async function fetchSanityData(pair: string) {
-    const snapshot = await sanityFetch<SanityPairSnapshot>({
+    const snapshot = await sanityFetch<{ pair: string; candleData: string; lastUpdated: string }>({
         query: pairSnapshotQuery,
         qParams: { pair: pair.toUpperCase() },
         tags: ['pairSnapshot'],
     });
 
     const parsedData = JSON.parse(snapshot.candleData);
-
     return parsedData;
 }
 
 export default async function PairPage(props: PageProps) {
     const params = await props.params;
     const { pair } = params;
-
     const supabase = await createClient();
     const subscription = await getSubscription(supabase);
     const hasSubscription = subscription?.status === 'active';
-    const candleData = hasSubscription ? [] : await fetchSanityData(pair);
+    const rawCandleData = hasSubscription ? [] : await fetchSanityData(pair);
+    const { processedCandles, initialVisibleData } = processInitialChartData(rawCandleData);
 
     return (
         <div className='w-full'>
-            <Client pair={pair} initialCandleData={candleData} />
+            <Client
+                pair={pair}
+                chartData={{
+                    processedCandles,
+                    initialVisibleData,
+                }}
+            />
         </div>
     );
 }

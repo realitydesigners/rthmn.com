@@ -22,12 +22,12 @@ const CHART_CONFIG = {
     VISIBLE_POINTS: 1000,
     MIN_ZOOM: 0.1,
     MAX_ZOOM: 5,
-    PADDING: { top: 0, right: 60, bottom: 60, left: 0 },
+    PADDING: { top: 0, right: 70, bottom: 20, left: 0 },
     COLORS: {
-        UP: '#22c55e',
-        DOWN: '#ef4444',
-        AXIS: '#777',
-        HOVER_BG: '#1f2937',
+        BULLISH: '#22c55e', // Green for bullish
+        BEARISH: '#ef4444', // Red for bearish
+        AXIS: '#ffffff',
+        HOVER_BG: '#000',
         LAST_PRICE: '#2563eb',
     },
     Y_AXIS: {
@@ -51,10 +51,10 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
             {data.map((point, i) => {
                 if (point.scaledX < -candleWidth || point.scaledX > width + candleWidth) return null;
 
-                const isGreen = point.close >= point.open;
-                const candleColor = isGreen ? CHART_CONFIG.COLORS.UP : CHART_CONFIG.COLORS.DOWN;
+                const isBullish = point.close < point.open;
+                const candleColor = isBullish ? CHART_CONFIG.COLORS.BULLISH : CHART_CONFIG.COLORS.BEARISH;
                 const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
-                const bodyHeight = Math.max(1, Math.max(point.scaledOpen, point.scaledClose) - bodyTop);
+                const bodyHeight = Math.max(1, Math.abs(point.scaledClose - point.scaledOpen));
 
                 return (
                     <g key={i} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
@@ -77,8 +77,7 @@ const LastPriceLine = memo(({ price, scaledY, chartWidth }: { price: number; sca
     </g>
 ));
 
-// Main chart component
-export const LineChart = ({ candles = [] }: { candles: any[] }) => {
+export const LineChart = ({ candles = [], initialVisibleData }: { candles: ChartDataPoint[]; initialVisibleData: ChartDataPoint[] }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [yAxisScale, setYAxisScale] = useState(1);
@@ -93,7 +92,8 @@ export const LineChart = ({ candles = [] }: { candles: any[] }) => {
     const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
     const chartHeight = dimensions.height - chartPadding.top - chartPadding.bottom;
 
-    const { processedCandles, visibleData, minY, maxY } = useChartData(candles, scrollLeft, chartWidth, chartHeight, yAxisScale, CHART_CONFIG.VISIBLE_POINTS);
+    // Get chart data directly
+    const { visibleData, minY, maxY } = useChartData(candles, scrollLeft, chartWidth, chartHeight, yAxisScale, CHART_CONFIG.VISIBLE_POINTS);
 
     // Update dimension effect to use parent's full dimensions
     useEffect(() => {
@@ -111,18 +111,13 @@ export const LineChart = ({ candles = [] }: { candles: any[] }) => {
         };
 
         updateDimensions();
-
-        // Create ResizeObserver to watch parent size changes
         const resizeObserver = new ResizeObserver(updateDimensions);
         if (containerRef.current?.parentElement) {
             resizeObserver.observe(containerRef.current.parentElement);
         }
 
-        window.addEventListener('resize', updateDimensions);
-
         return () => {
             resizeObserver.disconnect();
-            window.removeEventListener('resize', updateDimensions);
         };
     }, []);
 
@@ -142,38 +137,51 @@ export const LineChart = ({ candles = [] }: { candles: any[] }) => {
         [chartHeight]
     );
 
-    // Combine all drag-related handlers into one object
-    const dragHandlers = useMemo(
-        () => ({
+    // Optimize drag handlers with throttling
+    const dragHandlers = useMemo(() => {
+        let lastDragTime = 0;
+        let lastScrollUpdate = 0;
+        const THROTTLE_MS = 16; // Approx. 60fps
+
+        const updateScroll = (clientX: number) => {
+            const now = Date.now();
+            if (now - lastScrollUpdate < THROTTLE_MS) return;
+
+            const deltaX = clientX - dragStart;
+            const maxScroll = Math.max(0, candles.length * (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) - chartWidth);
+            const newScrollLeft = Math.max(0, Math.min(maxScroll, scrollStart - deltaX));
+
+            setScrollLeft(newScrollLeft);
+            lastScrollUpdate = now;
+        };
+
+        return {
             onMouseDown: (event: React.MouseEvent) => {
                 if (!isYAxisDragging) {
+                    event.preventDefault();
                     setIsDragging(true);
                     setDragStart(event.clientX);
                     setScrollStart(scrollLeft);
-                    if (containerRef.current) {
-                        containerRef.current.style.cursor = 'grabbing';
-                    }
+                    lastDragTime = Date.now();
                 }
             },
-            onMouseMove: (event: React.MouseEvent<HTMLDivElement>) => {
+            onMouseMove: (event: React.MouseEvent) => {
                 if (isDragging && !isYAxisDragging) {
-                    const deltaX = event.clientX - dragStart;
-                    const maxScroll = Math.max(0, processedCandles.length * (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) - chartWidth);
-                    const newScrollLeft = Math.max(0, Math.min(maxScroll, scrollStart - deltaX));
-                    setScrollLeft(newScrollLeft);
+                    event.preventDefault();
+                    const now = Date.now();
+                    if (now - lastDragTime < THROTTLE_MS) return;
+                    lastDragTime = now;
+                    updateScroll(event.clientX);
                 }
             },
             onMouseUp: () => {
-                if (!isYAxisDragging) {
-                    setIsDragging(false);
-                    if (containerRef.current) {
-                        containerRef.current.style.cursor = 'grab';
-                    }
-                }
+                setIsDragging(false);
             },
-        }),
-        [isDragging, isYAxisDragging, dragStart, scrollStart, chartWidth, processedCandles.length]
-    );
+            onMouseLeave: () => {
+                setIsDragging(false);
+            },
+        };
+    }, [isDragging, isYAxisDragging, dragStart, scrollStart, chartWidth, candles.length, scrollLeft]);
 
     // Replace the separate hover handlers with a single object
     const hoverHandlers = useMemo(
@@ -208,38 +216,47 @@ export const LineChart = ({ candles = [] }: { candles: any[] }) => {
     return (
         <div
             ref={containerRef}
-            className='no-select absolute inset-0 overflow-hidden border-t border-[#222] bg-[#0a0a0a]'
+            className='no-select h-full w-full overflow-hidden bg-black'
             onMouseDown={dragHandlers.onMouseDown}
             onMouseMove={dragHandlers.onMouseMove}
             onMouseUp={dragHandlers.onMouseUp}
-            onMouseLeave={dragHandlers.onMouseUp}>
-            <svg
-                width='100%'
-                height='100%'
-                viewBox={`0 0 ${dimensions.width} ${dimensions.height + 25}`}
-                onMouseMove={hoverHandlers.onSvgMouseMove}
-                onMouseLeave={hoverHandlers.onMouseLeave}
-                style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
-                <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                    <path d={`M ${visibleData.map((p) => `${p.scaledX} ${p.scaledClose}`).join(' L ')}`} stroke='rgba(34, 197, 94, 0.3)' strokeWidth='1' fill='none' />
-                    <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
-                    {visibleData.length > 0 && (
-                        <LastPriceLine price={visibleData[visibleData.length - 1].close} scaledY={visibleData[visibleData.length - 1].scaledClose} chartWidth={chartWidth} />
-                    )}
-                    <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
-                    <YAxis
-                        minY={minY}
-                        maxY={maxY}
-                        chartHeight={chartHeight}
-                        chartWidth={chartWidth}
-                        onDrag={handleYAxisDrag}
-                        hoverInfo={hoverInfo}
-                        onYAxisDragStart={() => setIsYAxisDragging(true)}
-                        onYAxisDragEnd={() => setIsYAxisDragging(false)}
-                    />
-                    {hoverInfo && <HoverInfoComponent x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
-                </g>
-            </svg>
+            onMouseLeave={dragHandlers.onMouseLeave}>
+            {(!chartWidth || !chartHeight) && initialVisibleData ? (
+                <svg width='100%' height='100%'>
+                    <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
+                        <CandleSticks data={initialVisibleData} width={chartWidth || 1000} height={chartHeight || 500} />
+                    </g>
+                </svg>
+            ) : visibleData.length > 0 ? (
+                <svg
+                    width='100%'
+                    height='100%'
+                    onMouseMove={hoverHandlers.onSvgMouseMove}
+                    onMouseLeave={hoverHandlers.onMouseLeave}
+                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
+                    <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
+                        <path d={`M ${visibleData.map((p) => `${p.scaledX} ${p.scaledClose}`).join(' L ')}`} stroke='rgba(34, 197, 94, 0.3)' strokeWidth='1' fill='none' />
+                        <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
+                        {visibleData.length > 0 && (
+                            <LastPriceLine price={visibleData[visibleData.length - 1].close} scaledY={visibleData[visibleData.length - 1].scaledClose} chartWidth={chartWidth} />
+                        )}
+                        <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
+                        <YAxis
+                            minY={minY}
+                            maxY={maxY}
+                            chartHeight={chartHeight}
+                            chartWidth={chartWidth}
+                            onDrag={handleYAxisDrag}
+                            hoverInfo={hoverInfo}
+                            onYAxisDragStart={() => setIsYAxisDragging(true)}
+                            onYAxisDragEnd={() => setIsYAxisDragging(false)}
+                        />
+                        {hoverInfo && <HoverInfoComponent x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
+                    </g>
+                </svg>
+            ) : (
+                <div className='flex h-full items-center justify-center text-gray-400'>No data to display</div>
+            )}
         </div>
     );
 };
@@ -312,8 +329,8 @@ const YAxis: React.FC<{
 }> = memo(({ minY, maxY, chartHeight, chartWidth, onDrag, hoverInfo, onYAxisDragStart, onYAxisDragEnd }) => {
     const handleMouseDown = useCallback(
         (event: React.MouseEvent) => {
-            event.stopPropagation(); // Prevent container drag from starting
-            onYAxisDragStart(); // Start Y-axis drag
+            event.stopPropagation();
+            onYAxisDragStart();
             const startY = event.clientY;
 
             const handleMouseMove = (e: MouseEvent) => {
@@ -322,7 +339,7 @@ const YAxis: React.FC<{
             };
 
             const handleMouseUp = () => {
-                onYAxisDragEnd(); // End Y-axis drag
+                onYAxisDragEnd();
                 window.removeEventListener('mousemove', handleMouseMove);
                 window.removeEventListener('mouseup', handleMouseUp);
             };
@@ -335,36 +352,45 @@ const YAxis: React.FC<{
 
     const priceRange = maxY - minY;
 
-    // Calculate the number of price levels based on available height
+    // Calculate price levels
     const minSpacing = CHART_CONFIG.Y_AXIS.MIN_PRICE_HEIGHT;
     const maxLevels = Math.floor(chartHeight / minSpacing);
     const numLevels = Math.min(12, maxLevels);
 
-    const prices = Array.from({ length: numLevels }, (_, i) => {
-        const ratio = i / (numLevels - 1);
-        return minY + priceRange * ratio;
-    });
+    // Generate price levels with more precise calculations
+    const prices = useMemo(() => {
+        const range = maxY - minY;
+        const step = range / (numLevels - 1);
+        return Array.from({ length: numLevels }, (_, i) => {
+            const price = maxY - step * i;
+            const y = (chartHeight * i) / (numLevels - 1);
+            return { price, y };
+        });
+    }, [minY, maxY, chartHeight, numLevels]);
 
     return (
         <g className='y-axis' transform={`translate(${chartWidth}, 0)`} onMouseDown={handleMouseDown} style={{ userSelect: 'none' }}>
+            {/* Background for price labels */}
             <rect x={0} y={0} width={CHART_CONFIG.Y_AXIS.LABEL_WIDTH} height={chartHeight} fill='transparent' cursor='ns-resize' />
-            <line x1={0} y1={0} x2={0} y2={chartHeight} stroke={CHART_CONFIG.COLORS.AXIS} />
 
-            {/* Price levels */}
-            {prices.map((price, i) => {
-                const y = chartHeight * (1 - i / (numLevels - 1));
-                return (
-                    <g key={i} transform={`translate(0, ${y})`}>
-                        <line x1={0} x2={5} stroke={CHART_CONFIG.COLORS.AXIS} />
-                        <text x={10} y={4} fill='white' fontSize='12' textAnchor='start'>
-                            {price.toFixed(5)}
-                        </text>
-                        <line x1={0} y1={0} x2={-chartWidth} y2={0} stroke={CHART_CONFIG.COLORS.AXIS} strokeOpacity='0.1' strokeDasharray='4 4' />
-                    </g>
-                );
-            })}
+            {/* Vertical axis line */}
+            <line x1={0} y1={0} x2={0} y2={chartHeight} stroke={CHART_CONFIG.COLORS.AXIS} strokeWidth={1} />
 
-            {/* Hover price */}
+            {/* Price levels and grid lines */}
+            {prices.map(({ price, y }, i) => (
+                <g key={i}>
+                    {/* Grid line */}
+                    <line x1={-chartWidth} y1={y} x2={0} y2={y} stroke={CHART_CONFIG.COLORS.AXIS} strokeOpacity={0.1} strokeWidth={1} />
+                    {/* Tick mark */}
+                    <line x1={0} x2={5} y1={y} y2={y} stroke={CHART_CONFIG.COLORS.AXIS} />
+                    {/* Price label */}
+                    <text x={10} y={y + 4} fill='white' fontSize='12' textAnchor='start'>
+                        {price.toFixed(5)}
+                    </text>
+                </g>
+            ))}
+
+            {/* Hover price indicator */}
             {hoverInfo && (
                 <g transform={`translate(0, ${hoverInfo.y})`}>
                     <rect x={3} y={-10} width={CHART_CONFIG.Y_AXIS.LABEL_WIDTH} height={20} fill={CHART_CONFIG.COLORS.HOVER_BG} rx={4} />
