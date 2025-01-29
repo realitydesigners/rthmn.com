@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { BoxSlice } from '@/types/types';
+import { BoxSlice, Box } from '@/types/types';
 import HistogramManager from '@/components/Histogram/HistogramManager';
 import { LineChart, ChartDataPoint } from '@/components/LineChart';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
@@ -11,6 +11,24 @@ interface ChartData {
     processedCandles: ChartDataPoint[];
     initialVisibleData: ChartDataPoint[];
     histogramBoxes: BoxSlice[];
+    histogramPreProcessed: {
+        maxSize: number;
+        initialFramesWithPoints: {
+            frameData: {
+                boxArray: Box[];
+                isSelected: boolean;
+                meetingPointY: number;
+                sliceWidth: number;
+                price: number;
+                high: number;
+                low: number;
+            };
+            meetingPointY: number;
+            sliceWidth: number;
+        }[];
+        defaultVisibleBoxesCount: number;
+        defaultHeight: number;
+    };
 }
 
 const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
@@ -18,7 +36,7 @@ const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => 
     const [histogramData, setHistogramData] = useState<BoxSlice[]>(chartData.histogramBoxes);
     const { boxOffset, handleOffsetChange } = useUrlParams(pair);
     const { selectedFrame, selectedFrameIndex, handleFrameSelect } = useSelectedFrame();
-    const [visibleBoxesCount, setVisibleBoxesCount] = useState(8);
+    const [visibleBoxesCount, setVisibleBoxesCount] = useState(chartData.histogramPreProcessed.defaultVisibleBoxesCount);
     const containerRef = useRef<HTMLDivElement>(null);
     const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({
         width: 0,
@@ -30,7 +48,7 @@ const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => 
         isDragging,
         handleDragStart,
     } = useDraggableHeight({
-        initialHeight: 200,
+        initialHeight: chartData.histogramPreProcessed.defaultHeight,
         minHeight: 100,
         maxHeight: 350,
     });
@@ -80,6 +98,10 @@ const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => 
                     isDragging={isDragging}
                     onDragStart={handleDragStart}
                     containerWidth={rthmnVisionDimensions.width}
+                    preProcessedData={{
+                        maxSize: chartData.histogramPreProcessed.maxSize,
+                        initialFramesWithPoints: chartData.histogramPreProcessed.initialFramesWithPoints,
+                    }}
                 />
             </div>
         </div>

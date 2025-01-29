@@ -18,7 +18,18 @@ type OscillatorRef = {
 
 type GetColorAndY = (x: number) => { y: number; color: string; high: number; low: number; linePrice: number };
 
-const useHistogramData = (data: BoxSlice[], selectedFrame: BoxSlice | null, selectedFrameIndex: number | null, boxOffset: number, visibleBoxesCount: number, height: number) => {
+const useHistogramData = (
+    data: BoxSlice[],
+    selectedFrame: BoxSlice | null,
+    selectedFrameIndex: number | null,
+    boxOffset: number,
+    visibleBoxesCount: number,
+    height: number,
+    preProcessedData: {
+        maxSize: number;
+        initialFramesWithPoints: any[];
+    }
+) => {
     const currentFrame = useMemo(() => {
         return selectedFrame || (data.length > 0 ? data[0] : null);
     }, [selectedFrame, data]);
@@ -31,15 +42,17 @@ const useHistogramData = (data: BoxSlice[], selectedFrame: BoxSlice | null, sele
         return currentFrame.boxes.slice(start, end);
     }, [currentFrame, boxOffset, visibleBoxesCount]);
 
-    const maxSize = useMemo(() => {
-        const sizes = data.flatMap((slice) => slice.boxes.map((box) => Math.abs(box.value)));
-        return sizes.reduce((max, size) => Math.max(max, size), 0);
-    }, [data]);
+    // Use pre-calculated maxSize
+    const maxSize = preProcessedData.maxSize;
 
     const framesWithPoints = useMemo(() => {
         const boxHeight = height / visibleBoxesCount;
         return data.map((slice, index) => {
+            // Start with pre-processed data
+            const baseFrame = preProcessedData.initialFramesWithPoints[index];
             const isSelected = index === selectedFrameIndex;
+
+            // Only recalculate what's necessary based on current state
             const totalBoxes = slice.boxes.length;
             const start = Math.max(0, boxOffset);
             const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
@@ -50,29 +63,18 @@ const useHistogramData = (data: BoxSlice[], selectedFrame: BoxSlice | null, sele
             const totalNegativeHeight = negativeBoxesCount * boxHeight;
             const meetingPointY = totalNegativeHeight + (height - totalNegativeHeight - positiveBoxesCount * boxHeight) / 2;
 
-            // Find the smallest box based on absolute value
-            // Calculate price based on the smallest box
-            // Calculate high and low from visible boxes
-            const smallestBox = visibleBoxes.reduce((smallest, current) => (Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest));
-            const price = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
-            const high = Math.max(...visibleBoxes.map((box) => box.high));
-            const low = Math.min(...visibleBoxes.map((box) => box.low));
-
             return {
                 frameData: {
-                    boxArray: slice.boxes,
+                    ...baseFrame.frameData,
                     isSelected,
                     meetingPointY,
                     sliceWidth: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
-                    price,
-                    high,
-                    low,
                 },
                 meetingPointY,
                 sliceWidth: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
             };
         });
-    }, [data, selectedFrameIndex, height, boxOffset, visibleBoxesCount]);
+    }, [data, selectedFrameIndex, height, boxOffset, visibleBoxesCount, preProcessedData.initialFramesWithPoints]);
 
     return { currentFrame, visibleBoxes, maxSize, framesWithPoints };
 };
@@ -438,7 +440,11 @@ const HistogramManager: React.FC<{
     onFrameSelect: (frame: BoxSlice | null, index: number | null) => void;
     isDragging: boolean;
     onDragStart: (e: React.MouseEvent) => void;
-    containerWidth: number; // Add this prop
+    containerWidth: number;
+    preProcessedData: {
+        maxSize: number;
+        initialFramesWithPoints: any[];
+    };
 }> = ({
     data,
     height,
@@ -450,13 +456,14 @@ const HistogramManager: React.FC<{
     onFrameSelect,
     isDragging,
     onDragStart,
-    containerWidth, // Add this prop
+    containerWidth,
+    preProcessedData,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [scrollLeft, setScrollLeft] = useState(0);
 
-    const { framesWithPoints } = useHistogramData(data, selectedFrame, selectedFrameIndex, boxOffset, visibleBoxesCount, height);
+    const { framesWithPoints } = useHistogramData(data, selectedFrame, selectedFrameIndex, boxOffset, visibleBoxesCount, height, preProcessedData);
 
     const oscillatorRefs = useRef<(OscillatorRef | null)[]>([]);
     const [hoverInfo, setHoverInfo] = useState<any>(null);

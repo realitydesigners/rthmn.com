@@ -4,7 +4,7 @@ import { getSubscription } from '@/utils/supabase/queries';
 import { pairSnapshotQuery } from '@/utils/sanity/lib/queries';
 import { sanityFetch } from '@/utils/sanity/lib/client';
 import { processInitialChartData } from '@/utils/chartDataProcessor';
-import { createBoxCalculator } from '../boxCalculator';
+import { processInitialBoxData } from '@/utils/boxDataProcessor';
 
 interface PageProps {
     params: Promise<{
@@ -24,7 +24,7 @@ async function fetchSanityData(pair: string) {
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 1000;
+    const CANDLE_LIMIT = 500;
     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}`, {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -66,46 +66,7 @@ export default async function PairPage(props: PageProps) {
     }
 
     const { processedCandles, initialVisibleData } = processInitialChartData(rawCandleData);
-
-    // Process box data on the server
-    const boxCalculator = createBoxCalculator(pair.toUpperCase());
-    const boxTimeseriesData = processedCandles.map((candle, index) => {
-        const candleSlice = processedCandles.slice(0, index + 1).map((c) => ({
-            timestamp: new Date(c.timestamp).toISOString(),
-            open: c.open,
-            high: c.high,
-            low: c.low,
-            close: c.close,
-            mid: {
-                o: c.open.toString(),
-                h: c.high.toString(),
-                l: c.low.toString(),
-                c: c.close.toString(),
-            },
-        }));
-
-        return {
-            timestamp: new Date(candle.timestamp).toISOString(),
-            boxes: boxCalculator.calculateBoxArrays(candleSlice),
-            currentOHLC: {
-                open: candle.open,
-                high: candle.high,
-                low: candle.low,
-                close: candle.close,
-            },
-        };
-    });
-
-    // Transform box data for HistogramManager
-    const histogramBoxes = boxTimeseriesData.map((timepoint) => ({
-        timestamp: timepoint.timestamp, // Already a string from above
-        boxes: Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
-            high: Number(data.high),
-            low: Number(data.low),
-            value: data.value,
-        })),
-        currentOHLC: timepoint.currentOHLC,
-    }));
+    const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(processedCandles, pair);
 
     return (
         <Client
@@ -113,7 +74,8 @@ export default async function PairPage(props: PageProps) {
             chartData={{
                 processedCandles,
                 initialVisibleData,
-                histogramBoxes, // Pass pre-calculated box data
+                histogramBoxes,
+                histogramPreProcessed,
             }}
         />
     );
