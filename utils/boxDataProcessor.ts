@@ -17,6 +17,18 @@ export interface ProcessedBoxData {
             };
             meetingPointY: number;
             sliceWidth: number;
+            preCalculated: {
+                boxVisualData: {
+                    y: number;
+                    rangeY: number;
+                    rangeHeight: number;
+                    centerX: number;
+                    centerY: number;
+                    value: number;
+                }[];
+                positiveBoxesCount: number;
+                negativeBoxesCount: number;
+            };
         }[];
         defaultVisibleBoxesCount: number;
         defaultHeight: number;
@@ -92,6 +104,24 @@ export function processInitialBoxData(
         const high = Math.max(...visibleBoxes.map((box) => box.high));
         const low = Math.min(...visibleBoxes.map((box) => box.low));
 
+        // Pre-calculate box positions and dimensions for each box
+        const boxVisualData = visibleBoxes.map((box, boxIndex) => {
+            const y = Math.round(boxIndex * boxHeight);
+            const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
+            const rangeY = Math.round(box.value > 0 ? y + boxHeight - rangeHeight : y);
+            const centerX = initialBarWidth / 2;
+            const centerY = Math.round(y + boxHeight / 2);
+
+            return {
+                y,
+                rangeY,
+                rangeHeight,
+                centerX,
+                centerY,
+                value: box.value,
+            };
+        });
+
         return {
             frameData: {
                 boxArray: slice.boxes,
@@ -104,6 +134,11 @@ export function processInitialBoxData(
             },
             meetingPointY,
             sliceWidth: initialBarWidth,
+            preCalculated: {
+                boxVisualData,
+                positiveBoxesCount,
+                negativeBoxesCount,
+            },
         };
     });
 

@@ -261,7 +261,17 @@ const Oscillator: React.FC<{
     nextMeetingPointY: number | null;
     sliceWidth: number;
     onGetColorAndY?: (getColorAndY: GetColorAndY) => void;
-}> = ({ boxArray, height, visibleBoxesCount, meetingPointY, prevMeetingPointY, nextMeetingPointY, sliceWidth, onGetColorAndY }) => {
+    boxData: {
+        y: number;
+        rangeY: number;
+        rangeHeight: number;
+        centerX: number;
+        centerY: number;
+        value: number;
+    }[];
+    meetingPoints: { x: number; y: number }[];
+    interpolateY: (x: number) => number;
+}> = ({ boxArray, height, visibleBoxesCount, meetingPointY, prevMeetingPointY, nextMeetingPointY, sliceWidth, onGetColorAndY, boxData, meetingPoints, interpolateY }) => {
     const boxHeight = height / visibleBoxesCount;
     const sortedBoxes = useMemo(() => boxArray.slice(0, visibleBoxesCount), [boxArray, visibleBoxesCount]);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -275,54 +285,6 @@ const Oscillator: React.FC<{
     }, [sortedBoxes]);
 
     const colors = COLORS[sectionColor as keyof typeof COLORS];
-    const isGreen = sectionColor === 'GREEN';
-
-    const meetingPoints = useMemo(() => {
-        return [
-            { x: -sliceWidth / 2, y: prevMeetingPointY ?? meetingPointY },
-            { x: 0, y: prevMeetingPointY ?? meetingPointY },
-            { x: 0, y: meetingPointY },
-            { x: sliceWidth / 2, y: meetingPointY },
-            { x: sliceWidth, y: meetingPointY },
-            { x: sliceWidth, y: nextMeetingPointY ?? meetingPointY },
-            { x: sliceWidth * 1.5, y: nextMeetingPointY ?? meetingPointY },
-        ];
-    }, [prevMeetingPointY, meetingPointY, nextMeetingPointY, sliceWidth]);
-
-    // Pre-calculate box positions and dimensions
-    const boxData = useMemo(() => {
-        return sortedBoxes.map((box, index) => {
-            const y = Math.round(index * boxHeight);
-            const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
-            const rangeY = Math.round(box.value > 0 ? y + boxHeight - rangeHeight : y);
-            const centerX = sliceWidth / 2;
-            const centerY = Math.round(y + boxHeight / 2);
-
-            return {
-                y,
-                rangeY,
-                rangeHeight,
-                centerX,
-                centerY,
-                value: box.value,
-            };
-        });
-    }, [sortedBoxes, boxHeight, sliceWidth]);
-
-    const interpolateY = useCallback(
-        (x: number) => {
-            for (let i = 0; i < meetingPoints.length - 1; i++) {
-                const start = meetingPoints[i];
-                const end = meetingPoints[i + 1];
-                if (x >= start.x && x <= end.x) {
-                    const t = (x - start.x) / (end.x - start.x);
-                    return start.y + t * (end.y - start.y);
-                }
-            }
-            return meetingPointY;
-        },
-        [meetingPoints, meetingPointY]
-    );
 
     const getColorAndY = useCallback(
         (x: number) => {
@@ -340,7 +302,6 @@ const Oscillator: React.FC<{
         [sortedBoxes, colors.LIGHT, interpolateY]
     );
 
-    // Expose getColorAndY through prop
     useEffect(() => {
         if (onGetColorAndY) {
             onGetColorAndY(getColorAndY);
@@ -385,7 +346,7 @@ const Oscillator: React.FC<{
         ctx.stroke();
 
         // Draw boxes and dots in a single pass
-        boxData.forEach(({ y, rangeY, rangeHeight, centerX, centerY }) => {
+        boxData.forEach(({ rangeY, rangeHeight, centerX, centerY }) => {
             // Draw range
             ctx.fillStyle = colors.MEDIUM;
             ctx.fillRect(sliceWidth * 0.25, rangeY, sliceWidth * 0.5, rangeHeight);
@@ -422,7 +383,7 @@ const Oscillator: React.FC<{
                 height: `${height}px`,
             }}>
             <canvas ref={canvasRef} width={sliceWidth} height={height} className='absolute inset-0' />
-            <svg className='pointer-events-none absolute top-0 left-0 h-full w-full' style={{ zIndex: 200, overflow: 'visible' }}>
+            <svg className='pointer-events-none absolute top-0 h-full w-full' style={{ zIndex: 200, overflow: 'visible' }}>
                 <HistogramLine prevMeetingPointY={prevMeetingPointY} nextMeetingPointY={nextMeetingPointY} meetingPointY={meetingPointY} sliceWidth={sliceWidth} colors={colors} />
             </svg>
         </div>
@@ -467,6 +428,57 @@ const HistogramManager: React.FC<{
 
     const oscillatorRefs = useRef<(OscillatorRef | null)[]>([]);
     const [hoverInfo, setHoverInfo] = useState<any>(null);
+
+    const boxHeight = height / visibleBoxesCount;
+
+    // Calculate box data here for each frame
+    const getBoxData = useCallback(
+        (boxArray: Box[], sliceWidth: number) => {
+            return boxArray.map((box, index) => {
+                const y = Math.round(index * boxHeight);
+                const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
+                const rangeY = Math.round(box.value > 0 ? y + boxHeight - rangeHeight : y);
+                const centerX = sliceWidth / 2;
+                const centerY = Math.round(y + boxHeight / 2);
+
+                return {
+                    y,
+                    rangeY,
+                    rangeHeight,
+                    centerX,
+                    centerY,
+                    value: box.value,
+                };
+            });
+        },
+        [boxHeight]
+    );
+
+    // Calculate meeting points for each frame
+    const getMeetingPoints = useCallback((meetingPointY: number, prevMeetingPointY: number | null, nextMeetingPointY: number | null, sliceWidth: number) => {
+        return [
+            { x: -sliceWidth / 2, y: prevMeetingPointY ?? meetingPointY },
+            { x: 0, y: prevMeetingPointY ?? meetingPointY },
+            { x: 0, y: meetingPointY },
+            { x: sliceWidth / 2, y: meetingPointY },
+            { x: sliceWidth, y: meetingPointY },
+            { x: sliceWidth, y: nextMeetingPointY ?? meetingPointY },
+            { x: sliceWidth * 1.5, y: nextMeetingPointY ?? meetingPointY },
+        ];
+    }, []);
+
+    // Calculate interpolation for each frame
+    const getInterpolateY = useCallback((x: number, meetingPoints: { x: number; y: number }[], meetingPointY: number) => {
+        for (let i = 0; i < meetingPoints.length - 1; i++) {
+            const start = meetingPoints[i];
+            const end = meetingPoints[i + 1];
+            if (x >= start.x && x <= end.x) {
+                const t = (x - start.x) / (end.x - start.x);
+                return start.y + t * (end.y - start.y);
+            }
+        }
+        return meetingPointY;
+    }, []);
 
     const handleScroll = useCallback(() => {
         if (scrollContainerRef.current) {
@@ -517,6 +529,8 @@ const HistogramManager: React.FC<{
             const start = boxOffset;
             const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
             const visibleBoxArray = boxArray.slice(start, end);
+            const boxData = getBoxData(visibleBoxArray, sliceWidth);
+            const meetingPoints = getMeetingPoints(meetingPointY, prevMeetingPointY, nextMeetingPointY, sliceWidth);
 
             return (
                 <Oscillator
@@ -530,15 +544,18 @@ const HistogramManager: React.FC<{
                     onGetColorAndY={(getColorAndY) => {
                         oscillatorRefs.current[index] = {
                             getColorAndY,
-                            meetingPoints: [],
+                            meetingPoints,
                             sliceWidth,
                             visibleBoxesCount,
                         };
                     }}
+                    boxData={boxData}
+                    meetingPoints={meetingPoints}
+                    interpolateY={(x: number) => getInterpolateY(x, meetingPoints, meetingPointY)}
                 />
             );
         },
-        [height, boxOffset, visibleBoxesCount]
+        [height, boxOffset, visibleBoxesCount, getBoxData, getMeetingPoints, getInterpolateY]
     );
 
     // Update hover info when offset changes
@@ -681,41 +698,22 @@ const HistogramLine: React.FC<{
     meetingPointY: number;
     sliceWidth: number;
     colors: typeof COLORS.GREEN | typeof COLORS.RED | typeof COLORS.NEUTRAL;
-}> = ({ prevMeetingPointY, nextMeetingPointY, meetingPointY, sliceWidth, colors }) => {
-    const cornerRadius = sliceWidth / 8; // Adjust this value to control the roundness of corners
-
+    isLastItem?: boolean;
+}> = ({ prevMeetingPointY, nextMeetingPointY, meetingPointY, sliceWidth, colors, isLastItem }) => {
     return (
         <>
-            {prevMeetingPointY !== null && (
-                <path
-                    d={`M ${-sliceWidth / 2} ${prevMeetingPointY} 
-                        H ${-cornerRadius}
-                        Q 0 ${prevMeetingPointY}, 0 ${prevMeetingPointY + Math.sign(meetingPointY - prevMeetingPointY) * cornerRadius}
-                        V ${meetingPointY - Math.sign(meetingPointY - prevMeetingPointY) * cornerRadius}
-                        Q 0 ${meetingPointY}, ${cornerRadius} ${meetingPointY}
-                        H ${sliceWidth / 2}`}
-                    fill='none'
-                    stroke={colors.LIGHT}
-                    strokeWidth='3'
-                    className='transition-all duration-200 ease-in-out'>
-                    <animate attributeName='stroke-dashoffset' from='0' to='20' dur='20s' repeatCount='indefinite' />
-                </path>
-            )}
-            {nextMeetingPointY !== null ? (
-                <path
-                    d={`M ${sliceWidth / 2} ${meetingPointY} 
-                        H ${sliceWidth - cornerRadius}
-                        Q ${sliceWidth} ${meetingPointY}, ${sliceWidth} ${meetingPointY + Math.sign(nextMeetingPointY - meetingPointY) * cornerRadius}
-                        V ${nextMeetingPointY - Math.sign(nextMeetingPointY - meetingPointY) * cornerRadius}
-                        Q ${sliceWidth} ${nextMeetingPointY}, ${sliceWidth + cornerRadius} ${nextMeetingPointY}
-                        H ${sliceWidth * 1.5}`}
-                    fill='none'
-                    stroke={colors.LIGHT}
-                    strokeWidth='3'
-                    className='transition-all duration-200 ease-in-out'>
-                    <animate attributeName='stroke-dashoffset' from='0' to='20' dur='20s' repeatCount='indefinite' />
-                </path>
-            ) : (
+            <path
+                d={`M 0 ${prevMeetingPointY ?? meetingPointY}
+                    H ${sliceWidth / 2}
+                    V ${meetingPointY}
+                    H ${sliceWidth}
+                    `}
+                fill='none'
+                stroke={colors.LIGHT}
+                strokeWidth='2'
+                className='transition-all duration-200 ease-in-out'
+            />
+            {isLastItem && (
                 <circle cx={sliceWidth / 2} cy={meetingPointY} r='4' fill={colors.LIGHT}>
                     <animate attributeName='r' values='3;5;3' dur='2s' repeatCount='indefinite' />
                 </circle>
