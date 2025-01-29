@@ -33,7 +33,6 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
                 <WebSocketProvider>
                     <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
                         <div id='app-container' className='min-h-screen bg-black'>
-                            <NavbarPublic />
                             <main className='w-full bg-black pt-16 transition-all duration-300 ease-in-out'>{children}</main>
                         </div>
                     </DashboardProvider>

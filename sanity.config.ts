@@ -3,7 +3,7 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { contentBlock, headingBlock, headingSplineBlock, teamBlock, teamGrid, sceneBlock } from '@/utils/sanity/blocks/index';
 import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
-import { audio, category, glossary, img, posts, team, video, changelog, module, lesson, marketData, faq } from '@/utils/sanity/schemas';
+import { audio, category, glossary, img, posts, team, video, changelog, module, lesson, marketData, faq, pairSnapshot } from '@/utils/sanity/schemas';
 import { CustomField } from '@/utils/sanity/ui/CustomField';
 import { CustomItem } from '@/utils/sanity/ui/CustomItem';
 
@@ -37,6 +37,7 @@ export default defineConfig({
             marketData,
             faq,
             page,
+            pairSnapshot,
             teamGrid,
             sceneBlock,
         ],

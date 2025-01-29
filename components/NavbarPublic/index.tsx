@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 
 export const NavbarPublic = () => {
     return (
@@ -19,20 +18,6 @@ export const NavbarPublic = () => {
                     </Link>
                     <Link href='/about' className='text-sm text-gray-300 hover:text-white'>
                         About
-                    </Link>
-                </div>
-
-                {/* Auth Buttons */}
-                <div className='flex items-center gap-4'>
-                    <Link href='/signin'>
-                        <Button variant='ghost' className='text-sm text-gray-300 hover:text-white'>
-                            Sign In
-                        </Button>
-                    </Link>
-                    <Link href='/signup'>
-                        <Button variant='default' className='text-sm'>
-                            Get Started
-                        </Button>
                     </Link>
                 </div>
             </div>
