@@ -28,11 +28,25 @@ const useBoxColors = (box: Box, boxColors: BoxColors) => {
 const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof useBoxColors>, index: number) => {
     return useMemo(() => {
         const calculatedSize = (Math.abs(box.value) / maxSize) * containerSize;
-        const positionStyle = !prevColor ? { top: 0, right: 0 } : prevColor.includes(boxColors.negative.split(',')[0]) ? { bottom: 0, right: 0 } : { top: 0, right: 0 };
+        const positionStyle: React.CSSProperties = !prevColor
+            ? { top: 0, right: 0 }
+            : prevColor.includes(boxColors.negative.split(',')[0])
+              ? { bottom: 0, right: 0 }
+              : { top: 0, right: 0 };
 
-        // Determine direction of slant based on box value
-        const xOffset = 3; // Always move right
-        const yOffset = box.value > 0 ? -3 : 3; // Move up for positive, down for negative
+        // Handle different view modes
+        let transform = undefined;
+        if (boxColors.styles?.viewMode === 'perspective') {
+            const xOffset = 3; // Always move right
+            const yOffset = box.value > 0 ? -3 : 3; // Move up for positive, down for negative
+            transform = `translate(${xOffset}px, ${yOffset}px)`;
+        } else if (boxColors.styles?.viewMode === 'centered') {
+            // Keep all boxes perfectly aligned in the center
+            positionStyle.top = '49.5%';
+            positionStyle.left = '51%';
+
+            transform = 'translate(-50.5%, -49.5%)';
+        }
 
         const baseStyles: React.CSSProperties = {
             width: `${calculatedSize}px`,
@@ -43,7 +57,7 @@ const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, 
             borderWidth: boxColors.styles?.showBorder ? '1px' : '0',
             transition: 'all 0.3s ease-out',
             position: 'absolute',
-            transform: boxColors.styles?.perspective ? `translate(${xOffset}px, ${yOffset}px)` : undefined,
+            transform,
         };
 
         const isFirstDifferent = prevColor && ((box.value > 0 && prevColor.includes(boxColors.negative)) || (box.value < 0 && prevColor.includes(boxColors.positive)));
@@ -59,7 +73,7 @@ const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, 
         boxColors.positive,
         boxColors.styles?.showBorder,
         boxColors.styles?.borderRadius,
-        boxColors.styles?.perspective,
+        boxColors.styles?.viewMode,
         containerSize,
         maxSize,
         index,
