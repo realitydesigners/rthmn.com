@@ -14,6 +14,14 @@ interface ChartDataPoint {
     timestamp: number;
     scaledX: number;
     scaledY: number;
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    scaledOpen: number;
+    scaledHigh: number;
+    scaledLow: number;
+    scaledClose: number;
 }
 
 class OptimizedPriceBuffer {
@@ -68,33 +76,58 @@ const PathGenerator = {
     },
 };
 
-// Add this memoized function at the top level
 const processCandles = (candles: Candle[], buffer: OptimizedPriceBuffer) => {
     buffer.clear();
     candles.forEach((candle) => {
         const point: ChartDataPoint = {
             price: Number(candle.close),
             timestamp: typeof candle.time === 'string' ? new Date(candle.time).getTime() : candle.time,
+            open: Number(candle.open),
+            high: Number(candle.high),
+            low: Number(candle.low),
+            close: Number(candle.close),
             scaledX: 0,
             scaledY: 0,
+            scaledOpen: 0,
+            scaledHigh: 0,
+            scaledLow: 0,
+            scaledClose: 0,
         };
         buffer.push(point);
     });
 };
 
-// Add HoverInfo component definition at the top with other components
-interface HoverInfoProps {
+// Update the hover info interface
+interface HoverInfo {
     x: number;
     y: number;
-    chartHeight: number;
-    chartWidth: number;
+    price: number;
+    time: string;
+    candle: {
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+    };
 }
 
 const ensureNumber = (value: number) => {
     return isNaN(value) || !isFinite(value) ? 0 : value;
 };
 
-const HoverInfo: React.FC<HoverInfoProps> = ({ x, y, chartHeight, chartWidth }) => {
+// Update HoverInfo component
+const HoverInfo: React.FC<{
+    x: number;
+    y: number;
+    chartHeight: number;
+    chartWidth: number;
+    candle?: {
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+    };
+}> = ({ x, y, chartHeight, chartWidth, candle }) => {
     const safeX = ensureNumber(x);
     const safeY = ensureNumber(y);
 
@@ -102,9 +135,8 @@ const HoverInfo: React.FC<HoverInfoProps> = ({ x, y, chartHeight, chartWidth }) 
 
     return (
         <g>
-            <line x1={safeX} y1={0} x2={safeX} y2={chartHeight} stroke='rgba(255,255,255,0.5)' strokeWidth='1' />
-            <line x1={0} y1={safeY} x2={chartWidth} y2={safeY} stroke='rgba(255,255,255,0.5)' strokeWidth='1' />
-            <circle cx={safeX} cy={safeY} r='4' fill='white' />
+            <line x1={safeX} y1={0} x2={safeX} y2={chartHeight} stroke='rgba(255,255,255,0.3)' strokeWidth='1' />
+            <line x1={0} y1={safeY} x2={chartWidth} y2={safeY} stroke='rgba(255,255,255,0.3)' strokeWidth='1' />
         </g>
     );
 };
@@ -169,12 +201,7 @@ export const LineChart = ({ pair, candles = [], height = 400 }: LineChartProps) 
     const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
     const chartHeight = dimensions.height - chartPadding.top - chartPadding.bottom;
 
-    const [hoverInfo, setHoverInfo] = useState<{
-        x: number;
-        y: number;
-        price: number;
-        time: string;
-    } | null>(null);
+    const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
 
     // Keep dimension update effect but make it more responsive
     useEffect(() => {
@@ -288,30 +315,61 @@ export const LineChart = ({ pair, candles = [], height = 400 }: LineChartProps) 
         if (!formattedCandles.length) {
             return { minY: 0, maxY: 0, yScale: 1 };
         }
-        const prices = formattedCandles.map((d) => d.close);
-        const minY = Math.min(...prices);
-        const maxY = Math.max(...prices);
-        const yScale = chartHeight / (maxY - minY || 1);
-        return { minY, maxY, yScale };
-    }, [formattedCandles, chartHeight]);
 
-    // Update the scaledData calculation
+        // Calculate visible range based on scroll position
+        const visibleCount = Math.min(formattedCandles.length, VISIBLE_POINTS);
+        const startIndex = Math.floor((scrollLeft / chartWidth) * formattedCandles.length);
+        const endIndex = Math.min(startIndex + visibleCount, formattedCandles.length);
+        const visibleCandles = formattedCandles.slice(startIndex, endIndex);
+
+        // Calculate price range for visible candles only
+        const highs = visibleCandles.map((c) => Number(c.high));
+        const lows = visibleCandles.map((c) => Number(c.low));
+        const minY = Math.min(...lows);
+        const maxY = Math.max(...highs);
+        const padding = (maxY - minY) * 0.1;
+
+        return {
+            minY: minY - padding,
+            maxY: maxY + padding,
+            yScale: chartHeight / (maxY + padding - (minY - padding) || 1),
+        };
+    }, [formattedCandles, chartWidth, chartHeight, scrollLeft]);
+
+    // Update the scaledData calculation to use the same scaling
     const scaledData = useMemo(() => {
         if (!formattedCandles.length) return [];
 
-        const midPrice = (maxY + minY) / 2;
-        return formattedCandles.map((point, index) => {
-            const price = Number(point.close) || 0; // Ensure number
-            const scaledX = ensureNumber(index * (chartWidth / (formattedCandles.length - 1)));
-            const scaledY = ensureNumber(chartHeight / 2 - ((price - midPrice) * yScale) / animatedScale);
+        // Calculate visible range based on scroll position
+        const visibleCount = Math.min(formattedCandles.length, VISIBLE_POINTS);
+        const startIndex = Math.floor((scrollLeft / chartWidth) * formattedCandles.length);
+        const endIndex = Math.min(startIndex + visibleCount, formattedCandles.length);
+        const visibleCandles = formattedCandles.slice(startIndex, endIndex);
+
+        const priceRange = maxY - minY;
+        const xScaleFactor = chartWidth / (visibleCount - 1);
+
+        const scaleY = (price: number) => {
+            const normalized = (price - minY) / priceRange;
+            return chartHeight * (1 - normalized / yAxisScale);
+        };
+
+        return visibleCandles.map((candle, index) => {
+            const scaledX = index * xScaleFactor;
+
             return {
-                ...point,
-                price,
+                ...candle,
+                price: Number(candle.close),
+                timestamp: candle.timestamp,
                 scaledX,
-                scaledY,
+                scaledY: scaleY(candle.close),
+                scaledOpen: scaleY(candle.open),
+                scaledHigh: scaleY(candle.high),
+                scaledLow: scaleY(candle.low),
+                scaledClose: scaleY(candle.close),
             };
         });
-    }, [formattedCandles, chartWidth, chartHeight, minY, maxY, yScale, animatedScale]);
+    }, [formattedCandles, chartWidth, chartHeight, scrollLeft, minY, maxY, yAxisScale]);
 
     const pathData = useMemo(() => {
         return PathGenerator.generate(scaledData, chartWidth, chartHeight);
@@ -325,39 +383,78 @@ export const LineChart = ({ pair, candles = [], height = 400 }: LineChartProps) 
         setYAxisScale((prev) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev * scaleFactor)));
     }, []);
 
-    const handleSvgMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
-        const svgRect = event.currentTarget.getBoundingClientRect();
-        const x = event.clientX - svgRect.left - chartPadding.left;
+    const handleSvgMouseMove = useCallback(
+        (event: React.MouseEvent<SVGSVGElement>) => {
+            if (isDragging) return;
 
-        if (x >= 0 && x <= chartWidth) {
-            const xRatio = x / chartWidth;
-            const index = Math.floor(xRatio * (scaledData.length - 1));
-            if (index >= 0 && index < scaledData.length) {
-                const point = scaledData[index];
-                setHoverInfo({
-                    x: point.scaledX,
-                    y: point.scaledY,
-                    price: point.price,
-                    time: formatTime(new Date(point.timestamp)),
-                });
+            const svgRect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX - svgRect.left - chartPadding.left;
+
+            if (x >= 0 && x <= chartWidth) {
+                const xRatio = x / chartWidth;
+                const index = Math.floor(xRatio * (scaledData.length - 1));
+                if (index >= 0 && index < scaledData.length) {
+                    const point = scaledData[index];
+                    setHoverInfo({
+                        x: point.scaledX,
+                        y: point.scaledClose, // Use close price for crosshair
+                        price: point.close,
+                        time: formatTime(new Date(point.timestamp)),
+                        candle: {
+                            open: point.open,
+                            high: point.high,
+                            low: point.low,
+                            close: point.close,
+                        },
+                    });
+                }
+            } else {
+                setHoverInfo(null);
             }
-        } else {
-            setHoverInfo(null);
-        }
-    };
+        },
+        [isDragging, chartWidth, chartPadding.left, scaledData]
+    );
 
     const handleMouseLeave = useCallback(() => {
         setHoverInfo(null);
     }, []);
 
-    // Add early return for empty data
-    if (!formattedCandles.length) {
+    // Replace the ChartLine component with CandleSticks
+    const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
+        // Calculate candle width based on visible area
+        const candleWidth = Math.max(2, Math.min(20, (width / data.length) * 0.8));
+        const halfCandleWidth = candleWidth / 2;
+
         return (
-            <div style={{ height }} className='flex items-center justify-center text-sm text-gray-400'>
-                No chart data available
-            </div>
+            <g>
+                {data.map((point, i) => {
+                    const isGreen = point.close >= point.open;
+                    const candleColor = isGreen ? '#fff' : '#eee';
+
+                    // Ensure positive values for rect
+                    const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
+                    const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
+                    const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+
+                    // Skip rendering if outside visible area
+                    if (point.scaledX < -candleWidth || point.scaledX > width + candleWidth) {
+                        return null;
+                    }
+
+                    return (
+                        <g key={i} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
+                            {/* Wick */}
+                            <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth='1' />
+                            {/* Body */}
+                            <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill={candleColor} />
+                        </g>
+                    );
+                })}
+            </g>
         );
-    }
+    });
+
+    CandleSticks.displayName = 'CandleSticks';
 
     return (
         <div
@@ -373,12 +470,12 @@ export const LineChart = ({ pair, candles = [], height = 400 }: LineChartProps) 
                 height='100%'
                 viewBox={`0 0 ${dimensions.width} ${dimensions.height}`}
                 preserveAspectRatio='none'
-                className='touch-pan-x touch-pan-y' // Add touch support
+                className='touch-pan-x touch-pan-y'
                 onMouseMove={handleSvgMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
                 <g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
-                    <ChartLine pathData={pathData} width={chartWidth} height={chartHeight} yAxisScale={animatedScale} />
+                    <CandleSticks data={scaledData} width={chartWidth} height={chartHeight} />
                     <XAxis data={scaledData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
                     <YAxis
                         minY={minY}
@@ -390,35 +487,18 @@ export const LineChart = ({ pair, candles = [], height = 400 }: LineChartProps) 
                         yAxisScale={animatedScale}
                         hoverInfo={hoverInfo}
                     />
-                    {hoverInfo && <HoverInfo x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
+                    {hoverInfo && <HoverInfo x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} candle={hoverInfo.candle} />}
                 </g>
             </svg>
         </div>
     );
 };
 
-const ChartLine: React.FC<{
-    pathData: string;
-    width: number;
-    height: number;
-    yAxisScale: number;
-}> = React.memo(({ pathData, width, height }) => {
-    const pathRef = useRef<SVGPathElement>(null);
-
-    useEffect(() => {
-        if (pathRef.current) {
-            pathRef.current.setAttribute('d', pathData);
-        }
-    }, [pathData]);
-
-    return <path ref={pathRef} stroke='white' strokeWidth='1.5' fill='none' className={styles.chartLine} />;
-});
-
 const XAxis: React.FC<{
     data: ChartDataPoint[];
     chartWidth: number;
     chartHeight: number;
-    hoverInfo: { time: string; x: number } | null;
+    hoverInfo: HoverInfo | null;
     formatTime: (date: Date) => string;
 }> = memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
     const intervals = useMemo(() => {
@@ -447,33 +527,23 @@ const XAxis: React.FC<{
         return result;
     }, [data, chartWidth]);
 
-    if (data.length === 0) {
-        return null;
-    }
+    if (data.length === 0) return null;
 
     return (
         <g className='x-axis' transform={`translate(0, ${chartHeight})`}>
             <line x1={0} y1={0} x2={chartWidth} y2={0} stroke='#777' />
-            {intervals.map((point, index) => {
-                const xPosition = ((point.timestamp - data[0].timestamp) / (data[data.length - 1].timestamp - data[0].timestamp)) * chartWidth;
-
-                // Create a unique key using both timestamp and index
-                const uniqueKey = `time-${point.timestamp}-${index}`;
-
-                return (
-                    <g key={uniqueKey} transform={`translate(${xPosition}, 0)`}>
-                        <line y2={6} stroke='#777' />
-                        <text y={20} textAnchor='middle' fill='#fff' fontSize='12'>
-                            {formatTime(new Date(point.timestamp))}
-                        </text>
-                        <line y1={-chartHeight} y2={0} stroke='#777' strokeOpacity='0.2' strokeDasharray='4 4' />
-                    </g>
-                );
-            })}
+            {intervals.map((point, index) => (
+                <g key={`time-${point.timestamp}-${index}`} transform={`translate(${point.scaledX}, 0)`}>
+                    <line y2={6} stroke='#777' />
+                    <text y={20} textAnchor='middle' fill='#fff' fontSize='12'>
+                        {formatTime(new Date(point.timestamp))}
+                    </text>
+                </g>
+            ))}
             {hoverInfo && (
                 <g transform={`translate(${hoverInfo.x}, 0)`}>
-                    <rect x={-40} y={5} width={80} height={20} fill='#d1d5db' rx={4} />
-                    <text x={0} y={20} textAnchor='middle' fill='#000' fontSize='12' fontWeight='bold'>
+                    <rect x={-40} y={5} width={80} height={20} fill='#1f2937' rx={4} />
+                    <text x={0} y={20} textAnchor='middle' fill='white' fontSize='12' fontWeight='bold'>
                         {hoverInfo.time}
                     </text>
                 </g>
@@ -490,7 +560,7 @@ const YAxis: React.FC<{
     onDrag: (deltaY: number) => void;
     onScale: (scaleFactor: number) => void;
     yAxisScale: number;
-    hoverInfo: { price: number; y: number } | null;
+    hoverInfo: HoverInfo | null;
 }> = memo(({ minY, maxY, chartHeight, chartWidth, onDrag, onScale, yAxisScale, hoverInfo }) => {
     const handleMouseDown = useCallback(
         (event: React.MouseEvent) => {
@@ -518,13 +588,19 @@ const YAxis: React.FC<{
         [onScale]
     );
 
-    const visibleRange = maxY - minY;
-    const midPrice = (maxY + minY) / 2;
-    const scaledVisibleRange = visibleRange * yAxisScale;
-    const visibleMin = midPrice - scaledVisibleRange / 2;
-    const visibleMax = midPrice + scaledVisibleRange / 2;
-    const steps = Math.max(2, Math.round(chartHeight < 300 ? 4 : 10 * yAxisScale));
-    const stepSize = scaledVisibleRange / steps;
+    const priceRange = maxY - minY;
+
+    const scaleY = (price: number) => {
+        const normalized = (price - minY) / priceRange;
+        return chartHeight * (1 - normalized / yAxisScale);
+    };
+
+    // Calculate price levels with more precision
+    const numLevels = 8; // Increased number of levels
+    const prices = Array.from({ length: numLevels }, (_, i) => {
+        const ratio = i / (numLevels - 1);
+        return minY + priceRange * ratio;
+    });
 
     return (
         <g
@@ -534,37 +610,33 @@ const YAxis: React.FC<{
             onWheel={handleWheel}
             style={{
                 userSelect: 'none',
-                WebkitUserSelect: 'none', // For Safari
-                MozUserSelect: 'none', // For Firefox
-                msUserSelect: 'none', // For IE/Edge
+                WebkitUserSelect: 'none',
+                MozUserSelect: 'none',
+                msUserSelect: 'none',
             }}>
             <rect x={0} y={0} width={60} height={chartHeight} fill='transparent' cursor='ns-resize' />
             <line x1={0} y1={0} x2={0} y2={chartHeight} stroke='#777' />
-            {Array.from({ length: steps + 1 }, (_, i) => {
-                const value = visibleMax - i * stepSize;
-                const y = (i / steps) * chartHeight;
+
+            {/* Price levels */}
+            {prices.map((price, i) => {
+                const y = scaleY(price);
                 return (
                     <g key={i} transform={`translate(0, ${y})`}>
-                        <line x2={6} stroke='#777' />
-                        <text x={10} y={4} textAnchor='start' fill='#fff' fontSize='12'>
-                            {value.toFixed(3)}
+                        <line x1={0} x2={5} stroke='#777' />
+                        <text x={10} y={4} fill='white' fontSize='12' textAnchor='start'>
+                            {price.toFixed(5)}
                         </text>
-                        <line x1={0} y1={0} x2={-chartWidth} y2={0} stroke='#777' strokeOpacity='0.2' strokeDasharray='4 4' />
+                        <line x1={0} y1={0} x2={-chartWidth} y2={0} stroke='#777' strokeOpacity='0.1' strokeDasharray='4 4' />
                     </g>
                 );
             })}
+
+            {/* Hover price */}
             {hoverInfo && (
-                <g transform={`translate(0, ${ensureNumber(chartHeight * (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange))})`}>
-                    <rect
-                        x={3}
-                        y={-10}
-                        width={55}
-                        height={Math.max(20, 0)} // Ensure positive height
-                        fill='#d1d5db'
-                        rx={4}
-                    />
-                    <text x={30} y={4} textAnchor='middle' fill='#000' fontSize='12' fontWeight='bold'>
-                        {hoverInfo.price.toFixed(3)}
+                <g transform={`translate(0, ${hoverInfo.y})`}>
+                    <rect x={3} y={-10} width={65} height={20} fill='#1f2937' rx={4} />
+                    <text x={33} y={4} textAnchor='middle' fill='white' fontSize='12' fontWeight='bold'>
+                        {hoverInfo.price.toFixed(5)}
                     </text>
                 </g>
             )}

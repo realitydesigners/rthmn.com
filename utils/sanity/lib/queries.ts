@@ -317,6 +317,15 @@ export const pageQuery = groq`
   }
 `;
 
+export const pairSnapshotQuery = groq`
+  *[_type == "pairSnapshot" && pair == $pair][0] {
+    _type,
+    pair,
+    candleData,
+    lastUpdated
+  }
+`;
+
 export async function getModules() {
     return client.fetch(
         groq`*[_type == "module"] | order(order asc) {

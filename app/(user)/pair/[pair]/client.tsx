@@ -11,12 +11,13 @@ import { createBoxCalculator } from '../boxCalculator';
 
 interface DashboardClientProps {
     pair: string;
+    initialCandleData: any[];
 }
 
-const Client: React.FC<DashboardClientProps> = ({ pair }) => {
+const Client: React.FC<DashboardClientProps> = ({ pair, initialCandleData }) => {
     const { session } = useAuth();
     const [initialData, setInitialData] = useState<BoxSlice[]>([]);
-    const [candleData, setCandleData] = useState<any[]>([]);
+    const [candleData, setCandleData] = useState<any[]>(initialCandleData);
     const [boxData, setBoxData] = useState<any>(null);
     const [histogramData, setHistogramData] = useState<BoxSlice[]>([]);
     const { boxOffset, handleOffsetChange } = useUrlParams(pair);
@@ -67,7 +68,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
     useEffect(() => {
         if (session && session.access_token) {
             const token = session.access_token;
-            const CANDLE_LIMIT = 100;
+            const CANDLE_LIMIT = 200;
 
             const fetchCandles = async () => {
                 try {
@@ -171,7 +172,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
 
     return (
         <div className='w-full px-2 pt-16 sm:px-4 lg:pt-18'>
-            <div className='min-h-[600px]'>
+            <div className='h-full'>
                 {candleData && candleData.length > 0 ? (
                     <LineChart pair={pair} candles={candleData} />
                 ) : (
@@ -179,7 +180,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
                 )}
             </div>
 
-            <div className='relative bottom-0 z-90 shrink-0'>
+            {/* <div className='relative bottom-0 z-90 shrink-0'>
                 <HistogramManager
                     data={histogramData}
                     height={histogramHeight}
@@ -195,7 +196,7 @@ const Client: React.FC<DashboardClientProps> = ({ pair }) => {
                     onDragStart={handleDragStart}
                     containerWidth={rthmnVisionDimensions.width}
                 />
-            </div>
+            </div> */}
         </div>
     );
 };
