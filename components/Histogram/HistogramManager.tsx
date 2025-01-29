@@ -584,7 +584,7 @@ const HistogramManager: React.FC<{
 
     return (
         <>
-            <div className='relative flex h-full w-full bg-black pr-16' style={{ height: `${height}px`, transition: 'height 0.1s ease-out' }} ref={containerRef}>
+            <div className='relative flex h-[200px] w-full pr-16' style={{ height: `${height}px`, transition: 'height 0.1s ease-out' }} ref={containerRef}>
                 <DraggableBorder isDragging={isDragging} onDragStart={onDragStart} direction='top' />
                 {data && data.length > 0 && (
                     <div className='flex h-full w-full'>

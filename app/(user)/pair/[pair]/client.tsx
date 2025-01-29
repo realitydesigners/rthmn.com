@@ -21,7 +21,6 @@ interface DashboardClientProps {
 
 const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
     const { session } = useAuth();
-    const [initialData, setInitialData] = useState<BoxSlice[]>([]);
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [boxData, setBoxData] = useState<any>(null);
     const [histogramData, setHistogramData] = useState<BoxSlice[]>([]);
@@ -49,6 +48,64 @@ const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
         setViewType(newViewType);
     };
 
+    // Calculate box data whenever candleData changes
+    useEffect(() => {
+        if (!candleData.length) return;
+
+        try {
+            // Convert candleData back to the format needed for box calculations
+            const reversedData = candleData.map((candle) => ({
+                timestamp: new Date(candle.timestamp).toISOString(),
+                open: candle.open,
+                high: candle.high,
+                low: candle.low,
+                close: candle.close,
+                mid: {
+                    o: candle.open.toString(),
+                    h: candle.high.toString(),
+                    l: candle.low.toString(),
+                    c: candle.close.toString(),
+                },
+            }));
+
+            // Calculate boxes for each timestamp
+            const boxTimeseriesData = reversedData.map((_, index) => {
+                const candleSlice = reversedData.slice(0, index + 1);
+                const boxCalculator = createBoxCalculator(pair.toUpperCase());
+                const boxResults = boxCalculator.calculateBoxArrays(candleSlice);
+                return {
+                    timestamp: reversedData[index].timestamp,
+                    boxes: boxResults,
+                    currentOHLC: {
+                        open: reversedData[index].open,
+                        high: reversedData[index].high,
+                        low: reversedData[index].low,
+                        close: reversedData[index].close,
+                    },
+                };
+            });
+
+            // Transform box data for HistogramManager
+            const histogramBoxes = boxTimeseriesData.map((timepoint) => ({
+                timestamp: timepoint.timestamp,
+                boxes: Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
+                    high: Number(data.high),
+                    low: Number(data.low),
+                    value: data.value,
+                })),
+                currentOHLC: timepoint.currentOHLC,
+            }));
+
+            console.log('Box timeseries data:', boxTimeseriesData);
+            console.log('Histogram data:', histogramBoxes);
+
+            setBoxData(boxTimeseriesData);
+            setHistogramData(histogramBoxes);
+        } catch (error) {
+            console.error('Error calculating box data:', error);
+        }
+    }, [candleData, pair]);
+
     useEffect(() => {
         const updateDimensions = () => {
             if (containerRef.current) {
@@ -70,122 +127,38 @@ const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
         };
     }, [histogramHeight]);
 
+    // Update candleData when chartData changes
     useEffect(() => {
-        if (session?.access_token) {
-            const token = session.access_token;
-            const CANDLE_LIMIT = 200;
+        setCandleData(chartData.processedCandles);
+    }, [chartData]);
 
-            const fetchCandles = async () => {
-                try {
-                    const response = await fetch(`/api/getCandles?pair=${pair.toUpperCase()}&limit=${CANDLE_LIMIT}&token=${token}`);
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const { data } = await response.json();
+    useEffect(() => {
+        const updateDimensions = () => {
+            if (containerRef.current) {
+                const containerHeight = containerRef.current.clientHeight;
+                const containerWidth = containerRef.current.clientWidth;
+                const newRthmnVisionHeight = containerHeight - histogramHeight - 80;
+                setRthmnVisionDimensions({
+                    width: containerWidth,
+                    height: Math.max(newRthmnVisionHeight, 200),
+                });
+            }
+        };
 
-                    // Create a reversed copy of the data
-                    const reversedData = [...data].reverse();
+        updateDimensions();
+        window.addEventListener('resize', updateDimensions);
 
-                    // Transform the data to match LineChart's expected format
-                    const formattedCandles = reversedData.map((candle) => ({
-                        timestamp: new Date(candle.timestamp).getTime(),
-                        close: Number(candle.close),
-                        high: Number(candle.high),
-                        low: Number(candle.low),
-                        open: Number(candle.open),
-                        volume: Number(candle.volume),
-                        scaledX: 0,
-                        scaledY: 0,
-                        scaledOpen: 0,
-                        scaledHigh: 0,
-                        scaledLow: 0,
-                        scaledClose: 0,
-                    }));
-
-                    // Calculate boxes for each timestamp
-                    const boxTimeseriesData = reversedData.map((_, index) => {
-                        const candleSlice = reversedData.slice(0, index + 1);
-                        const boxCalculator = createBoxCalculator(pair.toUpperCase());
-                        const boxResults = boxCalculator.calculateBoxArrays(candleSlice);
-                        return {
-                            timestamp: reversedData[index].timestamp,
-                            boxes: boxResults,
-                            currentOHLC: {
-                                open: Number(reversedData[index].open),
-                                high: Number(reversedData[index].high),
-                                low: Number(reversedData[index].low),
-                                close: Number(reversedData[index].close),
-                            },
-                        };
-                    });
-
-                    // Transform box data for HistogramManager
-                    const histogramBoxes = boxTimeseriesData.map((timepoint) => ({
-                        timestamp: timepoint.timestamp,
-                        boxes: Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
-                            high: Number(data.high),
-                            low: Number(data.low),
-                            value: data.value,
-                        })),
-                        currentOHLC: timepoint.currentOHLC,
-                    }));
-
-                    console.log('Box timeseries data:', boxTimeseriesData);
-                    console.log('Histogram data:', histogramBoxes);
-
-                    setCandleData(formattedCandles);
-                    setBoxData(boxTimeseriesData);
-                    setHistogramData(histogramBoxes);
-                } catch (error) {
-                    console.error('Error fetching candle data:', error);
-                    // On error, keep using the server-processed data
-                    setCandleData(chartData.processedCandles);
-                }
-            };
-
-            fetchCandles();
-        }
-    }, [session, pair, chartData.processedCandles]);
-
-    const BoxTable = () => {
-        if (!boxData?.length) return null;
-
-        return (
-            <div className='max-h-[400px] overflow-auto'>
-                <table className='w-full text-left text-sm text-gray-300'>
-                    <thead className='sticky top-0 bg-gray-900 text-xs uppercase'>
-                        <tr>
-                            <th className='px-6 py-3'>Timestamp</th>
-                            {Object.keys(boxData[0].boxes).map((size) => (
-                                <th key={size} className='px-6 py-3'>
-                                    Box {size}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className='divide-y divide-gray-800'>
-                        {boxData.map((timepoint) => (
-                            <tr key={timepoint.timestamp} className='bg-black hover:bg-gray-900'>
-                                <td className='px-6 py-4 whitespace-nowrap'>{new Date(timepoint.timestamp).toLocaleString()}</td>
-                                {Object.entries(timepoint.boxes).map(([size, data]: [string, any]) => (
-                                    <td key={size} className='px-6 py-4'>
-                                        <div className='space-y-1'>
-                                            <div className='text-gray-400'>H: {data.high.toFixed(3)}</div>
-                                            <div className='text-gray-400'>L: {data.low.toFixed(3)}</div>
-                                            <div className={`font-medium ${data.value > 0 ? 'text-green-500' : 'text-red-500'}`}>V: {data.value}</div>
-                                        </div>
-                                    </td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
-    };
+        return () => {
+            window.removeEventListener('resize', updateDimensions);
+        };
+    }, [histogramHeight]);
 
     return (
         <div className='relative flex h-screen w-full'>
-            <LineChart candles={candleData} initialVisibleData={chartData.initialVisibleData} />
-            {/* <div className='relative bottom-0 z-90 shrink-0'>
+            <div className='relative h-[90vh] w-full'>
+                <LineChart candles={candleData} initialVisibleData={chartData.initialVisibleData} />
+            </div>
+            {/* <div className='fixed bottom-2 z-90 shrink-0'>
                 <HistogramManager
                     data={histogramData}
                     height={histogramHeight}
