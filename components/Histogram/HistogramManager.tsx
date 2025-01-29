@@ -1,11 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import SelectedFrameDetails from './SelectedFrameDetails';
-import type { BoxSlice, ViewType, Box } from '@/types/types';
+import type { BoxSlice, Box } from '@/types/types';
 import { COLORS } from './Colors';
 import { DraggableBorder } from '@/components/DraggableBorder';
 import { formatTime } from '@/utils/dateUtils';
-import { MeetingPoint } from './Oscillator/MeetingPoint';
-import { PulseWave } from './Oscillator/PulseWave';
 import { PlusIcon, MinusIcon } from '../Icons/icons';
 
 const ZOOMED_BAR_WIDTH = 0;
@@ -17,15 +15,6 @@ type OscillatorRef = {
     sliceWidth: number;
     visibleBoxesCount: number;
 };
-
-type HoverInfo = {
-    x: number;
-    y: number;
-    color: string;
-    high: number;
-    low: number;
-    linePrice: number;
-} | null;
 
 type GetColorAndY = (x: number) => { y: number; color: string; high: number; low: number; linePrice: number };
 
@@ -96,7 +85,7 @@ const HistogramChart: React.FC<{
     renderNestedBoxes: any;
     onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
     onMouseLeave: () => void;
-    hoverInfo: HoverInfo;
+    hoverInfo: any;
     scrollContainerRef: React.RefObject<HTMLDivElement | null>;
     onScroll: () => void;
 }> = React.memo(({ data, framesWithPoints, height, onFrameSelect, renderNestedBoxes, onMouseMove, onMouseLeave, hoverInfo, scrollContainerRef, onScroll }) => {
@@ -432,8 +421,7 @@ const Oscillator: React.FC<{
             }}>
             <canvas ref={canvasRef} width={sliceWidth} height={height} className='absolute inset-0' />
             <svg className='pointer-events-none absolute top-0 left-0 h-full w-full' style={{ zIndex: 200, overflow: 'visible' }}>
-                <PulseWave meetingPoints={meetingPoints} colors={colors} height={height} sliceWidth={sliceWidth} isGreen={isGreen} />
-                <MeetingPoint prevMeetingPointY={prevMeetingPointY} nextMeetingPointY={nextMeetingPointY} meetingPointY={meetingPointY} sliceWidth={sliceWidth} colors={colors} />
+                <HistogramLine prevMeetingPointY={prevMeetingPointY} nextMeetingPointY={nextMeetingPointY} meetingPointY={meetingPointY} sliceWidth={sliceWidth} colors={colors} />
             </svg>
         </div>
     );
@@ -445,8 +433,6 @@ const HistogramManager: React.FC<{
     boxOffset: number;
     onOffsetChange: (newOffset: number) => void;
     visibleBoxesCount: number;
-    viewType: ViewType;
-    onViewChange: (newViewType: ViewType) => void;
     selectedFrame: BoxSlice | null;
     selectedFrameIndex: number | null;
     onFrameSelect: (frame: BoxSlice | null, index: number | null) => void;
@@ -459,8 +445,6 @@ const HistogramManager: React.FC<{
     boxOffset,
     onOffsetChange,
     visibleBoxesCount,
-    viewType,
-    onViewChange,
     selectedFrame,
     selectedFrameIndex,
     onFrameSelect,
@@ -475,7 +459,7 @@ const HistogramManager: React.FC<{
     const { framesWithPoints } = useHistogramData(data, selectedFrame, selectedFrameIndex, boxOffset, visibleBoxesCount, height);
 
     const oscillatorRefs = useRef<(OscillatorRef | null)[]>([]);
-    const [hoverInfo, setHoverInfo] = useState<HoverInfo>(null);
+    const [hoverInfo, setHoverInfo] = useState<any>(null);
 
     const handleScroll = useCallback(() => {
         if (scrollContainerRef.current) {
@@ -547,7 +531,7 @@ const HistogramManager: React.FC<{
                 />
             );
         },
-        [viewType, height, boxOffset, visibleBoxesCount]
+        [height, boxOffset, visibleBoxesCount]
     );
 
     // Update hover info when offset changes
@@ -558,7 +542,7 @@ const HistogramManager: React.FC<{
             const oscillator = oscillatorRefs.current[frameIndex];
             if (oscillator) {
                 const { y, color, high, low, linePrice } = oscillator.getColorAndY(frameX);
-                setHoverInfo((prevInfo: HoverInfo) => ({
+                setHoverInfo((prevInfo) => ({
                     ...prevInfo!,
                     y,
                     color,
@@ -684,4 +668,53 @@ const HistogramControls = ({
     );
 };
 
-export default React.memo(HistogramManager);
+const HistogramLine: React.FC<{
+    prevMeetingPointY: number | null;
+    nextMeetingPointY: number | null;
+    meetingPointY: number;
+    sliceWidth: number;
+    colors: typeof COLORS.GREEN | typeof COLORS.RED | typeof COLORS.NEUTRAL;
+}> = ({ prevMeetingPointY, nextMeetingPointY, meetingPointY, sliceWidth, colors }) => {
+    const cornerRadius = sliceWidth / 8; // Adjust this value to control the roundness of corners
+
+    return (
+        <>
+            {prevMeetingPointY !== null && (
+                <path
+                    d={`M ${-sliceWidth / 2} ${prevMeetingPointY} 
+                        H ${-cornerRadius}
+                        Q 0 ${prevMeetingPointY}, 0 ${prevMeetingPointY + Math.sign(meetingPointY - prevMeetingPointY) * cornerRadius}
+                        V ${meetingPointY - Math.sign(meetingPointY - prevMeetingPointY) * cornerRadius}
+                        Q 0 ${meetingPointY}, ${cornerRadius} ${meetingPointY}
+                        H ${sliceWidth / 2}`}
+                    fill='none'
+                    stroke={colors.LIGHT}
+                    strokeWidth='3'
+                    className='transition-all duration-200 ease-in-out'>
+                    <animate attributeName='stroke-dashoffset' from='0' to='20' dur='20s' repeatCount='indefinite' />
+                </path>
+            )}
+            {nextMeetingPointY !== null ? (
+                <path
+                    d={`M ${sliceWidth / 2} ${meetingPointY} 
+                        H ${sliceWidth - cornerRadius}
+                        Q ${sliceWidth} ${meetingPointY}, ${sliceWidth} ${meetingPointY + Math.sign(nextMeetingPointY - meetingPointY) * cornerRadius}
+                        V ${nextMeetingPointY - Math.sign(nextMeetingPointY - meetingPointY) * cornerRadius}
+                        Q ${sliceWidth} ${nextMeetingPointY}, ${sliceWidth + cornerRadius} ${nextMeetingPointY}
+                        H ${sliceWidth * 1.5}`}
+                    fill='none'
+                    stroke={colors.LIGHT}
+                    strokeWidth='3'
+                    className='transition-all duration-200 ease-in-out'>
+                    <animate attributeName='stroke-dashoffset' from='0' to='20' dur='20s' repeatCount='indefinite' />
+                </path>
+            ) : (
+                <circle cx={sliceWidth / 2} cy={meetingPointY} r='4' fill={colors.LIGHT}>
+                    <animate attributeName='r' values='3;5;3' dur='2s' repeatCount='indefinite' />
+                </circle>
+            )}
+        </>
+    );
+};
+
+export default HistogramManager;

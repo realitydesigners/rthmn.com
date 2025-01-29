@@ -5,7 +5,6 @@ import { pairSnapshotQuery } from '@/utils/sanity/lib/queries';
 import { sanityFetch } from '@/utils/sanity/lib/client';
 import { processInitialChartData } from '@/utils/chartDataProcessor';
 import { createBoxCalculator } from '../boxCalculator';
-import { cookies } from 'next/headers';
 
 interface PageProps {
     params: Promise<{

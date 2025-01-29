@@ -1,13 +1,11 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { BoxSlice, PairData, ViewType } from '@/types/types';
+import { BoxSlice } from '@/types/types';
 import HistogramManager from '@/components/Histogram/HistogramManager';
 import { LineChart, ChartDataPoint } from '@/components/LineChart';
-import { useAuth } from '@/providers/SupabaseProvider';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
-import { createBoxCalculator } from '../boxCalculator';
 
 interface ChartData {
     processedCandles: ChartDataPoint[];
@@ -15,19 +13,12 @@ interface ChartData {
     histogramBoxes: BoxSlice[];
 }
 
-interface DashboardClientProps {
-    pair: string;
-    chartData: ChartData;
-}
-
-const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
-    const { session } = useAuth();
+const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [histogramData, setHistogramData] = useState<BoxSlice[]>(chartData.histogramBoxes);
     const { boxOffset, handleOffsetChange } = useUrlParams(pair);
     const { selectedFrame, selectedFrameIndex, handleFrameSelect } = useSelectedFrame();
     const [visibleBoxesCount, setVisibleBoxesCount] = useState(8);
-    const [viewType, setViewType] = useState<ViewType>('oscillator');
     const containerRef = useRef<HTMLDivElement>(null);
     const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({
         width: 0,
@@ -44,11 +35,6 @@ const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
         maxHeight: 350,
     });
 
-    const handleViewChange = (newViewType: ViewType) => {
-        setViewType(newViewType);
-    };
-
-    // Update data when chartData changes
     useEffect(() => {
         setCandleData(chartData.processedCandles);
         setHistogramData(chartData.histogramBoxes);
@@ -88,8 +74,6 @@ const Client: React.FC<DashboardClientProps> = ({ pair, chartData }) => {
                     boxOffset={boxOffset}
                     onOffsetChange={handleOffsetChange}
                     visibleBoxesCount={visibleBoxesCount}
-                    viewType={viewType}
-                    onViewChange={handleViewChange}
                     selectedFrame={selectedFrame}
                     selectedFrameIndex={selectedFrameIndex}
                     onFrameSelect={handleFrameSelect}
