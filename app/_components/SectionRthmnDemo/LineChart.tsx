@@ -110,7 +110,7 @@ const HoverInfo: React.FC<HoverInfoProps> = ({ x, y, chartHeight, chartWidth }) 
 
 export const LineChart: React.FC<{
     pair: string;
-    candles: Candle[];
+    candles: any[];
 }> = ({ pair, candles }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
