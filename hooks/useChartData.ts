@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ChartDataPoint } from '../components/CandleChart';
+import { ChartDataPoint } from '@/components/CandleChart';
 
 interface ChartDataResult {
     visibleData: ChartDataPoint[];
@@ -7,54 +7,61 @@ interface ChartDataResult {
     maxY: number;
 }
 
-export const useChartData = (
-    candles: ChartDataPoint[],
-    scrollLeft: number,
-    chartWidth: number,
-    chartHeight: number,
-    yAxisScale: number,
-    visiblePoints: number
-): ChartDataResult => {
+export const useChartData = (data: ChartDataPoint[], scrollLeft: number, chartWidth: number, chartHeight: number, yAxisScale: number, visiblePoints: number): ChartDataResult => {
     return useMemo(() => {
-        if (!chartWidth || !chartHeight || !candles.length) {
+        if (!data.length || !chartWidth || !chartHeight) {
             return { visibleData: [], minY: 0, maxY: 0 };
         }
 
-        // Calculate visible range
-        const startIndex = Math.min(Math.floor((scrollLeft / chartWidth) * candles.length), candles.length - visiblePoints);
-        const endIndex = Math.min(startIndex + visiblePoints, candles.length);
-        const visibleCandles = candles.slice(Math.max(0, startIndex), endIndex);
+        // Calculate visible data range
+        const pointWidth = chartWidth / visiblePoints;
+        const startIndex = Math.max(0, Math.floor(scrollLeft / pointWidth));
+        const endIndex = Math.min(data.length, Math.ceil((scrollLeft + chartWidth) / pointWidth));
+        const visibleData = data.slice(startIndex, endIndex);
 
-        // Calculate price range
-        let minPrice = visibleCandles[0].low;
-        let maxPrice = visibleCandles[0].high;
-        for (let i = 1; i < visibleCandles.length; i++) {
-            minPrice = Math.min(minPrice, visibleCandles[i].low);
-            maxPrice = Math.max(maxPrice, visibleCandles[i].high);
+        if (!visibleData.length) {
+            return { visibleData: [], minY: 0, maxY: 0 };
         }
 
-        const padding = (maxPrice - minPrice) * 0.1;
-        const minY = minPrice - padding;
-        const maxY = maxPrice + padding;
+        // Find min/max prices in visible range
+        let minPrice = Infinity;
+        let maxPrice = -Infinity;
+        visibleData.forEach((point) => {
+            minPrice = Math.min(minPrice, point.low);
+            maxPrice = Math.max(maxPrice, point.high);
+        });
 
-        // Scale the data
-        const xScale = chartWidth / Math.max(visiblePoints - 1, 1);
-        const yScale = chartHeight / ((maxY - minY) * yAxisScale);
+        // Add padding to price range
+        const priceRange = maxPrice - minPrice;
+        const padding = priceRange * 0.1; // 10% padding
+        let paddedMin = minPrice - padding;
+        let paddedMax = maxPrice + padding;
 
-        const visibleData = new Array(visibleCandles.length);
-        for (let i = 0; i < visibleCandles.length; i++) {
-            const candle = visibleCandles[i];
-            visibleData[i] = {
-                ...candle,
-                scaledX: i * xScale,
-                scaledY: chartHeight - (candle.close - minY) * yScale,
-                scaledOpen: chartHeight - (candle.open - minY) * yScale,
-                scaledHigh: chartHeight - (candle.high - minY) * yScale,
-                scaledLow: chartHeight - (candle.low - minY) * yScale,
-                scaledClose: chartHeight - (candle.close - minY) * yScale,
+        // Apply Y-axis scaling
+        const midPrice = (paddedMax + paddedMin) / 2;
+        const scaledRange = (paddedMax - paddedMin) / yAxisScale;
+        paddedMin = midPrice - scaledRange / 2;
+        paddedMax = midPrice + scaledRange / 2;
+
+        // Scale the data points
+        const scaledData = visibleData.map((point, i) => {
+            const scaledX = i * pointWidth;
+            const scaleY = (price: number) => chartHeight - ((price - paddedMin) / (paddedMax - paddedMin)) * chartHeight;
+
+            return {
+                ...point,
+                scaledX,
+                scaledOpen: scaleY(point.open),
+                scaledHigh: scaleY(point.high),
+                scaledLow: scaleY(point.low),
+                scaledClose: scaleY(point.close),
             };
-        }
+        });
 
-        return { visibleData, minY, maxY };
-    }, [candles, scrollLeft, chartWidth, chartHeight, yAxisScale, visiblePoints]);
+        return {
+            visibleData: scaledData,
+            minY: paddedMin,
+            maxY: paddedMax,
+        };
+    }, [data, scrollLeft, chartWidth, chartHeight, yAxisScale, visiblePoints]);
 };

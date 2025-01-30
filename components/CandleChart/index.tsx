@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { formatTime } from '@/utils/dateUtils';
 import { useChartData } from '@/hooks/useChartData';
+import { INSTRUMENTS } from '@/utils/instruments';
 
 export interface ChartDataPoint {
     timestamp: number;
@@ -19,15 +20,15 @@ export interface ChartDataPoint {
 }
 
 const CHART_CONFIG = {
-    VISIBLE_POINTS: 200,
+    VISIBLE_POINTS: 2000,
     MIN_ZOOM: 0.1,
     MAX_ZOOM: 5,
-    PADDING: { top: 20, right: 70, bottom: 20, left: 0 },
+    PADDING: { top: 20, right: 70, bottom: 40, left: 0 },
     COLORS: {
         BULLISH: '#22c55e', // Green for bullish
         BEARISH: '#ef4444', // Red for bearish
         AXIS: '#ffffff',
-        HOVER_BG: '#000',
+        HOVER_BG: '#fff',
         LAST_PRICE: '#2563eb',
     },
     Y_AXIS: {
@@ -41,6 +42,21 @@ const CHART_CONFIG = {
         WICK_WIDTH: 1,
     },
 } as const;
+
+// Add this hook at the top of the file after imports
+const useInstrumentConfig = (pair: string) => {
+    return useMemo(() => {
+        const upperPair = pair.toUpperCase();
+        // Search in all instrument categories
+        for (const category of Object.values(INSTRUMENTS)) {
+            if (category[upperPair]) {
+                return category[upperPair];
+            }
+        }
+        console.warn(`No instrument configuration found for ${upperPair}, using default`);
+        return { point: 0.00001, digits: 5 };
+    }, [pair]);
+};
 
 // Core chart components
 const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
@@ -71,17 +87,7 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
     );
 });
 
-const LastPriceLine = memo(({ price, scaledY, chartWidth }: { price: number; scaledY: number; chartWidth: number }) => (
-    <g>
-        <line x1={0} y1={scaledY} x2={chartWidth} y2={scaledY} stroke={CHART_CONFIG.COLORS.LAST_PRICE} strokeWidth='1.5' strokeDasharray='4 4' />
-        <rect x={chartWidth - 65} y={scaledY - 12} width={55} height={24} fill={CHART_CONFIG.COLORS.LAST_PRICE} rx={6} />
-        <text x={chartWidth - 37.5} y={scaledY + 4} fill='white' fontSize='13' fontWeight='600' textAnchor='middle'>
-            {price.toFixed(5)}
-        </text>
-    </g>
-));
-
-const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataPoint[]; initialVisibleData: ChartDataPoint[] }) => {
+const CandleChart = ({ candles = [], initialVisibleData, pair }: { candles: ChartDataPoint[]; initialVisibleData: ChartDataPoint[]; pair: string }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [yAxisScale, setYAxisScale] = useState(1);
@@ -187,7 +193,7 @@ const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataP
         };
     }, [isDragging, isYAxisDragging, dragStart, scrollStart, chartWidth, candles.length, scrollLeft]);
 
-    // Replace the separate hover handlers with a single object
+    // Update hover handlers to use scaled prices
     const hoverHandlers = useMemo(
         () => ({
             onSvgMouseMove: (event: React.MouseEvent<SVGSVGElement>) => {
@@ -195,16 +201,24 @@ const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataP
 
                 const svgRect = event.currentTarget.getBoundingClientRect();
                 const x = event.clientX - svgRect.left - chartPadding.left;
+                const y = event.clientY - svgRect.top - chartPadding.top;
 
                 if (x >= 0 && x <= chartWidth) {
                     const xRatio = x / chartWidth;
                     const index = Math.floor(xRatio * (visibleData.length - 1));
+
+                    // Find the closest data point
                     if (index >= 0 && index < visibleData.length) {
                         const point = visibleData[index];
+                        // Calculate the actual price at hover position
+                        const yRatio = (chartHeight - y) / chartHeight;
+                        const hoverPrice = minY + (maxY - minY) * yRatio;
+
                         setHoverInfo({
-                            x: point.scaledX,
-                            y: point.scaledClose,
-                            price: point.close,
+                            x, // Use exact cursor X position instead of point.scaledX
+                            y,
+                            price: hoverPrice,
+                            actualPrice: point.close,
                             time: formatTime(new Date(point.timestamp)),
                         });
                     }
@@ -214,7 +228,7 @@ const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataP
             },
             onMouseLeave: () => setHoverInfo(null),
         }),
-        [isDragging, chartWidth, chartPadding.left, visibleData]
+        [isDragging, chartWidth, chartHeight, chartPadding.left, chartPadding.top, visibleData, minY, maxY]
     );
 
     return (
@@ -241,9 +255,6 @@ const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataP
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
                         <path d={`M ${visibleData.map((p) => `${p.scaledX} ${p.scaledClose}`).join(' L ')}`} stroke='rgba(34, 197, 94, 0.3)' strokeWidth='1' fill='none' />
                         <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
-
-                        <LastPriceLine price={visibleData[visibleData.length - 1].close} scaledY={visibleData[visibleData.length - 1].scaledClose} chartWidth={chartWidth} />
-
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
                         <YAxis
                             minY={minY}
@@ -254,6 +265,9 @@ const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataP
                             hoverInfo={hoverInfo}
                             onYAxisDragStart={() => setIsYAxisDragging(true)}
                             onYAxisDragEnd={() => setIsYAxisDragging(false)}
+                            pair={pair}
+                            lastPrice={visibleData[visibleData.length - 1].close}
+                            lastPriceY={visibleData[visibleData.length - 1].scaledClose}
                         />
                         {hoverInfo && <HoverInfoComponent x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
                     </g>
@@ -274,6 +288,11 @@ const XAxis: React.FC<{
     hoverInfo: any | null;
     formatTime: (date: Date) => string;
 }> = memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
+    const TICK_HEIGHT = 6;
+    const LABEL_PADDING = 5;
+    const FONT_SIZE = 12;
+    const HOVER_BG_HEIGHT = 15;
+
     const intervals = useMemo(() => {
         if (data.length === 0) return [];
 
@@ -300,21 +319,37 @@ const XAxis: React.FC<{
 
     if (data.length === 0) return null;
 
+    // Calculate Y positions for consistent alignment
+    const labelY = TICK_HEIGHT + LABEL_PADDING + FONT_SIZE;
+    const hoverY = TICK_HEIGHT + LABEL_PADDING;
+
     return (
         <g className='x-axis'>
+            {/* Main axis line */}
             <line x1={0} y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke='#777' strokeWidth='1' />
+
+            {/* Time intervals */}
             {intervals.map((point, index) => (
                 <g key={`time-${point.timestamp}-${index}`} transform={`translate(${point.scaledX}, ${chartHeight})`}>
-                    <line y2={6} stroke='#777' strokeWidth='1' />
-                    <text y={25} textAnchor='middle' fill='#fff' fontSize='12' style={{ userSelect: 'none' }}>
+                    <line y2={TICK_HEIGHT} stroke='#777' strokeWidth='1' />
+                    <text y={labelY} textAnchor='middle' fill='#fff' fontSize={FONT_SIZE} style={{ userSelect: 'none' }}>
                         {formatTime(new Date(point.timestamp))}
                     </text>
                 </g>
             ))}
+
+            {/* Hover time indicator */}
             {hoverInfo && (
-                <g transform={`translate(${hoverInfo.x}, ${chartHeight - 5})`}>
-                    <rect x={-40} y={5} width={80} height={20} fill='#1f2937' rx={4} />
-                    <text x={0} y={20} textAnchor='middle' fill='white' fontSize='12' fontWeight='bold' style={{ userSelect: 'none' }}>
+                <g transform={`translate(${hoverInfo.x}, ${chartHeight})`}>
+                    <rect x={-40} y={hoverY} width={80} height={HOVER_BG_HEIGHT} fill={CHART_CONFIG.COLORS.HOVER_BG} rx={4} />
+                    <text
+                        x={0}
+                        y={hoverY + HOVER_BG_HEIGHT / 2 + FONT_SIZE / 3}
+                        textAnchor='middle'
+                        fill='black'
+                        fontSize={FONT_SIZE}
+                        fontWeight='bold'
+                        style={{ userSelect: 'none' }}>
                         {hoverInfo.time}
                     </text>
                 </g>
@@ -323,7 +358,7 @@ const XAxis: React.FC<{
     );
 });
 
-const YAxis: React.FC<{
+interface YAxisProps {
     minY: number;
     maxY: number;
     chartHeight: number;
@@ -332,66 +367,81 @@ const YAxis: React.FC<{
     hoverInfo: any | null;
     onYAxisDragStart: () => void;
     onYAxisDragEnd: () => void;
-}> = memo(({ minY, maxY, chartHeight, chartWidth, onDrag, hoverInfo, onYAxisDragStart, onYAxisDragEnd }) => {
-    const handleMouseDown = useCallback(
-        (event: React.MouseEvent) => {
-            event.stopPropagation();
-            onYAxisDragStart();
-            const startY = event.clientY;
+    pair: string;
+    lastPrice: number;
+    lastPriceY: number;
+}
 
-            const handleMouseMove = (e: MouseEvent) => {
-                const deltaY = (e.clientY - startY) / chartHeight;
-                onDrag(deltaY);
-            };
+const YAxis: React.FC<YAxisProps> = ({ minY, maxY, chartHeight, chartWidth, onDrag, hoverInfo, onYAxisDragStart, onYAxisDragEnd, pair, lastPrice, lastPriceY }) => {
+    const handleMouseDown = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        onYAxisDragStart();
+        const startY = event.clientY;
 
-            const handleMouseUp = () => {
-                onYAxisDragEnd();
-                window.removeEventListener('mousemove', handleMouseMove);
-                window.removeEventListener('mouseup', handleMouseUp);
-            };
+        const handleMouseMove = (e: MouseEvent) => {
+            const deltaY = (e.clientY - startY) / chartHeight;
+            onDrag(deltaY);
+        };
 
-            window.addEventListener('mousemove', handleMouseMove);
-            window.addEventListener('mouseup', handleMouseUp);
-        },
-        [onDrag, chartHeight, onYAxisDragStart, onYAxisDragEnd]
-    );
+        const handleMouseUp = () => {
+            onYAxisDragEnd();
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
 
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+    };
+
+    const instrumentConfig = useInstrumentConfig(pair);
+
+    // Generate price levels with fixed 5-pip intervals
+    const PIP_SIZE = instrumentConfig.point * 10; // Adjust for actual pip size (point is usually 0.00001, pip is 0.0001)
+    const FIXED_INTERVAL_PIPS = 5; // Always show every 5 pips
+    const PRICE_INTERVAL = PIP_SIZE * FIXED_INTERVAL_PIPS;
     const priceRange = maxY - minY;
 
-    // Calculate price levels
-    const minSpacing = CHART_CONFIG.Y_AXIS.MIN_PRICE_HEIGHT;
-    const maxLevels = Math.floor(chartHeight / minSpacing);
-    const numLevels = Math.min(12, maxLevels);
+    // Round min and max to nearest 5-pip interval
+    const roundedMin = Math.floor(minY / PRICE_INTERVAL) * PRICE_INTERVAL;
+    const roundedMax = Math.ceil(maxY / PRICE_INTERVAL) * PRICE_INTERVAL;
 
-    // Generate price levels with more precise calculations
-    const prices = useMemo(() => {
-        const range = maxY - minY;
-        const step = range / (numLevels - 1);
-        return Array.from({ length: numLevels }, (_, i) => {
-            const price = maxY - step * i;
-            const y = (chartHeight * i) / (numLevels - 1);
-            return { price, y };
-        });
-    }, [minY, maxY, chartHeight, numLevels]);
+    const levels = [];
+    for (let price = roundedMin; price <= roundedMax; price += PRICE_INTERVAL) {
+        const y = chartHeight - ((price - minY) / priceRange) * chartHeight;
+        // Only add levels that are visible or just slightly outside the view
+        if (y >= -20 && y <= chartHeight + 20) {
+            levels.push({
+                price,
+                y,
+                digits: instrumentConfig.digits,
+            });
+        }
+    }
 
     return (
-        <g className='y-axis' transform={`translate(${chartWidth}, 0)`} onMouseDown={handleMouseDown} style={{ userSelect: 'none' }}>
+        <g className='y-axis' transform={`translate(${chartWidth}, 0)`} onMouseDown={handleMouseDown}>
             {/* Background for price labels */}
             <rect x={0} y={0} width={CHART_CONFIG.Y_AXIS.LABEL_WIDTH} height={chartHeight} fill='transparent' cursor='ns-resize' />
 
             {/* Vertical axis line */}
             <line x1={0} y1={0} x2={0} y2={chartHeight} stroke={CHART_CONFIG.COLORS.AXIS} strokeWidth={1} />
 
+            {/* Last price line and label */}
+            <g>
+                <line x1={-chartWidth} y1={lastPriceY} x2={0} y2={lastPriceY} stroke='white' strokeWidth='1.5' strokeDasharray='2 2' />
+                <rect x={3} y={lastPriceY - 10} width={CHART_CONFIG.Y_AXIS.LABEL_WIDTH} height={20} fill='black' rx={4} />
+                <text x={33} y={lastPriceY + 4} textAnchor='middle' fill='white' fontSize='12' fontWeight='bold'>
+                    {lastPrice.toFixed(instrumentConfig.digits)}
+                </text>
+            </g>
+
             {/* Price levels and grid lines */}
-            {prices.map(({ price, y }, i) => (
-                <g key={i}>
-                    {/* Grid line */}
+            {levels.map(({ price, y, digits }) => (
+                <g key={price}>
                     <line x1={-chartWidth} y1={y} x2={0} y2={y} stroke={CHART_CONFIG.COLORS.AXIS} strokeOpacity={0.1} strokeWidth={1} />
-                    {/* Tick mark */}
                     <line x1={0} x2={5} y1={y} y2={y} stroke={CHART_CONFIG.COLORS.AXIS} />
-                    {/* Price label */}
                     <text x={10} y={y + 4} fill='white' fontSize='12' textAnchor='start'>
-                        {price.toFixed(5)}
+                        {price.toFixed(digits)}
                     </text>
                 </g>
             ))}
@@ -400,14 +450,14 @@ const YAxis: React.FC<{
             {hoverInfo && (
                 <g transform={`translate(0, ${hoverInfo.y})`}>
                     <rect x={3} y={-10} width={CHART_CONFIG.Y_AXIS.LABEL_WIDTH} height={20} fill={CHART_CONFIG.COLORS.HOVER_BG} rx={4} />
-                    <text x={33} y={4} textAnchor='middle' fill='white' fontSize='12' fontWeight='bold'>
-                        {hoverInfo.price.toFixed(5)}
+                    <text x={33} y={4} textAnchor='middle' fill='black' fontSize='12' fontWeight='bold'>
+                        {hoverInfo.price.toFixed(instrumentConfig.digits)}
                     </text>
                 </g>
             )}
         </g>
     );
-});
+};
 
 const HoverInfoComponent = ({ x, y, chartHeight, chartWidth }: { x: number; y: number; chartHeight: number; chartWidth: number }) => {
     if (!isFinite(x) || !isFinite(y)) return null;
