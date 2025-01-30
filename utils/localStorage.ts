@@ -85,14 +85,16 @@ export interface BoxColors {
     positive: string;
     negative: string;
     styles?: {
-        startIndex: number;
-        maxBoxCount: number;
-        borderRadius: number;
-        shadowIntensity: number;
-        opacity: number;
-        showBorder: boolean;
-        globalTimeframeControl: boolean;
-        showLineChart: boolean;
+        opacity?: number;
+        shadowIntensity?: number;
+        showBorder?: boolean;
+        borderRadius?: number;
+        startIndex?: number;
+        maxBoxCount?: number;
+        showLineChart?: boolean;
+        globalTimeframeControl?: boolean;
+        perspective?: boolean;
+        viewMode?: 'default' | 'perspective' | 'centered';
     };
 }
 
@@ -108,6 +110,8 @@ export const DEFAULT_BOX_COLORS: BoxColors = {
         showBorder: true,
         globalTimeframeControl: false,
         showLineChart: false,
+        perspective: false,
+        viewMode: 'default',
     },
 };
 

@@ -25,6 +25,7 @@ export const StudioStructure = (S: StructureBuilder) =>
                             S.listItem().title('Categories').icon(TagIcon).child(S.documentTypeList('category')),
                             S.listItem().title('Market Data').icon(TagIcon).child(S.documentTypeList('marketData')),
                             S.listItem().title('Changelog').icon(TagIcon).child(S.documentTypeList('changelog')),
+                            S.listItem().title('Pair Snapshots').icon(TagIcon).child(S.documentTypeList('pairSnapshot')),
                         ])
                 ),
 

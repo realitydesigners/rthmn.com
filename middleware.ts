@@ -3,11 +3,18 @@ import { updateSession } from '@/utils/supabase/middleware';
 import { NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-    // Only check auth for /user routes
+    // Update session for user routes
     if (request.nextUrl.pathname.startsWith('/user')) {
-        return await updateSession(request);
+        const response = await updateSession(request);
+        // Add pathname to headers
+        response.headers.set('x-pathname', request.nextUrl.pathname);
+        return response;
     }
-    return NextResponse.next();
+
+    // For other routes, just add pathname
+    const response = NextResponse.next();
+    response.headers.set('x-pathname', request.nextUrl.pathname);
+    return response;
 }
 
 export const config = {
