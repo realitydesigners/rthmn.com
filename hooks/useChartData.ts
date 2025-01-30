@@ -13,10 +13,11 @@ export const useChartData = (data: ChartDataPoint[], scrollLeft: number, chartWi
             return { visibleData: [], minY: 0, maxY: 0 };
         }
 
-        // Calculate visible data range
         const pointWidth = chartWidth / visiblePoints;
+        const RIGHT_MARGIN = chartWidth * 0.5; // Add 50% of chart width as right margin
+        const totalWidth = chartWidth + RIGHT_MARGIN;
         const startIndex = Math.max(0, Math.floor(scrollLeft / pointWidth));
-        const endIndex = Math.min(data.length, Math.ceil((scrollLeft + chartWidth) / pointWidth));
+        const endIndex = Math.min(data.length, Math.ceil((scrollLeft + totalWidth) / pointWidth));
         const visibleData = data.slice(startIndex, endIndex);
 
         if (!visibleData.length) {

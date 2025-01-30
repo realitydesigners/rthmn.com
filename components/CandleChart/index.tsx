@@ -20,7 +20,7 @@ export interface ChartDataPoint {
 }
 
 const CHART_CONFIG = {
-    VISIBLE_POINTS: 2000,
+    VISIBLE_POINTS: 1000,
     MIN_ZOOM: 0.1,
     MAX_ZOOM: 5,
     PADDING: { top: 20, right: 70, bottom: 40, left: 0 },
@@ -63,11 +63,19 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
     const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * 0.7));
     const halfCandleWidth = candleWidth / 2;
 
+    // Filter visible candles before mapping
+    const visibleCandles = data.filter((point) => {
+        // Add a buffer of one candle width on each side
+        const isVisible = point.scaledX >= -candleWidth && point.scaledX <= width + candleWidth;
+        return isVisible;
+    });
+
+    // Log the number of rendered candles vs total
+    console.log('Rendered candles:', visibleCandles.length, 'of', data.length);
+
     return (
         <g>
-            {data.map((point, i) => {
-                if (point.scaledX < -candleWidth || point.scaledX > width + candleWidth) return null;
-
+            {visibleCandles.map((point, i) => {
                 const candle = point.close > point.open;
                 const candleColor = candle ? CHART_CONFIG.COLORS.BULLISH : CHART_CONFIG.COLORS.BEARISH;
 
@@ -76,7 +84,7 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
                 const bodyHeight = Math.max(1, bodyBottom - bodyTop);
 
                 return (
-                    <g key={i} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
+                    <g key={point.timestamp} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
                         <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={bodyTop} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
                         <line x1={halfCandleWidth} y1={bodyBottom} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
                         <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill={candle ? 'none' : candleColor} stroke={candleColor} strokeWidth={1} />
@@ -253,7 +261,6 @@ const CandleChart = ({ candles = [], initialVisibleData, pair }: { candles: Char
                     onMouseLeave={hoverHandlers.onMouseLeave}
                     style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                        <path d={`M ${visibleData.map((p) => `${p.scaledX} ${p.scaledClose}`).join(' L ')}`} stroke='rgba(34, 197, 94, 0.3)' strokeWidth='1' fill='none' />
                         <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
                         <YAxis
