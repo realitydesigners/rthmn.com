@@ -123,7 +123,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         pathname?.startsWith('/onboarding') ||
         pathname?.startsWith('/test') ||
         pathname?.startsWith('/admin') ||
-        pathname?.startsWith('/pair') ||
+        pathname?.startsWith('/pair/') ||
         pathname?.startsWith('/account') ||
         pathname?.startsWith('/studio') ||
         pathname?.startsWith('/signals')

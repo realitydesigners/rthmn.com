@@ -56,14 +56,15 @@ export interface PairData {
     currentOHLC: OHLC;
 }
 
-export type ViewType = 'scaled' | 'even' | 'oscillator';
-
 export interface Candle {
-    time: string;
     open: number;
     high: number;
     low: number;
     close: number;
+    time: number | string;
+    timestamp: number;
+    symbol: string;
+    volume: number;
 }
 
 interface BaseItem {

@@ -1,12 +1,9 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { LuX } from 'react-icons/lu';
 import { ResoBox } from '@/components/ResoBox';
-import { LineChart } from '@/components/LineChart';
 import { BoxSlice, OHLC, PairData } from '@/types/types';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { useAuth } from '@/providers/SupabaseProvider';
 
 interface ModalContentProps {
     pair: string;

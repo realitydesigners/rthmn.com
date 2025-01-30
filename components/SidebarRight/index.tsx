@@ -57,6 +57,23 @@ export const SidebarRight = () => {
         if (hasCompletedInitialOnboarding() && !currentStepId) {
             setCurrentStep('onboarding');
         }
+
+        // Automatically open onboarding panel when feature tour starts
+        if (currentStepId === 'instruments') {
+            setIsOpen(true);
+            setActivePanel('onboarding');
+            setIsLocked(true);
+            // Update sidebar state to reflect this change
+            const state = getSidebarState();
+            setSidebarState({
+                ...state,
+                right: {
+                    isOpen: true,
+                    activePanel: 'onboarding',
+                    locked: true,
+                },
+            });
+        }
     }, [hasCompletedInitialOnboarding, currentStepId, setCurrentStep]);
 
     if (!mounted || isMobile || pathname === '/account') return null;
