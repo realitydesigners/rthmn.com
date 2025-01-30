@@ -390,7 +390,7 @@ const Oscillator: React.FC<{
     );
 };
 
-const HistogramManager: React.FC<{
+const Histogram: React.FC<{
     data: BoxSlice[];
     height: number;
     boxOffset: number;
@@ -722,4 +722,4 @@ const HistogramLine: React.FC<{
     );
 };
 
-export default HistogramManager;
+export default Histogram;

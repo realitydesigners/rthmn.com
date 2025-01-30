@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ChartDataPoint } from '../components/LineChart';
+import { ChartDataPoint } from '../components/CandleChart';
 
 interface ChartDataResult {
     visibleData: ChartDataPoint[];

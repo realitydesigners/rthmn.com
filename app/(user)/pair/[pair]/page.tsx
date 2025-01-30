@@ -20,11 +20,19 @@ async function fetchSanityData(pair: string) {
     });
 
     const parsedData = JSON.parse(snapshot.candleData);
-    return parsedData;
+
+    return [...parsedData].reverse().map((candle) => ({
+        timestamp: new Date(candle.timestamp).getTime(),
+        close: Number(candle.close),
+        high: Number(candle.high),
+        low: Number(candle.low),
+        open: Number(candle.open),
+        volume: 0,
+    }));
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 500;
+    const CANDLE_LIMIT = 1000;
     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}`, {
         headers: {
             Authorization: `Bearer ${token}`,

@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
 import { BoxSlice, Box } from '@/types/types';
-import HistogramManager from '@/components/Histogram/HistogramManager';
-import { LineChart, ChartDataPoint } from '@/components/LineChart';
+import Histogram from '@/components/Histogram';
+import CandleChart, { ChartDataPoint } from '@/components/CandleChart';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
@@ -82,11 +82,11 @@ const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => 
 
     return (
         <div className='relative flex h-screen w-full'>
-            {/* <div className='relative h-[90vh] w-full'>
-                <LineChart candles={candleData} initialVisibleData={chartData.initialVisibleData} />
-            </div> */}
+            <div className='relative h-full w-full'>
+                <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} />
+            </div>
             <div className='fixed bottom-0 z-[2000] -ml-16 max-w-screen shrink-0'>
-                <HistogramManager
+                <Histogram
                     data={histogramData}
                     height={histogramHeight}
                     boxOffset={boxOffset}

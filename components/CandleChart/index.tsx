@@ -19,10 +19,10 @@ export interface ChartDataPoint {
 }
 
 const CHART_CONFIG = {
-    VISIBLE_POINTS: 1000,
+    VISIBLE_POINTS: 200,
     MIN_ZOOM: 0.1,
     MAX_ZOOM: 5,
-    PADDING: { top: 0, right: 70, bottom: 20, left: 0 },
+    PADDING: { top: 20, right: 70, bottom: 20, left: 0 },
     COLORS: {
         BULLISH: '#22c55e', // Green for bullish
         BEARISH: '#ef4444', // Red for bearish
@@ -35,15 +35,16 @@ const CHART_CONFIG = {
         LABEL_WIDTH: 65,
     },
     CANDLES: {
-        MIN_WIDTH: 4, // Minimum width of a candle
-        MAX_WIDTH: 12, // Maximum width of a candle
-        MIN_SPACING: 2, // Minimum pixels between candles
+        MIN_WIDTH: 2,
+        MAX_WIDTH: 16,
+        MIN_SPACING: 1,
+        WICK_WIDTH: 1,
     },
 } as const;
 
 // Core chart components
 const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
-    const candleWidth = Math.max(4, Math.min(12, (width / data.length) * 0.8));
+    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * 0.7));
     const halfCandleWidth = candleWidth / 2;
 
     return (
@@ -51,15 +52,18 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
             {data.map((point, i) => {
                 if (point.scaledX < -candleWidth || point.scaledX > width + candleWidth) return null;
 
-                const isBullish = point.close < point.open;
-                const candleColor = isBullish ? CHART_CONFIG.COLORS.BULLISH : CHART_CONFIG.COLORS.BEARISH;
+                const candle = point.close > point.open;
+                const candleColor = candle ? CHART_CONFIG.COLORS.BULLISH : CHART_CONFIG.COLORS.BEARISH;
+
                 const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
-                const bodyHeight = Math.max(1, Math.abs(point.scaledClose - point.scaledOpen));
+                const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
+                const bodyHeight = Math.max(1, bodyBottom - bodyTop);
 
                 return (
                     <g key={i} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
-                        <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth='1.5' />
-                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill={candleColor} />
+                        <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={bodyTop} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
+                        <line x1={halfCandleWidth} y1={bodyBottom} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
+                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill={candle ? 'none' : candleColor} stroke={candleColor} strokeWidth={1} />
                     </g>
                 );
             })}
@@ -77,7 +81,7 @@ const LastPriceLine = memo(({ price, scaledY, chartWidth }: { price: number; sca
     </g>
 ));
 
-export const LineChart = ({ candles = [], initialVisibleData }: { candles: ChartDataPoint[]; initialVisibleData: ChartDataPoint[] }) => {
+const CandleChart = ({ candles = [], initialVisibleData }: { candles: ChartDataPoint[]; initialVisibleData: ChartDataPoint[] }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [yAxisScale, setYAxisScale] = useState(1);
@@ -237,9 +241,9 @@ export const LineChart = ({ candles = [], initialVisibleData }: { candles: Chart
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
                         <path d={`M ${visibleData.map((p) => `${p.scaledX} ${p.scaledClose}`).join(' L ')}`} stroke='rgba(34, 197, 94, 0.3)' strokeWidth='1' fill='none' />
                         <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
-                        {visibleData.length > 0 && (
-                            <LastPriceLine price={visibleData[visibleData.length - 1].close} scaledY={visibleData[visibleData.length - 1].scaledClose} chartWidth={chartWidth} />
-                        )}
+
+                        <LastPriceLine price={visibleData[visibleData.length - 1].close} scaledY={visibleData[visibleData.length - 1].scaledClose} chartWidth={chartWidth} />
+
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
                         <YAxis
                             minY={minY}
@@ -260,6 +264,8 @@ export const LineChart = ({ candles = [], initialVisibleData }: { candles: Chart
         </div>
     );
 };
+
+export default CandleChart;
 
 const XAxis: React.FC<{
     data: ChartDataPoint[];
