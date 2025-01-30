@@ -83,9 +83,9 @@ const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => 
     return (
         <div className='relative flex h-screen w-full'>
             <div className='relative h-full w-full'>
-                <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} />
+                <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} pair={pair} />
             </div>
-            <div className='fixed bottom-0 z-[2000] -ml-16 max-w-screen shrink-0'>
+            {/* <div className='fixed bottom-0 z-[2000] -ml-16 max-w-screen shrink-0'>
                 <Histogram
                     data={histogramData}
                     height={histogramHeight}
@@ -103,7 +103,7 @@ const Client = ({ pair, chartData }: { pair: string; chartData: ChartData }) => 
                         initialFramesWithPoints: chartData.histogramPreProcessed.initialFramesWithPoints,
                     }}
                 />
-            </div>
+            </div> */}
         </div>
     );
 };

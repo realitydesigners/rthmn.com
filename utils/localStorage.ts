@@ -85,14 +85,14 @@ export interface BoxColors {
     positive: string;
     negative: string;
     styles?: {
-        opacity?: number;
-        shadowIntensity?: number;
-        showBorder?: boolean;
-        borderRadius?: number;
-        startIndex?: number;
-        maxBoxCount?: number;
-        showLineChart?: boolean;
-        globalTimeframeControl?: boolean;
+        startIndex: number;
+        maxBoxCount: number;
+        borderRadius: number;
+        shadowIntensity: number;
+        opacity: number;
+        showBorder: boolean;
+        globalTimeframeControl: boolean;
+        showLineChart: boolean;
         perspective?: boolean;
         viewMode?: 'default' | 'perspective' | 'centered';
     };
