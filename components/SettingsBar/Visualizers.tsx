@@ -156,21 +156,21 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
 
                             {/* Selection overlay with timeframe display */}
                             <div
-                                className='pointer-events-none absolute inset-y-0 z-100 transition-all duration-300'
+                                className='pointer-events-none absolute inset-y-0 z-0 transition-all duration-300'
                                 style={{
                                     left: `${(reversedStartIndex / 38) * 100}%`,
                                     width: `${(reversedMaxBoxCount / 38) * 100}%`,
                                 }}>
                                 {/* Edge handles with enhanced glow */}
                                 <div
-                                    className='group/left pointer-events-auto absolute -inset-y-3 -left-2 z-50 w-4 cursor-ew-resize'
+                                    className='group/left pointer-events-auto absolute -inset-y-3 -left-2 z-10 w-4 cursor-ew-resize'
                                     onMouseDown={(e) => handleMouseDown(e, 'left')}>
                                     <div className='absolute inset-y-3 right-[8px] w-[2px] bg-gradient-to-b from-white/50 via-white/40 to-white/50 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-all duration-150 group-hover/left:from-white/70 group-hover/left:via-white/60 group-hover/left:to-white/70 group-hover/left:shadow-[0_0_15px_rgba(255,255,255,0.4)]' />
                                     <div className='absolute inset-y-3 right-[7px] w-[3px] bg-gradient-to-r from-white/0 to-white/10 opacity-0 transition-all duration-150 group-hover/left:opacity-100' />
                                 </div>
 
                                 <div
-                                    className='group/right pointer-events-auto absolute -inset-y-3 -right-2 z-50 w-4 cursor-ew-resize'
+                                    className='group/right pointer-events-auto absolute -inset-y-3 -right-2 z-10 w-4 cursor-ew-resize'
                                     onMouseDown={(e) => handleMouseDown(e, 'right')}>
                                     <div className='absolute inset-y-3 left-[8px] w-[2px] bg-gradient-to-b from-white/50 via-white/40 to-white/50 shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-all duration-150 group-hover/right:from-white/70 group-hover/right:via-white/60 group-hover/right:to-white/70 group-hover/right:shadow-[0_0_15px_rgba(255,255,255,0.4)]' />
                                     <div className='absolute inset-y-3 left-[7px] w-[3px] bg-gradient-to-l from-white/0 to-white/10 opacity-0 transition-all duration-150 group-hover/right:opacity-100' />
