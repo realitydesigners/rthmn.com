@@ -25,28 +25,10 @@ const useBoxColors = (box: Box, boxColors: BoxColors) => {
 };
 
 // Memoize style calculations
-const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof useBoxColors>, index: number) => {
+const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof useBoxColors>) => {
     return useMemo(() => {
         const calculatedSize = (Math.abs(box.value) / maxSize) * containerSize;
-        const positionStyle: React.CSSProperties = !prevColor
-            ? { top: 0, right: 0 }
-            : prevColor.includes(boxColors.negative.split(',')[0])
-              ? { bottom: 0, right: 0 }
-              : { top: 0, right: 0 };
-
-        // Handle different view modes
-        let transform = undefined;
-        if (boxColors.styles?.viewMode === 'perspective') {
-            const xOffset = 3; // Always move right
-            const yOffset = box.value > 0 ? -3 : 3; // Move up for positive, down for negative
-            transform = `translate(${xOffset}px, ${yOffset}px)`;
-        } else if (boxColors.styles?.viewMode === 'centered') {
-            // Keep all boxes perfectly aligned in the center
-            positionStyle.top = '49.5%';
-            positionStyle.left = '51%';
-
-            transform = 'translate(-50.5%, -49.5%)';
-        }
+        const positionStyle = !prevColor ? { top: 0, right: 0 } : prevColor.includes(boxColors.negative.split(',')[0]) ? { bottom: 0, right: 0 } : { top: 0, right: 0 };
 
         const baseStyles: React.CSSProperties = {
             width: `${calculatedSize}px`,
@@ -55,9 +37,7 @@ const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, 
             margin: boxColors.styles?.showBorder ? '-1px' : '0',
             borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
             borderWidth: boxColors.styles?.showBorder ? '1px' : '0',
-            transition: 'all 0.3s ease-out',
-            position: 'absolute',
-            transform,
+            transition: 'all 0.15s ease-out',
         };
 
         const isFirstDifferent = prevColor && ((box.value > 0 && prevColor.includes(boxColors.negative)) || (box.value < 0 && prevColor.includes(boxColors.positive)));
@@ -66,18 +46,7 @@ const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, 
             baseStyles,
             isFirstDifferent,
         };
-    }, [
-        box.value,
-        prevColor,
-        boxColors.negative,
-        boxColors.positive,
-        boxColors.styles?.showBorder,
-        boxColors.styles?.borderRadius,
-        boxColors.styles?.viewMode,
-        containerSize,
-        maxSize,
-        index,
-    ]);
+    }, [box.value, prevColor, boxColors.negative, boxColors.positive, boxColors.styles?.showBorder, boxColors.styles?.borderRadius, containerSize, maxSize]);
 };
 
 const Box = React.memo(
@@ -103,7 +72,7 @@ const Box = React.memo(
         renderBox: (box: Box, index: number, prevColor: string | null) => React.ReactNode;
     }) => {
         const colors = useBoxColors(box, boxColors);
-        const { baseStyles, isFirstDifferent } = useBoxStyles(box, prevColor, boxColors, containerSize, maxSize, colors, index);
+        const { baseStyles, isFirstDifferent } = useBoxStyles(box, prevColor, boxColors, containerSize, maxSize, colors);
 
         return (
             <div key={`${slice?.timestamp}-${index}`} className='absolute border border-black' style={baseStyles}>
@@ -112,7 +81,7 @@ const Box = React.memo(
                     style={{
                         borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
                         boxShadow: `inset 0 ${colors.shadowY}px ${colors.shadowBlur}px ${colors.shadowColor(colors.shadowIntensity)}`,
-                        transition: 'all 0.3s ease-out',
+                        transition: 'all 0.15s ease-out',
                     }}
                 />
 
@@ -122,7 +91,7 @@ const Box = React.memo(
                         borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
                         background: `linear-gradient(to bottom right, ${colors.baseColor.replace(')', `, ${colors.opacity}`)} 100%, transparent 100%)`,
                         opacity: colors.opacity,
-                        transition: 'all 0.3s ease-out',
+                        transition: 'all 0.15s ease-out',
                     }}
                 />
 
@@ -134,7 +103,7 @@ const Box = React.memo(
                             backgroundColor: colors.baseColor,
                             opacity: colors.opacity * 0.5,
                             boxShadow: `inset 0 2px 15px ${colors.shadowColor(0.2)}`,
-                            transition: 'all 0.3s ease-out',
+                            transition: 'all 0.15s ease-out',
                         }}
                     />
                 )}

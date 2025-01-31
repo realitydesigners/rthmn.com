@@ -21,7 +21,6 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
     const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
     const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
     const [showSidebar, setShowSidebar] = useState(true);
-    const [viewMode, setViewMode] = useState<'default' | 'perspective' | 'centered'>(boxColors?.styles?.viewMode ?? 'default');
 
     // Memoize values that depend on props
     const memoizedBoxColors = useMemo(
@@ -31,10 +30,9 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
                 ...boxColors?.styles,
                 startIndex: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.startIndex : localStartIndex,
                 maxBoxCount: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.maxBoxCount : localMaxBoxCount,
-                viewMode: viewMode,
             },
         }),
-        [boxColors, localStartIndex, localMaxBoxCount, viewMode]
+        [boxColors, localStartIndex, localMaxBoxCount]
     );
 
     const isBoxView = useMemo(() => !memoizedBoxColors?.styles?.showLineChart, [memoizedBoxColors?.styles?.showLineChart]);
@@ -52,7 +50,7 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
 
     // Always return a consistent structure
     return (
-        <div className='no-select group relative flex w-full flex-col rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
+        <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
             <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
                 <div className='relative flex h-auto flex-col items-center justify-center gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
                     {/* Price Display */}
@@ -62,38 +60,13 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
                                 <div className='font-kodemono text-sm font-medium text-gray-200'>{currentOHLC?.close ?? '-'}</div>
                             </div>
-                            <div className='flex gap-2'>
-                                <button
-                                    onClick={() => {
-                                        const newMode = viewMode === 'default' ? 'perspective' : viewMode === 'perspective' ? 'centered' : 'default';
-                                        setViewMode(newMode);
-                                        if (boxColors?.styles) {
-                                            boxColors.styles.viewMode = newMode;
-                                        }
-                                    }}
-                                    className={`rounded px-2 py-1 text-sm transition-colors ${
-                                        viewMode === 'default'
-                                            ? 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                                            : viewMode === 'perspective'
-                                              ? 'bg-blue-500/20 text-blue-400'
-                                              : 'bg-purple-500/20 text-purple-400'
-                                    }`}>
-                                    {viewMode === 'default' ? 'Default View' : viewMode === 'perspective' ? '3D View' : 'Center View'}
-                                </button>
-                            </div>
                         </div>
                     </div>
 
                     {/* Chart Section */}
-                    <div className={`relative flex h-full w-full items-center justify-center`}>
+                    <div className='relative flex h-full w-full'>
                         {isBoxView ? (
-                            <div
-                                className='h-full w-full transition-transform duration-300'
-                                style={{
-                                    transform: viewMode === 'perspective' ? 'scale(0.7)' : undefined,
-                                }}>
-                                <ResoBox slice={boxSlice} className='h-full w-full' boxColors={memoizedBoxColors} />
-                            </div>
+                            <ResoBox slice={boxSlice} className='h-full w-full' boxColors={memoizedBoxColors} />
                         ) : (
                             <div className='relative aspect-[2/1] w-full'>
                                 <ResoChart slice={boxSlice} className='w-full' showSidebar={showSidebar} digits={2} boxColors={memoizedBoxColors} />
