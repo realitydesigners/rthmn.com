@@ -101,8 +101,8 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
 
     return (
         <div className='space-y-4'>
-            <div className='group relative flex flex-col overflow-hidden rounded-lg bg-black/30 p-[1px] transition-all'>
-                <div className='relative flex flex-col rounded-lg bg-[linear-gradient(to_bottom,rgba(10,10,10,0.95),rgba(17,17,17,0.95))] backdrop-blur-md'>
+            <div className='group relative flex flex-col overflow-hidden rounded-lg p-[1px] transition-all'>
+                <div className='relative flex flex-col rounded-lg'>
                     {/* Main visualization area */}
                     <div className='relative h-full px-4 pt-4 pb-9'>
                         <div ref={barContainerRef} className='group/bars relative flex h-10 items-center rounded-lg bg-white/[0.02]'>

@@ -78,11 +78,11 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
 
                     {/* Timeframe Control */}
                     {!memoizedBoxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
-                        <div className='relative h-24 w-full'>
+                        <div className='relative h-20 w-full'>
                             <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
                                 <div className='h-24 w-full rounded-md bg-[#222]/50' />
                             </div>
-                            <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                            <div className={`inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <TimeFrameVisualizer
                                     startIndex={localStartIndex}
                                     maxBoxCount={localMaxBoxCount}
