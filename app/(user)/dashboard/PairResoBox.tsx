@@ -22,6 +22,8 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
     const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
     const [showSidebar, setShowSidebar] = useState(true);
 
+    // console.log(boxSlice);
+
     // Memoize values that depend on props
     const memoizedBoxColors = useMemo(
         () => ({
@@ -64,9 +66,9 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
                     </div>
 
                     {/* Chart Section */}
-                    <div className='relative flex h-full w-full'>
+                    <div className='relative flex h-full w-full pr-16'>
                         {isBoxView ? (
-                            <ResoBox slice={boxSlice} className='h-full w-full' boxColors={memoizedBoxColors} />
+                            <ResoBox slice={boxSlice} className='h-full w-full' boxColors={memoizedBoxColors} pair={pair} />
                         ) : (
                             <div className='relative aspect-[2/1] w-full'>
                                 <ResoChart slice={boxSlice} className='w-full' showSidebar={showSidebar} digits={2} boxColors={memoizedBoxColors} />

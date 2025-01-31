@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
 import { BoxColors } from '@/utils/localStorage';
+import { INSTRUMENTS } from '@/utils/instruments';
 
 // Memoize color calculations
 const useBoxColors = (box: Box, boxColors: BoxColors) => {
@@ -49,6 +50,17 @@ const useBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, 
     }, [box.value, prevColor, boxColors.negative, boxColors.positive, boxColors.styles?.showBorder, boxColors.styles?.borderRadius, containerSize, maxSize]);
 };
 
+// Helper to get instrument digits
+const getInstrumentDigits = (pair: string): number => {
+    const categories = INSTRUMENTS as Record<string, Record<string, { digits: number }>>;
+    for (const [category, pairs] of Object.entries(categories)) {
+        if (pair in pairs) {
+            return pairs[pair].digits;
+        }
+    }
+    return 5; // Default to 5 digits if not found
+};
+
 const Box = React.memo(
     ({
         box,
@@ -60,6 +72,7 @@ const Box = React.memo(
         slice,
         sortedBoxes,
         renderBox,
+        pair,
     }: {
         box: Box;
         index: number;
@@ -70,9 +83,38 @@ const Box = React.memo(
         slice: BoxSlice | null;
         sortedBoxes: Box[];
         renderBox: (box: Box, index: number, prevColor: string | null) => React.ReactNode;
+        pair: string;
     }) => {
         const colors = useBoxColors(box, boxColors);
         const { baseStyles, isFirstDifferent } = useBoxStyles(box, prevColor, boxColors, containerSize, maxSize, colors);
+        const digits = useMemo(() => getInstrumentDigits(pair), [pair]);
+
+        // Check if this box is the first in a sequence of same-colored boxes
+        const isFirstInColorSequence = useMemo(() => {
+            return !prevColor || (box.value > 0 && !prevColor.includes(boxColors.positive)) || (box.value < 0 && !prevColor.includes(boxColors.negative));
+        }, [prevColor, box.value, boxColors.positive, boxColors.negative]);
+
+        const HighPrice = (
+            <div className='absolute top-0 -right-16 z-10 w-16 opacity-60'>
+                <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 0.3)')}` }} />
+                <div className='absolute -top-3.5 right-0'>
+                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
+                        {box.high.toFixed(digits)}
+                    </span>
+                </div>
+            </div>
+        );
+
+        const LowPrice = (
+            <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-60'>
+                <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 0.3)')}` }} />
+                <div className='absolute -top-3.5 right-0'>
+                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
+                        {box.low.toFixed(digits)}
+                    </span>
+                </div>
+            </div>
+        );
 
         return (
             <div key={`${slice?.timestamp}-${index}`} className='absolute border border-black' style={baseStyles}>
@@ -108,6 +150,31 @@ const Box = React.memo(
                     />
                 )}
 
+                {/* Show prices based on color sequence */}
+                {isFirstDifferent ? (
+                    <>
+                        {box.value > 0 && HighPrice}
+                        {box.value < 0 && LowPrice}
+                    </>
+                ) : (
+                    <>
+                        {/* For positive boxes: show low always, but high only if first in sequence */}
+                        {box.value > 0 && (
+                            <>
+                                {isFirstInColorSequence && HighPrice}
+                                {LowPrice}
+                            </>
+                        )}
+                        {/* For negative boxes: show high always, but low only if first in sequence */}
+                        {box.value < 0 && (
+                            <>
+                                {HighPrice}
+                                {isFirstInColorSequence && LowPrice}
+                            </>
+                        )}
+                    </>
+                )}
+
                 {index < sortedBoxes.length - 1 && renderBox(sortedBoxes[index + 1], index + 1, colors.baseColor)}
             </div>
         );
@@ -117,7 +184,17 @@ const Box = React.memo(
 Box.displayName = 'Box';
 
 export const ResoBox = React.memo(
-    ({ slice, boxColors, className = '' }: { slice: BoxSlice | null; boxColors: BoxColors; className?: string }) => {
+    ({
+        slice,
+        boxColors,
+        className = '',
+        pair = '', // Add pair prop with default empty string
+    }: {
+        slice: BoxSlice | null;
+        boxColors: BoxColors;
+        className?: string;
+        pair?: string;
+    }) => {
         const boxRef = useRef<HTMLDivElement>(null);
         const [containerSize, setContainerSize] = useState(0);
 
@@ -173,9 +250,10 @@ export const ResoBox = React.memo(
                     slice={slice}
                     sortedBoxes={sortedBoxes}
                     renderBox={renderBox}
+                    pair={pair}
                 />
             ),
-            [boxColors, containerSize, maxSize, slice, sortedBoxes]
+            [boxColors, containerSize, maxSize, slice, sortedBoxes, pair]
         );
 
         const renderShiftedBoxes = useCallback(

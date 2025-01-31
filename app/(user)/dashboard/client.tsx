@@ -5,7 +5,6 @@ import { PairResoBox } from './PairResoBox';
 import { NoInstruments } from './LoadingSkeleton';
 import { getSidebarState } from '@/utils/localStorage';
 
-// Custom hook to handle grid layout based on sidebar states
 const useGridLayout = () => {
     const { isSidebarInitialized } = useDashboard();
     const [gridClass, setGridClass] = useState('');
