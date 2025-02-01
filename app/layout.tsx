@@ -1,5 +1,5 @@
 import { NavbarSignedOut } from '@/components/NavbarSignedOut';
-import { Toaster } from '@/components/Toasts/toaster';
+import { Toaster } from '@/app/_components/Toasts/toaster';
 import { getURL } from '@/utils/helpers';
 import type { Metadata, Viewport } from 'next';
 import { Suspense } from 'react';

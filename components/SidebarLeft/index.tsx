@@ -11,6 +11,7 @@ import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/on
 import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { VisualizerContent } from '@/app/(user)/onboarding/_components/FeatureTour/VisualizerContent';
 import { VisualizersView } from '@/components/VisualizersView';
+import { InstrumentsView } from './InstrumentsView';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -28,12 +29,7 @@ export const SidebarLeft = () => {
             icon: LuLineChart,
             onClick: () => handlePanelToggle('instruments'),
             tourContent: <InstrumentsContent />,
-            panelContent: (
-                <>
-                    <SelectedPairs />
-                    <AvailablePairs />
-                </>
-            ),
+            panelContent: <InstrumentsView />,
         },
         {
             id: 'visualizer',

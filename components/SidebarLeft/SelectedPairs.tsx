@@ -51,47 +51,52 @@ export const SelectedPairs = () => {
         <div className='mb-4'>
             <div className='font-kodemono mb-2 flex h-8 items-center text-xs font-medium tracking-wider text-[#818181]'>
                 <span className='uppercase'>Selected Pairs</span>
-                <span className='ml-auto text-[#444]'>{selectedPairs.length}</span>
+                <div className='ml-auto flex items-center gap-1.5'>
+                    <div className='h-1.5 w-1.5 rounded-full bg-emerald-400/50'></div>
+                    <span className='text-[#444]'>{selectedPairs.length}</span>
+                </div>
             </div>
             <div className='space-y-1'>
                 {selectedPairs.map((item) => (
                     <div
                         key={item}
                         className={cn(
-                            'group relative flex h-9 cursor-default items-center justify-between overflow-hidden rounded-lg border border-transparent bg-[#111] px-3 transition-all select-none hover:border-[#333]',
+                            'group/item relative flex h-10 items-center justify-between overflow-hidden rounded-lg border border-transparent bg-gradient-to-b from-[#141414] to-[#0F0F0F] px-3 transition-all select-none',
+                            'hover:border-[#222] hover:from-[#161616] hover:to-[#111]',
                             isOnboardingActive && [
-                                // Intense inner glow layers
                                 'shadow-[inset_0_0_50px_rgba(59,130,246,0.5)]',
                                 'shadow-[inset_0_0_30px_rgba(59,130,246,0.4)]',
                                 'shadow-[inset_0_0_20px_rgba(59,130,246,0.3)]',
-                                // Strong outer glow
                                 'shadow-[0_0_30px_rgba(59,130,246,0.3)]',
-                                // Hover effects with increased intensity
                                 'hover:shadow-[inset_0_0_60px_rgba(59,130,246,0.6)]',
                                 'hover:shadow-[inset_0_0_40px_rgba(59,130,246,0.5)]',
                                 'hover:shadow-[inset_0_0_25px_rgba(59,130,246,0.4)]',
                                 'hover:shadow-[0_0_40px_rgba(59,130,246,0.4)]',
                                 'hover:border-blue-500/40',
-                                // Smooth transitions
                                 'transition-all duration-300',
-                                // Animated gradient background using pseudo-element
                                 'before:absolute before:inset-0 before:-z-10 before:animate-pulse before:bg-gradient-to-r before:from-blue-500/[0.15] before:via-transparent before:to-blue-500/[0.15] before:transition-opacity hover:before:from-blue-500/[0.25] hover:before:to-blue-500/[0.25]',
                             ]
                         )}>
-                        <div className='relative z-10 flex items-center overflow-hidden'>
-                            <span className='font-outfit truncate text-[13px] font-bold tracking-wider text-white'>{item}</span>
+                        <div className='absolute inset-y-0 left-0 w-[2px] bg-emerald-400/20'></div>
+                        <div className='relative z-10 flex items-center gap-3'>
+                            <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-sm'>
+                                <div className='h-1.5 w-1.5 rounded-full bg-emerald-400/50'></div>
+                            </div>
+                            <div className='flex flex-col gap-0.5'>
+                                <span className='font-outfit truncate text-[13px] font-bold tracking-wider text-white'>{item}</span>
+                                <span className='font-kodemono text-[11px] font-medium tracking-wider text-[#666] transition-all group-hover/item:text-[#818181]'>
+                                    {priceData[item]?.price ? formatPrice(priceData[item].price) : <LoadingSpinner key={`${item}-loading`} itemId={item} color='#3b82f6' />}
+                                </span>
+                            </div>
                         </div>
-                        <div className='relative z-10 flex shrink-0 items-center gap-3'>
-                            <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666] transition-all'>
-                                {priceData[item]?.price ? formatPrice(priceData[item].price) : <LoadingSpinner key={`${item}-loading`} itemId={item} color='#3b82f6' />}
-                            </span>
+                        <div className='relative z-10 flex items-center'>
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     togglePair(item);
                                 }}
-                                className='flex h-5 w-5 items-center justify-center rounded-md border border-red-400 bg-red-400/80 opacity-0 transition-all group-hover:opacity-100 hover:text-white'>
-                                <FaTimes size={10} className='text-black' />
+                                className='flex h-5 w-5 items-center justify-center rounded-full border border-[#333] bg-gradient-to-b from-[#181818] to-[#0F0F0F] opacity-0 transition-all group-hover/item:opacity-100 hover:border-red-500/30 hover:from-red-500/10 hover:to-red-600/10'>
+                                <FaTimes size={8} className='text-[#666] transition-all hover:text-red-400' />
                             </button>
                         </div>
                     </div>
