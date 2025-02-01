@@ -137,7 +137,10 @@ export interface ColorPreset {
 }
 
 export interface FullPreset extends ColorPreset {
-    styles: BoxColors['styles'];
+    styles: Omit<NonNullable<BoxColors['styles']>, 'startIndex' | 'maxBoxCount'> & {
+        startIndex?: number;
+        maxBoxCount?: number;
+    };
 }
 
 export const fullPresets: FullPreset[] = [
@@ -147,8 +150,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#ff2975', // Hot pink
         styles: {
             borderRadius: 4,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -162,8 +163,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#b91dff', // Electric purple
         styles: {
             borderRadius: 6,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -177,8 +176,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#6600cc', // Deep purple
         styles: {
             borderRadius: 8,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -192,8 +189,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#6600ff', // Royal purple
         styles: {
             borderRadius: 5,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -207,8 +202,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#0066ff', // Bright blue
         styles: {
             borderRadius: 6,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -222,8 +215,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#4d0099', // Deep purple
         styles: {
             borderRadius: 7,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -237,8 +228,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#ff1a1a', // Bright red
         styles: {
             borderRadius: 6,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -252,8 +241,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#0099ff', // Sky blue
         styles: {
             borderRadius: 5,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -267,8 +254,6 @@ export const fullPresets: FullPreset[] = [
         negative: '#ff0000', // Pure red
         styles: {
             borderRadius: 4,
-            maxBoxCount: 12,
-            startIndex: 0,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,

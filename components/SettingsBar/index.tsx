@@ -46,7 +46,16 @@ export const SettingsBar = () => {
         updateBoxColors({
             positive: preset.positive,
             negative: preset.negative,
-            styles: preset.styles,
+            styles: {
+                ...boxColors.styles, // Preserve existing settings including startIndex, maxBoxCount, and globalTimeframeControl
+                borderRadius: preset.styles.borderRadius,
+                shadowIntensity: preset.styles.shadowIntensity,
+                opacity: preset.styles.opacity,
+                showBorder: preset.styles.showBorder,
+                showLineChart: preset.styles.showLineChart,
+                // Explicitly preserve globalTimeframeControl from current settings
+                globalTimeframeControl: boxColors.styles?.globalTimeframeControl ?? false,
+            },
         });
     };
 
