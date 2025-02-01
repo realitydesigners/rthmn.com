@@ -242,16 +242,6 @@ export interface BoxColors {
     };
 }
 
-export interface ColorPreset {
-    name: string;
-    positive: string;
-    negative: string;
-}
-
-export interface FullPreset extends ColorPreset {
-    styles: BoxColors['styles'];
-}
-
 export interface PriceData {
     price: number;
     timestamp: string;

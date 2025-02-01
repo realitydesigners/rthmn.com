@@ -2,13 +2,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { LuRotateCcw, LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid, LuLineChart } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import type { BoxColors, FullPreset } from '@/types/types';
+import type { BoxColors } from '@/types/types';
+import type { FullPreset } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
 import { TimeFrameVisualizer, BoxVisualizer } from './Visualizers';
 import { getTimeframeRange } from '@/utils/timeframe';
 
 export const SettingsBar = () => {
-    const { boxColors, updateBoxColors, togglePair, selectedPairs, DEFAULT_BOX_COLORS, fullPresets } = useDashboard();
+    const { boxColors, updateBoxColors, DEFAULT_BOX_COLORS, fullPresets } = useDashboard();
     const [mounted, setMounted] = useState(false);
     const [showColors, setShowColors] = useState(true);
     const [showtimeframe, setShowtimeframe] = useState(true);
@@ -69,7 +70,6 @@ export const SettingsBar = () => {
             boxColors.positive === preset.positive &&
             boxColors.negative === preset.negative &&
             boxColors.styles?.borderRadius === preset.styles.borderRadius &&
-            boxColors.styles?.maxBoxCount === preset.styles.maxBoxCount &&
             boxColors.styles?.shadowIntensity === preset.styles.shadowIntensity &&
             boxColors.styles?.opacity === preset.styles.opacity &&
             boxColors.styles?.showBorder === preset.styles.showBorder
@@ -84,7 +84,7 @@ export const SettingsBar = () => {
                     <div className='flex flex-col gap-2'>
                         <button
                             onClick={() => setShowColors(!showColors)}
-                            className='group flex h-10 items-center justify-between rounded-lg border border-[#222] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                            className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
                             <div className='flex items-center gap-3'>
                                 <div className='relative h-6 w-6 overflow-hidden rounded-full shadow-xl'>
                                     <div

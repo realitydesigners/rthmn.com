@@ -1,31 +1,18 @@
 const SELECTED_PAIRS_KEY = 'selectedPairs';
 const SIDEBAR_LOCKS_KEY = 'sidebarLocks';
 const SIDEBAR_STATE_KEY = 'sidebarState';
+const BOX_COLORS_KEY = 'boxColors';
+const PAIR_TIMEFRAMES_KEY = 'pairTimeframes';
 
-export interface SidebarLocks {
-    left: boolean;
-    right: boolean;
-}
-
-export interface SidebarState {
-    left: {
-        isOpen: boolean;
-        activePanel?: string;
-        locked: boolean;
-    };
-    right: {
-        isOpen: boolean;
-        activePanel?: string;
-        locked: boolean;
-    };
-}
-
-export const DEFAULT_SIDEBAR_LOCKS: SidebarLocks = {
+export const DEFAULT_SIDEBAR_LOCKS: { left: boolean; right: boolean } = {
     left: false,
     right: false,
 };
 
-export const DEFAULT_SIDEBAR_STATE: SidebarState = {
+export const DEFAULT_SIDEBAR_STATE: {
+    left: { isOpen: boolean; activePanel: string | undefined; locked: boolean };
+    right: { isOpen: boolean; activePanel: string | undefined; locked: boolean };
+} = {
     left: {
         isOpen: false,
         activePanel: undefined,
@@ -38,7 +25,10 @@ export const DEFAULT_SIDEBAR_STATE: SidebarState = {
     },
 };
 
-export const getSidebarState = (): SidebarState => {
+export const getSidebarState = (): {
+    left: { isOpen: boolean; activePanel: string | undefined; locked: boolean };
+    right: { isOpen: boolean; activePanel: string | undefined; locked: boolean };
+} => {
     if (typeof window === 'undefined') return DEFAULT_SIDEBAR_STATE;
     try {
         const stored = localStorage.getItem(SIDEBAR_STATE_KEY);
@@ -48,12 +38,15 @@ export const getSidebarState = (): SidebarState => {
     }
 };
 
-export const setSidebarState = (state: SidebarState) => {
+export const setSidebarState = (state: {
+    left: { isOpen: boolean; activePanel: string | undefined; locked: boolean };
+    right: { isOpen: boolean; activePanel: string | undefined; locked: boolean };
+}) => {
     if (typeof window === 'undefined') return;
     localStorage.setItem(SIDEBAR_STATE_KEY, JSON.stringify(state));
 };
 
-export const getSidebarLocks = (): SidebarLocks => {
+export const getSidebarLocks = (): { left: boolean; right: boolean } => {
     if (typeof window === 'undefined') return DEFAULT_SIDEBAR_LOCKS;
     try {
         const stored = localStorage.getItem(SIDEBAR_LOCKS_KEY);
@@ -63,7 +56,7 @@ export const getSidebarLocks = (): SidebarLocks => {
     }
 };
 
-export const setSidebarLocks = (locks: SidebarLocks) => {
+export const setSidebarLocks = (locks: { left: boolean; right: boolean }) => {
     if (typeof window === 'undefined') return;
     localStorage.setItem(SIDEBAR_LOCKS_KEY, JSON.stringify(locks));
 };
@@ -78,8 +71,6 @@ export const setSelectedPairs = (pairs: string[]) => {
     if (typeof window === 'undefined') return;
     localStorage.setItem(SELECTED_PAIRS_KEY, JSON.stringify(pairs));
 };
-
-const BOX_COLORS_KEY = 'boxColors';
 
 export interface BoxColors {
     positive: string;
@@ -130,16 +121,17 @@ export const setBoxColors = (colors: BoxColors) => {
     localStorage.setItem(BOX_COLORS_KEY, JSON.stringify(colors));
 };
 
-export interface ColorPreset {
+export interface FullPreset {
     name: string;
     positive: string;
     negative: string;
-}
-
-export interface FullPreset extends ColorPreset {
-    styles: Omit<NonNullable<BoxColors['styles']>, 'startIndex' | 'maxBoxCount'> & {
-        startIndex?: number;
-        maxBoxCount?: number;
+    styles: {
+        borderRadius: number;
+        shadowIntensity: number;
+        opacity: number;
+        showBorder: boolean;
+        globalTimeframeControl: boolean;
+        showLineChart: boolean;
     };
 }
 
@@ -262,3 +254,28 @@ export const fullPresets: FullPreset[] = [
         },
     },
 ];
+
+export const getPairTimeframes = (): { [pair: string]: { startIndex: number; maxBoxCount: number } } => {
+    if (typeof window === 'undefined') return {};
+    try {
+        const stored = localStorage.getItem(PAIR_TIMEFRAMES_KEY);
+        return stored ? JSON.parse(stored) : {};
+    } catch {
+        return {};
+    }
+};
+
+export const setPairTimeframe = (pair: string, settings: { startIndex: number; maxBoxCount: number }) => {
+    if (typeof window === 'undefined') return;
+    const currentSettings = getPairTimeframes();
+    const newSettings = {
+        ...currentSettings,
+        [pair]: settings,
+    };
+    localStorage.setItem(PAIR_TIMEFRAMES_KEY, JSON.stringify(newSettings));
+};
+
+export const getPairTimeframe = (pair: string): { startIndex: number; maxBoxCount: number } => {
+    const settings = getPairTimeframes();
+    return settings[pair] || { startIndex: 0, maxBoxCount: 12 };
+};

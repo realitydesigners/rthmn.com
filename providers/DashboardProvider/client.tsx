@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { BoxSlice, PairData, Signal, BoxColors, FullPreset } from '@/types/types';
+import { BoxSlice, PairData, Signal, BoxColors } from '@/types/types';
+import { FullPreset } from '@/utils/localStorage';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';

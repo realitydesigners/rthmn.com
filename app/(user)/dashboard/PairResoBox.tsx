@@ -7,6 +7,7 @@ import { getTimeframeRange } from '@/utils/timeframe';
 import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
 import React, { useMemo, useState } from 'react';
 import { ResoChart } from '@/components/ResoChart';
+import { getPairTimeframe, setPairTimeframe } from '@/utils/localStorage';
 
 interface PairResoBoxProps {
     pair?: string;
@@ -17,9 +18,15 @@ interface PairResoBoxProps {
 }
 
 export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
-    // Move all hooks to the top level
-    const [localStartIndex, setLocalStartIndex] = useState(boxColors?.styles?.startIndex ?? 0);
-    const [localMaxBoxCount, setLocalMaxBoxCount] = useState(boxColors?.styles?.maxBoxCount ?? 10);
+    // Get individual pair settings if not using global control
+    const [localStartIndex, setLocalStartIndex] = useState(() =>
+        boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.startIndex ?? 0) : getPairTimeframe(pair || '').startIndex
+    );
+
+    const [localMaxBoxCount, setLocalMaxBoxCount] = useState(() =>
+        boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.maxBoxCount ?? 10) : getPairTimeframe(pair || '').maxBoxCount
+    );
+
     const [showSidebar, setShowSidebar] = useState(true);
 
     // console.log(boxSlice);
@@ -46,8 +53,24 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
     }, [memoizedBoxColors.styles, localStartIndex, localMaxBoxCount]);
 
     const handleLocalStyleChange = (property: string, value: number | boolean) => {
-        if (property === 'startIndex') setLocalStartIndex(value as number);
-        if (property === 'maxBoxCount') setLocalMaxBoxCount(value as number);
+        if (property === 'startIndex') {
+            setLocalStartIndex(value as number);
+            if (!boxColors?.styles?.globalTimeframeControl && pair) {
+                setPairTimeframe(pair, {
+                    startIndex: value as number,
+                    maxBoxCount: localMaxBoxCount,
+                });
+            }
+        }
+        if (property === 'maxBoxCount') {
+            setLocalMaxBoxCount(value as number);
+            if (!boxColors?.styles?.globalTimeframeControl && pair) {
+                setPairTimeframe(pair, {
+                    startIndex: localStartIndex,
+                    maxBoxCount: value as number,
+                });
+            }
+        }
     };
 
     // Always return a consistent structure
