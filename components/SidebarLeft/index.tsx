@@ -3,8 +3,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { LuLineChart, LuLayoutGrid } from 'react-icons/lu';
 import { usePathname } from 'next/navigation';
 import { SidebarWrapper } from '../SidebarWrapper';
-import { SelectedPairs } from './SelectedPairs';
-import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
 import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
