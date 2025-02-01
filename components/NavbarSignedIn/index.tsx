@@ -9,7 +9,7 @@ import { createClient } from '@/utils/supabase/client';
 import { LogoIcon, BellIcon } from '@/components/Icons/icons';
 import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { SearchBar } from '../SearchBar';
+
 import { LuChevronRight, LuLayoutDashboard, LuOrbit } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 
@@ -121,9 +121,6 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                 <span className='font-mono text-[11px] font-medium tracking-wider text-gray-200/50 uppercase'>{pathSegments}</span>
                             )}
                         </div>
-                    </div>
-                    <div className='absolute w-full justify-center'>
-                        <SearchBar selectedPairs={selectedPairs} />
                     </div>
 
                     <div className='relative z-[110] flex items-center space-x-4'>
