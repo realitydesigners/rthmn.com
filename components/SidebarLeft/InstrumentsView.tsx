@@ -63,7 +63,6 @@ const PairItem: React.FC<PairItemProps> = ({ item, isSelected = false, onToggle,
         <div
             className={cn(
                 'group/item relative flex h-10 items-center overflow-hidden transition-all duration-300 select-none',
-                'backdrop-blur-[1px] backdrop-filter',
                 'after:absolute after:inset-0 after:rounded-lg after:transition-all after:duration-300',
                 isSelected
                     ? ['bg-[#141414]/90', 'after:bg-gradient-to-r after:from-transparent after:via-[rgba(255,255,255,0.03)] after:to-transparent', 'after:animate-shimmer']
@@ -237,7 +236,7 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
 
             {/* Results Dropdown */}
             {showResults && searchQuery && (
-                <div className='absolute top-full right-0 left-0 z-50 mt-1 overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C]/95 shadow-lg backdrop-blur-sm'>
+                <div className='absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C] shadow-lg'>
                     <div className='max-h-[280px] overflow-y-auto'>
                         {getFilteredPairs().map((pair) => {
                             const isSelected = selectedPairs.includes(pair);
