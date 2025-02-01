@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { LuOrbit, LuLineChart, LuTestTube, LuLayoutGrid } from 'react-icons/lu';
+import { LuLineChart, LuLayoutGrid } from 'react-icons/lu';
 import { usePathname } from 'next/navigation';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
@@ -10,7 +10,6 @@ import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour
 import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
 import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { VisualizerContent } from '@/app/(user)/onboarding/_components/FeatureTour/VisualizerContent';
-import { TimeFrameVisualizer, BoxVisualizer } from '@/components/VisualizersView/Visualizers';
 import { VisualizersView } from '@/components/VisualizersView';
 
 export const SidebarLeft = () => {
@@ -22,17 +21,30 @@ export const SidebarLeft = () => {
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
     const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } = useOnboardingStore();
-    const [showTimeframe, setShowTimeframe] = useState(true);
-    const [boxColors, setBoxColors] = useState({
-        styles: {
-            borderRadius: 4,
-            shadowIntensity: 0.5,
-            opacity: 0.5,
-            showBorder: true,
-            startIndex: 0,
-            maxBoxCount: 10,
+
+    const buttons = [
+        {
+            id: 'instruments',
+            icon: LuLineChart,
+            onClick: () => handlePanelToggle('instruments'),
+            tourContent: <InstrumentsContent />,
+            panelContent: (
+                <>
+                    <SelectedPairs />
+                    <AvailablePairs />
+                </>
+            ),
         },
-    });
+        {
+            id: 'visualizer',
+            icon: LuLayoutGrid,
+            onClick: () => handlePanelToggle('visualizer'),
+            tourContent: <VisualizerContent />,
+            panelContent: <VisualizersView />,
+        },
+    ];
+
+    const isLeftSidebarStep = (stepId: string) => buttons.some((button) => button.id === stepId);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -82,7 +94,9 @@ export const SidebarLeft = () => {
                 .sort((a, b) => a.order - b.order)
                 .find((step) => !isStepCompleted(step.id));
 
-            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId))) {
+            // Only open the next step if there's no current step or the current step is completed
+            // AND the next step belongs to the left sidebar
+            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId)) && isLeftSidebarStep(nextIncompleteStep.id)) {
                 console.log('Setting next incomplete step:', nextIncompleteStep);
                 setCurrentStep(nextIncompleteStep.id);
                 setIsOpen(true);
@@ -135,28 +149,6 @@ export const SidebarLeft = () => {
         setIsLocked(newLockedState);
         updateSidebarState(isOpen, activePanel, newLockedState);
     };
-
-    const buttons = [
-        {
-            id: 'instruments',
-            icon: LuLineChart,
-            onClick: () => handlePanelToggle('instruments'),
-            tourContent: <InstrumentsContent />,
-            panelContent: (
-                <>
-                    <SelectedPairs />
-                    <AvailablePairs />
-                </>
-            ),
-        },
-        {
-            id: 'visualizer',
-            icon: LuLayoutGrid,
-            onClick: () => handlePanelToggle('visualizer'),
-            tourContent: <VisualizerContent />,
-            panelContent: <VisualizersView />,
-        },
-    ];
 
     const renderButtons = () =>
         buttons.map((button) => (

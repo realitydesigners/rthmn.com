@@ -1,13 +1,12 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { LuSettings, LuLineChart, LuGraduationCap } from 'react-icons/lu';
+import { LuSettings, LuGraduationCap } from 'react-icons/lu';
 import { usePathname } from 'next/navigation';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SettingsBar } from '../SettingsBar';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
 import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
-import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { Onboarding } from './Onboarding';
 import { OnboardingContent } from '@/app/(user)/onboarding/_components/FeatureTour/OnboardingContent';
 import { SettingsContent } from '@/app/(user)/onboarding/_components/FeatureTour/SettingsContent';
@@ -21,6 +20,25 @@ export const SidebarRight = () => {
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
     const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } = useOnboardingStore();
+
+    const buttons = [
+        {
+            id: 'onboarding',
+            icon: LuGraduationCap,
+            onClick: () => handlePanelToggle('onboarding'),
+            tourContent: <OnboardingContent />,
+            panelContent: <Onboarding />,
+        },
+        {
+            id: 'settings',
+            icon: LuSettings,
+            onClick: () => handlePanelToggle('settings'),
+            tourContent: <SettingsContent />,
+            panelContent: <SettingsBar />,
+        },
+    ];
+
+    const isRightSidebarStep = (stepId: string) => buttons.some((button) => button.id === stepId);
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -70,7 +88,9 @@ export const SidebarRight = () => {
                 .sort((a, b) => a.order - b.order)
                 .find((step) => !isStepCompleted(step.id));
 
-            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId))) {
+            // Only open the next step if there's no current step or the current step is completed
+            // AND the next step belongs to the right sidebar
+            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId)) && isRightSidebarStep(nextIncompleteStep.id)) {
                 console.log('Setting next incomplete step:', nextIncompleteStep);
                 setCurrentStep(nextIncompleteStep.id);
                 setIsOpen(true);
@@ -123,23 +143,6 @@ export const SidebarRight = () => {
         setIsLocked(newLockedState);
         updateSidebarState(isOpen, activePanel, newLockedState);
     };
-
-    const buttons = [
-        {
-            id: 'onboarding',
-            icon: LuGraduationCap,
-            onClick: () => handlePanelToggle('onboarding'),
-            tourContent: <OnboardingContent />,
-            panelContent: <Onboarding />,
-        },
-        {
-            id: 'settings',
-            icon: LuSettings,
-            onClick: () => handlePanelToggle('settings'),
-            tourContent: <SettingsContent />,
-            panelContent: <SettingsBar />,
-        },
-    ];
 
     const renderButtons = () =>
         buttons.map((button) => (
