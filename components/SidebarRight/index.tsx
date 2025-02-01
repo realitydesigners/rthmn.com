@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SettingsBar } from '../SettingsBar';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
 import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
 import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { Onboarding } from './Onboarding';
@@ -20,7 +20,7 @@ export const SidebarRight = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
-    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, isStepCompleted } = useOnboardingStore();
+    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } = useOnboardingStore();
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -54,27 +54,30 @@ export const SidebarRight = () => {
     }, [isLocked, isMobile]);
 
     useEffect(() => {
-        if (hasCompletedInitialOnboarding() && !currentStepId) {
-            setCurrentStep('onboarding');
-        }
+        // Add debug logging regardless of conditions
+        // console.log('Right Sidebar Onboarding State:', {
+        //     completedSteps: useOnboardingStore.getState().completedSteps,
+        //     currentStepId: useOnboardingStore.getState().currentStepId,
+        //     hasCompletedInitialOnboarding: hasCompletedInitialOnboarding(),
+        //     hasCompletedAllSteps: hasCompletedAllSteps(),
+        //     allSteps: ONBOARDING_STEPS,
+        //     nextFeatureTourSteps: ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour'),
+        // });
 
-        // Automatically open onboarding panel when feature tour starts
-        if (currentStepId === 'instruments') {
-            setIsOpen(true);
-            setActivePanel('onboarding');
-            setIsLocked(true);
-            // Update sidebar state to reflect this change
-            const state = getSidebarState();
-            setSidebarState({
-                ...state,
-                right: {
-                    isOpen: true,
-                    activePanel: 'onboarding',
-                    locked: true,
-                },
-            });
+        // Check for incomplete feature tour steps if page steps are completed
+        if (hasCompletedInitialOnboarding() && !hasCompletedAllSteps()) {
+            const nextIncompleteStep = ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour')
+                .sort((a, b) => a.order - b.order)
+                .find((step) => !isStepCompleted(step.id));
+
+            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId))) {
+                console.log('Setting next incomplete step:', nextIncompleteStep);
+                setCurrentStep(nextIncompleteStep.id);
+                setIsOpen(true);
+                setActivePanel(nextIncompleteStep.id);
+            }
         }
-    }, [hasCompletedInitialOnboarding, currentStepId, setCurrentStep]);
+    }, [hasCompletedInitialOnboarding, hasCompletedAllSteps, currentStepId, setCurrentStep, isStepCompleted]);
 
     if (!mounted || isMobile || pathname === '/account') return null;
 

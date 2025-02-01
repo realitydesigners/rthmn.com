@@ -4,7 +4,7 @@ import { BoxSlice, OHLC } from '@/types/types';
 import { ResoBox } from '@/components/ResoBox';
 import { BoxColors } from '@/utils/localStorage';
 import { getTimeframeRange } from '@/utils/timeframe';
-import { TimeFrameVisualizer } from '@/components/SettingsBar/Visualizers';
+import { TimeFrameVisualizer } from '@/components/VisualizersView/Visualizers';
 import React, { useMemo, useState, useEffect } from 'react';
 import { ResoChart } from '@/components/ResoChart';
 

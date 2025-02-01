@@ -1,14 +1,17 @@
 'use client';
 import React, { useState, useEffect, useRef } from 'react';
-import { LuOrbit, LuLineChart, LuTestTube } from 'react-icons/lu';
+import { LuOrbit, LuLineChart, LuTestTube, LuLayoutGrid } from 'react-icons/lu';
 import { usePathname } from 'next/navigation';
 import { SidebarWrapper } from '../SidebarWrapper';
 import { SelectedPairs } from './SelectedPairs';
 import { AvailablePairs } from './AvailablePairs';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import { InstrumentsContent } from '../../app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
+import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
+import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
+import { VisualizerContent } from '@/app/(user)/onboarding/_components/FeatureTour/VisualizerContent';
+import { TimeFrameVisualizer, BoxVisualizer } from '@/components/VisualizersView/Visualizers';
+import { VisualizersView } from '@/components/VisualizersView';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -18,7 +21,18 @@ export const SidebarLeft = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
-    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, isStepCompleted } = useOnboardingStore();
+    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } = useOnboardingStore();
+    const [showTimeframe, setShowTimeframe] = useState(true);
+    const [boxColors, setBoxColors] = useState({
+        styles: {
+            borderRadius: 4,
+            shadowIntensity: 0.5,
+            opacity: 0.5,
+            showBorder: true,
+            startIndex: 0,
+            maxBoxCount: 10,
+        },
+    });
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -52,10 +66,30 @@ export const SidebarLeft = () => {
     }, [isLocked, isMobile]);
 
     useEffect(() => {
-        if (hasCompletedInitialOnboarding() && !currentStepId) {
-            setCurrentStep('instruments');
+        // Add debug logging regardless of conditions
+        // console.log('Onboarding State:', {
+        //     completedSteps: useOnboardingStore.getState().completedSteps,
+        //     currentStepId: useOnboardingStore.getState().currentStepId,
+        //     hasCompletedInitialOnboarding: hasCompletedInitialOnboarding(),
+        //     hasCompletedAllSteps: hasCompletedAllSteps(),
+        //     allSteps: ONBOARDING_STEPS,
+        //     nextFeatureTourSteps: ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour'),
+        // });
+
+        // Check for incomplete feature tour steps if page steps are completed
+        if (hasCompletedInitialOnboarding() && !hasCompletedAllSteps()) {
+            const nextIncompleteStep = ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour')
+                .sort((a, b) => a.order - b.order)
+                .find((step) => !isStepCompleted(step.id));
+
+            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId))) {
+                console.log('Setting next incomplete step:', nextIncompleteStep);
+                setCurrentStep(nextIncompleteStep.id);
+                setIsOpen(true);
+                setActivePanel(nextIncompleteStep.id);
+            }
         }
-    }, [hasCompletedInitialOnboarding, currentStepId, setCurrentStep]);
+    }, [hasCompletedInitialOnboarding, hasCompletedAllSteps, currentStepId, setCurrentStep, isStepCompleted]);
 
     if (!mounted || isMobile || pathname === '/account') return null;
 
@@ -114,6 +148,13 @@ export const SidebarLeft = () => {
                     <AvailablePairs />
                 </>
             ),
+        },
+        {
+            id: 'visualizer',
+            icon: LuLayoutGrid,
+            onClick: () => handlePanelToggle('visualizer'),
+            tourContent: <VisualizerContent />,
+            panelContent: <VisualizersView />,
         },
     ];
 

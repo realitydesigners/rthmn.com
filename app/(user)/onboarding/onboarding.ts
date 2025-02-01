@@ -48,18 +48,25 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         order: 4,
     },
     {
+        id: 'visualizer',
+        title: 'Visualizer',
+        description: 'Customize your chart visualization settings',
+        type: 'feature-tour',
+        order: 5,
+    },
+    {
         id: 'onboarding',
         title: 'Learning Center',
         description: 'Access your selected trading pairs and available markets',
         type: 'feature-tour',
-        order: 5,
+        order: 6,
     },
     {
         id: 'settings',
         title: 'Settings',
         description: 'View detailed market analysis and trading insights',
         type: 'feature-tour',
-        order: 6,
+        order: 7,
     },
 ];
 
@@ -81,6 +88,9 @@ interface OnboardingState {
     setCurrentStep: (stepId: string) => void;
     isStepCompleted: (stepId: string) => boolean;
     hasCompletedInitialOnboarding: () => boolean;
+    hasCompletedPageSteps: () => boolean;
+    hasCompletedAllSteps: () => boolean;
+    getNextIncompleteStep: () => OnboardingStep | null;
 }
 
 export const useOnboardingStore = create<OnboardingState>()(
@@ -95,33 +105,46 @@ export const useOnboardingStore = create<OnboardingState>()(
             },
 
             completeStep: (stepId, data) => {
-                // console.log(`Completing step: ${stepId}`);
-                const step = ONBOARDING_STEPS.find((s) => s.id === stepId);
-                // console.log(`Step details:`, step);
-
                 set((state) => {
+                    if (state.completedSteps.includes(stepId)) {
+                        console.log('Step already completed:', stepId);
+                        return state;
+                    }
+
                     const newCompletedSteps = [...state.completedSteps, stepId];
-                    // console.log('Updated completed steps:', newCompletedSteps);
 
-                    // Check if this is the last step
-                    const isLastStep = stepId === ONBOARDING_STEPS[ONBOARDING_STEPS.length - 1].id;
+                    // Find next step based on current phase
+                    let nextIncompleteStep = null;
 
-                    return {
+                    const newState = {
                         completedSteps: newCompletedSteps,
                         userData: data ? { ...state.userData, ...data } : state.userData,
-                        // Clear currentStepId if this is the last step
-                        currentStepId: isLastStep ? '' : state.currentStepId,
+                        currentStepId: nextIncompleteStep ? nextIncompleteStep.id : '',
                     };
+
+                    return newState;
                 });
             },
 
             goToNextStep: () => {
                 const state = get();
-                const currentIndex = ONBOARDING_STEPS.findIndex((step) => step.id === state.currentStepId);
-                const nextStep = ONBOARDING_STEPS[currentIndex + 1];
+                const currentStep = ONBOARDING_STEPS.find((step) => step.id === state.currentStepId);
 
-                if (nextStep) {
-                    set({ currentStepId: nextStep.id });
+                let nextIncompleteStep = null;
+                if (currentStep?.type === 'page' || !get().hasCompletedPageSteps()) {
+                    // If in page steps, stay in page steps
+                    nextIncompleteStep = ONBOARDING_STEPS.filter((step) => step.type === 'page' && !state.completedSteps.includes(step.id)).sort((a, b) => a.order - b.order)[0];
+                } else {
+                    // If in feature tours, find next by order
+                    nextIncompleteStep = ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour' && !state.completedSteps.includes(step.id)).sort(
+                        (a, b) => a.order - b.order
+                    )[0];
+                }
+
+                if (nextIncompleteStep) {
+                    set({ currentStepId: nextIncompleteStep.id });
+                } else {
+                    set({ currentStepId: '' });
                 }
             },
 
@@ -157,15 +180,51 @@ export const useOnboardingStore = create<OnboardingState>()(
             isStepCompleted: (stepId) => {
                 const state = get();
                 const isCompleted = state.completedSteps.includes(stepId);
-                // console.log(`Checking if step ${stepId} is completed:`, isCompleted);
-                // console.log('Current completed steps:', state.completedSteps);
                 return isCompleted;
             },
 
-            hasCompletedInitialOnboarding: () => {
+            hasCompletedPageSteps: () => {
                 const state = get();
                 const pageSteps = ONBOARDING_STEPS.filter((step) => step.type === 'page');
                 return pageSteps.every((step) => state.completedSteps.includes(step.id));
+            },
+
+            hasCompletedInitialOnboarding: () => {
+                // Only check page steps for routing to dashboard
+                return get().hasCompletedPageSteps();
+            },
+
+            hasCompletedAllSteps: () => {
+                const state = get();
+                // Check if all steps (both page and feature-tour) are completed
+                return ONBOARDING_STEPS.every((step) => state.completedSteps.includes(step.id));
+            },
+
+            getNextIncompleteStep: () => {
+                const state = get();
+                const currentStep = ONBOARDING_STEPS.find((step) => step.id === state.currentStepId);
+
+                console.log('Current Onboarding State:', {
+                    currentStepId: state.currentStepId,
+                    completedSteps: state.completedSteps,
+                    currentStep,
+                    hasCompletedPages: get().hasCompletedPageSteps(),
+                });
+
+                // If we're in page-based onboarding, only look at page steps
+                if (currentStep?.type === 'page' || !get().hasCompletedPageSteps()) {
+                    const pageSteps = ONBOARDING_STEPS.filter((step) => step.type === 'page');
+                    const nextPageStep = pageSteps.find((step) => !state.completedSteps.includes(step.id));
+                    console.log('Next Page Step:', nextPageStep);
+                    return nextPageStep || null;
+                }
+
+                // If page steps are done, find the first incomplete feature tour by order
+                const nextFeatureTour = ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour' && !state.completedSteps.includes(step.id)).sort(
+                    (a, b) => a.order - b.order
+                )[0];
+                console.log('Next Feature Tour Step:', nextFeatureTour);
+                return nextFeatureTour || null;
             },
         }),
         {
