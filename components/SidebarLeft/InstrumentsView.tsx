@@ -217,7 +217,7 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
                         setSearchQuery(value);
                     }}
                     onFocus={() => setShowResults(true)}
-                    className='font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-bold text-[#888] placeholder-[#666] transition-colors outline-none'
+                    className='font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-[#888] placeholder-[#666] transition-colors outline-none'
                 />
 
                 {/* Clear Button */}
@@ -235,8 +235,8 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
 
             {/* Results Dropdown */}
             {showResults && searchQuery && (
-                <div className='absolute top-full right-0 left-0 z-50 mt-2 overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C] shadow-lg'>
-                    <div className='max-h-[280px] overflow-y-auto'>
+                <div className='absolute top-full right-0 left-0 z-10 overflow-hidden bg-[#0C0C0C] pt-2 shadow-lg'>
+                    <div className='max-h-[280px] overflow-y-auto rounded-lg border border-[#222]'>
                         {getFilteredPairs().map((pair) => {
                             const isSelected = selectedPairs.includes(pair);
                             return (
@@ -344,10 +344,10 @@ export const InstrumentsView = () => {
 
     return (
         <div className='flex h-full flex-col'>
-            <div className='sticky top-0 z-0'>
+            <div className='sticky top-0 z-10'>
                 <SearchBar onSearchStateChange={setIsSearching} />
             </div>
-            <div className='flex-1 overflow-y-auto'>
+            <div className='z-0 flex-1 overflow-y-auto pt-4'>
                 <div className={cn('transition-opacity duration-200', isSearching ? 'opacity-30' : 'opacity-100')}>
                     {selectedPairs.length > 0 && <PairGroup label='Selected Pairs' items={selectedPairsItems} count={selectedPairs.length} isSelected={true} />}
                     {availablePairsGroups}
