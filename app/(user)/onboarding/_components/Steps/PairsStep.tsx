@@ -114,26 +114,6 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                         </div>
                     </div>
                 </motion.div>
-
-                {/* Selected Pairs */}
-                {selectedPairs.length > 0 && (
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className='flex flex-wrap gap-2'>
-                        {selectedPairs.map((pair) => (
-                            <motion.button
-                                key={pair}
-                                onClick={() => handlePairClick(pair)}
-                                className='group relative overflow-hidden rounded-lg border border-blue-500/50 bg-gradient-to-b from-blue-500/20 to-blue-500/0 px-3 py-1.5'
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}>
-                                <div className='absolute inset-0 bg-blue-500/10 blur-md' />
-                                <div className='relative flex items-center gap-2'>
-                                    <span className='font-outfit text-sm font-medium text-white'>{pair}</span>
-                                    <span className='font-kodemono text-sm text-blue-400'>{priceData[pair]?.price ? formatPrice(priceData[pair].price, pair) : 'N/A'}</span>
-                                </div>
-                            </motion.button>
-                        ))}
-                    </motion.div>
-                )}
             </div>
 
             {/* Scrollable Pairs Grid */}
