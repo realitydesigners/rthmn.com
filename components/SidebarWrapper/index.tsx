@@ -161,55 +161,63 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                             ease: [0.2, 1, 0.2, 1],
                         },
                     }}
-                    className={cn(
-                        'relative flex h-full w-full flex-col bg-[#0a0a0a]',
-                        position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]',
-                        isCurrentTourStep &&
-                            !isCompleted &&
-                            [
-                                // Edge glow with even distribution
-                                'before:pointer-events-none before:absolute before:inset-0 before:bg-gradient-to-r before:from-blue-500/10 before:via-transparent before:to-transparent',
-                                'after:pointer-events-none after:absolute after:inset-0 after:bg-gradient-to-t after:from-blue-500/20 after:via-transparent after:to-transparent',
-                                'bg-gradient-to-b from-blue-500/[0.1] via-transparent to-blue-500/[0.1]',
-                                'before:pointer-events-none before:absolute before:inset-0 before:bg-[linear-gradient(to_right,rgba(59,130,246,0.05),transparent_20%,transparent_90%,rgba(59,130,246,0.05))]',
-
-                                'animate-pulse-subtle',
-                            ].join(' ')
-                    )}>
-                    {/* Header Section */}
-                    <div className='relative z-10 flex h-12 items-center justify-between px-2'>
-                        {position === 'right' && (
-                            <button
-                                onClick={handleLockToggle}
-                                className={cn(
-                                    'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
-                                    isLocked
-                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
-                                        : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
-                                )}>
-                                <LuUnlock size={12} />
-                            </button>
-                        )}
-                        <div className={cn('flex items-center justify-center gap-2', position === 'right' && 'flex-1 justify-end')}>
-                            <h2 className='font-kodemono px-2 text-[8px] font-medium tracking-widest uppercase'>{title}</h2>
-                        </div>
-                        {position === 'left' && (
-                            <button
-                                onClick={handleLockToggle}
-                                className={cn(
-                                    'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
-                                    isLocked
-                                        ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
-                                        : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
-                                )}>
-                                <LuUnlock size={12} />
-                            </button>
-                        )}
-                    </div>
-
-                    {/* Content Section */}
+                    className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a]', position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]')}>
                     <div className='relative flex-1 touch-pan-y overflow-y-scroll px-2 pb-4 [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.1)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-thumb:hover]:bg-white/[0.12] [&::-webkit-scrollbar-track]:bg-transparent'>
+                        <div className='relative z-10 flex h-12 items-center justify-between px-2 py-6'>
+                            {position === 'right' && (
+                                <button
+                                    onClick={handleLockToggle}
+                                    className={cn(
+                                        'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
+                                        isLocked
+                                            ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
+                                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
+                                    )}>
+                                    <LuUnlock size={12} />
+                                </button>
+                            )}
+                            <div className={cn('flex items-center justify-center gap-2', position === 'right' && 'flex-1 justify-end')}>
+                                <h2 className='font-kodemono px-2 text-[8px] font-medium tracking-widest uppercase'>{title}</h2>
+                            </div>
+                            {position === 'left' && (
+                                <button
+                                    onClick={handleLockToggle}
+                                    className={cn(
+                                        'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
+                                        isLocked
+                                            ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
+                                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
+                                    )}>
+                                    <LuUnlock size={12} />
+                                </button>
+                            )}
+                        </div>
                         {children}
+                        {/* Onboarding Overlay */}
+                        {isCurrentTourStep && !isCompleted && (
+                            <div className='pointer-events-none absolute inset-0 z-[1000]'>
+                                {/* Inner edge glows */}
+                                <div className='absolute inset-[1px] overflow-hidden'>
+                                    {/* Enhanced corner shadows */}
+
+                                    {/* Intense corner glows */}
+                                </div>
+
+                                {/* Additional corner radials for depth */}
+                                <div className='absolute inset-[1px] overflow-hidden'>
+                                    <div className='absolute -top-16 -left-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
+                                    <div className='absolute -top-16 -right-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
+                                    <div className='absolute -bottom-16 -left-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
+                                    <div className='absolute -right-16 -bottom-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
+                                    <div className='absolute -top-16 -left-16 h-64 w-64 bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.3),transparent_70%)]' />
+                                    <div className='absolute -top-16 -right-16 h-64 w-64 bg-[radial-gradient(circle_at_100%_0%,rgba(59,130,246,0.3),transparent_70%)]' />
+                                </div>
+
+                                {/* Soft edge gradients */}
+                                <div className='absolute inset-[1px] bg-[linear-gradient(to_right,rgba(59,130,246,0.1),transparent_20%,transparent_80%,rgba(59,130,246,0.1))]' />
+                                <div className='absolute inset-[1px] bg-[linear-gradient(to_bottom,rgba(59,130,246,0.1),transparent_20%,transparent_80%,rgba(59,130,246,0.1))]' />
+                            </div>
+                        )}
                     </div>
                 </motion.div>
 

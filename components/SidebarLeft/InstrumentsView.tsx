@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useRef, useEffect } from 'react';
 import { FaTimes, FaSearch } from 'react-icons/fa';
 import { useDashboard } from '@/providers/DashboardProvider/client';
@@ -95,7 +94,7 @@ const PairItem: React.FC<PairItemProps> = ({ item, isSelected = false, onToggle,
                 {/* Instrument name */}
                 <span
                     className={cn(
-                        'font-outfit ml-3 flex-1 text-sm font-medium tracking-wide transition-all duration-300',
+                        'font-outfit ml-3 flex-1 text-sm font-bold tracking-wide transition-all duration-300',
                         isSelected ? 'text-white' : 'text-[#666] group-hover/item:text-[#888]'
                     )}>
                     {item}
@@ -197,7 +196,7 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
     };
 
     return (
-        <div className='relative mb-4' ref={searchRef}>
+        <div className='relative' ref={searchRef}>
             {/* Search Input */}
             <div className='group/search relative flex h-10 items-center overflow-hidden rounded-lg transition-all duration-300'>
                 <div className='absolute inset-0 rounded-lg border border-[#222] bg-[#0C0C0C] transition-all duration-300 group-focus-within/search:border-[#333] group-focus-within/search:bg-[#111]' />
@@ -218,7 +217,7 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
                         setSearchQuery(value);
                     }}
                     onFocus={() => setShowResults(true)}
-                    className='font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] text-[#888] placeholder-[#666] transition-colors outline-none'
+                    className='font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-bold text-[#888] placeholder-[#666] transition-colors outline-none'
                 />
 
                 {/* Clear Button */}
@@ -273,7 +272,7 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
                                         </div>
                                         <span
                                             className={cn(
-                                                'font-outfit text-[13px] font-medium tracking-wide transition-colors',
+                                                'font-outfit text-[13px] font-bold tracking-wide transition-colors',
                                                 isSelected ? 'text-white' : 'text-[#666] group-hover/result:text-[#888]'
                                             )}>
                                             {pair}
@@ -345,12 +344,9 @@ export const InstrumentsView = () => {
 
     return (
         <div className='flex h-full flex-col'>
-            {/* Fixed search bar */}
-            <div className='sticky top-0 z-50'>
+            <div className='sticky top-0 z-0'>
                 <SearchBar onSearchStateChange={setIsSearching} />
             </div>
-
-            {/* Scrollable content */}
             <div className='flex-1 overflow-y-auto'>
                 <div className={cn('transition-opacity duration-200', isSearching ? 'opacity-30' : 'opacity-100')}>
                     {selectedPairs.length > 0 && <PairGroup label='Selected Pairs' items={selectedPairsItems} count={selectedPairs.length} isSelected={true} />}
