@@ -1,16 +1,14 @@
 'use client';
 
-import { useEffect, useRef, useState, type JSX } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { LuChevronRight, LuLayoutDashboard, LuOrbit } from 'react-icons/lu';
-import { BellIcon, LogoIcon } from '@/components/Icons/icons';
+import { LogoIcon } from '@/components/Icons/icons';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { cn } from '@/utils/cn';
-import { CRYPTO_PAIRS, FOREX_PAIRS } from '@/utils/instruments';
 import { createClient } from '@/utils/supabase/client';
 
 interface NavbarSignedInProps {

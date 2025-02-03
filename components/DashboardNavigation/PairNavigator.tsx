@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { LuArrowRight, LuBitcoin, LuBookmark, LuDollarSign, LuList, LuPlus, LuSearch, LuTrash2 } from 'react-icons/lu';
-import { useSwipeable } from 'react-swipeable';
 import { useLongPress } from '@/hooks/useLongPress';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { CRYPTO_PAIRS, FOREX_PAIRS } from '@/utils/instruments';

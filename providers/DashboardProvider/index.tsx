@@ -3,7 +3,6 @@
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { PairData } from '@/types/types';
-import { getSelectedPairs } from '@/utils/localStorage';
 import { DashboardProviderClient } from './client';
 
 async function fetchBoxData(pairs: string[]) {

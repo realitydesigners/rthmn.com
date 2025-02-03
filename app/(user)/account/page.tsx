@@ -1,8 +1,6 @@
 'use client';
 
 import { redirect } from 'next/navigation';
-import { FaDiscord } from 'react-icons/fa';
-import { LuCreditCard, LuUser } from 'react-icons/lu';
 import { useAuth } from '@/providers/SupabaseProvider';
 import CustomerPortalForm from './CustomerPortalForm';
 import DiscordConnectionForm from './DiscordConnectionForm';

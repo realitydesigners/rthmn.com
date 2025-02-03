@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import CandleChart, { ChartDataPoint } from '@/components/CandleChart';
-import Histogram from '@/components/Histogram';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
 import { useUrlParams } from '@/hooks/useUrlParams';

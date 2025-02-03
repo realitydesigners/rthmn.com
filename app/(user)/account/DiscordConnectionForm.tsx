@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { FaDiscord, FaLink, FaUnlink } from 'react-icons/fa';
+import { FaDiscord } from 'react-icons/fa';
 import { Database } from '@/types/supabase';
 import { createClient } from '@/utils/supabase/client';
 

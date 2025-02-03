@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BASE_VALUES, createMockBoxData, sequences } from '@/components/Constants/constants';
 import { NestedBoxes } from '@/components/NestedBoxes';

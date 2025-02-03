@@ -12,7 +12,8 @@
         "stripe:login": "stripe login",
         "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks",
         "prepare": "bunx husky install",
-        "lint-staged": "lint-staged"
+        "lint-staged": "lint-staged",
+        "remove-unused": "eslint . --fix --rule 'unused-imports/no-unused-imports: error'"
     },
     "dependencies": {
         "@discordjs/rest": "2.4.0",
@@ -70,6 +71,7 @@
         "eslint-config-prettier": "9.1.0",
         "eslint-plugin-react": "7.37.2",
         "eslint-plugin-tailwindcss": "3.17.5",
+        "eslint-plugin-unused-imports": "^4.1.4",
         "husky": "^8.0.3",
         "lint-staged": "^15.2.11",
         "prettier": "^3.4.2",

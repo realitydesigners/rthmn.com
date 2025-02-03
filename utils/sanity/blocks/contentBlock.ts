@@ -1,4 +1,4 @@
-import { BookIcon, ImageIcon, LinkIcon, PlayIcon, UserIcon } from '@sanity/icons';
+import { ImageIcon, LinkIcon, PlayIcon, UserIcon } from '@sanity/icons';
 import { defineField, defineType } from 'sanity';
 
 type ThemeOption = 'light' | 'dark';

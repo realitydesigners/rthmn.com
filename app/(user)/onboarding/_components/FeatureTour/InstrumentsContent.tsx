@@ -1,4 +1,4 @@
-import { LuLayoutGrid, LuLineChart, LuZap } from 'react-icons/lu';
+import { LuLayoutGrid, LuZap } from 'react-icons/lu';
 
 interface InstrumentsContentProps {
     onComplete?: () => void;

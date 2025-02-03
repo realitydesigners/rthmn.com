@@ -1,7 +1,6 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { DashboardNavigation } from '@/components/DashboardNavigation';
-import { NavbarPublic } from '@/components/NavbarPublic';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';
 import { SidebarLeft } from '@/components/SidebarLeft';
 import { SidebarRight } from '@/components/SidebarRight';

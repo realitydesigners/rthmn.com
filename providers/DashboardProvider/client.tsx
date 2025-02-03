@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { useAuth } from '@/providers/SupabaseProvider';

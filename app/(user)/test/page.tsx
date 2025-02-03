@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import App from '@/app/(user)/test/SplineScene';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import PairUniverse from './PairUniverse';
 

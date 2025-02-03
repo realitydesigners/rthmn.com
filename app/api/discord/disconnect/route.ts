@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { getDiscordClient } from '@/utils/discord/client';
-import { createClient } from '@/utils/supabase/server';
 
 export async function POST(request: Request) {
     try {

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
 import { INSTRUMENTS } from '@/utils/instruments';
 import { BoxColors } from '@/utils/localStorage';

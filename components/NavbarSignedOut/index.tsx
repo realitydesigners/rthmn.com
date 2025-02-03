@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'motion/react';
-import { LogoIcon, MenuIcon } from '@/components/Icons/icons';
+import { LogoIcon } from '@/components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
 import { allLinks, LinkItem } from './allLinks';

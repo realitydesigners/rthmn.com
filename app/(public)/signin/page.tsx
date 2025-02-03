@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { Scene } from '@/app/_components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';

@@ -2,7 +2,7 @@
 
 import { useState, type JSX } from 'react';
 import Link from 'next/link';
-import { FaDiscord, FaGithub, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { FaGithub, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 
 const FOOTER_LINKS = {
     product: [

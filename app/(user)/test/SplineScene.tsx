@@ -4,7 +4,6 @@ import React, { useRef, useState } from 'react';
 import Spline from '@splinetool/react-spline';
 import { IconType } from 'react-icons';
 import { FaChevronDown } from 'react-icons/fa';
-import { LuLayoutGrid, LuSettings } from 'react-icons/lu';
 
 interface BoxDimensions {
     size: number;

@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { LuLock, LuUnlock } from 'react-icons/lu';
+import { LuUnlock } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 import { getSidebarLocks, getSidebarState, setSidebarLocks, setSidebarState } from '@/utils/localStorage';
 

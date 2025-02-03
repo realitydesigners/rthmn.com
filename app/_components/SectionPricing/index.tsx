@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import type { User } from '@supabase/supabase-js';
 import { motion } from 'framer-motion';
-import { FaArrowRight, FaBolt, FaCheck, FaCrown, FaRocket } from 'react-icons/fa';
+import { FaArrowRight, FaCheck } from 'react-icons/fa';
 import { getErrorRedirect } from '@/utils/helpers';
 import { getStripe } from '@/utils/stripe/client';
 import { checkoutWithStripe } from '@/utils/stripe/server';

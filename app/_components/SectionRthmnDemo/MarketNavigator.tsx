@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FaBell, FaChevronRight, FaSearch, FaStar } from 'react-icons/fa';
 import type { CandleData } from '@/types/types';
 
