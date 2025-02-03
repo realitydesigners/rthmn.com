@@ -1,15 +1,15 @@
 'use client';
+
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
-import { contentBlock, headingBlock, headingSplineBlock, teamBlock, teamGrid, sceneBlock } from '@/utils/sanity/blocks/index';
+import { contentBlock, headingBlock, headingSplineBlock, sceneBlock, teamBlock, teamGrid } from '@/utils/sanity/blocks/index';
 import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
-import { audio, category, glossary, img, posts, team, video, changelog, module, lesson, marketData, faq, pairSnapshot } from '@/utils/sanity/schemas';
+import { audio, category, changelog, faq, glossary, img, lesson, marketData, module, pairSnapshot, posts, team, video } from '@/utils/sanity/schemas';
+import page from '@/utils/sanity/schemas/page';
 import { CustomField } from '@/utils/sanity/ui/CustomField';
 import { CustomItem } from '@/utils/sanity/ui/CustomItem';
-
 import { StudioStructure } from '@/utils/sanity/ui/deskStructure';
 import { myTheme } from '@/utils/sanity/ui/theme';
-import page from '@/utils/sanity/schemas/page';
 
 const title = process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'RTHMN';
 

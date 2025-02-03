@@ -1,12 +1,12 @@
 'use client';
 
-import type { Signal } from '@/types/types';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/utils/supabase/client';
-import { getSubscription, getSignals } from '@/utils/supabase/queries';
 import { useAuth } from '@/providers/SupabaseProvider';
+import type { Signal } from '@/types/types';
+import { createClient } from '@/utils/supabase/client';
+import { getSignals, getSubscription } from '@/utils/supabase/queries';
 
 export default function SignalsPage() {
     const [hasSubscription, setHasSubscription] = useState<boolean | null>(null);

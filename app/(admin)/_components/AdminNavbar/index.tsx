@@ -1,12 +1,13 @@
 'use client';
-import Link from 'next/link';
+
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
-import { LogoIcon } from '@/components/Icons/icons';
 import { LuChevronRight, LuLayoutDashboard } from 'react-icons/lu';
-import { useWebSocket } from '@/providers/WebsocketProvider';
+import { LogoIcon } from '@/components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 import { createClient } from '@/utils/supabase/client';
 
 const ConnectionStatus = ({ isConnected }: { isConnected: boolean }) => {

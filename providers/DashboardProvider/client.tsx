@@ -1,13 +1,13 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { BoxSlice, PairData, Signal, BoxColors } from '@/types/types';
-import { FullPreset } from '@/utils/localStorage';
-import { useWebSocket } from '@/providers/WebsocketProvider';
-import { useAuth } from '@/providers/SupabaseProvider';
-import { getBoxColors, setBoxColors, getSelectedPairs, setSelectedPairs, DEFAULT_BOX_COLORS, fullPresets } from '@/utils/localStorage';
-import { GridCalculator } from '@/utils/gridCalc';
-import { useRouter, usePathname } from 'next/navigation';
+
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { useAuth } from '@/providers/SupabaseProvider';
+import { useWebSocket } from '@/providers/WebsocketProvider';
+import { BoxColors, BoxSlice, PairData, Signal } from '@/types/types';
+import { GridCalculator } from '@/utils/gridCalc';
+import { DEFAULT_BOX_COLORS, FullPreset, fullPresets, getBoxColors, getSelectedPairs, setBoxColors, setSelectedPairs } from '@/utils/localStorage';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;

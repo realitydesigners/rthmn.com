@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Toast, ToastClose, ToastDescription, ToastProvider, ToastTitle, ToastViewport } from './toast';
 import { useToast } from './use-toast';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
 
 export function Toaster() {
     const { toast, toasts } = useToast();

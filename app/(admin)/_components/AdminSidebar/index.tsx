@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
-import { INSTRUMENTS } from '@/utils/instruments';
 import { PriceData } from '@/types/types';
+import { INSTRUMENTS } from '@/utils/instruments';
 
 interface AdminSidebarProps {
     priceData: Record<string, PriceData>;

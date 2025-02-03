@@ -1,8 +1,9 @@
 'use client';
-import Image from 'next/image';
-import Spline from '@splinetool/react-spline';
-import Link from 'next/link';
+
 import React from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import Spline from '@splinetool/react-spline';
 
 const HeadingSplineBlock = ({ block }) => {
     const { className, url } = block;

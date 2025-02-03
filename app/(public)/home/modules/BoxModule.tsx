@@ -1,5 +1,6 @@
 'use client';
-import React, { useRef, useState, useEffect } from 'react';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
 
 // Types

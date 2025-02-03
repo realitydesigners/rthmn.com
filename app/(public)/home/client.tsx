@@ -1,9 +1,10 @@
 'use client';
+
 import { useRef } from 'react';
-import { useSceneConfig, ButtonsMap } from './config';
-import { useSceneManager } from '@/hooks/useSceneManager';
 import Spline from '@splinetool/react-spline';
+import { useSceneManager } from '@/hooks/useSceneManager';
 import { NavigationDots } from './components/NavigationDots';
+import { ButtonsMap, useSceneConfig } from './config';
 
 export default function HomeClient({ url, posts, marketData, products }: { url: string; posts: any[]; marketData: any[]; products: any[] }) {
     const splineRef = useRef(null);

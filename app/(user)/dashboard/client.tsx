@@ -1,9 +1,10 @@
 'use client';
-import React, { useMemo, useEffect, useState } from 'react';
+
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { PairResoBox } from './PairResoBox';
-import { NoInstruments } from './LoadingSkeleton';
 import { getSidebarState } from '@/utils/localStorage';
+import { NoInstruments } from './LoadingSkeleton';
+import { PairResoBox } from './PairResoBox';
 
 const useGridLayout = () => {
     const { isSidebarInitialized } = useDashboard();

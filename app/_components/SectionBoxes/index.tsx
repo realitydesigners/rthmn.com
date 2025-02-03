@@ -1,10 +1,11 @@
 'use client';
+
 import type React from 'react';
-import { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { sequences, createDemoStep, createMockBoxData, BASE_VALUES } from '@/components/Constants/constants';
-import { NestedBoxes } from '@/components/NestedBoxes';
-import { FEATURE_TAGS } from '@/components/Constants/text';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/components/Constants/constants';
+import { FEATURE_TAGS } from '@/components/Constants/text';
+import { NestedBoxes } from '@/components/NestedBoxes';
 import { BoxSlice } from '@/types/types';
 
 const POINT_OF_CHANGE_INDEX = 29;

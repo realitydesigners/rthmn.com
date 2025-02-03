@@ -1,9 +1,10 @@
 'use client';
-import React, { useState, useEffect } from 'react';
-import { Signal } from '@/types/types';
-import { useDashboard } from '@/providers/DashboardProvider/client';
-import { getTimeAgo } from '@/utils/dateUtils';
+
+import React, { useEffect, useState } from 'react';
 import { CondensedIcon, DetailedIcon } from '@/components/Icons/icons';
+import { useDashboard } from '@/providers/DashboardProvider/client';
+import { Signal } from '@/types/types';
+import { getTimeAgo } from '@/utils/dateUtils';
 
 export function SignalSidebar() {
     const { signalsData } = useDashboard();

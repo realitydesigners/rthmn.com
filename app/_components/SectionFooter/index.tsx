@@ -1,7 +1,8 @@
 'use client';
-import Link from 'next/link';
+
 import { useState, type JSX } from 'react';
-import { FaGithub, FaTwitter, FaDiscord, FaInstagram, FaYoutube } from 'react-icons/fa';
+import Link from 'next/link';
+import { FaDiscord, FaGithub, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 
 const FOOTER_LINKS = {
     product: [

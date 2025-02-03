@@ -1,7 +1,8 @@
 'use client';
-import React, { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { formatTime } from '@/utils/dateUtils';
+
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useChartData } from '@/hooks/useChartData';
+import { formatTime } from '@/utils/dateUtils';
 import { INSTRUMENTS } from '@/utils/instruments';
 
 export interface ChartDataPoint {

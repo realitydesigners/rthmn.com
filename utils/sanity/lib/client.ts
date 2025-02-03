@@ -1,5 +1,5 @@
-import { apiVersion, dataset, projectId, token } from '@/utils/sanity/lib/api';
 import { createClient } from '@sanity/client';
+import { apiVersion, dataset, projectId, token } from '@/utils/sanity/lib/api';
 
 const config = {
     projectId,

@@ -1,9 +1,9 @@
 'use client';
 
-import { createClient } from '@/utils/supabase/client';
-import { FaDiscord, FaLink, FaUnlink } from 'react-icons/fa';
 import { useState } from 'react';
+import { FaDiscord, FaLink, FaUnlink } from 'react-icons/fa';
 import { Database } from '@/types/supabase';
+import { createClient } from '@/utils/supabase/client';
 
 type DiscordConnection = Database['public']['Tables']['discord_connections']['Row'];
 

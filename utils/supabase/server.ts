@@ -1,5 +1,5 @@
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies, type UnsafeUnwrappedCookies } from 'next/headers';
+import { createServerClient, type CookieOptions } from '@supabase/ssr';
 
 export async function createClient() {
     const cookieStore = await cookies();

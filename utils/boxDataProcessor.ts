@@ -1,5 +1,5 @@
-import { BoxSlice } from '@/types/types';
 import { createBoxCalculator } from '@/app/(user)/pair/boxCalculator';
+import { BoxSlice } from '@/types/types';
 
 export interface ProcessedBoxData {
     histogramBoxes: BoxSlice[];

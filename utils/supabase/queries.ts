@@ -1,5 +1,5 @@
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { cache } from 'react';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 export const getUser = cache(async (supabase: SupabaseClient) => {
     try {

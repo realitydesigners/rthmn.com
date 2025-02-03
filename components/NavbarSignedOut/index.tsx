@@ -1,17 +1,18 @@
 'use client';
-import Link from 'next/link';
+
 import type { FC } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useRef, useEffect } from 'react';
-import styles from './styles.module.css';
-import { AnimatePresence } from 'motion/react';
 import { User } from '@supabase/supabase-js';
-import { useAuth } from '@/providers/SupabaseProvider';
 import { motion } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import { LogoIcon, MenuIcon } from '@/components/Icons/icons';
-import { allLinks, LinkItem } from './allLinks';
+import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
+import { allLinks, LinkItem } from './allLinks';
+import styles from './styles.module.css';
 
 interface NavbarSignedOutProps {
     user: User | null;

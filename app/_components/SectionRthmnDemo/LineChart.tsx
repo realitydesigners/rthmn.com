@@ -1,6 +1,6 @@
 'use client';
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
 
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
 

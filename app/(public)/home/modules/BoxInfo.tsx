@@ -1,8 +1,8 @@
 'use client';
-import { StartButton } from '@/app/_components/StartNowButton';
-import { motion } from 'framer-motion';
 
-import { FaCode, FaCube, FaChartLine, FaBrain } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { FaBrain, FaChartLine, FaCode, FaCube } from 'react-icons/fa';
+import { StartButton } from '@/app/_components/StartNowButton';
 
 interface AutoBoxModuleProps {
     visibility?: {

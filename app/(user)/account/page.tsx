@@ -1,11 +1,12 @@
 'use client';
-import { useAuth } from '@/providers/SupabaseProvider';
+
 import { redirect } from 'next/navigation';
+import { FaDiscord } from 'react-icons/fa';
+import { LuCreditCard, LuUser } from 'react-icons/lu';
+import { useAuth } from '@/providers/SupabaseProvider';
 import CustomerPortalForm from './CustomerPortalForm';
 import DiscordConnectionForm from './DiscordConnectionForm';
 import ProfilePhotoForm from './ProfilePhotoForm';
-import { LuUser, LuCreditCard } from 'react-icons/lu';
-import { FaDiscord } from 'react-icons/fa';
 
 export default function AccountContent() {
     const { user, userDetails, subscription, discordConnection, isLoading } = useAuth();

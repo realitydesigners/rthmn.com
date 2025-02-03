@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
-import { LuImagePlus, LuUpload } from 'react-icons/lu';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { LuImagePlus, LuUpload } from 'react-icons/lu';
 
 interface Props {
     onPhotoUpload: (url: string) => void;

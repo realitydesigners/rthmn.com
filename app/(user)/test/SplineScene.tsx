@@ -1,9 +1,10 @@
 'use client';
-import Spline from '@splinetool/react-spline';
+
 import React, { useRef, useState } from 'react';
-import { LuLayoutGrid, LuSettings } from 'react-icons/lu';
+import Spline from '@splinetool/react-spline';
 import { IconType } from 'react-icons';
 import { FaChevronDown } from 'react-icons/fa';
+import { LuLayoutGrid, LuSettings } from 'react-icons/lu';
 
 interface BoxDimensions {
     size: number;

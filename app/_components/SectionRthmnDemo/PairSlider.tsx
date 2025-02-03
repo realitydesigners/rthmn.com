@@ -1,7 +1,8 @@
 'use client';
-import type { CandleData } from '@/types/types';
-import { useRef, useEffect, useState } from 'react';
+
+import { useEffect, useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
+import type { CandleData } from '@/types/types';
 
 interface MarketData {
     pair: string;

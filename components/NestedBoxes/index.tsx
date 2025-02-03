@@ -1,6 +1,6 @@
-import type { Box } from '@/types/types';
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
+import type { Box } from '@/types/types';
 
 interface NestedBoxesProps {
     boxes: Box[];

@@ -1,6 +1,7 @@
 'use client';
+
 import { motion } from 'framer-motion';
-import { FaChartLine, FaCoins, FaChartBar } from 'react-icons/fa';
+import { FaChartBar, FaChartLine, FaCoins } from 'react-icons/fa';
 
 const MARKETS = [
     {

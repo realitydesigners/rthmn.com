@@ -1,9 +1,10 @@
 'use client';
-import { BackgroundGrid } from '@/components/BackgroundGrid';
-import { PortableText } from '@/app/(public)/_components/blocks/PortableText';
+
 import Link from 'next/link';
-import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 import { IconType } from 'react-icons';
+import { FaDiscord, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { PortableText } from '@/app/(public)/_components/blocks/PortableText';
+import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { useAuth } from '@/providers/SupabaseProvider';
 
 const socialMediaLinks: { icon: IconType; href: string }[] = [

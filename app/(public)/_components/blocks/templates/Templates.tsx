@@ -1,3 +1,5 @@
+import React from 'react';
+import { generateHeadingId } from '@/app/(public)/_components/TOC';
 import AudioRefBlock from '../nested/AudioRefBlock';
 import ImageRefBlock from '../nested/ImageRefBlock';
 import InternalLink from '../nested/InternalLink';
@@ -5,8 +7,6 @@ import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
 import SplineRefBlock from '../nested/SplineRefBlock';
 import VideoRefBlock from '../nested/VideoRefBlock';
-import React from 'react';
-import { generateHeadingId } from '@/app/(public)/_components/TOC';
 
 export type TemplateTheme = 'dark' | 'light';
 

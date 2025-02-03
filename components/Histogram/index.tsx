@@ -1,10 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import SelectedFrameDetails from './SelectedFrameDetails';
-import type { BoxSlice, Box } from '@/types/types';
-import { COLORS } from './Colors';
 import { DraggableBorder } from '@/components/DraggableBorder';
+import type { Box, BoxSlice } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
-import { PlusIcon, MinusIcon } from '../Icons/icons';
+import { MinusIcon, PlusIcon } from '../Icons/icons';
+import { COLORS } from './Colors';
+import SelectedFrameDetails from './SelectedFrameDetails';
 
 const ZOOMED_BAR_WIDTH = 0;
 const INITIAL_BAR_WIDTH = 20;

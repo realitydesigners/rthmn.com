@@ -1,10 +1,10 @@
 'use server';
 
+import type Stripe from 'stripe';
 import { calculateTrialEndUnixTimestamp, getErrorRedirect, getURL } from '@/utils/helpers';
 import { stripe } from '@/utils/stripe/config';
 import { createOrRetrieveCustomer } from '@/utils/supabase/admin';
 import { createClient } from '@/utils/supabase/server';
-import type Stripe from 'stripe';
 
 type Price = any;
 

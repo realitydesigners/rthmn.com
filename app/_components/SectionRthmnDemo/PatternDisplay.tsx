@@ -1,8 +1,9 @@
 'use client';
-import { useState, useEffect, useRef, useMemo, memo } from 'react';
-import { NestedBoxes } from '@/components/NestedBoxes';
+
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { sequences, BASE_VALUES, createMockBoxData } from '@/components/Constants/constants';
+import { BASE_VALUES, createMockBoxData, sequences } from '@/components/Constants/constants';
+import { NestedBoxes } from '@/components/NestedBoxes';
 import type { CandleData } from '@/types/types';
 
 interface MarketData {

@@ -1,8 +1,9 @@
 'use client';
-import React, { useRef, useState, useEffect, useMemo, useCallback } from 'react';
+
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
-import { BoxColors } from '@/utils/localStorage';
 import { INSTRUMENTS } from '@/utils/instruments';
+import { BoxColors } from '@/utils/localStorage';
 
 // Convert memoized functions to regular functions
 const getBoxColors = (box: Box, boxColors: BoxColors) => {

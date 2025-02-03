@@ -1,10 +1,11 @@
 'use client';
-import { useAuth } from '@/providers/SupabaseProvider';
+
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { LuUser, LuCreditCard, LuLogOut, LuSettings } from 'react-icons/lu';
+import Link from 'next/link';
 import { FaDiscord } from 'react-icons/fa';
+import { LuCreditCard, LuLogOut, LuSettings, LuUser } from 'react-icons/lu';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 const menuItems = [
     {

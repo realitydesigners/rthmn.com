@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
-import { BoxSlice, Box } from '@/types/types';
-import Histogram from '@/components/Histogram';
+
+import React, { useEffect, useRef, useState } from 'react';
 import CandleChart, { ChartDataPoint } from '@/components/CandleChart';
+import Histogram from '@/components/Histogram';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
-import { useUrlParams } from '@/hooks/useUrlParams';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
+import { useUrlParams } from '@/hooks/useUrlParams';
+import { Box, BoxSlice } from '@/types/types';
 
 interface ChartData {
     processedCandles: ChartDataPoint[];

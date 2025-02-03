@@ -1,6 +1,7 @@
 'use client';
-import { FaWaveSquare, FaLayerGroup, FaChartLine } from 'react-icons/fa';
+
 import { motion } from 'framer-motion';
+import { FaChartLine, FaLayerGroup, FaWaveSquare } from 'react-icons/fa';
 
 interface Step {
     step: string;

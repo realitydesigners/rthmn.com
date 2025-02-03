@@ -1,4 +1,4 @@
-import { LuGraduationCap, LuBookOpen, LuTrophy } from 'react-icons/lu';
+import { LuBookOpen, LuGraduationCap, LuTrophy } from 'react-icons/lu';
 
 interface OnboardingContentProps {
     onComplete?: () => void;

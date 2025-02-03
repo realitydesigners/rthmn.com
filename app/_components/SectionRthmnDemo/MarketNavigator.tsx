@@ -1,7 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
+
+import { useEffect, useState } from 'react';
+import { FaBell, FaChevronRight, FaSearch, FaStar } from 'react-icons/fa';
 import type { CandleData } from '@/types/types';
-import { FaStar, FaSearch, FaBell, FaChevronRight } from 'react-icons/fa';
 
 interface MarketData {
     pair: string;

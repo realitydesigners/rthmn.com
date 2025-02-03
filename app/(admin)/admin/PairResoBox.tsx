@@ -1,12 +1,12 @@
 'use client';
 
-import { BoxSlice, OHLC } from '@/types/types';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ResoBox } from '@/components/ResoBox';
+import { ResoChart } from '@/components/ResoChart';
+import { TimeFrameVisualizer } from '@/components/VisualizersView/Visualizers';
+import { BoxSlice, OHLC } from '@/types/types';
 import { BoxColors } from '@/utils/localStorage';
 import { getTimeframeRange } from '@/utils/timeframe';
-import { TimeFrameVisualizer } from '@/components/VisualizersView/Visualizers';
-import React, { useMemo, useState, useEffect } from 'react';
-import { ResoChart } from '@/components/ResoChart';
 
 const PriceDisplay = React.memo(
     ({ pair, closePrice, timeframeRange, isBoxView }: { pair: string; closePrice: string | number; timeframeRange: { start: string; end: string }; isBoxView: boolean }) => (

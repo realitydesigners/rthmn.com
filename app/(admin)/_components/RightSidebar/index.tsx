@@ -1,7 +1,8 @@
 'use client';
-import { useState, useEffect } from 'react';
-import { useDashboard } from '@/providers/DashboardProvider/client';
+
+import { useEffect, useState } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 
 interface RightSidebarProps {
     selectedPair: string | null;

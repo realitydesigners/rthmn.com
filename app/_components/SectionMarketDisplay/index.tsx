@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect, useMemo, memo, useRef } from 'react';
+
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
+import { FaPlay } from 'react-icons/fa';
+import { useInView } from 'react-intersection-observer';
 import { StartButton } from '@/app/_components/StartNowButton';
 import { CandleData } from '@/types/types';
-import { useInView } from 'react-intersection-observer';
-import { FaPlay } from 'react-icons/fa';
 
 // Types
 interface MarketData {

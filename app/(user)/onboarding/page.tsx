@@ -1,12 +1,13 @@
 'use client';
-import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import ProfileUpload from './_components/Steps/ProfileUpload';
-import ExperienceStep from './_components/Steps/ExperienceStep';
-import PairsStep from './_components/Steps/PairsStep';
-import { useOnboardingStore, ONBOARDING_STEPS } from './onboarding';
+
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { AnimatePresence, motion } from 'framer-motion';
+import ExperienceStep from './_components/Steps/ExperienceStep';
 import IntroSequence from './_components/Steps/IntroSequence';
+import PairsStep from './_components/Steps/PairsStep';
+import ProfileUpload from './_components/Steps/ProfileUpload';
+import { ONBOARDING_STEPS, useOnboardingStore } from './onboarding';
 
 const COMPONENTS: {
     ProfileUpload: any;

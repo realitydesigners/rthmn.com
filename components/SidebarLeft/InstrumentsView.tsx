@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import { FaTimes, FaSearch } from 'react-icons/fa';
+
+import React, { useEffect, useRef, useState } from 'react';
+import { FaSearch, FaTimes } from 'react-icons/fa';
+import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { cn } from '@/utils/cn';
-import { FOREX_PAIRS, CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, INSTRUMENTS } from '@/utils/instruments';
+import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
 
 const formatPrice = (price: number, instrument: string) => {
     let digits = 2;

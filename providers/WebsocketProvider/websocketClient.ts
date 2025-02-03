@@ -1,5 +1,5 @@
-import { BoxSlice, PriceData } from '@/types/types';
 import { decode } from '@msgpack/msgpack';
+import { BoxSlice, PriceData } from '@/types/types';
 
 interface WebSocketMessage {
     type: 'boxSlice' | 'ack' | 'price';

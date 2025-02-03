@@ -1,8 +1,8 @@
-import { BackgroundGrid } from '@/components/BackgroundGrid';
+import Link from 'next/link';
+import { FaArrowRight, FaBook, FaDiscord, FaEnvelope, FaGithub } from 'react-icons/fa';
 import { SectionFAQ } from '@/app/_components/SectionFAQ';
 import { SectionFooter } from '@/app/_components/SectionFooter';
-import Link from 'next/link';
-import { FaDiscord, FaEnvelope, FaBook, FaGithub, FaArrowRight } from 'react-icons/fa';
+import { BackgroundGrid } from '@/components/BackgroundGrid';
 
 // GitHub Integration Section
 const SectionGitHub = () => (

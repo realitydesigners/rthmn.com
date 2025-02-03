@@ -1,9 +1,10 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { client } from '@/utils/sanity/lib/client';
 import { groq } from 'next-sanity';
-import { FaTwitter, FaInstagram } from 'react-icons/fa';
+import { FaInstagram, FaTwitter } from 'react-icons/fa';
+import { client } from '@/utils/sanity/lib/client';
 
 interface TeamMember {
     _id: string;

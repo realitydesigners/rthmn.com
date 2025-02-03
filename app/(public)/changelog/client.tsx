@@ -1,10 +1,11 @@
 'use client';
+
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { PortableText } from '@portabletext/react';
+import { motion } from 'framer-motion';
 import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
-import { ChangelogEntry } from '@/types/types';
 import { BackgroundGrid } from '@/components/BackgroundGrid';
+import { ChangelogEntry } from '@/types/types';
 
 interface ClientPageProps {
     changelog: ChangelogEntry[];

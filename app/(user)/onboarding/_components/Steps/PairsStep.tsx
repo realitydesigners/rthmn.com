@@ -1,12 +1,12 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { useDashboard } from '@/providers/DashboardProvider/client';
-import { setSelectedPairs as saveToLocalStorage } from '@/utils/localStorage';
-import { useState, useEffect } from 'react';
 import { FaSearch } from 'react-icons/fa';
-import { FOREX_PAIRS, CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, INSTRUMENTS } from '@/utils/instruments';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useWebSocket } from '@/providers/WebsocketProvider';
+import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
+import { setSelectedPairs as saveToLocalStorage } from '@/utils/localStorage';
 
 interface Props {
     selectedPairs: string[];

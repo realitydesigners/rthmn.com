@@ -1,10 +1,11 @@
 'use client';
-import { useState, useEffect, memo, useMemo, useCallback } from 'react';
+
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { FaCalculator, FaChartLine, FaDollarSign, FaExchangeAlt, FaInfoCircle, FaPercentage } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
-import { FaCalculator, FaChartLine, FaPercentage, FaDollarSign, FaExchangeAlt, FaInfoCircle } from 'react-icons/fa';
-import { TradeDirection, Direction, TradeStats } from './components';
-import { CurrencySelector, type Currency, getCurrencySymbol } from './components/CurrencySelector';
+import { Direction, TradeDirection, TradeStats } from './components';
+import { CurrencySelector, getCurrencySymbol, type Currency } from './components/CurrencySelector';
 import { RiskRewardGrid } from './components/RiskRewardGrid';
 
 interface CalculatorInputs {

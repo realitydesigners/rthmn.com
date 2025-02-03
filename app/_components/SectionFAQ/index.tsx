@@ -1,14 +1,15 @@
 'use client';
+
 import type React from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useState, useEffect, memo, useMemo } from 'react';
-import { FaChevronDown, FaQuestionCircle, FaCommentAlt, FaSearch, FaTags } from 'react-icons/fa';
-import { motion } from 'framer-motion';
-import { client } from '@/utils/sanity/lib/client';
 import { PortableText } from '@portabletext/react';
-import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
-import { useInView } from 'react-intersection-observer';
+import { motion } from 'framer-motion';
 import { AnimatePresence } from 'motion/react';
+import { FaChevronDown, FaCommentAlt, FaQuestionCircle, FaSearch, FaTags } from 'react-icons/fa';
+import { useInView } from 'react-intersection-observer';
+import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
+import { client } from '@/utils/sanity/lib/client';
 
 interface FAQItem {
     _id: string;
