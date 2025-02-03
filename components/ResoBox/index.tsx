@@ -85,25 +85,31 @@ const Box = ({
     const digits = getInstrumentDigits(pair);
     const isFirstInColorSequence = !prevColor || (box.value > 0 && !prevColor.includes(boxColors.positive)) || (box.value < 0 && !prevColor.includes(boxColors.negative));
 
-    const HighPrice = (
-        <div className='absolute top-0 -right-16 z-10 w-16 opacity-60'>
-            <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 0.3)')}` }} />
+    const TopPrice = (
+        <div className='absolute top-0 -right-16 z-10 w-16 opacity-90'>
+            <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
             <div className='absolute -top-3.5 right-0'>
                 <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                    {box.high.toFixed(digits)}
+                    {box.value < 0 ? box.high.toFixed(digits) : box.high.toFixed(digits)}
                 </span>
             </div>
         </div>
     );
 
-    const LowPrice = (
-        <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-60'>
-            <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 0.3)')}` }} />
+    const BottomPrice = (
+        <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-90'>
+            <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
             <div className='absolute -top-3.5 right-0'>
                 <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                    {box.low.toFixed(digits)}
+                    {box.value < 0 ? box.low.toFixed(digits) : box.low.toFixed(digits)}
                 </span>
             </div>
+        </div>
+    );
+
+    const ValueDisplay = (
+        <div className={`absolute ${box.value < 0 ? '-top-1' : 'bottom-1'} left-2 z-20`}>
+            <span className='font-kodemono text-[8px] tracking-wider text-white'>{Math.abs(box.value).toFixed(5)}</span>
         </div>
     );
 
@@ -141,30 +147,12 @@ const Box = ({
                 />
             )}
 
-            {/* Show prices based on color sequence */}
-            {isFirstDifferent ? (
-                <>
-                    {box.value > 0 && HighPrice}
-                    {box.value < 0 && LowPrice}
-                </>
-            ) : (
-                <>
-                    {/* For positive boxes: show low always, but high only if first in sequence */}
-                    {box.value > 0 && (
-                        <>
-                            {isFirstInColorSequence && HighPrice}
-                            {LowPrice}
-                        </>
-                    )}
-                    {/* For negative boxes: show high always, but low only if first in sequence */}
-                    {box.value < 0 && (
-                        <>
-                            {HighPrice}
-                            {isFirstInColorSequence && LowPrice}
-                        </>
-                    )}
-                </>
-            )}
+            {/* Show the value inside the box */}
+            {ValueDisplay}
+
+            {/* Show prices */}
+            {TopPrice}
+            {BottomPrice}
 
             {index < sortedBoxes.length - 1 && renderBox(sortedBoxes[index + 1], index + 1, colors.baseColor)}
         </div>
@@ -207,24 +195,44 @@ export const ResoBox = ({ slice, boxColors, className = '', pair = '' }: { slice
         return null;
     }
 
-    const selectedBoxes = slice.boxes.slice(boxColors.styles?.startIndex ?? 0, (boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? slice.boxes.length));
-    const sortedBoxes = selectedBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    // Get the current timeframe window
+    const startIndex = boxColors.styles?.startIndex ?? 0;
+    const maxBoxCount = boxColors.styles?.maxBoxCount ?? 10;
+
+    // Filter boxes to only show those in the current timeframe window
+    const visibleBoxes = slice.boxes.slice(startIndex, startIndex + maxBoxCount);
+    const sortedBoxes = visibleBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
+    // Log the order of boxes after sorting
+    console.log('ResoBox Rendering Order:', {
+        pair,
+        boxesInOrder: sortedBoxes.map((box, idx) => ({
+            index: idx,
+            value: box.value,
+            high: box.high,
+            low: box.low,
+            size: Math.abs(box.value),
+        })),
+    });
+
     const maxSize = sortedBoxes.length ? Math.abs(sortedBoxes[0].value) : 0;
 
-    const renderBox = (box: Box, index: number, prevColor: string | null = null) => (
-        <Box
-            box={box}
-            index={index}
-            prevColor={prevColor}
-            boxColors={boxColors}
-            containerSize={containerSize}
-            maxSize={maxSize}
-            slice={slice}
-            sortedBoxes={sortedBoxes}
-            renderBox={renderBox}
-            pair={pair}
-        />
-    );
+    const renderBox = (box: Box, index: number, prevColor: string | null = null) => {
+        return (
+            <Box
+                box={box}
+                index={index}
+                prevColor={prevColor}
+                boxColors={boxColors}
+                containerSize={containerSize}
+                maxSize={maxSize}
+                slice={slice}
+                sortedBoxes={sortedBoxes}
+                renderBox={renderBox}
+                pair={pair}
+            />
+        );
+    };
 
     return (
         <div ref={boxRef} className={`relative aspect-square h-full w-full ${className}`}>

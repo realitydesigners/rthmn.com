@@ -48,8 +48,21 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
     const timeframeRange = useMemo(() => {
         const startIndex = memoizedBoxColors.styles?.globalTimeframeControl ? memoizedBoxColors.styles?.startIndex : localStartIndex;
         const maxBoxCount = memoizedBoxColors.styles?.globalTimeframeControl ? memoizedBoxColors.styles?.maxBoxCount : localMaxBoxCount;
+
+        // Log visible boxes
+        if (boxSlice?.boxes) {
+            const visibleBoxes = boxSlice.boxes.slice(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
+            console.log('Visible boxes:', {
+                pair,
+                boxes: visibleBoxes,
+                startIndex,
+                maxBoxCount,
+                totalBoxes: boxSlice.boxes.length,
+            });
+        }
+
         return getTimeframeRange(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
-    }, [memoizedBoxColors.styles, localStartIndex, localMaxBoxCount]);
+    }, [memoizedBoxColors.styles, localStartIndex, localMaxBoxCount, boxSlice, pair]);
 
     const handleLocalStyleChange = (property: string, value: number | boolean) => {
         if (property === 'startIndex') {
