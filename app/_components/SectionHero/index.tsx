@@ -1,9 +1,9 @@
 'use client';
-import type React from 'react';
 
+import type React from 'react';
+import { motion } from 'framer-motion';
 import { StartButton } from '@/app/_components/StartNowButton';
 import { MarketWall } from './MarketWall';
-import { motion } from 'framer-motion';
 
 interface MarketData {
     pair: string;

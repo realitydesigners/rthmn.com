@@ -1,17 +1,18 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+
+import React, { useEffect, useRef, useState } from 'react';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
 import { IconType } from 'react-icons';
-import { LuSettings, LuBeaker, LuSearch } from 'react-icons/lu';
+import { LuBeaker, LuSearch, LuSettings } from 'react-icons/lu';
+import { PairNavigator } from '@/components/DashboardNavigation/PairNavigator';
+import { ProfilePanel } from '@/components/DashboardNavigation/ProfilePanel';
 import { SelectedPairs } from '@/components/SelectedPairs';
 import { SettingsBar } from '@/components/SettingsBar';
-import { PairNavigator } from '@/components/DashboardNavigation/PairNavigator';
-import { useScrollDirection } from '../../hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import Image from 'next/image';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { ProfilePanel } from '@/components/DashboardNavigation/ProfilePanel';
+import { useScrollDirection } from '../../hooks/useScrollDirection';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | null;
 

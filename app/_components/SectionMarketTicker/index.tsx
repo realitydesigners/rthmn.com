@@ -1,4 +1,5 @@
 'use client';
+
 import { motion } from 'framer-motion';
 import { CandleData } from '@/types/types';
 

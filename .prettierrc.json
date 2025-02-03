@@ -6,13 +6,11 @@
     "plugins": ["prettier-plugin-tailwindcss"],
     "semi": true,
     "printWidth": 180,
-
     "bracketSameLine": true,
     "endOfLine": "lf",
     "useTabs": false,
     "quoteProps": "as-needed",
     "htmlWhitespaceSensitivity": "css",
     "singleAttributePerLine": false,
-
     "jsxSingleQuote": true
 }

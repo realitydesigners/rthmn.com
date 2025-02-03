@@ -1,5 +1,5 @@
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import debounce from 'lodash/debounce';
 
 export const useUrlParams = (pair: string) => {

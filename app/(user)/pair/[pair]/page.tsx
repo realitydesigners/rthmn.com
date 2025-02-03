@@ -1,10 +1,10 @@
+import { processInitialBoxData } from '@/utils/boxDataProcessor';
+import { processInitialChartData } from '@/utils/chartDataProcessor';
+import { sanityFetch } from '@/utils/sanity/lib/client';
+import { pairSnapshotQuery } from '@/utils/sanity/lib/queries';
+import { getSubscription } from '@/utils/supabase/queries';
 import { createClient } from '@/utils/supabase/server';
 import Client from './client';
-import { getSubscription } from '@/utils/supabase/queries';
-import { pairSnapshotQuery } from '@/utils/sanity/lib/queries';
-import { sanityFetch } from '@/utils/sanity/lib/client';
-import { processInitialChartData } from '@/utils/chartDataProcessor';
-import { processInitialBoxData } from '@/utils/boxDataProcessor';
 
 interface PageProps {
     params: Promise<{

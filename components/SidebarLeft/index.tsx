@@ -1,14 +1,15 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
-import { LuLineChart, LuLayoutGrid } from 'react-icons/lu';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { SidebarWrapper } from '../SidebarWrapper';
-import { getSidebarState, setSidebarState } from '@/utils/localStorage';
-import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
-import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
+import { LuLayoutGrid, LuLineChart } from 'react-icons/lu';
 import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { VisualizerContent } from '@/app/(user)/onboarding/_components/FeatureTour/VisualizerContent';
+import { ONBOARDING_STEPS, useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { VisualizersView } from '@/components/VisualizersView';
+import { getSidebarState, setSidebarState } from '@/utils/localStorage';
+import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
+import { SidebarWrapper } from '../SidebarWrapper';
 import { InstrumentsView } from './InstrumentsView';
 
 export const SidebarLeft = () => {

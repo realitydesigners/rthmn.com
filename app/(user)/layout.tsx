@@ -1,15 +1,15 @@
-import { redirect } from 'next/navigation';
-import { createClient } from '@/utils/supabase/server';
-import { getSubscription, getUser } from '@/utils/supabase/queries';
-import { DashboardNavigation } from '@/components/DashboardNavigation';
-import { SidebarRight } from '@/components/SidebarRight';
-import { SidebarLeft } from '@/components/SidebarLeft';
-import { NavbarSignedIn } from '@/components/NavbarSignedIn';
-import { WebSocketProvider } from '@/providers/WebsocketProvider';
-import { QueryProvider } from '@/providers/QueryProvider';
-import { DashboardProvider } from '@/providers/DashboardProvider/client';
-import { NavbarPublic } from '@/components/NavbarPublic';
 import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { DashboardNavigation } from '@/components/DashboardNavigation';
+import { NavbarPublic } from '@/components/NavbarPublic';
+import { NavbarSignedIn } from '@/components/NavbarSignedIn';
+import { SidebarLeft } from '@/components/SidebarLeft';
+import { SidebarRight } from '@/components/SidebarRight';
+import { DashboardProvider } from '@/providers/DashboardProvider/client';
+import { QueryProvider } from '@/providers/QueryProvider';
+import { WebSocketProvider } from '@/providers/WebsocketProvider';
+import { getSubscription, getUser } from '@/utils/supabase/queries';
+import { createClient } from '@/utils/supabase/server';
 
 interface UserLayoutProps {
     children: React.ReactNode;

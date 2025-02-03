@@ -1,7 +1,7 @@
 import React from 'react';
 import type { PortableTextComponents } from '@portabletext/react';
-import { TeamCard } from '@/app/(public)/_components/blocks/TeamCard';
 import { Scene } from '@/app/_components/Scene/Scene';
+import { TeamCard } from '@/app/(public)/_components/blocks/TeamCard';
 
 const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div className='flex w-full justify-center p-3'>

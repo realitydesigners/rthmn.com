@@ -1,5 +1,5 @@
-import { defineType } from 'sanity';
 import { EarthGlobeIcon } from '@sanity/icons';
+import { defineType } from 'sanity';
 
 export default defineType({
     name: 'sceneBlock',

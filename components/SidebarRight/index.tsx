@@ -1,15 +1,16 @@
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
-import { LuSettings, LuGraduationCap } from 'react-icons/lu';
+
+import React, { useEffect, useRef, useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { SidebarWrapper } from '../SidebarWrapper';
-import { SettingsBar } from '../SettingsBar';
-import { getSidebarState, setSidebarState } from '@/utils/localStorage';
-import { useOnboardingStore, ONBOARDING_STEPS } from '@/app/(user)/onboarding/onboarding';
-import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
-import { Onboarding } from './Onboarding';
+import { LuGraduationCap, LuSettings } from 'react-icons/lu';
 import { OnboardingContent } from '@/app/(user)/onboarding/_components/FeatureTour/OnboardingContent';
 import { SettingsContent } from '@/app/(user)/onboarding/_components/FeatureTour/SettingsContent';
+import { ONBOARDING_STEPS, useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { getSidebarState, setSidebarState } from '@/utils/localStorage';
+import { FeatureTour } from '../../app/(user)/onboarding/_components/FeatureTour';
+import { SettingsBar } from '../SettingsBar';
+import { SidebarWrapper } from '../SidebarWrapper';
+import { Onboarding } from './Onboarding';
 
 export const SidebarRight = () => {
     const pathname = usePathname();

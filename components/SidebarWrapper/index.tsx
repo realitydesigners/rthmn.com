@@ -1,9 +1,10 @@
 'use client';
-import React, { useState, useCallback, useEffect } from 'react';
-import { cn } from '@/utils/cn';
-import { LuLock, LuUnlock } from 'react-icons/lu';
-import { getSidebarLocks, setSidebarLocks, getSidebarState, setSidebarState } from '@/utils/localStorage';
+
+import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import { LuLock, LuUnlock } from 'react-icons/lu';
+import { cn } from '@/utils/cn';
+import { getSidebarLocks, getSidebarState, setSidebarLocks, setSidebarState } from '@/utils/localStorage';
 
 interface SidebarContentProps {
     isOpen: boolean;

@@ -1,5 +1,5 @@
+import { DocumentIcon, HomeIcon, ImageIcon, TagIcon } from '@sanity/icons';
 import { StructureBuilder } from 'sanity/structure';
-import { ImageIcon, DocumentIcon, TagIcon, HomeIcon } from '@sanity/icons';
 
 export const StudioStructure = (S: StructureBuilder) =>
     S.list()

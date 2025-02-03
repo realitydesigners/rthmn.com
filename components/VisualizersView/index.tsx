@@ -1,11 +1,12 @@
 'use client';
-import React, { useState, useMemo } from 'react';
-import { LuChevronDown, LuChevronUp, LuBox, LuLayoutGrid, LuLineChart, LuLock, LuBoxes } from 'react-icons/lu';
+
+import React, { useMemo, useState } from 'react';
+import { LuBox, LuBoxes, LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuLock } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import type { BoxColors } from '@/types/types';
 import { cn } from '@/utils/cn';
-import { TimeFrameVisualizer } from './Visualizers';
 import { getTimeframeRange } from '@/utils/timeframe';
+import { TimeFrameVisualizer } from './Visualizers';
 
 interface ChartStyleOptionProps {
     id: string;

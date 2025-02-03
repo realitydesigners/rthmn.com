@@ -1,9 +1,9 @@
 import React from 'react';
 import type { PortableTextBlock } from '@portabletext/types';
+import ContentBlock from '@/app/(public)/_components/blocks/section/ContentBlock';
 import HeadingBlock from '@/app/(public)/_components/blocks/section/HeadingBlock';
 import HeadingSplineBlock from '@/app/(public)/_components/blocks/section/HeadingSplineBlock';
 import TeamBlock from '@/app/(public)/_components/blocks/section/TeamBlock';
-import ContentBlock from '@/app/(public)/_components/blocks/section/ContentBlock';
 
 export type BlockType = 'headingBlock' | 'headingSplineBlock' | 'contentBlock' | 'teamBlock';
 

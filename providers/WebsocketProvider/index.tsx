@@ -1,9 +1,10 @@
 'use client';
+
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { BoxSlice, PriceData } from '@/types/types';
-import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
-import { useAuth } from '@/providers/SupabaseProvider';
 import { API_ROUTES } from '@/app/api/config';
+import { useAuth } from '@/providers/SupabaseProvider';
+import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
+import { BoxSlice, PriceData } from '@/types/types';
 
 const PROVIDER_ERROR = 'useWebSocket must be used within a WebSocketProvider';
 

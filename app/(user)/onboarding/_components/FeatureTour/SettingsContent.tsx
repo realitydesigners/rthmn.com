@@ -1,4 +1,4 @@
-import { LuPalette, LuLayoutGrid, LuBox } from 'react-icons/lu';
+import { LuBox, LuLayoutGrid, LuPalette } from 'react-icons/lu';
 
 interface SettingsContentProps {
     onComplete?: () => void;

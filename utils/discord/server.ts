@@ -1,6 +1,6 @@
+import { getDiscordConnection } from '@/utils/supabase/queries';
 import { createClient } from '@/utils/supabase/server';
 import { getDiscordClient } from './client';
-import { getDiscordConnection } from '@/utils/supabase/queries';
 
 export async function manageDiscordAccess(stripeCustomerId: string, isActive: boolean) {
     const supabase = await createClient();

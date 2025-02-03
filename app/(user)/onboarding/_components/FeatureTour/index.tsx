@@ -1,10 +1,10 @@
 'use client';
-import React from 'react';
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/utils/cn';
+
+import React, { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { IconType } from 'react-icons';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { cn } from '@/utils/cn';
 
 export function FeatureTour({
     icon: Icon,

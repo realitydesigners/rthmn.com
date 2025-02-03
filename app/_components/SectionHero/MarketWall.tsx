@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 
 const ROWS = 35;
 const HIGHLIGHT_CHANCE = 0.03;

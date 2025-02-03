@@ -1,11 +1,12 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
+import { AdminSidebar } from '@/app/(admin)/_components/AdminSidebar';
+import { RightSidebar } from '@/app/(admin)/_components/RightSidebar';
+import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { useDashboard } from '@/providers/DashboardProvider/client';
-import { AdminSidebar } from '@/app/(admin)/_components/AdminSidebar';
 import { PairResoBox } from './PairResoBox';
-import { RightSidebar } from '@/app/(admin)/_components/RightSidebar';
 
 const fetchCandles = async (pair: string, limit: number, token: string) => {
     const response = await fetch(`/api/getCandles?pair=${pair}&limit=${limit}&token=${token}`);

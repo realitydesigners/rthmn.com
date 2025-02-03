@@ -1,6 +1,6 @@
-import { createClient } from '@/utils/supabase/server';
 import { NextResponse } from 'next/server';
 import { getDiscordClient } from '@/utils/discord/client';
+import { createClient } from '@/utils/supabase/server';
 
 export async function GET(request: Request) {
     console.log('==== DISCORD CALLBACK STARTED ====');

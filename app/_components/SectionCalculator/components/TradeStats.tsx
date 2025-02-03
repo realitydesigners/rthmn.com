@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { FaChartLine, FaPercentage, FaDollarSign, FaExchangeAlt } from 'react-icons/fa';
+import { FaChartLine, FaDollarSign, FaExchangeAlt, FaPercentage } from 'react-icons/fa';
 
 interface TradeStatsProps {
     entryPrice: number;

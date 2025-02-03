@@ -1,7 +1,9 @@
 'use client';
-import { BackgroundGrid } from '@/components/BackgroundGrid';
+
 import { SectionPricing } from '@/app/_components/SectionPricing';
+import { BackgroundGrid } from '@/components/BackgroundGrid';
 import { useAuth } from '@/providers/SupabaseProvider';
+
 // import { SectionBlogPosts } from '@/components/Sections/SectionBlogPosts';
 // import { SectionFooter } from '@/components/Sections/SectionFooter';
 

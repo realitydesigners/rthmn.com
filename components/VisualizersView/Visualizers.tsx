@@ -1,6 +1,6 @@
-import React, { useState, useRef } from 'react';
-import { cn } from '@/utils/cn';
+import React, { useRef, useState } from 'react';
 import { Box } from '@/types/types';
+import { cn } from '@/utils/cn';
 import { BoxColors } from '@/utils/localStorage';
 import { StyleControl } from './StyleControl';
 

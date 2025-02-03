@@ -1,14 +1,15 @@
 'use client';
-import { useState, useRef, useEffect, useMemo, memo, useCallback } from 'react';
+
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { motion } from 'framer-motion';
+import { FaChartArea, FaCube, FaTable, FaUserCircle } from 'react-icons/fa';
+import { BellIcon, LogoIcon } from '@/components/Icons/icons';
+import { CandleData } from '@/types/types';
 import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
-import { motion } from 'framer-motion';
-import { CandleData } from '@/types/types';
-import { FaChartArea, FaTable, FaCube, FaUserCircle } from 'react-icons/fa';
-import { PatternDisplay } from './PatternDisplay';
-import { LogoIcon, BellIcon } from '@/components/Icons/icons';
-import { PairSlider } from './PairSlider';
 import { MarketNavigator } from './MarketNavigator';
+import { PairSlider } from './PairSlider';
+import { PatternDisplay } from './PatternDisplay';
 
 interface MarketData {
     pair: string;

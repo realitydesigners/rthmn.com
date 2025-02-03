@@ -1,8 +1,8 @@
 'use client';
 
 import type { Provider } from '@supabase/supabase-js';
-import { createClient } from '@/utils/supabase/client';
 import { getURL } from '@/utils/helpers';
+import { createClient } from '@/utils/supabase/client';
 
 export function useSignInWithOAuth() {
     const supabase = createClient();

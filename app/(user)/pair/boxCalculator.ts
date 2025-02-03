@@ -1,5 +1,5 @@
 import { CandleData } from '@/types/types';
-import { INSTRUMENTS, BoxSizes } from '@/utils/instruments';
+import { BoxSizes, INSTRUMENTS } from '@/utils/instruments';
 
 export class BoxCalculator {
     private boxSizes: Float64Array;

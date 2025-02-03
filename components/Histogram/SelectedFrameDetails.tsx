@@ -1,5 +1,5 @@
 import React from 'react';
-import { BoxSlice, Box } from '@/types/types';
+import { Box, BoxSlice } from '@/types/types';
 
 interface SelectedFrameDetailsProps {
     selectedFrame: BoxSlice;

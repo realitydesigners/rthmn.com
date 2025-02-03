@@ -1,10 +1,11 @@
 'use client';
+
 import React, { useState } from 'react';
-import { LuChevronDown, LuChevronUp, LuBox } from 'react-icons/lu';
+import { LuBox, LuChevronDown, LuChevronUp } from 'react-icons/lu';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import type { BoxColors } from '@/types/types';
-import type { FullPreset } from '@/utils/localStorage';
 import { cn } from '@/utils/cn';
+import type { FullPreset } from '@/utils/localStorage';
 import { BoxVisualizer } from '../VisualizersView/Visualizers';
 
 export const SettingsBar = () => {

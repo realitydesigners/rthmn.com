@@ -1,9 +1,10 @@
 'use client';
+
 import { useEffect, useState } from 'react';
-import { BlockProps } from '@/app/(public)/_components/blocks/Blocks';
-import { PortableTextBlock } from '@portabletext/types';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { PortableTextBlock } from '@portabletext/types';
+import { BlockProps } from '@/app/(public)/_components/blocks/Blocks';
 
 interface TOCItem {
     id: string;

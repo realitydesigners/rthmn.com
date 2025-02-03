@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { LuLayoutGrid, LuClock, LuPieChart } from 'react-icons/lu';
+import { LuClock, LuLayoutGrid, LuPieChart } from 'react-icons/lu';
 
 interface VisualizerContentProps {
     onComplete?: () => void;

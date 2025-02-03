@@ -1,6 +1,7 @@
 'use client';
+
 import { useMemo } from 'react';
-import { BoxSection, BoxInfo, DataStream } from './modules';
+import { BoxInfo, BoxSection, DataStream } from './modules';
 
 export const Buttons = [
     {

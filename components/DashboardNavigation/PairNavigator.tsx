@@ -1,11 +1,12 @@
 'use client';
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLongPress } from '@/hooks/useLongPress';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useDashboard } from '@/providers/DashboardProvider/client';
+import { LuArrowRight, LuBitcoin, LuBookmark, LuDollarSign, LuList, LuPlus, LuSearch, LuTrash2 } from 'react-icons/lu';
 import { useSwipeable } from 'react-swipeable';
-import { FOREX_PAIRS, CRYPTO_PAIRS } from '@/utils/instruments';
-import { LuDollarSign, LuBitcoin, LuList, LuBookmark, LuSearch, LuTrash2, LuArrowRight, LuPlus } from 'react-icons/lu';
+import { useLongPress } from '@/hooks/useLongPress';
+import { useDashboard } from '@/providers/DashboardProvider/client';
+import { CRYPTO_PAIRS, FOREX_PAIRS } from '@/utils/instruments';
 
 const useSound = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);

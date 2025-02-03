@@ -1,7 +1,8 @@
 'use client';
+
 import { useState } from 'react';
-import { Buttons } from '../config';
 import { motion } from 'framer-motion';
+import { Buttons } from '../config';
 
 interface NavigationDotsProps {
     currentSection: string;

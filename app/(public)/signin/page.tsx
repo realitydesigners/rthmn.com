@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { FcGoogle } from 'react-icons/fc';
 import { Scene } from '@/app/_components/Scene/Scene';
 import { useSignInWithOAuth } from '@/utils/auth-helpers/client';
-import { FcGoogle } from 'react-icons/fc';
-import { useEffect, useState } from 'react';
 import { getAuthTypes } from '@/utils/auth-helpers/settings';
 
 export default function SignIn() {

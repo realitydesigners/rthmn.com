@@ -1,4 +1,4 @@
-import { FaWaveSquare, FaBrain, FaFingerprint, FaChartLine, FaServer, FaMicrochip, FaRobot, FaCube, FaDna, FaRocket, FaInfinity } from 'react-icons/fa';
+import { FaBrain, FaChartLine, FaCube, FaDna, FaFingerprint, FaInfinity, FaMicrochip, FaRobot, FaRocket, FaServer, FaWaveSquare } from 'react-icons/fa';
 
 export const ALGORITHM_FEATURES = [
     {
