@@ -252,7 +252,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                 togglePair,
                 isConnected,
                 boxColors: boxColorsState,
-                updateBoxColors: setBoxColorsState,
+                updateBoxColors,
                 isAuthenticated,
                 handleSidebarClick,
                 signalsData,
