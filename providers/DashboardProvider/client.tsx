@@ -26,6 +26,7 @@ interface DashboardContextType {
     candlesData: Record<string, any[]>;
     DEFAULT_BOX_COLORS: BoxColors;
     fullPresets: FullPreset[];
+    fetchBoxSlice: Record<string, any>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -66,26 +67,76 @@ export function useSignals() {
     return context;
 }
 
-interface DashboardProviderClientProps {
-    children: React.ReactNode;
-    initialSignalsData: Signal[] | null;
-    initialBoxData?: Record<string, PairData>;
-}
-
-export function DashboardProviderClient({ children, initialSignalsData, initialBoxData = {} }: DashboardProviderClientProps) {
+export function DashboardProviderClient({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const { hasCompletedInitialOnboarding } = useOnboardingStore();
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
-    const [signalsData, setSignalsData] = useState<Signal[] | null>(initialSignalsData);
+    const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
-    const [pairData, setPairData] = useState<Record<string, PairData>>(initialBoxData);
+    const [pairData, setPairData] = useState<Record<string, PairData>>({});
+    const [fetchBoxSlice, setFetchBoxSlice] = useState<Record<string, any>>({});
     const gridCalculators = React.useRef<Map<string, GridCalculator>>(new Map());
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
+
+    // Initialize state and fetch all initial data
+    useEffect(() => {
+        const initializeData = async () => {
+            const storedColors = getBoxColors();
+            const storedPairs = getSelectedPairs();
+            setBoxColorsState(storedColors);
+            setSelectedPairsState(storedPairs);
+
+            if (isAuthenticated) {
+                // Fetch initial box data for stored pairs
+                if (storedPairs.length > 0) {
+                    const fetchedData: Record<string, PairData> = {};
+                    const rawBoxSliceData: Record<string, any> = {};
+
+                    for (const pair of storedPairs) {
+                        try {
+                            const response = await fetch(`/api/getBoxSlice?pair=${pair}&token=${session.access_token}`, {
+                                headers: {
+                                    Authorization: `Bearer ${session.access_token}`,
+                                },
+                                cache: 'no-store',
+                            });
+                            if (response.ok) {
+                                const data = await response.json();
+                                console.log(`Fetched box data for ${pair}:`, data);
+                                if (data.status === 'success' && data.data?.[0]) {
+                                    // Store raw API response
+                                    rawBoxSliceData[pair] = data.data[0];
+
+                                    // Store working copy for GridCalculator
+                                    fetchedData[pair] = {
+                                        boxes: [data.data[0]],
+                                        currentOHLC: data.data[0].currentOHLC,
+                                    };
+                                }
+                            } else {
+                                console.error(`Failed to fetch box data for ${pair}:`, await response.text());
+                            }
+                        } catch (error) {
+                            console.error(`Error fetching box data for ${pair}:`, error);
+                        }
+                    }
+                    setPairData(fetchedData);
+                    setFetchBoxSlice(rawBoxSliceData);
+                    console.log('Raw API response:', rawBoxSliceData);
+                    console.log('Fetched initial box data for all pairs:', fetchedData);
+                }
+            }
+
+            setIsSidebarInitialized(true);
+        };
+
+        initializeData();
+    }, [isAuthenticated, session?.access_token]);
 
     // Onboarding check
     useEffect(() => {
@@ -95,23 +146,6 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
             router.replace('/onboarding');
         }
     }, [pathname, router, hasCompletedInitialOnboarding]);
-
-    // Initialize state from localStorage after mount
-    useEffect(() => {
-        const storedColors = getBoxColors();
-        const storedPairs = getSelectedPairs();
-        setBoxColorsState(storedColors);
-        setSelectedPairsState(storedPairs);
-        setIsSidebarInitialized(true);
-    }, []);
-
-    // Load selected pairs from localStorage
-    useEffect(() => {
-        if (!isAuthenticated) return;
-        const stored = getSelectedPairs();
-        // Only use what's in storage, no defaults
-        setSelectedPairsState(stored);
-    }, [isAuthenticated]);
 
     // Calculate loading state including sidebar initialization
     const isLoading = !isAuthenticated || !isConnected || !isSidebarInitialized;
@@ -247,7 +281,7 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
             togglePair,
             isConnected,
             boxColors: boxColorsState,
-            updateBoxColors,
+            updateBoxColors: setBoxColorsState,
             isAuthenticated,
             handleSidebarClick,
             signalsData,
@@ -256,12 +290,32 @@ export function DashboardProviderClient({ children, initialSignalsData, initialB
             candlesData: {},
             DEFAULT_BOX_COLORS,
             fullPresets,
+            fetchBoxSlice,
         }),
-        [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal]
+        [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal, fetchBoxSlice]
     );
 
     return (
-        <DashboardContext.Provider value={contextValue}>
+        <DashboardContext.Provider
+            value={{
+                pairData,
+                selectedPairs,
+                isLoading,
+                isSidebarInitialized,
+                togglePair,
+                isConnected,
+                boxColors: boxColorsState,
+                updateBoxColors: setBoxColorsState,
+                isAuthenticated,
+                handleSidebarClick,
+                signalsData,
+                selectedSignal,
+                setSelectedSignal,
+                candlesData: {},
+                DEFAULT_BOX_COLORS,
+                fullPresets,
+                fetchBoxSlice,
+            }}>
             <div onClick={handleSidebarClick}>{children}</div>
         </DashboardContext.Provider>
     );
