@@ -181,7 +181,7 @@ export const TimeFrameVisualizer: React.FC<PatternVisualizerProps> = ({ startInd
                         {/* Integrated Timeframe Scale with Active Indicator */}
                         <div className='absolute inset-x-0 bottom-2 flex justify-between px-[10px]'>
                             <div className='font-kodemono font- relative flex w-full justify-between text-[8px] uppercase'>
-                                {['1m', '5m', '15m', '30m', '1h', '2h', '4h', '8hr', '12h', '1d'].map((time, i) => {
+                                {['1d', '12hr', '8hr', '4hr', '2hr', '1hr', '30m', '15m', '5m', '1m'].map((time, i) => {
                                     // More accurate position calculation
                                     const segmentWidth = 38 / 9; // Width of each timeframe segment
                                     const position = Math.round(i * segmentWidth); // Use normal i for position
