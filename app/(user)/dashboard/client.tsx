@@ -72,16 +72,52 @@ export default function Dashboard() {
                 if (!data?.boxes?.length) {
                     return null;
                 }
-                return data.boxes.map((boxSlice, index) => ({
-                    pair,
-                    boxSlice,
-                    currentOHLC: data.currentOHLC,
-                    index,
-                }));
+
+                // Process each box slice
+                return data.boxes.map((boxSlice, index) => {
+                    // Sort boxes by absolute value while preserving original high/low
+                    const sortedBoxes = [...boxSlice.boxes]
+                        .map((box) => ({
+                            ...box,
+                            calculatedDiff: Number((box.high - box.low).toFixed(5)),
+                            expectedHigh: box.value > 0 ? box.high : box.low,
+                            expectedLow: box.value > 0 ? box.low : box.high,
+                            direction: box.value > 0 ? 'up' : 'down',
+                        }))
+                        .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+
+                    // Create analysis object for all boxes
+                    const analysis = {
+                        pair,
+                        timestamp: boxSlice.timestamp,
+                        boxes: sortedBoxes.map((box, i) => ({
+                            value: box.value,
+                            high: box.high,
+                            low: box.low,
+                            diff: box.calculatedDiff,
+                            direction: box.direction,
+                            expectedHigh: box.expectedHigh,
+                            expectedLow: box.expectedLow,
+                            matchesValue: Math.abs(Math.abs(box.value) - box.calculatedDiff) < 0.00001,
+                        })),
+                    };
+
+                    console.log('Box Analysis:', analysis);
+
+                    return {
+                        pair,
+                        boxSlice: {
+                            ...boxSlice,
+                            boxes: sortedBoxes,
+                        },
+                        currentOHLC: data.currentOHLC,
+                        index,
+                    };
+                });
             })
             .filter(Boolean)
             .flat();
-    }, [selectedPairs, pairData, isLoading]);
+    }, [selectedPairs, pairData]);
 
     if (!selectedPairs.length && !isLoading) {
         return (
@@ -91,6 +127,8 @@ export default function Dashboard() {
             </main>
         );
     }
+
+    console.log(filteredPairData);
 
     return (
         <main className='w-full px-2 pt-16 sm:px-4 lg:pt-18'>

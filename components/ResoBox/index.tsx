@@ -24,10 +24,10 @@ const getBoxColors = (box: Box, boxColors: BoxColors) => {
     };
 };
 
-const getBoxStyles = (box: Box, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof getBoxColors>, index: number) => {
+const getBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof getBoxColors>, index: number) => {
     // Calculate size based on nesting level (90% of parent)
     const calculatedSize = containerSize * Math.pow(0.86, index);
-    const positionStyle = box.value > 0 ? { top: 0, right: 0 } : { bottom: 0, right: 0 };
+    const positionStyle = !prevColor ? { top: 0, right: 0 } : prevColor.includes(boxColors.negative.split(',')[0]) ? { bottom: 0, right: 0 } : { top: 0, right: 0 };
 
     const baseStyles: React.CSSProperties = {
         width: `${calculatedSize}px`,
@@ -39,8 +39,11 @@ const getBoxStyles = (box: Box, boxColors: BoxColors, containerSize: number, max
         transition: 'all 0.15s ease-out',
     };
 
+    const isFirstDifferent = prevColor && ((box.value > 0 && prevColor.includes(boxColors.negative)) || (box.value < 0 && prevColor.includes(boxColors.positive)));
+
     return {
         baseStyles,
+        isFirstDifferent,
     };
 };
 
@@ -78,25 +81,16 @@ const Box = ({
     pair: string;
 }) => {
     const colors = getBoxColors(box, boxColors);
-    const { baseStyles } = getBoxStyles(box, boxColors, containerSize, maxSize, colors, index);
+    const { baseStyles, isFirstDifferent } = getBoxStyles(box, prevColor, boxColors, containerSize, maxSize, colors, index);
     const digits = getInstrumentDigits(pair);
-
-    const shouldShowPrice = (currentBox: Box, nextBox: Box | undefined, isHigh: boolean) => {
-        if (!nextBox) return true;
-        // For negative boxes, show the shared low value once, and show each unique high
-        if (currentBox.value < 0) {
-            return isHigh ? true : currentBox.low !== nextBox.low;
-        }
-        // For positive boxes, show the shared high value once, and show each unique low
-        return isHigh ? currentBox.high !== nextBox.high : true;
-    };
+    const isFirstInColorSequence = !prevColor || (box.value > 0 && !prevColor.includes(boxColors.positive)) || (box.value < 0 && !prevColor.includes(boxColors.negative));
 
     const TopPrice = (
         <div className='absolute top-0 -right-16 z-10 w-16 opacity-90'>
             <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
             <div className='absolute -top-3.5 right-0'>
                 <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                    {shouldShowPrice(box, sortedBoxes[index + 1], true) && box.low.toFixed(digits)}
+                    {box.value < 0 ? box.high.toFixed(digits) : box.high.toFixed(digits)}
                 </span>
             </div>
         </div>
@@ -107,18 +101,15 @@ const Box = ({
             <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
             <div className='absolute -top-3.5 right-0'>
                 <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                    {shouldShowPrice(box, sortedBoxes[index + 1], false) && box.high.toFixed(digits)}
+                    {box.value < 0 ? box.low.toFixed(digits) : box.low.toFixed(digits)}
                 </span>
             </div>
         </div>
     );
 
     const ValueDisplay = (
-        <div className={`absolute ${box.value < 0 ? '-top-2' : 'bottom-1'} left-1 z-20`}>
-            <span className='font-kodemono text-[6px] tracking-wider text-white'>
-                {box.value < 0 ? '-' : ''}
-                {Math.round(Math.abs(box.value) * 100000)}
-            </span>
+        <div className={`absolute ${box.value < 0 ? '-top-1' : 'bottom-1'} left-2 z-20`}>
+            <span className='font-kodemono text-[8px] tracking-wider text-white'>{Math.abs(box.value).toFixed(5)}</span>
         </div>
     );
 
@@ -142,6 +133,19 @@ const Box = ({
                     transition: 'all 0.15s ease-out',
                 }}
             />
+
+            {isFirstDifferent && (
+                <div
+                    className='absolute inset-0'
+                    style={{
+                        borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+                        backgroundColor: colors.baseColor,
+                        opacity: colors.opacity * 0.5,
+                        boxShadow: `inset 0 2px 15px ${colors.shadowColor(0.2)}`,
+                        transition: 'all 0.15s ease-out',
+                    }}
+                />
+            )}
 
             {/* Show the value inside the box */}
             {ValueDisplay}
@@ -197,43 +201,21 @@ export const ResoBox = ({ slice, boxColors, className = '', pair = '' }: { slice
 
     // Filter boxes to only show those in the current timeframe window
     const visibleBoxes = slice.boxes.slice(startIndex, startIndex + maxBoxCount);
+    const sortedBoxes = visibleBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
-    // First transform the data to reverse high/low for negative boxes
-    const transformedBoxes = visibleBoxes.map((box) => {
-        if (box.value < 0) {
-            // For negative boxes, swap high and low and reverse the order
-            return {
-                ...box,
-                high: box.high, // Keep original high
-                low: box.low, // Keep original low
-            };
-        }
-        return box;
+    // Log the order of boxes after sorting
+    console.log('ResoBox Rendering Order:', {
+        pair,
+        boxesInOrder: sortedBoxes.map((box, idx) => ({
+            index: idx,
+            value: box.value,
+            high: box.high,
+            low: box.low,
+            size: Math.abs(box.value),
+        })),
     });
 
-    // Sort boxes by actual value
-    const sortedBoxes = transformedBoxes.sort((a, b) => {
-        // For negative boxes, most negative (lowest value) should be first
-        if (a.value < 0 && b.value < 0) {
-            return a.value - b.value; // Keep the box order the same
-        }
-        // For positive boxes, highest value should be first
-        return b.value - a.value;
-    });
-
-    // Now reverse the high/low values for negative boxes after sorting
-    const finalBoxes = sortedBoxes.map((box) => {
-        if (box.value < 0) {
-            return {
-                ...box,
-                high: box.low,
-                low: box.high,
-            };
-        }
-        return box;
-    });
-
-    const maxSize = finalBoxes.length ? Math.abs(finalBoxes[0].value) : 0;
+    const maxSize = sortedBoxes.length ? Math.abs(sortedBoxes[0].value) : 0;
 
     const renderBox = (box: Box, index: number, prevColor: string | null = null) => {
         return (
@@ -245,7 +227,7 @@ export const ResoBox = ({ slice, boxColors, className = '', pair = '' }: { slice
                 containerSize={containerSize}
                 maxSize={maxSize}
                 slice={slice}
-                sortedBoxes={finalBoxes}
+                sortedBoxes={sortedBoxes}
                 renderBox={renderBox}
                 pair={pair}
             />
@@ -254,7 +236,7 @@ export const ResoBox = ({ slice, boxColors, className = '', pair = '' }: { slice
 
     return (
         <div ref={boxRef} className={`relative aspect-square h-full w-full ${className}`}>
-            <div className='relative h-full w-full'>{finalBoxes.length > 0 && renderBox(finalBoxes[0], 0, null)}</div>
+            <div className='relative h-full w-full'>{sortedBoxes.length > 0 && renderBox(sortedBoxes[0], 0, null)}</div>
         </div>
     );
 };
