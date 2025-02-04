@@ -83,29 +83,37 @@ const Box = ({
     const colors = getBoxColors(box, boxColors);
     const { baseStyles, isFirstDifferent } = getBoxStyles(box, prevColor, boxColors, containerSize, maxSize, colors, index);
     const digits = getInstrumentDigits(pair);
-    const isFirstInColorSequence = !prevColor || (box.value > 0 && !prevColor.includes(boxColors.positive)) || (box.value < 0 && !prevColor.includes(boxColors.negative));
 
-    const TopPrice = (
-        <div className='absolute top-0 -right-16 z-10 w-16 opacity-90'>
-            <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
-            <div className='absolute -top-3.5 right-0'>
-                <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                    {box.value < 0 ? box.high.toFixed(digits) : box.high.toFixed(digits)}
-                </span>
-            </div>
-        </div>
-    );
+    const isConsecutivePositive = prevColor?.includes(boxColors.positive.split(',')[0]);
+    const isConsecutiveNegative = prevColor?.includes(boxColors.negative.split(',')[0]);
 
-    const BottomPrice = (
-        <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-90'>
-            <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
-            <div className='absolute -top-3.5 right-0'>
-                <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                    {box.value < 0 ? box.low.toFixed(digits) : box.low.toFixed(digits)}
-                </span>
+    const TopPrice =
+        (!isFirstDifferent || (isFirstDifferent && box.value > 0)) &&
+        // Only show top price if it's not a consecutive positive box (as high would be same)
+        !isConsecutivePositive ? (
+            <div className='absolute top-0 -right-16 z-10 w-16 opacity-90'>
+                <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
+                <div className='absolute -top-3.5 right-0'>
+                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
+                        {box.value < 0 ? box.high.toFixed(digits) : box.high.toFixed(digits)}
+                    </span>
+                </div>
             </div>
-        </div>
-    );
+        ) : null;
+
+    const BottomPrice =
+        (!isFirstDifferent || (isFirstDifferent && box.value < 0)) &&
+        // Only show bottom price if it's not a consecutive negative box (as low would be same)
+        !isConsecutiveNegative ? (
+            <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-90'>
+                <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
+                <div className='absolute -top-3.5 right-0'>
+                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
+                        {box.value < 0 ? box.low.toFixed(digits) : box.low.toFixed(digits)}
+                    </span>
+                </div>
+            </div>
+        ) : null;
 
     const ValueDisplay = (
         <div className={`absolute ${box.value < 0 ? '-top-1' : 'bottom-1'} left-2 z-20`}>
@@ -147,10 +155,6 @@ const Box = ({
                 />
             )}
 
-            {/* Show the value inside the box */}
-            {ValueDisplay}
-
-            {/* Show prices */}
             {TopPrice}
             {BottomPrice}
 
