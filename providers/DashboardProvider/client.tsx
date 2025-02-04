@@ -5,8 +5,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { BoxColors, BoxSlice, PairData, Signal } from '@/types/types';
-import { GridCalculator } from '@/utils/gridCalc';
+import { Box, BoxColors, BoxSlice, PairData, Signal } from '@/types/types';
+
 import { DEFAULT_BOX_COLORS, FullPreset, fullPresets, getBoxColors, getSelectedPairs, setBoxColors, setSelectedPairs } from '@/utils/localStorage';
 
 interface DashboardContextType {
@@ -77,11 +77,31 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
     const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
     const [pairData, setPairData] = useState<Record<string, PairData>>({});
-    const initialDataReceivedRef = useRef<Set<string>>(new Set());
-    const gridCalculators = React.useRef<Map<string, GridCalculator>>(new Map());
+    const boxMapRef = useRef<Map<string, Box[]>>(new Map());
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
+
+    // Function to update box values based on price
+    const updateBoxesWithPrice = (boxes: Box[], price: number): Box[] => {
+        return boxes.map((box) => {
+            const newBox = { ...box };
+            if (price > box.high) {
+                newBox.high = price;
+                newBox.low = price - Math.abs(box.value);
+                if (box.value < 0) {
+                    newBox.value = Math.abs(box.value);
+                }
+            } else if (price < box.low) {
+                newBox.low = price;
+                newBox.high = price + Math.abs(box.value);
+                if (box.value > 0) {
+                    newBox.value = -Math.abs(box.value);
+                }
+            }
+            return newBox;
+        });
+    };
 
     // Initialize state and fetch all initial data
     useEffect(() => {
@@ -108,19 +128,6 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
     // Calculate loading state including sidebar initialization
     const isLoading = !isAuthenticated || !isConnected || !isSidebarInitialized;
 
-    // Initialize grid calculator with server data and update with price data
-    useEffect(() => {
-        if (!isLoading && pairData) {
-            Object.entries(pairData).forEach(([pair, data]) => {
-                if (data.boxes?.[0]?.boxes) {
-                    const calculator = new GridCalculator();
-                    calculator.initializeBoxes(pair, data.boxes[0].boxes);
-                    gridCalculators.current.set(pair, calculator);
-                }
-            });
-        }
-    }, [pairData, isLoading]);
-
     // Subscribe to box slices for initial values
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
@@ -134,39 +141,17 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                 setPairData((prev) => {
                     const isFirstMessage = !prev[pair];
                     if (isFirstMessage) {
-                        // Initialize calculator with initial box values
-                        const calculator = new GridCalculator();
-                        calculator.initializeBoxes(pair, wsData.boxes);
-                        gridCalculators.current.set(pair, calculator);
+                        // Store initial box values
+                        boxMapRef.current.set(pair, [...wsData.boxes]);
 
-                        // For first message, use the same data for both initial and current
                         return {
                             ...prev,
                             [pair]: {
-                                boxes: [wsData], // Current box data starts with initial values
+                                boxes: [wsData],
                                 currentOHLC: wsData.currentOHLC,
-                                initialBoxData: wsData, // Store initial values
+                                initialBoxData: wsData,
                             },
                         };
-                    }
-
-                    // For subsequent messages, only update if we have a calculator
-                    const calculator = gridCalculators.current.get(pair);
-                    if (calculator && wsData.currentOHLC) {
-                        // Update calculator with new price
-                        calculator.updateWithPrice(pair, wsData.currentOHLC.close);
-
-                        // Get processed box data
-                        const processedData = calculator.getPairData(pair, wsData.currentOHLC);
-                        if (processedData) {
-                            return {
-                                ...prev,
-                                [pair]: {
-                                    ...processedData,
-                                    initialBoxData: prev[pair].initialBoxData, // Keep initial data unchanged
-                                },
-                            };
-                        }
                     }
                     return prev;
                 });
@@ -177,41 +162,48 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
             console.log('Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
-                gridCalculators.current.delete(pair);
+                boxMapRef.current.delete(pair);
             });
         };
     }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices]);
 
-    // Process price updates using initial box values
+    // Process price updates
     useEffect(() => {
         if (!priceData || Object.keys(priceData).length === 0) return;
 
         Object.entries(priceData).forEach(([pair, data]) => {
             if (data.price) {
-                const calculator = gridCalculators.current.get(pair);
-                if (calculator) {
-                    // Update calculator with new price
-                    calculator.updateWithPrice(pair, data.price);
+                const boxes = boxMapRef.current.get(pair);
+                if (boxes) {
+                    // Update boxes with new price
+                    const updatedBoxes = updateBoxesWithPrice(boxes, data.price);
+                    boxMapRef.current.set(pair, updatedBoxes);
 
-                    // Create OHLC from price data
-                    const currentOHLC = {
-                        open: data.price,
-                        high: data.price,
-                        low: data.price,
-                        close: data.price,
-                    };
-
-                    // Get processed box data
-                    const processedData = calculator.getPairData(pair, currentOHLC);
-                    if (processedData) {
-                        setPairData((prev) => ({
-                            ...prev,
-                            [pair]: {
-                                ...processedData,
-                                initialBoxData: prev[pair]?.initialBoxData, // Keep initial data unchanged
+                    // Update state with new box values
+                    setPairData((prev) => ({
+                        ...prev,
+                        [pair]: {
+                            boxes: [
+                                {
+                                    boxes: updatedBoxes,
+                                    timestamp: data.timestamp,
+                                    currentOHLC: {
+                                        open: data.price,
+                                        high: data.price,
+                                        low: data.price,
+                                        close: data.price,
+                                    },
+                                },
+                            ],
+                            currentOHLC: {
+                                open: data.price,
+                                high: data.price,
+                                low: data.price,
+                                close: data.price,
                             },
-                        }));
-                    }
+                            initialBoxData: prev[pair]?.initialBoxData,
+                        },
+                    }));
                 }
             }
         });
@@ -227,7 +219,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
 
             if (wasSelected) {
                 unsubscribeFromBoxSlices(pair);
-                gridCalculators.current.delete(pair);
+                boxMapRef.current.delete(pair);
                 setPairData((prev) => {
                     const { [pair]: removed, ...rest } = prev;
                     return rest;
