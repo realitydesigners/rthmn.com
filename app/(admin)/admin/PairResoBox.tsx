@@ -59,7 +59,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                     <div className='flex w-auto flex-col gap-4'>
                         {/* ResoBox Section */}
                         <div className='h-[300px] rounded border border-[#181818] bg-[#0a0a0a] p-2'>
-                            <div className='relative h-full w-[300px]'>
+                            <div className='relative h-full w-[300px] overflow-hidden'>
                                 <ResoBox slice={boxSlice} className='h-[300px] w-full' boxColors={boxColors} pair={pair} />
                             </div>
                         </div>
