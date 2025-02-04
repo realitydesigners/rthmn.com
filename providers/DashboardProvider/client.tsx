@@ -26,6 +26,7 @@ interface DashboardContextType {
     candlesData: Record<string, any[]>;
     DEFAULT_BOX_COLORS: BoxColors;
     fullPresets: FullPreset[];
+    fetchBoxSlice: Record<string, any>;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -76,6 +77,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
     const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
     const [pairData, setPairData] = useState<Record<string, PairData>>({});
+    const [fetchBoxSlice, setFetchBoxSlice] = useState<Record<string, any>>({});
     const gridCalculators = React.useRef<Map<string, GridCalculator>>(new Map());
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
@@ -93,6 +95,8 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                 // Fetch initial box data for stored pairs
                 if (storedPairs.length > 0) {
                     const fetchedData: Record<string, PairData> = {};
+                    const rawBoxSliceData: Record<string, any> = {};
+
                     for (const pair of storedPairs) {
                         try {
                             const response = await fetch(`/api/getBoxSlice?pair=${pair}&token=${session.access_token}`, {
@@ -105,6 +109,10 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                                 const data = await response.json();
                                 console.log(`Fetched box data for ${pair}:`, data);
                                 if (data.status === 'success' && data.data?.[0]) {
+                                    // Store raw API response
+                                    rawBoxSliceData[pair] = data.data[0];
+
+                                    // Store working copy for GridCalculator
                                     fetchedData[pair] = {
                                         boxes: [data.data[0]],
                                         currentOHLC: data.data[0].currentOHLC,
@@ -118,6 +126,8 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                         }
                     }
                     setPairData(fetchedData);
+                    setFetchBoxSlice(rawBoxSliceData);
+                    console.log('Raw API response:', rawBoxSliceData);
                     console.log('Fetched initial box data for all pairs:', fetchedData);
                 }
             }
@@ -271,7 +281,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
             togglePair,
             isConnected,
             boxColors: boxColorsState,
-            updateBoxColors,
+            updateBoxColors: setBoxColorsState,
             isAuthenticated,
             handleSidebarClick,
             signalsData,
@@ -280,12 +290,32 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
             candlesData: {},
             DEFAULT_BOX_COLORS,
             fullPresets,
+            fetchBoxSlice,
         }),
-        [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal]
+        [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal, fetchBoxSlice]
     );
 
     return (
-        <DashboardContext.Provider value={contextValue}>
+        <DashboardContext.Provider
+            value={{
+                pairData,
+                selectedPairs,
+                isLoading,
+                isSidebarInitialized,
+                togglePair,
+                isConnected,
+                boxColors: boxColorsState,
+                updateBoxColors: setBoxColorsState,
+                isAuthenticated,
+                handleSidebarClick,
+                signalsData,
+                selectedSignal,
+                setSelectedSignal,
+                candlesData: {},
+                DEFAULT_BOX_COLORS,
+                fullPresets,
+                fetchBoxSlice,
+            }}>
             <div onClick={handleSidebarClick}>{children}</div>
         </DashboardContext.Provider>
     );
