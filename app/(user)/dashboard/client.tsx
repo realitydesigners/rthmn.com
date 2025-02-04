@@ -64,60 +64,27 @@ export default function Dashboard() {
     const { pairData, selectedPairs, isLoading, isAuthenticated, boxColors } = useDashboard();
     const gridClass = useGridLayout();
 
-    // Memoize the filtered data
-    const filteredPairData = useMemo(() => {
-        return selectedPairs
-            .map((pair) => {
-                const data = pairData[pair];
-                if (!data?.boxes?.length) {
-                    return null;
-                }
+    // Transform data directly without memo
+    const displayData = selectedPairs
+        .map((pair) => {
+            const data = pairData[pair];
+            if (!data?.boxes?.length) return null;
 
-                // Process each box slice
-                return data.boxes.map((boxSlice, index) => {
-                    // Sort boxes by absolute value while preserving original high/low
-                    const sortedBoxes = [...boxSlice.boxes]
-                        .map((box) => ({
-                            ...box,
-                            calculatedDiff: Number((box.high - box.low).toFixed(5)),
-                            expectedHigh: box.value > 0 ? box.high : box.low,
-                            expectedLow: box.value > 0 ? box.low : box.high,
-                            direction: box.value > 0 ? 'up' : 'down',
-                        }))
-                        .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
-
-                    // Create analysis object for all boxes
-                    const analysis = {
-                        pair,
-                        timestamp: boxSlice.timestamp,
-                        boxes: sortedBoxes.map((box, i) => ({
-                            value: box.value,
-                            high: box.high,
-                            low: box.low,
-                            diff: box.calculatedDiff,
-                            direction: box.direction,
-                            expectedHigh: box.expectedHigh,
-                            expectedLow: box.expectedLow,
-                            matchesValue: Math.abs(Math.abs(box.value) - box.calculatedDiff) < 0.00001,
-                        })),
-                    };
-
-                    console.log('Box Analysis:', analysis);
-
-                    return {
-                        pair,
-                        boxSlice: {
-                            ...boxSlice,
-                            boxes: sortedBoxes,
-                        },
-                        currentOHLC: data.currentOHLC,
-                        index,
-                    };
-                });
-            })
-            .filter(Boolean)
-            .flat();
-    }, [selectedPairs, pairData]);
+            return data.boxes.map((boxSlice, index) => ({
+                pair,
+                boxSlice: {
+                    ...boxSlice,
+                    boxes: boxSlice.boxes.map((box) => ({
+                        ...box,
+                        direction: box.value > 0 ? 'up' : 'down',
+                    })),
+                },
+                currentOHLC: data.currentOHLC,
+                index,
+            }));
+        })
+        .filter(Boolean)
+        .flat();
 
     if (!selectedPairs.length && !isLoading) {
         return (
@@ -128,12 +95,10 @@ export default function Dashboard() {
         );
     }
 
-    console.log(filteredPairData);
-
     return (
         <main className='w-full px-2 pt-16 sm:px-4 lg:pt-18'>
             <div className={gridClass}>
-                {filteredPairData.map(({ pair, boxSlice, currentOHLC, index }) => (
+                {displayData.map(({ pair, boxSlice, currentOHLC, index }) => (
                     <PairResoBox
                         key={isLoading ? index : `${pair}-${index}`}
                         pair={pair}

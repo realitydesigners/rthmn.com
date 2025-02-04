@@ -49,21 +49,28 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
         const startIndex = memoizedBoxColors.styles?.globalTimeframeControl ? memoizedBoxColors.styles?.startIndex : localStartIndex;
         const maxBoxCount = memoizedBoxColors.styles?.globalTimeframeControl ? memoizedBoxColors.styles?.maxBoxCount : localMaxBoxCount;
 
-        // Log visible boxes
-        // if (boxSlice?.boxes) {
-        //     const visibleBoxes = boxSlice.boxes.slice(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
-        //     console.log('Visible boxes:', {
-        //         pair,
-        //         boxes: visibleBoxes.map((box) => ({
-        //             ...box,
-        //             highLow: `${box.high}-${box.low}`,
-        //             value: box.value,
-        //         })),
-        //         startIndex,
-        //         maxBoxCount,
-        //         totalBoxes: boxSlice.boxes.length,
-        //     });
-        // }
+        // Debug box order
+        if (boxSlice?.boxes) {
+            const visibleBoxes = boxSlice.boxes.slice(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
+            console.log('Box Order Analysis:', {
+                pair,
+                allBoxes: boxSlice.boxes.map((box) => ({
+                    value: box.value,
+                    absValue: Math.abs(box.value),
+                    high: box.high,
+                    low: box.low,
+                })),
+                visibleBoxes: visibleBoxes.map((box) => ({
+                    value: box.value,
+                    absValue: Math.abs(box.value),
+                    high: box.high,
+                    low: box.low,
+                })),
+                startIndex,
+                maxBoxCount,
+                direction: startIndex > 0 ? 'sliding right' : 'sliding left',
+            });
+        }
 
         return getTimeframeRange(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
     }, [memoizedBoxColors.styles, localStartIndex, localMaxBoxCount, boxSlice, pair]);

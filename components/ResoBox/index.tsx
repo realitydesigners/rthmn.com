@@ -203,18 +203,6 @@ export const ResoBox = ({ slice, boxColors, className = '', pair = '' }: { slice
     const visibleBoxes = slice.boxes.slice(startIndex, startIndex + maxBoxCount);
     const sortedBoxes = visibleBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
-    // Log the order of boxes after sorting
-    console.log('ResoBox Rendering Order:', {
-        pair,
-        boxesInOrder: sortedBoxes.map((box, idx) => ({
-            index: idx,
-            value: box.value,
-            high: box.high,
-            low: box.low,
-            size: Math.abs(box.value),
-        })),
-    });
-
     const maxSize = sortedBoxes.length ? Math.abs(sortedBoxes[0].value) : 0;
 
     const renderBox = (box: Box, index: number, prevColor: string | null = null) => {
