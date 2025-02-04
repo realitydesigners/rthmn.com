@@ -30,7 +30,7 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
         return (
             <QueryProvider>
                 <WebSocketProvider>
-                    <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
+                    <DashboardProvider>
                         <div id='app-container' className='min-h-screen bg-black'>
                             <main className='h-screen w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
                         </div>
@@ -48,7 +48,7 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
     return (
         <QueryProvider>
             <WebSocketProvider>
-                <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
+                <DashboardProvider>
                     <div id='app-container'>
                         <NavbarSignedIn user={user} />
                         <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>

@@ -3,23 +3,8 @@
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { PairResoBox } from './PairResoBox';
 
-const boxColors = {
-    positive: '#00ff00',
-    negative: '#ff0000',
-    styles: {
-        startIndex: 0,
-        maxBoxCount: 38,
-        showLineChart: false,
-        globalTimeframeControl: false,
-        borderRadius: 0,
-        shadowIntensity: 0.5,
-        opacity: 0.5,
-        showBorder: true,
-    },
-} as const;
-
 export default function AdminPage() {
-    const { selectedPairs, pairData, boxColors, isLoading, fetchBoxSlice } = useDashboard();
+    const { selectedPairs, pairData, boxColors } = useDashboard();
 
     return (
         <div className='flex flex-col gap-4 p-4 pt-20'>
@@ -30,9 +15,7 @@ export default function AdminPage() {
                     boxSlice={pairData?.[pair]?.boxes?.[0]}
                     currentOHLC={pairData?.[pair]?.currentOHLC}
                     boxColors={boxColors}
-                    isLoading={isLoading}
-                    pairData={pairData}
-                    fetchBoxSlice={fetchBoxSlice}
+                    initialBoxData={pairData?.[pair]?.initialBoxData}
                 />
             ))}
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { useAuth } from '@/providers/SupabaseProvider';
@@ -77,7 +77,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
     const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
     const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
     const [pairData, setPairData] = useState<Record<string, PairData>>({});
-    const [fetchBoxSlice, setFetchBoxSlice] = useState<Record<string, any>>({});
+    const initialDataReceivedRef = useRef<Set<string>>(new Set());
     const gridCalculators = React.useRef<Map<string, GridCalculator>>(new Map());
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
@@ -90,53 +90,11 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
             const storedPairs = getSelectedPairs();
             setBoxColorsState(storedColors);
             setSelectedPairsState(storedPairs);
-
-            if (isAuthenticated) {
-                // Fetch initial box data for stored pairs
-                if (storedPairs.length > 0) {
-                    const fetchedData: Record<string, PairData> = {};
-                    const rawBoxSliceData: Record<string, any> = {};
-
-                    for (const pair of storedPairs) {
-                        try {
-                            const response = await fetch(`/api/getBoxSlice?pair=${pair}&token=${session.access_token}`, {
-                                headers: {
-                                    Authorization: `Bearer ${session.access_token}`,
-                                },
-                                cache: 'no-store',
-                            });
-                            if (response.ok) {
-                                const data = await response.json();
-                                console.log(`Fetched box data for ${pair}:`, data);
-                                if (data.status === 'success' && data.data?.[0]) {
-                                    // Store raw API response
-                                    rawBoxSliceData[pair] = data.data[0];
-
-                                    // Store working copy for GridCalculator
-                                    fetchedData[pair] = {
-                                        boxes: [data.data[0]],
-                                        currentOHLC: data.data[0].currentOHLC,
-                                    };
-                                }
-                            } else {
-                                console.error(`Failed to fetch box data for ${pair}:`, await response.text());
-                            }
-                        } catch (error) {
-                            console.error(`Error fetching box data for ${pair}:`, error);
-                        }
-                    }
-                    setPairData(fetchedData);
-                    setFetchBoxSlice(rawBoxSliceData);
-                    console.log('Raw API response:', rawBoxSliceData);
-                    console.log('Fetched initial box data for all pairs:', fetchedData);
-                }
-            }
-
             setIsSidebarInitialized(true);
         };
 
         initializeData();
-    }, [isAuthenticated, session?.access_token]);
+    }, []);
 
     // Onboarding check
     useEffect(() => {
@@ -163,80 +121,101 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
         }
     }, [pairData, isLoading]);
 
-    // Update grid calculator with price data
-    useEffect(() => {
-        if (priceData && Object.keys(priceData).length > 0) {
-            Object.entries(priceData).forEach(([pair, data]) => {
-                if (data.price) {
-                    const calculator = gridCalculators.current.get(pair);
-                    if (calculator) {
-                        calculator.updateWithPrice(pair, data.price);
-
-                        // Update pair data with new box values
-                        const currentOHLC = {
-                            open: data.price,
-                            high: data.price,
-                            low: data.price,
-                            close: data.price,
-                        };
-
-                        const updatedPairData = calculator.getPairData(pair, currentOHLC);
-                        if (updatedPairData) {
-                            setPairData((prev) => ({
-                                ...prev,
-                                [pair]: updatedPairData,
-                            }));
-                        }
-                    }
-                }
-            });
-        }
-    }, [priceData]);
-
-    const handleBulkUpdate = React.useCallback((pair: string, wsData: BoxSlice) => {
-        // Initialize or get grid calculator for this pair
-        if (!gridCalculators.current.has(pair)) {
-            const calculator = new GridCalculator();
-            calculator.initializeBoxes(pair, wsData.boxes);
-            gridCalculators.current.set(pair, calculator);
-        }
-
-        const calculator = gridCalculators.current.get(pair)!;
-
-        // Update grid calculator with new price
-        if (wsData.currentOHLC) {
-            calculator.updateWithPrice(pair, wsData.currentOHLC.close);
-        }
-
-        // Get updated box data
-        const updatedPairData = calculator.getPairData(pair, wsData.currentOHLC);
-        if (!updatedPairData) return;
-
-        // Update box data with calculated values
-        setPairData((prev) => ({
-            ...prev,
-            [pair]: updatedPairData,
-        }));
-    }, []);
-
-    // WebSocket subscription management
+    // Subscribe to box slices for initial values
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
+        console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
+
         selectedPairs.forEach((pair) => {
             subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
-                handleBulkUpdate(pair, wsData);
+                console.log(`Received box data for ${pair}:`, wsData);
+
+                setPairData((prev) => {
+                    const isFirstMessage = !prev[pair];
+                    if (isFirstMessage) {
+                        // Initialize calculator with initial box values
+                        const calculator = new GridCalculator();
+                        calculator.initializeBoxes(pair, wsData.boxes);
+                        gridCalculators.current.set(pair, calculator);
+
+                        // For first message, use the same data for both initial and current
+                        return {
+                            ...prev,
+                            [pair]: {
+                                boxes: [wsData], // Current box data starts with initial values
+                                currentOHLC: wsData.currentOHLC,
+                                initialBoxData: wsData, // Store initial values
+                            },
+                        };
+                    }
+
+                    // For subsequent messages, only update if we have a calculator
+                    const calculator = gridCalculators.current.get(pair);
+                    if (calculator && wsData.currentOHLC) {
+                        // Update calculator with new price
+                        calculator.updateWithPrice(pair, wsData.currentOHLC.close);
+
+                        // Get processed box data
+                        const processedData = calculator.getPairData(pair, wsData.currentOHLC);
+                        if (processedData) {
+                            return {
+                                ...prev,
+                                [pair]: {
+                                    ...processedData,
+                                    initialBoxData: prev[pair].initialBoxData, // Keep initial data unchanged
+                                },
+                            };
+                        }
+                    }
+                    return prev;
+                });
             });
         });
 
         return () => {
-            // console.log('🧹 Cleaning up WebSocket subscriptions');
+            console.log('Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
                 gridCalculators.current.delete(pair);
             });
         };
-    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, handleBulkUpdate]);
+    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices]);
+
+    // Process price updates using initial box values
+    useEffect(() => {
+        if (!priceData || Object.keys(priceData).length === 0) return;
+
+        Object.entries(priceData).forEach(([pair, data]) => {
+            if (data.price) {
+                const calculator = gridCalculators.current.get(pair);
+                if (calculator) {
+                    // Update calculator with new price
+                    calculator.updateWithPrice(pair, data.price);
+
+                    // Create OHLC from price data
+                    const currentOHLC = {
+                        open: data.price,
+                        high: data.price,
+                        low: data.price,
+                        close: data.price,
+                    };
+
+                    // Get processed box data
+                    const processedData = calculator.getPairData(pair, currentOHLC);
+                    if (processedData) {
+                        setPairData((prev) => ({
+                            ...prev,
+                            [pair]: {
+                                ...processedData,
+                                initialBoxData: prev[pair]?.initialBoxData, // Keep initial data unchanged
+                            },
+                        }));
+                    }
+                }
+            }
+        });
+    }, [priceData]);
 
     const togglePair = React.useCallback(
         (pair: string) => {
@@ -271,30 +250,6 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
         window.dispatchEvent(new Event('closeSidebars'));
     }, []);
 
-    // Memoize context value
-    const contextValue = React.useMemo(
-        () => ({
-            pairData,
-            selectedPairs,
-            isLoading,
-            isSidebarInitialized,
-            togglePair,
-            isConnected,
-            boxColors: boxColorsState,
-            updateBoxColors: setBoxColorsState,
-            isAuthenticated,
-            handleSidebarClick,
-            signalsData,
-            selectedSignal,
-            setSelectedSignal,
-            candlesData: {},
-            DEFAULT_BOX_COLORS,
-            fullPresets,
-            fetchBoxSlice,
-        }),
-        [pairData, selectedPairs, isLoading, isSidebarInitialized, isConnected, boxColorsState, isAuthenticated, signalsData, selectedSignal, fetchBoxSlice]
-    );
-
     return (
         <DashboardContext.Provider
             value={{
@@ -314,7 +269,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                 candlesData: {},
                 DEFAULT_BOX_COLORS,
                 fullPresets,
-                fetchBoxSlice,
+                fetchBoxSlice: {},
             }}>
             <div onClick={handleSidebarClick}>{children}</div>
         </DashboardContext.Provider>

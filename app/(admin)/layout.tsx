@@ -18,7 +18,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     return (
         <QueryProvider>
             <WebSocketProvider>
-                <DashboardProvider initialSignalsData={[]} initialBoxData={{}}>
+                <DashboardProvider>
                     <div id='app-container' className='relative min-h-screen overflow-y-auto'>
                         <AdminNavbar />
                         <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>

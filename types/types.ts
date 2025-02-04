@@ -54,6 +54,7 @@ export interface OHLC {
 export interface PairData {
     boxes: BoxSlice[];
     currentOHLC: OHLC;
+    initialBoxData?: BoxSlice;
 }
 
 export interface Candle {
