@@ -1,12 +1,10 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
-import { ResoBox } from '@/components/ResoBox';
-import { ResoChart } from '@/components/ResoChart';
-import { TimeFrameVisualizer } from '@/components/VisualizersView/Visualizers';
+import React, { useState } from 'react';
+import { ResoBox } from '@/app/(user)/_components/ResoBox';
+import { TimeFrameVisualizer } from '@/app/(user)/_components/VisualizersView/Visualizers';
 import { BoxSlice, OHLC } from '@/types/types';
 import { BoxColors, getPairTimeframe, setPairTimeframe } from '@/utils/localStorage';
-import { getTimeframeRange } from '@/utils/timeframe';
 
 interface PairResoBoxProps {
     pair?: string;
@@ -16,7 +14,7 @@ interface PairResoBoxProps {
     isLoading?: boolean;
 }
 
-export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
+export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
     // Get individual pair settings if not using global control
     const [localStartIndex, setLocalStartIndex] = useState(() =>
         boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.startIndex ?? 0) : getPairTimeframe(pair || '').startIndex
@@ -26,54 +24,14 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
         boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.maxBoxCount ?? 10) : getPairTimeframe(pair || '').maxBoxCount
     );
 
-    const [showSidebar, setShowSidebar] = useState(true);
-
-    // console.log(boxSlice);
-
-    // Memoize values that depend on props
-    const memoizedBoxColors = useMemo(
-        () => ({
-            ...boxColors,
-            styles: {
-                ...boxColors?.styles,
-                startIndex: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.startIndex : localStartIndex,
-                maxBoxCount: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.maxBoxCount : localMaxBoxCount,
-            },
-        }),
-        [boxColors, localStartIndex, localMaxBoxCount]
-    );
-
-    const isBoxView = useMemo(() => !memoizedBoxColors?.styles?.showLineChart, [memoizedBoxColors?.styles?.showLineChart]);
-
-    const timeframeRange = useMemo(() => {
-        const startIndex = memoizedBoxColors.styles?.globalTimeframeControl ? memoizedBoxColors.styles?.startIndex : localStartIndex;
-        const maxBoxCount = memoizedBoxColors.styles?.globalTimeframeControl ? memoizedBoxColors.styles?.maxBoxCount : localMaxBoxCount;
-
-        // Debug box order
-        if (boxSlice?.boxes) {
-            const visibleBoxes = boxSlice.boxes.slice(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
-            console.log('Box Order Analysis:', {
-                pair,
-                allBoxes: boxSlice.boxes.map((box) => ({
-                    value: box.value,
-                    absValue: Math.abs(box.value),
-                    high: box.high,
-                    low: box.low,
-                })),
-                visibleBoxes: visibleBoxes.map((box) => ({
-                    value: box.value,
-                    absValue: Math.abs(box.value),
-                    high: box.high,
-                    low: box.low,
-                })),
-                startIndex,
-                maxBoxCount,
-                direction: startIndex > 0 ? 'sliding right' : 'sliding left',
-            });
-        }
-
-        return getTimeframeRange(startIndex ?? 0, (startIndex ?? 0) + (maxBoxCount ?? 10));
-    }, [memoizedBoxColors.styles, localStartIndex, localMaxBoxCount, boxSlice, pair]);
+    const modifiedBoxColors = {
+        ...boxColors,
+        styles: {
+            ...boxColors?.styles,
+            startIndex: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.startIndex : localStartIndex,
+            maxBoxCount: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.maxBoxCount : localMaxBoxCount,
+        },
+    };
 
     const handleLocalStyleChange = (property: string, value: number | boolean) => {
         if (property === 'startIndex') {
@@ -96,7 +54,6 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
         }
     };
 
-    // Always return a consistent structure
     return (
         <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
             <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
@@ -113,29 +70,17 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
 
                     {/* Chart Section */}
                     <div className='relative flex h-full w-full pr-16'>
-                        {isBoxView ? (
-                            <ResoBox slice={boxSlice} className='h-full w-full' boxColors={memoizedBoxColors} pair={pair} />
-                        ) : (
-                            <div className='relative aspect-[2/1] w-full'>
-                                <ResoChart slice={boxSlice} className='w-full' showSidebar={showSidebar} digits={2} boxColors={memoizedBoxColors} />
-                            </div>
-                        )}
+                        <ResoBox slice={boxSlice} className='h-full w-full' boxColors={modifiedBoxColors} pair={pair} />
                     </div>
 
                     {/* Timeframe Control */}
-                    {!memoizedBoxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
+                    {!modifiedBoxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
                         <div className='relative h-20 w-full'>
                             <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
                                 <div className='h-24 w-full rounded-md bg-[#222]/50' />
                             </div>
                             <div className={`inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <TimeFrameVisualizer
-                                    startIndex={localStartIndex}
-                                    maxBoxCount={localMaxBoxCount}
-                                    boxes={boxSlice.boxes}
-                                    onStyleChange={handleLocalStyleChange}
-                                    timeframeRange={timeframeRange}
-                                />
+                                <TimeFrameVisualizer startIndex={localStartIndex} maxBoxCount={localMaxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleLocalStyleChange} />
                             </div>
                         </div>
                     )}
@@ -143,6 +88,4 @@ export const PairResoBox = React.memo(({ pair, boxSlice, currentOHLC, boxColors,
             </div>
         </div>
     );
-});
-
-PairResoBox.displayName = 'PairResoBox';
+};

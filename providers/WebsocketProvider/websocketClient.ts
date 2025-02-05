@@ -18,7 +18,6 @@ class WebSocketClient {
     private accessToken: string | null = null;
     private isAuthenticated: boolean = false;
     private pendingOperations: (() => void)[] = [];
-    private lastUpdateLog: number = 0;
 
     public setAccessToken(token: string) {
         this.accessToken = token;

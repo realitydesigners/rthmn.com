@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
-import { ResoBox } from '@/components/ResoBox';
-import { ResoChart } from '@/components/ResoChart';
+import { ResoBox } from '@/app/(user)/_components/ResoBox';
+import { ResoChart } from '@/app/(user)/_components/ResoChart';
 import { BoxSlice, OHLC } from '@/types/types';
 import { BoxColors } from '@/utils/localStorage';
 import { INSTRUMENTS } from '@/utils/instruments';

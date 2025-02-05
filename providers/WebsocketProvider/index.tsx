@@ -1,12 +1,10 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import React, { createContext, use, useEffect, useRef, useState } from 'react';
 import { API_ROUTES } from '@/app/api/config';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
 import { BoxSlice, PriceData } from '@/types/types';
-
-const PROVIDER_ERROR = 'useWebSocket must be used within a WebSocketProvider';
 
 interface WebSocketContextType {
     subscribeToBoxSlices: (pair: string, handler: (data: BoxSlice) => void) => void;
@@ -153,11 +151,11 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         priceData,
     };
 
-    return <WebSocketContext.Provider value={contextValue}>{children}</WebSocketContext.Provider>;
+    return <WebSocketContext value={contextValue}>{children}</WebSocketContext>;
 }
 
 export const useWebSocket = () => {
-    const context = useContext(WebSocketContext);
-    if (!context) throw new Error(PROVIDER_ERROR);
+    const context = use(WebSocketContext);
+
     return context;
 };

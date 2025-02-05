@@ -1,8 +1,9 @@
 import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Toaster } from '@/app/_components/Toasts/toaster';
-import { NavbarSignedOut } from '@/components/NavbarSignedOut';
+import { NavbarSignedOut } from '@/app/_components/NavbarSignedOut';
 import SupabaseProvider from '@/providers/SupabaseProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
 import ogImage from '@/public/opengraph-image.png';
 import { getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
@@ -11,7 +12,7 @@ import Script from 'next/script';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { kodeMono, outfit, oxanium, russo } from '@/app/fonts';
-
+import { SectionFooter } from '@/app/_components/Sections/SectionFooter';
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
     'RTHMN is a next generation algorithmic trading platform that provides real-time trading signals, 3D pattern recognition, gamified learning, AI-powered predictions, and comprehensive risk management.';
@@ -50,13 +51,14 @@ export default async function RootLayout({ children, modal }: { children: React.
             <GoogleTagManager gtmId='GTM-XYZ' />
             <body className='bg-black'>
                 <SupabaseProvider initialUser={user}>
-                    <NavbarSignedOut user={user} />
-                    {children}
-                    {modal}
-                    <div id='modal-root' />
-                    <Suspense>
-                        <Toaster />
-                    </Suspense>
+                    <QueryProvider>
+                        <NavbarSignedOut user={user} />
+                        {children}
+                        <SectionFooter />
+                        <Suspense>
+                            <Toaster />
+                        </Suspense>
+                    </QueryProvider>
                 </SupabaseProvider>
                 <Analytics />
                 {/* Google Analytics */}
