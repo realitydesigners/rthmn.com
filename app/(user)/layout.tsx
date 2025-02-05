@@ -4,7 +4,7 @@ import { DashboardNavigation } from '@/components/DashboardNavigation';
 import { NavbarSignedIn } from '@/components/NavbarSignedIn';
 import { SidebarLeft } from '@/components/SidebarLeft';
 import { SidebarRight } from '@/components/SidebarRight';
-import { DashboardProvider } from '@/providers/DashboardProvider/client';
+import DashboardProvider from '@/providers/DashboardProvider/client';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
@@ -28,15 +28,13 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 
     if (isPairPage && !user) {
         return (
-            <QueryProvider>
-                <WebSocketProvider>
-                    <DashboardProvider>
-                        <div id='app-container' className='min-h-screen bg-black'>
-                            <main className='h-screen w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
-                        </div>
-                    </DashboardProvider>
-                </WebSocketProvider>
-            </QueryProvider>
+            <WebSocketProvider>
+                <DashboardProvider>
+                    <div id='app-container' className='min-h-screen bg-black'>
+                        <main className='h-screen w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
+                    </div>
+                </DashboardProvider>
+            </WebSocketProvider>
         );
     }
 
@@ -46,19 +44,17 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
     }
 
     return (
-        <QueryProvider>
-            <WebSocketProvider>
-                <DashboardProvider>
-                    <div id='app-container'>
-                        <NavbarSignedIn user={user} />
-                        <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
-                        <SidebarLeft />
-                        <SidebarRight />
-                        <DashboardNavigation />
-                        {modal}
-                    </div>
-                </DashboardProvider>
-            </WebSocketProvider>
-        </QueryProvider>
+        <WebSocketProvider>
+            <DashboardProvider>
+                <div id='app-container'>
+                    <NavbarSignedIn user={user} />
+                    <main className='w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
+                    <SidebarLeft />
+                    <SidebarRight />
+                    <DashboardNavigation />
+                    {modal}
+                </div>
+            </DashboardProvider>
+        </WebSocketProvider>
     );
 }

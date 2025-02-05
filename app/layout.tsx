@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Toaster } from '@/app/_components/Toasts/toaster';
 import { NavbarSignedOut } from '@/components/NavbarSignedOut';
 import SupabaseProvider from '@/providers/SupabaseProvider';
+import { QueryProvider } from '@/providers/QueryProvider';
 import ogImage from '@/public/opengraph-image.png';
 import { getURL } from '@/utils/helpers';
 import { createClient } from '@/utils/supabase/server';
@@ -50,13 +51,15 @@ export default async function RootLayout({ children, modal }: { children: React.
             <GoogleTagManager gtmId='GTM-XYZ' />
             <body className='bg-black'>
                 <SupabaseProvider initialUser={user}>
-                    <NavbarSignedOut user={user} />
-                    {children}
-                    {modal}
-                    <div id='modal-root' />
-                    <Suspense>
-                        <Toaster />
-                    </Suspense>
+                    <QueryProvider>
+                        <NavbarSignedOut user={user} />
+                        {children}
+                        {modal}
+                        <div id='modal-root' />
+                        <Suspense>
+                            <Toaster />
+                        </Suspense>
+                    </QueryProvider>
                 </SupabaseProvider>
                 <Analytics />
                 {/* Google Analytics */}

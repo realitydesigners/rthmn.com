@@ -3,7 +3,6 @@
 import React, { useMemo } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import type { Box } from '@/types/types';
-import { formatNumber } from '@/utils/formatters';
 
 interface BoxDetailsRowProps {
     boxes: Box[];
@@ -19,11 +18,21 @@ export const BoxDetailsRow: React.FC<BoxDetailsRowProps> = ({ boxes, maxBoxCount
     // Memoize sorted boxes to prevent recreation on every render
     const sortedBoxes = useMemo(() => boxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)).slice(0, maxBoxCount), [boxes, maxBoxCount]);
 
-    // Constants for sizing - making these explicit helps understand the layout
     const BOX_HEIGHT = 40; // Base height for boxes
     const BOX_GAP = 0; // Gap between boxes
     const LABEL_HEIGHT = 20; // Height for size labels
-    const LABEL_MARGIN = 8; // Margin between labels and boxes
+
+    const formatNumber = (value: number): string => {
+        const absValue = Math.abs(value);
+
+        if (absValue >= 1000000) {
+            return `${(value / 1000000).toFixed(2)}M`;
+        }
+        if (absValue >= 1000) {
+            return `${(value / 1000).toFixed(2)}K`;
+        }
+        return value.toFixed(2);
+    };
 
     return (
         <div className='flex w-full flex-col'>

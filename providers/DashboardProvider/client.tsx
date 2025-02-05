@@ -1,12 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, use } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { Box, BoxColors, BoxSlice, PairData, Signal } from '@/types/types';
-
+import { Box, BoxColors, BoxSlice, PairData } from '@/types/types';
 import { DEFAULT_BOX_COLORS, FullPreset, fullPresets, getBoxColors, getSelectedPairs, setBoxColors, setSelectedPairs } from '@/utils/localStorage';
 
 interface DashboardContextType {
@@ -20,9 +19,6 @@ interface DashboardContextType {
     updateBoxColors: (colors: BoxColors) => void;
     isAuthenticated: boolean;
     handleSidebarClick: (e: React.MouseEvent) => void;
-    signalsData: Signal[] | null;
-    selectedSignal: Signal | null;
-    setSelectedSignal: (signal: Signal | null) => void;
     candlesData: Record<string, any[]>;
     DEFAULT_BOX_COLORS: BoxColors;
     fullPresets: FullPreset[];
@@ -32,50 +28,20 @@ interface DashboardContextType {
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
 
 export const useDashboard = () => {
-    const context = useContext(DashboardContext);
+    const context = use(DashboardContext);
     if (!context) {
         throw new Error('useDashboard must be used within a DashboardProvider');
     }
     return context;
 };
 
-type SignalContextType = {
-    signalsData: Signal[] | null;
-    selectedSignal: Signal | null;
-    setSelectedSignal: (signal: Signal | null) => void;
-};
-
-const SignalContext = createContext<SignalContextType | undefined>(undefined);
-
-type SignalProviderProps = {
-    children: React.ReactNode;
-    initialSignalsData: Signal[] | null;
-};
-
-export function SignalProviderClient({ children, initialSignalsData }: SignalProviderProps) {
-    const [signalsData, setSignalsData] = useState<Signal[] | null>(initialSignalsData);
-    const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
-
-    return <SignalContext.Provider value={{ signalsData, selectedSignal, setSelectedSignal }}>{children}</SignalContext.Provider>;
-}
-
-export function useSignals() {
-    const context = useContext(SignalContext);
-    if (context === undefined) {
-        throw new Error('useSignals must be used within a SignalProvider');
-    }
-    return context;
-}
-
-export function DashboardProviderClient({ children }: { children: React.ReactNode }) {
+export default function DashboardProvider({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
     const { hasCompletedInitialOnboarding } = useOnboardingStore();
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
-    const [signalsData, setSignalsData] = useState<Signal[] | null>(null);
-    const [selectedSignal, setSelectedSignal] = useState<Signal | null>(null);
     const [pairData, setPairData] = useState<Record<string, PairData>>({});
     const boxMapRef = useRef<Map<string, Box[]>>(new Map());
     const { session } = useAuth();
@@ -243,7 +209,7 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
     }, []);
 
     return (
-        <DashboardContext.Provider
+        <DashboardContext
             value={{
                 pairData,
                 selectedPairs,
@@ -255,18 +221,12 @@ export function DashboardProviderClient({ children }: { children: React.ReactNod
                 updateBoxColors,
                 isAuthenticated,
                 handleSidebarClick,
-                signalsData,
-                selectedSignal,
-                setSelectedSignal,
                 candlesData: {},
                 DEFAULT_BOX_COLORS,
                 fullPresets,
                 fetchBoxSlice: {},
             }}>
             <div onClick={handleSidebarClick}>{children}</div>
-        </DashboardContext.Provider>
+        </DashboardContext>
     );
 }
-
-export { DashboardProviderClient as DashboardProvider };
-export type { DashboardContextType };
