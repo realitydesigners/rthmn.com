@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { getSidebarState } from '@/utils/localStorage';
 import { NoInstruments } from './LoadingSkeleton';
