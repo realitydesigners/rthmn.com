@@ -17,7 +17,6 @@ interface DashboardContextType {
     isConnected: boolean;
     boxColors: BoxColors;
     updateBoxColors: (colors: BoxColors) => void;
-    isAuthenticated: boolean;
     handleSidebarClick: (e: React.MouseEvent) => void;
     candlesData: Record<string, any[]>;
     DEFAULT_BOX_COLORS: BoxColors;
@@ -47,27 +46,6 @@ export default function DashboardProvider({ children }: { children: React.ReactN
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
-
-    // Function to update box values based on price
-    const updateBoxesWithPrice = (boxes: Box[], price: number): Box[] => {
-        return boxes.map((box) => {
-            const newBox = { ...box };
-            if (price > box.high) {
-                newBox.high = price;
-                newBox.low = price - Math.abs(box.value);
-                if (box.value < 0) {
-                    newBox.value = Math.abs(box.value);
-                }
-            } else if (price < box.low) {
-                newBox.low = price;
-                newBox.high = price + Math.abs(box.value);
-                if (box.value > 0) {
-                    newBox.value = -Math.abs(box.value);
-                }
-            }
-            return newBox;
-        });
-    };
 
     // Initialize state and fetch all initial data
     useEffect(() => {
@@ -133,47 +111,81 @@ export default function DashboardProvider({ children }: { children: React.ReactN
         };
     }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices]);
 
-    // Process price updates
+    // Function to update box values based on price
+    const updateBoxesWithPrice = (boxes: Box[], price: number): Box[] => {
+        return boxes.map((box) => {
+            const newBox = { ...box };
+            if (price > box.high) {
+                newBox.high = price;
+                newBox.low = price - Math.abs(box.value);
+                if (box.value < 0) {
+                    newBox.value = Math.abs(box.value);
+                }
+            } else if (price < box.low) {
+                newBox.low = price;
+                newBox.high = price + Math.abs(box.value);
+                if (box.value > 0) {
+                    newBox.value = -Math.abs(box.value);
+                }
+            }
+            return newBox;
+        });
+    };
+
     useEffect(() => {
-        if (!priceData || Object.keys(priceData).length === 0) return;
+        if (!priceData || Object.keys(priceData).length === 0 || selectedPairs.length === 0) return;
 
-        Object.entries(priceData).forEach(([pair, data]) => {
-            if (data.price) {
-                const boxes = boxMapRef.current.get(pair);
-                if (boxes) {
-                    // Update boxes with new price
-                    const updatedBoxes = updateBoxesWithPrice(boxes, data.price);
-                    boxMapRef.current.set(pair, updatedBoxes);
+        // Batch updates to reduce state updates
+        const updates: Record<string, { boxes: Box[]; timestamp: string; price: number }> = {};
 
-                    // Update state with new box values
-                    setPairData((prev) => ({
-                        ...prev,
-                        [pair]: {
+        // Only process updates for selected pairs
+        selectedPairs.forEach((pair) => {
+            const data = priceData[pair];
+            if (!data?.price) return;
+
+            const boxes = boxMapRef.current.get(pair);
+            if (!boxes) return;
+
+            // Update boxes with new price
+            const updatedBoxes = updateBoxesWithPrice(boxes, data.price);
+            boxMapRef.current.set(pair, updatedBoxes);
+            updates[pair] = { boxes: updatedBoxes, timestamp: data.timestamp, price: data.price };
+        });
+
+        // Only update state if we have updates
+        if (Object.keys(updates).length > 0) {
+            setPairData((prev) => {
+                const newPairData = { ...prev };
+                Object.entries(updates).forEach(([pair, { boxes, timestamp, price }]) => {
+                    if (newPairData[pair]) {
+                        newPairData[pair] = {
+                            ...newPairData[pair],
                             boxes: [
                                 {
-                                    boxes: updatedBoxes,
-                                    timestamp: data.timestamp,
+                                    boxes,
+                                    timestamp,
                                     currentOHLC: {
-                                        open: data.price,
-                                        high: data.price,
-                                        low: data.price,
-                                        close: data.price,
+                                        open: price,
+                                        high: price,
+                                        low: price,
+                                        close: price,
                                     },
                                 },
                             ],
                             currentOHLC: {
-                                open: data.price,
-                                high: data.price,
-                                low: data.price,
-                                close: data.price,
+                                open: price,
+                                high: price,
+                                low: price,
+                                close: price,
                             },
-                            initialBoxData: prev[pair]?.initialBoxData,
-                        },
-                    }));
-                }
-            }
-        });
-    }, [priceData]);
+                            initialBoxData: newPairData[pair].initialBoxData,
+                        };
+                    }
+                });
+                return newPairData;
+            });
+        }
+    }, [priceData, selectedPairs]);
 
     const togglePair = React.useCallback(
         (pair: string) => {
@@ -219,7 +231,7 @@ export default function DashboardProvider({ children }: { children: React.ReactN
                 isConnected,
                 boxColors: boxColorsState,
                 updateBoxColors,
-                isAuthenticated,
+
                 handleSidebarClick,
                 candlesData: {},
                 DEFAULT_BOX_COLORS,
