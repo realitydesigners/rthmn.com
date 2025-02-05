@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import { AdminNavbar } from '@/app/(admin)/_components/AdminNavbar';
-import { DashboardProvider } from '@/providers/DashboardProvider/client';
+import DashboardProvider from '@/providers/DashboardProvider/client';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { getUser } from '@/utils/supabase/queries';
