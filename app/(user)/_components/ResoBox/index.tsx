@@ -24,10 +24,23 @@ const getBoxColors = (box: Box, boxColors: BoxColors) => {
     };
 };
 
-const getBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof getBoxColors>, index: number) => {
+const getBoxStyles = (box: Box, prevBox: Box | null, boxColors: BoxColors, containerSize: number, maxSize: number, colors: ReturnType<typeof getBoxColors>, index: number) => {
     // Calculate size based on nesting level (90% of parent)
     const calculatedSize = containerSize * Math.pow(0.86, index);
-    const positionStyle = !prevColor ? { top: 0, right: 0 } : prevColor.includes(boxColors.negative.split(',')[0]) ? { bottom: 0, right: 0 } : { top: 0, right: 0 };
+
+    // Determine if this is the first box with a different direction from the previous
+    const isFirstDifferent = prevBox && ((box.value > 0 && prevBox.value < 0) || (box.value < 0 && prevBox.value > 0));
+
+    // Position based on previous box and direction
+    const positionStyle = !prevBox
+        ? { top: 0, right: 0 }
+        : isFirstDifferent
+          ? prevBox.value > 0
+              ? { top: 0, right: 0 }
+              : { bottom: 0, right: 0 }
+          : box.value < 0
+            ? { bottom: 0, right: 0 }
+            : { top: 0, right: 0 };
 
     const baseStyles: React.CSSProperties = {
         width: `${calculatedSize}px`,
@@ -38,8 +51,6 @@ const getBoxStyles = (box: Box, prevColor: string | null, boxColors: BoxColors, 
         borderWidth: boxColors.styles?.showBorder ? '1px' : '0',
         transition: 'all 0.15s ease-out',
     };
-
-    const isFirstDifferent = prevColor && ((box.value > 0 && prevColor.includes(boxColors.negative)) || (box.value < 0 && prevColor.includes(boxColors.positive)));
 
     return {
         baseStyles,
@@ -60,7 +71,7 @@ const getInstrumentDigits = (pair: string): number => {
 const Box = ({
     box,
     index,
-    prevColor,
+    prevBox,
     boxColors,
     containerSize,
     maxSize,
@@ -71,21 +82,21 @@ const Box = ({
 }: {
     box: Box;
     index: number;
-    prevColor: string | null;
+    prevBox: Box | null;
     boxColors: BoxColors;
     containerSize: number;
     maxSize: number;
     slice: BoxSlice | null;
     sortedBoxes: Box[];
-    renderBox: (box: Box, index: number, prevColor: string | null) => React.ReactNode;
+    renderBox: (box: Box, index: number, prevBox: Box | null) => React.ReactNode;
     pair: string;
 }) => {
     const colors = getBoxColors(box, boxColors);
-    const { baseStyles, isFirstDifferent } = getBoxStyles(box, prevColor, boxColors, containerSize, maxSize, colors, index);
+    const { baseStyles, isFirstDifferent } = getBoxStyles(box, prevBox, boxColors, containerSize, maxSize, colors, index);
     const digits = getInstrumentDigits(pair);
 
-    const isConsecutivePositive = prevColor?.includes(boxColors.positive.split(',')[0]);
-    const isConsecutiveNegative = prevColor?.includes(boxColors.negative.split(',')[0]);
+    const isConsecutivePositive = prevBox?.value > 0 && box.value > 0 && !isFirstDifferent;
+    const isConsecutiveNegative = prevBox?.value < 0 && box.value < 0 && !isFirstDifferent;
 
     const TopPrice =
         (!isFirstDifferent || (isFirstDifferent && box.value > 0)) &&
@@ -95,7 +106,7 @@ const Box = ({
                 <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
                 <div className='absolute -top-3.5 right-0'>
                     <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                        {box.value < 0 ? box.high.toFixed(digits) : box.high.toFixed(digits)}
+                        {box.high.toFixed(digits)}
                     </span>
                 </div>
             </div>
@@ -109,17 +120,11 @@ const Box = ({
                 <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
                 <div className='absolute -top-3.5 right-0'>
                     <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                        {box.value < 0 ? box.low.toFixed(digits) : box.low.toFixed(digits)}
+                        {box.low.toFixed(digits)}
                     </span>
                 </div>
             </div>
         ) : null;
-
-    const ValueDisplay = (
-        <div className={`absolute ${box.value < 0 ? '-top-1' : 'bottom-1'} left-2 z-20`}>
-            <span className='font-kodemono text-[8px] tracking-wider text-white'>{Math.abs(box.value).toFixed(5)}</span>
-        </div>
-    );
 
     return (
         <div key={`${slice?.timestamp}-${index}`} className='absolute border border-black' style={baseStyles}>
@@ -158,7 +163,7 @@ const Box = ({
             {TopPrice}
             {BottomPrice}
 
-            {index < sortedBoxes.length - 1 && renderBox(sortedBoxes[index + 1], index + 1, colors.baseColor)}
+            {index < sortedBoxes.length - 1 && renderBox(sortedBoxes[index + 1], index + 1, box)}
         </div>
     );
 };
@@ -200,21 +205,19 @@ export const ResoBox = ({ slice, boxColors, className = '', pair = '' }: { slice
     }
 
     // Get the current timeframe window
+    // Filter boxes to only show those in the current timeframe window
     const startIndex = boxColors.styles?.startIndex ?? 0;
     const maxBoxCount = boxColors.styles?.maxBoxCount ?? 10;
-
-    // Filter boxes to only show those in the current timeframe window
     const visibleBoxes = slice.boxes.slice(startIndex, startIndex + maxBoxCount);
     const sortedBoxes = visibleBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
-
     const maxSize = sortedBoxes.length ? Math.abs(sortedBoxes[0].value) : 0;
 
-    const renderBox = (box: Box, index: number, prevColor: string | null = null) => {
+    const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
         return (
             <Box
                 box={box}
                 index={index}
-                prevColor={prevColor}
+                prevBox={prevBox}
                 boxColors={boxColors}
                 containerSize={containerSize}
                 maxSize={maxSize}

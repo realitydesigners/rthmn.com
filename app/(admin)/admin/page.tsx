@@ -1,6 +1,7 @@
 'use client';
 
 import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
 import { PairResoBox } from './PairResoBox';
 import { INSTRUMENTS } from '@/utils/instruments';
 import { Box } from '@/types/types';
@@ -185,7 +186,8 @@ const BoxValidationSummary = ({ pairs, pairData }: { pairs: string[]; pairData: 
 };
 
 export default function AdminPage() {
-    const { selectedPairs, pairData, boxColors } = useDashboard();
+    const { pairData } = useDashboard();
+    const { selectedPairs, boxColors } = useUser();
 
     return (
         <div className='flex flex-col gap-4 p-4 pt-20'>

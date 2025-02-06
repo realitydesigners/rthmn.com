@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { cn } from '@/utils/cn';
 import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
@@ -56,7 +56,7 @@ interface PairItemProps {
 
 const PairItem: React.FC<PairItemProps> = ({ item, isSelected = false, onToggle, price }) => {
     const { currentStepId } = useOnboardingStore();
-    const { boxColors } = useDashboard();
+    const { boxColors } = useUser();
     const isOnboardingActive = currentStepId === 'instruments';
 
     return (
@@ -160,7 +160,7 @@ const PairGroup: React.FC<PairGroupProps> = ({ label, items, count, isSelected =
 const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching: boolean) => void }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showResults, setShowResults] = useState(false);
-    const { selectedPairs, togglePair, boxColors } = useDashboard();
+    const { selectedPairs, togglePair, boxColors } = useUser();
     const { priceData } = useWebSocket();
     const searchRef = useRef<HTMLDivElement>(null);
 
@@ -321,7 +321,7 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
 };
 
 export const InstrumentsView = () => {
-    const { selectedPairs, togglePair } = useDashboard();
+    const { selectedPairs, togglePair } = useUser();
     const { priceData } = useWebSocket();
     const [isSearching, setIsSearching] = useState(false);
 

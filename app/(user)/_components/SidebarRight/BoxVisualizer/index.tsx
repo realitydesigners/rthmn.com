@@ -54,7 +54,7 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
 
                 <div className='flex items-center justify-between px-1 py-2'>
                     <div className='space-y-1'>
-                        <span className='text-[10px] font-medium tracking-wider text-white/50 uppercase'>Show Border</span>
+                        <span className='font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase'>Show Border</span>
                     </div>
                     <button
                         onClick={() => onStyleChange('showBorder', !showBorder)}

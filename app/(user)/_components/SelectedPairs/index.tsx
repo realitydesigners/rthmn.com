@@ -3,9 +3,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
 
 export const SelectedPairs = () => {
-    const { selectedPairs, togglePair, pairData } = useDashboard();
+    const { pairData } = useDashboard();
+    const { selectedPairs, togglePair } = useUser();
     const [activeRow, setActiveRow] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
