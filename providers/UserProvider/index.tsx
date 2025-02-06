@@ -67,58 +67,47 @@ export default function UserProvider({ children }: { children: React.ReactNode }
             return;
         }
 
-        const updateGridClass = () => {
-            const sidebarState = getSidebarState();
-            const leftLocked = sidebarState.left.locked && sidebarState.left.isOpen;
-            const rightLocked = sidebarState.right.locked && sidebarState.right.isOpen;
+        const handleResize = () => {
+            const main = document.querySelector('main');
+            if (!main) return;
 
-            // Base classes with smooth transitions
-            let classes = 'grid transition-[width,margin] duration-150 ease-in-out';
+            const width = main.clientWidth;
+            const baseClasses = 'grid w-full gap-4 transition-all duration-300 ';
 
-            // Add gap classes
-            classes += ' gap-3 lg:gap-4';
-
-            // Calculate available width based on sidebar state
-            if (leftLocked && rightLocked) {
-                classes += ' pr-[350px] pl-[350px]'; // Both sidebars
-            } else if (leftLocked) {
-                classes += ' pl-[350px]'; // Left sidebar
-            } else if (rightLocked) {
-                classes += ' pr-[350px]'; // Right sidebar
-            }
-
-            // Responsive grid with consistent 3-column layout
-            const selectedPairsCount = selectedPairs.length;
-            if (selectedPairsCount <= 3) {
-                classes += ' grid-cols-3';
-                // Center the content when less than 3 items
-                if (selectedPairsCount < 3) {
-                    const colSpan = Math.ceil(3 / selectedPairsCount);
-                    classes += ` [&>*]:col-span-${colSpan}`;
-                }
+            // Add appropriate grid-cols based on width
+            if (width <= 600) {
+                setGridClass(`${baseClasses} grid-cols-1`);
+            } else if (width <= 900) {
+                setGridClass(`${baseClasses} grid-cols-2`);
+            } else if (width <= 1200) {
+                setGridClass(`${baseClasses} grid-cols-3`);
             } else {
-                // For more than 3 pairs, maintain 3 columns but allow wrapping
-                classes += ' grid-cols-3';
+                setGridClass(`${baseClasses} grid-cols-4`);
             }
-
-            // Set consistent item size
-            classes += ' auto-rows-[350px]';
-
-            setGridClass(classes);
         };
 
-        // Initial update
-        updateGridClass();
+        // Set up resize observer for main element
+        const resizeObserver = new ResizeObserver(() => {
+            requestAnimationFrame(handleResize);
+        });
+
+        const main = document.querySelector('main');
+        if (main) {
+            resizeObserver.observe(main);
+            handleResize(); // Initial measurement
+        }
 
         // Listen for sidebar state changes
         const handleStorageChange = () => {
-            updateGridClass();
+            // Wait for sidebar transition to complete before measuring
+            setTimeout(handleResize, 150);
         };
 
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('sidebarStateChange', handleStorageChange);
 
         return () => {
+            resizeObserver.disconnect();
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('sidebarStateChange', handleStorageChange);
         };
