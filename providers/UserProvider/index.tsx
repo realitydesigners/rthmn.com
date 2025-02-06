@@ -77,9 +77,9 @@ export default function UserProvider({ children }: { children: React.ReactNode }
             // Add appropriate grid-cols based on width
             if (width <= 600) {
                 setGridClass(`${baseClasses} grid-cols-1`);
-            } else if (width <= 900) {
+            } else if (width <= 1280) {
                 setGridClass(`${baseClasses} grid-cols-2`);
-            } else if (width <= 1200) {
+            } else if (width <= 1600) {
                 setGridClass(`${baseClasses} grid-cols-3`);
             } else {
                 setGridClass(`${baseClasses} grid-cols-4`);
