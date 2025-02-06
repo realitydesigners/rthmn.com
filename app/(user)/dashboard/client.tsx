@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useUser } from '@/providers/UserProvider';
 import { NoInstruments } from './LoadingSkeleton';

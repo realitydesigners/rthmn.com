@@ -1,6 +1,8 @@
 'use client';
 
 import React, { createContext, useEffect, useState, use } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { BoxColors } from '@/types/types';
 import { DEFAULT_BOX_COLORS, FullPreset, fullPresets, getBoxColors, getSelectedPairs, getSidebarState, setBoxColors, setSelectedPairs } from '@/utils/localStorage';
 
@@ -31,6 +33,18 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
     const [gridClass, setGridClass] = useState('');
+    const router = useRouter();
+    const pathname = usePathname();
+    const { hasCompletedInitialOnboarding } = useOnboardingStore();
+
+    // Onboarding check
+    useEffect(() => {
+        if (!pathname || pathname.includes('/onboarding')) return;
+        if (pathname === '/signin' || pathname === '/signup' || pathname === '/pricing') return;
+        if (!hasCompletedInitialOnboarding()) {
+            router.replace('/onboarding');
+        }
+    }, [pathname, router, hasCompletedInitialOnboarding]);
 
     // Initialize state and fetch all initial data
     useEffect(() => {
@@ -58,20 +72,37 @@ export default function UserProvider({ children }: { children: React.ReactNode }
             const leftLocked = sidebarState.left.locked && sidebarState.left.isOpen;
             const rightLocked = sidebarState.right.locked && sidebarState.right.isOpen;
 
-            // Base classes for mobile and tablet
-            let classes = 'grid grid-cols-1 gap-2 sm:gap-3 lg:gap-4';
+            // Base classes with smooth transitions
+            let classes = 'grid transition-[width,margin] duration-150 ease-in-out';
 
-            // Tablet breakpoint
-            classes += ' sm:grid-cols-[repeat(auto-fit,minmax(350px,1fr))]';
+            // Add gap classes
+            classes += ' gap-3 lg:gap-4';
 
-            // Desktop breakpoint with dynamic sidebar adjustments
+            // Calculate available width based on sidebar state
             if (leftLocked && rightLocked) {
-                classes += ' lg:grid-cols-[repeat(auto-fit,minmax(350px,1fr))]'; // Both sidebars
-            } else if (leftLocked || rightLocked) {
-                classes += ' lg:grid-cols-[repeat(auto-fit,minmax(375px,1fr))]'; // One sidebar
-            } else {
-                classes += ' lg:grid-cols-[repeat(auto-fit,minmax(400px,1fr))]'; // No sidebars
+                classes += ' pr-[350px] pl-[350px]'; // Both sidebars
+            } else if (leftLocked) {
+                classes += ' pl-[350px]'; // Left sidebar
+            } else if (rightLocked) {
+                classes += ' pr-[350px]'; // Right sidebar
             }
+
+            // Responsive grid with consistent 3-column layout
+            const selectedPairsCount = selectedPairs.length;
+            if (selectedPairsCount <= 3) {
+                classes += ' grid-cols-3';
+                // Center the content when less than 3 items
+                if (selectedPairsCount < 3) {
+                    const colSpan = Math.ceil(3 / selectedPairsCount);
+                    classes += ` [&>*]:col-span-${colSpan}`;
+                }
+            } else {
+                // For more than 3 pairs, maintain 3 columns but allow wrapping
+                classes += ' grid-cols-3';
+            }
+
+            // Set consistent item size
+            classes += ' auto-rows-[350px]';
 
             setGridClass(classes);
         };
@@ -93,28 +124,25 @@ export default function UserProvider({ children }: { children: React.ReactNode }
         };
     }, [isSidebarInitialized]);
 
-    const togglePair = React.useCallback(
-        (pair: string) => {
-            const wasSelected = selectedPairs.includes(pair);
-            const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
-            setSelectedPairsState(newSelected);
-            setSelectedPairs(newSelected);
-        },
-        [selectedPairs]
-    );
+    const togglePair = (pair: string) => {
+        const wasSelected = selectedPairs.includes(pair);
+        const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
+        setSelectedPairsState(newSelected);
+        setSelectedPairs(newSelected);
+    };
 
-    const updateBoxColors = React.useCallback((colors: BoxColors) => {
+    const updateBoxColors = (colors: BoxColors) => {
         setBoxColors(colors);
         setBoxColorsState(colors);
-    }, []);
+    };
 
-    const handleSidebarClick = React.useCallback((e: React.MouseEvent) => {
+    const handleSidebarClick = (e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
         if (target.closest('.sidebar-toggle') || target.closest('.sidebar-content') || target.closest('.fixed-sidebar')) {
             return;
         }
         window.dispatchEvent(new Event('closeSidebars'));
-    }, []);
+    };
 
     return (
         <UserContext

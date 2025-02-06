@@ -1,8 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, use } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import React, { createContext, useEffect, useRef, use } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
@@ -27,24 +25,12 @@ export const useDashboard = () => {
 };
 
 export default function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const { hasCompletedInitialOnboarding } = useOnboardingStore();
     const { selectedPairs, isSidebarInitialized } = useUser();
     const [pairData, setPairData] = React.useState<Record<string, PairData>>({});
     const boxMapRef = useRef<Map<string, Box[]>>(new Map());
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
-
-    // Onboarding check
-    useEffect(() => {
-        if (!pathname || pathname.includes('/onboarding')) return;
-        if (pathname === '/signin' || pathname === '/signup' || pathname === '/pricing') return;
-        if (!hasCompletedInitialOnboarding()) {
-            router.replace('/onboarding');
-        }
-    }, [pathname, router, hasCompletedInitialOnboarding]);
 
     // Calculate loading state including sidebar initialization
     const isLoading = !isAuthenticated || !isConnected || !isSidebarInitialized;
