@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaSearch } from 'react-icons/fa';
-import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
 import { setSelectedPairs as saveToLocalStorage } from '@/utils/localStorage';
@@ -28,7 +28,7 @@ const formatPrice = (price: number, instrument: string) => {
 };
 
 export default function PairsStep({ selectedPairs, setSelectedPairs, onValidationChange }: Props) {
-    const { togglePair } = useDashboard();
+    const { togglePair } = useUser();
     const [searchQuery, setSearchQuery] = useState('');
     const { priceData } = useWebSocket();
 

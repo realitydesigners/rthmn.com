@@ -1,26 +1,16 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useRef, use } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import React, { createContext, useEffect, useRef, use } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { Box, BoxColors, BoxSlice, PairData } from '@/types/types';
-import { DEFAULT_BOX_COLORS, FullPreset, fullPresets, getBoxColors, getSelectedPairs, setBoxColors, setSelectedPairs } from '@/utils/localStorage';
+import { Box, BoxSlice, PairData } from '@/types/types';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;
-    selectedPairs: string[];
     isLoading: boolean;
-    isSidebarInitialized: boolean;
-    togglePair: (pair: string) => void;
     isConnected: boolean;
-    boxColors: BoxColors;
-    updateBoxColors: (colors: BoxColors) => void;
-    handleSidebarClick: (e: React.MouseEvent) => void;
     candlesData: Record<string, any[]>;
-    DEFAULT_BOX_COLORS: BoxColors;
-    fullPresets: FullPreset[];
     fetchBoxSlice: Record<string, any>;
 }
 
@@ -35,39 +25,12 @@ export const useDashboard = () => {
 };
 
 export default function DashboardProvider({ children }: { children: React.ReactNode }) {
-    const router = useRouter();
-    const pathname = usePathname();
-    const { hasCompletedInitialOnboarding } = useOnboardingStore();
-    const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
-    const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
-    const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
-    const [pairData, setPairData] = useState<Record<string, PairData>>({});
+    const { selectedPairs, isSidebarInitialized } = useUser();
+    const [pairData, setPairData] = React.useState<Record<string, PairData>>({});
     const boxMapRef = useRef<Map<string, Box[]>>(new Map());
     const { session } = useAuth();
     const isAuthenticated = !!session?.access_token;
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
-
-    // Initialize state and fetch all initial data
-    useEffect(() => {
-        const initializeData = async () => {
-            const storedColors = getBoxColors();
-            const storedPairs = getSelectedPairs();
-            setBoxColorsState(storedColors);
-            setSelectedPairsState(storedPairs);
-            setIsSidebarInitialized(true);
-        };
-
-        initializeData();
-    }, []);
-
-    // Onboarding check
-    useEffect(() => {
-        if (!pathname || pathname.includes('/onboarding')) return;
-        if (pathname === '/signin' || pathname === '/signup' || pathname === '/pricing') return;
-        if (!hasCompletedInitialOnboarding()) {
-            router.replace('/onboarding');
-        }
-    }, [pathname, router, hasCompletedInitialOnboarding]);
 
     // Calculate loading state including sidebar initialization
     const isLoading = !isAuthenticated || !isConnected || !isSidebarInitialized;
@@ -187,58 +150,16 @@ export default function DashboardProvider({ children }: { children: React.ReactN
         }
     }, [priceData, selectedPairs]);
 
-    const togglePair = React.useCallback(
-        (pair: string) => {
-            const wasSelected = selectedPairs.includes(pair);
-            const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
-
-            setSelectedPairsState(newSelected);
-            setSelectedPairs(newSelected);
-
-            if (wasSelected) {
-                unsubscribeFromBoxSlices(pair);
-                boxMapRef.current.delete(pair);
-                setPairData((prev) => {
-                    const { [pair]: removed, ...rest } = prev;
-                    return rest;
-                });
-            }
-        },
-        [selectedPairs, unsubscribeFromBoxSlices]
-    );
-
-    const updateBoxColors = React.useCallback((colors: BoxColors) => {
-        setBoxColors(colors);
-        setBoxColorsState(colors);
-    }, []);
-
-    const handleSidebarClick = React.useCallback((e: React.MouseEvent) => {
-        const target = e.target as HTMLElement;
-        if (target.closest('.sidebar-toggle') || target.closest('.sidebar-content') || target.closest('.fixed-sidebar')) {
-            return;
-        }
-        window.dispatchEvent(new Event('closeSidebars'));
-    }, []);
-
     return (
         <DashboardContext
             value={{
                 pairData,
-                selectedPairs,
                 isLoading,
-                isSidebarInitialized,
-                togglePair,
                 isConnected,
-                boxColors: boxColorsState,
-                updateBoxColors,
-
-                handleSidebarClick,
                 candlesData: {},
-                DEFAULT_BOX_COLORS,
-                fullPresets,
                 fetchBoxSlice: {},
             }}>
-            <div onClick={handleSidebarClick}>{children}</div>
+            {children}
         </DashboardContext>
     );
 }
