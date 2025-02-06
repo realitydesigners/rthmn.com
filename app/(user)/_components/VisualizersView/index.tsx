@@ -2,7 +2,7 @@
 
 import React, { useMemo, useState } from 'react';
 import { LuBox, LuBoxes, LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuLock } from 'react-icons/lu';
-import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
 import type { BoxColors } from '@/types/types';
 import { cn } from '@/utils/cn';
 import { TimeFrameVisualizer } from './Visualizers';
@@ -139,7 +139,7 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, icon: Ic
 };
 
 export const VisualizersView = () => {
-    const { boxColors, updateBoxColors } = useDashboard();
+    const { boxColors, updateBoxColors } = useUser();
     const [showtimeframe, setShowtimeframe] = useState(true);
     const [showChartStyle, setShowChartStyle] = useState(true);
 

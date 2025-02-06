@@ -6,6 +6,7 @@ import { LuArrowRight, LuBitcoin, LuBookmark, LuDollarSign, LuList, LuPlus, LuSe
 import { useLongPress } from '@/hooks/useLongPress';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { CRYPTO_PAIRS, FOREX_PAIRS } from '@/utils/instruments';
+import { useUser } from '@/providers/UserProvider';
 
 const useSound = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -98,7 +99,8 @@ interface PairNavigatorProps {
 }
 
 export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
-    const { selectedPairs, togglePair, pairData } = useDashboard();
+    const { pairData } = useDashboard();
+    const { selectedPairs, togglePair } = useUser();
     const [activeIndex, setActiveIndex] = useState(0);
     const [viewMode, setViewMode] = useState<string>('favorites');
     const scrollRef = useRef<HTMLDivElement>(null);

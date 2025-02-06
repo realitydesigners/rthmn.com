@@ -9,7 +9,6 @@ import { PairNavigator } from '@/app/(user)/_components/DashboardNavigation/Pair
 import { ProfilePanel } from '@/app/(user)/_components/DashboardNavigation/ProfilePanel';
 import { SettingsBar } from '@/app/(user)/_components/SettingsBar';
 import { useScrollLock } from '@/hooks/useScrollLock';
-import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useScrollDirection } from '../../../../hooks/useScrollDirection';
 
@@ -61,7 +60,7 @@ const PanelWrapper = ({ children, onClose }: { children: React.ReactNode; onClos
 export const DashboardNavigation = () => {
     const router = useRouter();
     const pathname = usePathname();
-    const { selectedPairs } = useDashboard();
+
     const [activePanel, setActivePanel] = useState<Panel>(null);
     const scrollDirection = useScrollDirection();
     const panelRef = useRef<HTMLDivElement>(null);

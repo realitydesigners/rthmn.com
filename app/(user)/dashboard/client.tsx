@@ -1,68 +1,14 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { getSidebarState } from '@/utils/localStorage';
+import { useUser } from '@/providers/UserProvider';
 import { NoInstruments } from './LoadingSkeleton';
 import { PairResoBox } from './PairResoBox';
 
-const useGridLayout = () => {
-    const { isSidebarInitialized } = useDashboard();
-    const [gridClass, setGridClass] = useState('');
-
-    useEffect(() => {
-        // Only update grid class after sidebars are initialized
-        if (!isSidebarInitialized) {
-            setGridClass('invisible');
-            return;
-        }
-
-        const updateGridClass = () => {
-            const sidebarState = getSidebarState();
-            const leftLocked = sidebarState.left.locked && sidebarState.left.isOpen;
-            const rightLocked = sidebarState.right.locked && sidebarState.right.isOpen;
-
-            // Base classes for mobile and tablet
-            let classes = 'grid grid-cols-1 gap-2 sm:gap-3 lg:gap-4';
-
-            // Tablet breakpoint
-            classes += ' sm:grid-cols-[repeat(auto-fit,minmax(350px,1fr))]';
-
-            // Desktop breakpoint with dynamic sidebar adjustments
-            if (leftLocked && rightLocked) {
-                classes += ' lg:grid-cols-[repeat(auto-fit,minmax(350px,1fr))]'; // Both sidebars
-            } else if (leftLocked || rightLocked) {
-                classes += ' lg:grid-cols-[repeat(auto-fit,minmax(375px,1fr))]'; // One sidebar
-            } else {
-                classes += ' lg:grid-cols-[repeat(auto-fit,minmax(400px,1fr))]'; // No sidebars
-            }
-
-            setGridClass(classes);
-        };
-
-        // Initial update
-        updateGridClass();
-
-        // Listen for sidebar state changes
-        const handleStorageChange = () => {
-            updateGridClass();
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        window.addEventListener('sidebarStateChange', handleStorageChange);
-
-        return () => {
-            window.removeEventListener('storage', handleStorageChange);
-            window.removeEventListener('sidebarStateChange', handleStorageChange);
-        };
-    }, [isSidebarInitialized]);
-
-    return gridClass;
-};
-
 export default function Dashboard() {
-    const { pairData, selectedPairs, isLoading, boxColors } = useDashboard();
-    const gridClass = useGridLayout();
+    const { pairData, isLoading } = useDashboard();
+    const { selectedPairs, boxColors, gridClass } = useUser();
 
     if (!selectedPairs.length && !isLoading) {
         return (

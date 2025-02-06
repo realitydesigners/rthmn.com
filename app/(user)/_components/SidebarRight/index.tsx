@@ -120,13 +120,6 @@ export const SidebarRight = () => {
         }
     };
 
-    const handleClose = () => {
-        if (!isLocked) {
-            setIsOpen(false);
-            setActivePanel(undefined);
-        }
-    };
-
     const updateSidebarState = (isOpen: boolean, panel: string | undefined, locked: boolean) => {
         const state = getSidebarState();
         setSidebarState({
@@ -164,7 +157,6 @@ export const SidebarRight = () => {
             </div>
             <SidebarWrapper
                 isOpen={isOpen && !!activePanel}
-                onClose={handleClose}
                 title={activePanel}
                 isLocked={isLocked}
                 onLockToggle={handleLockToggle}

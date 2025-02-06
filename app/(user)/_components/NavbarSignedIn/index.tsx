@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { LuChevronRight, LuLayoutDashboard, LuOrbit } from 'react-icons/lu';
 import { LogoIcon } from '@/app/_components/Icons/icons';
-import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
 
@@ -22,10 +21,6 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { signOut } = useAuth();
-    const [searchQuery, setSearchQuery] = useState('');
-    const [showSearchResults, setShowSearchResults] = useState(false);
-    const searchRef = useRef<HTMLDivElement>(null);
-    const { togglePair, selectedPairs } = useDashboard();
 
     // Get icon for path segment
     const getSegmentIcon = (segment: string) => {

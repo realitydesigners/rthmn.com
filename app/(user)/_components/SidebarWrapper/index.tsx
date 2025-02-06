@@ -2,13 +2,41 @@
 
 import React, { useCallback, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { LuUnlock } from 'react-icons/lu';
+import { LuUnlock, LuLock } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 import { getSidebarLocks, getSidebarState, setSidebarLocks, setSidebarState } from '@/utils/localStorage';
 
-interface SidebarContentProps {
+const LockButton = ({ isLocked, onClick }: { isLocked: boolean; onClick: () => void }) => (
+    <button
+        onClick={onClick}
+        className={cn(
+            'group relative z-[120] flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-200',
+            isLocked
+                ? 'border-[#333] bg-gradient-to-b from-[#181818] to-[#0F0F0F] text-white shadow-lg shadow-black/20'
+                : 'border-transparent bg-transparent text-[#666] hover:border-[#333] hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
+        )}>
+        <div className='relative flex items-center justify-center'>
+            {isLocked ? (
+                <LuLock size={11} className='transition-transform duration-200 group-hover:scale-110' />
+            ) : (
+                <LuUnlock size={11} className='transition-transform duration-200 group-hover:scale-110' />
+            )}
+        </div>
+    </button>
+);
+
+export const SidebarWrapper = ({
+    isOpen,
+    children,
+    title,
+    isLocked,
+    onLockToggle,
+    position,
+    initialWidth = 350,
+    isCurrentTourStep,
+    isCompleted,
+}: {
     isOpen: boolean;
-    onClose: () => void;
     children: React.ReactNode;
     title: string;
     isLocked: boolean;
@@ -16,20 +44,16 @@ interface SidebarContentProps {
     position: 'left' | 'right';
     initialWidth?: number;
     isCurrentTourStep?: boolean;
-    isCompleted: boolean;
-}
-
-export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onLockToggle, position, initialWidth = 350, isCurrentTourStep, isCompleted }: SidebarContentProps) => {
+    isCompleted?: boolean;
+}) => {
     const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        // Load initial state
         const state = getSidebarState();
         const locks = getSidebarLocks();
 
-        // If the sidebar is locked but not open, we need to sync the states
         if (locks[position] && !state[position].isOpen) {
             setSidebarState({
                 ...state,
@@ -39,21 +63,18 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                     locked: true,
                 },
             });
-            // Force the parent to update its state
             onLockToggle();
         }
     }, []);
 
     const handleResize = useCallback((newWidth: number) => {
-        const constrainedWidth = Math.max(350, Math.min(600, newWidth));
-        setWidth(constrainedWidth);
+        setWidth(Math.max(350, Math.min(600, newWidth)));
     }, []);
 
     const handleLockToggle = useCallback(() => {
         const locks = getSidebarLocks();
         const state = getSidebarState();
 
-        // Update both locks and state, but keep isOpen unchanged
         setSidebarLocks({
             ...locks,
             [position]: !isLocked,
@@ -63,7 +84,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
             ...state,
             [position]: {
                 ...state[position],
-                isOpen: isOpen, // Keep current open state
+                isOpen: isOpen,
                 locked: !isLocked,
             },
         });
@@ -71,52 +92,42 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
         onLockToggle();
     }, [isLocked, onLockToggle, position, isOpen]);
 
-    // Update main content margin and width when sidebar opens/closes or resizes
     useEffect(() => {
         if (!mounted) return;
 
         const main = document.querySelector('main');
         const container = document.getElementById('app-container');
+        if (!main || !container) return;
 
-        if (main && container) {
-            // Find both sidebars
-            const leftSidebar = document.querySelector('.sidebar-content [data-position="left"]');
-            const rightSidebar = document.querySelector('.sidebar-content [data-position="right"]');
+        const leftSidebar = document.querySelector('.sidebar-content [data-position="left"]');
+        const rightSidebar = document.querySelector('.sidebar-content [data-position="right"]');
 
-            // Calculate widths for both sidebars if they're open and locked
-            const leftWidth = leftSidebar?.getAttribute('data-locked') === 'true' ? parseInt(leftSidebar?.getAttribute('data-width') || '0') : 0;
-            const rightWidth = rightSidebar?.getAttribute('data-locked') === 'true' ? parseInt(rightSidebar?.getAttribute('data-width') || '0') : 0;
+        const leftWidth = leftSidebar?.getAttribute('data-locked') === 'true' ? parseInt(leftSidebar?.getAttribute('data-width') || '0') : 0;
+        const rightWidth = rightSidebar?.getAttribute('data-locked') === 'true' ? parseInt(rightSidebar?.getAttribute('data-width') || '0') : 0;
 
-            if (isOpen && isLocked) {
-                // When locked, adjust content width and margin
-                if (position === 'left') {
-                    main.style.marginLeft = `${width}px`;
-                    main.style.width = `calc(100vw - ${width + rightWidth}px)`;
-                    main.style.paddingLeft = '0'; // Reset padding when locked
-                }
-
-                if (position === 'right') {
-                    main.style.marginRight = `${width}px`;
-                    main.style.width = `calc(100vw - ${width + leftWidth}px)`;
-                    main.style.paddingRight = '0'; // Reset padding when locked
-                }
+        if (isOpen && isLocked) {
+            if (position === 'left') {
+                main.style.marginLeft = `${width}px`;
+                main.style.width = `calc(100% - ${width + rightWidth}px)`;
+                main.style.paddingLeft = '0';
             } else {
-                // When unlocked or closed, only respect the other locked sidebar
-                if (position === 'left') {
-                    main.style.marginLeft = '0';
-                    main.style.width = rightWidth > 0 ? `calc(100vw - ${rightWidth}px)` : '100%';
-                    main.style.paddingLeft = '64px'; // 16 * 4 = 64px for the fixed sidebar
-                }
-
-                if (position === 'right') {
-                    main.style.marginRight = '0';
-                    main.style.width = leftWidth > 0 ? `calc(100vw - ${leftWidth}px)` : '100%';
-                    main.style.paddingRight = '64px'; // 16 * 4 = 64px for the fixed sidebar
-                }
+                main.style.marginRight = `${width}px`;
+                main.style.width = `calc(100% - ${width + leftWidth}px)`;
+                main.style.paddingRight = '0';
             }
-            container.style.overflowX = 'hidden';
+        } else {
+            if (position === 'left') {
+                main.style.marginLeft = '0';
+                main.style.width = rightWidth > 0 ? `calc(100% - ${rightWidth}px)` : '100%';
+                main.style.paddingLeft = '64px';
+            } else {
+                main.style.marginRight = '0';
+                main.style.width = leftWidth > 0 ? `calc(100% - ${leftWidth}px)` : '100%';
+                main.style.paddingRight = '64px';
+            }
         }
-    }, [isOpen, width, position, isLocked, mounted, title]);
+        container.style.overflowX = 'hidden';
+    }, [isOpen, width, position, isLocked, mounted]);
 
     if (!mounted) return null;
 
@@ -125,74 +136,33 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
             initial={false}
             animate={{
                 x: isOpen ? 0 : position === 'left' ? -width : width,
-                opacity: isOpen ? 1 : 0,
-                transition: {
-                    x: {
-                        type: 'tween',
-                        duration: 0.2,
-                        ease: [0.2, 1, 0.2, 1],
-                    },
-                    opacity: {
-                        duration: 0.15,
-                    },
-                },
+            }}
+            transition={{
+                duration: 0.15,
+                ease: 'easeInOut',
             }}
             className={cn(
-                'sidebar-content top-14 bottom-0 hidden transform lg:fixed lg:flex',
+                'sidebar-content fixed top-14 bottom-0 hidden transform lg:flex',
                 position === 'left' ? 'left-0' : 'right-0',
                 isOpen ? 'pointer-events-auto' : 'pointer-events-none',
-                isLocked ? 'z-[90]' : 'z-[110]' // Higher z-index when floating
+                isLocked ? 'z-[90]' : 'z-[110]'
             )}
             data-position={position}
             data-locked={isLocked}
             data-width={width}
             style={{ width: `${width}px` }}>
-            <motion.div
-                className={cn(
-                    'group my- relative flex h-screen w-full transition-all duration-300 hover:from-[#333]/40 hover:via-[#222]/35 hover:to-[#111]/40',
-                    position === 'left' ? 'ml-16' : 'mr-16'
-                )}>
-                <motion.div
-                    initial={false}
-                    animate={{
-                        scale: isOpen ? 1 : 0.98,
-                        opacity: isOpen ? 1 : 0.8,
-                        transition: {
-                            duration: 0.2,
-                            ease: [0.2, 1, 0.2, 1],
-                        },
-                    }}
-                    className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a]', position === 'left' ? 'border-r border-[#121212]' : 'border-l border-[#121212]')}>
-                    <div className='relative flex-1 touch-pan-y overflow-y-scroll px-2 pb-4 [-webkit-overflow-scrolling:touch] [scrollbar-color:rgba(255,255,255,0.1)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-thumb:hover]:bg-white/[0.12] [&::-webkit-scrollbar-track]:bg-transparent'>
-                        <div className='relative z-10 flex h-12 items-center justify-between px-2 py-6'>
-                            {position === 'right' && (
-                                <button
-                                    onClick={handleLockToggle}
-                                    className={cn(
-                                        'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
-                                        isLocked
-                                            ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
-                                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
-                                    )}>
-                                    <LuUnlock size={12} />
-                                </button>
-                            )}
-                            <div className={cn('flex items-center justify-center gap-2', position === 'right' && 'flex-1 justify-end')}>
-                                <h2 className='font-kodemono px-2 text-[8px] font-medium tracking-widest uppercase'>{title}</h2>
-                            </div>
-                            {position === 'left' && (
-                                <button
-                                    onClick={handleLockToggle}
-                                    className={cn(
-                                        'group flex h-6 w-6 items-center justify-center rounded-md bg-white/10 transition-all duration-300',
-                                        isLocked
-                                            ? 'border-[#333] from-[#181818] to-[#0F0F0F] text-white hover:scale-105 hover:border-[#444] hover:bg-white/20'
-                                            : 'border-[#222] from-[#141414] to-[#0A0A0A] text-[#818181] hover:scale-105 hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
-                                    )}>
-                                    <LuUnlock size={12} />
-                                </button>
-                            )}
+            <div className={cn('relative flex h-[calc(100vh-55px)] w-full', position === 'left' ? 'ml-16' : 'mr-16')}>
+                <div className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a] p-1', position === 'left' ? 'border-r' : 'border-l', 'border-[#121212]')}>
+                    {/* Header */}
+                    <div className='relative z-10 flex h-12 items-center justify-between px-3'>
+                        {position === 'right' && <LockButton isLocked={isLocked} onClick={handleLockToggle} />}
+                        <div className={cn('flex items-center justify-center', position === 'right' && 'flex-1 justify-end')}>
+                            <h2 className='font-kodemono text-[10px] font-medium tracking-widest text-[#666] uppercase'>{title}</h2>
                         </div>
+                        {position === 'left' && <LockButton isLocked={isLocked} onClick={handleLockToggle} />}
+                    </div>
+                    {/* Content */}
+                    <div className='relative flex-1 overflow-y-auto px-2 pb-4 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-track]:bg-transparent'>
                         {children}
                         {/* Onboarding Overlay */}
                         {isCurrentTourStep && !isCompleted && (
@@ -220,13 +190,11 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                             </div>
                         )}
                     </div>
-                </motion.div>
+                </div>
 
+                {/* Resize handle */}
                 <div
-                    className={cn(
-                        'absolute top-0 bottom-0 w-4 cursor-ew-resize opacity-0 transition-opacity duration-200 group-hover:opacity-100',
-                        position === 'left' ? '-right-4' : '-left-4'
-                    )}
+                    className={cn('absolute top-0 bottom-0 w-4 cursor-ew-resize opacity-0 hover:opacity-100', position === 'left' ? '-right-4' : '-left-4')}
                     onMouseDown={(e) => {
                         e.preventDefault();
                         const startX = e.clientX;
@@ -234,8 +202,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
 
                         const handleMouseMove = (e: MouseEvent) => {
                             const delta = e.clientX - startX;
-                            const newWidth = Math.max(350, Math.min(600, startWidth + (position === 'left' ? delta : -delta)));
-                            handleResize(newWidth);
+                            handleResize(startWidth + (position === 'left' ? delta : -delta));
                         };
 
                         const handleMouseUp = () => {
@@ -247,7 +214,7 @@ export const SidebarWrapper = ({ isOpen, onClose, children, title, isLocked, onL
                         window.addEventListener('mouseup', handleMouseUp);
                     }}
                 />
-            </motion.div>
+            </div>
         </motion.div>
     );
 };

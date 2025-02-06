@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
 import type { Box } from '@/types/types';
 
 interface BoxDetailsRowProps {
@@ -12,8 +12,7 @@ interface BoxDetailsRowProps {
 }
 
 export const BoxDetailsRow: React.FC<BoxDetailsRowProps> = ({ boxes, maxBoxCount, pairName, showSizes = false }) => {
-    if (!boxes?.length) return null;
-    const { boxColors } = useDashboard();
+    const { boxColors } = useUser();
 
     // Memoize sorted boxes to prevent recreation on every render
     const sortedBoxes = useMemo(() => boxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)).slice(0, maxBoxCount), [boxes, maxBoxCount]);
