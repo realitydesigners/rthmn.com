@@ -4,9 +4,9 @@ import { DashboardNavigation } from '@/app/(user)/_components/DashboardNavigatio
 import { NavbarSignedIn } from '@/app/(user)/_components/NavbarSignedIn';
 import { SidebarLeft } from '@/app/(user)/_components/SidebarLeft';
 import { SidebarRight } from '@/app/(user)/_components/SidebarRight';
-import DashboardProvider from '@/providers/DashboardProvider/client';
+import { DashboardProvider } from '@/providers/DashboardProvider/client';
 import { QueryProvider } from '@/providers/QueryProvider';
-import UserProvider from '@/providers/UserProvider';
+import { UserProvider } from '@/providers/UserProvider';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { getSubscription, getUser } from '@/utils/supabase/queries';
 import { createClient } from '@/utils/supabase/server';

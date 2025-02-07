@@ -2,9 +2,21 @@
 
 import React, { useState } from 'react';
 import { ResoBox } from '@/app/(user)/_components/ResoBox';
-import { TimeFrameVisualizer } from '@/app/(user)/_components/VisualizersView/Visualizers';
+import { TimeFrameSlider } from '@/app/(user)/_components/TimeFrameSlider';
 import { BoxSlice, OHLC } from '@/types/types';
 import { BoxColors, getPairTimeframe, setPairTimeframe } from '@/utils/localStorage';
+import { useWebSocket } from '@/providers/WebsocketProvider';
+import { INSTRUMENTS } from '@/utils/instruments';
+
+const getInstrumentDigits = (pair: string): number => {
+    const categories = INSTRUMENTS as Record<string, Record<string, { digits: number }>>;
+    for (const [category, pairs] of Object.entries(categories)) {
+        if (pair in pairs) {
+            return pairs[pair].digits;
+        }
+    }
+    return 5;
+};
 
 interface PairResoBoxProps {
     pair?: string;
@@ -15,7 +27,7 @@ interface PairResoBoxProps {
 }
 
 export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
-    // Get individual pair settings if not using global control
+    const { priceData } = useWebSocket();
     const [localStartIndex, setLocalStartIndex] = useState(() =>
         boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.startIndex ?? 0) : getPairTimeframe(pair || '').startIndex
     );
@@ -54,6 +66,9 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
         }
     };
 
+    const currentPrice = pair ? priceData[pair]?.price : null;
+    const digits = pair ? getInstrumentDigits(pair) : 5;
+
     return (
         <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
             <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
@@ -63,7 +78,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
-                                <div className='font-kodemono text-sm font-medium text-gray-200'>{currentOHLC?.close ?? '-'}</div>
+                                <div className='font-kodemono text-sm font-medium text-gray-200'>{currentPrice ? currentPrice.toFixed(digits) : '-'}</div>
                             </div>
                         </div>
                     </div>
@@ -80,7 +95,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                                 <div className='h-24 w-full rounded-md bg-[#222]/50' />
                             </div>
                             <div className={`inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <TimeFrameVisualizer startIndex={localStartIndex} maxBoxCount={localMaxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleLocalStyleChange} />
+                                <TimeFrameSlider startIndex={localStartIndex} maxBoxCount={localMaxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleLocalStyleChange} />
                             </div>
                         </div>
                     )}

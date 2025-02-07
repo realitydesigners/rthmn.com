@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, use, useEffect, useRef, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { API_ROUTES } from '@/app/api/config';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
@@ -20,84 +20,77 @@ interface WebSocketHandlers {
     handleMessage: (event: MessageEvent) => void;
 }
 
-const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
+const WebSocketContext = createContext<WebSocketContextType | null>(null);
+
+// Optimized price data transformation
+const transformCandleToPrice = (pair: string, candle: any): PriceData | null => {
+    if (candle && typeof candle.close !== 'undefined') {
+        return {
+            price: candle.close,
+            timestamp: candle.timestamp || new Date().toISOString(),
+            volume: 0,
+        };
+    }
+    return null;
+};
 
 export function WebSocketProvider({ children }: { children: React.ReactNode }) {
-    const [isConnected, setIsConnected] = React.useState(false);
+    const [isConnected, setIsConnected] = useState(false);
     const { session } = useAuth();
     const subscriptionsRef = useRef<Map<string, (data: BoxSlice) => void>>(new Map());
     const [priceData, setPriceData] = useState<Record<string, PriceData>>({});
-    // Connection management
-    useEffect(() => {
-        if (session?.access_token && !isConnected) {
-            fetchInitialCandleData();
-            initializeConnection();
-        }
-    }, [session, isConnected]);
 
-    // Event handlers setup
-    useEffect(() => setupConnectionHandlers(), []);
-    useEffect(() => setupMessageHandler(), []);
-
-    const initializeConnection = () => {
-        wsClient.setAccessToken(session!.access_token);
+    // Memoized connection initialization
+    const initializeConnection = useCallback(() => {
+        if (!session?.access_token) return;
+        wsClient.setAccessToken(session.access_token);
         wsClient.connect();
-    };
+    }, [session?.access_token]);
 
-    const createHandlers = (): WebSocketHandlers => ({
-        handleOpen: () => {
-            setIsConnected(true);
-            // console.log('🟢 WebSocket connected');
-        },
-        handleClose: () => {
-            setIsConnected(false);
-            // console.log('🔴 WebSocket disconnected');
-        },
-        handleMessage: (event: MessageEvent) => {
-            const data = JSON.parse(event.data);
-            if (data.type === 'boxSlice') {
-                handleBoxSliceMessage(data);
-            } else if (data.type === 'price' && data.pair) {
-                setPriceData((prev) => ({
-                    ...prev,
-                    [data.pair]: {
-                        price: data.data.price,
-                        timestamp: data.data.timestamp,
-                        volume: data.data.volume,
-                    },
-                }));
-            }
-        },
-    });
-
-    const handleBoxSliceMessage = (data: any) => {
+    // Optimized message handlers
+    const handleBoxSliceMessage = useCallback((data: any) => {
         const callback = subscriptionsRef.current.get(data.pair);
-        if (callback && data.slice) {
-            callback(data.slice);
+        if (callback && data.data) {
+            callback(data.data);
         }
-    };
+    }, []);
 
-    const setupConnectionHandlers = () => {
-        const { handleOpen, handleClose } = createHandlers();
-        wsClient.onOpen(handleOpen);
-        wsClient.onClose(handleClose);
-        return () => {
-            wsClient.offOpen(handleOpen);
-            wsClient.offClose(handleClose);
-        };
-    };
+    const handlePriceMessage = useCallback((data: any) => {
+        if (data.type === 'price' && data.pair) {
+            setPriceData((prev) => ({
+                ...prev,
+                [data.pair]: {
+                    price: data.data.price,
+                    timestamp: data.data.timestamp,
+                    volume: data.data.volume,
+                },
+            }));
+        }
+    }, []);
 
-    const setupMessageHandler = () => {
-        const { handleMessage } = createHandlers();
-        wsClient.onMessage(handleMessage);
-        return () => wsClient.offMessage(handleMessage);
-    };
+    // Memoized WebSocket handlers
+    const handlers = useMemo(
+        (): WebSocketHandlers => ({
+            handleOpen: () => setIsConnected(true),
+            handleClose: () => setIsConnected(false),
+            handleMessage: (event: MessageEvent) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'boxSlice') {
+                    handleBoxSliceMessage(data);
+                } else if (data.type === 'price') {
+                    handlePriceMessage(data);
+                }
+            },
+        }),
+        [handleBoxSliceMessage, handlePriceMessage]
+    );
 
-    const fetchInitialCandleData = async () => {
+    // Optimized initial data fetching
+    const fetchInitialCandleData = useCallback(async () => {
+        if (!session?.access_token) return;
+
         try {
-            // console.log('Fetching initial candle data...');
-            const response = await fetch(`${window.location.origin}${API_ROUTES.LATEST_CANDLES}?token=${session!.access_token}`);
-
+            const response = await fetch(`${window.location.origin}${API_ROUTES.LATEST_CANDLES}?token=${session.access_token}`);
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
                 console.error('Candle data fetch failed:', {
@@ -109,53 +102,79 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             }
 
             const data = await response.json();
-            // console.log('Received candle data:', {
-            //     pairs: Object.keys(data),
-            //     dataSize: JSON.stringify(data).length,
-            // });
-
-            // Transform candle data into price data format
             const initialPriceData: Record<string, PriceData> = {};
+
             Object.entries(data).forEach(([pair, candle]: [string, any]) => {
-                if (candle && typeof candle.close !== 'undefined') {
-                    initialPriceData[pair] = {
-                        price: candle.close,
-                        timestamp: candle.timestamp || new Date().toISOString(),
-                        volume: 0, // Server doesn't provide volume data
-                    };
+                const priceData = transformCandleToPrice(pair, candle);
+                if (priceData) {
+                    initialPriceData[pair] = priceData;
                 }
             });
 
             if (Object.keys(initialPriceData).length > 0) {
-                // console.log('Setting initial price data for pairs:', Object.keys(initialPriceData));
                 setPriceData(initialPriceData);
-            } else {
-                console.warn('No valid price data found in response');
             }
         } catch (error) {
             console.error('Failed to fetch initial candle data:', error);
         }
-    };
+    }, [session?.access_token]);
 
-    const contextValue = {
-        subscribeToBoxSlices: (pair, handler) => {
-            subscriptionsRef.current.set(pair, handler);
-            wsClient.subscribe(pair, handler);
-        },
-        unsubscribeFromBoxSlices: (pair) => {
-            subscriptionsRef.current.delete(pair);
-            wsClient.unsubscribe(pair);
-        },
-        isConnected,
-        disconnect: () => wsClient.disconnect(),
-        priceData,
-    };
+    // Connection management
+    useEffect(() => {
+        if (session?.access_token && !isConnected) {
+            fetchInitialCandleData();
+            initializeConnection();
+        }
+    }, [session?.access_token, isConnected, fetchInitialCandleData, initializeConnection]);
 
-    return <WebSocketContext value={contextValue}>{children}</WebSocketContext>;
+    // Event handlers setup
+    useEffect(() => {
+        const { handleOpen, handleClose } = handlers;
+        wsClient.onOpen(handleOpen);
+        wsClient.onClose(handleClose);
+        return () => {
+            wsClient.offOpen(handleOpen);
+            wsClient.offClose(handleClose);
+        };
+    }, [handlers]);
+
+    useEffect(() => {
+        const { handleMessage } = handlers;
+        wsClient.onMessage(handleMessage);
+        return () => wsClient.offMessage(handleMessage);
+    }, [handlers]);
+
+    // Memoized subscription handlers
+    const subscribeToBoxSlices = useCallback((pair: string, handler: (data: BoxSlice) => void) => {
+        subscriptionsRef.current.set(pair, handler);
+        wsClient.subscribe(pair, handler);
+    }, []);
+
+    const unsubscribeFromBoxSlices = useCallback((pair: string) => {
+        subscriptionsRef.current.delete(pair);
+        wsClient.unsubscribe(pair);
+    }, []);
+
+    // Memoized context value
+    const value = useMemo(
+        () => ({
+            subscribeToBoxSlices,
+            unsubscribeFromBoxSlices,
+            isConnected,
+            disconnect: () => wsClient.disconnect(),
+            priceData,
+        }),
+        [subscribeToBoxSlices, unsubscribeFromBoxSlices, isConnected, priceData]
+    );
+
+    return <WebSocketContext.Provider value={value}>{children}</WebSocketContext.Provider>;
 }
 
-export const useWebSocket = () => {
-    const context = use(WebSocketContext);
-
+// Custom hook with proper error handling
+export function useWebSocket() {
+    const context = useContext(WebSocketContext);
+    if (!context) {
+        throw new Error('useWebSocket must be used within a WebSocketProvider');
+    }
     return context;
-};
+}

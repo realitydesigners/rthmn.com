@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { cn } from '@/utils/cn';
 import type { BoxColors } from '@/types/types';
 import type { FullPreset } from '@/utils/localStorage';
@@ -10,17 +10,7 @@ interface ColorPresetsProps {
     isPresetSelected: (preset: FullPreset) => boolean;
 }
 
-export const ColorPresets = ({ fullPresets, boxColors, onPresetClick, isPresetSelected }: ColorPresetsProps) => {
-    return (
-        <div className='grid grid-cols-3 gap-2'>
-            {fullPresets.map((preset) => (
-                <PresetButton key={preset.name} preset={preset} isSelected={isPresetSelected(preset)} onClick={() => onPresetClick(preset)} />
-            ))}
-        </div>
-    );
-};
-
-const PresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset; isSelected: boolean; onClick: () => void }) => (
+const PresetButton = memo(({ preset, isSelected, onClick }: { preset: FullPreset; isSelected: boolean; onClick: () => void }) => (
     <button
         onClick={onClick}
         className={cn(
@@ -61,4 +51,14 @@ const PresetButton = ({ preset, isSelected, onClick }: { preset: FullPreset; isS
             <span className='font-kodemono text-[8px] font-medium tracking-widest text-[#666] uppercase transition-colors group-hover:text-[#818181]'>{preset.name}</span>
         </div>
     </button>
-);
+));
+
+export const ColorPresets = memo(({ fullPresets, boxColors, onPresetClick, isPresetSelected }: ColorPresetsProps) => {
+    return (
+        <div className='grid grid-cols-3 gap-2'>
+            {fullPresets.map((preset) => (
+                <PresetButton key={preset.name} preset={preset} isSelected={isPresetSelected(preset)} onClick={() => onPresetClick(preset)} />
+            ))}
+        </div>
+    );
+});

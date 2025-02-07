@@ -1,8 +1,10 @@
 import { decode } from '@msgpack/msgpack';
 import { BoxSlice, PriceData } from '@/types/types';
 
+type MessageType = 'auth' | 'subscribe' | 'unsubscribe' | 'price' | 'boxSlice' | 'error' | 'ack';
+
 interface WebSocketMessage {
-    type: 'boxSlice' | 'ack' | 'price';
+    type: MessageType;
     pair?: string;
     data?: any;
     message?: string;
@@ -10,14 +12,19 @@ interface WebSocketMessage {
 
 class WebSocketClient {
     private socket: WebSocket | null = null;
-    private subscriptions: Set<string> = new Set();
-    private messageHandlers: Map<string, (data: BoxSlice | PriceData) => void> = new Map();
-    private openHandlers: Set<() => void> = new Set();
-    private closeHandlers: Set<() => void> = new Set();
-    private globalMessageHandlers: Set<(event: MessageEvent) => void> = new Set();
     private accessToken: string | null = null;
     private isAuthenticated: boolean = false;
-    private pendingOperations: (() => void)[] = [];
+    private reconnectAttempts: number = 0;
+    private maxReconnectAttempts: number = 5;
+    private reconnectDelay: number = 1000; // Base delay of 1 second
+
+    private handlers = {
+        message: new Set<(event: MessageEvent) => void>(),
+        open: new Set<() => void>(),
+        close: new Set<() => void>(),
+        error: new Set<(error: any) => void>(),
+        subscriptions: new Map<string, (data: BoxSlice) => void>(),
+    };
 
     public setAccessToken(token: string) {
         this.accessToken = token;
@@ -25,157 +32,200 @@ class WebSocketClient {
 
     public connect() {
         const wsUrl = process.env.NEXT_PUBLIC_WS_URL;
-        if (!this.canConnect(wsUrl)) return;
+        if (!wsUrl || !this.accessToken) {
+            console.error('Cannot connect: missing URL or access token');
+            return;
+        }
 
         try {
-            this.initializeConnection(wsUrl!);
+            this.socket = new WebSocket(wsUrl);
+            this.socket.binaryType = 'arraybuffer';
+            this.setupEventHandlers();
         } catch (error) {
-            console.error('❌ Failed to create WebSocket connection:', error);
+            console.error('WebSocket connection failed:', error);
+            this.handleReconnect();
         }
-    }
-
-    private canConnect(wsUrl: string | undefined): boolean {
-        if (!wsUrl) {
-            console.error('WebSocket URL is not defined in environment variables');
-            return false;
-        }
-        if (!this.accessToken) {
-            console.error('Access token not set. Cannot connect to WebSocket.');
-            return false;
-        }
-        return true;
-    }
-
-    private initializeConnection(wsUrl: string) {
-        this.socket = new WebSocket(wsUrl);
-        this.socket.binaryType = 'arraybuffer';
-        this.setupEventHandlers();
     }
 
     private setupEventHandlers() {
         if (!this.socket) return;
 
-        this.socket.onopen = () => this.handleOpen();
-        this.socket.onmessage = (event) => this.handleMessage(event);
-        this.socket.onerror = (error) => this.handleError(error);
-        this.socket.onclose = (event) => this.handleClose(event);
-    }
+        this.socket.onopen = () => {
+            console.log('WebSocket connected');
+            this.authenticate();
+            this.reconnectAttempts = 0;
+        };
 
-    private handleOpen() {
-        // console.log('🟢 WebSocket connection opened');
-        this.authenticate();
+        this.socket.onmessage = this.handleMessage.bind(this);
+        this.socket.onerror = this.handleError.bind(this);
+        this.socket.onclose = this.handleClose.bind(this);
     }
 
     private handleMessage(event: MessageEvent) {
         try {
-            let message;
+            let message: WebSocketMessage;
+
+            // Handle binary messages (msgpackr encoded from Bun)
             if (event.data instanceof ArrayBuffer) {
                 const uint8Array = new Uint8Array(event.data);
-                message = decode(uint8Array);
-            } else {
+                message = decode(uint8Array) as WebSocketMessage;
+            }
+            // Handle text messages (JSON)
+            else if (typeof event.data === 'string') {
                 message = JSON.parse(event.data);
+            } else {
+                throw new Error(`Unsupported message format: ${typeof event.data}`);
             }
 
             this.processMessage(message);
         } catch (error) {
-            console.error('❌ Error processing WebSocket message:', error, {
-                dataType: event.data?.constructor?.name,
-                messageLength: event.data?.byteLength,
-            });
+            console.error('Error processing message:', error);
+            this.handlers.error.forEach((handler) => handler(error));
         }
     }
 
     private processMessage(message: WebSocketMessage) {
-        const timestamp = new Date().toISOString();
-
         switch (message.type) {
-            case 'boxSlice':
-                this.handleBoxSliceMessage(message, timestamp);
-                break;
             case 'ack':
-                this.handleAckMessage(message);
+                if (message.message === 'auth operation successful') {
+                    this.isAuthenticated = true;
+                    this.handlers.open.forEach((handler) => handler());
+                    this.resubscribeAll();
+                }
                 break;
+
+            case 'boxSlice':
+                if (message.pair && message.data) {
+                    const handler = this.handlers.subscriptions.get(message.pair);
+                    if (handler) {
+                        const boxSlice: BoxSlice = {
+                            boxes: message.data.boxes || [],
+                            timestamp: message.data.timestamp || new Date().toISOString(),
+                            currentOHLC: message.data.currentOHLC,
+                        };
+                        handler(boxSlice);
+                    }
+                }
+                break;
+
             case 'price':
-                // Just pass the message to global handlers
-                this.globalMessageHandlers.forEach((handler) => handler(new MessageEvent('message', { data: JSON.stringify(message) })));
+                this.handlers.message.forEach((handler) => handler(new MessageEvent('message', { data: JSON.stringify(message) })));
+                break;
+
+            case 'error':
+                console.error('Server error:', message.message);
+                this.handlers.error.forEach((handler) => handler(message));
                 break;
         }
-    }
-
-    private handleAckMessage(message: any) {
-        if (message.message === 'auth operation successful') {
-            this.handleAuthSuccess();
-        } else {
-            // console.log('✅ Received ack:', message);
-        }
-    }
-
-    private handleAuthSuccess() {
-        // console.log('🟢 Authentication successful');
-        this.isAuthenticated = true;
-        // Delay the open handlers slightly to ensure price data is loaded
-        setTimeout(() => {
-            this.openHandlers.forEach((handler) => handler());
-            this.processPendingOperations();
-        }, 100);
     }
 
     private handleError(error: Event) {
-        console.error('🔴 WebSocket error:', error);
+        console.error('WebSocket error:', error);
+        this.handlers.error.forEach((handler) => handler(error));
     }
 
     private handleClose(event: CloseEvent) {
-        this.cleanupConnection();
-        this.scheduleReconnect(event);
-    }
-
-    private cleanupConnection() {
         this.isAuthenticated = false;
+        this.handlers.close.forEach((handler) => handler());
+        this.handleReconnect();
     }
 
-    private scheduleReconnect(event: CloseEvent) {
-        setTimeout(() => this.connect(), 5000);
+    private handleReconnect() {
+        if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+            console.error('Max reconnection attempts reached');
+            return;
+        }
+
+        const delay = Math.min(this.reconnectDelay * Math.pow(2, this.reconnectAttempts), 30000);
+        this.reconnectAttempts++;
+
+        console.log(`Reconnecting in ${delay}ms... (attempt ${this.reconnectAttempts})`);
+        setTimeout(() => this.connect(), delay);
     }
 
+    private authenticate() {
+        if (!this.socket || this.socket.readyState !== WebSocket.OPEN || !this.accessToken) {
+            return;
+        }
+
+        this.socket.send(
+            JSON.stringify({
+                type: 'auth',
+                token: this.accessToken,
+            })
+        );
+    }
+
+    private resubscribeAll() {
+        if (!this.isAuthenticated || !this.socket) return;
+
+        const pairs = Array.from(this.handlers.subscriptions.keys());
+        if (pairs.length > 0) {
+            this.socket.send(
+                JSON.stringify({
+                    type: 'subscribe',
+                    pairs,
+                })
+            );
+        }
+    }
+
+    // Public API
     public onOpen(handler: () => void) {
-        this.openHandlers.add(handler);
+        this.handlers.open.add(handler);
     }
 
     public offOpen(handler: () => void) {
-        this.openHandlers.delete(handler);
+        this.handlers.open.delete(handler);
     }
 
     public onClose(handler: () => void) {
-        this.closeHandlers.add(handler);
+        this.handlers.close.add(handler);
     }
 
     public offClose(handler: () => void) {
-        this.closeHandlers.delete(handler);
+        this.handlers.close.delete(handler);
+    }
+
+    public onError(handler: (error: any) => void) {
+        this.handlers.error.add(handler);
+    }
+
+    public offError(handler: (error: any) => void) {
+        this.handlers.error.delete(handler);
     }
 
     public onMessage(handler: (event: MessageEvent) => void) {
-        this.globalMessageHandlers.add(handler);
+        this.handlers.message.add(handler);
     }
 
     public offMessage(handler: (event: MessageEvent) => void) {
-        this.globalMessageHandlers.delete(handler);
+        this.handlers.message.delete(handler);
     }
 
     public subscribe(pair: string, handler: (data: BoxSlice) => void) {
-        this.subscriptions.add(pair);
-        this.messageHandlers.set(pair, handler);
+        this.handlers.subscriptions.set(pair, handler);
+
         if (this.isAuthenticated && this.socket?.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify({ type: 'subscribe', pairs: [pair] }));
-        } else {
-            this.pendingOperations.push(() => this.subscribe(pair, handler));
+            this.socket.send(
+                JSON.stringify({
+                    type: 'subscribe',
+                    pairs: [pair],
+                })
+            );
         }
     }
 
     public unsubscribe(pair: string) {
-        this.subscriptions.delete(pair);
-        this.messageHandlers.delete(pair);
+        this.handlers.subscriptions.delete(pair);
+
         if (this.socket?.readyState === WebSocket.OPEN) {
-            this.socket.send(JSON.stringify({ type: 'unsubscribe', pairs: [pair] }));
+            this.socket.send(
+                JSON.stringify({
+                    type: 'unsubscribe',
+                    pairs: [pair],
+                })
+            );
         }
     }
 
@@ -184,40 +234,17 @@ class WebSocketClient {
             this.socket.close();
             this.socket = null;
         }
-    }
 
-    private authenticate() {
-        if (this.socket?.readyState === WebSocket.OPEN && this.accessToken) {
-            // console.log(' Sending authentication message');
-            this.socket.send(JSON.stringify({ type: 'auth', token: this.accessToken }));
-        } else {
-            console.warn('��️ Cannot authenticate - socket not ready or no token', {
-                readyState: this.socket?.readyState,
-                hasToken: !!this.accessToken,
-                socketState: this.socket ? ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][this.socket.readyState] : 'NO_SOCKET',
-            });
-        }
-    }
+        // Clear all handlers
+        this.handlers.message.clear();
+        this.handlers.open.clear();
+        this.handlers.close.clear();
+        this.handlers.error.clear();
+        this.handlers.subscriptions.clear();
 
-    private processPendingOperations() {
-        while (this.pendingOperations.length > 0) {
-            const operation = this.pendingOperations.shift();
-            operation?.();
-        }
-    }
-
-    private handleBoxSliceMessage(message: any, timestamp: string) {
-        if (message.pair && message.data) {
-            const handler = this.messageHandlers.get(message.pair);
-            if (handler) {
-                const boxSlice: BoxSlice = {
-                    boxes: message.data.boxes || [],
-                    timestamp: message.data.timestamp || timestamp,
-                    currentOHLC: message.data.currentOHLC,
-                };
-                handler(boxSlice);
-            }
-        }
+        // Reset state
+        this.isAuthenticated = false;
+        this.reconnectAttempts = 0;
     }
 }
 

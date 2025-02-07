@@ -5,7 +5,7 @@ import { LuBox, LuBoxes, LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, 
 import { useUser } from '@/providers/UserProvider';
 import type { BoxColors } from '@/types/types';
 import { cn } from '@/utils/cn';
-import { TimeFrameVisualizer } from './Visualizers';
+import { TimeFrameSlider } from '../TimeFrameSlider';
 
 interface ChartStyleOptionProps {
     id: string;
@@ -260,7 +260,7 @@ export const VisualizersView = () => {
                                             />
                                         </button>
                                     </div>
-                                    <TimeFrameVisualizer
+                                    <TimeFrameSlider
                                         startIndex={boxColors.styles?.startIndex ?? 0}
                                         maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
                                         boxes={[]}

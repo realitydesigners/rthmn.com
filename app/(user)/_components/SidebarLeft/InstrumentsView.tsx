@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
 import { useUser } from '@/providers/UserProvider';
@@ -54,10 +54,12 @@ interface PairItemProps {
     price?: number;
 }
 
-const PairItem: React.FC<PairItemProps> = ({ item, isSelected = false, onToggle, price }) => {
+const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProps, 'price'>) => {
     const { currentStepId } = useOnboardingStore();
     const { boxColors } = useUser();
+    const { priceData } = useWebSocket();
     const isOnboardingActive = currentStepId === 'instruments';
+    const price = priceData[item]?.price;
 
     return (
         <div
@@ -133,7 +135,7 @@ const PairItem: React.FC<PairItemProps> = ({ item, isSelected = false, onToggle,
             </div>
         </div>
     );
-};
+});
 
 interface PairGroupProps {
     label: string;
@@ -142,7 +144,7 @@ interface PairGroupProps {
     isSelected?: boolean;
 }
 
-const PairGroup: React.FC<PairGroupProps> = ({ label, items, count, isSelected = false }) => {
+const PairGroup = memo(({ label, items, count, isSelected = false }: PairGroupProps) => {
     return (
         <div className='mb-4'>
             <div className='font-kodemono mb-2 flex h-8 items-center text-xs font-medium tracking-wider text-[#818181]'>
@@ -155,14 +157,102 @@ const PairGroup: React.FC<PairGroupProps> = ({ label, items, count, isSelected =
             <div className='space-y-1'>{items}</div>
         </div>
     );
+});
+
+// Memoized search result item component
+const SearchResultItem = memo(({ pair, isSelected, onSelect }: { pair: string; isSelected: boolean; onSelect: () => void }) => {
+    const { boxColors } = useUser();
+    const { priceData } = useWebSocket();
+    const price = priceData[pair]?.price;
+
+    return (
+        <div
+            className={cn('group/result relative flex h-10 items-center justify-between px-3 transition-all duration-300', isSelected ? 'bg-[#141414]/90' : 'hover:bg-[#111]/90')}
+            onClick={onSelect}>
+            {/* Left side */}
+            <div className='flex items-center gap-3'>
+                <div className='relative flex h-8 w-8 items-center justify-center'>
+                    <div
+                        className={cn('absolute h-4 w-4 rounded-full transition-all duration-300', isSelected ? 'opacity-10' : 'opacity-0 group-hover/result:opacity-5')}
+                        style={{
+                            background: isSelected ? `radial-gradient(circle at center, ${boxColors.positive}, ${boxColors.negative})` : '#333',
+                        }}
+                    />
+                    <div
+                        className={cn('h-1.5 w-1.5 rounded-full transition-all duration-300', isSelected ? 'scale-100' : 'scale-90 opacity-40')}
+                        style={{
+                            background: isSelected ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})` : '#333',
+                        }}
+                    />
+                </div>
+                <span className={cn('font-outfit text-[13px] font-bold tracking-wide transition-colors', isSelected ? 'text-white' : 'text-[#666] group-hover/result:text-[#888]')}>
+                    {pair}
+                </span>
+            </div>
+
+            {/* Right side */}
+            <div className='flex items-center gap-3'>
+                <span
+                    className={cn(
+                        'font-kodemono text-[13px] tracking-wider transition-colors',
+                        isSelected ? 'text-[#999]' : 'text-[#444] group-hover/result:text-[#666]',
+                        'flex w-[70px] items-center justify-end'
+                    )}>
+                    {price ? formatPrice(price, pair) : 'N/A'}
+                </span>
+                <button
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onSelect();
+                    }}
+                    className={cn(
+                        'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
+                        'opacity-0 group-hover/result:opacity-100',
+                        isSelected
+                            ? ['border-[#333] bg-[#1A1A1A] text-[#666]', 'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400']
+                            : ['border-[#222] bg-[#141414] text-[#666]', 'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400']
+                    )}>
+                    {isSelected ? <FaTimes size={8} /> : <span className='text-[9px] font-medium'>+</span>}
+                </button>
+            </div>
+        </div>
+    );
+});
+
+// Memoized filtered pairs calculation
+const useFilteredPairs = (searchQuery: string, selectedPairs: string[]) => {
+    return useMemo(() => {
+        if (!searchQuery) return [];
+
+        const allPairs = [...FOREX_PAIRS, ...CRYPTO_PAIRS, ...EQUITY_PAIRS, ...ETF_PAIRS];
+        return allPairs
+            .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
+            .sort((a, b) => {
+                const aSelected = selectedPairs.includes(a);
+                const bSelected = selectedPairs.includes(b);
+                if (aSelected && !bSelected) return -1;
+                if (!aSelected && bSelected) return 1;
+                return 0;
+            });
+    }, [searchQuery, selectedPairs]);
 };
 
-const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching: boolean) => void }) => {
+const SearchBar = memo(({ onSearchStateChange }: { onSearchStateChange: (isSearching: boolean) => void }) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [showResults, setShowResults] = useState(false);
-    const { selectedPairs, togglePair, boxColors } = useUser();
-    const { priceData } = useWebSocket();
+    const { selectedPairs, togglePair } = useUser();
     const searchRef = useRef<HTMLDivElement>(null);
+
+    const filteredPairs = useFilteredPairs(searchQuery, selectedPairs);
+
+    const handleToggle = useCallback(
+        (pair: string) => {
+            togglePair(pair);
+            setSearchQuery('');
+            setShowResults(false);
+        },
+        [togglePair]
+    );
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -179,22 +269,6 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
     useEffect(() => {
         onSearchStateChange(showResults && !!searchQuery);
     }, [showResults, searchQuery, onSearchStateChange]);
-
-    const getFilteredPairs = () => {
-        if (!searchQuery) return [];
-
-        const allPairs = [...FOREX_PAIRS, ...CRYPTO_PAIRS, ...EQUITY_PAIRS, ...ETF_PAIRS];
-        return allPairs
-            .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
-            .sort((a, b) => {
-                // Sort selected pairs to the top
-                const aSelected = selectedPairs.includes(a);
-                const bSelected = selectedPairs.includes(b);
-                if (aSelected && !bSelected) return -1;
-                if (!aSelected && bSelected) return 1;
-                return 0;
-            });
-    };
 
     return (
         <div className='relative' ref={searchRef}>
@@ -238,79 +312,10 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
             {showResults && searchQuery && (
                 <div className='absolute top-full right-0 left-0 z-10 overflow-hidden bg-[#0C0C0C] pt-2 shadow-lg'>
                     <div className='max-h-[280px] overflow-y-auto rounded-lg border border-[#222]'>
-                        {getFilteredPairs().map((pair) => {
-                            const isSelected = selectedPairs.includes(pair);
-                            return (
-                                <div
-                                    key={pair}
-                                    className={cn(
-                                        'group/result relative flex h-10 items-center justify-between px-3 transition-all duration-300',
-                                        isSelected ? 'bg-[#141414]/90' : 'hover:bg-[#111]/90'
-                                    )}
-                                    onClick={() => {
-                                        togglePair(pair);
-                                        setSearchQuery('');
-                                        setShowResults(false);
-                                    }}>
-                                    {/* Left side */}
-                                    <div className='flex items-center gap-3'>
-                                        <div className='relative flex h-8 w-8 items-center justify-center'>
-                                            <div
-                                                className={cn(
-                                                    'absolute h-4 w-4 rounded-full transition-all duration-300',
-                                                    isSelected ? 'opacity-10' : 'opacity-0 group-hover/result:opacity-5'
-                                                )}
-                                                style={{
-                                                    background: isSelected ? `radial-gradient(circle at center, ${boxColors.positive}, ${boxColors.negative})` : '#333',
-                                                }}
-                                            />
-                                            <div
-                                                className={cn('h-1.5 w-1.5 rounded-full transition-all duration-300', isSelected ? 'scale-100' : 'scale-90 opacity-40')}
-                                                style={{
-                                                    background: isSelected ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})` : '#333',
-                                                }}
-                                            />
-                                        </div>
-                                        <span
-                                            className={cn(
-                                                'font-outfit text-[13px] font-bold tracking-wide transition-colors',
-                                                isSelected ? 'text-white' : 'text-[#666] group-hover/result:text-[#888]'
-                                            )}>
-                                            {pair}
-                                        </span>
-                                    </div>
-
-                                    {/* Right side */}
-                                    <div className='flex items-center gap-3'>
-                                        <span
-                                            className={cn(
-                                                'font-kodemono text-[13px] tracking-wider transition-colors',
-                                                isSelected ? 'text-[#999]' : 'text-[#444] group-hover/result:text-[#666]',
-                                                'flex w-[70px] items-center justify-end'
-                                            )}>
-                                            {priceData[pair]?.price ? formatPrice(priceData[pair].price, pair) : 'N/A'}
-                                        </span>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                togglePair(pair);
-                                                setSearchQuery('');
-                                                setShowResults(false);
-                                            }}
-                                            className={cn(
-                                                'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
-                                                'opacity-0 group-hover/result:opacity-100',
-                                                isSelected
-                                                    ? ['border-[#333] bg-[#1A1A1A] text-[#666]', 'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400']
-                                                    : ['border-[#222] bg-[#141414] text-[#666]', 'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400']
-                                            )}>
-                                            {isSelected ? <FaTimes size={8} /> : <span className='text-[9px] font-medium'>+</span>}
-                                        </button>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                        {getFilteredPairs().length === 0 && (
+                        {filteredPairs.map((pair) => (
+                            <SearchResultItem key={pair} pair={pair} isSelected={selectedPairs.includes(pair)} onSelect={() => handleToggle(pair)} />
+                        ))}
+                        {filteredPairs.length === 0 && (
                             <div className='flex h-20 items-center justify-center text-center text-[13px] text-[#666]'>No instruments found matching "{searchQuery}"</div>
                         )}
                     </div>
@@ -318,30 +323,39 @@ const SearchBar = ({ onSearchStateChange }: { onSearchStateChange: (isSearching:
             )}
         </div>
     );
-};
+});
 
 export const InstrumentsView = () => {
     const { selectedPairs, togglePair } = useUser();
     const { priceData } = useWebSocket();
     const [isSearching, setIsSearching] = useState(false);
 
-    // Render selected pairs
-    const selectedPairsItems = selectedPairs.map((item) => <PairItem key={item} item={item} isSelected={true} onToggle={() => togglePair(item)} price={priceData[item]?.price} />);
+    // Memoized selected pairs items
+    const selectedPairsItems = useMemo(
+        () => selectedPairs.map((item) => <PairItem key={item} item={item} isSelected={true} onToggle={() => togglePair(item)} />),
+        [selectedPairs, togglePair]
+    );
 
-    // Group available pairs by category
-    const availablePairsGroups = [
-        { label: 'FX', items: FOREX_PAIRS },
-        { label: 'CRYPTO', items: CRYPTO_PAIRS },
-        { label: 'STOCKS', items: EQUITY_PAIRS },
-        { label: 'ETF', items: ETF_PAIRS },
-    ].map((group) => {
-        const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
-        if (availablePairs.length === 0) return null;
+    // Memoized available pairs groups
+    const availablePairsGroups = useMemo(
+        () =>
+            [
+                { label: 'FX', items: FOREX_PAIRS },
+                { label: 'CRYPTO', items: CRYPTO_PAIRS },
+                { label: 'STOCKS', items: EQUITY_PAIRS },
+                { label: 'ETF', items: ETF_PAIRS },
+            ]
+                .map((group) => {
+                    const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
+                    if (availablePairs.length === 0) return null;
 
-        const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => togglePair(item)} price={priceData[item]?.price} />);
+                    const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => togglePair(item)} />);
 
-        return <PairGroup key={group.label} label={group.label} items={items} count={availablePairs.length} />;
-    });
+                    return <PairGroup key={group.label} label={group.label} items={items} count={availablePairs.length} />;
+                })
+                .filter(Boolean),
+        [selectedPairs, togglePair]
+    );
 
     return (
         <div className='flex h-full flex-col'>

@@ -1,10 +1,18 @@
 'use client';
 
-import React, { createContext, useEffect, useState, use } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import { BoxColors } from '@/types/types';
-import { DEFAULT_BOX_COLORS, FullPreset, fullPresets, getBoxColors, getSelectedPairs, getSidebarState, setBoxColors, setSelectedPairs } from '@/utils/localStorage';
+import type { BoxColors } from '@/types/types';
+import {
+    DEFAULT_BOX_COLORS,
+    FullPreset,
+    fullPresets,
+    getBoxColors as getStoredBoxColors,
+    getSelectedPairs,
+    setBoxColors as setStoredBoxColors,
+    setSelectedPairs,
+} from '@/utils/localStorage';
 
 interface UserContextType {
     selectedPairs: string[];
@@ -14,23 +22,27 @@ interface UserContextType {
     togglePair: (pair: string) => void;
     updateBoxColors: (colors: BoxColors) => void;
     handleSidebarClick: (e: React.MouseEvent) => void;
-    DEFAULT_BOX_COLORS: BoxColors;
     fullPresets: FullPreset[];
+    getComputedBoxColors: (value: number) => {
+        baseColor: string;
+        opacity: number;
+        shadowIntensity: number;
+        shadowY: number;
+        shadowBlur: number;
+        shadowColor: (alpha: number) => string;
+    };
+    getBoxStyles: (isFirstDifferent: boolean, value: number) => React.CSSProperties;
 }
 
-const UserContext = createContext<UserContextType | undefined>(undefined);
+const UserContext = createContext<UserContextType | null>(null);
 
-export const useUser = () => {
-    const context = use(UserContext);
-    if (!context) {
-        throw new Error('useUser must be used within a UserProvider');
-    }
-    return context;
-};
+// Color computation cache
+const colorCache = new Map<string, any>();
+const styleCache = new Map<string, React.CSSProperties>();
 
-export default function UserProvider({ children }: { children: React.ReactNode }) {
+export function UserProvider({ children }: { children: React.ReactNode }) {
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
-    const [boxColorsState, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
+    const [boxColors, setBoxColorsState] = useState<BoxColors>(DEFAULT_BOX_COLORS);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
     const [gridClass, setGridClass] = useState('');
     const router = useRouter();
@@ -49,7 +61,7 @@ export default function UserProvider({ children }: { children: React.ReactNode }
     // Initialize state and fetch all initial data
     useEffect(() => {
         const initializeData = async () => {
-            const storedColors = getBoxColors();
+            const storedColors = getStoredBoxColors();
             const storedPairs = getSelectedPairs();
             setBoxColorsState(storedColors);
             setSelectedPairsState(storedPairs);
@@ -61,7 +73,6 @@ export default function UserProvider({ children }: { children: React.ReactNode }
 
     // Grid layout management
     useEffect(() => {
-        // Only update grid class after sidebars are initialized
         if (!isSidebarInitialized) {
             setGridClass('invisible');
             return;
@@ -74,7 +85,6 @@ export default function UserProvider({ children }: { children: React.ReactNode }
             const width = main.clientWidth;
             const baseClasses = 'grid w-full gap-4 transition-all duration-300 ';
 
-            // Add appropriate grid-cols based on width
             if (width <= 600) {
                 setGridClass(`${baseClasses} grid-cols-1`);
             } else if (width <= 1280) {
@@ -86,7 +96,6 @@ export default function UserProvider({ children }: { children: React.ReactNode }
             }
         };
 
-        // Set up resize observer for main element
         const resizeObserver = new ResizeObserver(() => {
             requestAnimationFrame(handleResize);
         });
@@ -94,59 +103,133 @@ export default function UserProvider({ children }: { children: React.ReactNode }
         const main = document.querySelector('main');
         if (main) {
             resizeObserver.observe(main);
-            handleResize(); // Initial measurement
+            handleResize();
         }
-
-        // Listen for sidebar state changes
-        const handleStorageChange = () => {
-            // Wait for sidebar transition to complete before measuring
-            setTimeout(handleResize, 150);
-        };
-
-        window.addEventListener('storage', handleStorageChange);
-        window.addEventListener('sidebarStateChange', handleStorageChange);
 
         return () => {
             resizeObserver.disconnect();
-            window.removeEventListener('storage', handleStorageChange);
-            window.removeEventListener('sidebarStateChange', handleStorageChange);
         };
     }, [isSidebarInitialized]);
 
-    const togglePair = (pair: string) => {
-        const wasSelected = selectedPairs.includes(pair);
-        const newSelected = wasSelected ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
-        setSelectedPairsState(newSelected);
-        setSelectedPairs(newSelected);
-    };
+    // Memoized color computation function
+    const getComputedBoxColors = useCallback(
+        (value: number) => {
+            const cacheKey = `${value}-${boxColors.positive}-${boxColors.negative}-${JSON.stringify(boxColors.styles)}`;
 
-    const updateBoxColors = (colors: BoxColors) => {
-        setBoxColors(colors);
-        setBoxColorsState(colors);
-    };
+            if (colorCache.has(cacheKey)) {
+                return colorCache.get(cacheKey);
+            }
 
-    const handleSidebarClick = (e: React.MouseEvent) => {
+            const baseColor = value > 0 ? boxColors.positive : boxColors.negative;
+            const opacity = boxColors.styles?.opacity ?? 0.2;
+            const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
+            const shadowY = Math.floor(shadowIntensity * 16);
+            const shadowBlur = Math.floor(shadowIntensity * 80);
+            const shadowColor = (alpha: number) => (value > 0 ? boxColors.positive : boxColors.negative).replace(')', `, ${alpha})`);
+
+            const computedColors = {
+                baseColor,
+                opacity,
+                shadowIntensity,
+                shadowY,
+                shadowBlur,
+                shadowColor,
+            };
+
+            colorCache.set(cacheKey, computedColors);
+            if (colorCache.size > 1000) {
+                const entries = Array.from(colorCache.entries());
+                entries.slice(0, entries.length - 500).forEach(([k]) => colorCache.delete(k));
+            }
+
+            return computedColors;
+        },
+        [boxColors.positive, boxColors.negative, boxColors.styles?.opacity, boxColors.styles?.shadowIntensity]
+    );
+
+    // Memoized style computation function
+    const getBoxStyles = useCallback(
+        (isFirstDifferent: boolean, value: number) => {
+            const cacheKey = `${isFirstDifferent}-${value}-${JSON.stringify(boxColors.styles)}`;
+
+            if (styleCache.has(cacheKey)) {
+                return styleCache.get(cacheKey)!;
+            }
+
+            const colors = getComputedBoxColors(value);
+            const styles: React.CSSProperties = {
+                borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+                borderWidth: boxColors.styles?.showBorder ? '1px' : '0',
+                transition: 'all 0.15s ease-out',
+                background: `linear-gradient(to bottom right, ${colors.baseColor.replace(')', `, ${colors.opacity}`)} 100%, transparent 100%)`,
+                opacity: colors.opacity,
+                boxShadow: isFirstDifferent
+                    ? `inset 0 2px 15px ${colors.shadowColor(0.2)}`
+                    : `inset 0 ${colors.shadowY}px ${colors.shadowBlur}px ${colors.shadowColor(colors.shadowIntensity)}`,
+            };
+
+            styleCache.set(cacheKey, styles);
+            if (styleCache.size > 1000) {
+                const entries = Array.from(styleCache.entries());
+                entries.slice(0, entries.length - 500).forEach(([k]) => styleCache.delete(k));
+            }
+
+            return styles;
+        },
+        [boxColors.styles, getComputedBoxColors]
+    );
+
+    const togglePair = useCallback((pair: string) => {
+        setSelectedPairsState((prev) => {
+            const wasSelected = prev.includes(pair);
+            const newSelected = wasSelected ? prev.filter((p) => p !== pair) : [...prev, pair];
+            setSelectedPairs(newSelected);
+            return newSelected;
+        });
+    }, []);
+
+    const updateBoxColors = useCallback((newColors: BoxColors) => {
+        setBoxColorsState(newColors);
+        setStoredBoxColors(newColors);
+        colorCache.clear();
+        styleCache.clear();
+    }, []);
+
+    const handleSidebarClick = useCallback((e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
         if (target.closest('.sidebar-toggle') || target.closest('.sidebar-content') || target.closest('.fixed-sidebar')) {
             return;
         }
         window.dispatchEvent(new Event('closeSidebars'));
-    };
+    }, []);
+
+    const value = useMemo(
+        () => ({
+            selectedPairs,
+            boxColors,
+            isSidebarInitialized,
+            gridClass,
+            togglePair,
+            updateBoxColors,
+            handleSidebarClick,
+            fullPresets,
+            getComputedBoxColors,
+            getBoxStyles,
+        }),
+        [selectedPairs, boxColors, isSidebarInitialized, gridClass, togglePair, updateBoxColors, handleSidebarClick, getComputedBoxColors, getBoxStyles]
+    );
 
     return (
-        <UserContext
-            value={{
-                selectedPairs,
-                boxColors: boxColorsState,
-                isSidebarInitialized,
-                gridClass,
-                togglePair,
-                updateBoxColors,
-                handleSidebarClick,
-                DEFAULT_BOX_COLORS,
-                fullPresets,
-            }}>
+        <UserContext.Provider value={value}>
             <div onClick={handleSidebarClick}>{children}</div>
-        </UserContext>
+        </UserContext.Provider>
     );
+}
+
+export function useUser() {
+    const context = useContext(UserContext);
+    if (!context) {
+        throw new Error('useUser must be used within a UserProvider');
+    }
+    return context;
 }

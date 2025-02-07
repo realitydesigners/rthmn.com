@@ -1,3 +1,4 @@
+import React, { memo, useCallback } from 'react';
 import { BoxColors } from '@/utils/localStorage';
 import { StyleControl } from '@/app/(user)/_components/StyleControl';
 
@@ -9,7 +10,15 @@ interface BoxVisualizerProps {
     onStyleChange: (property: keyof BoxColors['styles'], value: number | boolean) => void;
 }
 
-export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }) => {
+export const BoxVisualizer = memo(({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }: BoxVisualizerProps) => {
+    const handleBorderRadiusChange = useCallback((value: number) => onStyleChange('borderRadius', value), [onStyleChange]);
+
+    const handleShadowIntensityChange = useCallback((value: number) => onStyleChange('shadowIntensity', value), [onStyleChange]);
+
+    const handleOpacityChange = useCallback((value: number) => onStyleChange('opacity', value), [onStyleChange]);
+
+    const handleBorderToggle = useCallback(() => onStyleChange('showBorder', !showBorder), [onStyleChange, showBorder]);
+
     return (
         <div className='space-y-2'>
             <div className='group relative flex flex-col overflow-hidden rounded-lg p-[1px] transition-all'>
@@ -48,17 +57,15 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
 
             {/* Enhanced Controls Container */}
             <div className='space-y-2 rounded-lg bg-black/30 p-4'>
-                <StyleControl label='Border Radius' value={borderRadius} onChange={(value) => onStyleChange('borderRadius', value)} min={0} max={16} step={1} unit='px' />
-                <StyleControl label='Shadow Depth' value={shadowIntensity} onChange={(value) => onStyleChange('shadowIntensity', value)} min={0} max={1} step={0.05} />
-                <StyleControl label='Opacity' value={opacity} onChange={(value) => onStyleChange('opacity', value)} min={0.01} max={1} step={0.05} />
+                <StyleControl label='Border Radius' value={borderRadius} onChange={handleBorderRadiusChange} min={0} max={16} step={1} unit='px' />
+                <StyleControl label='Shadow Depth' value={shadowIntensity} onChange={handleShadowIntensityChange} min={0} max={1} step={0.05} />
+                <StyleControl label='Opacity' value={opacity} onChange={handleOpacityChange} min={0.01} max={1} step={0.05} />
 
                 <div className='flex items-center justify-between px-1 py-2'>
                     <div className='space-y-1'>
                         <span className='font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase'>Show Border</span>
                     </div>
-                    <button
-                        onClick={() => onStyleChange('showBorder', !showBorder)}
-                        className={`relative h-6 w-11 rounded-full transition-all duration-300 ${showBorder ? 'bg-white/20' : 'bg-white/[0.03]'}`}>
+                    <button onClick={handleBorderToggle} className={`relative h-6 w-11 rounded-full transition-all duration-300 ${showBorder ? 'bg-white/20' : 'bg-white/[0.03]'}`}>
                         <div
                             className={`absolute top-1 h-4 w-4 rounded-full transition-all duration-300 ${
                                 showBorder ? 'left-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'left-1 bg-white/50'
@@ -69,4 +76,4 @@ export const BoxVisualizer: React.FC<BoxVisualizerProps> = ({ borderRadius, shad
             </div>
         </div>
     );
-};
+});

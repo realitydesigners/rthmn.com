@@ -1,54 +1,76 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useUser } from '@/providers/UserProvider';
 import type { BoxColors } from '@/types/types';
 import { BoxVisualizer } from '@/app/(user)/_components/SidebarRight/BoxVisualizer';
 import { ColorPresets } from './ColorPresets';
 import { CustomColorPicker } from './CustomColorPicker';
 
+// Memoized preset comparison function
+const useIsPresetSelected = (boxColors: BoxColors) => {
+    return useCallback(
+        (preset: any) => {
+            return (
+                boxColors.positive === preset.positive &&
+                boxColors.negative === preset.negative &&
+                boxColors.styles?.borderRadius === preset.styles.borderRadius &&
+                boxColors.styles?.shadowIntensity === preset.styles.shadowIntensity &&
+                boxColors.styles?.opacity === preset.styles.opacity &&
+                boxColors.styles?.showBorder === preset.styles.showBorder
+            );
+        },
+        [boxColors.positive, boxColors.negative, boxColors.styles?.borderRadius, boxColors.styles?.shadowIntensity, boxColors.styles?.opacity, boxColors.styles?.showBorder]
+    );
+};
+
+// Memoized preset click handler
+const useHandlePresetClick = (updateBoxColors: (colors: BoxColors) => void, boxColors: BoxColors) => {
+    return useCallback(
+        (preset: any) => {
+            updateBoxColors({
+                positive: preset.positive,
+                negative: preset.negative,
+                styles: {
+                    ...boxColors.styles,
+                    borderRadius: preset.styles.borderRadius,
+                    shadowIntensity: preset.styles.shadowIntensity,
+                    opacity: preset.styles.opacity,
+                    showBorder: preset.styles.showBorder,
+                    showLineChart: preset.styles.showLineChart,
+                    globalTimeframeControl: boxColors.styles?.globalTimeframeControl ?? false,
+                },
+            });
+        },
+        [updateBoxColors, boxColors.styles?.globalTimeframeControl]
+    );
+};
+
+// Memoized style change handler
+const useHandleStyleChange = (boxColors: BoxColors, updateBoxColors: (colors: BoxColors) => void) => {
+    return useCallback(
+        (property: keyof BoxColors['styles'], value: number | boolean) => {
+            if (!boxColors.styles) return;
+            updateBoxColors({
+                ...boxColors,
+                styles: {
+                    ...boxColors.styles,
+                    [property]: value,
+                },
+            });
+        },
+        [boxColors, updateBoxColors]
+    );
+};
+
 export const SettingsBar = () => {
     const { boxColors, updateBoxColors, fullPresets } = useUser();
     const [showColors, setShowColors] = useState(true);
     const [showBoxStyle, setShowBoxStyle] = useState(true);
 
-    const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
-        if (!boxColors.styles) return;
-        updateBoxColors({
-            ...boxColors,
-            styles: {
-                ...boxColors.styles,
-                [property]: value,
-            },
-        });
-    };
-
-    const handleFullPresetClick = (preset: any) => {
-        updateBoxColors({
-            positive: preset.positive,
-            negative: preset.negative,
-            styles: {
-                ...boxColors.styles,
-                borderRadius: preset.styles.borderRadius,
-                shadowIntensity: preset.styles.shadowIntensity,
-                opacity: preset.styles.opacity,
-                showBorder: preset.styles.showBorder,
-                showLineChart: preset.styles.showLineChart,
-                globalTimeframeControl: boxColors.styles?.globalTimeframeControl ?? false,
-            },
-        });
-    };
-
-    const isFullPresetSelected = (preset: any) => {
-        return (
-            boxColors.positive === preset.positive &&
-            boxColors.negative === preset.negative &&
-            boxColors.styles?.borderRadius === preset.styles.borderRadius &&
-            boxColors.styles?.shadowIntensity === preset.styles.shadowIntensity &&
-            boxColors.styles?.opacity === preset.styles.opacity &&
-            boxColors.styles?.showBorder === preset.styles.showBorder
-        );
-    };
+    const handleStyleChange = useHandleStyleChange(boxColors, updateBoxColors);
+    const handleFullPresetClick = useHandlePresetClick(updateBoxColors, boxColors);
+    const isFullPresetSelected = useIsPresetSelected(boxColors);
 
     return (
         <div className='flex h-full flex-col'>
