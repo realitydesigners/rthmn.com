@@ -16,11 +16,12 @@ interface TimeframeState {
     updatePairSettings: (pair: string, settings: Partial<TimeframeSettings>) => void;
     setGlobalControl: (isGlobal: boolean) => void;
     getSettingsForPair: (pair: string) => TimeframeSettings;
+    initializePair: (pair: string) => void;
 }
 
 const DEFAULT_SETTINGS: TimeframeSettings = {
     startIndex: 0,
-    maxBoxCount: 38,
+    maxBoxCount: 10,
 };
 
 export const useTimeframeStore = create<TimeframeState>()(
@@ -44,7 +45,7 @@ export const useTimeframeStore = create<TimeframeState>()(
                 set((state) => ({
                     pairs: {
                         ...state.pairs,
-                        [pair]: { ...state.pairs[pair], ...settings },
+                        [pair]: { ...DEFAULT_SETTINGS, ...state.pairs[pair], ...settings },
                     },
                 })),
 
@@ -72,10 +73,27 @@ export const useTimeframeStore = create<TimeframeState>()(
                     };
                 }),
 
+            initializePair: (pair) =>
+                set((state) => {
+                    if (!state.pairs[pair]) {
+                        return {
+                            pairs: {
+                                ...state.pairs,
+                                [pair]: { ...DEFAULT_SETTINGS },
+                            },
+                        };
+                    }
+                    return state;
+                }),
+
             getSettingsForPair: (pair) => {
                 const state = get();
                 if (state.global.isGlobalControl) {
                     return state.global.settings;
+                }
+                // Initialize pair if it doesn't exist
+                if (!state.pairs[pair]) {
+                    get().initializePair(pair);
                 }
                 return state.pairs[pair] || state.global.settings;
             },
