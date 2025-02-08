@@ -1,13 +1,14 @@
 import React, { memo, useCallback } from 'react';
-import { BoxColors } from '@/utils/localStorage';
 import { StyleControl } from '@/app/(user)/_components/StyleControl';
+
+type BoxStyleProperty = 'borderRadius' | 'shadowIntensity' | 'opacity' | 'showBorder';
 
 interface BoxVisualizerProps {
     borderRadius: number;
     shadowIntensity: number;
     opacity: number;
     showBorder: boolean;
-    onStyleChange: (property: keyof BoxColors['styles'], value: number | boolean) => void;
+    onStyleChange: (property: BoxStyleProperty, value: number | boolean) => void;
 }
 
 export const BoxVisualizer = memo(({ borderRadius, shadowIntensity, opacity, showBorder, onStyleChange }: BoxVisualizerProps) => {

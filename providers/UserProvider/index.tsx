@@ -3,7 +3,6 @@
 import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import type { BoxColors } from '@/types/types';
 import {
     DEFAULT_BOX_COLORS,
     FullPreset,
@@ -12,6 +11,7 @@ import {
     getSelectedPairs,
     setBoxColors as setStoredBoxColors,
     setSelectedPairs,
+    BoxColors,
 } from '@/utils/localStorage';
 
 interface UserContextType {
