@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
 import { ResoBox } from '@/app/(user)/_components/ResoBox';
 import { ResoChart } from '@/app/(user)/_components/ResoChart';
 import { BoxSlice, OHLC } from '@/types/types';
-import { BoxColors } from '@/utils/localStorage';
+import type { BoxColors } from '@/stores/colorStore';
 import { INSTRUMENTS } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useWebSocket } from '@/providers/WebsocketProvider';

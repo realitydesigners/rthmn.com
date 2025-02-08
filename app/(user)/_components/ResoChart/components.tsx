@@ -1,14 +1,6 @@
-import React from 'react';
-import { BoxColors } from '@/utils/localStorage';
-
-export interface PriceLine {
-    price: number;
-    y: number;
-    x1: number;
-    x2: number;
-    isPositive: boolean;
-    intersectX: number;
-}
+import React, { memo } from 'react';
+import type { BoxColors } from '@/stores/colorStore';
+import type { PriceLine } from './types';
 
 type Point = [number, number];
 
@@ -30,16 +22,27 @@ export const ChartGradients = ({ boxColors }: { boxColors: BoxColors }) => (
 export const PriceLines = ({ priceLines, boxColors }: { priceLines: PriceLine[]; boxColors: BoxColors }) => (
     <>
         {priceLines.map((line, index) => (
-            <line
-                key={`line-${index}`}
-                x1={!isNaN(line.x1) ? line.x1 : 0}
-                y1={!isNaN(line.y) ? line.y : 0}
-                x2={line.x2}
-                y2={!isNaN(line.y) ? line.y : 0}
-                stroke={line.isPositive ? boxColors.positive : boxColors.negative}
-                strokeWidth='1'
-                strokeDasharray='1,3'
-            />
+            <g key={`line-${index}`}>
+                <line
+                    x1={!isNaN(line.x1) ? line.x1 : 0}
+                    y1={!isNaN(line.y) ? line.y : 0}
+                    x2={line.x2}
+                    y2={!isNaN(line.y) ? line.y : 0}
+                    stroke={line.isPositive ? boxColors.positive : boxColors.negative}
+                    strokeWidth='2'
+                    strokeOpacity='0.05'
+                />
+                <line
+                    x1={!isNaN(line.x1) ? line.x1 : 0}
+                    y1={!isNaN(line.y) ? line.y : 0}
+                    x2={line.x2}
+                    y2={!isNaN(line.y) ? line.y : 0}
+                    stroke={line.isPositive ? boxColors.positive : boxColors.negative}
+                    strokeWidth='.5'
+                    strokeDasharray='2,4'
+                    strokeOpacity='0.3'
+                />
+            </g>
         ))}
     </>
 );

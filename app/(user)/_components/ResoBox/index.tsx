@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, memo, useMemo } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
 import { INSTRUMENTS } from '@/utils/instruments';
-import { BoxColors } from '@/utils/localStorage';
+import type { BoxColors } from '@/stores/colorStore';
 import { useUser } from '@/providers/UserProvider';
 
 const getInstrumentDigits = (pair: string): number => {

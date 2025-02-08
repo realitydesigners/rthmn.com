@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { useUser } from '@/providers/UserProvider';
-import type { BoxColors } from '@/types/types';
 import { BoxVisualizer } from '@/app/(user)/_components/SidebarRight/BoxVisualizer';
 import { ColorPresets } from './ColorPresets';
 import { CustomColorPicker } from './CustomColorPicker';
+import { useUser } from '@/providers/UserProvider';
+import { usePresetStore } from '@/stores/presetStore';
+import type { BoxColors } from '@/stores/colorStore';
 
 // Memoized preset comparison function
 const useIsPresetSelected = (boxColors: BoxColors) => {
@@ -64,7 +65,8 @@ const useHandleStyleChange = (boxColors: BoxColors, updateBoxColors: (colors: Bo
 };
 
 export const SettingsBar = () => {
-    const { boxColors, updateBoxColors, fullPresets } = useUser();
+    const { boxColors, updateBoxColors } = useUser();
+    const presets = usePresetStore((state) => state.presets);
     const [showColors, setShowColors] = useState(true);
     const [showBoxStyle, setShowBoxStyle] = useState(true);
 
@@ -79,7 +81,7 @@ export const SettingsBar = () => {
                 <div className='flex flex-col gap-2'>
                     {showColors && (
                         <>
-                            <ColorPresets fullPresets={fullPresets} boxColors={boxColors} onPresetClick={handleFullPresetClick} isPresetSelected={isFullPresetSelected} />
+                            <ColorPresets fullPresets={presets} boxColors={boxColors} onPresetClick={handleFullPresetClick} isPresetSelected={isFullPresetSelected} />
                             <CustomColorPicker boxColors={boxColors} onColorChange={updateBoxColors} />
                         </>
                     )}

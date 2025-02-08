@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useEffect, useRef, useContext, useState, useCallback, useMemo } from 'react';
+import React, { createContext, useEffect, useRef, use, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
@@ -161,7 +161,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 // Custom hook with proper error handling
 export function useDashboard() {
-    const context = useContext(DashboardContext);
+    const context = use(DashboardContext);
     if (!context) {
         throw new Error('useDashboard must be used within a DashboardProvider');
     }

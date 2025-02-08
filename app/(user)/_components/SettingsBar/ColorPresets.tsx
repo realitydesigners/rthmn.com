@@ -1,16 +1,16 @@
 import React, { memo } from 'react';
 import { cn } from '@/utils/cn';
 import type { BoxColors } from '@/types/types';
-import type { FullPreset } from '@/utils/localStorage';
+import type { Preset } from '@/stores/presetStore';
 
 interface ColorPresetsProps {
-    fullPresets: FullPreset[];
+    fullPresets: Preset[];
     boxColors: BoxColors;
-    onPresetClick: (preset: FullPreset) => void;
-    isPresetSelected: (preset: FullPreset) => boolean;
+    onPresetClick: (preset: Preset) => void;
+    isPresetSelected: (preset: Preset) => boolean;
 }
 
-const PresetButton = memo(({ preset, isSelected, onClick }: { preset: FullPreset; isSelected: boolean; onClick: () => void }) => (
+const PresetButton = memo(({ preset, isSelected, onClick }: { preset: Preset; isSelected: boolean; onClick: () => void }) => (
     <button
         onClick={onClick}
         className={cn(
