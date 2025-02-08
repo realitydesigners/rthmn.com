@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, memo } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
 import { BoxColors } from '@/utils/localStorage';
+import { useUser } from '@/providers/UserProvider';
+import { useTimeframeStore } from '@/stores/timeframeStore';
 
 interface ResoChartProps {
     slice: BoxSlice | null;
@@ -10,10 +12,26 @@ interface ResoChartProps {
     className?: string;
     digits: number;
     showSidebar: boolean;
+    pair?: string;
 }
 
-export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, className = '', digits, showSidebar }) => {
-    console.log(slice);
+export const ResoChart = memo(({ slice, boxColors: propBoxColors, pair = '', className = '', digits, showSidebar }: ResoChartProps) => {
+    const { boxColors: userBoxColors } = useUser();
+    const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
+
+    // Merge boxColors from props with userBoxColors, preferring props
+    const mergedBoxColors = useMemo(() => {
+        if (!propBoxColors) return userBoxColors;
+        return {
+            ...userBoxColors,
+            ...propBoxColors,
+            styles: {
+                ...userBoxColors.styles,
+                ...propBoxColors.styles,
+            },
+        };
+    }, [propBoxColors, userBoxColors]);
+
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -50,16 +68,15 @@ export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, classNam
 
     const selectedBoxes = useMemo(() => {
         if (!slice?.boxes?.length) return [];
-        const boxes = slice.boxes.slice(boxColors.styles?.startIndex ?? 0, (boxColors.styles?.startIndex ?? 0) + (boxColors.styles?.maxBoxCount ?? slice.boxes.length));
+        const boxes = slice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount);
         console.log('Boxes in view:', {
             total: slice.boxes.length,
-            startIndex: boxColors.styles?.startIndex ?? 0,
-            maxBoxCount: boxColors.styles?.maxBoxCount ?? slice.boxes.length,
-            visibleBoxes: boxes,
-            sortedBoxes: [...boxes].sort((a, b) => Math.abs(b.value) - Math.abs(a.value)),
+            startIndex: settings.startIndex,
+            maxBoxCount: settings.maxBoxCount,
+            selected: boxes.length,
         });
         return boxes;
-    }, [slice?.boxes, boxColors.styles?.maxBoxCount, boxColors.styles?.startIndex]);
+    }, [slice?.boxes, settings.startIndex, settings.maxBoxCount]);
 
     const { points, priceLines, prices } = useLinePoints(selectedBoxes, dimensions.height, dimensions.width);
 
@@ -71,14 +88,14 @@ export const ResoChart: React.FC<ResoChartProps> = ({ slice, boxColors, classNam
         <div ref={containerRef} className={`relative flex h-full w-full ${className}`}>
             <div className='relative h-full flex-1 overflow-visible'>
                 <svg className='h-full w-full overflow-visible' preserveAspectRatio='none'>
-                    <ChartSegments points={points} priceLines={priceLines} boxColors={boxColors} />
-                    <PriceLines priceLines={priceLines} boxColors={boxColors} />
+                    <ChartSegments points={points} priceLines={priceLines} boxColors={mergedBoxColors} />
+                    <PriceLines priceLines={priceLines} boxColors={mergedBoxColors} />
                 </svg>
             </div>
-            {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={boxColors} digits={digits} prices={prices} />}
+            {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={mergedBoxColors} digits={digits} prices={prices} />}
         </div>
     );
-};
+});
 
 ResoChart.displayName = 'ResoChart';
 

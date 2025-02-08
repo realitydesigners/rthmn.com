@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ResoBox } from '@/app/(user)/_components/ResoBox';
 import { TimeFrameSlider } from '@/app/(user)/_components/TimeFrameSlider';
 import { BoxSlice, OHLC } from '@/types/types';
-import { BoxColors, getPairTimeframe, setPairTimeframe } from '@/utils/localStorage';
+import { BoxColors } from '@/utils/localStorage';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { INSTRUMENTS } from '@/utils/instruments';
+import { useTimeframeStore } from '@/stores/timeframeStore';
 
 const getInstrumentDigits = (pair: string): number => {
     const categories = INSTRUMENTS as Record<string, Record<string, { digits: number }>>;
@@ -28,46 +29,23 @@ interface PairResoBoxProps {
 
 export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
     const { priceData } = useWebSocket();
-    const [localStartIndex, setLocalStartIndex] = useState(() =>
-        boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.startIndex ?? 0) : getPairTimeframe(pair || '').startIndex
-    );
 
-    const [localMaxBoxCount, setLocalMaxBoxCount] = useState(() =>
-        boxColors?.styles?.globalTimeframeControl ? (boxColors?.styles?.maxBoxCount ?? 10) : getPairTimeframe(pair || '').maxBoxCount
-    );
-
-    const modifiedBoxColors = {
-        ...boxColors,
-        styles: {
-            ...boxColors?.styles,
-            startIndex: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.startIndex : localStartIndex,
-            maxBoxCount: boxColors?.styles?.globalTimeframeControl ? boxColors?.styles?.maxBoxCount : localMaxBoxCount,
-        },
-    };
-
-    const handleLocalStyleChange = (property: string, value: number | boolean) => {
-        if (property === 'startIndex') {
-            setLocalStartIndex(value as number);
-            if (!boxColors?.styles?.globalTimeframeControl && pair) {
-                setPairTimeframe(pair, {
-                    startIndex: value as number,
-                    maxBoxCount: localMaxBoxCount,
-                });
-            }
-        }
-        if (property === 'maxBoxCount') {
-            setLocalMaxBoxCount(value as number);
-            if (!boxColors?.styles?.globalTimeframeControl && pair) {
-                setPairTimeframe(pair, {
-                    startIndex: localStartIndex,
-                    maxBoxCount: value as number,
-                });
-            }
-        }
-    };
+    // Get timeframe state and actions
+    const isGlobalControl = useTimeframeStore((state) => state.global.isGlobalControl);
+    const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
+    const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
 
     const currentPrice = pair ? priceData[pair]?.price : null;
     const digits = pair ? getInstrumentDigits(pair) : 5;
+
+    const handleTimeframeChange = useCallback(
+        (property: string, value: number) => {
+            if (!isGlobalControl && pair) {
+                updatePairSettings(pair, { [property]: value });
+            }
+        },
+        [pair, isGlobalControl, updatePairSettings]
+    );
 
     return (
         <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
@@ -84,18 +62,30 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                     </div>
 
                     {/* Chart Section */}
-                    <div className='relative flex h-full w-full pr-16'>
-                        <ResoBox slice={boxSlice} className='h-full w-full' boxColors={modifiedBoxColors} pair={pair} />
+                    <div className='relative flex h-full w-full pr-12'>
+                        <ResoBox
+                            slice={{
+                                ...boxSlice,
+                                boxes: boxSlice?.boxes?.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
+                            }}
+                            className='h-full w-full'
+                            boxColors={boxColors}
+                            pair={pair}
+                        />
                     </div>
 
                     {/* Timeframe Control */}
-                    {!modifiedBoxColors?.styles?.globalTimeframeControl && boxSlice?.boxes && (
-                        <div className='relative h-20 w-full'>
-                            <div className={`absolute inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-100' : 'opacity-0'}`}>
-                                <div className='h-24 w-full rounded-md bg-[#222]/50' />
-                            </div>
-                            <div className={`inset-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <TimeFrameSlider startIndex={localStartIndex} maxBoxCount={localMaxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleLocalStyleChange} />
+                    {boxSlice?.boxes && (
+                        <div className='relative h-24 w-full'>
+                            <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                                <div className={`relative ${isGlobalControl ? 'pointer-events-none opacity-50' : ''}`}>
+                                    <TimeFrameSlider
+                                        startIndex={settings.startIndex}
+                                        maxBoxCount={settings.maxBoxCount}
+                                        boxes={boxSlice.boxes}
+                                        onStyleChange={handleTimeframeChange}
+                                    />
+                                </div>
                             </div>
                         </div>
                     )}

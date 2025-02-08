@@ -76,8 +76,6 @@ export interface BoxColors {
     positive: string;
     negative: string;
     styles?: {
-        startIndex: number;
-        maxBoxCount: number;
         borderRadius: number;
         shadowIntensity: number;
         opacity: number;
@@ -93,8 +91,6 @@ export const DEFAULT_BOX_COLORS: BoxColors = {
     positive: '#00ffd5', // Cyan
     negative: '#ff2975', // Hot pink
     styles: {
-        startIndex: 0,
-        maxBoxCount: 12,
         borderRadius: 4,
         shadowIntensity: 0.1,
         opacity: 0.2,
