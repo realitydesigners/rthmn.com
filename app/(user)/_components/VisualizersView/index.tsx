@@ -120,10 +120,10 @@ export const VisualizersView = () => {
     const [showChartStyle, setShowChartStyle] = useState(true);
 
     // Get state from stores
-    const isGlobalControl = useTimeframeStore((state) => state.global.isGlobalControl);
     const globalSettings = useTimeframeStore((state) => state.global.settings);
-    const setGlobalControl = useTimeframeStore((state) => state.setGlobalControl);
     const updateGlobalSettings = useTimeframeStore((state) => state.updateGlobalSettings);
+    const startGlobalDrag = useTimeframeStore((state) => state.startGlobalDrag);
+    const endGlobalDrag = useTimeframeStore((state) => state.endGlobalDrag);
 
     const handleTimeframeChange = useCallback(
         (property: string, value: number) => {
@@ -214,35 +214,14 @@ export const VisualizersView = () => {
 
                             {showtimeframe && (
                                 <>
-                                    <div className='flex items-center justify-between px-1 py-2'>
-                                        <div className='space-y-1'>
-                                            <span className='font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase'>Global Control</span>
-                                        </div>
-                                        <button
-                                            onClick={() => {
-                                                setGlobalControl(!isGlobalControl);
-                                                // When enabling global control, update global settings to match current settings
-                                                if (!isGlobalControl) {
-                                                    updateGlobalSettings({
-                                                        startIndex: globalSettings.startIndex,
-                                                        maxBoxCount: globalSettings.maxBoxCount,
-                                                    });
-                                                }
-                                            }}
-                                            className={`relative h-4 w-9 rounded-full transition-all duration-300 ${isGlobalControl ? 'bg-white/20' : 'bg-white/[0.03]'}`}>
-                                            <div
-                                                className={`absolute top-0.5 right-0.5 h-3 w-3 rounded-full transition-all duration-300 ${
-                                                    isGlobalControl ? 'left-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'left-1 bg-white/50'
-                                                }`}
-                                            />
-                                        </button>
-                                    </div>
                                     <div className='relative h-20 w-full'>
                                         <TimeFrameSlider
                                             startIndex={globalSettings.startIndex}
                                             maxBoxCount={globalSettings.maxBoxCount}
                                             boxes={[]}
                                             onStyleChange={handleTimeframeChange}
+                                            onDragStart={startGlobalDrag}
+                                            onDragEnd={endGlobalDrag}
                                         />
                                     </div>
                                 </>

@@ -9,19 +9,21 @@ export interface TimeframeSettings {
 interface TimeframeState {
     global: {
         settings: TimeframeSettings;
-        isGlobalControl: boolean;
+        isDragging: boolean;
     };
     pairs: Record<string, TimeframeSettings>;
+    pairsBackup: Record<string, TimeframeSettings>;
     updateGlobalSettings: (settings: Partial<TimeframeSettings>) => void;
     updatePairSettings: (pair: string, settings: Partial<TimeframeSettings>) => void;
-    setGlobalControl: (isGlobal: boolean) => void;
+    startGlobalDrag: () => void;
+    endGlobalDrag: () => void;
     getSettingsForPair: (pair: string) => TimeframeSettings;
     initializePair: (pair: string) => void;
 }
 
 const DEFAULT_SETTINGS: TimeframeSettings = {
     startIndex: 0,
-    maxBoxCount: 10,
+    maxBoxCount: 38,
 };
 
 export const useTimeframeStore = create<TimeframeState>()(
@@ -29,16 +31,60 @@ export const useTimeframeStore = create<TimeframeState>()(
         (set, get) => ({
             global: {
                 settings: DEFAULT_SETTINGS,
-                isGlobalControl: false,
+                isDragging: false,
             },
             pairs: {},
+            pairsBackup: {},
 
             updateGlobalSettings: (settings) =>
+                set((state) => {
+                    const newGlobalSettings = {
+                        ...state.global.settings,
+                        ...settings,
+                    };
+
+                    // Only sync pairs if we're dragging
+                    if (state.global.isDragging) {
+                        const updatedPairs = { ...state.pairs };
+                        Object.keys(state.pairs).forEach((pair) => {
+                            updatedPairs[pair] = { ...newGlobalSettings };
+                        });
+
+                        return {
+                            global: {
+                                ...state.global,
+                                settings: newGlobalSettings,
+                            },
+                            pairs: updatedPairs,
+                        };
+                    }
+
+                    return {
+                        global: {
+                            ...state.global,
+                            settings: newGlobalSettings,
+                        },
+                    };
+                }),
+
+            startGlobalDrag: () =>
                 set((state) => ({
                     global: {
                         ...state.global,
-                        settings: { ...state.global.settings, ...settings },
+                        isDragging: true,
                     },
+                    // Backup current pair states
+                    pairsBackup: { ...state.pairs },
+                })),
+
+            endGlobalDrag: () =>
+                set((state) => ({
+                    global: {
+                        ...state.global,
+                        isDragging: false,
+                    },
+                    // Restore individual pair states
+                    pairs: { ...state.pairsBackup },
                 })),
 
             updatePairSettings: (pair, settings) =>
@@ -49,37 +95,18 @@ export const useTimeframeStore = create<TimeframeState>()(
                     },
                 })),
 
-            setGlobalControl: (isGlobal) =>
-                set((state) => {
-                    // When disabling global control, copy current global settings to all pairs
-                    if (!isGlobal) {
-                        const updatedPairs = { ...state.pairs };
-                        Object.keys(state.pairs).forEach((pair) => {
-                            updatedPairs[pair] = { ...state.global.settings };
-                        });
-                        return {
-                            global: {
-                                ...state.global,
-                                isGlobalControl: false,
-                            },
-                            pairs: updatedPairs,
-                        };
-                    }
-                    return {
-                        global: {
-                            ...state.global,
-                            isGlobalControl: isGlobal,
-                        },
-                    };
-                }),
-
             initializePair: (pair) =>
                 set((state) => {
                     if (!state.pairs[pair]) {
+                        const newSettings = { ...DEFAULT_SETTINGS };
                         return {
                             pairs: {
                                 ...state.pairs,
-                                [pair]: { ...DEFAULT_SETTINGS },
+                                [pair]: newSettings,
+                            },
+                            pairsBackup: {
+                                ...state.pairsBackup,
+                                [pair]: newSettings,
                             },
                         };
                     }
@@ -88,18 +115,19 @@ export const useTimeframeStore = create<TimeframeState>()(
 
             getSettingsForPair: (pair) => {
                 const state = get();
-                if (state.global.isGlobalControl) {
-                    return state.global.settings;
-                }
                 // Initialize pair if it doesn't exist
                 if (!state.pairs[pair]) {
                     get().initializePair(pair);
                 }
-                return state.pairs[pair] || state.global.settings;
+                return state.pairs[pair] || DEFAULT_SETTINGS;
             },
         }),
         {
             name: 'timeframe-storage',
+            partialize: (state) => ({
+                global: { settings: state.global.settings },
+                pairs: state.pairs,
+            }),
         }
     )
 );
