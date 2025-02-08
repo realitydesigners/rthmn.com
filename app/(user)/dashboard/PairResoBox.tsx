@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { ResoBox } from '@/app/(user)/_components/ResoBox';
 import { TimeFrameSlider } from '@/app/(user)/_components/TimeFrameSlider';
 import { BoxSlice, OHLC } from '@/types/types';
@@ -34,6 +34,14 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
     const isGlobalControl = useTimeframeStore((state) => state.global.isGlobalControl);
     const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
+    const initializePair = useTimeframeStore((state) => state.initializePair);
+
+    // Initialize timeframe settings for this pair when component mounts
+    useEffect(() => {
+        if (pair && !isGlobalControl) {
+            initializePair(pair);
+        }
+    }, [pair, isGlobalControl, initializePair]);
 
     const currentPrice = pair ? priceData[pair]?.price : null;
     const digits = pair ? getInstrumentDigits(pair) : 5;
