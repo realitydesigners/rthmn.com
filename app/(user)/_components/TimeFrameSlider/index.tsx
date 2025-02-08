@@ -1,4 +1,4 @@
-import React, { useRef, useState, useMemo, useCallback, memo } from 'react';
+import React, { useRef, useState, useMemo, useCallback, memo, useEffect } from 'react';
 import { Box } from '@/types/types';
 import { cn } from '@/utils/cn';
 
@@ -22,12 +22,14 @@ interface PatternVisualizerProps {
     maxBoxCount: number;
     boxes: Box[];
     onStyleChange: (property: string, value: number | boolean) => void;
-    onDragStart?: () => void;
+    onDragStart?: (type: 'left' | 'right' | 'position') => void;
     onDragEnd?: () => void;
 }
 
 export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIndex, maxBoxCount, boxes, onStyleChange, onDragStart, onDragEnd }) => {
     const barContainerRef = useRef<HTMLDivElement>(null);
+    const edgeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
         dragType: 'left' | 'right' | 'position' | null;
@@ -35,6 +37,15 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
         isDragging: false,
         dragType: null,
     });
+
+    // Clear timeouts on unmount
+    useEffect(() => {
+        return () => {
+            if (edgeTimeoutRef.current) clearTimeout(edgeTimeoutRef.current);
+            if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+            window.removeEventListener('mousemove', handleGlobalMouseMove);
+        };
+    }, []);
 
     // Convert to reversed index for calculations
     const reversedStartIndex = useMemo(() => 37 - (startIndex + maxBoxCount - 1), [startIndex, maxBoxCount]);
@@ -50,6 +61,27 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
         [reversedStartIndex, reversedMaxBoxCount]
     );
 
+    // Global mouse move handler for tracking position after drag
+    const handleGlobalMouseMove = useCallback(
+        (e: MouseEvent) => {
+            if (!barContainerRef.current || !edgeTimeoutRef.current) return;
+
+            const rect = barContainerRef.current.getBoundingClientRect();
+            const isNearSlider = e.clientX >= rect.left - 40 && e.clientX <= rect.right + 40 && e.clientY >= rect.top - 40 && e.clientY <= rect.bottom + 40;
+
+            if (!isNearSlider) {
+                // Mouse moved far from slider, trigger reset
+                if (edgeTimeoutRef.current) {
+                    clearTimeout(edgeTimeoutRef.current);
+                    edgeTimeoutRef.current = null;
+                }
+                onDragEnd?.();
+                window.removeEventListener('mousemove', handleGlobalMouseMove);
+            }
+        },
+        [onDragEnd]
+    );
+
     const handleMouseDown = useCallback(
         (e: React.MouseEvent, type: 'left' | 'right' | 'position') => {
             e.preventDefault();
@@ -57,14 +89,23 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
 
             if (!barContainerRef.current) return;
 
-            onDragStart?.();
+            // Clear any existing timeouts
+            if (edgeTimeoutRef.current) clearTimeout(edgeTimeoutRef.current);
+            if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+            edgeTimeoutRef.current = null;
+            resetTimeoutRef.current = null;
+
+            // Remove any existing global mouse move listener
+            window.removeEventListener('mousemove', handleGlobalMouseMove);
+
+            onDragStart?.(type);
 
             const rect = barContainerRef.current.getBoundingClientRect();
             const barWidth = rect.width / 38;
             const startX = e.clientX;
             let previousIndex = type === 'left' ? reversedStartIndex : type === 'right' ? reversedMaxBoxCount : reversedStartIndex;
 
-            const handleGlobalMouseMove = (e: MouseEvent) => {
+            const handleDragMouseMove = (e: MouseEvent) => {
                 if (!barContainerRef.current) return;
 
                 const totalDeltaX = e.clientX - startX;
@@ -106,18 +147,35 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                 });
             };
 
-            const handleGlobalMouseUp = () => {
+            const handleDragMouseUp = () => {
                 setDragState({ isDragging: false, dragType: null });
-                window.removeEventListener('mousemove', handleGlobalMouseMove);
-                window.removeEventListener('mouseup', handleGlobalMouseUp);
-                onDragEnd?.();
+                window.removeEventListener('mousemove', handleDragMouseMove);
+                window.removeEventListener('mouseup', handleDragMouseUp);
+
+                if (type === 'left' || type === 'right') {
+                    // Start tracking global mouse movement
+                    window.addEventListener('mousemove', handleGlobalMouseMove);
+
+                    // Set a longer timeout for eventual reset
+                    resetTimeoutRef.current = setTimeout(() => {
+                        if (edgeTimeoutRef.current) {
+                            clearTimeout(edgeTimeoutRef.current);
+                            edgeTimeoutRef.current = null;
+                        }
+                        onDragEnd?.();
+                        window.removeEventListener('mousemove', handleGlobalMouseMove);
+                    }, 2000); // 2 second inactivity timeout
+                } else {
+                    // For position drags, reset immediately
+                    onDragEnd?.();
+                }
             };
 
-            window.addEventListener('mousemove', handleGlobalMouseMove);
-            window.addEventListener('mouseup', handleGlobalMouseUp);
+            window.addEventListener('mousemove', handleDragMouseMove);
+            window.addEventListener('mouseup', handleDragMouseUp);
             setDragState({ isDragging: true, dragType: type });
         },
-        [reversedStartIndex, reversedMaxBoxCount, onStyleChange, onDragStart, onDragEnd]
+        [reversedStartIndex, reversedMaxBoxCount, onStyleChange, onDragStart, onDragEnd, handleGlobalMouseMove]
     );
 
     // Memoize time label calculations
