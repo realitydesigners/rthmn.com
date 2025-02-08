@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState, memo } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
-import { BoxColors } from '@/utils/localStorage';
+import type { BoxColors } from '@/stores/colorStore';
 import { useUser } from '@/providers/UserProvider';
 import { useTimeframeStore } from '@/stores/timeframeStore';
 

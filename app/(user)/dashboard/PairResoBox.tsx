@@ -4,7 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import { ResoBox } from '@/app/(user)/_components/ResoBox';
 import { TimeFrameSlider } from '@/app/(user)/_components/TimeFrameSlider';
 import { BoxSlice, OHLC } from '@/types/types';
-import { BoxColors } from '@/utils/localStorage';
+import type { BoxColors } from '@/stores/colorStore';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { INSTRUMENTS } from '@/utils/instruments';
 import { useTimeframeStore } from '@/stores/timeframeStore';

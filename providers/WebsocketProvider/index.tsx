@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import React, { createContext, use, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { API_ROUTES } from '@/app/api/config';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
@@ -172,7 +172,7 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
 
 // Custom hook with proper error handling
 export function useWebSocket() {
-    const context = useContext(WebSocketContext);
+    const context = use(WebSocketContext);
     if (!context) {
         throw new Error('useWebSocket must be used within a WebSocketProvider');
     }
