@@ -31,28 +31,27 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
     const { priceData } = useWebSocket();
 
     // Get timeframe state and actions
-    const isGlobalControl = useTimeframeStore((state) => state.global.isGlobalControl);
     const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
 
     // Initialize timeframe settings for this pair when component mounts
     useEffect(() => {
-        if (pair && !isGlobalControl) {
+        if (pair) {
             initializePair(pair);
         }
-    }, [pair, isGlobalControl, initializePair]);
+    }, [pair, initializePair]);
 
     const currentPrice = pair ? priceData[pair]?.price : null;
     const digits = pair ? getInstrumentDigits(pair) : 5;
 
     const handleTimeframeChange = useCallback(
         (property: string, value: number) => {
-            if (!isGlobalControl && pair) {
+            if (pair) {
                 updatePairSettings(pair, { [property]: value });
             }
         },
-        [pair, isGlobalControl, updatePairSettings]
+        [pair, updatePairSettings]
     );
 
     return (
@@ -86,14 +85,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                     {boxSlice?.boxes && (
                         <div className='relative h-24 w-full'>
                             <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <div className={`relative ${isGlobalControl ? 'pointer-events-none opacity-50' : ''}`}>
-                                    <TimeFrameSlider
-                                        startIndex={settings.startIndex}
-                                        maxBoxCount={settings.maxBoxCount}
-                                        boxes={boxSlice.boxes}
-                                        onStyleChange={handleTimeframeChange}
-                                    />
-                                </div>
+                                <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
                             </div>
                         </div>
                     )}

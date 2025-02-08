@@ -22,9 +22,11 @@ interface PatternVisualizerProps {
     maxBoxCount: number;
     boxes: Box[];
     onStyleChange: (property: string, value: number | boolean) => void;
+    onDragStart?: () => void;
+    onDragEnd?: () => void;
 }
 
-export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIndex, maxBoxCount, boxes, onStyleChange }) => {
+export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIndex, maxBoxCount, boxes, onStyleChange, onDragStart, onDragEnd }) => {
     const barContainerRef = useRef<HTMLDivElement>(null);
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
@@ -55,6 +57,8 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
 
             if (!barContainerRef.current) return;
 
+            onDragStart?.();
+
             const rect = barContainerRef.current.getBoundingClientRect();
             const barWidth = rect.width / 38;
             const startX = e.clientX;
@@ -71,19 +75,11 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                 requestAnimationFrame(() => {
                     switch (type) {
                         case 'left': {
-                            if (newIndex < 0) {
-                                const newReversedStartIndex = Math.max(0, previousIndex + newIndex);
-                                const newMaxBoxCount = reversedMaxBoxCount + Math.abs(newIndex);
-                                const newStartIndex = 37 - (newReversedStartIndex + newMaxBoxCount - 1);
-                                onStyleChange('startIndex', newStartIndex);
-                                onStyleChange('maxBoxCount', Math.min(newMaxBoxCount, 38 - newReversedStartIndex));
-                            } else {
-                                const newReversedStartIndex = Math.min(previousIndex + newIndex, 36);
-                                const newMaxBoxCount = Math.max(2, reversedMaxBoxCount - newIndex);
-                                const newStartIndex = 37 - (newReversedStartIndex + newMaxBoxCount - 1);
-                                onStyleChange('startIndex', newStartIndex);
-                                onStyleChange('maxBoxCount', newMaxBoxCount);
-                            }
+                            const newReversedStartIndex = Math.max(0, Math.min(36, previousIndex + newIndex));
+                            const newMaxBoxCount = Math.max(2, Math.min(38 - newReversedStartIndex, reversedMaxBoxCount + (previousIndex - newReversedStartIndex)));
+                            const newStartIndex = Math.min(37 - (newReversedStartIndex + newMaxBoxCount - 1), 36);
+                            onStyleChange('startIndex', newStartIndex);
+                            onStyleChange('maxBoxCount', newMaxBoxCount);
                             break;
                         }
                         case 'right': {
@@ -114,13 +110,14 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                 setDragState({ isDragging: false, dragType: null });
                 window.removeEventListener('mousemove', handleGlobalMouseMove);
                 window.removeEventListener('mouseup', handleGlobalMouseUp);
+                onDragEnd?.();
             };
 
             window.addEventListener('mousemove', handleGlobalMouseMove);
             window.addEventListener('mouseup', handleGlobalMouseUp);
             setDragState({ isDragging: true, dragType: type });
         },
-        [reversedStartIndex, reversedMaxBoxCount, onStyleChange]
+        [reversedStartIndex, reversedMaxBoxCount, onStyleChange, onDragStart, onDragEnd]
     );
 
     // Memoize time label calculations
