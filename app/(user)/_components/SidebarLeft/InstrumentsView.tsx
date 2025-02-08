@@ -362,7 +362,7 @@ export const InstrumentsView = () => {
             <div className='sticky top-0 z-10'>
                 <SearchBar onSearchStateChange={setIsSearching} />
             </div>
-            <div className='z-0 flex-1 overflow-y-auto pt-4'>
+            <div className='no-scrollbar z-0 flex-1 overflow-y-auto pt-4'>
                 <div className={cn('transition-opacity duration-200', isSearching ? 'opacity-30' : 'opacity-100')}>
                     {selectedPairs.length > 0 && <PairGroup label='Selected Pairs' items={selectedPairsItems} count={selectedPairs.length} isSelected={true} />}
                     {availablePairsGroups}

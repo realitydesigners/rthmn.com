@@ -150,6 +150,18 @@
             --angle: 360deg;
         }
     }
+
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari and Opera */
+        width: 0;
+        height: 0;
+        background: transparent;
+    }
 }
 
 @keyframes marquee {
