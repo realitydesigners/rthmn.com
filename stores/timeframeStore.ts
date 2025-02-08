@@ -10,12 +10,13 @@ interface TimeframeState {
     global: {
         settings: TimeframeSettings;
         isDragging: boolean;
+        dragType: string | null;
     };
     pairs: Record<string, TimeframeSettings>;
     pairsBackup: Record<string, TimeframeSettings>;
     updateGlobalSettings: (settings: Partial<TimeframeSettings>) => void;
     updatePairSettings: (pair: string, settings: Partial<TimeframeSettings>) => void;
-    startGlobalDrag: () => void;
+    startGlobalDrag: (dragType: string) => void;
     endGlobalDrag: () => void;
     getSettingsForPair: (pair: string) => TimeframeSettings;
     initializePair: (pair: string) => void;
@@ -32,6 +33,7 @@ export const useTimeframeStore = create<TimeframeState>()(
             global: {
                 settings: DEFAULT_SETTINGS,
                 isDragging: false,
+                dragType: null,
             },
             pairs: {},
             pairsBackup: {},
@@ -43,22 +45,33 @@ export const useTimeframeStore = create<TimeframeState>()(
                         ...settings,
                     };
 
-                    // Only sync pairs if we're dragging
+                    // Only sync pairs if we're dragging AND the values are within valid ranges
                     if (state.global.isDragging) {
-                        const updatedPairs = { ...state.pairs };
-                        Object.keys(state.pairs).forEach((pair) => {
-                            updatedPairs[pair] = { ...newGlobalSettings };
-                        });
+                        // Validate the new settings
+                        const isValidSettings =
+                            newGlobalSettings.startIndex >= 0 &&
+                            newGlobalSettings.startIndex <= 36 &&
+                            newGlobalSettings.maxBoxCount >= 2 &&
+                            newGlobalSettings.maxBoxCount <= 38 &&
+                            newGlobalSettings.startIndex + newGlobalSettings.maxBoxCount <= 38;
 
-                        return {
-                            global: {
-                                ...state.global,
-                                settings: newGlobalSettings,
-                            },
-                            pairs: updatedPairs,
-                        };
+                        if (isValidSettings) {
+                            const updatedPairs = { ...state.pairs };
+                            Object.keys(state.pairs).forEach((pair) => {
+                                updatedPairs[pair] = { ...newGlobalSettings };
+                            });
+
+                            return {
+                                global: {
+                                    ...state.global,
+                                    settings: newGlobalSettings,
+                                },
+                                pairs: updatedPairs,
+                            };
+                        }
                     }
 
+                    // If not dragging or invalid settings, only update global
                     return {
                         global: {
                             ...state.global,
@@ -67,25 +80,49 @@ export const useTimeframeStore = create<TimeframeState>()(
                     };
                 }),
 
-            startGlobalDrag: () =>
-                set((state) => ({
-                    global: {
-                        ...state.global,
-                        isDragging: true,
-                    },
-                    // Backup current pair states
-                    pairsBackup: { ...state.pairs },
-                })),
+            startGlobalDrag: (dragType) =>
+                set((state) => {
+                    // If already dragging, maintain the current state and just update the drag type
+                    if (state.global.isDragging) {
+                        return {
+                            ...state,
+                            global: {
+                                ...state.global,
+                                dragType,
+                            },
+                        };
+                    }
+
+                    // For new drags, backup the pairs and start dragging
+                    return {
+                        ...state,
+                        global: {
+                            ...state.global,
+                            isDragging: true,
+                            dragType,
+                        },
+                        pairsBackup: { ...state.pairs },
+                    };
+                }),
 
             endGlobalDrag: () =>
-                set((state) => ({
-                    global: {
-                        ...state.global,
-                        isDragging: false,
-                    },
-                    // Restore individual pair states
-                    pairs: { ...state.pairsBackup },
-                })),
+                set((state) => {
+                    // Only restore pairs if we have a backup
+                    const nextState: Partial<TimeframeState> = {
+                        global: {
+                            ...state.global,
+                            isDragging: false,
+                            dragType: null,
+                        },
+                    };
+
+                    if (Object.keys(state.pairsBackup).length > 0) {
+                        nextState.pairs = { ...state.pairsBackup };
+                        nextState.pairsBackup = {};
+                    }
+
+                    return nextState as TimeframeState;
+                }),
 
             updatePairSettings: (pair, settings) =>
                 set((state) => ({
