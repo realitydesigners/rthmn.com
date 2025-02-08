@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { LuBox, LuBoxes, LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuLock } from 'react-icons/lu';
 import { useUser } from '@/providers/UserProvider';
 import type { BoxColors } from '@/types/types';
 import { cn } from '@/utils/cn';
 import { TimeFrameSlider } from '../TimeFrameSlider';
+import { useTimeframeStore } from '@/stores/timeframeStore';
 
 interface ChartStyleOptionProps {
     id: string;
@@ -15,30 +16,6 @@ interface ChartStyleOptionProps {
     isActive?: boolean;
     onClick?: () => void;
 }
-
-// Constants
-export const TIMEFRAMES = ['D', '12H', '4H', '2H', '1H', '15m', '5m', '1m'] as const;
-export const SEGMENT_WIDTH = 38 / 9; // Width of each timeframe segment
-
-export interface TimeframeRange {
-    start: string;
-    end: string;
-}
-
-/**
- * Converts start and end indices to timeframe range
- * Used by both PatternVisualizer and PairResoBox to ensure consistent timeframe display
- */
-export const getTimeframeRange = (start: number, end: number): TimeframeRange => {
-    // Calculate which segments we're in
-    const startSegment = Math.floor(start / SEGMENT_WIDTH);
-    const endSegment = Math.floor(end / SEGMENT_WIDTH);
-
-    return {
-        start: TIMEFRAMES[Math.min(startSegment, TIMEFRAMES.length - 1)] || 'D',
-        end: TIMEFRAMES[Math.min(endSegment, TIMEFRAMES.length - 1)] || 'D',
-    };
-};
 
 const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, icon: Icon, locked = false, isActive = false, onClick }) => {
     return (
@@ -139,27 +116,21 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, icon: Ic
 };
 
 export const VisualizersView = () => {
-    const { boxColors, updateBoxColors } = useUser();
     const [showtimeframe, setShowtimeframe] = useState(true);
     const [showChartStyle, setShowChartStyle] = useState(true);
 
-    // Calculate timeframe range based on current settings
-    const timeframeRange = useMemo(() => {
-        const startIndex = boxColors.styles?.startIndex ?? 0;
-        const maxBoxCount = boxColors.styles?.maxBoxCount ?? 10;
-        return getTimeframeRange(startIndex, startIndex + maxBoxCount);
-    }, [boxColors.styles?.startIndex, boxColors.styles?.maxBoxCount]);
+    // Get state from stores
+    const isGlobalControl = useTimeframeStore((state) => state.global.isGlobalControl);
+    const globalSettings = useTimeframeStore((state) => state.global.settings);
+    const setGlobalControl = useTimeframeStore((state) => state.setGlobalControl);
+    const updateGlobalSettings = useTimeframeStore((state) => state.updateGlobalSettings);
 
-    const handleStyleChange = (property: keyof BoxColors['styles'], value: number | boolean) => {
-        if (!boxColors.styles) return;
-        updateBoxColors({
-            ...boxColors,
-            styles: {
-                ...boxColors.styles,
-                [property]: value,
-            },
-        });
-    };
+    const handleTimeframeChange = useCallback(
+        (property: string, value: number) => {
+            updateGlobalSettings({ [property]: value });
+        },
+        [updateGlobalSettings]
+    );
 
     const chartStyleOptions: ChartStyleOptionProps[] = [
         {
@@ -167,15 +138,15 @@ export const VisualizersView = () => {
             title: 'Box',
             icon: LuBox,
             locked: false,
-            isActive: !boxColors.styles?.showLineChart,
-            onClick: () => handleStyleChange('showLineChart', false),
+            isActive: true,
+            onClick: () => {},
         },
         {
             id: 'line',
             title: 'Line',
             icon: LuLineChart,
             locked: true,
-            isActive: boxColors.styles?.showLineChart,
+            isActive: false,
         },
         {
             id: '3d',
@@ -191,7 +162,6 @@ export const VisualizersView = () => {
             <div className='flex-1 overflow-y-visible'>
                 <div className='flex flex-col gap-2'>
                     {/* Colors Section Toggle */}
-
                     <div className='flex flex-col gap-2'>
                         <button
                             onClick={() => setShowChartStyle(!showChartStyle)}
@@ -249,23 +219,32 @@ export const VisualizersView = () => {
                                             <span className='font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase'>Global Control</span>
                                         </div>
                                         <button
-                                            onClick={() => handleStyleChange('globalTimeframeControl', !boxColors.styles?.globalTimeframeControl)}
-                                            className={`relative h-4 w-9 rounded-full transition-all duration-300 ${
-                                                boxColors.styles?.globalTimeframeControl ? 'bg-white/20' : 'bg-white/[0.03]'
-                                            }`}>
+                                            onClick={() => {
+                                                setGlobalControl(!isGlobalControl);
+                                                // When enabling global control, update global settings to match current settings
+                                                if (!isGlobalControl) {
+                                                    updateGlobalSettings({
+                                                        startIndex: globalSettings.startIndex,
+                                                        maxBoxCount: globalSettings.maxBoxCount,
+                                                    });
+                                                }
+                                            }}
+                                            className={`relative h-4 w-9 rounded-full transition-all duration-300 ${isGlobalControl ? 'bg-white/20' : 'bg-white/[0.03]'}`}>
                                             <div
                                                 className={`absolute top-0.5 right-0.5 h-3 w-3 rounded-full transition-all duration-300 ${
-                                                    boxColors.styles?.globalTimeframeControl ? 'left-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'left-1 bg-white/50'
+                                                    isGlobalControl ? 'left-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'left-1 bg-white/50'
                                                 }`}
                                             />
                                         </button>
                                     </div>
-                                    <TimeFrameSlider
-                                        startIndex={boxColors.styles?.startIndex ?? 0}
-                                        maxBoxCount={boxColors.styles?.maxBoxCount ?? 10}
-                                        boxes={[]}
-                                        onStyleChange={handleStyleChange}
-                                    />
+                                    <div className='relative h-20 w-full'>
+                                        <TimeFrameSlider
+                                            startIndex={globalSettings.startIndex}
+                                            maxBoxCount={globalSettings.maxBoxCount}
+                                            boxes={[]}
+                                            onStyleChange={handleTimeframeChange}
+                                        />
+                                    </div>
                                 </>
                             )}
                         </div>

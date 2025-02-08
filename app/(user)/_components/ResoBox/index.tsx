@@ -220,10 +220,7 @@ export const ResoBox = memo(({ slice, className = '', pair = '', boxColors: prop
         return null;
     }
 
-    const startIndex = mergedBoxColors.styles?.startIndex ?? 0;
-    const maxBoxCount = mergedBoxColors.styles?.maxBoxCount ?? 10;
-    const visibleBoxes = slice.boxes.slice(startIndex, startIndex + maxBoxCount);
-    const sortedBoxes = visibleBoxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
+    const sortedBoxes = slice.boxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
     return (
         <div ref={boxRef} className={`relative aspect-square h-full w-full ${className}`}>

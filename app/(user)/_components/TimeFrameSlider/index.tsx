@@ -152,65 +152,63 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
     }, [handleMouseDown]);
 
     return (
-        <div className='space-y-4'>
-            <div className='relative flex flex-col'>
-                {/* Main visualization area */}
-                <div className='relative h-full px-4 pt-4 pb-9'>
-                    {/* Main slider container */}
-                    <div ref={barContainerRef} className='group/bars relative flex h-12 items-center'>
-                        {/* Ambient glow effect */}
-                        <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent opacity-50' />
+        <div className='relative flex flex-col'>
+            {/* Main visualization area */}
+            <div className='relative h-full px-4 pt-4 pb-9'>
+                {/* Main slider container */}
+                <div ref={barContainerRef} className='group/bars relative flex h-12 items-center'>
+                    {/* Ambient glow effect */}
+                    <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent opacity-50' />
 
-                        {/* Selection area with gradient */}
-                        <div
-                            className='absolute h-full bg-gradient-to-b from-white/[0.15] to-white/[0.08] shadow-[inset_0_0_30px_rgba(255,255,255,0.1),0_0_15px_rgba(255,255,255,0.05)] will-change-transform'
-                            style={selectionStyle}>
-                            {/* Inner glow effect */}
-                            <div className='absolute inset-0 overflow-hidden'>
-                                <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]' />
-                            </div>
-                            {/* Top highlight */}
-                            <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent' />
-                            {/* Bottom shadow */}
-                            <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                            {/* Side highlights */}
-                            <div className='absolute inset-y-0 left-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
-                            <div className='absolute inset-y-0 right-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
+                    {/* Selection area with gradient */}
+                    <div
+                        className='absolute h-full bg-gradient-to-b from-white/[0.15] to-white/[0.08] shadow-[inset_0_0_30px_rgba(255,255,255,0.1),0_0_15px_rgba(255,255,255,0.05)] will-change-transform'
+                        style={selectionStyle}>
+                        {/* Inner glow effect */}
+                        <div className='absolute inset-0 overflow-hidden'>
+                            <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]' />
                         </div>
-
-                        {/* Invisible click handlers */}
-                        <div className='relative flex h-full w-full'>
-                            {Array.from({ length: 38 }).map((_, i) => (
-                                <div
-                                    key={i}
-                                    className='flex h-full flex-1 items-center'
-                                    onMouseDown={(e) => {
-                                        const reversedI = i;
-                                        const isSelected = reversedI >= reversedStartIndex && reversedI < reversedStartIndex + reversedMaxBoxCount;
-                                        const isNearLeftEdge = Math.abs(reversedI - reversedStartIndex) <= 1;
-                                        const isNearRightEdge = Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
-
-                                        if (isSelected) {
-                                            handleMouseDown(e, 'position');
-                                        } else if (isNearLeftEdge) {
-                                            handleMouseDown(e, 'left');
-                                        } else if (isNearRightEdge) {
-                                            handleMouseDown(e, 'right');
-                                        }
-                                    }}
-                                />
-                            ))}
-                        </div>
-
-                        {/* Edge handles */}
-                        <div className='pointer-events-none absolute inset-y-0 z-0 will-change-transform' style={selectionStyle}>
-                            {renderEdgeHandles}
-                        </div>
+                        {/* Top highlight */}
+                        <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent' />
+                        {/* Bottom shadow */}
+                        <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
+                        {/* Side highlights */}
+                        <div className='absolute inset-y-0 left-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
+                        <div className='absolute inset-y-0 right-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
                     </div>
 
-                    {/* Dynamic Timeframe Scale */}
-                    <DynamicTimeScale reversedStartIndex={reversedStartIndex} reversedMaxBoxCount={reversedMaxBoxCount} getTimeLabel={getTimeLabel} />
+                    {/* Invisible click handlers */}
+                    <div className='relative flex h-full w-full'>
+                        {Array.from({ length: 38 }).map((_, i) => (
+                            <div
+                                key={i}
+                                className='flex h-full flex-1 items-center'
+                                onMouseDown={(e) => {
+                                    const reversedI = i;
+                                    const isSelected = reversedI >= reversedStartIndex && reversedI < reversedStartIndex + reversedMaxBoxCount;
+                                    const isNearLeftEdge = Math.abs(reversedI - reversedStartIndex) <= 1;
+                                    const isNearRightEdge = Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
+
+                                    if (isSelected) {
+                                        handleMouseDown(e, 'position');
+                                    } else if (isNearLeftEdge) {
+                                        handleMouseDown(e, 'left');
+                                    } else if (isNearRightEdge) {
+                                        handleMouseDown(e, 'right');
+                                    }
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* Edge handles */}
+                    <div className='pointer-events-none absolute inset-y-0 z-0 will-change-transform' style={selectionStyle}>
+                        {renderEdgeHandles}
+                    </div>
                 </div>
+
+                {/* Dynamic Timeframe Scale */}
+                <DynamicTimeScale reversedStartIndex={reversedStartIndex} reversedMaxBoxCount={reversedMaxBoxCount} getTimeLabel={getTimeLabel} />
             </div>
         </div>
     );
@@ -234,7 +232,7 @@ const DynamicTimeScale = memo(({ reversedStartIndex, reversedMaxBoxCount, getTim
                 <div key={i} className='relative flex flex-col items-center'>
                     <div
                         className={cn(
-                            'mb-1 h-3 w-[1px] will-change-transform',
+                            'mb-1 h-2 w-[1px] will-change-transform',
                             isInRange ? 'bg-gradient-to-b from-white/90 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.6)]' : 'bg-gradient-to-b from-white/20 to-transparent'
                         )}
                     />
