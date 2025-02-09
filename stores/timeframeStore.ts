@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 export interface TimeframeSettings {
     startIndex: number;
     maxBoxCount: number;
+    showPriceLines: boolean;
 }
 
 interface TimeframeState {
@@ -20,11 +21,13 @@ interface TimeframeState {
     endGlobalDrag: () => void;
     getSettingsForPair: (pair: string) => TimeframeSettings;
     initializePair: (pair: string) => void;
+    togglePriceLines: (pair?: string) => void;
 }
 
 const DEFAULT_SETTINGS: TimeframeSettings = {
     startIndex: 0,
     maxBoxCount: 38,
+    showPriceLines: true,
 };
 
 export const useTimeframeStore = create<TimeframeState>()(
@@ -40,9 +43,11 @@ export const useTimeframeStore = create<TimeframeState>()(
 
             updateGlobalSettings: (settings) =>
                 set((state) => {
+                    // Don't handle showPriceLines in global settings update
+                    const { showPriceLines, ...timeframeSettings } = settings;
                     const newGlobalSettings = {
                         ...state.global.settings,
-                        ...settings,
+                        ...timeframeSettings,
                     };
 
                     // Validate the new settings
@@ -54,10 +59,13 @@ export const useTimeframeStore = create<TimeframeState>()(
                         newGlobalSettings.startIndex + newGlobalSettings.maxBoxCount <= 38;
 
                     if (isValidSettings) {
-                        // Always update all pairs when using global settings
+                        // Update pairs with new timeframe settings, but preserve their showPriceLines state
                         const updatedPairs = { ...state.pairs };
                         Object.keys(state.pairs).forEach((pair) => {
-                            updatedPairs[pair] = { ...newGlobalSettings };
+                            updatedPairs[pair] = {
+                                ...state.pairs[pair],
+                                ...timeframeSettings,
+                            };
                         });
 
                         return {
@@ -69,13 +77,49 @@ export const useTimeframeStore = create<TimeframeState>()(
                         };
                     }
 
-                    // If invalid settings, only update global
                     return {
                         global: {
                             ...state.global,
                             settings: newGlobalSettings,
                         },
                     };
+                }),
+
+            togglePriceLines: (pair) =>
+                set((state) => {
+                    if (pair) {
+                        // Toggle for specific pair
+                        return {
+                            pairs: {
+                                ...state.pairs,
+                                [pair]: {
+                                    ...state.pairs[pair],
+                                    showPriceLines: !state.pairs[pair].showPriceLines,
+                                },
+                            },
+                        };
+                    } else {
+                        // Toggle global setting and update all pairs
+                        const newShowPriceLines = !state.global.settings.showPriceLines;
+                        const updatedPairs = { ...state.pairs };
+                        Object.keys(state.pairs).forEach((pair) => {
+                            updatedPairs[pair] = {
+                                ...state.pairs[pair],
+                                showPriceLines: newShowPriceLines,
+                            };
+                        });
+
+                        return {
+                            global: {
+                                ...state.global,
+                                settings: {
+                                    ...state.global.settings,
+                                    showPriceLines: newShowPriceLines,
+                                },
+                            },
+                            pairs: updatedPairs,
+                        };
+                    }
                 }),
 
             startGlobalDrag: (dragType) =>

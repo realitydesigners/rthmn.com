@@ -72,119 +72,116 @@ const useBoxStyles = (box: Box, prevBox: Box | null, boxColors: BoxColors, conta
     }, [box.value, prevBox?.value, boxColors.styles, containerSize, index]);
 };
 
+interface BoxProps {
+    box: Box;
+    index: number;
+    prevBox: Box | null;
+    boxColors: BoxColors;
+    containerSize: number;
+    slice: BoxSlice;
+    sortedBoxes: Box[];
+    pair: string;
+    showPriceLines?: boolean;
+}
+
 // Recursive Box component
-const Box = memo(
-    ({
-        box,
-        index,
-        prevBox,
-        boxColors,
-        containerSize,
-        slice,
-        sortedBoxes,
-        pair,
-    }: {
-        box: Box;
-        index: number;
-        prevBox: Box | null;
-        boxColors: BoxColors;
-        containerSize: number;
-        slice: BoxSlice;
-        sortedBoxes: Box[];
-        pair: string;
-    }) => {
-        const colors = useBoxColors(box, boxColors);
-        const { baseStyles, isFirstDifferent } = useBoxStyles(box, prevBox, boxColors, containerSize, index);
-        const digits = getInstrumentDigits(pair);
+const Box = memo(({ box, index, prevBox, boxColors, containerSize, slice, sortedBoxes, pair, showPriceLines = true }: BoxProps) => {
+    const colors = useBoxColors(box, boxColors);
+    const { baseStyles, isFirstDifferent } = useBoxStyles(box, prevBox, boxColors, containerSize, index);
+    const digits = getInstrumentDigits(pair);
 
-        const isConsecutivePositive = prevBox?.value > 0 && box.value > 0 && !isFirstDifferent;
-        const isConsecutiveNegative = prevBox?.value < 0 && box.value < 0 && !isFirstDifferent;
+    const isConsecutivePositive = prevBox?.value > 0 && box.value > 0 && !isFirstDifferent;
+    const isConsecutiveNegative = prevBox?.value < 0 && box.value < 0 && !isFirstDifferent;
 
-        const shouldShowTopPrice = (!isFirstDifferent || (isFirstDifferent && box.value > 0)) && !isConsecutivePositive;
-        const shouldShowBottomPrice = (!isFirstDifferent || (isFirstDifferent && box.value < 0)) && !isConsecutiveNegative;
+    // Only show price lines for largest box and first different boxes when we have more than 15 boxes
+    const shouldLimitPriceLines = sortedBoxes.length > 12;
+    const shouldShowTopPrice = (!isFirstDifferent || (isFirstDifferent && box.value > 0)) && (!shouldLimitPriceLines || isFirstDifferent || index === 0) && !isConsecutivePositive;
+    const shouldShowBottomPrice =
+        (!isFirstDifferent || (isFirstDifferent && box.value < 0)) && (!shouldLimitPriceLines || isFirstDifferent || index === 0) && !isConsecutiveNegative;
 
-        return (
-            <div key={`${slice.timestamp}-${index}`} className='absolute border border-black' style={baseStyles}>
+    return (
+        <div key={`${slice.timestamp}-${index}`} className='absolute border border-black' style={baseStyles}>
+            <div
+                className='absolute inset-0'
+                style={{
+                    borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+                    boxShadow: `inset 0 ${colors.shadowY}px ${colors.shadowBlur}px ${colors.shadowColor(colors.shadowIntensity)}`,
+                    transition: 'all 0.15s ease-out',
+                }}
+            />
+
+            <div
+                className='absolute inset-0'
+                style={{
+                    borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+                    background: `linear-gradient(to bottom right, ${colors.baseColor.replace(')', `, ${colors.opacity}`)} 100%, transparent 100%)`,
+                    opacity: colors.opacity,
+                    transition: 'all 0.15s ease-out',
+                }}
+            />
+
+            {isFirstDifferent && (
                 <div
                     className='absolute inset-0'
                     style={{
                         borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-                        boxShadow: `inset 0 ${colors.shadowY}px ${colors.shadowBlur}px ${colors.shadowColor(colors.shadowIntensity)}`,
+                        backgroundColor: colors.baseColor,
+                        opacity: colors.opacity * 0.5,
+                        boxShadow: `inset 0 2px 15px ${colors.shadowColor(0.2)}`,
                         transition: 'all 0.15s ease-out',
                     }}
                 />
+            )}
 
-                <div
-                    className='absolute inset-0'
-                    style={{
-                        borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-                        background: `linear-gradient(to bottom right, ${colors.baseColor.replace(')', `, ${colors.opacity}`)} 100%, transparent 100%)`,
-                        opacity: colors.opacity,
-                        transition: 'all 0.15s ease-out',
-                    }}
+            {showPriceLines && shouldShowTopPrice && (
+                <div className='absolute top-0 -right-16 z-10 w-16 opacity-90'>
+                    <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
+                    <div className='absolute -top-3.5 right-0'>
+                        <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
+                            {box.high.toFixed(digits)}
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {showPriceLines && shouldShowBottomPrice && (
+                <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-90'>
+                    <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
+                    <div className='absolute -top-3.5 right-0'>
+                        <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
+                            {box.low.toFixed(digits)}
+                        </span>
+                    </div>
+                </div>
+            )}
+
+            {index < sortedBoxes.length - 1 && (
+                <Box
+                    box={sortedBoxes[index + 1]}
+                    index={index + 1}
+                    prevBox={box}
+                    boxColors={boxColors}
+                    containerSize={containerSize}
+                    slice={slice}
+                    sortedBoxes={sortedBoxes}
+                    pair={pair}
+                    showPriceLines={showPriceLines}
                 />
-
-                {isFirstDifferent && (
-                    <div
-                        className='absolute inset-0'
-                        style={{
-                            borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-                            backgroundColor: colors.baseColor,
-                            opacity: colors.opacity * 0.5,
-                            boxShadow: `inset 0 2px 15px ${colors.shadowColor(0.2)}`,
-                            transition: 'all 0.15s ease-out',
-                        }}
-                    />
-                )}
-
-                {shouldShowTopPrice && (
-                    <div className='absolute top-0 -right-16 z-10 w-16 opacity-90'>
-                        <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
-                        <div className='absolute -top-3.5 right-0'>
-                            <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                                {box.high.toFixed(digits)}
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {shouldShowBottomPrice && (
-                    <div className='absolute -right-16 bottom-0 z-10 w-16 opacity-90'>
-                        <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
-                        <div className='absolute -top-3.5 right-0'>
-                            <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                                {box.low.toFixed(digits)}
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {index < sortedBoxes.length - 1 && (
-                    <Box
-                        box={sortedBoxes[index + 1]}
-                        index={index + 1}
-                        prevBox={box}
-                        boxColors={boxColors}
-                        containerSize={containerSize}
-                        slice={slice}
-                        sortedBoxes={sortedBoxes}
-                        pair={pair}
-                    />
-                )}
-            </div>
-        );
-    }
-);
+            )}
+        </div>
+    );
+});
 
 interface ResoBoxProps {
     slice: BoxSlice;
     className?: string;
     pair?: string;
     boxColors?: BoxColors;
+    showPriceLines?: boolean;
 }
 
 // Main ResoBox component with optimized rendering
-export const ResoBox = memo(({ slice, className = '', pair = '', boxColors: propBoxColors }: ResoBoxProps) => {
+export const ResoBox = memo(({ slice, className = '', pair = '', boxColors: propBoxColors, showPriceLines = true }: ResoBoxProps) => {
     const boxRef = useRef<HTMLDivElement>(null);
     const [containerSize, setContainerSize] = useState(0);
     const { boxColors: userBoxColors } = useUser();
@@ -235,6 +232,7 @@ export const ResoBox = memo(({ slice, className = '', pair = '', boxColors: prop
                         slice={slice}
                         sortedBoxes={sortedBoxes}
                         pair={pair}
+                        showPriceLines={showPriceLines}
                     />
                 )}
             </div>
