@@ -7,6 +7,7 @@ import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { cn } from '@/utils/cn';
 import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
+import { LuSearch } from 'react-icons/lu';
 
 const formatPrice = (price: number, instrument: string) => {
     let digits = 2;
@@ -64,19 +65,19 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
     return (
         <div
             className={cn(
-                'group/item relative flex h-10 items-center overflow-hidden transition-all duration-300 select-none',
+                'group/item relative flex h-10 items-center transition-all duration-300 select-none',
                 'after:absolute after:inset-0 after:rounded-lg after:transition-all after:duration-300',
                 isSelected
                     ? ['bg-[#141414]/90', 'after:bg-gradient-to-r after:from-transparent after:via-[rgba(255,255,255,0.03)] after:to-transparent', 'after:animate-shimmer']
                     : [
                           'bg-[#0C0C0C]/90 hover:bg-[#111]/90',
-                          'after:bg-gradient-to-r after:from-transparent after:via-transparent after:to-transparent',
-                          'hover:after:via-[rgba(255,255,255,0.01)]',
-                      ],
-                'before:absolute before:inset-0 before:rounded-lg before:border before:border-transparent before:transition-all before:duration-300',
-                isSelected ? 'before:border-[#222]' : 'hover:before:border-[#181818]',
-                isOnboardingActive && isSelected && 'hover:border-blue-500/40'
-            )}>
+                          'after:bg-gradient-to-r after:from-transparent after:via-[rgba(255,255,255,0.03)] after:to-transparent after:opacity-0',
+                          'group-hover/item:after:opacity-100',
+                      ]
+            )}
+            onClick={() => onToggle()}
+            role='button'
+            tabIndex={0}>
             <div className='relative flex w-full items-center px-3'>
                 {/* Status indicator */}
                 <div className='relative flex h-8 w-8 items-center justify-center'>
@@ -359,14 +360,12 @@ export const InstrumentsPanel = () => {
 
     return (
         <div className='flex h-full flex-col'>
-            <div className='sticky top-0 z-10'>
+            <div className='sticky top-0 z-10 bg-[#0a0a0a] pb-4'>
                 <SearchBar onSearchStateChange={setIsSearching} />
             </div>
-            <div className='no-scrollbar z-0 flex-1 overflow-y-auto pt-4'>
-                <div className={cn('transition-opacity duration-200', isSearching ? 'opacity-30' : 'opacity-100')}>
-                    {selectedPairs.length > 0 && <PairGroup label='Selected Pairs' items={selectedPairsItems} count={selectedPairs.length} isSelected={true} />}
-                    {availablePairsGroups}
-                </div>
+            <div className={cn('flex-1 overflow-y-auto', isSearching ? 'opacity-30' : 'opacity-100')}>
+                {selectedPairs.length > 0 && <PairGroup label='Selected Pairs' items={selectedPairsItems} count={selectedPairs.length} isSelected={true} />}
+                {availablePairsGroups}
             </div>
         </div>
     );
