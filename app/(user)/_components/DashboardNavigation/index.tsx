@@ -7,7 +7,7 @@ import { IconType } from 'react-icons';
 import { LuSearch, LuSettings } from 'react-icons/lu';
 import { PairNavigator } from '@/app/(user)/_components/DashboardNavigation/PairNavigator';
 import { ProfilePanel } from '@/app/(user)/_components/DashboardNavigation/ProfilePanel';
-import { SettingsBar } from '@/app/(user)/_components/SettingsBar';
+import { SettingsBar } from '@/app/(user)/_components/Panels/BoxUXPanel';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useScrollDirection } from '../../../../hooks/useScrollDirection';

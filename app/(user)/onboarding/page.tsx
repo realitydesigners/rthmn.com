@@ -7,7 +7,7 @@ import ExperienceStep from './_components/Steps/ExperienceStep';
 import IntroSequence from './_components/Steps/IntroSequence';
 import PairsStep from './_components/Steps/PairsStep';
 import ProfileUpload from './_components/Steps/ProfileUpload';
-import { ONBOARDING_STEPS, useOnboardingStore } from './onboarding';
+import { ONBOARDING_STEPS, useOnboardingStore } from '../../../stores/onboardingStore';
 
 const COMPONENTS: {
     ProfileUpload: any;

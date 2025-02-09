@@ -2,7 +2,7 @@
 
 import React, { createContext, use, useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import { getSelectedPairs, setSelectedPairs } from '@/utils/localStorage';
 import { useColorStore, type BoxColors } from '@/stores/colorStore';
 
@@ -10,7 +10,6 @@ interface UserContextType {
     selectedPairs: string[];
     boxColors: BoxColors;
     isSidebarInitialized: boolean;
-    gridClass: string;
     togglePair: (pair: string) => void;
     updateBoxColors: (colors: Partial<BoxColors>) => void;
     handleSidebarClick: (e: React.MouseEvent) => void;
@@ -21,7 +20,6 @@ const UserContext = createContext<UserContextType | null>(null);
 export function UserProvider({ children }: { children: React.ReactNode }) {
     const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
-    const [gridClass, setGridClass] = useState('');
     const router = useRouter();
     const pathname = usePathname();
     const { hasCompletedInitialOnboarding } = useOnboardingStore();
@@ -50,46 +48,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         initializeData();
     }, []);
 
-    // Grid layout management
-    useEffect(() => {
-        if (!isSidebarInitialized) {
-            setGridClass('invisible');
-            return;
-        }
-
-        const handleResize = () => {
-            const main = document.querySelector('main');
-            if (!main) return;
-
-            const width = main.clientWidth;
-            const baseClasses = 'grid w-full gap-4 transition-all duration-300 ';
-
-            if (width <= 600) {
-                setGridClass(`${baseClasses} grid-cols-1`);
-            } else if (width <= 1280) {
-                setGridClass(`${baseClasses} grid-cols-2`);
-            } else if (width <= 1600) {
-                setGridClass(`${baseClasses} grid-cols-3`);
-            } else {
-                setGridClass(`${baseClasses} grid-cols-4`);
-            }
-        };
-
-        const resizeObserver = new ResizeObserver(() => {
-            requestAnimationFrame(handleResize);
-        });
-
-        const main = document.querySelector('main');
-        if (main) {
-            resizeObserver.observe(main);
-            handleResize();
-        }
-
-        return () => {
-            resizeObserver.disconnect();
-        };
-    }, [isSidebarInitialized]);
-
     const togglePair = useCallback((pair: string) => {
         setSelectedPairsState((prev) => {
             const wasSelected = prev.includes(pair);
@@ -112,12 +70,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             selectedPairs,
             boxColors,
             isSidebarInitialized,
-            gridClass,
             togglePair,
             updateBoxColors,
             handleSidebarClick,
         }),
-        [selectedPairs, boxColors, isSidebarInitialized, gridClass, togglePair, updateBoxColors, handleSidebarClick]
+        [selectedPairs, boxColors, isSidebarInitialized, togglePair, updateBoxColors, handleSidebarClick]
     );
 
     return (

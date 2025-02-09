@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 import { LuGraduationCap, LuSettings } from 'react-icons/lu';
 import { OnboardingContent } from '@/app/(user)/onboarding/_components/FeatureTour/OnboardingContent';
 import { SettingsContent } from '@/app/(user)/onboarding/_components/FeatureTour/SettingsContent';
-import { ONBOARDING_STEPS, useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { ONBOARDING_STEPS, useOnboardingStore } from '@/stores/onboardingStore';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '../../onboarding/_components/FeatureTour';
-import { SettingsBar } from '../SettingsBar';
-import { SidebarWrapper } from '../SidebarWrapper';
-import { Onboarding } from './Onboarding';
+import { SettingsBar } from '../Panels/BoxUXPanel';
+import { SidebarWrapper } from '../Panels/SidebarPanelWrapper';
+import { Onboarding } from '../Panels/OnboardingPanel';
 
 export const SidebarRight = () => {
     const pathname = usePathname();

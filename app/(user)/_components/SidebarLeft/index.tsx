@@ -5,12 +5,12 @@ import { usePathname } from 'next/navigation';
 import { LuLayoutGrid, LuLineChart } from 'react-icons/lu';
 import { InstrumentsContent } from '@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent';
 import { VisualizerContent } from '@/app/(user)/onboarding/_components/FeatureTour/VisualizerContent';
-import { ONBOARDING_STEPS, useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
-import { VisualizersView } from '@/app/(user)/_components/VisualizersView';
+import { ONBOARDING_STEPS, useOnboardingStore } from '@/stores/onboardingStore';
+import { VisualizersView } from '@/app/(user)/_components/Panels/BoxDataPanel';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '../../onboarding/_components/FeatureTour';
-import { SidebarWrapper } from '../SidebarWrapper';
-import { InstrumentsView } from './InstrumentsView';
+import { SidebarWrapper } from '../Panels/SidebarPanelWrapper';
+import { InstrumentsPanel } from '../Panels/InstrumentsPanel';
 
 export const SidebarLeft = () => {
     const pathname = usePathname();
@@ -28,7 +28,7 @@ export const SidebarLeft = () => {
             icon: LuLineChart,
             onClick: () => handlePanelToggle('instruments'),
             tourContent: <InstrumentsContent />,
-            panelContent: <InstrumentsView />,
+            panelContent: <InstrumentsPanel />,
         },
         {
             id: 'visualizer',

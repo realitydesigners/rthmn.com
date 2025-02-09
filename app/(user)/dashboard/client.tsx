@@ -2,12 +2,38 @@
 
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useUser } from '@/providers/UserProvider';
+import { useGridStore } from '@/stores/gridStore';
 import { NoInstruments } from './LoadingSkeleton';
 import { PairResoBox } from './PairResoBox';
+import { useEffect, useState, useCallback } from 'react';
 
 export default function Dashboard() {
     const { pairData, isLoading } = useDashboard();
-    const { selectedPairs, boxColors, gridClass } = useUser();
+    const { selectedPairs, boxColors, isSidebarInitialized } = useUser();
+    const getGridClass = useGridStore((state) => state.getGridClass);
+    const breakpoints = useGridStore((state) => state.breakpoints);
+    const [gridClass, setGridClass] = useState('');
+
+    const updateGridClass = useCallback(() => {
+        const width = document.querySelector('main')?.clientWidth || window.innerWidth;
+        setGridClass(getGridClass(width));
+    }, [getGridClass]);
+
+    // Handle resize events
+    useEffect(() => {
+        const resizeObserver = new ResizeObserver(updateGridClass);
+        const main = document.querySelector('main');
+        if (main) {
+            resizeObserver.observe(main);
+        }
+
+        return () => resizeObserver.disconnect();
+    }, [updateGridClass]);
+
+    // Handle store changes
+    useEffect(() => {
+        updateGridClass();
+    }, [updateGridClass, breakpoints]);
 
     if (!selectedPairs.length && !isLoading) {
         return (

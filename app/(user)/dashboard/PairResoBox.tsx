@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo } from 'react';
-import { ResoBox } from '@/app/(user)/_components/ResoBox';
-import { TimeFrameSlider } from '@/app/(user)/_components/TimeFrameSlider';
+import { ResoBox } from '@/app/(user)/_components/Charts/ResoBox';
+import { TimeFrameSlider } from '@/app/(user)/_components/PanelComponents/TimeFrameSlider';
 import { BoxSlice, OHLC } from '@/types/types';
 import type { BoxColors } from '@/stores/colorStore';
 import { useWebSocket } from '@/providers/WebsocketProvider';
