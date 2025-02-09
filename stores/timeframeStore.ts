@@ -59,12 +59,13 @@ export const useTimeframeStore = create<TimeframeState>()(
                         newGlobalSettings.startIndex + newGlobalSettings.maxBoxCount <= 38;
 
                     if (isValidSettings) {
-                        // Update pairs with new timeframe settings, but preserve their showPriceLines state
+                        // Update all pairs with the new timeframe settings
                         const updatedPairs = { ...state.pairs };
                         Object.keys(state.pairs).forEach((pair) => {
                             updatedPairs[pair] = {
                                 ...state.pairs[pair],
-                                ...timeframeSettings,
+                                startIndex: newGlobalSettings.startIndex,
+                                maxBoxCount: newGlobalSettings.maxBoxCount,
                             };
                         });
 
@@ -144,14 +145,15 @@ export const useTimeframeStore = create<TimeframeState>()(
                 set((state) => ({
                     pairs: {
                         ...state.pairs,
-                        [pair]: { ...DEFAULT_SETTINGS, ...state.pairs[pair], ...settings },
+                        [pair]: { ...state.global.settings, ...state.pairs[pair], ...settings },
                     },
                 })),
 
             initializePair: (pair) =>
                 set((state) => {
                     if (!state.pairs[pair]) {
-                        const newSettings = { ...DEFAULT_SETTINGS };
+                        // Use global settings instead of DEFAULT_SETTINGS for new pairs
+                        const newSettings = { ...state.global.settings };
                         return {
                             pairs: {
                                 ...state.pairs,
@@ -168,11 +170,11 @@ export const useTimeframeStore = create<TimeframeState>()(
 
             getSettingsForPair: (pair) => {
                 const state = get();
-                // Initialize pair if it doesn't exist
+                // Return global settings if pair doesn't exist yet
                 if (!state.pairs[pair]) {
-                    get().initializePair(pair);
+                    return state.global.settings;
                 }
-                return state.pairs[pair] || DEFAULT_SETTINGS;
+                return state.pairs[pair];
             },
         }),
         {

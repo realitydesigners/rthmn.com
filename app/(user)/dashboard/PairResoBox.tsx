@@ -30,8 +30,8 @@ interface PairResoBoxProps {
 export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
     const { priceData } = useWebSocket();
 
-    // Get timeframe state and actions
-    const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
+    // Get timeframe state and actions - memoize selectors
+    const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
 
