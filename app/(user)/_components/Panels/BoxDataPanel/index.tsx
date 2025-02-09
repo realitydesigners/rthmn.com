@@ -5,6 +5,7 @@ import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '../../PanelComponents/TimeFrameSlider';
 import { CHART_STYLES, ChartStyleOption } from '../../ChartStyleOptions';
 import { Toggle } from '../../PanelComponents/Toggle/Toggle';
+import { GridControl } from './GridControl';
 
 const VISUALIZER_TABS = {
     chartStyle: {
@@ -174,6 +175,9 @@ export const VisualizersView = () => {
                         })}
                     </div>
                 </div>
+            </div>
+            <div className='border-t border-[#181818]'>
+                <GridControl />
             </div>
         </div>
     );
