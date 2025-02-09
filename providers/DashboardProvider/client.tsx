@@ -16,135 +16,163 @@ interface DashboardContextType {
 
 const DashboardContext = createContext<DashboardContextType | null>(null);
 
-// Optimized box update calculation
+// Pre-allocate a single reusable box object for updates
+const updateBox = { high: 0, low: 0, value: 0 };
+
+// Optimized box update calculation using a single shared object
 const useBoxUpdater = () => {
-    return useCallback((boxes: Box[], price: number): Box[] => {
-        return boxes.map((box) => {
-            const newBox = { ...box };
-            if (price > box.high) {
-                newBox.high = price;
-                newBox.low = price - Math.abs(box.value);
-                if (box.value < 0) {
-                    newBox.value = Math.abs(box.value);
-                }
-            } else if (price < box.low) {
-                newBox.low = price;
-                newBox.high = price + Math.abs(box.value);
-                if (box.value > 0) {
-                    newBox.value = -Math.abs(box.value);
-                }
+    return useCallback((boxes: Box[], price: number): Box[] | null => {
+        let hasChanges = false;
+
+        // First pass: check if we need to update anything
+        for (let i = 0; i < boxes.length; i++) {
+            const box = boxes[i];
+            if (price > box.high || price < box.low) {
+                hasChanges = true;
+                break;
             }
-            return newBox;
-        });
+        }
+
+        // If no changes needed, return null to indicate no update
+        if (!hasChanges) return null;
+
+        // Only create new array if we need to update
+        const updatedBoxes = new Array(boxes.length);
+
+        for (let i = 0; i < boxes.length; i++) {
+            const box = boxes[i];
+
+            if (price > box.high) {
+                updateBox.high = price;
+                updateBox.low = price - Math.abs(box.value);
+                updateBox.value = Math.abs(box.value);
+                // Clone only when needed
+                updatedBoxes[i] = { ...updateBox };
+            } else if (price < box.low) {
+                updateBox.low = price;
+                updateBox.high = price + Math.abs(box.value);
+                updateBox.value = -Math.abs(box.value);
+                // Clone only when needed
+                updatedBoxes[i] = { ...updateBox };
+            } else {
+                // Reuse existing box if no change
+                updatedBoxes[i] = box;
+            }
+        }
+
+        return updatedBoxes;
     }, []);
 };
-
-// Optimized OHLC creation
-const createOHLC = (price: number): OHLC => ({
-    open: price,
-    high: price,
-    low: price,
-    close: price,
-});
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const { selectedPairs, isSidebarInitialized } = useUser();
     const [pairData, setPairData] = useState<Record<string, PairData>>({});
     const boxMapRef = useRef<Map<string, Box[]>>(new Map());
+    const lastPricesRef = useRef<Map<string, number>>(new Map());
     const { session } = useAuth();
     const { isConnected, subscribeToBoxSlices, unsubscribeFromBoxSlices, priceData } = useWebSocket();
     const updateBoxesWithPrice = useBoxUpdater();
 
-    // Memoized authentication state
+    // Memoized states
     const isAuthenticated = useMemo(() => !!session?.access_token, [session?.access_token]);
-
-    // Memoized loading state
     const isLoading = useMemo(() => !isAuthenticated || !isConnected || !isSidebarInitialized, [isAuthenticated, isConnected, isSidebarInitialized]);
 
     // Optimized box slice subscription handler
     const handleBoxSliceUpdate = useCallback((pair: string, wsData: BoxSlice) => {
-        console.log(`Received box data for ${pair}:`, wsData);
-
-        setPairData((prev) => {
-            // Store box values
-            boxMapRef.current.set(pair, [...wsData.boxes]);
-
-            return {
-                ...prev,
-                [pair]: {
-                    boxes: [wsData],
-                    currentOHLC: wsData.currentOHLC,
-                    initialBoxData: prev[pair]?.initialBoxData || wsData,
-                },
-            };
-        });
+        boxMapRef.current.set(pair, wsData.boxes);
+        setPairData((prev) => ({
+            ...prev,
+            [pair]: {
+                boxes: [wsData],
+                currentOHLC: wsData.currentOHLC,
+                initialBoxData: prev[pair]?.initialBoxData || wsData,
+            },
+        }));
     }, []);
 
     // WebSocket subscription effect
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
-        console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
-
         selectedPairs.forEach((pair) => {
             subscribeToBoxSlices(pair, (wsData: BoxSlice) => handleBoxSliceUpdate(pair, wsData));
         });
 
         return () => {
-            console.log('Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
                 boxMapRef.current.delete(pair);
+                lastPricesRef.current.delete(pair);
             });
         };
     }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, handleBoxSliceUpdate]);
 
-    // Price update effect with batch processing
+    // Price update effect with optimized batching
     useEffect(() => {
         if (!priceData || Object.keys(priceData).length === 0 || selectedPairs.length === 0) return;
 
-        // Use requestAnimationFrame for smooth updates
-        const rafId = requestAnimationFrame(() => {
-            // Batch updates to reduce state updates
-            const updates: Record<string, { boxes: Box[]; timestamp: string; price: number }> = {};
+        let frameId: number;
+        let lastUpdate = performance.now();
+        const MIN_UPDATE_INTERVAL = 16; // ~60fps
 
-            // Only process updates for selected pairs
-            selectedPairs.forEach((pair) => {
+        const processUpdates = () => {
+            const now = performance.now();
+            if (now - lastUpdate < MIN_UPDATE_INTERVAL) {
+                frameId = requestAnimationFrame(processUpdates);
+                return;
+            }
+
+            let hasUpdates = false;
+            const updates = new Map<string, { boxes: Box[]; timestamp: string }>();
+
+            // Batch process updates
+            for (const pair of selectedPairs) {
                 const data = priceData[pair];
-                if (!data?.price) return;
+                if (!data?.price) continue;
+
+                // Skip if price hasn't changed
+                const lastPrice = lastPricesRef.current.get(pair);
+                if (lastPrice === data.price) continue;
+
+                lastPricesRef.current.set(pair, data.price);
 
                 const boxes = boxMapRef.current.get(pair);
-                if (!boxes) return;
+                if (!boxes) continue;
 
                 const updatedBoxes = updateBoxesWithPrice(boxes, data.price);
-                boxMapRef.current.set(pair, updatedBoxes);
-                updates[pair] = { boxes: updatedBoxes, timestamp: data.timestamp, price: data.price };
-            });
+                if (updatedBoxes) {
+                    boxMapRef.current.set(pair, updatedBoxes);
+                    updates.set(pair, {
+                        boxes: updatedBoxes,
+                        timestamp: data.timestamp,
+                    });
+                    hasUpdates = true;
+                }
+            }
 
-            // Only update state if we have updates
-            if (Object.keys(updates).length > 0) {
+            if (hasUpdates) {
                 setPairData((prev) => {
                     const newPairData = { ...prev };
-                    Object.entries(updates).forEach(([pair, { boxes, timestamp, price }]) => {
+                    updates.forEach((update, pair) => {
                         if (newPairData[pair]) {
-                            const ohlc = createOHLC(price);
                             newPairData[pair] = {
                                 ...newPairData[pair],
-                                boxes: [{ boxes, timestamp, currentOHLC: ohlc }],
-                                currentOHLC: ohlc,
-                                initialBoxData: newPairData[pair].initialBoxData,
+                                boxes: [update],
                             };
                         }
                     });
                     return newPairData;
                 });
             }
-        });
 
-        return () => cancelAnimationFrame(rafId);
+            lastUpdate = now;
+            frameId = requestAnimationFrame(processUpdates);
+        };
+
+        frameId = requestAnimationFrame(processUpdates);
+        return () => cancelAnimationFrame(frameId);
     }, [priceData, selectedPairs, updateBoxesWithPrice]);
 
-    // Memoized context value
     const value = useMemo(
         () => ({
             pairData,
@@ -159,7 +187,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
 }
 
-// Custom hook with proper error handling
 export function useDashboard() {
     const context = use(DashboardContext);
     if (!context) {
