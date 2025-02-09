@@ -106,7 +106,7 @@ const VISUALIZER_TABS = {
                     <div className='px-3 py-2'>
                         <Toggle
                             isEnabled={props.globalSettings.showPriceLines}
-                            onToggle={() => props.handleTimeframeChange('showPriceLines', !props.globalSettings.showPriceLines)}
+                            onToggle={props.handleTimeframeChange.bind(null, 'showPriceLines', !props.globalSettings.showPriceLines)}
                             size='sm'
                             title='Show Price Lines'
                         />
@@ -125,14 +125,19 @@ export const VisualizersView = () => {
     // Get state from stores
     const globalSettings = useTimeframeStore((state) => state.global.settings);
     const updateGlobalSettings = useTimeframeStore((state) => state.updateGlobalSettings);
+    const togglePriceLines = useTimeframeStore((state) => state.togglePriceLines);
     const startGlobalDrag = useTimeframeStore((state) => state.startGlobalDrag);
     const endGlobalDrag = useTimeframeStore((state) => state.endGlobalDrag);
 
     const handleTimeframeChange = useCallback(
         (property: string, value: number | boolean) => {
-            updateGlobalSettings({ [property]: value });
+            if (property === 'showPriceLines') {
+                togglePriceLines();
+            } else {
+                updateGlobalSettings({ [property]: value });
+            }
         },
-        [updateGlobalSettings]
+        [updateGlobalSettings, togglePriceLines]
     );
 
     return (

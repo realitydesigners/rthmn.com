@@ -2,9 +2,9 @@ import React, { useRef, useState, useMemo, useCallback, memo, useEffect } from '
 import { Box } from '@/types/types';
 import { cn } from '@/utils/cn';
 
-// Dynamic time intervals in minutes
 const TIME_INTERVALS = [
     { label: '1D', minutes: 1440 },
+    { label: '18H', minutes: 1080 },
     { label: '12H', minutes: 720 },
     { label: '8H', minutes: 480 },
     { label: '6H', minutes: 360 },
@@ -30,6 +30,8 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
     const barContainerRef = useRef<HTMLDivElement>(null);
     const edgeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const lastUpdateRef = useRef<{ startIndex: number; maxBoxCount: number }>({ startIndex, maxBoxCount });
+
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
         dragType: 'left' | 'right' | 'position' | null;
@@ -37,6 +39,11 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
         isDragging: false,
         dragType: null,
     });
+
+    // Update lastUpdateRef when props change
+    useEffect(() => {
+        lastUpdateRef.current = { startIndex, maxBoxCount };
+    }, [startIndex, maxBoxCount]);
 
     // Clear timeouts on unmount
     useEffect(() => {
@@ -104,6 +111,7 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
             const barWidth = rect.width / 38;
             const startX = e.clientX;
             let previousIndex = type === 'left' ? reversedStartIndex : type === 'right' ? reversedMaxBoxCount : reversedStartIndex;
+            let lastValidIndex = previousIndex;
 
             const handleDragMouseMove = (e: MouseEvent) => {
                 if (!barContainerRef.current) return;
@@ -114,35 +122,53 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                 if (newIndex === 0) return;
 
                 requestAnimationFrame(() => {
+                    let updates: { startIndex?: number; maxBoxCount?: number } = {};
+
                     switch (type) {
                         case 'left': {
                             const newReversedStartIndex = Math.max(0, Math.min(36, previousIndex + newIndex));
                             const newMaxBoxCount = Math.max(2, Math.min(38 - newReversedStartIndex, reversedMaxBoxCount + (previousIndex - newReversedStartIndex)));
                             const newStartIndex = Math.min(37 - (newReversedStartIndex + newMaxBoxCount - 1), 36);
-                            onStyleChange('startIndex', newStartIndex);
-                            onStyleChange('maxBoxCount', newMaxBoxCount);
+
+                            if (newStartIndex !== lastUpdateRef.current.startIndex) {
+                                updates.startIndex = newStartIndex;
+                            }
+                            if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount) {
+                                updates.maxBoxCount = newMaxBoxCount;
+                            }
                             break;
                         }
                         case 'right': {
-                            if (newIndex > 0) {
-                                const newMaxBoxCount = Math.min(previousIndex + newIndex, 38 - reversedStartIndex);
-                                const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
-                                onStyleChange('startIndex', newStartIndex);
-                                onStyleChange('maxBoxCount', newMaxBoxCount);
-                            } else {
-                                const newMaxBoxCount = Math.max(2, previousIndex + newIndex);
-                                const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
-                                onStyleChange('startIndex', newStartIndex);
-                                onStyleChange('maxBoxCount', newMaxBoxCount);
+                            const proposedMaxBoxCount = previousIndex + newIndex;
+                            const newMaxBoxCount = Math.max(2, Math.min(proposedMaxBoxCount, 38 - reversedStartIndex));
+                            const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
+
+                            if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount && newMaxBoxCount >= 2 && newStartIndex >= 0) {
+                                updates.maxBoxCount = newMaxBoxCount;
+                                updates.startIndex = newStartIndex;
                             }
                             break;
                         }
                         case 'position': {
                             const newReversedStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 38 - reversedMaxBoxCount));
                             const newStartIndex = 37 - (newReversedStartIndex + reversedMaxBoxCount - 1);
-                            onStyleChange('startIndex', newStartIndex);
+
+                            if (newStartIndex !== lastUpdateRef.current.startIndex) {
+                                updates.startIndex = newStartIndex;
+                            }
                             break;
                         }
+                    }
+
+                    // Only update if there are changes
+                    if (Object.keys(updates).length > 0) {
+                        Object.entries(updates).forEach(([key, value]) => {
+                            onStyleChange(key, value);
+                        });
+                        lastUpdateRef.current = {
+                            startIndex: updates.startIndex ?? lastUpdateRef.current.startIndex,
+                            maxBoxCount: updates.maxBoxCount ?? lastUpdateRef.current.maxBoxCount,
+                        };
                     }
                 });
             };
