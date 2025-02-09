@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
 import { FaSearch, FaTimes } from 'react-icons/fa';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { cn } from '@/utils/cn';
@@ -325,7 +325,7 @@ const SearchBar = memo(({ onSearchStateChange }: { onSearchStateChange: (isSearc
     );
 });
 
-export const InstrumentsView = () => {
+export const InstrumentsPanel = () => {
     const { selectedPairs, togglePair } = useUser();
     const { priceData } = useWebSocket();
     const [isSearching, setIsSearching] = useState(false);

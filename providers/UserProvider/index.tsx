@@ -2,7 +2,7 @@
 
 import React, { createContext, use, useState, useCallback, useMemo, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import { getSelectedPairs, setSelectedPairs } from '@/utils/localStorage';
 import { useColorStore, type BoxColors } from '@/stores/colorStore';
 

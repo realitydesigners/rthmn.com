@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { IconType } from 'react-icons';
-import { useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import { cn } from '@/utils/cn';
 
 export function FeatureTour({

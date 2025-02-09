@@ -1,7 +1,7 @@
 import React, { memo, useCallback } from 'react';
 
-import { StyleControl } from '@/app/(user)/_components/StyleControl';
-import { Toggle } from '@/app/(user)/_components/Toggle';
+import { StyleControl } from '@/app/(user)/_components/PanelComponents/StyleControl';
+import { Toggle } from '@/app/(user)/_components/PanelComponents/Toggle/Toggle';
 
 type BoxStyleProperty = 'borderRadius' | 'shadowIntensity' | 'opacity' | 'showBorder';
 
