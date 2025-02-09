@@ -1,6 +1,7 @@
 import React, { memo, useCallback } from 'react';
 
 import { StyleControl } from '@/app/(user)/_components/StyleControl';
+import { Toggle } from '@/app/(user)/_components/Toggle';
 
 type BoxStyleProperty = 'borderRadius' | 'shadowIntensity' | 'opacity' | 'showBorder';
 
@@ -63,17 +64,8 @@ export const BoxVisualizer = memo(({ borderRadius, shadowIntensity, opacity, sho
                 <StyleControl label='Shadow Depth' value={shadowIntensity} onChange={handleShadowIntensityChange} min={0} max={1} step={0.05} />
                 <StyleControl label='Opacity' value={opacity} onChange={handleOpacityChange} min={0.01} max={1} step={0.05} />
 
-                <div className='flex items-center justify-between px-1 py-2'>
-                    <div className='space-y-1'>
-                        <span className='font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase'>Show Border</span>
-                    </div>
-                    <button onClick={handleBorderToggle} className={`relative h-6 w-11 rounded-full transition-all duration-300 ${showBorder ? 'bg-white/20' : 'bg-white/[0.03]'}`}>
-                        <div
-                            className={`absolute top-1 h-4 w-4 rounded-full transition-all duration-300 ${
-                                showBorder ? 'left-6 bg-white shadow-[0_0_10px_rgba(255,255,255,0.2)]' : 'left-1 bg-white/50'
-                            }`}
-                        />
-                    </button>
+                <div className='px-1 py-2'>
+                    <Toggle isEnabled={showBorder} onToggle={handleBorderToggle} size='sm' title='Show Border' />
                 </div>
             </div>
         </div>

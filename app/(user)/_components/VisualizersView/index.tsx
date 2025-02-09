@@ -4,6 +4,7 @@ import { LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuRuler } from '
 import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '../TimeFrameSlider';
 import { CHART_STYLES, ChartStyleOption } from './ChartStyleOptions';
+import { Toggle } from '../Toggle';
 
 const VISUALIZER_TABS = {
     chartStyle: {
@@ -102,17 +103,13 @@ const VISUALIZER_TABS = {
                     )}
                 </button>
                 {props.showPriceLines && (
-                    <div className='flex items-center justify-between px-3 py-2'>
-                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#666]'>Show Price Lines</span>
-                        <div
-                            onClick={() => props.handleTimeframeChange('showPriceLines', !props.globalSettings.showPriceLines)}
-                            className={`h-4 w-8 cursor-pointer rounded-full transition-all duration-300 ${props.globalSettings.showPriceLines ? 'bg-[#666]' : 'bg-[#222]'}`}>
-                            <div
-                                className={`h-4 w-4 rounded-full border border-[#444] bg-gradient-to-b from-[#222] to-[#111] transition-all duration-300 ${
-                                    props.globalSettings.showPriceLines ? 'translate-x-4' : 'translate-x-0'
-                                }`}
-                            />
-                        </div>
+                    <div className='px-3 py-2'>
+                        <Toggle
+                            isEnabled={props.globalSettings.showPriceLines}
+                            onToggle={() => props.handleTimeframeChange('showPriceLines', !props.globalSettings.showPriceLines)}
+                            size='sm'
+                            title='Show Price Lines'
+                        />
                     </div>
                 )}
             </>
