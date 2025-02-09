@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { ResoBox } from '@/app/(user)/_components/ResoBox';
 import { TimeFrameSlider } from '@/app/(user)/_components/TimeFrameSlider';
 import { BoxSlice, OHLC } from '@/types/types';
@@ -46,13 +46,22 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
     const digits = pair ? getInstrumentDigits(pair) : 5;
 
     const handleTimeframeChange = useCallback(
-        (property: string, value: number) => {
+        (property: string, value: number | boolean) => {
             if (pair) {
                 updatePairSettings(pair, { [property]: value });
             }
         },
         [pair, updatePairSettings]
     );
+
+    // Memoize the filtered boxes based on timeframe settings
+    const filteredBoxSlice = useMemo(() => {
+        if (!boxSlice?.boxes) return undefined;
+        return {
+            ...boxSlice,
+            boxes: boxSlice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
+        };
+    }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
     return (
         <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
@@ -69,21 +78,13 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                     </div>
 
                     {/* Chart Section */}
-                    <div className='relative flex h-full w-full pr-12'>
-                        <ResoBox
-                            slice={{
-                                ...boxSlice,
-                                boxes: boxSlice?.boxes?.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
-                            }}
-                            className='h-full w-full'
-                            boxColors={boxColors}
-                            pair={pair}
-                        />
+                    <div className={`relative flex h-full w-full ${settings.showPriceLines ? 'pr-12' : 'p-0'} transition-all duration-300`}>
+                        <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
                     </div>
 
                     {/* Timeframe Control */}
                     {boxSlice?.boxes && (
-                        <div className='relative h-24 w-full'>
+                        <div className='relative h-16 w-full'>
                             <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
                             </div>

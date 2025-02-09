@@ -2,9 +2,9 @@ import React, { useRef, useState, useMemo, useCallback, memo, useEffect } from '
 import { Box } from '@/types/types';
 import { cn } from '@/utils/cn';
 
-// Dynamic time intervals in minutes
 const TIME_INTERVALS = [
     { label: '1D', minutes: 1440 },
+    { label: '18H', minutes: 1080 },
     { label: '12H', minutes: 720 },
     { label: '8H', minutes: 480 },
     { label: '6H', minutes: 360 },
@@ -30,6 +30,8 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
     const barContainerRef = useRef<HTMLDivElement>(null);
     const edgeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const lastUpdateRef = useRef<{ startIndex: number; maxBoxCount: number }>({ startIndex, maxBoxCount });
+
     const [dragState, setDragState] = useState<{
         isDragging: boolean;
         dragType: 'left' | 'right' | 'position' | null;
@@ -37,6 +39,11 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
         isDragging: false,
         dragType: null,
     });
+
+    // Update lastUpdateRef when props change
+    useEffect(() => {
+        lastUpdateRef.current = { startIndex, maxBoxCount };
+    }, [startIndex, maxBoxCount]);
 
     // Clear timeouts on unmount
     useEffect(() => {
@@ -104,6 +111,7 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
             const barWidth = rect.width / 38;
             const startX = e.clientX;
             let previousIndex = type === 'left' ? reversedStartIndex : type === 'right' ? reversedMaxBoxCount : reversedStartIndex;
+            let lastValidIndex = previousIndex;
 
             const handleDragMouseMove = (e: MouseEvent) => {
                 if (!barContainerRef.current) return;
@@ -114,35 +122,53 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                 if (newIndex === 0) return;
 
                 requestAnimationFrame(() => {
+                    let updates: { startIndex?: number; maxBoxCount?: number } = {};
+
                     switch (type) {
                         case 'left': {
                             const newReversedStartIndex = Math.max(0, Math.min(36, previousIndex + newIndex));
                             const newMaxBoxCount = Math.max(2, Math.min(38 - newReversedStartIndex, reversedMaxBoxCount + (previousIndex - newReversedStartIndex)));
                             const newStartIndex = Math.min(37 - (newReversedStartIndex + newMaxBoxCount - 1), 36);
-                            onStyleChange('startIndex', newStartIndex);
-                            onStyleChange('maxBoxCount', newMaxBoxCount);
+
+                            if (newStartIndex !== lastUpdateRef.current.startIndex) {
+                                updates.startIndex = newStartIndex;
+                            }
+                            if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount) {
+                                updates.maxBoxCount = newMaxBoxCount;
+                            }
                             break;
                         }
                         case 'right': {
-                            if (newIndex > 0) {
-                                const newMaxBoxCount = Math.min(previousIndex + newIndex, 38 - reversedStartIndex);
-                                const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
-                                onStyleChange('startIndex', newStartIndex);
-                                onStyleChange('maxBoxCount', newMaxBoxCount);
-                            } else {
-                                const newMaxBoxCount = Math.max(2, previousIndex + newIndex);
-                                const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
-                                onStyleChange('startIndex', newStartIndex);
-                                onStyleChange('maxBoxCount', newMaxBoxCount);
+                            const proposedMaxBoxCount = previousIndex + newIndex;
+                            const newMaxBoxCount = Math.max(2, Math.min(proposedMaxBoxCount, 38 - reversedStartIndex));
+                            const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
+
+                            if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount && newMaxBoxCount >= 2 && newStartIndex >= 0) {
+                                updates.maxBoxCount = newMaxBoxCount;
+                                updates.startIndex = newStartIndex;
                             }
                             break;
                         }
                         case 'position': {
                             const newReversedStartIndex = Math.max(0, Math.min(previousIndex + newIndex, 38 - reversedMaxBoxCount));
                             const newStartIndex = 37 - (newReversedStartIndex + reversedMaxBoxCount - 1);
-                            onStyleChange('startIndex', newStartIndex);
+
+                            if (newStartIndex !== lastUpdateRef.current.startIndex) {
+                                updates.startIndex = newStartIndex;
+                            }
                             break;
                         }
+                    }
+
+                    // Only update if there are changes
+                    if (Object.keys(updates).length > 0) {
+                        Object.entries(updates).forEach(([key, value]) => {
+                            onStyleChange(key, value);
+                        });
+                        lastUpdateRef.current = {
+                            startIndex: updates.startIndex ?? lastUpdateRef.current.startIndex,
+                            maxBoxCount: updates.maxBoxCount ?? lastUpdateRef.current.maxBoxCount,
+                        };
                     }
                 });
             };
@@ -207,64 +233,61 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
     }, [handleMouseDown]);
 
     return (
-        <div className='relative flex flex-col'>
-            {/* Main visualization area */}
-            <div className='relative h-full px-4 pt-4 pb-9'>
-                {/* Main slider container */}
-                <div ref={barContainerRef} className='group/bars relative flex h-12 items-center'>
-                    {/* Ambient glow effect */}
-                    <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent opacity-50' />
+        <div className='relative h-full px-2 pb-6'>
+            {/* Main slider container */}
+            <div ref={barContainerRef} className='group/bars relative flex h-8 items-center'>
+                {/* Ambient glow effect */}
+                <div className='absolute inset-0 bg-gradient-to-r from-transparent via-white/[0.02] to-transparent opacity-50' />
 
-                    {/* Selection area with gradient */}
-                    <div
-                        className='absolute h-full bg-gradient-to-b from-white/[0.15] to-white/[0.08] shadow-[inset_0_0_30px_rgba(255,255,255,0.1),0_0_15px_rgba(255,255,255,0.05)] will-change-transform'
-                        style={selectionStyle}>
-                        {/* Inner glow effect */}
-                        <div className='absolute inset-0 overflow-hidden'>
-                            <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]' />
-                        </div>
-                        {/* Top highlight */}
-                        <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent' />
-                        {/* Bottom shadow */}
-                        <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                        {/* Side highlights */}
-                        <div className='absolute inset-y-0 left-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
-                        <div className='absolute inset-y-0 right-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
+                {/* Selection area with gradient */}
+                <div
+                    className='absolute h-full bg-gradient-to-b from-white/[0.15] to-white/[0.08] shadow-[inset_0_0_30px_rgba(255,255,255,0.1),0_0_15px_rgba(255,255,255,0.05)] will-change-transform'
+                    style={selectionStyle}>
+                    {/* Inner glow effect */}
+                    <div className='absolute inset-0 overflow-hidden'>
+                        <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2),transparent_70%)]' />
                     </div>
-
-                    {/* Invisible click handlers */}
-                    <div className='relative flex h-full w-full'>
-                        {Array.from({ length: 38 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className='flex h-full flex-1 items-center'
-                                onMouseDown={(e) => {
-                                    const reversedI = i;
-                                    const isSelected = reversedI >= reversedStartIndex && reversedI < reversedStartIndex + reversedMaxBoxCount;
-                                    const isNearLeftEdge = Math.abs(reversedI - reversedStartIndex) <= 1;
-                                    const isNearRightEdge = Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
-
-                                    if (isSelected) {
-                                        handleMouseDown(e, 'position');
-                                    } else if (isNearLeftEdge) {
-                                        handleMouseDown(e, 'left');
-                                    } else if (isNearRightEdge) {
-                                        handleMouseDown(e, 'right');
-                                    }
-                                }}
-                            />
-                        ))}
-                    </div>
-
-                    {/* Edge handles */}
-                    <div className='pointer-events-none absolute inset-y-0 z-0 will-change-transform' style={selectionStyle}>
-                        {renderEdgeHandles}
-                    </div>
+                    {/* Top highlight */}
+                    <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent' />
+                    {/* Bottom shadow */}
+                    <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
+                    {/* Side highlights */}
+                    <div className='absolute inset-y-0 left-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
+                    <div className='absolute inset-y-0 right-0 w-px bg-gradient-to-b from-white/40 via-white/25 to-white/40 shadow-[0_0_8px_rgba(255,255,255,0.2)]' />
                 </div>
 
-                {/* Dynamic Timeframe Scale */}
-                <DynamicTimeScale reversedStartIndex={reversedStartIndex} reversedMaxBoxCount={reversedMaxBoxCount} getTimeLabel={getTimeLabel} />
+                {/* Invisible click handlers */}
+                <div className='relative flex h-full w-full'>
+                    {Array.from({ length: 38 }).map((_, i) => (
+                        <div
+                            key={i}
+                            className='flex h-full flex-1 items-center'
+                            onMouseDown={(e) => {
+                                const reversedI = i;
+                                const isSelected = reversedI >= reversedStartIndex && reversedI < reversedStartIndex + reversedMaxBoxCount;
+                                const isNearLeftEdge = Math.abs(reversedI - reversedStartIndex) <= 1;
+                                const isNearRightEdge = Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
+
+                                if (isSelected) {
+                                    handleMouseDown(e, 'position');
+                                } else if (isNearLeftEdge) {
+                                    handleMouseDown(e, 'left');
+                                } else if (isNearRightEdge) {
+                                    handleMouseDown(e, 'right');
+                                }
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Edge handles */}
+                <div className='pointer-events-none absolute inset-y-0 z-0 will-change-transform' style={selectionStyle}>
+                    {renderEdgeHandles}
+                </div>
             </div>
+
+            {/* Dynamic Timeframe Scale */}
+            <DynamicTimeScale reversedStartIndex={reversedStartIndex} reversedMaxBoxCount={reversedMaxBoxCount} getTimeLabel={getTimeLabel} />
         </div>
     );
 });
@@ -304,7 +327,7 @@ const DynamicTimeScale = memo(({ reversedStartIndex, reversedMaxBoxCount, getTim
     }, [reversedStartIndex, reversedMaxBoxCount, getTimeLabel]);
 
     return (
-        <div className='absolute inset-x-0 -bottom-1 flex justify-between px-[10px]'>
+        <div className='absolute inset-x-0 flex justify-between'>
             <div className='relative flex w-full justify-between'>{scaleMarks}</div>
         </div>
     );
