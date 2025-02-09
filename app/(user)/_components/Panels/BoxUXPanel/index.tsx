@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { BoxVisualizer } from '@/app/(user)/_components/SidebarRight/BoxVisualizer';
+import { BoxVisualizer } from '@/app/(user)/_components/PanelComponents/BoxVisualizer';
 import { ColorPresets } from './ColorPresets';
 import { CustomColorPicker } from './CustomColorPicker';
 import { useUser } from '@/providers/UserProvider';

@@ -282,99 +282,6 @@ const PatternRecognitionStep = ({ duration = 8000, delay, onComplete, team }: St
     </motion.div>
 );
 
-const VisionStep = ({ duration, delay, onComplete }: StepProps) => (
-    <motion.div
-        key='vision'
-        {...BASE_ANIMATIONS.fade}
-        transition={{
-            ...BASE_ANIMATIONS.transition,
-            delay,
-        }}
-        onAnimationComplete={() => {
-            setTimeout(onComplete, duration);
-        }}
-        className='max-w-3xl space-y-16 text-center'>
-        <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative space-y-8'>
-            {/* Main heading with gradient */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='relative'>
-                <h2 className='font-outfit relative bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-6xl leading-tight font-bold tracking-tight text-transparent'>
-                    Trading from another dimension
-                </h2>
-                <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: '40%' }}
-                    transition={{ duration: 1.5, delay: delay + 0.4 }}
-                    className='mx-auto mt-6 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent'
-                />
-            </motion.div>
-
-            {/* Subtitle with gradient background */}
-            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.5 }} className='relative mx-auto max-w-xl'>
-                <p className='font-outfit text-2xl leading-relaxed tracking-wide text-white/70'>Multi-dimensional wave analysis across any timeframe</p>
-            </motion.div>
-        </motion.div>
-
-        {/* Markets list */}
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.8 }}
-            className='relative mx-auto flex max-w-lg flex-col items-center gap-10'>
-            <div className='flex items-center gap-10 font-mono text-sm tracking-wider'>
-                {['Forex', 'Stocks', 'Crypto', 'Metals', 'Indices'].map((market, i) => (
-                    <motion.div
-                        key={market}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: delay + 0.8 + i * 0.1 }}
-                        className='group relative'>
-                        <motion.div className='absolute -inset-4 rounded-lg bg-white/0 transition-all duration-300 group-hover:bg-white/5' whileHover={{ scale: 1.1 }} />
-                        <span className='relative text-white/40 transition-all duration-300 group-hover:text-white/90'>{market}</span>
-                    </motion.div>
-                ))}
-            </div>
-        </motion.div>
-    </motion.div>
-);
-
-const IntelligenceStep = ({ duration, delay, onComplete }: StepProps) => (
-    <motion.div
-        key='intelligence'
-        initial={{ opacity: 0, scale: 0.95, filter: 'blur(10px)' }}
-        animate={{
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            transitionEnd: { opacity: 0, scale: 0.95, y: -20, filter: 'blur(15px)' },
-        }}
-        transition={{
-            ...BASE_ANIMATIONS.transition,
-            delay,
-            duration: duration / 1000,
-        }}
-        onAnimationComplete={onComplete}
-        className='max-w-2xl space-y-6'>
-        <div className='space-y-4'>
-            <motion.p
-                initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-                className='font-outfit text-2xl text-white/90 [text-shadow:_0_0_30px_rgba(255,255,255,0.2)]'>
-                Our high-performance algorithms process large amounts of data and perform complex calculations in real time.
-            </motion.p>
-            <motion.p
-                initial={{ opacity: 0, y: 20, filter: 'blur(8px)' }}
-                animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, y: -10, filter: 'blur(8px)' }}
-                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-                className='font-mono text-lg text-white/60'>
-                With Rthmn, the past and present are guides to the future.
-            </motion.p>
-        </div>
-    </motion.div>
-);
-
 const LegalStep = ({ delay, onComplete }: Omit<StepProps, 'duration'>) => {
     const [accepted, setAccepted] = useState(false);
 
@@ -535,10 +442,6 @@ export default function IntroSequence({ onComplete }: Props) {
             case 1:
                 return <PatternRecognitionStep key='pattern' duration={10000} delay={0} onComplete={handleStepComplete} team={team} />;
             case 2:
-                return <IntelligenceStep key='intelligence' duration={8000} delay={0} onComplete={handleStepComplete} />;
-            case 3:
-                return <VisionStep key='vision' duration={6000} delay={0} onComplete={handleStepComplete} />;
-            case 4:
                 return <LegalStep key='legal' delay={0} onComplete={handleStepComplete} />;
             default:
                 return null;

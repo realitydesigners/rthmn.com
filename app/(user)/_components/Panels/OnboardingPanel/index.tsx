@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { LuChevronDown, LuChevronUp } from 'react-icons/lu';
-import { ONBOARDING_STEPS, useOnboardingStore } from '@/app/(user)/onboarding/onboarding';
+import { ONBOARDING_STEPS, useOnboardingStore } from '@/stores/onboardingStore';
 import { cn } from '@/utils/cn';
 
 const OnboardingCard = ({ step, isCompleted, isCurrent, stepNumber }: { step: (typeof ONBOARDING_STEPS)[0]; isCompleted: boolean; isCurrent: boolean; stepNumber: number }) => {

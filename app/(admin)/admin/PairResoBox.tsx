@@ -1,14 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoChevronDown, IoChevronUp } from 'react-icons/io5';
-import { ResoBox } from '@/app/(user)/_components/ResoBox';
-import { ResoChart } from '@/app/(user)/_components/ResoChart';
+import { ResoBox } from '@/app/(user)/_components/Charts/ResoBox';
 import { BoxSlice, OHLC } from '@/types/types';
 import type { BoxColors } from '@/stores/colorStore';
 import { INSTRUMENTS } from '@/utils/instruments';
-import { useDashboard } from '@/providers/DashboardProvider/client';
-import { useWebSocket } from '@/providers/WebsocketProvider';
 
 const getInstrumentDigits = (pair: string): number => {
     for (const category of Object.values(INSTRUMENTS)) {
@@ -18,29 +15,6 @@ const getInstrumentDigits = (pair: string): number => {
         }
     }
     return 5;
-};
-
-const CollapsibleSection = ({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) => {
-    const [isOpen, setIsOpen] = useState(defaultOpen);
-
-    // Use effect to sync with defaultOpen prop changes
-    useEffect(() => {
-        setIsOpen(defaultOpen);
-    }, [defaultOpen]);
-
-    return (
-        <div className='rounded border border-[#181818] bg-[#0a0a0a]'>
-            <button onClick={() => setIsOpen(!isOpen)} className='flex w-full items-center justify-between p-2 hover:bg-[#111111]'>
-                <h4 className='text-[11px] font-medium text-gray-300'>{title}</h4>
-                {isOpen ? <IoChevronUp size={14} /> : <IoChevronDown size={14} />}
-            </button>
-            {isOpen && (
-                <div className='border-t border-[#181818] p-2'>
-                    <div className='max-h-[500px] overflow-auto'>{children}</div>
-                </div>
-            )}
-        </div>
-    );
 };
 
 interface PairResoBoxProps {

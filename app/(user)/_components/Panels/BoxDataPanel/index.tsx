@@ -2,9 +2,9 @@
 import React, { useCallback, useState } from 'react';
 import { LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuRuler } from 'react-icons/lu';
 import { useTimeframeStore } from '@/stores/timeframeStore';
-import { TimeFrameSlider } from '../TimeFrameSlider';
-import { CHART_STYLES, ChartStyleOption } from './ChartStyleOptions';
-import { Toggle } from '../Toggle';
+import { TimeFrameSlider } from '../../PanelComponents/TimeFrameSlider';
+import { CHART_STYLES, ChartStyleOption } from '../../ChartStyleOptions';
+import { Toggle } from '../../PanelComponents/Toggle/Toggle';
 
 const VISUALIZER_TABS = {
     chartStyle: {

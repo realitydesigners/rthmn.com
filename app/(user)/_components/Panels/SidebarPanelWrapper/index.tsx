@@ -151,7 +151,7 @@ export const SidebarWrapper = ({
             data-locked={isLocked}
             data-width={width}
             style={{ width: `${width}px` }}>
-            <div className={cn('relative flex h-[calc(100vh-55px)] w-full', position === 'left' ? 'ml-16' : 'mr-16')}>
+            <div className={cn('relative flex h-full w-full', position === 'left' ? 'ml-16' : 'mr-16')}>
                 <div className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a] p-1', position === 'left' ? 'border-r' : 'border-l', 'border-[#121212]')}>
                     {/* Header */}
                     <div className='relative z-10 flex h-12 items-center justify-between px-3'>
@@ -161,35 +161,34 @@ export const SidebarWrapper = ({
                         </div>
                         {position === 'left' && <LockButton isLocked={isLocked} onClick={handleLockToggle} />}
                     </div>
+
                     {/* Content */}
-                    <div className='relative flex-1 overflow-y-auto px-2 pb-4 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/[0.08] hover:[&::-webkit-scrollbar-thumb]:bg-white/[0.1] [&::-webkit-scrollbar-track]:bg-transparent'>
-                        {children}
-                        {/* Onboarding Overlay */}
-                        {isCurrentTourStep && !isCompleted && (
-                            <div className='pointer-events-none absolute inset-0 z-[1000]'>
-                                {/* Inner edge glows */}
-                                <div className='absolute inset-[1px] overflow-hidden'>
-                                    {/* Enhanced corner shadows */}
+                    <div className='relative flex-1 overflow-y-auto px-2 pb-4'>{children}</div>
 
-                                    {/* Intense corner glows */}
-                                </div>
+                    {/* Onboarding Overlay */}
+                    {isCurrentTourStep && !isCompleted && (
+                        <div className='pointer-events-none absolute inset-0 z-[1000]'>
+                            {/* Inner edge glows */}
+                            <div className='absolute inset-0 overflow-hidden'>
+                                {/* Enhanced corner shadows */}
 
-                                {/* Additional corner radials for depth */}
-                                <div className='absolute inset-[1px] overflow-hidden'>
-                                    <div className='absolute -top-16 -left-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
-                                    <div className='absolute -top-16 -right-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
-                                    <div className='absolute -bottom-16 -left-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
-                                    <div className='absolute -right-16 -bottom-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
-                                    <div className='absolute -top-16 -left-16 h-64 w-64 bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.3),transparent_70%)]' />
-                                    <div className='absolute -top-16 -right-16 h-64 w-64 bg-[radial-gradient(circle_at_100%_0%,rgba(59,130,246,0.3),transparent_70%)]' />
-                                </div>
-
-                                {/* Soft edge gradients */}
-                                <div className='absolute inset-[1px] bg-[linear-gradient(to_right,rgba(59,130,246,0.1),transparent_20%,transparent_80%,rgba(59,130,246,0.1))]' />
-                                <div className='absolute inset-[1px] bg-[linear-gradient(to_bottom,rgba(59,130,246,0.1),transparent_20%,transparent_80%,rgba(59,130,246,0.1))]' />
+                                {/* Intense corner glows */}
                             </div>
-                        )}
-                    </div>
+
+                            {/* Additional corner radials for depth */}
+                            <div className='absolute inset-0 overflow-hidden'>
+                                <div className='absolute -bottom-32 -left-16 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
+                                <div className='absolute -right-16 -bottom-32 h-32 w-32 bg-blue-500/[0.25] blur-[24px]' />
+
+                                <div className='absolute -top-16 -left-16 h-64 w-64 bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.3),transparent_70%)]' />
+                                <div className='absolute -top-16 -right-16 h-64 w-64 bg-[radial-gradient(circle_at_100%_0%,rgba(59,130,246,0.3),transparent_70%)]' />
+                            </div>
+
+                            {/* Soft edge gradients */}
+                            <div className='absolute inset-0 bg-[linear-gradient(to_right,rgba(59,130,246,0.1),transparent_20%,transparent_80%,rgba(59,130,246,0.1))]' />
+                            <div className='absolute inset-0 bg-[linear-gradient(to_bottom,rgba(59,130,246,0.1),transparent_20%,transparent_80%,rgba(59,130,246,0.1))]' />
+                        </div>
+                    )}
                 </div>
 
                 {/* Resize handle */}
