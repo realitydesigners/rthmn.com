@@ -4,6 +4,7 @@ import { persist } from 'zustand/middleware';
 export interface TimeframeSettings {
     startIndex: number;
     maxBoxCount: number;
+    showPriceLines: boolean;
 }
 
 interface TimeframeState {
@@ -25,6 +26,7 @@ interface TimeframeState {
 const DEFAULT_SETTINGS: TimeframeSettings = {
     startIndex: 0,
     maxBoxCount: 38,
+    showPriceLines: true,
 };
 
 export const useTimeframeStore = create<TimeframeState>()(

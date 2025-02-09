@@ -1,4 +1,5 @@
 import React, { memo, useCallback } from 'react';
+
 import { StyleControl } from '@/app/(user)/_components/StyleControl';
 
 type BoxStyleProperty = 'borderRadius' | 'shadowIntensity' | 'opacity' | 'showBorder';

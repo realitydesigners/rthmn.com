@@ -69,7 +69,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                     </div>
 
                     {/* Chart Section */}
-                    <div className='relative flex h-full w-full pr-12'>
+                    <div className={`relative flex h-full w-full ${settings.showPriceLines ? 'pr-12' : 'p-0'}`}>
                         <ResoBox
                             slice={{
                                 ...boxSlice,
@@ -78,12 +78,13 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                             className='h-full w-full'
                             boxColors={boxColors}
                             pair={pair}
+                            showPriceLines={settings.showPriceLines}
                         />
                     </div>
 
                     {/* Timeframe Control */}
                     {boxSlice?.boxes && (
-                        <div className='relative h-24 w-full'>
+                        <div className='relative h-16 w-full'>
                             <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
                             </div>
