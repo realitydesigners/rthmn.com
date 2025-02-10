@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { getSelectedPairs, setSelectedPairs } from '@/utils/localStorage';
 import { useColorStore, type BoxColors } from '@/stores/colorStore';
+import { useGridStore } from '@/stores/gridStore';
 
 interface UserContextType {
     selectedPairs: string[];
@@ -18,7 +19,6 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | null>(null);
 
 export function UserProvider({ children }: { children: React.ReactNode }) {
-    const [selectedPairs, setSelectedPairsState] = useState<string[]>([]);
     const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
@@ -27,6 +27,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // Get box colors from the store
     const boxColors = useColorStore((state) => state.boxColors);
     const updateBoxColors = useColorStore((state) => state.updateBoxColors);
+
+    // Get grid store functions
+    const orderedPairs = useGridStore((state) => state.orderedPairs);
+    const setInitialPairs = useGridStore((state) => state.setInitialPairs);
 
     // Onboarding check
     useEffect(() => {
@@ -41,21 +45,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         const initializeData = async () => {
             const storedPairs = getSelectedPairs();
-            setSelectedPairsState(storedPairs);
+            setInitialPairs(storedPairs);
             setIsSidebarInitialized(true);
         };
 
         initializeData();
-    }, []);
+    }, [setInitialPairs]);
 
-    const togglePair = useCallback((pair: string) => {
-        setSelectedPairsState((prev) => {
-            const wasSelected = prev.includes(pair);
-            const newSelected = wasSelected ? prev.filter((p) => p !== pair) : [...prev, pair];
+    const togglePair = useCallback(
+        (pair: string) => {
+            const newSelected = orderedPairs.includes(pair) ? orderedPairs.filter((p) => p !== pair) : [...orderedPairs, pair];
+
             setSelectedPairs(newSelected);
-            return newSelected;
-        });
-    }, []);
+            setInitialPairs(newSelected);
+        },
+        [orderedPairs, setInitialPairs]
+    );
 
     const handleSidebarClick = useCallback((e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
@@ -67,14 +72,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     const value = useMemo(
         () => ({
-            selectedPairs,
+            selectedPairs: orderedPairs,
             boxColors,
             isSidebarInitialized,
             togglePair,
             updateBoxColors,
             handleSidebarClick,
         }),
-        [selectedPairs, boxColors, isSidebarInitialized, togglePair, updateBoxColors, handleSidebarClick]
+        [orderedPairs, boxColors, isSidebarInitialized, togglePair, updateBoxColors, handleSidebarClick]
     );
 
     return (

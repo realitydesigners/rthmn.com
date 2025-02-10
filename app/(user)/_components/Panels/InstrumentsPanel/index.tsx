@@ -7,18 +7,10 @@ import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { cn } from '@/utils/cn';
 import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
-import { LuSearch } from 'react-icons/lu';
-
-const formatPrice = (price: number, instrument: string) => {
-    let digits = 2;
-    for (const category of Object.values(INSTRUMENTS)) {
-        if (instrument in category) {
-            digits = category[instrument].digits;
-            break;
-        }
-    }
-    return price.toFixed(digits);
-};
+import { Reorder, useDragControls } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { useGridStore } from '@/stores/gridStore';
+import { formatPrice } from '@/utils/instruments';
 
 interface LoadingSpinnerProps {
     color?: string;
@@ -65,30 +57,16 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
     return (
         <div
             className={cn(
-                'group/item relative flex h-10 items-center transition-all duration-300 select-none',
-                'after:absolute after:inset-0 after:rounded-lg after:transition-all after:duration-300',
-                isSelected
-                    ? ['bg-[#141414]/90', 'after:bg-gradient-to-r after:from-transparent after:via-[rgba(255,255,255,0.03)] after:to-transparent', 'after:animate-shimmer']
-                    : [
-                          'bg-[#0C0C0C]/90 hover:bg-[#111]/90',
-                          'after:bg-gradient-to-r after:from-transparent after:via-[rgba(255,255,255,0.03)] after:to-transparent after:opacity-0',
-                          'group-hover/item:after:opacity-100',
-                      ]
+                'group/item relative flex h-10 w-full items-center rounded-lg transition-all duration-300 select-none',
+                isSelected ? 'bg-[#141414] hover:bg-[#181818]' : 'bg-[#0C0C0C] hover:bg-[#111]'
             )}
-            onClick={() => onToggle()}
             role='button'
             tabIndex={0}>
             <div className='relative flex w-full items-center px-3'>
                 {/* Status indicator */}
                 <div className='relative flex h-8 w-8 items-center justify-center'>
                     <div
-                        className={cn('absolute h-4 w-4 rounded-full transition-all duration-300', isSelected ? 'opacity-10' : 'opacity-0 group-hover/item:opacity-5')}
-                        style={{
-                            background: isSelected ? `radial-gradient(circle at center, ${boxColors.positive}, ${boxColors.negative})` : '#333',
-                        }}
-                    />
-                    <div
-                        className={cn('h-1.5 w-1.5 rounded-full transition-all duration-300', isSelected ? 'scale-100' : 'scale-90 opacity-40')}
+                        className={cn('h-1.5 w-1.5 rounded-full transition-all duration-300', isSelected ? 'opacity-100' : 'opacity-40')}
                         style={{
                             background: isSelected ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})` : '#333',
                         }}
@@ -97,10 +75,7 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
 
                 {/* Instrument name */}
                 <span
-                    className={cn(
-                        'font-outfit ml-3 flex-1 text-sm font-bold tracking-wide transition-all duration-300',
-                        isSelected ? 'text-white' : 'text-[#666] group-hover/item:text-[#888]'
-                    )}>
+                    className={cn('font-outfit flex-1 text-sm font-bold tracking-wide transition-colors', isSelected ? 'text-white' : 'text-[#666] group-hover/item:text-[#888]')}>
                     {item}
                 </span>
 
@@ -108,9 +83,8 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
                 <div className='flex items-center'>
                     <span
                         className={cn(
-                            'font-kodemono w-[70px] text-right text-sm tracking-wider transition-all duration-300',
-                            isSelected ? 'text-[#999]' : 'text-[#444] group-hover/item:text-[#666]',
-                            'flex items-center justify-end'
+                            'font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors',
+                            isSelected ? 'text-[#999]' : 'text-[#444] group-hover/item:text-[#666]'
                         )}>
                         {price ? formatPrice(price, item) : <LoadingSpinner key={`${item}-loading`} itemId={item} color={isSelected ? boxColors.positive : '#444'} />}
                     </span>
@@ -124,7 +98,7 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
                             }}
                             className={cn(
                                 'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
-                                'invisible group-hover/item:visible',
+                                'opacity-0 group-hover/item:opacity-100',
                                 isSelected
                                     ? ['border-[#333] bg-[#1A1A1A] text-[#666]', 'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400']
                                     : ['border-[#222] bg-[#141414] text-[#666]', 'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400']
@@ -326,15 +300,86 @@ const SearchBar = memo(({ onSearchStateChange }: { onSearchStateChange: (isSearc
     );
 });
 
+// DraggableItem component to handle individual drag controls
+const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => void }) => {
+    const dragControls = useDragControls();
+
+    return (
+        <Reorder.Item
+            key={item}
+            value={item}
+            dragListener={false}
+            dragControls={dragControls}
+            className='group/drag mb-1'
+            whileDrag={{ zIndex: 50 }}
+            style={{ position: 'relative', zIndex: 0 }}>
+            <motion.div className='relative flex w-full items-center rounded-lg' layout='position' transition={{ duration: 0.15 }} whileDrag={{ zIndex: 50 }}>
+                <div className='w-full'>
+                    {/* Drag Handle - Positioned to the left of the status indicator */}
+
+                    {/* Regular PairItem */}
+                    <div className='group-hover/drag:[&>div]:bg-[#181818]'>
+                        <motion.button
+                            className='absolute top-1/2 left-0 z-[100] -translate-y-1/2 cursor-grab active:cursor-grabbing'
+                            onPointerDown={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                dragControls.start(e);
+                            }}>
+                            <div className='flex h-8 w-8 items-center justify-center opacity-0 transition-all duration-200 group-hover/drag:opacity-60'>
+                                <svg width='14' height='14' viewBox='0 0 16 16' fill='none' className='pointer-events-none'>
+                                    <path d='M7 3H5V5H7V3Z' fill='#666' />
+                                    <path d='M7 7H5V9H7V7Z' fill='#666' />
+                                    <path d='M7 11H5V13H7V11Z' fill='#666' />
+                                    <path d='M11 3H9V5H11V3Z' fill='#666' />
+                                    <path d='M11 7H9V9H11V7Z' fill='#666' />
+                                    <path d='M11 11H9V13H11V11Z' fill='#666' />
+                                </svg>
+                            </div>
+                        </motion.button>
+                        <PairItem item={item} isSelected={true} onToggle={onToggle} />
+                    </div>
+                </div>
+            </motion.div>
+        </Reorder.Item>
+    );
+});
+
+DraggableItem.displayName = 'DraggableItem';
+
 export const InstrumentsPanel = () => {
     const { selectedPairs, togglePair } = useUser();
     const { priceData } = useWebSocket();
     const [isSearching, setIsSearching] = useState(false);
+    const orderedPairs = useGridStore((state) => state.orderedPairs);
+    const reorderPairs = useGridStore((state) => state.reorderPairs);
+    const setInitialPairs = useGridStore((state) => state.setInitialPairs);
+
+    // Initialize ordered pairs when selected pairs change
+    useEffect(() => {
+        setInitialPairs(selectedPairs);
+    }, [selectedPairs, setInitialPairs]);
+
+    const handleToggle = useCallback(
+        (pair: string) => {
+            togglePair(pair);
+            // Update grid store after toggle
+            const newPairs = selectedPairs.includes(pair) ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
+
+            // If removing a pair, also remove it from orderedPairs
+            if (selectedPairs.includes(pair)) {
+                reorderPairs(orderedPairs.filter((p) => p !== pair));
+            } else {
+                setInitialPairs(newPairs);
+            }
+        },
+        [selectedPairs, togglePair, setInitialPairs, orderedPairs, reorderPairs]
+    );
 
     // Memoized selected pairs items
     const selectedPairsItems = useMemo(
-        () => selectedPairs.map((item) => <PairItem key={item} item={item} isSelected={true} onToggle={() => togglePair(item)} />),
-        [selectedPairs, togglePair]
+        () => orderedPairs.map((item) => <DraggableItem key={item} item={item} onToggle={() => handleToggle(item)} />),
+        [orderedPairs, handleToggle]
     );
 
     // Memoized available pairs groups
@@ -350,12 +395,12 @@ export const InstrumentsPanel = () => {
                     const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
                     if (availablePairs.length === 0) return null;
 
-                    const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => togglePair(item)} />);
+                    const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => handleToggle(item)} />);
 
                     return <PairGroup key={group.label} label={group.label} items={items} count={availablePairs.length} />;
                 })
                 .filter(Boolean),
-        [selectedPairs, togglePair]
+        [selectedPairs, handleToggle]
     );
 
     return (
@@ -364,7 +409,18 @@ export const InstrumentsPanel = () => {
                 <SearchBar onSearchStateChange={setIsSearching} />
             </div>
             <div className={cn('flex-1 overflow-y-auto', isSearching ? 'opacity-30' : 'opacity-100')}>
-                {selectedPairs.length > 0 && <PairGroup label='Selected Pairs' items={selectedPairsItems} count={selectedPairs.length} isSelected={true} />}
+                {orderedPairs.length > 0 && (
+                    <PairGroup
+                        label='Selected Pairs'
+                        items={
+                            <Reorder.Group axis='y' values={orderedPairs} onReorder={reorderPairs}>
+                                {selectedPairsItems}
+                            </Reorder.Group>
+                        }
+                        count={orderedPairs.length}
+                        isSelected={true}
+                    />
+                )}
                 {availablePairsGroups}
             </div>
         </div>
