@@ -46,6 +46,7 @@ const BASE_COLUMN_OPTIONS = [1, 2, 3, 4];
 export const GridControl = () => {
     const { updateBreakpoint, getGridClass } = useGridStore();
     const [currentWidth, setCurrentWidth] = useState(0);
+    const [selectedCols, setSelectedCols] = useState<number | null>(null);
 
     // Update width when main container changes
     const updateWidth = useCallback(() => {
@@ -53,14 +54,16 @@ export const GridControl = () => {
         if (!main) return;
 
         const newWidth = main.clientWidth;
-        if (Math.abs(newWidth - currentWidth) > 5) {
-            setCurrentWidth(newWidth);
-        }
-    }, [currentWidth]);
+        setCurrentWidth(newWidth);
+    }, []); // Remove currentWidth dependency to avoid stale updates
 
+    // Initial width setup
     useEffect(() => {
-        // Initial update
+        // Try to get width immediately
         updateWidth();
+
+        // Also wait for any dynamic content to load
+        const timer = setTimeout(updateWidth, 100);
 
         // Watch for resize
         const resizeObserver = new ResizeObserver(() => {
@@ -72,26 +75,49 @@ export const GridControl = () => {
             resizeObserver.observe(main);
         }
 
-        return () => resizeObserver.disconnect();
+        return () => {
+            resizeObserver.disconnect();
+            clearTimeout(timer);
+        };
     }, [updateWidth]);
+
+    // Force update when width changes significantly
+    useEffect(() => {
+        if (currentWidth > 0) {
+            const gridClass = getGridClass(currentWidth);
+            const match = gridClass.match(/grid-cols-(\d+)/);
+            const cols = match ? parseInt(match[1], 10) : 1;
+            setSelectedCols(cols);
+        }
+    }, [currentWidth, getGridClass]);
 
     // Determine if we should show the 5-column option based on width
     const showFiveColumns = currentWidth > 1400;
 
-    // Get the current column count directly from the grid class
+    // Get current columns directly from the grid class
     const currentCols = useMemo(() => {
+        if (selectedCols !== null) return selectedCols;
         const gridClass = getGridClass(currentWidth);
         const match = gridClass.match(/grid-cols-(\d+)/);
-        return match ? parseInt(match[1]) : 1;
-    }, [getGridClass, currentWidth]);
+        return match ? parseInt(match[1], 10) : 1;
+    }, [getGridClass, currentWidth, selectedCols]);
 
     // Memoize click handlers
     const handleClick = useCallback(
         (cols: number) => {
-            updateBreakpoint(currentWidth, cols);
+            if (currentWidth > 0) {
+                // Only allow clicks if width is initialized
+                setSelectedCols(cols);
+                updateBreakpoint(currentWidth, cols);
+            }
         },
         [currentWidth, updateBreakpoint]
     );
+
+    // Reset selected cols when width changes significantly
+    useEffect(() => {
+        setSelectedCols(null);
+    }, [currentWidth]);
 
     return (
         <div className='flex items-center gap-2 px-2 py-1.5'>
