@@ -118,21 +118,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
-        console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
-
-        // Only subscribe to pairs that we don't already have data for
-        selectedPairs.forEach((pair) => {
-            if (!boxMapRef.current.has(pair)) {
-                subscribeToBoxSlices(pair, (wsData: BoxSlice) => handleBoxSliceUpdate(pair, wsData));
-            }
-        });
-
-        // Only unsubscribe from pairs that are no longer selected
+        // Clean up any stale data for pairs that are no longer selected
         const currentPairs = new Set(selectedPairs);
         Array.from(boxMapRef.current.keys()).forEach((pair) => {
             if (!currentPairs.has(pair)) {
                 unsubscribeFromBoxSlices(pair);
                 boxMapRef.current.delete(pair);
+                lastPricesRef.current.delete(pair);
                 setPairData((prev) => {
                     const newData = { ...prev };
                     delete newData[pair];
@@ -141,13 +133,45 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             }
         });
 
+        // Subscribe to all selected pairs, including re-added ones
+        selectedPairs.forEach((pair) => {
+            // Always resubscribe to ensure fresh data
+            unsubscribeFromBoxSlices(pair);
+            subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
+                setPairData((prev) => {
+                    // Always use new box data when a pair is re-added
+                    const isReAdded = !prev[pair] || !boxMapRef.current.has(pair);
+                    if (isReAdded) {
+                        boxMapRef.current.set(pair, [...wsData.boxes]);
+                        lastPricesRef.current.delete(pair); // Clear last price to force update
+                        return {
+                            ...prev,
+                            [pair]: {
+                                boxes: [wsData],
+                                currentOHLC: wsData.currentOHLC,
+                                initialBoxData: wsData,
+                            },
+                        };
+                    }
+
+                    // Keep existing box data for continuous updates
+                    return {
+                        ...prev,
+                        [pair]: {
+                            ...prev[pair],
+                            currentOHLC: wsData.currentOHLC,
+                        },
+                    };
+                });
+            });
+        });
+
         return () => {
-            console.log('Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
             });
         };
-    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, handleBoxSliceUpdate]);
+    }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices]);
 
     // Price update effect with optimized batching
     useEffect(() => {
