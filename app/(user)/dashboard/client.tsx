@@ -128,7 +128,7 @@ export default function Dashboard() {
                             key={pair}
                             initial={false}
                             layout='position'
-                            drag
+                            // drag
                             dragSnapToOrigin
                             dragElastic={0.1}
                             dragTransition={{
