@@ -1,11 +1,17 @@
-interface CurrencyPairDetails {
-    point: number;
-    digits: number;
-}
-
 export const roundToDigits = (value: number, digits: number): number => {
     const multiplier = 10 ** digits;
     return Math.round(value * multiplier) / multiplier;
+};
+
+export const formatPrice = (price: number, instrument: string) => {
+    let digits = 2;
+    for (const category of Object.values(INSTRUMENTS)) {
+        if (instrument in category) {
+            digits = category[instrument].digits;
+            break;
+        }
+    }
+    return price.toFixed(digits);
 };
 
 export const INSTRUMENTS = {

@@ -2,19 +2,9 @@
 
 import React, { useEffect, useRef, useState, memo, useMemo } from 'react';
 import type { Box, BoxSlice } from '@/types/types';
-import { INSTRUMENTS } from '@/utils/instruments';
+import { INSTRUMENTS, formatPrice } from '@/utils/instruments';
 import type { BoxColors } from '@/stores/colorStore';
 import { useUser } from '@/providers/UserProvider';
-
-const getInstrumentDigits = (pair: string): number => {
-    const categories = INSTRUMENTS as Record<string, Record<string, { digits: number }>>;
-    for (const [category, pairs] of Object.entries(categories)) {
-        if (pair in pairs) {
-            return pairs[pair].digits;
-        }
-    }
-    return 5;
-};
 
 // Optimized color computation
 const useBoxColors = (box: Box, boxColors: BoxColors) => {
@@ -88,7 +78,6 @@ interface BoxProps {
 const Box = memo(({ box, index, prevBox, boxColors, containerSize, slice, sortedBoxes, pair, showPriceLines = true }: BoxProps) => {
     const colors = useBoxColors(box, boxColors);
     const { baseStyles, isFirstDifferent } = useBoxStyles(box, prevBox, boxColors, containerSize, index);
-    const digits = getInstrumentDigits(pair);
 
     const isConsecutivePositive = prevBox?.value > 0 && box.value > 0 && !isFirstDifferent;
     const isConsecutiveNegative = prevBox?.value < 0 && box.value < 0 && !isFirstDifferent;
@@ -138,7 +127,7 @@ const Box = memo(({ box, index, prevBox, boxColors, containerSize, slice, sorted
                     <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
                     <div className='absolute -top-3.5 right-0'>
                         <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                            {box.high.toFixed(digits)}
+                            {formatPrice(box.high, pair)}
                         </span>
                     </div>
                 </div>
@@ -149,7 +138,7 @@ const Box = memo(({ box, index, prevBox, boxColors, containerSize, slice, sorted
                     <div className='w-5 border-[0.05px] transition-all' style={{ borderColor: `${colors.baseColor.replace(')', ', 1)')}` }} />
                     <div className='absolute -top-3.5 right-0'>
                         <span className='font-kodemono text-[8px] tracking-wider' style={{ color: colors.baseColor }}>
-                            {box.low.toFixed(digits)}
+                            {formatPrice(box.low, pair)}
                         </span>
                     </div>
                 </div>

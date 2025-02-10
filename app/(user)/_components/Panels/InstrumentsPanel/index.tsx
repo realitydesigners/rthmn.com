@@ -10,17 +10,7 @@ import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from 
 import { Reorder, useDragControls } from 'framer-motion';
 import { motion } from 'framer-motion';
 import { useGridStore } from '@/stores/gridStore';
-
-const formatPrice = (price: number, instrument: string) => {
-    let digits = 2;
-    for (const category of Object.values(INSTRUMENTS)) {
-        if (instrument in category) {
-            digits = category[instrument].digits;
-            break;
-        }
-    }
-    return price.toFixed(digits);
-};
+import { formatPrice } from '@/utils/instruments';
 
 interface LoadingSpinnerProps {
     color?: string;
