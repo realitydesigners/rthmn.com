@@ -64,6 +64,14 @@ const useBoxUpdater = () => {
     }, []);
 };
 
+// Optimized OHLC creation
+const createOHLC = (price: number): OHLC => ({
+    open: price,
+    high: price,
+    low: price,
+    close: price,
+});
+
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const { selectedPairs, isSidebarInitialized } = useUser();
     const [pairData, setPairData] = useState<Record<string, PairData>>({});
@@ -79,30 +87,64 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     // Optimized box slice subscription handler
     const handleBoxSliceUpdate = useCallback((pair: string, wsData: BoxSlice) => {
-        boxMapRef.current.set(pair, wsData.boxes);
-        setPairData((prev) => ({
-            ...prev,
-            [pair]: {
-                boxes: [wsData],
-                currentOHLC: wsData.currentOHLC,
-                initialBoxData: prev[pair]?.initialBoxData || wsData,
-            },
-        }));
+        setPairData((prev) => {
+            // Keep existing box data if it exists
+            const existingBoxes = boxMapRef.current.get(pair);
+            if (existingBoxes) {
+                return {
+                    ...prev,
+                    [pair]: {
+                        ...prev[pair],
+                        currentOHLC: wsData.currentOHLC,
+                    },
+                };
+            }
+
+            // Store new box values only if we don't have existing ones
+            boxMapRef.current.set(pair, [...wsData.boxes]);
+
+            return {
+                ...prev,
+                [pair]: {
+                    boxes: [wsData],
+                    currentOHLC: wsData.currentOHLC,
+                    initialBoxData: prev[pair]?.initialBoxData || wsData,
+                },
+            };
+        });
     }, []);
 
     // WebSocket subscription effect
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
 
+        console.log('Setting up WebSocket subscriptions for pairs:', selectedPairs);
+
+        // Only subscribe to pairs that we don't already have data for
         selectedPairs.forEach((pair) => {
-            subscribeToBoxSlices(pair, (wsData: BoxSlice) => handleBoxSliceUpdate(pair, wsData));
+            if (!boxMapRef.current.has(pair)) {
+                subscribeToBoxSlices(pair, (wsData: BoxSlice) => handleBoxSliceUpdate(pair, wsData));
+            }
+        });
+
+        // Only unsubscribe from pairs that are no longer selected
+        const currentPairs = new Set(selectedPairs);
+        Array.from(boxMapRef.current.keys()).forEach((pair) => {
+            if (!currentPairs.has(pair)) {
+                unsubscribeFromBoxSlices(pair);
+                boxMapRef.current.delete(pair);
+                setPairData((prev) => {
+                    const newData = { ...prev };
+                    delete newData[pair];
+                    return newData;
+                });
+            }
         });
 
         return () => {
+            console.log('Cleaning up WebSocket subscriptions');
             selectedPairs.forEach((pair) => {
                 unsubscribeFromBoxSlices(pair);
-                boxMapRef.current.delete(pair);
-                lastPricesRef.current.delete(pair);
             });
         };
     }, [isConnected, selectedPairs, isAuthenticated, subscribeToBoxSlices, unsubscribeFromBoxSlices, handleBoxSliceUpdate]);
@@ -123,7 +165,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
             }
 
             let hasUpdates = false;
-            const updates = new Map<string, { boxes: Box[]; timestamp: string }>();
+            const updates = new Map<string, { boxes: Box[]; timestamp: string; price: number }>();
 
             // Batch process updates
             for (const pair of selectedPairs) {
@@ -145,6 +187,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     updates.set(pair, {
                         boxes: updatedBoxes,
                         timestamp: data.timestamp,
+                        price: data.price,
                     });
                     hasUpdates = true;
                 }
@@ -155,9 +198,12 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
                     const newPairData = { ...prev };
                     updates.forEach((update, pair) => {
                         if (newPairData[pair]) {
+                            const ohlc = createOHLC(update.price);
                             newPairData[pair] = {
                                 ...newPairData[pair],
-                                boxes: [update],
+                                boxes: [{ boxes: update.boxes, timestamp: update.timestamp, currentOHLC: ohlc }],
+                                currentOHLC: ohlc,
+                                initialBoxData: newPairData[pair].initialBoxData,
                             };
                         }
                     });
@@ -173,6 +219,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
         return () => cancelAnimationFrame(frameId);
     }, [priceData, selectedPairs, updateBoxesWithPrice]);
 
+    // Memoized context value
     const value = useMemo(
         () => ({
             pairData,
@@ -187,6 +234,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     return <DashboardContext.Provider value={value}>{children}</DashboardContext.Provider>;
 }
 
+// Custom hook with proper error handling
 export function useDashboard() {
     const context = use(DashboardContext);
     if (!context) {

@@ -60,12 +60,20 @@ export const setSidebarLocks = (locks: { left: boolean; right: boolean }) => {
 };
 
 export const getSelectedPairs = (): string[] => {
-    if (typeof window === 'undefined') return [];
-    const stored = localStorage.getItem(SELECTED_PAIRS_KEY);
-    return stored ? JSON.parse(stored) : [];
+    try {
+        const pairs = localStorage.getItem('rthmn-selected-pairs');
+        return pairs ? JSON.parse(pairs) : [];
+    } catch (e) {
+        console.error('Failed to get selected pairs:', e);
+        return [];
+    }
 };
 
 export const setSelectedPairs = (pairs: string[]) => {
-    if (typeof window === 'undefined') return;
-    localStorage.setItem(SELECTED_PAIRS_KEY, JSON.stringify(pairs));
+    try {
+        localStorage.setItem('rthmn-selected-pairs', JSON.stringify(pairs));
+        localStorage.setItem('rthmn-pairs-order', JSON.stringify(pairs)); // Also update the order
+    } catch (e) {
+        console.error('Failed to save selected pairs:', e);
+    }
 };

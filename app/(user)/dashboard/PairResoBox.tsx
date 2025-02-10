@@ -6,18 +6,8 @@ import { TimeFrameSlider } from '@/app/(user)/_components/PanelComponents/TimeFr
 import { BoxSlice, OHLC } from '@/types/types';
 import type { BoxColors } from '@/stores/colorStore';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { INSTRUMENTS } from '@/utils/instruments';
 import { useTimeframeStore } from '@/stores/timeframeStore';
-
-const getInstrumentDigits = (pair: string): number => {
-    const categories = INSTRUMENTS as Record<string, Record<string, { digits: number }>>;
-    for (const [category, pairs] of Object.entries(categories)) {
-        if (pair in pairs) {
-            return pairs[pair].digits;
-        }
-    }
-    return 5;
-};
+import { formatPrice } from '@/utils/instruments';
 
 interface PairResoBoxProps {
     pair?: string;
@@ -43,7 +33,6 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
     }, [pair, initializePair]);
 
     const currentPrice = pair ? priceData[pair]?.price : null;
-    const digits = pair ? getInstrumentDigits(pair) : 5;
 
     const handleTimeframeChange = useCallback(
         (property: string, value: number | boolean) => {
@@ -72,7 +61,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading 
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
-                                <div className='font-kodemono text-sm font-medium text-gray-200'>{currentPrice ? currentPrice.toFixed(digits) : '-'}</div>
+                                <div className='font-kodemono text-sm font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, pair) : '-'}</div>
                             </div>
                         </div>
                     </div>
