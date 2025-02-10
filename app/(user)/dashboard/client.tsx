@@ -130,15 +130,22 @@ export default function Dashboard() {
                             layout='position'
                             drag
                             dragSnapToOrigin
+                            dragElastic={0.1}
+                            dragTransition={{
+                                bounceStiffness: 300,
+                                bounceDamping: 20,
+                            }}
                             onDragStart={() => handleDragStart(pair)}
                             onDrag={(e) => handleDrag(e, pair)}
                             onDragEnd={() => setDraggedItem(null)}
-                            whileDrag={{ zIndex: 1 }}
+                            whileDrag={{
+                                zIndex: 1,
+                            }}
                             transition={{
                                 layout: {
-                                    type: 'tween',
-                                    duration: 0.2,
-                                    ease: 'easeOut',
+                                    type: 'spring',
+                                    stiffness: 250,
+                                    damping: 20,
                                 },
                             }}
                             className='relative cursor-grab active:cursor-grabbing'>

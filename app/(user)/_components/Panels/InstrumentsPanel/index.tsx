@@ -325,17 +325,19 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
             style={{ position: 'relative', zIndex: 0 }}>
             <motion.div className='relative flex w-full items-center rounded-lg' layout='position' transition={{ duration: 0.15 }} whileDrag={{ zIndex: 50 }}>
                 <div className='w-full'>
-                    <div className='relative'>
-                        {/* Drag Handle - Absolute positioned over the status indicator */}
+                    {/* Drag Handle - Positioned to the left of the status indicator */}
+
+                    {/* Regular PairItem */}
+                    <div className='group-hover/drag:[&>div]:bg-[#181818]'>
                         <motion.button
-                            className='absolute top-1/2 left-3 z-[100] h-8 w-8 -translate-y-1/2 cursor-grab active:cursor-grabbing'
+                            className='absolute top-1/2 left-0 z-[100] -translate-y-1/2 cursor-grab active:cursor-grabbing'
                             onPointerDown={(e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
                                 dragControls.start(e);
                             }}>
-                            <div className='flex h-8 w-8 items-center justify-center rounded-md opacity-0 transition-all duration-200 group-hover/drag:opacity-100'>
-                                <svg width='16' height='16' viewBox='0 0 16 16' fill='none' className='pointer-events-none'>
+                            <div className='flex h-8 w-8 items-center justify-center opacity-0 transition-all duration-200 group-hover/drag:opacity-60'>
+                                <svg width='14' height='14' viewBox='0 0 16 16' fill='none' className='pointer-events-none'>
                                     <path d='M7 3H5V5H7V3Z' fill='#666' />
                                     <path d='M7 7H5V9H7V7Z' fill='#666' />
                                     <path d='M7 11H5V13H7V11Z' fill='#666' />
@@ -345,10 +347,7 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
                                 </svg>
                             </div>
                         </motion.button>
-                        {/* Regular PairItem */}
-                        <div className='group-hover/drag:[&>div]:bg-[#181818]'>
-                            <PairItem item={item} isSelected={true} onToggle={onToggle} />
-                        </div>
+                        <PairItem item={item} isSelected={true} onToggle={onToggle} />
                     </div>
                 </div>
             </motion.div>
