@@ -302,12 +302,14 @@ const SearchBar = memo(({ onSearchStateChange }: { onSearchStateChange: (isSearc
 
 // DraggableItem component to handle individual drag controls
 const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => void }) => {
+    const { boxColors } = useUser();
+    const { priceData } = useWebSocket();
     const dragControls = useDragControls();
 
     return (
         <Reorder.Item
-            key={item}
             value={item}
+            id={item}
             dragListener={false}
             dragControls={dragControls}
             className='group/drag mb-1'
@@ -315,29 +317,69 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
             style={{ position: 'relative', zIndex: 0 }}>
             <motion.div className='relative flex w-full items-center rounded-lg' layout='position' transition={{ duration: 0.15 }} whileDrag={{ zIndex: 50 }}>
                 <div className='w-full'>
-                    {/* Drag Handle - Positioned to the left of the status indicator */}
+                    {/* Drag Handle */}
+                    <motion.button
+                        className='absolute top-1/2 left-0 z-[100] -translate-y-1/2 cursor-grab active:cursor-grabbing'
+                        onPointerDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            dragControls.start(e);
+                        }}>
+                        <div className='flex h-8 w-8 items-center justify-center opacity-0 transition-all duration-200 group-hover/drag:opacity-60'>
+                            <svg width='14' height='14' viewBox='0 0 16 16' fill='none' className='pointer-events-none'>
+                                <path d='M7 3H5V5H7V3Z' fill='#666' />
+                                <path d='M7 7H5V9H7V7Z' fill='#666' />
+                                <path d='M7 11H5V13H7V11Z' fill='#666' />
+                                <path d='M11 3H9V5H11V3Z' fill='#666' />
+                                <path d='M11 7H9V9H11V7Z' fill='#666' />
+                                <path d='M11 11H9V13H11V11Z' fill='#666' />
+                            </svg>
+                        </div>
+                    </motion.button>
 
-                    {/* Regular PairItem */}
-                    <div className='group-hover/drag:[&>div]:bg-[#181818]'>
-                        <motion.button
-                            className='absolute top-1/2 left-0 z-[100] -translate-y-1/2 cursor-grab active:cursor-grabbing'
-                            onPointerDown={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                dragControls.start(e);
-                            }}>
-                            <div className='flex h-8 w-8 items-center justify-center opacity-0 transition-all duration-200 group-hover/drag:opacity-60'>
-                                <svg width='14' height='14' viewBox='0 0 16 16' fill='none' className='pointer-events-none'>
-                                    <path d='M7 3H5V5H7V3Z' fill='#666' />
-                                    <path d='M7 7H5V9H7V7Z' fill='#666' />
-                                    <path d='M7 11H5V13H7V11Z' fill='#666' />
-                                    <path d='M11 3H9V5H11V3Z' fill='#666' />
-                                    <path d='M11 7H9V9H11V7Z' fill='#666' />
-                                    <path d='M11 11H9V13H11V11Z' fill='#666' />
-                                </svg>
+                    {/* Item Content */}
+                    <div className='group/item relative flex h-10 w-full items-center rounded-lg bg-[#141414] transition-all duration-300 select-none hover:bg-[#181818]'>
+                        <div className='relative flex w-full items-center px-3'>
+                            {/* Status indicator */}
+                            <div className='relative flex h-8 w-8 items-center justify-center'>
+                                <div
+                                    className='h-1.5 w-1.5 rounded-full opacity-100 transition-all duration-300'
+                                    style={{
+                                        background: `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})`,
+                                    }}
+                                />
                             </div>
-                        </motion.button>
-                        <PairItem item={item} isSelected={true} onToggle={onToggle} />
+
+                            {/* Instrument name */}
+                            <span className='font-outfit flex-1 text-sm font-bold tracking-wide text-white transition-colors'>{item}</span>
+
+                            {/* Price */}
+                            <div className='flex items-center'>
+                                <span className='font-kodemono w-[70px] text-right text-sm tracking-wider text-[#999] transition-colors'>
+                                    {priceData[item]?.price ? (
+                                        formatPrice(priceData[item].price, item)
+                                    ) : (
+                                        <LoadingSpinner key={`${item}-loading`} itemId={item} color={boxColors.positive} />
+                                    )}
+                                </span>
+
+                                {/* Toggle button */}
+                                <div className='z-90 ml-2 flex w-6 justify-center'>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onToggle();
+                                        }}
+                                        className={cn(
+                                            'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
+                                            'opacity-0 group-hover/item:opacity-100',
+                                            'border-[#333] bg-[#1A1A1A] text-[#666] hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400'
+                                        )}>
+                                        <FaTimes size={8} />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </motion.div>
@@ -351,36 +393,10 @@ export const InstrumentsPanel = () => {
     const { selectedPairs, togglePair } = useUser();
     const { priceData } = useWebSocket();
     const [isSearching, setIsSearching] = useState(false);
-    const orderedPairs = useGridStore((state) => state.orderedPairs);
     const reorderPairs = useGridStore((state) => state.reorderPairs);
-    const setInitialPairs = useGridStore((state) => state.setInitialPairs);
-
-    // Initialize ordered pairs when selected pairs change
-    useEffect(() => {
-        setInitialPairs(selectedPairs);
-    }, [selectedPairs, setInitialPairs]);
-
-    const handleToggle = useCallback(
-        (pair: string) => {
-            togglePair(pair);
-            // Update grid store after toggle
-            const newPairs = selectedPairs.includes(pair) ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
-
-            // If removing a pair, also remove it from orderedPairs
-            if (selectedPairs.includes(pair)) {
-                reorderPairs(orderedPairs.filter((p) => p !== pair));
-            } else {
-                setInitialPairs(newPairs);
-            }
-        },
-        [selectedPairs, togglePair, setInitialPairs, orderedPairs, reorderPairs]
-    );
 
     // Memoized selected pairs items
-    const selectedPairsItems = useMemo(
-        () => orderedPairs.map((item) => <DraggableItem key={item} item={item} onToggle={() => handleToggle(item)} />),
-        [orderedPairs, handleToggle]
-    );
+    const selectedPairsItems = useMemo(() => selectedPairs.map((item) => <DraggableItem key={item} item={item} onToggle={() => togglePair(item)} />), [selectedPairs, togglePair]);
 
     // Memoized available pairs groups
     const availablePairsGroups = useMemo(
@@ -395,12 +411,12 @@ export const InstrumentsPanel = () => {
                     const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
                     if (availablePairs.length === 0) return null;
 
-                    const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => handleToggle(item)} />);
+                    const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => togglePair(item)} />);
 
                     return <PairGroup key={group.label} label={group.label} items={items} count={availablePairs.length} />;
                 })
                 .filter(Boolean),
-        [selectedPairs, handleToggle]
+        [selectedPairs, togglePair]
     );
 
     return (
@@ -409,15 +425,15 @@ export const InstrumentsPanel = () => {
                 <SearchBar onSearchStateChange={setIsSearching} />
             </div>
             <div className={cn('flex-1 overflow-y-auto', isSearching ? 'opacity-30' : 'opacity-100')}>
-                {orderedPairs.length > 0 && (
+                {selectedPairs.length > 0 && (
                     <PairGroup
                         label='Selected Pairs'
                         items={
-                            <Reorder.Group axis='y' values={orderedPairs} onReorder={reorderPairs}>
+                            <Reorder.Group axis='y' values={selectedPairs} onReorder={reorderPairs}>
                                 {selectedPairsItems}
                             </Reorder.Group>
                         }
-                        count={orderedPairs.length}
+                        count={selectedPairs.length}
                         isSelected={true}
                     />
                 )}
