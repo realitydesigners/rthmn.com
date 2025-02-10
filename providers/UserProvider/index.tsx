@@ -31,6 +31,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // Get grid store functions
     const orderedPairs = useGridStore((state) => state.orderedPairs);
     const setInitialPairs = useGridStore((state) => state.setInitialPairs);
+    const reorderPairs = useGridStore((state) => state.reorderPairs);
 
     // Onboarding check
     useEffect(() => {
@@ -54,12 +55,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     const togglePair = useCallback(
         (pair: string) => {
-            const newSelected = orderedPairs.includes(pair) ? orderedPairs.filter((p) => p !== pair) : [...orderedPairs, pair];
+            const currentPairs = orderedPairs;
+            let newPairs;
 
-            setSelectedPairs(newSelected);
-            setInitialPairs(newSelected);
+            if (currentPairs.includes(pair)) {
+                // Remove the pair
+                newPairs = currentPairs.filter((p) => p !== pair);
+            } else {
+                // Add the pair
+                newPairs = [...currentPairs, pair];
+            }
+
+            // Update both local storage and grid store
+            setSelectedPairs(newPairs);
+            reorderPairs(newPairs);
         },
-        [orderedPairs, setInitialPairs]
+        [orderedPairs, reorderPairs]
     );
 
     const handleSidebarClick = useCallback((e: React.MouseEvent) => {
