@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getSelectedPairs } from '@/utils/localStorage';
 
 export interface GridBreakpoint {
     width: number;
@@ -15,6 +16,7 @@ interface GridState {
     lastCols: number;
     reorderPairs: (newOrder: string[]) => void;
     setInitialPairs: (pairs: string[]) => void;
+    initialized: boolean;
 }
 
 // Initial default breakpoints
@@ -25,24 +27,93 @@ const DEFAULT_BREAKPOINTS: GridBreakpoint[] = [
     { width: 1400, cols: 4 }, // Large screens
 ];
 
+// Helper to save order to localStorage
+const saveOrderToLocalStorage = (pairs: string[]) => {
+    try {
+        localStorage.setItem('rthmn-pairs-order', JSON.stringify(pairs));
+    } catch (e) {
+        console.error('Failed to save pairs order:', e);
+    }
+};
+
+// Helper to get order from localStorage
+const getOrderFromLocalStorage = (): string[] => {
+    try {
+        const saved = localStorage.getItem('rthmn-pairs-order');
+        return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+        console.error('Failed to get pairs order:', e);
+        return [];
+    }
+};
+
 export const useGridStore = create<GridState>()(
     persist(
         (set, get) => ({
             breakpoints: DEFAULT_BREAKPOINTS,
-            orderedPairs: [],
+            orderedPairs: getOrderFromLocalStorage(), // Initialize with saved order
             lastWidth: 0,
             lastCols: DEFAULT_BREAKPOINTS[0].cols,
+            initialized: false,
 
             setInitialPairs: (pairs: string[]) => {
-                const currentPairs = get().orderedPairs;
-                // Keep the order of existing pairs and add new ones at the end
-                const existingPairs = currentPairs.filter((pair) => pairs.includes(pair));
-                const newPairs = pairs.filter((pair) => !currentPairs.includes(pair));
-                set({ orderedPairs: [...existingPairs, ...newPairs] });
+                const state = get();
+                const savedOrder = getOrderFromLocalStorage();
+
+                // If already initialized and pairs haven't changed, do nothing
+                if (state.initialized && state.orderedPairs.length === pairs.length && state.orderedPairs.every((p) => pairs.includes(p))) {
+                    return;
+                }
+
+                let newOrder: string[];
+
+                if (savedOrder.length > 0) {
+                    // Keep pairs in saved order if they still exist
+                    const orderedExisting = savedOrder.filter((pair) => pairs.includes(pair));
+                    // Add any new pairs that weren't in the saved order
+                    const newPairs = pairs.filter((pair) => !savedOrder.includes(pair));
+                    newOrder = [...orderedExisting, ...newPairs];
+                } else {
+                    newOrder = [...pairs];
+                }
+
+                set({
+                    orderedPairs: newOrder,
+                    initialized: true,
+                });
+                saveOrderToLocalStorage(newOrder);
             },
 
             reorderPairs: (newOrder: string[]) => {
-                set({ orderedPairs: newOrder });
+                const currentOrder = get().orderedPairs;
+
+                // If arrays are identical, do nothing
+                if (currentOrder.length === newOrder.length && currentOrder.every((pair, index) => pair === newOrder[index])) {
+                    return;
+                }
+
+                // Validate the new order contains all the same pairs
+                const currentSet = new Set<string>(currentOrder);
+                const newSet = new Set<string>(newOrder);
+
+                if (currentSet.size !== newSet.size) {
+                    console.error('Invalid reorder: different number of pairs');
+                    return;
+                }
+
+                // Check if all current pairs exist in the new order
+                const missingPairs = Array.from(currentSet).filter((pair) => !newSet.has(pair));
+                if (missingPairs.length > 0) {
+                    console.error('Invalid reorder: missing pairs', missingPairs);
+                    return;
+                }
+
+                // Update both store and localStorage
+                set({ orderedPairs: [...newOrder] });
+                saveOrderToLocalStorage([...newOrder]);
+
+                // Debug log
+                console.log('Reordered pairs saved:', newOrder);
             },
 
             updateBreakpoint: (width: number, cols: number) => {
@@ -75,6 +146,7 @@ export const useGridStore = create<GridState>()(
                     }, [] as GridBreakpoint[]);
 
                     return {
+                        ...state,
                         breakpoints: cleanedBreakpoints,
                         lastWidth: width,
                         lastCols: cols,
@@ -101,11 +173,25 @@ export const useGridStore = create<GridState>()(
         }),
         {
             name: 'grid-storage',
-            version: 7, // Increment version to force reset
             merge: (persistedState: any, currentState: GridState) => {
+                const selectedPairs = getSelectedPairs();
+                const savedOrder = getOrderFromLocalStorage();
+
+                // If we have a saved order, use it to order the selected pairs
+                let orderedPairs = selectedPairs;
+                if (savedOrder.length > 0) {
+                    // Keep pairs in saved order if they still exist
+                    const orderedExisting = savedOrder.filter((pair) => selectedPairs.includes(pair));
+                    // Add any new pairs that weren't in the saved order
+                    const newPairs = selectedPairs.filter((pair) => !savedOrder.includes(pair));
+                    orderedPairs = [...orderedExisting, ...newPairs];
+                }
+
                 return {
                     ...currentState,
                     ...persistedState,
+                    orderedPairs,
+                    initialized: false,
                     lastWidth: 0,
                     lastCols: DEFAULT_BREAKPOINTS[0].cols,
                 };
