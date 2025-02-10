@@ -8,10 +8,13 @@ export interface GridBreakpoint {
 
 interface GridState {
     breakpoints: GridBreakpoint[];
+    orderedPairs: string[];
     updateBreakpoint: (width: number, cols: number) => void;
     getGridClass: (width: number) => string;
     lastWidth: number;
     lastCols: number;
+    reorderPairs: (newOrder: string[]) => void;
+    setInitialPairs: (pairs: string[]) => void;
 }
 
 // Initial default breakpoints
@@ -26,8 +29,21 @@ export const useGridStore = create<GridState>()(
     persist(
         (set, get) => ({
             breakpoints: DEFAULT_BREAKPOINTS,
+            orderedPairs: [],
             lastWidth: 0,
             lastCols: DEFAULT_BREAKPOINTS[0].cols,
+
+            setInitialPairs: (pairs: string[]) => {
+                const currentPairs = get().orderedPairs;
+                // Keep the order of existing pairs and add new ones at the end
+                const existingPairs = currentPairs.filter((pair) => pairs.includes(pair));
+                const newPairs = pairs.filter((pair) => !currentPairs.includes(pair));
+                set({ orderedPairs: [...existingPairs, ...newPairs] });
+            },
+
+            reorderPairs: (newOrder: string[]) => {
+                set({ orderedPairs: newOrder });
+            },
 
             updateBreakpoint: (width: number, cols: number) => {
                 set((state) => {
