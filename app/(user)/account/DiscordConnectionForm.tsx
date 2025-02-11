@@ -7,7 +7,23 @@ import { createClient } from '@/utils/supabase/client';
 
 type DiscordConnection = Database['public']['Tables']['discord_connections']['Row'];
 
-const DISCORD_OAUTH_URL = `https://discord.com/api/oauth2/authorize?client_id=${process.env.NEXT_PUBLIC_DISCORD_CLIENT_ID}&redirect_uri=${encodeURIComponent(process.env.NEXT_PUBLIC_DISCORD_REDIRECT_URI!)}&response_type=code&scope=identify`;
+// Get the base URL dynamically
+const getBaseUrl = () => {
+    if (typeof window !== 'undefined') {
+        return window.location.origin;
+    }
+    return process.env.NEXT_PUBLIC_SITE_URL || 'https://rthmn.com';
+};
+
+// Use dynamic redirect URI based on environment
+const DISCORD_OAUTH_URL =
+    'https://discord.com/oauth2/authorize?' +
+    new URLSearchParams({
+        client_id: '1297321318030639114',
+        redirect_uri: `${getBaseUrl()}/api/discord/callback`,
+        response_type: 'code',
+        scope: 'identify guilds.join',
+    }).toString();
 
 export default function DiscordConnectionForm({ discordConnection, subscription }: { discordConnection: DiscordConnection | null; subscription: any }) {
     const [isLoading, setIsLoading] = useState(false);

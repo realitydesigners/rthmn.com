@@ -4,13 +4,17 @@ import { getDiscordClient } from '@/utils/discord/client';
 export async function POST(request: Request) {
     try {
         const discord = await getDiscordClient();
+        if (!discord) {
+            throw new Error('Discord client not initialized');
+        }
+
         const { discord_user_id } = await request.json();
 
-        const guild = await discord.guilds.fetch(process.env.DISCORD_GUILD_ID!);
-        const member = await guild.members.fetch(discord_user_id);
-
         // Remove both roles when disconnecting
-        await Promise.all([member.roles.remove(process.env.DISCORD_PAID_ROLE_ID!), member.roles.remove(process.env.DISCORD_UNPAID_ROLE_ID!)]);
+        await Promise.all([
+            discord.removeGuildMemberRole(process.env.DISCORD_GUILD_ID!, discord_user_id, process.env.DISCORD_PAID_ROLE_ID!),
+            discord.removeGuildMemberRole(process.env.DISCORD_GUILD_ID!, discord_user_id, process.env.DISCORD_UNPAID_ROLE_ID!),
+        ]);
 
         console.log('Removed Discord roles for user:', discord_user_id);
 
