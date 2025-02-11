@@ -5,18 +5,30 @@ import { createClient } from '@/utils/supabase/server';
 // Constants for Discord OAuth
 const DISCORD_CLIENT_ID = '1297321318030639114';
 
+// Helper to get the correct base URL
+const getBaseUrl = (origin: string) => {
+    // For production, always use the non-www version
+    if (origin.includes('www.rthmn.com')) {
+        return 'https://rthmn.com';
+    }
+    return origin;
+};
+
 export async function GET(request: Request) {
     console.log('==== DISCORD CALLBACK STARTED ====');
     console.log('Request URL:', request.url);
 
     // Store origin at the top level so it's available throughout the function
     const { searchParams, origin } = new URL(request.url);
+    const baseUrl = getBaseUrl(origin);
+
     console.log('Search params:', Object.fromEntries(searchParams.entries()));
     console.log('Origin:', origin);
+    console.log('Base URL:', baseUrl);
 
     try {
-        // Use the origin from the request for the redirect URI
-        const REDIRECT_URI = `${origin}/api/discord/callback`;
+        // Use the consistent base URL for the redirect URI
+        const REDIRECT_URI = `${baseUrl}/api/discord/callback`;
         console.log('Using redirect URI:', REDIRECT_URI);
 
         const code = searchParams.get('code');

@@ -10,8 +10,13 @@ type DiscordConnection = Database['public']['Tables']['discord_connections']['Ro
 // Get the base URL dynamically
 const getBaseUrl = () => {
     if (typeof window !== 'undefined') {
+        // For production, always use the non-www version
+        if (window.location.hostname === 'www.rthmn.com') {
+            return 'https://rthmn.com';
+        }
         return window.location.origin;
     }
+    // Default to the non-www version for production
     return process.env.NEXT_PUBLIC_SITE_URL || 'https://rthmn.com';
 };
 
