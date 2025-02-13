@@ -53,6 +53,7 @@ export default defineType({
                 list: [
                     { title: 'Dark', value: 'dark' },
                     { title: 'Light', value: 'light' },
+                    { title: 'Course Template', value: 'course' },
                     { title: 'Transparent', value: 'transparent' },
                 ],
             },
@@ -247,56 +248,6 @@ export default defineType({
                         },
                     ],
                 }),
-                // Remove or comment out the quoteRef object
-                // defineField({
-                //   type: 'object',
-                //   name: 'quoteRef',
-                //   title: 'Quote',
-                //   icon: BookIcon,
-                //   fields: [
-                //     defineField({
-                //       type: 'reference',
-                //       icon: ImageIcon,
-                //       name: 'quote',
-                //       title: 'Quote Item',
-                //       to: [{ type: 'quote' }]
-                //     }),
-                //     {
-                //       name: 'className',
-                //       title: 'CSS Class',
-                //       type: 'string',
-                //       options: {
-                //         list: [
-                //           { title: 'Card 1', value: 'card-1' },
-                //           { title: 'Card 2', value: 'card-2' }
-                //         ]
-                //       }
-                //     }
-                //   ],
-                //   preview: {
-                //     select: {
-                //       title: 'quote.quote',
-                //       imageUrl: 'quote.mediaRef.image.image',
-                //       className: 'className'
-                //     },
-                //     prepare(selection: {
-                //       title?: string;
-                //       imageUrl?: string;
-                //       className?: QuoteClassOption;
-                //     }) {
-                //       const { title, imageUrl, className } = selection;
-                //       const classNameTitle = className
-                //         ? quoteClassTitles[className]
-                //         : 'No class selected';
-
-                //       return {
-                //         title: title || 'Untitled',
-                //         subtitle: classNameTitle,
-                //         media: imageUrl
-                //       };
-                //     }
-                //   }
-                // }),
                 defineField({
                     type: 'object',
                     icon: PlayIcon,
@@ -420,6 +371,95 @@ export default defineType({
                             validation: (rule) => rule.uri({ scheme: ['http', 'https'] }),
                         }),
                     ],
+                }),
+                defineField({
+                    type: 'object',
+                    name: 'callout',
+                    title: 'Callout',
+                    fields: [
+                        {
+                            name: 'type',
+                            title: 'Type',
+                            type: 'string',
+                            options: {
+                                list: [
+                                    { title: 'Learning Points', value: 'learning' },
+                                    { title: 'Info', value: 'info' },
+                                    { title: 'Warning', value: 'warning' },
+                                    { title: 'Success', value: 'success' },
+                                ],
+                            },
+                        },
+                        {
+                            name: 'title',
+                            title: 'Title',
+                            type: 'string',
+                        },
+                        {
+                            name: 'points',
+                            title: 'Points',
+                            type: 'array',
+                            of: [{ type: 'string' }],
+                        },
+                    ],
+                    preview: {
+                        select: {
+                            title: 'title',
+                            type: 'type',
+                        },
+                        prepare({ title, type }) {
+                            return {
+                                title: title || 'Untitled Callout',
+                                subtitle: `Callout - ${type || 'No type'}`,
+                            };
+                        },
+                    },
+                }),
+                defineField({
+                    type: 'object',
+                    name: 'quiz',
+                    title: 'Quiz',
+                    fields: [
+                        {
+                            name: 'question',
+                            title: 'Question',
+                            type: 'string',
+                            validation: (Rule) => Rule.required(),
+                        },
+                        {
+                            name: 'options',
+                            title: 'Answer Options',
+                            type: 'array',
+                            of: [{ type: 'string' }],
+                            validation: (Rule) => Rule.required().min(2).max(5),
+                        },
+                        {
+                            name: 'correctAnswer',
+                            title: 'Correct Answer',
+                            type: 'number',
+                            description: 'Index of the correct answer (0 for first option, 1 for second, etc.)',
+                            validation: (Rule) => Rule.required().min(0),
+                        },
+                        {
+                            name: 'explanation',
+                            title: 'Explanation',
+                            type: 'text',
+                            description: 'Optional explanation to show after answering',
+                        },
+                    ],
+                    preview: {
+                        select: {
+                            question: 'question',
+                            options: 'options',
+                            correctAnswer: 'correctAnswer',
+                        },
+                        prepare({ question, options = [], correctAnswer }) {
+                            return {
+                                title: question || 'Untitled Quiz',
+                                subtitle: `${options.length} options | Correct: ${options[correctAnswer] || 'Not set'}`,
+                            };
+                        },
+                    },
                 }),
             ],
         },

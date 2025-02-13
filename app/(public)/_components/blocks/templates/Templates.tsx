@@ -25,12 +25,6 @@ const normalTextStyles: Record<TemplateTheme, string> = {
     light: `font-outfit text-black leading-[1.5em] tracking-wide text-xl md:w-3/4 lg:w-1/2 lg:text-xl`,
 };
 
-interface ChildProps {
-    props: {
-        children: string | string[];
-    };
-}
-
 const NormalText: React.FC<{
     children: React.ReactNode;
     theme: TemplateTheme;

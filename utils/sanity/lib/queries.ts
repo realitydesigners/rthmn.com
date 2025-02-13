@@ -371,11 +371,12 @@ export async function getLesson(lessonSlug: string) {
       title,
       description,
       content,
+      "slug": slug.current,
       "relatedLessons": relatedLessons[]-> {
         _id,
         title,
         description,
-        slug
+        "slug": slug.current
       }
     }`,
         { lessonSlug }
@@ -435,3 +436,61 @@ export const allMarketDataQuery = groq`
     candleData
   }
 `;
+
+export async function getCourses() {
+    return client.fetch(
+        groq`*[_type == "course"] | order(order asc) {
+            _id,
+            title,
+            description,
+            slug,
+            icon,
+            difficulty,
+            estimatedTime,
+            "modules": *[_type == "module" && references(^._id)] | order(order asc) {
+                _id,
+                title,
+                description,
+                slug,
+                "lessons": *[_type == "lesson" && references(^._id)] | order(order asc) {
+                    _id,
+                    title,
+                    description,
+                    slug
+                }
+            }
+        }`
+    );
+}
+
+export async function getCourse(courseSlug: string) {
+    console.log('Fetching course with slug:', courseSlug);
+    const course = await client.fetch(
+        groq`*[_type == "course" && slug.current == $courseSlug][0] {
+            _id,
+            title,
+            description,
+            "slug": slug.current,
+            icon,
+            difficulty,
+            estimatedTime,
+            "modules": modules[]-> {
+                _id,
+                title,
+                description,
+                "slug": slug.current,
+                order,
+                "lessons": lessons[]-> {
+                    _id,
+                    title,
+                    description,
+                    "slug": slug.current,
+                    order
+                } | order(order asc)
+            } | order(order asc)
+        }`,
+        { courseSlug }
+    );
+    console.log('Course data:', JSON.stringify(course, null, 2));
+    return course;
+}

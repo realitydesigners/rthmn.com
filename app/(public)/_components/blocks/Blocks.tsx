@@ -5,49 +5,49 @@ import HeadingBlock from '@/app/(public)/_components/blocks/section/HeadingBlock
 import HeadingSplineBlock from '@/app/(public)/_components/blocks/section/HeadingSplineBlock';
 import TeamBlock from '@/app/(public)/_components/blocks/section/TeamBlock';
 
-export type BlockType = 'headingBlock' | 'headingSplineBlock' | 'contentBlock' | 'teamBlock';
-
 export interface BlockProps {
-    _type: BlockType;
-    layout?: LayoutTheme;
+    _type: {
+        headingBlock: 'headingBlock';
+        headingSplineBlock: 'headingSplineBlock';
+        contentBlock: 'contentBlock';
+        teamBlock: 'teamBlock';
+    };
+    layout?: {
+        dark: string;
+        light: string;
+        video: string;
+        course: string;
+        transparent: string;
+    };
     content?: PortableTextBlock[];
     className?: string;
+    template?: 'course' | 'dark' | 'light' | 'video';
 }
 
 export interface ContentBlockProps {
     block: {
         content: PortableTextBlock[];
         className?: string;
-        layout?: LayoutTheme;
+        layout?: {
+            dark: string;
+            light: string;
+            video: string;
+            course: string;
+            transparent: string;
+        };
     };
     layout?: string | undefined;
     theme?: string | undefined;
 }
 
-export type LayoutTheme = 'dark' | 'light' | 'video';
-
-export type TemplateTheme = 'dark' | 'light';
-export interface ThemeProps {
-    textColor?: string;
-    isInset?: boolean;
-    containerBg?: string;
-    tagBg?: string;
-    tagText?: string;
-    backgroundColor?: string;
-    topBackgroundColor?: string;
-    buttonTextColor?: string;
-    buttonBackgroundColor?: string;
-    containerBorder?: string;
-}
-
-const blockTypeComponents: Record<BlockType, React.ElementType> = {
+const blockTypeComponents = {
     headingBlock: HeadingBlock,
     headingSplineBlock: HeadingSplineBlock,
     contentBlock: ContentBlock,
     teamBlock: TeamBlock,
 };
 
-const Blocks: React.FC<{ block: BlockProps }> = ({ block }) => {
+const Blocks = ({ block }) => {
     const BlockComponent = blockTypeComponents[block._type];
     if (!BlockComponent) return null;
 

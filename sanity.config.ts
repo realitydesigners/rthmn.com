@@ -4,7 +4,7 @@ import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import { contentBlock, headingBlock, headingSplineBlock, sceneBlock, teamBlock, teamGrid } from '@/utils/sanity/blocks/index';
 import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
-import { audio, category, changelog, faq, glossary, img, lesson, marketData, module, pairSnapshot, posts, team, video } from '@/utils/sanity/schemas';
+import { audio, category, changelog, course, faq, glossary, img, lesson, marketData, module, pairSnapshot, posts, team, video } from '@/utils/sanity/schemas';
 import page from '@/utils/sanity/schemas/page';
 import { CustomField } from '@/utils/sanity/ui/CustomField';
 import { CustomItem } from '@/utils/sanity/ui/CustomItem';
@@ -33,6 +33,7 @@ export default defineConfig({
             teamBlock,
             module,
             lesson,
+            course,
             changelog,
             marketData,
             faq,
