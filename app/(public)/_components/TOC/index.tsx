@@ -34,24 +34,22 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
     useEffect(() => {
         const items: TOCItem[] = [];
         blocks?.forEach((block) => {
-            if (block._type === 'contentBlock') {
-                const contentBlock = block as ContentBlock;
-                contentBlock.content?.forEach((content: PortableTextBlock) => {
-                    if (content.style?.match(/^h[1-6]$/)) {
-                        const text = content.children
-                            ?.map((child) => child.text)
-                            .filter(Boolean)
-                            .join('')
-                            .trim();
+            const contentBlock = block as ContentBlock;
+            contentBlock.content?.forEach((content: PortableTextBlock) => {
+                if (content.style?.match(/^h[1-6]$/)) {
+                    const text = content.children
+                        ?.map((child) => child.text)
+                        .filter(Boolean)
+                        .join('')
+                        .trim();
 
-                        if (text) {
-                            const level = parseInt(content.style[1]);
-                            const id = generateHeadingId(text);
-                            items.push({ id, text, level });
-                        }
+                    if (text) {
+                        const level = parseInt(content.style[1]);
+                        const id = generateHeadingId(text);
+                        items.push({ id, text, level });
                     }
-                });
-            }
+                }
+            });
         });
         setHeadings(items);
     }, [blocks]);
