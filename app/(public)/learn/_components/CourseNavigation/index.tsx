@@ -152,42 +152,6 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                                 </div>
                                 {view === 'lesson' && <span className='text-xs text-gray-400'>{moduleProgress}%</span>}
                             </div>
-
-                            <div className='ml-8 space-y-1'>
-                                {module.lessons.map((lesson, lessonIndex) => {
-                                    const isActive = currentLessonSlug === lesson.slug;
-                                    const lessonStatus = getLessonStatus(module._id, lesson._id);
-                                    const isAccessible = isLessonAccessible(moduleIndex, lessonIndex);
-
-                                    return (
-                                        <Link
-                                            key={lesson._id}
-                                            href={isAccessible ? `/learn/${course.slug}/${lesson.slug}` : '#'}
-                                            className={`group flex items-center gap-3 rounded-lg px-4 py-2 transition-all ${
-                                                isActive
-                                                    ? 'bg-emerald-400/10 text-emerald-400'
-                                                    : isAccessible
-                                                      ? 'text-gray-400 hover:bg-white/5 hover:text-white'
-                                                      : 'cursor-not-allowed opacity-50'
-                                            }`}>
-                                            {lessonStatus === 'completed' ? (
-                                                <FaCheckCircle className='h-4 w-4 text-emerald-400' />
-                                            ) : isAccessible ? (
-                                                <FaPlay className='h-3 w-3 text-gray-500' />
-                                            ) : (
-                                                <FaLock className='h-3 w-3 text-gray-500' />
-                                            )}
-                                            <span className='flex-1 text-sm'>{lesson.title}</span>
-                                            {lesson.estimatedTime && (
-                                                <div className='flex items-center gap-1 text-xs text-gray-500'>
-                                                    <FaClock className='h-3 w-3' />
-                                                    {lesson.estimatedTime}
-                                                </div>
-                                            )}
-                                        </Link>
-                                    );
-                                })}
-                            </div>
                         </div>
                     );
                 })}
