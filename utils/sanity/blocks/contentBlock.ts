@@ -248,56 +248,6 @@ export default defineType({
                         },
                     ],
                 }),
-                // Remove or comment out the quoteRef object
-                // defineField({
-                //   type: 'object',
-                //   name: 'quoteRef',
-                //   title: 'Quote',
-                //   icon: BookIcon,
-                //   fields: [
-                //     defineField({
-                //       type: 'reference',
-                //       icon: ImageIcon,
-                //       name: 'quote',
-                //       title: 'Quote Item',
-                //       to: [{ type: 'quote' }]
-                //     }),
-                //     {
-                //       name: 'className',
-                //       title: 'CSS Class',
-                //       type: 'string',
-                //       options: {
-                //         list: [
-                //           { title: 'Card 1', value: 'card-1' },
-                //           { title: 'Card 2', value: 'card-2' }
-                //         ]
-                //       }
-                //     }
-                //   ],
-                //   preview: {
-                //     select: {
-                //       title: 'quote.quote',
-                //       imageUrl: 'quote.mediaRef.image.image',
-                //       className: 'className'
-                //     },
-                //     prepare(selection: {
-                //       title?: string;
-                //       imageUrl?: string;
-                //       className?: QuoteClassOption;
-                //     }) {
-                //       const { title, imageUrl, className } = selection;
-                //       const classNameTitle = className
-                //         ? quoteClassTitles[className]
-                //         : 'No class selected';
-
-                //       return {
-                //         title: title || 'Untitled',
-                //         subtitle: classNameTitle,
-                //         media: imageUrl
-                //       };
-                //     }
-                //   }
-                // }),
                 defineField({
                     type: 'object',
                     icon: PlayIcon,

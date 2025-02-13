@@ -37,52 +37,19 @@ interface CourseNavProps {
 
 export function CourseNav({ course, view: propView = 'course' }: CourseNavProps) {
     const params = useParams();
-    const pathname = usePathname();
     const currentLessonSlug = params.lessonSlug as string;
+    const courseSlug = params.courseSlug as string;
     const { courseProgress } = useLearningStore();
 
     // Determine view based on presence of lessonSlug in params
     const view = params.lessonSlug ? 'lesson' : propView;
 
-    console.log('CourseNav Render:', {
-        pathname,
-        params,
-        view,
-        currentLessonSlug,
-        course: {
-            title: course.title,
-            slug: course.slug,
-            _id: course._id,
-        },
-    });
-
-    const getLessonStatus = (moduleId: string, lessonId: string) => {
-        const module = courseProgress[course._id]?.moduleProgress[moduleId];
-        if (!module) return 'not-started';
-        return module.completedLessons.includes(lessonId) ? 'completed' : 'not-started';
-    };
-
-    const getModuleProgress = (moduleId: string) => {
-        const module = courseProgress[course._id]?.moduleProgress[moduleId];
-        if (!module) return 0;
-
-        const totalLessons = module.completedLessons.length;
-        const completedLessons = module.completedLessons.length;
-        return (completedLessons / totalLessons) * 100;
-    };
-
-    const isLessonAccessible = (moduleIndex: number, lessonIndex: number) => {
-        if (moduleIndex === 0 && lessonIndex === 0) return true;
-
-        // Check if previous lesson is completed
-        const prevModule = moduleIndex > 0 ? course.modules[moduleIndex - 1] : course.modules[moduleIndex];
-        const prevLesson = lessonIndex > 0 ? course.modules[moduleIndex].lessons[lessonIndex - 1] : prevModule.lessons[prevModule.lessons.length - 1];
-
-        return getLessonStatus(prevModule._id, prevLesson._id) === 'completed';
-    };
+    // Find the current module and lesson
+    const currentModule = course.modules.find((m) => m.lessons.some((l) => l.slug === currentLessonSlug));
+    const currentLessonIndex = currentModule?.lessons.findIndex((l) => l.slug === currentLessonSlug) ?? -1;
 
     return (
-        <div className='flex flex-col'>
+        <div className='flex flex-col px-2 pt-6'>
             {/* Course Header */}
             <div className='mb-8'>
                 <Link href='/learn' className='mb-6 flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-white'>
@@ -103,58 +70,61 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                 </div>
             </div>
 
-            {/* Course Progress - Only show in lesson view */}
-            {view === 'lesson' && (
-                <div className='mb-6 rounded-lg border border-white/10 bg-white/5 p-4'>
-                    <div className='mb-2 flex items-center justify-between'>
-                        <span className='text-sm text-gray-400'>Course Progress</span>
-                        <span className='text-sm font-medium text-emerald-400'>
-                            {Math.round(
-                                (Object.values(courseProgress[course._id]?.moduleProgress || {}).reduce((acc, module) => acc + module.completedLessons.length, 0) /
-                                    course.modules.reduce((acc, module) => acc + module.lessons.length, 0)) *
-                                    100
-                            )}
-                            %
-                        </span>
-                    </div>
-                    <div className='h-2 rounded-full bg-white/5'>
-                        <div
-                            className='h-full rounded-full bg-emerald-400/50 transition-all'
-                            style={{
-                                width: `${Math.round(
-                                    (Object.values(courseProgress[course._id]?.moduleProgress || {}).reduce((acc, module) => acc + module.completedLessons.length, 0) /
-                                        course.modules.reduce((acc, module) => acc + module.lessons.length, 0)) *
-                                        100
-                                )}%`,
-                            }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* Module List */}
-            <div className='space-y-6'>
-                {course.modules.map((module, moduleIndex) => {
-                    const isCurrentModule = module.lessons.some((lesson) => lesson.slug === currentLessonSlug);
-                    const moduleProgress = Math.round(((courseProgress[course._id]?.moduleProgress[module._id]?.completedLessons.length || 0) / module.lessons.length) * 100);
-
-                    return (
-                        <div key={module._id} className='space-y-3'>
-                            <div className='flex items-center justify-between'>
-                                <div className='flex items-center gap-2'>
-                                    <div
-                                        className={`flex h-6 w-6 items-center justify-center rounded-full text-sm ${
-                                            isCurrentModule ? 'bg-emerald-400/20 text-emerald-400' : 'bg-white/5 text-gray-400'
-                                        }`}>
-                                        {moduleIndex + 1}
-                                    </div>
-                                    <h3 className={`text-sm font-medium ${isCurrentModule ? 'text-emerald-400' : 'text-white'}`}>{module.title}</h3>
-                                </div>
-                                {view === 'lesson' && <span className='text-xs text-gray-400'>{moduleProgress}%</span>}
-                            </div>
+            {/* Course Content */}
+            <div className='flex-1 overflow-y-auto px-4'>
+                {/* Show Course Progress only in lesson view */}
+                {view === 'lesson' && currentModule && (
+                    <div className='mb-6'>
+                        <div className='mb-2 flex items-center justify-between'>
+                            <span className='text-sm text-gray-400'>Course Progress</span>
+                            <span className='text-sm font-medium text-emerald-400'>60%</span>
                         </div>
-                    );
-                })}
+                        <div className='h-2 rounded-full bg-white/5'>
+                            <div className='h-full w-[60%] rounded-full bg-emerald-400/50' />
+                        </div>
+
+                        {/* Lesson Navigation */}
+                        <div className='mt-6 space-y-4'>
+                            {currentModule.lessons.map((lessonItem, index) => (
+                                <Link
+                                    key={lessonItem._id}
+                                    href={`/learn/${courseSlug}/${lessonItem.slug}`}
+                                    className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
+                                        lessonItem.slug === currentLessonSlug ? 'bg-emerald-400/10 text-emerald-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                                    }`}>
+                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm'>{index + 1}</div>
+                                    <span className='flex-1 text-sm'>{lessonItem.title}</span>
+                                    <FaCheckCircle className={`h-4 w-4 ${lessonItem.slug === currentLessonSlug ? 'text-emerald-400' : 'text-gray-600'}`} />
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Module List */}
+                <div className='space-y-6'>
+                    {course.modules.map((module, moduleIndex) => {
+                        const isCurrentModule = module.lessons.some((lesson) => lesson.slug === currentLessonSlug);
+                        const moduleProgress = Math.round(((courseProgress[course._id]?.moduleProgress[module._id]?.completedLessons.length || 0) / module.lessons.length) * 100);
+
+                        return (
+                            <div key={module._id} className='space-y-3'>
+                                <div className='flex items-center justify-between'>
+                                    <div className='flex items-center gap-2'>
+                                        <div
+                                            className={`flex h-6 w-6 items-center justify-center rounded-full text-sm ${
+                                                isCurrentModule ? 'bg-emerald-400/20 text-emerald-400' : 'bg-white/5 text-gray-400'
+                                            }`}>
+                                            {moduleIndex + 1}
+                                        </div>
+                                        <h3 className={`text-sm font-medium ${isCurrentModule ? 'text-emerald-400' : 'text-white'}`}>{module.title}</h3>
+                                    </div>
+                                    {view === 'lesson' && <span className='text-xs text-gray-400'>{moduleProgress}%</span>}
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
             </div>
         </div>
     );

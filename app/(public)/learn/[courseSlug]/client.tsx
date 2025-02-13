@@ -45,11 +45,6 @@ interface Course {
 }
 
 export default function CourseClient({ course }: { course: Course }) {
-    const [expandedModule, setExpandedModule] = useState<string | null>(null);
-    const { startCourse, startModule } = useLearningStore();
-
-    console.log('CourseClient received course:', course); // Debug log
-
     return (
         <div className='relative min-h-screen w-full overflow-hidden bg-black'>
             <Background />
@@ -57,11 +52,6 @@ export default function CourseClient({ course }: { course: Course }) {
             <div className='relative'>
                 {/* Hero Section */}
                 <div className='mx-auto mt-32 max-w-5xl px-6 sm:px-8 lg:px-12'>
-                    <Link href='/learn' className='group mb-8 inline-flex items-center gap-2 text-gray-400 transition-colors hover:text-white'>
-                        <FaArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-                        Back to Learning Center
-                    </Link>
-
                     <div className='mb-16 flex items-start gap-6'>
                         <div className='rounded-2xl bg-emerald-400/10 p-4'>
                             <CourseIcon icon={course.icon} />

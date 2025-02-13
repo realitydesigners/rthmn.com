@@ -80,9 +80,10 @@ export default defineType({
         select: {
             title: 'title',
             difficulty: 'difficulty',
-            moduleCount: 'modules.length',
+            modules: 'modules',
         },
-        prepare({ title, difficulty, moduleCount = 0 }) {
+        prepare({ title, difficulty, modules = [] }) {
+            const moduleCount = modules.length;
             return {
                 title: title || 'Untitled Course',
                 subtitle: `${difficulty ? `${difficulty} · ` : ''}${moduleCount} module${moduleCount === 1 ? '' : 's'}`,

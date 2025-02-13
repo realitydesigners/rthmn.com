@@ -23,12 +23,6 @@ export default async function CourseLayout({ children, params }: LayoutProps) {
                 {/* Left Sidebar */}
                 <div className='fixed top-0 left-0 h-screen w-72 border-r border-white/10 bg-black/50 backdrop-blur-xl'>
                     <div className='flex h-full flex-col'>
-                        <div className='p-6'>
-                            <Link href='/learn' className='text-lg font-semibold text-white hover:text-emerald-400'>
-                                Learning Center
-                            </Link>
-                        </div>
-
                         <div className='flex-1 overflow-y-auto px-4 pb-8'>
                             <CourseNav course={course} />
                         </div>
@@ -36,8 +30,8 @@ export default async function CourseLayout({ children, params }: LayoutProps) {
                 </div>
 
                 {/* Main content */}
-                <div className='flex-1 pr-72 pl-72'>
-                    <div className='min-h-screen'>{children}</div>
+                <div className='flex-1 px-8'>
+                    <div className='w-full'>{children}</div>
                 </div>
             </div>
         </div>

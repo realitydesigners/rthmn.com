@@ -13,7 +13,7 @@ import Callout from '../nested/Callout';
 import Quiz from '../nested/Quiz';
 
 const baseStyles = {
-    text: 'font-outfit text-white leading-[1.4em] tracking-wide',
+    text: ' w-full font-outfit text-gray-200 leading-[1.4em] tracking-wide',
     container: 'w-full max-w-4xl mx-auto',
     heading: 'font-bold scroll-mt-24',
 };
@@ -52,7 +52,6 @@ const List = ({ children, type }: { children: React.ReactNode; type: 'bullet' | 
 
 export const CourseTemplate = {
     block: {
-        normal: ({ children, value }: any) => <Text value={value}>{children}</Text>,
         h1: ({ children }) => <Text value={{ style: 'h1' }}>{children}</Text>,
         h2: ({ children }) => <Text value={{ style: 'h2' }}>{children}</Text>,
         h3: ({ children }) => <Text value={{ style: 'h3' }}>{children}</Text>,

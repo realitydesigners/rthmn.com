@@ -20,9 +20,7 @@ export default async function CoursePage(props: Props) {
     }
 
     try {
-        console.log('Fetching course with slug:', courseSlug);
         const course = await getCourse(courseSlug);
-        console.log('Course data:', JSON.stringify(course, null, 2));
 
         if (!course) {
             console.log('Course not found for slug:', courseSlug);

@@ -38,18 +38,20 @@ export default async function LearnPage() {
             icon,
             difficulty,
             estimatedTime,
-            "modules": *[_type == "module" && references(^._id)] | order(order asc) {
+             "modules": modules[]-> {
                 _id,
                 title,
                 description,
-                slug,
-                "lessons": *[_type == "lesson" && references(^._id)] | order(order asc) {
+                "slug": slug.current,
+                order,
+                "lessons": lessons[]-> {
                     _id,
                     title,
                     description,
-                    slug
-                }
-            }
+                    "slug": slug.current,
+                    order
+                } | order(order asc)
+            } | order(order asc)
         }`,
         tags: ['course'],
         qParams: {},

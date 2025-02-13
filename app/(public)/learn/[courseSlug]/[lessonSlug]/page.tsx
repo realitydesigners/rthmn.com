@@ -6,6 +6,7 @@ import { TableOfContents } from '@/app/(public)/_components/TOC';
 import { getCourse, getLesson } from '@/utils/sanity/lib/queries';
 import { FaArrowLeft, FaArrowRight, FaBookmark, FaClock, FaCheckCircle, FaLightbulb, FaNotesMedical } from 'react-icons/fa';
 import { Background } from '@/app/(public)/_components/Background';
+import { CourseNav } from '../../_components/CourseNavigation';
 
 export const revalidate = 60;
 
@@ -68,57 +69,10 @@ export default async function LessonPage(props: Props) {
     return (
         <div className='relative flex min-h-screen'>
             {/* Left Sidebar - Course Navigation */}
-            <div className='fixed top-0 left-0 h-screen w-72 border-r border-white/10 bg-black/50 backdrop-blur-xl'>
-                <div className='flex h-full flex-col'>
-                    <div className='p-6'>
-                        <Link href='/learn' className='group mb-4 inline-flex items-center gap-2 text-gray-400 transition-colors hover:text-white'>
-                            <FaArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
-                            Back to Learning Center
-                        </Link>
-
-                        {/* Course Title */}
-                        <div className='mb-6'>
-                            <div className='text-xs font-medium tracking-wider text-emerald-400 uppercase'>Current Course</div>
-                            <Link href={`/learn/${courseSlug}`} className='mt-1 block text-xl font-semibold text-white hover:text-emerald-400'>
-                                {course.title}
-                            </Link>
-                        </div>
-                    </div>
-                    <div className='flex-1 overflow-y-auto px-4'>
-                        {/* Course Progress */}
-                        <div className='mb-6'>
-                            <div className='mb-2 flex items-center justify-between'>
-                                <span className='text-sm text-gray-400'>Course Progress</span>
-                                <span className='text-sm font-medium text-emerald-400'>60%</span>
-                            </div>
-                            <div className='h-2 rounded-full bg-white/5'>
-                                <div className='h-full w-[60%] rounded-full bg-emerald-400/50' />
-                            </div>
-                        </div>
-
-                        {/* Module Navigation */}
-                        <div className='space-y-4'>
-                            {module &&
-                                module.lessons.map((lessonItem, index) => (
-                                    <Link
-                                        key={lessonItem._id}
-                                        href={`/learn/${courseSlug}/${lessonItem.slug}`}
-                                        className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
-                                            lessonItem.slug === lessonSlug ? 'bg-emerald-400/10 text-emerald-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                                        }`}>
-                                        <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm'>{index + 1}</div>
-                                        <span className='flex-1 text-sm'>{lessonItem.title}</span>
-                                        <FaCheckCircle className={`h-4 w-4 ${lessonItem.slug === lessonSlug ? 'text-emerald-400' : 'text-gray-600'}`} />
-                                    </Link>
-                                ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             {/* Main Content */}
             <div className='flex-1 pr-72 pl-72'>
-                <div className='mx-auto max-w-4xl px-8 py-16'>
+                <div className='w-full px-8 py-16'>
                     {/* Lesson Header */}
                     <div className='mb-12'>
                         <div className='mb-4 flex items-center gap-4 text-sm text-gray-400'>
@@ -137,16 +91,17 @@ export default async function LessonPage(props: Props) {
                         {lesson.description && <p className='text-lg text-gray-400'>{lesson.description}</p>}
                     </div>
 
-                    {/* Lesson Content */}
-
-                    {lesson.content?.map((block, index) => (
-                        <Blocks
-                            key={index}
-                            block={{
-                                ...block,
-                            }}
-                        />
-                    ))}
+                    <div className='w-full'>
+                        {/* Lesson Content */}
+                        {lesson.content?.map((block, index) => (
+                            <Blocks
+                                key={index}
+                                block={{
+                                    ...block,
+                                }}
+                            />
+                        ))}
+                    </div>
 
                     {/* Navigation */}
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>
