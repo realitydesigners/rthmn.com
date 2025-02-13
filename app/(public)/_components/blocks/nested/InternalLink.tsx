@@ -3,9 +3,9 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { TemplateTheme, ThemeProps } from '@/app/(public)/_components/blocks/Blocks';
+import { TemplateTheme } from '../templates/Templates';
 
-const themeClasses: Record<TemplateTheme, ThemeProps> = {
+const themeClasses = {
     light: {
         textColor: 'text-black',
         backgroundColor: 'bg-gray-300',
@@ -56,7 +56,7 @@ const PostPreviewDialog = ({
     onClose: () => void;
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     postData: any;
-    theme: TemplateTheme;
+    theme: 'light' | 'dark';
 }) => {
     if (!isOpen || !postData) return null;
     const { block = [] } = postData;
@@ -108,7 +108,7 @@ const PostPreviewDialog = ({
 
 const InternalLink: React.FC<{
     slug: string;
-    theme: TemplateTheme;
+    theme: 'light' | 'dark';
     children: React.ReactNode;
 }> = ({ slug, children, theme }) => {
     const [isDialogOpen, setDialogOpen] = useState(false);
