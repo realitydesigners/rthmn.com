@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { PortableText } from '@portabletext/react';
 import { motion } from 'framer-motion';
-import { ChangelogTemplate } from '@/app/_components/blocks/templates/ChangelogTemplate';
-import { BackgroundGrid } from '@/app/_components/BackgroundGrid';
+import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
+import { BackgroundGrid } from '@/app/(public)/_components/BackgroundGrid';
 import { ChangelogEntry } from '@/types/types';
 
 interface ClientPageProps {

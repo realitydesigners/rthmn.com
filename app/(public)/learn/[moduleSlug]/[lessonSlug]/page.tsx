@@ -1,7 +1,7 @@
 import Link from 'next/link';
-import Blocks from '@/app/_components/blocks/Blocks';
-import type { BlockProps } from '@/app/_components/blocks/Blocks';
-import { TableOfContents } from '@/app/_components/TOC';
+import Blocks from '@/app/(public)/_components/blocks/Blocks';
+import type { BlockProps } from '@/app/(public)/_components/blocks/Blocks';
+import { TableOfContents } from '@/app/(public)/_components/TOC';
 import { getLesson, getModule } from '@/utils/sanity/lib/queries';
 
 export const revalidate = 60;

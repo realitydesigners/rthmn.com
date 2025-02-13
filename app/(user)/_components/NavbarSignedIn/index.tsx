@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { User } from '@supabase/supabase-js';
 import { LuChevronRight, LuLayoutDashboard, LuOrbit } from 'react-icons/lu';
-import { LogoIcon } from '@/app/_components/Icons/icons';
+import { LogoIcon } from '@/app/(public)/_components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
 import { GridControl } from '../Panels/BoxDataPanel/GridControl';

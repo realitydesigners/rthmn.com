@@ -1,7 +1,7 @@
 'use client';
 
-import { PortableText } from '@/app/_components/blocks/PortableText';
-import { BackgroundGrid } from '@/app/_components/BackgroundGrid';
+import { PortableText } from '@/app/(public)/_components/blocks/PortableText';
+import { BackgroundGrid } from '@/app/(public)/_components/BackgroundGrid';
 
 interface PageData {
     title: string;

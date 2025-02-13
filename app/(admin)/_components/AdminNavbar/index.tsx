@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LuChevronRight, LuLayoutDashboard } from 'react-icons/lu';
-import { LogoIcon } from '@/app/_components/Icons/icons';
+import { LogoIcon } from '@/app/(public)/_components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { createClient } from '@/utils/supabase/client';
