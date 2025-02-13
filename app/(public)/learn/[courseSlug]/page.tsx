@@ -4,25 +4,28 @@ import CourseClient from './client';
 
 export const revalidate = 60;
 
-interface PageProps {
-    params: {
+type Props = {
+    params: Promise<{
         courseSlug: string;
-    };
-}
+    }>;
+};
 
-export default async function CoursePage({ params }: PageProps) {
-    if (!params?.courseSlug) {
+export default async function CoursePage(props: Props) {
+    const resolvedParams = await props.params;
+    const { courseSlug } = resolvedParams;
+
+    if (!courseSlug) {
         console.log('Missing courseSlug parameter');
         notFound();
     }
 
     try {
-        console.log('Fetching course with slug:', params.courseSlug);
-        const course = await getCourse(params.courseSlug);
+        console.log('Fetching course with slug:', courseSlug);
+        const course = await getCourse(courseSlug);
         console.log('Course data:', JSON.stringify(course, null, 2));
 
         if (!course) {
-            console.log('Course not found for slug:', params.courseSlug);
+            console.log('Course not found for slug:', courseSlug);
             notFound();
         }
 

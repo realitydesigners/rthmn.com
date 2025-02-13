@@ -1,9 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ThemeProps } from '@/app/(public)/_components/blocks/Blocks';
 
-const themeClasses: Record<string, ThemeProps> = {
+const themeClasses = {
     'image-standard': {
         textColor: 'text-black',
         isInset: false,

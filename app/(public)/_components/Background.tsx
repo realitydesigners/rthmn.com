@@ -23,47 +23,68 @@ export const AuroraBackground = () => (
 );
 
 export const StarField = () => {
-    const [dimensions, setDimensions] = useState({ width: 1920, height: 1080 }); // Default fallback dimensions
+    const [mounted, setMounted] = useState(false);
+    const [stars, setStars] = useState<
+        Array<{
+            id: number;
+            x: number;
+            y: number;
+            size: number;
+            duration: number;
+            delay: number;
+        }>
+    >([]);
 
     useEffect(() => {
-        // Update dimensions on mount and window resize
-        const updateDimensions = () => {
-            setDimensions({
-                width: window.innerWidth,
-                height: window.innerHeight,
-            });
+        const generateStars = () => {
+            const newStars = Array.from({ length: 50 }, (_, i) => ({
+                id: i,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: 1 + Math.random() * 2,
+                duration: 15 + Math.random() * 20,
+                delay: Math.random() * -15,
+            }));
+            setStars(newStars);
         };
 
-        updateDimensions();
-        window.addEventListener('resize', updateDimensions);
+        generateStars();
+        setMounted(true);
 
-        return () => window.removeEventListener('resize', updateDimensions);
+        const handleResize = () => {
+            generateStars();
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    if (!mounted) return null;
 
     return (
         <div className='absolute inset-0 overflow-hidden'>
-            {[...Array(50)].map((_, i) => (
+            {stars.map((star) => (
                 <motion.div
-                    key={i}
+                    key={star.id}
                     initial={{
                         opacity: 0.1,
-                        x: Math.random() * dimensions.width,
-                        y: Math.random() * dimensions.height,
+                        x: star.x,
+                        y: star.y,
                     }}
                     animate={{
                         opacity: [0.1, 0.5, 0.1],
-                        y: [Math.random() * dimensions.height, -100],
+                        y: [star.y, -100],
                     }}
                     transition={{
-                        duration: 15 + Math.random() * 20,
+                        duration: star.duration,
                         repeat: Infinity,
-                        delay: Math.random() * -15,
+                        delay: star.delay,
                     }}
                     className='absolute'>
                     <div
                         style={{
-                            width: `${1 + Math.random() * 2}px`,
-                            height: `${1 + Math.random() * 2}px`,
+                            width: `${star.size}px`,
+                            height: `${star.size}px`,
                         }}
                         className='rounded-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)]'
                     />

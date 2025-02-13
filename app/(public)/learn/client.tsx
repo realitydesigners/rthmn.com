@@ -49,12 +49,6 @@ const CourseIcon = ({ icon }: { icon: string }) => {
 export function LearnPageClient({ courses }: { courses: Course[] }) {
     const { courseProgress, currentCourse, startCourse, startModule } = useLearningStore();
 
-    const getCourseStatus = (courseId: string) => {
-        const progress = courseProgress[courseId];
-        if (!progress) return 'not-started';
-        return progress.status;
-    };
-
     const getModuleStatus = (courseId: string, moduleId: string) => {
         const course = courseProgress[courseId];
         if (!course) return 'not-started';

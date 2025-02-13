@@ -3,11 +3,11 @@
 import React from 'react';
 import { PortableText } from '@portabletext/react';
 import type { PortableTextComponents } from '@portabletext/react';
-import { ContentBlockProps, LayoutTheme, TemplateTheme } from '@/app/(public)/_components/blocks/Blocks';
+import { ContentBlockProps } from '@/app/(public)/_components/blocks/Blocks';
 import { DarkTemplate, LightTemplate, VideoTemplate } from '@/app/(public)/_components/blocks/templates/Templates';
 import { CourseTemplate } from '@/app/(public)/_components/blocks/templates/CourseTemplate';
 
-const templateStyles: Record<TemplateTheme, string> = {
+const templateStyles = {
     dark: 'w-full bg-black',
     light: 'w-full bg-gray-200',
 };
@@ -19,7 +19,7 @@ const templateComponents = {
     course: CourseTemplate as PortableTextComponents,
 };
 
-const ContentBlock: React.FC<ContentBlockProps> = ({ block }) => {
+const ContentBlock = ({ block }) => {
     const { content, layout } = block;
     const theme = layout || 'dark';
     const styles = templateStyles[theme];

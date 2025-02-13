@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { FcGoogle } from 'react-icons/fc';
 import { motion } from 'framer-motion';
 import type { Provider } from '@supabase/supabase-js';
@@ -31,7 +32,7 @@ function useSignInWithOAuth() {
     };
 }
 
-const AuroraBackground = () => (
+export const AuroraBackground = () => (
     <motion.div
         initial={{ opacity: 0 }}
         animate={{
@@ -50,49 +51,69 @@ const AuroraBackground = () => (
     />
 );
 
-const LightShadows = () => (
-    <motion.div
-        initial={{ opacity: 0 }}
-        animate={{
-            opacity: [0, 0.15, 0],
-            filter: 'blur(50px)',
-            x: ['0%', '100%'],
-            y: ['30%', '40%'],
-        }}
-        transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: 'linear',
-        }}
-        className='bg-gradient-radial absolute inset-0 h-[500px] w-[500px] overflow-hidden rounded-full from-blue-500/10 via-violet-500/5 to-transparent blur-3xl'
-    />
-);
+export const StarField = () => {
+    const [mounted, setMounted] = useState(false);
+    const [stars, setStars] = useState<
+        Array<{
+            id: number;
+            x: number;
+            y: number;
+            size: number;
+            duration: number;
+            delay: number;
+        }>
+    >([]);
 
-const StarField = () => {
+    useEffect(() => {
+        const generateStars = () => {
+            const newStars = Array.from({ length: 50 }, (_, i) => ({
+                id: i,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: 1 + Math.random() * 2,
+                duration: 15 + Math.random() * 20,
+                delay: Math.random() * -15,
+            }));
+            setStars(newStars);
+        };
+
+        generateStars();
+        setMounted(true);
+
+        const handleResize = () => {
+            generateStars();
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    if (!mounted) return null;
+
     return (
         <div className='absolute inset-0 overflow-hidden'>
-            {[...Array(50)].map((_, i) => (
+            {stars.map((star) => (
                 <motion.div
-                    key={i}
+                    key={star.id}
                     initial={{
                         opacity: 0.1,
-                        x: Math.random() * window.innerWidth,
-                        y: Math.random() * window.innerHeight,
+                        x: star.x,
+                        y: star.y,
                     }}
                     animate={{
                         opacity: [0.1, 0.5, 0.1],
-                        y: [Math.random() * window.innerHeight, -100],
+                        y: [star.y, -100],
                     }}
                     transition={{
-                        duration: 15 + Math.random() * 20,
+                        duration: star.duration,
                         repeat: Infinity,
-                        delay: Math.random() * -15,
+                        delay: star.delay,
                     }}
                     className='absolute'>
                     <div
                         style={{
-                            width: `${1 + Math.random() * 2}px`,
-                            height: `${1 + Math.random() * 2}px`,
+                            width: `${star.size}px`,
+                            height: `${star.size}px`,
                         }}
                         className='rounded-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)]'
                     />
