@@ -93,17 +93,17 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
     };
 
     return (
-        <nav className='sticky top-24 ml-8 hidden w-64 self-start lg:block'>
-            <h4 className='text-muted-foreground mb-4 text-sm font-semibold'>On this page</h4>
+        <nav className='w-full'>
+            <h4 className='mb-4 text-sm font-semibold text-gray-400'>On this page</h4>
             <ul className='space-y-3 text-sm'>
                 {headings.map((heading) => (
-                    <li key={heading.id} style={{ paddingLeft: `${(heading.level - 1) * 26}px` }}>
+                    <li key={heading.id} style={{ paddingLeft: `${(heading.level - 1) * 16}px` }}>
                         <Link
                             href={`${pathname}#${heading.id}`}
                             scroll={false}
                             onClick={(e) => handleClick(e, heading.id)}
                             className={`inline-block w-full text-left transition-all duration-200 ${
-                                activeId === heading.id ? 'text-primary translate-x-2 rounded-lg bg-[#181818] p-2 font-medium' : 'text-muted-foreground hover:text-primary'
+                                activeId === heading.id ? 'translate-x-2 rounded-lg bg-emerald-400/10 p-2 font-medium text-emerald-400' : 'text-gray-400 hover:text-white'
                             }`}>
                             {heading.text}
                         </Link>

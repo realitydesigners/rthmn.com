@@ -96,19 +96,20 @@ export default function CourseClient({ course }: { course: Course }) {
                     <div className='space-y-8'>
                         <h2 className='font-outfit text-2xl font-semibold text-white'>Course Content</h2>
                         <div className='space-y-4'>
-                            {course.modules?.map((module, index) => (
-                                <Link
+                            {course.modules?.map((module, moduleIndex) => (
+                                <div
                                     key={module._id}
-                                    href={`/learn/${course.slug}/${module.lessons[0].slug}`}
-                                    className='block overflow-hidden rounded-xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:border-emerald-500/20 hover:bg-emerald-500/5'>
-                                    <div className='flex items-center gap-4'>
-                                        <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 text-lg font-semibold text-emerald-400'>
-                                            {index + 1}
-                                        </div>
-                                        <div className='text-left'>
-                                            <h3 className='text-lg font-medium text-white'>{module.title}</h3>
-                                            {module.description && <p className='mt-1 text-sm text-gray-400'>{module.description}</p>}
-                                            <div className='mt-2 flex items-center gap-2 text-sm text-gray-400'>
+                                    className='overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-emerald-500/20 hover:bg-emerald-500/5'>
+                                    <div className='p-6'>
+                                        <div className='flex items-center gap-4'>
+                                            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 text-lg font-semibold text-emerald-400'>
+                                                {moduleIndex + 1}
+                                            </div>
+                                            <div className='flex-1'>
+                                                <h3 className='text-lg font-medium text-white'>{module.title}</h3>
+                                                {module.description && <p className='mt-1 text-sm text-gray-400'>{module.description}</p>}
+                                            </div>
+                                            <div className='flex items-center gap-2 text-sm text-gray-400'>
                                                 <div className='flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-xs text-emerald-400'>
                                                     {module.lessons.length}
                                                 </div>
@@ -116,7 +117,25 @@ export default function CourseClient({ course }: { course: Course }) {
                                             </div>
                                         </div>
                                     </div>
-                                </Link>
+
+                                    <div className='border-t border-white/5'>
+                                        {module.lessons.map((lesson, lessonIndex) => (
+                                            <Link
+                                                key={lesson._id}
+                                                href={`/learn/${course.slug}/${lesson.slug}`}
+                                                className='flex items-center gap-4 border-b border-white/5 p-4 last:border-b-0 hover:bg-emerald-500/5'>
+                                                <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>
+                                                    {lessonIndex + 1}
+                                                </div>
+                                                <div className='flex-1'>
+                                                    <h4 className='text-white'>{lesson.title}</h4>
+                                                    {lesson.description && <p className='mt-1 text-sm text-gray-400'>{lesson.description}</p>}
+                                                </div>
+                                                <FaPlay className='h-4 w-4 text-emerald-400' />
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
                             ))}
                         </div>
                     </div>
