@@ -21,6 +21,7 @@ interface Lesson {
         description?: string;
         slug: { current: string };
     }[];
+    learningObjectives?: string[];
 }
 
 interface Module {
@@ -136,39 +137,16 @@ export default async function LessonPage(props: Props) {
                         {lesson.description && <p className='text-lg text-gray-400'>{lesson.description}</p>}
                     </div>
 
-                    {/* Key Learning Points */}
-                    <div className='mb-12 rounded-xl border border-emerald-400/20 bg-emerald-400/5 p-6'>
-                        <div className='mb-4 flex items-center gap-3'>
-                            <FaLightbulb className='h-5 w-5 text-emerald-400' />
-                            <h2 className='text-lg font-semibold text-white'>Key Learning Points</h2>
-                        </div>
-                        <ul className='space-y-2 text-gray-400'>
-                            <li className='flex items-center gap-2'>
-                                <div className='h-1.5 w-1.5 rounded-full bg-emerald-400' />
-                                <span>Understanding broker types and their roles</span>
-                            </li>
-                            <li className='flex items-center gap-2'>
-                                <div className='h-1.5 w-1.5 rounded-full bg-emerald-400' />
-                                <span>Core functions of a broker</span>
-                            </li>
-                            <li className='flex items-center gap-2'>
-                                <div className='h-1.5 w-1.5 rounded-full bg-emerald-400' />
-                                <span>How to choose the right broker for your needs</span>
-                            </li>
-                        </ul>
-                    </div>
-
                     {/* Lesson Content */}
-                    <div className='prose prose-invert max-w-none'>
-                        {lesson.content?.map((block, index) => (
-                            <Blocks
-                                key={index}
-                                block={{
-                                    ...(block as BlockProps),
-                                }}
-                            />
-                        ))}
-                    </div>
+
+                    {lesson.content?.map((block, index) => (
+                        <Blocks
+                            key={index}
+                            block={{
+                                ...block,
+                            }}
+                        />
+                    ))}
 
                     {/* Navigation */}
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>

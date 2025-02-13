@@ -32,7 +32,7 @@ function useSignInWithOAuth() {
     };
 }
 
-export const AuroraBackground = () => (
+const AuroraBackground = () => (
     <motion.div
         initial={{ opacity: 0 }}
         animate={{
@@ -51,7 +51,7 @@ export const AuroraBackground = () => (
     />
 );
 
-export const StarField = () => {
+const StarField = () => {
     const [mounted, setMounted] = useState(false);
     const [stars, setStars] = useState<
         Array<{

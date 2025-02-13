@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FaArrowLeft, FaBook, FaChartLine, FaChevronDown, FaGraduationCap, FaLightbulb, FaPlay, FaRocket, FaTools } from 'react-icons/fa';
 import { Background } from '@/app/(public)/_components/Background';
 import { useLearningStore } from '@/stores/learningStore';

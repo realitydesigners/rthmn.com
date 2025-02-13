@@ -9,6 +9,7 @@ import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
 import SplineRefBlock from '../nested/SplineRefBlock';
 import VideoRefBlock from '../nested/VideoRefBlock';
+import Callout from '../nested/Callout';
 
 const baseStyles = {
     text: 'font-outfit text-white leading-[1.4em] tracking-wide',
@@ -76,5 +77,6 @@ export const CourseTemplate = {
         imageRef: ({ value }) => <ImageRefBlock image={value.image} className={value.className} />,
         audioRef: ({ value }) => <AudioRefBlock audioFileUrl={value.audioRefData?.audioFileUrl} audioTitle={value.audioRefData?.audioTitle} />,
         quoteRef: ({ value }) => <QuoteRefBlock quote={value.quoteRef?.quoteTitle} image={value.quoteRef?.quoteImage} className={value.quoteRef?.className} />,
+        callout: ({ value }) => <Callout type={value.type} title={value.title} points={value.points} />,
     },
 };

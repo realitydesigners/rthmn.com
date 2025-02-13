@@ -422,6 +422,49 @@ export default defineType({
                         }),
                     ],
                 }),
+                defineField({
+                    type: 'object',
+                    name: 'callout',
+                    title: 'Callout',
+                    fields: [
+                        {
+                            name: 'type',
+                            title: 'Type',
+                            type: 'string',
+                            options: {
+                                list: [
+                                    { title: 'Learning Points', value: 'learning' },
+                                    { title: 'Info', value: 'info' },
+                                    { title: 'Warning', value: 'warning' },
+                                    { title: 'Success', value: 'success' },
+                                ],
+                            },
+                        },
+                        {
+                            name: 'title',
+                            title: 'Title',
+                            type: 'string',
+                        },
+                        {
+                            name: 'points',
+                            title: 'Points',
+                            type: 'array',
+                            of: [{ type: 'string' }],
+                        },
+                    ],
+                    preview: {
+                        select: {
+                            title: 'title',
+                            type: 'type',
+                        },
+                        prepare({ title, type }) {
+                            return {
+                                title: title || 'Untitled Callout',
+                                subtitle: `Callout - ${type || 'No type'}`,
+                            };
+                        },
+                    },
+                }),
             ],
         },
     ],

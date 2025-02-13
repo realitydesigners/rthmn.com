@@ -1,6 +1,5 @@
 import { getCourse } from '@/utils/sanity/lib/queries';
-import { Background } from '@/app/(public)/_components/Background';
-import { CourseNav } from './CourseNav';
+import { CourseNav } from '../_components/CourseNavigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 

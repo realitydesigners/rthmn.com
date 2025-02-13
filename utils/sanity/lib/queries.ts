@@ -371,7 +371,6 @@ export async function getLesson(lessonSlug: string) {
       title,
       description,
       content,
-  
       "slug": slug.current,
       "relatedLessons": relatedLessons[]-> {
         _id,
