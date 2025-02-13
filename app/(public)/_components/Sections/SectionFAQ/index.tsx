@@ -47,14 +47,7 @@ const FAQItem = memo(({ item, isActive, onClick, index }: { item: FAQItem; isAct
 
                 <button onClick={onClick} className='flex w-full cursor-pointer items-center justify-between p-6'>
                     <div className='flex items-center gap-4'>
-                        <div
-                            className={`flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-300 ${
-                                isActive ? 'border-emerald-400 bg-emerald-400/10' : 'border-white/10 bg-white/5 group-hover:border-white/20 group-hover:bg-white/10'
-                            }`}>
-                            <FaQuestionCircle
-                                className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? 'text-emerald-400' : 'text-gray-400 group-hover:text-gray-400'}`}
-                            />
-                        </div>
+                        <FaQuestionCircle className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? 'text-emerald-400' : 'text-gray-400 group-hover:text-gray-400'}`} />
                         <h3 className='text-left text-lg font-medium text-white'>{item.question}</h3>
                     </div>
                     <motion.div
@@ -75,8 +68,8 @@ const FAQItem = memo(({ item, isActive, onClick, index }: { item: FAQItem; isAct
                     className='overflow-hidden'>
                     <div className='border-t border-white/5 px-6 py-6'>
                         <div className='flex gap-4'>
-                            <div className='flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5'>
-                                <FaCommentAlt className='minw-5 min-h-5 text-gray-400' />
+                            <div className='mt-2 flex h-5 w-5 shrink-0 items-center justify-center'>
+                                <FaCommentAlt className='min-h-5 min-w-5 text-gray-400' />
                             </div>
                             <div className='prose prose-invert max-w-none text-base leading-relaxed text-white/70'>
                                 <PortableText value={item.answer} components={ChangelogTemplate} />
@@ -237,10 +230,8 @@ export const SectionFAQ: React.FC = () => {
                     className='mb-16 text-center'>
                     <h2 className='text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Frequently Asked Questions</h2>
                     <p className='font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg'>
-                        Everything you need to know about rthmn. Can't find the answer you're looking for?{' '}
-                        <Link href='/contact' className='text-emerald-400 hover:text-emerald-300'>
-                            Contact our support team
-                        </Link>
+                        Everything you need to know about rthmn. Can't find the answer you're looking for? Contact us at{' '}
+                        <button className='text-emerald-400'>hello@rthmn.com</button>
                     </p>
                 </motion.div>
                 <div className='mx-auto max-w-4xl'>
