@@ -465,6 +465,52 @@ export default defineType({
                         },
                     },
                 }),
+                defineField({
+                    type: 'object',
+                    name: 'quiz',
+                    title: 'Quiz',
+                    fields: [
+                        {
+                            name: 'question',
+                            title: 'Question',
+                            type: 'string',
+                            validation: (Rule) => Rule.required(),
+                        },
+                        {
+                            name: 'options',
+                            title: 'Answer Options',
+                            type: 'array',
+                            of: [{ type: 'string' }],
+                            validation: (Rule) => Rule.required().min(2).max(5),
+                        },
+                        {
+                            name: 'correctAnswer',
+                            title: 'Correct Answer',
+                            type: 'number',
+                            description: 'Index of the correct answer (0 for first option, 1 for second, etc.)',
+                            validation: (Rule) => Rule.required().min(0),
+                        },
+                        {
+                            name: 'explanation',
+                            title: 'Explanation',
+                            type: 'text',
+                            description: 'Optional explanation to show after answering',
+                        },
+                    ],
+                    preview: {
+                        select: {
+                            question: 'question',
+                            options: 'options',
+                            correctAnswer: 'correctAnswer',
+                        },
+                        prepare({ question, options = [], correctAnswer }) {
+                            return {
+                                title: question || 'Untitled Quiz',
+                                subtitle: `${options.length} options | Correct: ${options[correctAnswer] || 'Not set'}`,
+                            };
+                        },
+                    },
+                }),
             ],
         },
     ],
