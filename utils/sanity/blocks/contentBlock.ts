@@ -53,6 +53,7 @@ export default defineType({
                 list: [
                     { title: 'Dark', value: 'dark' },
                     { title: 'Light', value: 'light' },
+                    { title: 'Course Template', value: 'course' },
                     { title: 'Transparent', value: 'transparent' },
                 ],
             },

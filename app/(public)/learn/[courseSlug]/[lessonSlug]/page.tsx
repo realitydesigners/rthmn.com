@@ -23,6 +23,8 @@ export default async function LessonPage({ params }: PageProps) {
 
     const [course, lesson] = await Promise.all([getCourse(params.courseSlug), getLesson(params.lessonSlug)]);
 
+    console.log(lesson, 'lesson');
+
     if (!course || !lesson) {
         notFound();
     }
@@ -44,10 +46,19 @@ export default async function LessonPage({ params }: PageProps) {
             {/* Main content */}
             <div className='flex-1 px-8 py-16'>
                 <div className='w-full'>
-                    <h1 className='font-outfit text-4xl font-bold text-white'>{lesson.title}</h1>
+                    <h1 className='font-outfit mb-12 text-6xl font-bold text-white'>{lesson.title}</h1>
                     {lesson.description && <p className='mt-2 text-lg text-gray-400'>{lesson.description}</p>}
 
-                    <div className='w-full bg-gray-800 p-8'>{lesson.content?.map((block, index) => <Blocks key={index} block={block as BlockProps} />)}</div>
+                    <div className='w-full'>
+                        {lesson.content?.map((block, index) => (
+                            <Blocks
+                                key={index}
+                                block={{
+                                    ...(block as BlockProps),
+                                }}
+                            />
+                        ))}
+                    </div>
 
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>
                         {prevLesson && (

@@ -12,6 +12,7 @@ export interface BlockProps {
     layout?: LayoutTheme;
     content?: PortableTextBlock[];
     className?: string;
+    template?: 'course' | 'dark' | 'light' | 'video';
 }
 
 export interface ContentBlockProps {
@@ -19,12 +20,13 @@ export interface ContentBlockProps {
         content: PortableTextBlock[];
         className?: string;
         layout?: LayoutTheme;
+        template?: 'course' | 'dark' | 'light' | 'video';
     };
     layout?: string | undefined;
     theme?: string | undefined;
 }
 
-export type LayoutTheme = 'dark' | 'light' | 'video';
+export type LayoutTheme = 'dark' | 'light' | 'video' | 'course' | 'transparent';
 
 export type TemplateTheme = 'dark' | 'light';
 export interface ThemeProps {
