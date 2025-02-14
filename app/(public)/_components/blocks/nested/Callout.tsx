@@ -1,8 +1,8 @@
 import React from 'react';
-import { FaLightbulb, FaInfoCircle, FaExclamationTriangle, FaCheckCircle } from 'react-icons/fa';
+import { FaLightbulb, FaInfoCircle, FaExclamationTriangle, FaExclamationCircle } from 'react-icons/fa';
 
 interface CalloutProps {
-    type: 'info' | 'warning' | 'success' | 'learning';
+    type?: 'info' | 'warning' | 'tip' | 'learning' | 'important';
     title: string;
     points: string[];
 }
@@ -10,8 +10,9 @@ interface CalloutProps {
 const icons = {
     info: FaInfoCircle,
     warning: FaExclamationTriangle,
-    success: FaCheckCircle,
+    tip: FaLightbulb,
     learning: FaLightbulb,
+    important: FaExclamationCircle,
 };
 
 const styles = {
@@ -25,7 +26,7 @@ const styles = {
         bg: 'bg-yellow-400/5',
         text: 'text-yellow-400',
     },
-    success: {
+    tip: {
         border: 'border-green-400/20',
         bg: 'bg-green-400/5',
         text: 'text-green-400',
@@ -35,9 +36,14 @@ const styles = {
         bg: 'bg-emerald-400/5',
         text: 'text-emerald-400',
     },
+    important: {
+        border: 'border-red-400/20',
+        bg: 'bg-red-400/5',
+        text: 'text-red-400',
+    },
 };
 
-export default function Callout({ type, title, points }: CalloutProps) {
+export default function Callout({ type = 'info', title, points }: CalloutProps) {
     const Icon = icons[type];
     const style = styles[type];
 
