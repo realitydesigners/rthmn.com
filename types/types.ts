@@ -256,15 +256,20 @@ interface Slug {
 export interface Lesson {
     _id: string;
     title: string;
-    description: string | null;
-    slug: Slug;
+    description: string;
+    slug: {
+        current: string;
+    };
+    content?: any;
 }
 
 export interface Chapter {
     _id: string;
     title: string;
-    description: string | null;
-    slug: Slug;
+    description: string;
+    slug: {
+        current: string;
+    };
     lessons: Lesson[];
 }
 
@@ -272,6 +277,8 @@ export interface Course {
     _id: string;
     title: string;
     description: string;
-    slug: Slug;
+    slug: {
+        current: string;
+    };
     chapters: Chapter[];
 }

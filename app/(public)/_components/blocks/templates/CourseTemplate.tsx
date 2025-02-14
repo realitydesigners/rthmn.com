@@ -12,62 +12,42 @@ import VideoRefBlock from '../nested/VideoRefBlock';
 import Callout from '../nested/Callout';
 import Quiz from '../nested/Quiz';
 
-const baseStyles = {
-    text: ' w-full font-outfit text-gray-200 leading-[1.4em] tracking-wide',
-    container: 'w-full max-w-4xl mx-auto',
-    heading: 'font-bold scroll-mt-24',
-};
+import type { PortableTextComponents } from '@portabletext/react';
 
-const Text = ({ children, value }: { children: React.ReactNode; value?: any }) => {
-    // Handle headings
-    if (value?.style?.match(/^h[1-6]$/)) {
-        const level = parseInt(value.style[1]);
-        const text = React.Children.toArray(children)
-            .map((child) => (typeof child === 'string' ? child : ''))
-            .join('')
-            .trim();
-
-        const id = generateHeadingId(text);
-        const fontSize = level === 1 ? 'text-3xl lg:text-4xl' : level === 2 ? 'text-2xl lg:text-3xl' : 'text-xl lg:text-2xl';
-
-        const Tag = level <= 3 ? `h${level}` : 'h3';
-        return React.createElement(
-            Tag,
-            {
-                id,
-                className: `${baseStyles.text} ${baseStyles.heading} ${fontSize} mb-4`,
-            },
-            children
-        );
-    }
-
-    // Regular text
-    return <p className={`${baseStyles.text} mb-4 text-lg`}>{children}</p>;
-};
-
-const List = ({ children, type }: { children: React.ReactNode; type: 'bullet' | 'number' }) => {
-    const Tag = type === 'bullet' ? 'ul' : 'ol';
-    return <Tag className={`${baseStyles.text} list-${type} mb-6 ml-4 list-inside space-y-2`}>{children}</Tag>;
-};
-
-export const CourseTemplate = {
+export const CourseTemplate: PortableTextComponents = {
     block: {
-        h1: ({ children }) => <Text value={{ style: 'h1' }}>{children}</Text>,
-        h2: ({ children }) => <Text value={{ style: 'h2' }}>{children}</Text>,
-        h3: ({ children }) => <Text value={{ style: 'h3' }}>{children}</Text>,
-        h4: ({ children }) => <Text value={{ style: 'h3' }}>{children}</Text>,
-        h5: ({ children }) => <Text value={{ style: 'h3' }}>{children}</Text>,
-        h6: ({ children }) => <Text value={{ style: 'h3' }}>{children}</Text>,
+        normal: ({ children }) => (
+            <div className='mb-4'>
+                <p className={`font-outfit leading-relaxed text-gray-400`}>{children}</p>
+            </div>
+        ),
+        h1: ({ children }) => <h1 className={`font-outfit mb-6 text-3xl leading-relaxed font-bold text-gray-400`}>{children}</h1>,
+        h2: ({ children }) => <h2 className={`font-outfit mb-4 text-2xl leading-relaxed font-bold text-white`}>{children}</h2>,
+        h3: ({ children }) => <h3 className={`font-outfit mb-3 text-xl leading-relaxed font-bold text-white`}>{children}</h3>,
+        h4: ({ children }) => <h4 className={`font-outfit mb-2 text-lg leading-relaxed font-bold text-white`}>{children}</h4>,
+        bullet: ({ children }) => <li className='font-outfit leading-relaxed text-gray-400'>{children}</li>,
+        number: ({ children }) => <li className='font-outfit leading-relaxed text-gray-400'>{children}</li>,
     },
     list: {
-        bullet: (props) => <List type='bullet' {...props} />,
-        number: (props) => <List type='number' {...props} />,
+        bullet: ({ children }) => (
+            <div className='flex w-full justify-center p-3'>
+                <ul className='font-outfit w-full list-disc space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2'>{children}</ul>
+            </div>
+        ),
+        number: ({ children }) => (
+            <div className='flex w-full justify-center p-3'>
+                <ol className='font-outfit w-full list-decimal space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2'>{children}</ol>
+            </div>
+        ),
     },
     marks: {
-        internalLink: ({ value, children }) => (
-            <InternalLink slug={value?.slug?.current} theme='dark'>
+        strong: ({ children }) => <strong className='font-bold text-white'>{children}</strong>,
+        em: ({ children }) => <em className='text-gray-300 italic'>{children}</em>,
+        code: ({ children }) => <code className='rounded-sm bg-gray-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400'>{children}</code>,
+        link: ({ children, value }) => (
+            <a href={value?.href} className='font-bold text-white underline' target='_blank' rel='noopener noreferrer'>
                 {children}
-            </InternalLink>
+            </a>
         ),
     },
     types: {
