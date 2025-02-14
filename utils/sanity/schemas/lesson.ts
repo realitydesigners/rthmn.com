@@ -139,40 +139,6 @@ export default defineType({
             ],
         }),
         defineField({
-            name: 'quiz',
-            title: 'Knowledge Check',
-            type: 'array',
-            of: [
-                {
-                    type: 'object',
-                    name: 'question',
-                    fields: [
-                        {
-                            name: 'question',
-                            type: 'string',
-                            title: 'Question',
-                        },
-                        {
-                            name: 'options',
-                            type: 'array',
-                            of: [{ type: 'string' }],
-                            title: 'Options',
-                        },
-                        {
-                            name: 'correctAnswer',
-                            type: 'number',
-                            title: 'Correct Answer Index',
-                        },
-                        {
-                            name: 'explanation',
-                            type: 'text',
-                            title: 'Explanation',
-                        },
-                    ],
-                },
-            ],
-        }),
-        defineField({
             name: 'relatedLessons',
             title: 'Related Lessons',
             type: 'array',

@@ -1,3 +1,18 @@
+import { whatisforextrading } from './lessons/what-is-forex-trading';
+
+// ... import other lesson templates
+
+export interface LessonTemplate {
+    title: string;
+    description?: string;
+    estimatedTime?: string;
+    learningObjectives?: string[];
+    order: number;
+    content?: any[];
+    quiz?: any[];
+    relatedLessons?: any[];
+}
+
 export const forexFoundationsCourse = {
     title: 'Forex Foundations',
     chapters: [
@@ -5,7 +20,7 @@ export const forexFoundationsCourse = {
             title: 'Getting Started',
             order: 1,
             lessons: [
-                { title: 'What is Forex Trading?', order: 1 },
+                { title: 'What is Forex Trading?', order: 1, lesson: whatisforextrading },
                 { title: 'What is a Broker?', order: 2 },
                 { title: 'Understanding Currency Pairs', order: 3 },
                 { title: 'The Forex Market Structure', order: 4 },

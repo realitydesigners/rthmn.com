@@ -2,7 +2,7 @@
 import { client } from '@/utils/sanity/lib/client';
 import { forexFoundationsCourse } from './templates/forex-foundations-course';
 
-function generateKey(length = 12) {
+export function generateKey(length = 12) {
     return Math.random()
         .toString(36)
         .substring(2, 2 + length);
@@ -35,25 +35,22 @@ async function generateCourse() {
         for (const chapter of forexFoundationsCourse.chapters) {
             console.log(`\nProcessing chapter: ${chapter.title}`);
 
-            // Create lessons first
+            // Create lessons in Sanity
             console.log(`Creating ${chapter.lessons.length} lessons...`);
             const lessonDocs = await Promise.all(
                 chapter.lessons.map(async (lesson) => {
-                    // Create proper slug for lesson
-                    const lessonSlug = lesson.title
-                        .toLowerCase()
-                        .replace(/[^a-z0-9]+/g, '-') // Replace any non-alphanumeric with dash
-                        .replace(/^-+|-+$/g, ''); // Remove leading/trailing dashes
-
+                    // Create the lesson with template content if available
                     const lessonDoc = await client.create({
                         _type: 'lesson',
                         title: lesson.title,
                         slug: {
                             _type: 'slug',
-                            current: lessonSlug,
+                            current: lesson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                            _weak: true,
                         },
                         order: lesson.order,
-                        content: [
+                        ...(lesson.lesson || {}),
+                        content: lesson.lesson?.content || [
                             {
                                 _type: 'courseBlock',
                                 _key: generateKey(),
@@ -87,13 +84,13 @@ async function generateCourse() {
                             .set({
                                 slug: {
                                     _type: 'slug',
-                                    current: lessonSlug,
+                                    current: lesson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
                                 },
                             })
                             .commit();
                     }
 
-                    console.log(`  ✓ Created lesson: ${lesson.title} (slug: ${lessonSlug})`);
+                    console.log(`  ✓ Created lesson: ${lesson.title} (slug: ${lesson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')})`);
                     return lessonDoc;
                 })
             );
