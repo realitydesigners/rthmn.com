@@ -52,7 +52,7 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                     </div>
                     <div className='space-y-1'>
                         {view === 'lesson' && <div className='text-xs font-medium tracking-wider text-emerald-400 uppercase'>Current Course</div>}
-                        <Link href={`/learn/${course.slug.current}`} className='block text-xl font-semibold text-white hover:text-emerald-400'>
+                        <Link href={`/learn/${course.slug}`} className='block text-xl font-semibold text-white hover:text-emerald-400'>
                             {course.title}
                         </Link>
                         <p className='text-sm text-gray-400'>{course.description}</p>
@@ -130,7 +130,7 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                                         return (
                                             <Link
                                                 key={lesson._id}
-                                                href={`/learn/${course.slug}t/${lesson.slug}`}
+                                                href={`/learn/${course.slug}/${lesson.slug}`}
                                                 className={`flex items-center gap-3 rounded-lg p-2 text-sm transition-colors ${completed ? 'text-emerald-400' : 'text-white/60'} ${
                                                     lesson.slug.current === currentLessonSlug ? 'bg-emerald-400/10' : 'hover:bg-white/5'
                                                 }`}>
