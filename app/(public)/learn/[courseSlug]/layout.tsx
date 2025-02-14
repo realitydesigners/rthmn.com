@@ -5,13 +5,15 @@ import Link from 'next/link';
 
 interface LayoutProps {
     children: React.ReactNode;
-    params: {
+    params: Promise<{
         courseSlug: string;
-    };
+    }>;
 }
 
 export default async function CourseLayout({ children, params }: LayoutProps) {
-    const course = await getCourse(params.courseSlug);
+    // Await the params before using courseSlug
+    const resolvedParams = await params;
+    const course = await getCourse(resolvedParams.courseSlug);
 
     if (!course) {
         notFound();
