@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { client } from '@/utils/sanity/lib/client';
-import { forexFoundationsCourse } from './templates/forex-foundations-course';
+import { forexFoundationsCourse } from './templates/courses/forex-foundations-course';
 
 export function generateKey(length = 12) {
     return Math.random()
