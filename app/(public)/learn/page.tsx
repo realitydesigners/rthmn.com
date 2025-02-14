@@ -1,32 +1,7 @@
 import { getCourses } from '@/utils/sanity/lib/queries';
 import { LearnPageClient } from './client';
 import { sanityFetch } from '@/utils/sanity/lib/client';
-
-interface Lesson {
-    _id: string;
-    title: string;
-    description: string | null;
-    slug: { current: string };
-}
-
-interface Module {
-    _id: string;
-    title: string;
-    description: string | null;
-    slug: { current: string };
-    lessons: Lesson[];
-}
-
-interface Course {
-    _id: string;
-    title: string;
-    description: string;
-    slug: { current: string };
-    icon: string;
-    difficulty: string;
-    estimatedTime: string;
-    modules: Module[];
-}
+import { Course } from '@/types/types';
 
 export default async function LearnPage() {
     const courses = await sanityFetch<Course[]>({
@@ -38,7 +13,7 @@ export default async function LearnPage() {
             icon,
             difficulty,
             estimatedTime,
-             "modules": modules[]-> {
+             "chapters": chapters[]-> {
                 _id,
                 title,
                 description,

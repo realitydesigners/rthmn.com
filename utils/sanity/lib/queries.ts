@@ -364,25 +364,6 @@ export async function getModule(moduleSlug: string) {
     );
 }
 
-export async function getLesson(lessonSlug: string) {
-    return client.fetch(
-        groq`*[_type == "lesson" && slug.current == $lessonSlug][0] {
-      _id,
-      title,
-      description,
-      content,
-      "slug": slug.current,
-      "relatedLessons": relatedLessons[]-> {
-        _id,
-        title,
-        description,
-        "slug": slug.current
-      }
-    }`,
-        { lessonSlug }
-    );
-}
-
 export async function getChangeLog() {
     return client.fetch(
         groq`*[_type == "changelog"] | order(releaseDate desc) {
@@ -474,7 +455,7 @@ export async function getCourse(courseSlug: string) {
             icon,
             difficulty,
             estimatedTime,
-            "modules": modules[]-> {
+            "chapters": chapters[]-> {
                 _id,
                 title,
                 description,
@@ -493,4 +474,23 @@ export async function getCourse(courseSlug: string) {
     );
     console.log('Course data:', JSON.stringify(course, null, 2));
     return course;
+}
+
+export async function getLesson(lessonSlug: string) {
+    return client.fetch(
+        groq`*[_type == "lesson" && slug.current == $lessonSlug][0] {
+      _id,
+      title,
+      description,
+      content,
+      "slug": slug.current,
+      "relatedLessons": relatedLessons[]-> {
+        _id,
+        title,
+        description,
+        "slug": slug.current
+      }
+    }`,
+        { lessonSlug }
+    );
 }

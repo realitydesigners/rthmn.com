@@ -39,10 +39,10 @@ export default defineType({
             },
         }),
         defineField({
-            name: 'modules',
-            title: 'Course Modules',
+            name: 'chapters',
+            title: 'Course Chapters',
             type: 'array',
-            of: [{ type: 'reference', to: [{ type: 'module' }] }],
+            of: [{ type: 'reference', to: [{ type: 'chapter' }] }],
             validation: (Rule) => Rule.required(),
         }),
         defineField({

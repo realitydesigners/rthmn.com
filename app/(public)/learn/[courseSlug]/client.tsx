@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { FaArrowLeft, FaBook, FaChartLine, FaChevronDown, FaGraduationCap, FaLightbulb, FaPlay, FaRocket, FaTools } from 'react-icons/fa';
 import { Background } from '@/app/(public)/_components/Background';
-import { useLearningStore } from '@/stores/learningStore';
 
 const CourseIcon = ({ icon }: { icon: string }) => {
     const icons = {
@@ -25,7 +24,7 @@ interface Lesson {
     slug: string;
 }
 
-interface Module {
+interface Chapter {
     _id: string;
     title: string;
     description: string;
@@ -39,7 +38,7 @@ interface Course {
     description: string;
     slug: string;
     icon: string;
-    modules: Module[];
+    chapters: Chapter[];
     difficulty: string;
     estimatedTime: string;
 }
@@ -63,8 +62,8 @@ export default function CourseClient({ course }: { course: Course }) {
                             <p className='max-w-2xl text-lg text-gray-400'>{course.description}</p>
                             <div className='flex flex-wrap items-center gap-6'>
                                 <div className='flex items-center gap-2'>
-                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>{course.modules.length}</div>
-                                    <span className='text-sm text-gray-400'>Modules</span>
+                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>{course.chapters.length}</div>
+                                    <span className='text-sm text-gray-400'>Chapters</span>
                                 </div>
                                 {course.difficulty && (
                                     <div className='flex items-center gap-2'>
@@ -85,22 +84,22 @@ export default function CourseClient({ course }: { course: Course }) {
                     <div className='space-y-8'>
                         <h2 className='font-outfit text-2xl font-semibold text-white'>Course Content</h2>
                         <div className='space-y-4'>
-                            {course.modules?.map((module, moduleIndex) => (
+                            {course.chapters?.map((chapter, chapterIndex) => (
                                 <div
-                                    key={module._id}
+                                    key={chapter._id}
                                     className='overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-emerald-500/20 hover:bg-emerald-500/5'>
                                     <div className='p-6'>
                                         <div className='flex items-center gap-4'>
                                             <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 text-lg font-semibold text-emerald-400'>
-                                                {moduleIndex + 1}
+                                                {chapterIndex + 1}
                                             </div>
                                             <div className='flex-1'>
-                                                <h3 className='text-lg font-medium text-white'>{module.title}</h3>
-                                                {module.description && <p className='mt-1 text-sm text-gray-400'>{module.description}</p>}
+                                                <h3 className='text-lg font-medium text-white'>{chapter.title}</h3>
+                                                {chapter.description && <p className='mt-1 text-sm text-gray-400'>{chapter.description}</p>}
                                             </div>
                                             <div className='flex items-center gap-2 text-sm text-gray-400'>
                                                 <div className='flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-xs text-emerald-400'>
-                                                    {module.lessons.length}
+                                                    {chapter.lessons.length}
                                                 </div>
                                                 <span>Lessons</span>
                                             </div>
@@ -108,7 +107,7 @@ export default function CourseClient({ course }: { course: Course }) {
                                     </div>
 
                                     <div className='border-t border-white/5'>
-                                        {module.lessons.map((lesson, lessonIndex) => (
+                                        {chapter.lessons.map((lesson, lessonIndex) => (
                                             <Link
                                                 key={lesson._id}
                                                 href={`/learn/${course.slug}/${lesson.slug}`}

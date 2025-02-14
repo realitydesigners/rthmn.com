@@ -1,8 +1,8 @@
 import { defineField, defineType } from 'sanity';
 
 export default defineType({
-    name: 'module',
-    title: 'Learning Module',
+    name: 'chapter',
+    title: 'Chapter',
     type: 'document',
     fields: [
         defineField({
@@ -34,7 +34,7 @@ export default defineType({
         }),
         defineField({
             name: 'icon',
-            title: 'Module Icon',
+            title: 'Chapter Icon',
             type: 'string',
             options: {
                 list: [
@@ -66,13 +66,6 @@ export default defineType({
             description: 'e.g., "2 hours", "45 minutes"',
         }),
         defineField({
-            name: 'prerequisites',
-            title: 'Prerequisites',
-            type: 'array',
-            of: [{ type: 'reference', to: [{ type: 'module' }] }],
-            description: 'Other modules that should be completed before this one',
-        }),
-        defineField({
             name: 'lessons',
             title: 'Lessons',
             type: 'array',
@@ -93,7 +86,7 @@ export default defineType({
         },
         prepare({ title, subtitle, description }) {
             return {
-                title: title || 'Untitled Module',
+                title: title || 'Untitled Chapter',
                 subtitle: subtitle ? `Difficulty: ${subtitle}` : '',
                 description: description,
             };

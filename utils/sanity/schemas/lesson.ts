@@ -21,11 +21,10 @@ export default defineType({
             validation: (Rule) => Rule.required(),
         }),
         defineField({
-            name: 'module',
-            title: 'Parent Module',
+            name: 'chapter',
+            title: 'Parent Chapter',
             type: 'reference',
-            to: [{ type: 'module' }],
-            validation: (Rule) => Rule.required(),
+            to: [{ type: 'chapter' }],
         }),
         defineField({
             name: 'description',
@@ -53,6 +52,7 @@ export default defineType({
                 { type: 'headingBlock' },
                 { type: 'headingSplineBlock' },
                 { type: 'contentBlock' },
+                { type: 'courseBlock' },
                 { type: 'teamBlock' },
                 {
                     type: 'object',

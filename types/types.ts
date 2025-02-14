@@ -248,3 +248,30 @@ export interface PriceData {
     timestamp: string;
     volume?: number;
 }
+
+interface Slug {
+    current: string;
+}
+
+export interface Lesson {
+    _id: string;
+    title: string;
+    description: string | null;
+    slug: Slug;
+}
+
+export interface Chapter {
+    _id: string;
+    title: string;
+    description: string | null;
+    slug: Slug;
+    lessons: Lesson[];
+}
+
+export interface Course {
+    _id: string;
+    title: string;
+    description: string;
+    slug: Slug;
+    chapters: Chapter[];
+}

@@ -25,7 +25,7 @@ interface Lesson {
     learningObjectives?: string[];
 }
 
-interface Module {
+interface Chapter {
     _id: string;
     title: string;
     description?: string;
@@ -50,21 +50,22 @@ export default async function LessonPage(props: Props) {
 
     const [course, lesson] = await Promise.all([getCourse(courseSlug), getLesson(lessonSlug)]);
 
+    console.log('Course:', course);
     if (!course || !lesson) {
         notFound();
     }
 
     // Find the module that contains this lesson
-    const module = course.modules.find((m) => m.lessons.some((l) => l.slug === lessonSlug));
+    const chapter = course.chapters.find((m) => m.lessons.some((l) => l.slug === lessonSlug));
 
-    if (!module) {
+    if (!chapter) {
         notFound();
     }
 
     // Find current lesson index and next/prev lessons
-    const currentLessonIndex = module.lessons.findIndex((l) => l.slug === lessonSlug);
-    const nextLesson = module.lessons[currentLessonIndex + 1];
-    const prevLesson = module.lessons[currentLessonIndex - 1];
+    const currentLessonIndex = chapter.lessons.findIndex((l) => l.slug === lessonSlug);
+    const nextLesson = chapter.lessons[currentLessonIndex + 1];
+    const prevLesson = chapter.lessons[currentLessonIndex - 1];
 
     return (
         <div className='relative flex min-h-screen'>
@@ -83,7 +84,7 @@ export default async function LessonPage(props: Props) {
                             <div className='flex items-center gap-2'>
                                 <FaBookmark className='h-4 w-4' />
                                 <span>
-                                    Lesson {currentLessonIndex + 1} of {module.lessons.length}
+                                    Lesson {currentLessonIndex + 1} of {chapter.lessons.length}
                                 </span>
                             </div>
                         </div>

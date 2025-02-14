@@ -33,7 +33,7 @@ export const StudioStructure = (S: StructureBuilder) =>
                         .title('Courses')
                         .items([
                             S.listItem().title('Courses').icon(DocumentIcon).child(S.documentTypeList('course')),
-                            S.listItem().title('Modules').icon(DocumentIcon).child(S.documentTypeList('module')),
+                            S.listItem().title('Chapters').icon(DocumentIcon).child(S.documentTypeList('chapter')),
                             S.listItem().title('Lessons').icon(DocumentIcon).child(S.documentTypeList('lesson')),
                             S.listItem().title('Glossary').icon(DocumentIcon).child(S.documentTypeList('glossary')),
                         ])

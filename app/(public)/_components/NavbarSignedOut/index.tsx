@@ -123,7 +123,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 
     // Check routes after all hooks are declared
     const protectedRoutes = ['/dashboard', '/onboarding', '/test', '/admin', '/account', '/studio', '/signals'];
-    const isUserRoute = pathname.startsWith('/(user)') || pathname.startsWith('/pair/') || protectedRoutes.includes(pathname);
+    const isUserRoute = pathname.startsWith('/(user)') || pathname.startsWith('/pair/') || pathname.startsWith('/studio/') || protectedRoutes.includes(pathname);
     if (isUserRoute) {
         return null;
     }
