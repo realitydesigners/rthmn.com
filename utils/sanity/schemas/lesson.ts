@@ -20,12 +20,7 @@ export default defineType({
             },
             validation: (Rule) => Rule.required(),
         }),
-        defineField({
-            name: 'chapter',
-            title: 'Parent Chapter',
-            type: 'reference',
-            to: [{ type: 'chapter' }],
-        }),
+
         defineField({
             name: 'description',
             title: 'Description',
@@ -37,21 +32,12 @@ export default defineType({
             type: 'string',
             description: 'e.g., "15 minutes", "30 minutes"',
         }),
-        defineField({
-            name: 'learningObjectives',
-            title: 'Learning Objectives',
-            type: 'array',
-            of: [{ type: 'string' }],
-            description: 'What will students learn in this lesson?',
-        }),
+
         defineField({
             name: 'content',
             title: 'Content',
             type: 'array',
             of: [
-                { type: 'headingBlock' },
-                { type: 'headingSplineBlock' },
-                { type: 'contentBlock' },
                 { type: 'courseBlock' },
                 { type: 'teamBlock' },
                 {
@@ -103,47 +89,7 @@ export default defineType({
                 },
             ],
         }),
-        defineField({
-            name: 'resources',
-            title: 'Additional Resources',
-            type: 'array',
-            of: [
-                {
-                    type: 'object',
-                    name: 'resource',
-                    fields: [
-                        {
-                            name: 'title',
-                            type: 'string',
-                            title: 'Title',
-                        },
-                        {
-                            name: 'url',
-                            type: 'url',
-                            title: 'URL',
-                        },
-                        {
-                            name: 'type',
-                            type: 'string',
-                            title: 'Type',
-                            options: {
-                                list: [
-                                    { title: 'Article', value: 'article' },
-                                    { title: 'Video', value: 'video' },
-                                    { title: 'Documentation', value: 'documentation' },
-                                ],
-                            },
-                        },
-                    ],
-                },
-            ],
-        }),
-        defineField({
-            name: 'relatedLessons',
-            title: 'Related Lessons',
-            type: 'array',
-            of: [{ type: 'reference', to: [{ type: 'lesson' }] }],
-        }),
+
         defineField({
             name: 'order',
             title: 'Order',

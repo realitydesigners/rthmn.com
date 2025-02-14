@@ -2,7 +2,6 @@ export const whatisforextrading = {
     title: 'What is Forex Trading?',
     description: 'Understanding the basics of forex markets',
     estimatedTime: '15 minutes',
-    learningObjectives: ['Understand what forex trading is', 'Learn about market participants', 'Grasp basic trading concepts'],
     order: 1,
     content: [
         {
@@ -52,5 +51,4 @@ export const whatisforextrading = {
             ],
         },
     ],
-    relatedLessons: [],
 };

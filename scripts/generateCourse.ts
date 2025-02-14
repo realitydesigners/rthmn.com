@@ -45,7 +45,10 @@ async function generateCourse() {
                         title: lesson.title,
                         slug: {
                             _type: 'slug',
-                            current: lesson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                            current: lesson.title
+                                .toLowerCase()
+                                .replace(/[^a-z0-9]+/g, '-')
+                                .replace(/^-+|-+$/g, ''),
                             _weak: true,
                         },
                         order: lesson.order,
@@ -84,13 +87,21 @@ async function generateCourse() {
                             .set({
                                 slug: {
                                     _type: 'slug',
-                                    current: lesson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+                                    current: lesson.title
+                                        .toLowerCase()
+                                        .replace(/[^a-z0-9]+/g, '-')
+                                        .replace(/^-+|-+$/g, ''),
                                 },
                             })
                             .commit();
                     }
 
-                    console.log(`  ✓ Created lesson: ${lesson.title} (slug: ${lesson.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')})`);
+                    console.log(
+                        `  ✓ Created lesson: ${lesson.title} (slug: ${lesson.title
+                            .toLowerCase()
+                            .replace(/[^a-z0-9]+/g, '-')
+                            .replace(/^-+|-+$/g, '')})`
+                    );
                     return lessonDoc;
                 })
             );
