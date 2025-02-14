@@ -78,7 +78,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>
                         {prevLesson && (
                             <Link
-                                href={`/learn/${course.slug.current}/${prevLesson.slug}`}
+                                href={`/learn/${course.slug.current}/${prevLesson.slug.current}`}
                                 className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
                                 <FaArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
                                 Previous Lesson

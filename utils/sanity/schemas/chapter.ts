@@ -9,7 +9,7 @@ export default defineType({
             name: 'title',
             title: 'Title',
             type: 'string',
-            validation: (Rule) => Rule.required(),
+            validation: (Rule: any) => Rule.required(),
         }),
         defineField({
             name: 'slug',
@@ -18,19 +18,30 @@ export default defineType({
             options: {
                 source: 'title',
             },
-            validation: (Rule) => Rule.required(),
-        }),
-        defineField({
-            name: 'course',
-            title: 'Parent Course',
-            type: 'reference',
-            to: [{ type: 'course' }],
-            validation: (Rule) => Rule.required(),
+            validation: (Rule: any) => Rule.required(),
         }),
         defineField({
             name: 'description',
             title: 'Description',
             type: 'text',
+        }),
+        defineField({
+            name: 'order',
+            title: 'Order',
+            type: 'number',
+        }),
+        defineField({
+            name: 'lessons',
+            title: 'Lessons',
+            type: 'array',
+            of: [{ type: 'reference', to: [{ type: 'lesson' }] }],
+            validation: (Rule: any) => Rule.unique(),
+        }),
+        defineField({
+            name: 'course',
+            title: 'Course',
+            type: 'reference',
+            to: [{ type: 'course' }],
         }),
         defineField({
             name: 'icon',
@@ -65,31 +76,18 @@ export default defineType({
             type: 'string',
             description: 'e.g., "2 hours", "45 minutes"',
         }),
-        defineField({
-            name: 'lessons',
-            title: 'Lessons',
-            type: 'array',
-            of: [{ type: 'reference', to: [{ type: 'lesson' }] }],
-        }),
-        defineField({
-            name: 'order',
+    ],
+    orderings: [
+        {
             title: 'Order',
-            type: 'number',
-            validation: (Rule) => Rule.required(),
-        }),
+            name: 'order',
+            by: [{ field: 'order', direction: 'asc' }],
+        },
     ],
     preview: {
         select: {
             title: 'title',
-            subtitle: 'difficulty',
-            description: 'description',
-        },
-        prepare({ title, subtitle, description }) {
-            return {
-                title: title || 'Untitled Chapter',
-                subtitle: subtitle ? `Difficulty: ${subtitle}` : '',
-                description: description,
-            };
+            subtitle: 'description',
         },
     },
 });
