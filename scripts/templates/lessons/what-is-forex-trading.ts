@@ -1,4 +1,4 @@
-import { Block, H1, H2, H3, Text, BulletList, NumberedList, Bold, Italic, Callout, Image, Quiz } from '../components/LessonComponents';
+import { Block, H1, H2, H3, Text, Callout, Quiz } from '../components/LessonComponents';
 import { LessonBuilder } from '../components/LessonBuilder';
 
 export const whatisforextrading = new LessonBuilder('What is Forex Trading?')
