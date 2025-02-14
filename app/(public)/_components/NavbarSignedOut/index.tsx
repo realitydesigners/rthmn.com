@@ -73,6 +73,7 @@ const DropdownLink: React.FC<LinkItem & { className?: string }> = ({ title, desc
 };
 
 export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
+    // All hooks must be declared first
     const pathname = usePathname();
     const [isNavOpen, setIsNavOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -80,15 +81,6 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { session, signOut } = useAuth();
     const isproduction = process.env.NODE_ENV === 'production';
-
-    // Don't render if user is signed in
-    if (user) {
-        const dontRenderRoutes = ['/dashboard', '/onboarding', '/test', '/admin', '/account', '/studio', '/signals', '/pair'];
-        const pathname = usePathname();
-        if (dontRenderRoutes.includes(pathname)) {
-            return null;
-        }
-    }
 
     useEffect(() => {
         const fetchUserDetails = async () => {
@@ -128,6 +120,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             document.body.classList.remove('no-scroll');
         };
     }, [isNavOpen]);
+
+    // Check routes after all hooks are declared
+    const protectedRoutes = ['/dashboard', '/onboarding', '/test', '/admin', '/account', '/studio', '/signals'];
+    const isUserRoute = pathname.startsWith('/(user)') || pathname.startsWith('/pair/') || protectedRoutes.includes(pathname);
+    if (isUserRoute) {
+        return null;
+    }
 
     const handleBackdropClick = () => {
         setIsNavOpen(false);
