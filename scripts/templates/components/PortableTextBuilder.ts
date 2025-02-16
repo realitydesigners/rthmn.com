@@ -1,4 +1,4 @@
-export class LessonBuilder {
+export class PortableTextBuilder {
     private lesson: any = {};
 
     constructor(title: string) {

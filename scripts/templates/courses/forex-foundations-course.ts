@@ -1,16 +1,5 @@
 import { whatisforextrading } from '../lessons/what-is-forex-trading';
 
-export interface LessonTemplate {
-    title: string;
-    description?: string;
-    estimatedTime?: string;
-    learningObjectives?: string[];
-    order: number;
-    content?: any[];
-    quiz?: any[];
-    relatedLessons?: any[];
-}
-
 export const forexFoundationsCourse = {
     title: 'Forex Foundations',
     description: 'Master the core principles of forex trading through a comprehensive journey from basic concepts to practical trading psychology',

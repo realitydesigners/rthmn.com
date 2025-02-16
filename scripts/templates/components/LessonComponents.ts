@@ -5,7 +5,6 @@ export const Block = (props: { key?: string; layout?: 'course' | 'default'; chil
     content: props.children,
 });
 
-// Heading Components
 export const H1 = (props: { text: string; key?: string }) => ({
     _type: 'block',
     _key: props.key || generateKey(),
@@ -34,7 +33,6 @@ export const H4 = (props: { text: string; key?: string }) => ({
     children: [{ _type: 'span', _key: generateKey(), text: props.text }],
 });
 
-// Text Components
 export const Text = (props: { text: string; key?: string }) => ({
     _type: 'block',
     _key: props.key || generateKey(),

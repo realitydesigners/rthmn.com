@@ -1,7 +1,7 @@
 import { Block, H1, H2, H3, Text, Callout, Quiz } from '../components/LessonComponents';
-import { LessonBuilder } from '../components/LessonBuilder';
+import { PortableTextBuilder } from '../components/PortableTextBuilder';
 
-export const whatisforextrading = new LessonBuilder('What is Forex Trading?')
+export const whatisforextrading = new PortableTextBuilder('What is Forex Trading?')
     .setDescription('Understanding the basics of forex markets and how currency trading works')
     .setEstimatedTime('30 minutes')
     .setOrder(1)
