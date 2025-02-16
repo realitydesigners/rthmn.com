@@ -444,17 +444,15 @@ export async function getCourses() {
     );
 }
 
-export async function getCourse(courseSlug: string) {
-    console.log('Fetching course with slug:', courseSlug);
+export async function getCourse(slug: string) {
     const course = await client.fetch(
-        groq`*[_type == "course" && slug.current == $courseSlug][0] {
+        `*[_type == "course" && slug.current == $slug][0]{
             _id,
             title,
             description,
             "slug": slug.current,
             icon,
             difficulty,
-            estimatedTime,
             "chapters": chapters[]-> {
                 _id,
                 title,
@@ -466,31 +464,20 @@ export async function getCourse(courseSlug: string) {
                     title,
                     description,
                     "slug": slug.current,
-                    order
+                    order,
+                    content
                 } | order(order asc)
             } | order(order asc)
         }`,
-        { courseSlug }
+        { slug }
     );
-    console.log('Course data:', JSON.stringify(course, null, 2));
+
+    console.log('Fetched course:', JSON.stringify(course, null, 2));
     return course;
 }
 
-export async function getLesson(lessonSlug: string) {
-    return client.fetch(
-        groq`*[_type == "lesson" && slug.current == $lessonSlug][0] {
-      _id,
-      title,
-      description,
-      content,
-      "slug": slug.current,
-      "relatedLessons": relatedLessons[]-> {
-        _id,
-        title,
-        description,
-        "slug": slug.current
-      }
-    }`,
-        { lessonSlug }
-    );
+export async function getLesson(slug: string) {
+    return client.fetch(`*[_type == "lesson" && slug.current == $slug][0]`, {
+        slug,
+    });
 }

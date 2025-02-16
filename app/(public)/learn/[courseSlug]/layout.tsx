@@ -30,7 +30,7 @@ export default async function CourseLayout({ children, params }: LayoutProps) {
                 </div>
 
                 {/* Main content */}
-                <div className='flex-1 px-8 pl-70'>
+                <div className='ml-80 flex-1'>
                     <div className='w-full'>{children}</div>
                 </div>
             </div>
