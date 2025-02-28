@@ -1,7 +1,7 @@
-import { defineField } from 'sanity';
+import { defineField, defineType } from 'sanity';
 import teamType from '../schemas/team';
 
-export default {
+export const teamBlock = defineType({
     type: 'object',
     name: 'teamBlock',
     title: 'Team Block',
@@ -20,4 +20,4 @@ export default {
             media: 'team.image',
         },
     },
-};
+});

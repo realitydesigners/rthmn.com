@@ -1,7 +1,11 @@
-export { default as headingBlock } from '@/utils/sanity/blocks/headingBlock';
-export { default as contentBlock } from '@/utils/sanity/blocks/contentBlock';
-export { default as teamBlock } from '@/utils/sanity/blocks/teamBlock';
-export { default as headingSplineBlock } from '@/utils/sanity/blocks/headingSplineBlock';
-export { default as teamGrid } from '@/utils/sanity/blocks/teamGrid';
-export { default as sceneBlock } from '@/utils/sanity/blocks/sceneBlock';
-export { default as courseBlock } from '@/utils/sanity/blocks/courseBlock';
+import { headingBlock } from './headingBlock';
+import { contentBlock } from '@/utils/sanity/blocks/contentBlock';
+import { teamBlock } from '@/utils/sanity/blocks/teamBlock';
+import { headingSplineBlock } from '@/utils/sanity/blocks/headingSplineBlock';
+import { teamGrid } from '@/utils/sanity/blocks/teamGrid';
+import { sceneBlock } from '@/utils/sanity/blocks/sceneBlock';
+import { courseBlock } from '@/utils/sanity/blocks/courseBlock';
+import { heroBlock } from '@/utils/sanity/blocks/heroBlock';
+import { faqBlock } from '@/utils/sanity/blocks/faqBlock';
+
+export const PageBuilderBlocks = [heroBlock, headingBlock, contentBlock, teamBlock, headingSplineBlock, teamGrid, sceneBlock, courseBlock, faqBlock];

@@ -3,7 +3,7 @@ import Spline from '@splinetool/react-spline';
 
 const SplineRefBlock = ({ url }) => {
     return (
-        <div className='h-screen w-full'>
+        <div className='h-full w-full'>
             <Spline scene={url} />
         </div>
     );
