@@ -10,13 +10,13 @@ export function defineSlug(schema: any = { name: 'slug' }): FieldDefinition<'slu
         title: schema?.title ?? 'URL',
         type: 'slug',
         components: {
-            ...schema.components
+            ...schema.components,
             // field: schema.components?.field ?? PathnameFieldComponent,
         },
         options: {
             ...(slugOptions ?? {}),
-            isUnique: slugOptions?.isUnique ?? isUnique
-        }
+            isUnique: slugOptions?.isUnique ?? isUnique,
+        },
     });
 }
 
@@ -27,7 +27,7 @@ export async function isUnique(slug: string, context: SlugValidationContext): Pr
     const params = {
         draft: `drafts.${id}`,
         published: id,
-        slug
+        slug,
     };
     const query = '*[!(_id in [$draft, $published]) && slug.current == $slug]';
     const result = await client.fetch(query, params);
@@ -42,7 +42,7 @@ export const getDocTypePrefix = (type: string) => {
 
 const slugMapper = {
     homePage: '/',
-    blogIndex: '/blog'
+    blogIndex: '/blog',
 } as Record<string, string>;
 
 export const createSlug: SlugifierFn = (input, _, { parent }) => {
@@ -56,7 +56,7 @@ export const createSlug: SlugifierFn = (input, _, { parent }) => {
 
     const slug = slugify(input, {
         lower: true,
-        remove: /[^a-zA-Z0-9 ]/g
+        remove: /[^a-zA-Z0-9 ]/g,
     });
 
     return `/${[prefix, slug].filter(Boolean).join('/')}`;

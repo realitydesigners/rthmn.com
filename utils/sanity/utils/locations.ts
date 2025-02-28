@@ -4,53 +4,53 @@ export const locations = {
     blog: defineLocations({
         select: {
             title: 'title',
-            slug: 'slug.current'
+            slug: 'slug.current',
         },
-        resolve: doc => {
+        resolve: (doc) => {
             return {
                 locations: [
                     {
                         title: doc?.title || 'Untitled',
-                        href: `${doc?.slug}`
+                        href: `${doc?.slug}`,
                     },
                     {
                         title: 'Blog',
-                        href: '/blog'
-                    }
-                ]
+                        href: '/blog',
+                    },
+                ],
             };
-        }
+        },
     }),
     home: defineLocations({
         select: {
             title: 'title',
-            slug: 'slug.current'
+            slug: 'slug.current',
         },
         resolve: () => {
             return {
                 locations: [
                     {
                         title: 'Home',
-                        href: '/'
-                    }
-                ]
+                        href: '/',
+                    },
+                ],
             };
-        }
+        },
     }),
     page: defineLocations({
         select: {
             title: 'title',
-            slug: 'slug.current'
+            slug: 'slug.current',
         },
-        resolve: doc => {
+        resolve: (doc) => {
             return {
                 locations: [
                     {
                         title: doc?.title || 'Untitled',
-                        href: `${doc?.slug}`
-                    }
-                ]
+                        href: `${doc?.slug}`,
+                    },
+                ],
             };
-        }
-    })
+        },
+    }),
 };

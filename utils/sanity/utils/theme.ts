@@ -5,7 +5,7 @@ const props = {
     '--my-black': '#060F12',
     '--my-brand': '#00cc7a',
     '--my-red': '#ff4444',
-    '--my-gray': '#888'
+    '--my-gray': '#888',
 };
 
 export const Theme = buildLegacyTheme({
@@ -25,5 +25,5 @@ export const Theme = buildLegacyTheme({
     '--state-success-color': props['--my-brand'],
     '--state-warning-color': props['--my-brand'],
     '--state-danger-color': props['--my-red'],
-    '--focus-color': props['--my-brand']
+    '--focus-color': props['--my-brand'],
 });

@@ -6,7 +6,7 @@ export const GROUP = {
     MAIN_CONTENT: 'main-content',
     CARD: 'card',
     RELATED: 'related',
-    OG: 'og'
+    OG: 'og',
 };
 
 export const GROUPS: FieldGroupDefinition[] = [
@@ -15,41 +15,41 @@ export const GROUPS: FieldGroupDefinition[] = [
         name: GROUP.MAIN_CONTENT,
         icon: ComposeIcon,
         title: 'Content',
-        default: true
+        default: true,
     },
     { name: GROUP.SEO, icon: SearchIcon, title: 'SEO' },
     {
         name: GROUP.OG,
         icon: InsertAboveIcon,
-        title: 'Open Graph'
+        title: 'Open Graph',
     },
     {
         name: GROUP.CARD,
         icon: BlockElementIcon,
-        title: 'Card'
+        title: 'Card',
     },
     {
         name: GROUP.RELATED,
         icon: InlineElementIcon,
-        title: 'Related'
-    }
+        title: 'Related',
+    },
 ];
 
 export const richTextField = defineField({
     name: 'richText',
-    type: 'richText'
+    type: 'richText',
 });
 
 export const buttonsField = defineField({
     name: 'buttons',
     type: 'array',
-    of: [{ type: 'button' }]
+    of: [{ type: 'button' }],
 });
 
 export const pageBuilderField = defineField({
     name: 'pageBuilder',
     group: GROUP.MAIN_CONTENT,
-    type: 'pageBuilder'
+    type: 'pageBuilder',
 });
 
 export const iconField = defineField({
@@ -57,7 +57,7 @@ export const iconField = defineField({
     title: 'Icon',
     options: {
         storeSvg: true,
-        providers: ['fi']
+        providers: ['fi'],
     },
-    type: 'iconPicker'
+    type: 'iconPicker',
 });

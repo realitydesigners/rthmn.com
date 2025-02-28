@@ -7,5 +7,6 @@ import { sceneBlock } from '@/utils/sanity/blocks/sceneBlock';
 import { courseBlock } from '@/utils/sanity/blocks/courseBlock';
 import { heroBlock } from '@/utils/sanity/blocks/heroBlock';
 import { faqBlock } from '@/utils/sanity/blocks/faqBlock';
+import { legalContentBlock } from '@/utils/sanity/blocks/legalContentBlock';
 
-export const PageBuilderBlocks = [heroBlock, headingBlock, contentBlock, teamBlock, headingSplineBlock, teamGrid, sceneBlock, courseBlock, faqBlock];
+export const PageBuilderBlocks = [heroBlock, headingBlock, contentBlock, teamBlock, headingSplineBlock, teamGrid, sceneBlock, courseBlock, faqBlock, legalContentBlock];

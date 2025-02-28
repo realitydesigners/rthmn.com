@@ -205,6 +205,20 @@ const pageBuilderFragment = /* groq */ `
       _key,
       layout
     },
+    _type == "contentBlock" => {
+      ...,
+      _key,
+      title,
+      content,
+      layout
+    },
+    _type == "legalContentBlock" => {
+      ...,
+      _key,
+      title,
+      content,
+      layout
+    },
     ${heroBlock},
     ${foundingPartnersBlock},
     ${partnerCtaBlock},
@@ -230,10 +244,13 @@ export const queryHomePageData = defineQuery(/* groq */ `*[_type == "page" && sl
 }`);
 
 export const querySlugPageData = defineQuery(/* groq */ `
-  *[_type == "page" && slug.current == $slug][0]{
-    ...,
-    "slug": slug.current,
-    ${pageBuilderFragment}
+  {
+   
+    "data": *[_type == "page" && slug.current == $slug][0]{
+      ...,
+      "slug": slug.current,
+      ${pageBuilderFragment}
+    }
   }
   `);
 

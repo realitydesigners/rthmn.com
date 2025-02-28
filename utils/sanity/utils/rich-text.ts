@@ -12,19 +12,19 @@ const richTextMembers = [
             { title: 'H4', value: 'h4' },
             { title: 'H5', value: 'h5' },
             { title: 'H6', value: 'h6' },
-            { title: 'Inline', value: 'inline' }
+            { title: 'Inline', value: 'inline' },
         ],
         lists: [
             { title: 'Numbered', value: 'number' },
-            { title: 'Bullet', value: 'bullet' }
+            { title: 'Bullet', value: 'bullet' },
         ],
         marks: {
             decorators: [
                 { title: 'Strong', value: 'strong' },
                 { title: 'Emphasis', value: 'em' },
-                { title: 'Code', value: 'code' }
-            ]
-        }
+                { title: 'Code', value: 'code' },
+            ],
+        },
     }),
     defineArrayMember({
         name: 'image',
@@ -32,35 +32,35 @@ const richTextMembers = [
         type: 'image',
         icon: ImageIcon,
         options: {
-            hotspot: true
+            hotspot: true,
         },
         fields: [
             defineField({
                 name: 'caption',
                 type: 'string',
-                title: 'Caption Text'
-            })
-        ]
-    })
+                title: 'Caption Text',
+            }),
+        ],
+    }),
 ];
 
 export const richText = defineType({
     name: 'richText',
     type: 'array',
-    of: richTextMembers
+    of: richTextMembers,
 });
 
-export const memberTypes = richTextMembers.map(member => member.name);
+export const memberTypes = richTextMembers.map((member) => member.name);
 
 type Type = NonNullable<(typeof memberTypes)[number]>;
 
 export const customRichText = (type: Type[], options?: { name?: string; title?: string; group?: string }) => {
     const { name } = options ?? {};
-    const customMembers = richTextMembers.filter(member => member.name && type.includes(member.name));
+    const customMembers = richTextMembers.filter((member) => member.name && type.includes(member.name));
     return defineField({
         ...options,
         name: name ?? 'richText',
         type: 'array',
-        of: customMembers
+        of: customMembers,
     });
 };

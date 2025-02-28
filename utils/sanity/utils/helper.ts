@@ -23,11 +23,11 @@ export const getTitleCase = (name: string) => {
 };
 
 export const createRadioListLayout = (items: Array<string | { title: string; value: string }>, options?: StringOptions): StringOptions => {
-    const list = items.map(item => {
+    const list = items.map((item) => {
         if (typeof item === 'string') {
             return {
                 title: getTitleCase(item),
-                value: item
+                value: item,
             };
         }
         return item;
@@ -35,18 +35,18 @@ export const createRadioListLayout = (items: Array<string | { title: string; val
     return {
         layout: 'radio',
         list,
-        ...options
+        ...options,
     };
 };
 
 export const parseRichTextToString = (value: unknown, maxWords: number | undefined = undefined) => {
     if (!Array.isArray(value)) return 'No Content';
 
-    const text = value.map(val => {
+    const text = value.map((val) => {
         const test = isPortableTextTextBlock(val);
         if (!test) return '';
         return val.children
-            .map(child => child.text)
+            .map((child) => child.text)
             .filter(Boolean)
             .join(' ');
     });
@@ -88,7 +88,7 @@ export async function retryPromise<T>(promiseFn: () => Promise<T>, options: Retr
 
             const backoffDelay = Math.min(initialDelay * 2 ** attempts, maxDelay);
 
-            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+            await new Promise((resolve) => setTimeout(resolve, backoffDelay));
         }
     }
 
@@ -118,7 +118,7 @@ export function buildTree(pages: Page[]): Tree {
             _id: isFolder ? pathSoFar + pathSoFar.split('/').length : item._id,
             _type: isFolder ? ('folder' as const) : item._type,
             title: pathnameToTitle(pathSoFar),
-            children: {}
+            children: {},
         };
     }
 
@@ -137,7 +137,7 @@ export function buildTree(pages: Page[]): Tree {
             } else if (isFolder && currentFolder[segment]._type !== 'folder') {
                 currentFolder[segment] = {
                     ...node,
-                    children: { '': currentFolder[segment] }
+                    children: { '': currentFolder[segment] },
                 };
             }
             // biome-ignore lint/style/noParameterAssign: needed for tree traversal
@@ -254,29 +254,29 @@ export function createPageTemplate() {
     const pages = [
         {
             title: 'Page',
-            type: 'page'
+            type: 'page',
         },
         {
             title: 'Blog',
-            type: 'blog'
-        }
+            type: 'blog',
+        },
     ];
-    return pages.map(page => {
+    return pages.map((page) => {
         return {
             schemaType: page.type,
             id: getTemplateName(page.type),
             title: `${page.title} with slug`,
             value: (props: { slug?: string }) => {
                 return {
-                    ...(props.slug ? { slug: { current: props.slug, _type: 'slug' } } : {})
+                    ...(props.slug ? { slug: { current: props.slug, _type: 'slug' } } : {}),
                 };
             },
             parameters: [
                 {
                     name: 'slug',
-                    type: 'string'
-                }
-            ]
+                    type: 'string',
+                },
+            ],
         };
     });
 }

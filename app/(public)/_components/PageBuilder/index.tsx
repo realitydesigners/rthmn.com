@@ -5,6 +5,8 @@ import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
 import { HeroBlock, type HeroBlockProps } from './blocks/hero';
 import { TeamGridBlock, type TeamGridBlockProps } from './blocks/teamGrid';
 import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';
+import { ContentBlock, type ContentBlockProps } from './blocks/contentBlock';
+import { LegalContentBlock, type LegalContentBlockProps } from './blocks/legalContentBlock';
 
 // Import other block components as needed
 // For example:
@@ -17,6 +19,8 @@ type PageBuilderBlock =
     | HeroBlockProps
     | TeamGridBlockProps
     | FAQBlockProps
+    | ContentBlockProps
+    | LegalContentBlockProps
     // Add other block types here
     | { _type: string; _key: string; [key: string]: any };
 
@@ -37,6 +41,8 @@ const BLOCK_COMPONENTS = {
     hero: HeroBlock,
     teamGrid: TeamGridBlock,
     faqBlock: FAQBlock,
+    contentBlock: ContentBlock,
+    legalContentBlock: LegalContentBlock,
     // Add other block components here
     // heading: HeadingBlock,
     // content: ContentBlock,
