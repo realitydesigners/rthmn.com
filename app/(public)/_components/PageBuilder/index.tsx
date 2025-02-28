@@ -8,21 +8,7 @@ import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';
 import { ContentBlock, type ContentBlockProps } from './blocks/contentBlock';
 import { LegalContentBlock, type LegalContentBlockProps } from './blocks/legalContentBlock';
 
-// Import other block components as needed
-// For example:
-// import { HeadingBlock } from './blocks/heading';
-// import { ContentBlock } from './blocks/content';
-// etc.
-
-// Define a union type for all possible block types
-type PageBuilderBlock =
-    | HeroBlockProps
-    | TeamGridBlockProps
-    | FAQBlockProps
-    | ContentBlockProps
-    | LegalContentBlockProps
-    // Add other block types here
-    | { _type: string; _key: string; [key: string]: any };
+type PageBuilderBlock = HeroBlockProps | TeamGridBlockProps | FAQBlockProps | ContentBlockProps | LegalContentBlockProps;
 
 export type PageBuilderProps = {
     pageBuilder: PageBuilderBlock[];
@@ -36,17 +22,12 @@ type PageData = {
     pageBuilder?: PageBuilderBlock[];
 };
 
-// Register all block components
 const BLOCK_COMPONENTS = {
     hero: HeroBlock,
     teamGrid: TeamGridBlock,
     faqBlock: FAQBlock,
     contentBlock: ContentBlock,
     legalContentBlock: LegalContentBlock,
-    // Add other block components here
-    // heading: HeadingBlock,
-    // content: ContentBlock,
-    // etc.
 } as const;
 
 type BlockType = keyof typeof BLOCK_COMPONENTS;
@@ -58,8 +39,6 @@ export function PageBuilder({ pageBuilder: initialPageBuilder = [], id, type }: 
         }
         return currentPageBuilder;
     });
-
-    console.log('PageBuilder blocks:', pageBuilder); // Add this for debugging
 
     return (
         <main
