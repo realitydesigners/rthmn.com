@@ -1,7 +1,7 @@
 'use client';
 import { useOptimistic } from '@sanity/visual-editing/react';
 import { createDataAttribute, type SanityDocument } from 'next-sanity';
-import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
+import { dataset, projectId, studioUrl } from '@/utils/sanity/api';
 import { HeroBlock, type HeroBlockProps } from './blocks/hero';
 import { TeamGridBlock, type TeamGridBlockProps } from './blocks/teamGrid';
 import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';

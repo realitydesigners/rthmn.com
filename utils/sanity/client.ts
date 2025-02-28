@@ -1,4 +1,4 @@
-import { apiVersion, dataset, hookSecret, projectId, token } from '@/utils/sanity/lib/api';
+import { apiVersion, dataset, hookSecret, projectId, token } from '@/utils/sanity/api';
 
 import { type ClientConfig, type QueryParams, createClient } from '@sanity/client';
 

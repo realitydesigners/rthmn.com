@@ -3,8 +3,8 @@ import { PageBuilderBlocks } from './blocks';
 
 import page from './schemas/page';
 
-import { pageBuilder } from './utils/pagebuilder';
-import { richText } from './utils/rich-text';
+import { pageBuilder } from './pagebuilder';
+import { richText } from './rich-text';
 import { audio, img, team, category, posts, faq, course, glossary, video, pairSnapshot, marketData, chapter, changelog, lesson } from './schemas';
 
 export const blocks = [];

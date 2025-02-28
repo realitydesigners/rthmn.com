@@ -3,8 +3,8 @@
 import { defineConfig } from 'sanity';
 import { structureTool } from 'sanity/structure';
 import schemaTypes from './utils/sanity';
-import { dataset, projectId, studioUrl } from '@/utils/sanity/lib/api';
-import { createPageTemplate } from '@/utils/sanity/utils/helper';
+import { dataset, projectId, studioUrl } from '@/utils/sanity/api';
+import { createPageTemplate } from '@/utils/sanity/helper';
 import { CustomField } from '@/utils/sanity/ui/CustomField';
 import { CustomItem } from '@/utils/sanity/ui/CustomItem';
 import { StudioStructure } from '@/utils/sanity/ui/deskStructure';

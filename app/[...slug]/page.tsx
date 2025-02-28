@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { client, sanityFetch } from '@/utils/sanity/lib/client';
-import { queryPortfolioItem, querySlugPageData, querySlugPagePaths } from '@/utils/sanity/lib/query';
-import { getMetaData } from '@/utils/sanity/lib/seo';
+import { client, sanityFetch } from '@/utils/sanity/client';
+import { queryPortfolioItem, querySlugPageData, querySlugPagePaths } from '@/utils/sanity/query';
+import { getMetaData } from '@/utils/sanity/seo';
 import { PageBuilder } from '@/app/(public)/_components/PageBuilder';
 
 type PageTypeConfig = {

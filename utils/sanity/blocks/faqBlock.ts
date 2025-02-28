@@ -1,5 +1,4 @@
 import { defineField, defineType } from 'sanity';
-import { GROUP } from '../utils/constant';
 
 export const faqBlock = defineType({
     name: 'faqBlock',
