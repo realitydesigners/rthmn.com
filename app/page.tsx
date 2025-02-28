@@ -1,21 +1,41 @@
-import { client } from '@/utils/sanity/lib/client';
-import ClientPage from './client';
+import { sanityFetch } from '@/utils/sanity/client';
+import { queryHomePageData } from '@/utils/sanity/query';
+import { getMetaData } from '@/utils/sanity/seo';
+import { PageBuilder } from '@/app/(public)/_components/PageBuilder';
 
-async function getAboutPage() {
-    return client.fetch(`
-    *[_type == "page" && slug.current == "about"][0] {
-      title,
-      sections[] {
-        sectionTitle,
-        layout,
-        content,
-        backgroundColor
-      }
+// The response from sanityFetch directly matches the query result
+interface HomePageData {
+    _id: string;
+    _type: string;
+    pageBuilder?: any[];
+    title?: string;
+    description?: string;
+    slug?: string;
+}
+
+async function fetchHomePageData(): Promise<HomePageData> {
+    return await sanityFetch({
+        query: queryHomePageData,
+        tags: ['home'],
+    });
+}
+
+export async function generateMetadata() {
+    const homePageData = await fetchHomePageData();
+    if (!homePageData) {
+        return getMetaData({});
     }
-  `);
+    return getMetaData(homePageData);
 }
 
 export default async function Page() {
-    const page = await getAboutPage();
-    return <ClientPage page={page} />;
+    const homePageData = await fetchHomePageData();
+    const { _id, _type, pageBuilder } = homePageData ?? {};
+
+    // Ensure we have an id to pass to PageBuilder
+    if (!_id) {
+        return <div>Loading...</div>;
+    }
+
+    return <PageBuilder pageBuilder={pageBuilder ?? []} id={_id} type={_type ?? 'page'} />;
 }

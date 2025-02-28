@@ -1,113 +1,65 @@
 import { defineField, defineType } from 'sanity';
+import { GROUP, GROUPS, pageBuilderField } from '@/utils/sanity/constant';
+import { ogFields } from '@/utils/sanity/og-fields';
+import { seoFields } from '@/utils/sanity/seo-fields';
+import { createSlug, isUnique } from '@/utils/sanity/slug';
 
 export default defineType({
     name: 'page',
-    title: 'Pages',
+    title: 'Page',
     type: 'document',
+    groups: GROUPS,
     fields: [
         defineField({
             name: 'title',
-            title: 'Title',
             type: 'string',
-            validation: (rule) => rule.required(),
+            title: 'Title',
+            group: GROUP.MAIN_CONTENT,
+        }),
+        defineField({
+            name: 'description',
+            type: 'text',
+            title: 'Description',
+            rows: 3,
+            group: GROUP.MAIN_CONTENT,
+            validation: (rule) => [
+                rule.min(140).warning('The meta description should be at least 140 characters for optimal SEO visibility in search results'),
+                rule.max(160).warning('The meta description should not exceed 160 characters as it will be truncated in search results'),
+            ],
         }),
         defineField({
             name: 'slug',
-            title: 'Slug',
             type: 'slug',
+            title: 'URL',
+            group: GROUP.MAIN_CONTENT,
             options: {
                 source: 'title',
+                slugify: createSlug,
+                isUnique,
             },
-            validation: (rule) => rule.required(),
+            validation: (Rule) => Rule.required(),
         }),
         defineField({
-            name: 'sections',
-            title: 'Page Sections',
-            type: 'array',
-            of: [
-                {
-                    type: 'object',
-                    name: 'section',
-                    title: 'Section',
-                    fields: [
-                        {
-                            name: 'sectionTitle',
-                            title: 'Section Title',
-                            type: 'string',
-                        },
-                        {
-                            name: 'layout',
-                            title: 'Layout',
-                            type: 'string',
-                            options: {
-                                list: [
-                                    { title: 'Full Width', value: 'fullWidth' },
-                                    { title: 'Contained', value: 'contained' },
-                                    { title: 'Wide', value: 'wide' },
-                                ],
-                            },
-                        },
-                        {
-                            name: 'content',
-                            title: 'Content',
-                            type: 'array',
-                            of: [
-                                {
-                                    type: 'block',
-                                    styles: [
-                                        { title: 'Normal', value: 'normal' },
-                                        { title: 'H1', value: 'h1' },
-                                        { title: 'H2', value: 'h2' },
-                                        { title: 'H3', value: 'h3' },
-                                    ],
-                                },
-                                {
-                                    type: 'teamGrid',
-                                    title: 'Team Grid',
-                                },
-                                {
-                                    type: 'sceneBlock',
-                                    title: '3D Scene',
-                                },
-                                {
-                                    type: 'image',
-                                    title: 'Image',
-                                },
-                            ],
-                        },
-                        {
-                            name: 'backgroundColor',
-                            title: 'Background Color',
-                            type: 'string',
-                            options: {
-                                list: [
-                                    { title: 'None', value: 'none' },
-                                    { title: 'Dark', value: 'dark' },
-                                    { title: 'Light', value: 'light' },
-                                    { title: 'Gradient', value: 'gradient' },
-                                ],
-                            },
-                        },
-                    ],
-                    preview: {
-                        select: {
-                            title: 'sectionTitle',
-                            layout: 'layout',
-                        },
-                        prepare({ title, layout }) {
-                            return {
-                                title: title || 'Untitled Section',
-                                subtitle: `Layout: ${layout || 'Default'}`,
-                            };
-                        },
-                    },
-                },
-            ],
+            name: 'image',
+            type: 'image',
+            title: 'Image',
+            group: GROUP.MAIN_CONTENT,
         }),
+        pageBuilderField,
+        ...seoFields,
+        ...ogFields,
     ],
     preview: {
         select: {
             title: 'title',
+            description: 'description',
+            slug: 'slug.current',
+            media: 'image',
         },
+        prepare: ({ title, slug, media }) => ({
+            title,
+            subtitle: slug,
+            media,
+        }),
     },
 });

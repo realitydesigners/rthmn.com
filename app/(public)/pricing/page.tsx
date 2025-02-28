@@ -1,5 +1,5 @@
-import { client } from '@/utils/sanity/lib/client';
-import { allMarketDataQuery, postsQuery } from '@/utils/sanity/lib/queries';
+import { client } from '@/utils/sanity/client';
+import { allMarketDataQuery, postsQuery } from '@/utils/sanity/queries';
 import { getProducts } from '@/utils/supabase/queries';
 import { createClient } from '@/utils/supabase/server';
 import ClientPage from './client';

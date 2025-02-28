@@ -1,5 +1,5 @@
-import { sanityFetch } from '@/utils/sanity/lib/client';
-import { urlForOpenGraphImage } from '@/utils/sanity/lib/utils';
+import { sanityFetch } from '@/utils/sanity/client';
+import { urlForOpenGraphImage } from '@/utils/sanity/utils';
 
 export async function generateMetadata({ query, params, extractor }, parent) {
     const metadataBaseUrl = process.env.NEXT_PUBLIC_METADATA_BASE || 'http://localhost:3000';

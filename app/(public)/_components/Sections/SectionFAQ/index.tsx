@@ -9,7 +9,7 @@ import { AnimatePresence } from 'motion/react';
 import { FaChevronDown, FaCommentAlt, FaQuestionCircle, FaSearch, FaTags } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
 import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
-import { client } from '@/utils/sanity/lib/client';
+import { client } from '@/utils/sanity/client';
 
 interface FAQItem {
     _id: string;

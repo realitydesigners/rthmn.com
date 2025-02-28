@@ -1,6 +1,6 @@
 import { defineType } from 'sanity';
 
-export default defineType({
+export const teamGrid = defineType({
     name: 'teamGrid',
     title: 'Team Grid',
     type: 'object',
@@ -31,7 +31,6 @@ export default defineType({
             return {
                 title: title || 'Team Grid',
                 subtitle: 'Displays team members in a grid layout',
-                media: () => '👥',
             };
         },
     },

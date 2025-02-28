@@ -40,7 +40,7 @@ const imageOptionTitles: Record<ImageOption, string> = {
     'img-light': 'img-light',
 };
 
-export default defineType({
+export const contentBlock = defineType({
     type: 'object',
     name: 'contentBlock',
     title: 'Content',

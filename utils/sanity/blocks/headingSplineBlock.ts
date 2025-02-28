@@ -1,9 +1,9 @@
-import { defineField } from 'sanity';
+import { defineField, defineType } from 'sanity';
 import categoryType from '../schemas/category';
 import imgType from '../schemas/img';
 import teamType from '../schemas/team';
 
-export default {
+export const headingSplineBlock = defineType({
     type: 'object',
     name: 'headingSplineBlock',
     title: 'Heading',
@@ -71,4 +71,4 @@ export default {
             media: 'image',
         },
     },
-};
+});

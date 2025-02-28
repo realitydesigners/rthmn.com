@@ -1,4 +1,4 @@
-import { apiVersion, dataset, hookSecret, projectId, token } from '@/utils/sanity/lib/api';
+import { apiVersion, dataset, hookSecret, projectId, token } from '@/utils/sanity/api';
 
 import { type ClientConfig, type QueryParams, createClient } from '@sanity/client';
 
@@ -21,7 +21,7 @@ export const writeClient = createClient({
     useCdn: false,
 });
 
-export async function sanityFetch<QueryResponse>({ query, qParams = {}, tags }: { query: string; qParams?: QueryParams; tags: string[] }): Promise<QueryResponse> {
+export async function sanityFetch<QueryResponse>({ query, qParams = {}, tags = [] }: { query: string; qParams?: QueryParams; tags?: string[] }): Promise<QueryResponse> {
     return client.fetch<QueryResponse>(query, qParams, {
         next: { revalidate: 60, tags },
     });
