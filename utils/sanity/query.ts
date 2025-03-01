@@ -189,6 +189,68 @@ const newsGridBlock = /* groq */ `
   }
 `;
 
+const changelogFragment = /* groq */ `
+  _type == "changelogBlock" => {
+    ...,
+    _key,
+    title,
+    subtitle,
+    "entries": *[_type == "changelog"] | order(releaseDate desc) {
+      _id,
+      title,
+      description,
+      version,
+      releaseDate,
+      type,
+      content[] {
+        ...,
+        _type,
+        style,
+        children,
+        markDefs[] {
+          ...,
+        }
+      },
+      status,
+      contributors[]->{
+        _id,
+        name,
+        "image": {
+          "asset": {
+            "url": image.asset->url
+          }
+        }
+      }
+    }
+  }
+`;
+
+const githubFragment = /* groq */ `
+  _type == "githubBlock" => {
+    ...,
+    _key,
+    title,
+    description,
+    buttonText,
+    githubUrl
+  }
+`;
+
+const faqFragment = /* groq */ `
+  _type == "faqBlock" => {
+    ...,
+    _key,
+    title,
+    "items": *[_type == "faq"] {
+      _id,
+      question,
+      answer,
+      category,
+      isPublished
+    }
+  }
+`;
+
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
@@ -219,12 +281,9 @@ const pageBuilderFragment = /* groq */ `
       content,
       layout
     },
-     _type == "changelogBlock" => {
-      ...,
-      _key,
-      title,
-      subtitle,
-    },
+    ${faqFragment},
+    ${changelogFragment},
+    ${githubFragment},
     ${heroBlock},
     ${foundingPartnersBlock},
     ${partnerCtaBlock},

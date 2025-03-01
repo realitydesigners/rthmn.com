@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { FaArrowRight, FaGithub } from 'react-icons/fa';
-import { SectionFAQ } from '@/app/(public)/_components/Sections/SectionFAQ';
+
 import { SectionFooter } from '@/app/(public)/_components/Sections/SectionFooter';
 import { BackgroundGrid } from '@/app/(public)/_components/BackgroundGrid';
 
@@ -34,7 +34,6 @@ const SectionGitHub = () => (
 export default function FAQ() {
     return (
         <BackgroundGrid>
-            <SectionFAQ />
             {/* <SectionQuickHelp /> */}
             <SectionGitHub />
         </BackgroundGrid>

@@ -8,8 +8,9 @@ import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';
 import { ContentBlock, type ContentBlockProps } from './blocks/contentBlock';
 import { LegalContentBlock, type LegalContentBlockProps } from './blocks/legalContentBlock';
 import { ChangelogBlock, type ChangelogBlockProps } from './blocks/changelogBlock';
+import { GitHubBlock, type GitHubBlockProps } from './blocks/githubBlock';
 
-export type PageBuilderBlock = HeroBlockProps | TeamGridBlockProps | FAQBlockProps | ContentBlockProps | LegalContentBlockProps | ChangelogBlockProps;
+export type PageBuilderBlock = HeroBlockProps | TeamGridBlockProps | FAQBlockProps | ContentBlockProps | LegalContentBlockProps | ChangelogBlockProps | GitHubBlockProps;
 
 export interface PageBuilderProps {
     blocks: PageBuilderBlock[];
@@ -30,6 +31,7 @@ const BLOCK_COMPONENTS = {
     contentBlock: ContentBlock,
     legalContentBlock: LegalContentBlock,
     changelogBlock: ChangelogBlock,
+    githubBlock: GitHubBlock,
 } as const;
 
 type BlockType = keyof typeof BLOCK_COMPONENTS;

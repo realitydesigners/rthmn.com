@@ -9,6 +9,7 @@ import { heroBlock } from '@/utils/sanity/blocks/heroBlock';
 import { faqBlock } from '@/utils/sanity/blocks/faqBlock';
 import { legalContentBlock } from '@/utils/sanity/blocks/legalContentBlock';
 import { changelogBlock } from '@/utils/sanity/blocks/changelogBlock';
+import { githubBlock } from '@/utils/sanity/blocks/githubBlock';
 
 export const PageBuilderBlocks = [
     heroBlock,
@@ -22,4 +23,5 @@ export const PageBuilderBlocks = [
     faqBlock,
     legalContentBlock,
     changelogBlock,
+    githubBlock,
 ];
