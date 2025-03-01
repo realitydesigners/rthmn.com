@@ -1,6 +1,6 @@
 'use client';
 
-import { SectionPricing } from '@/app/(public)/_components/Sections/SectionPricing';
+import { SectionPricing } from '@/components/Sections/SectionPricing';
 import { useAuth } from '@/providers/SupabaseProvider';
 
 interface MarketData {

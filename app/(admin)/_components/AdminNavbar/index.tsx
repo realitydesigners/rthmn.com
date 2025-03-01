@@ -5,11 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { LuChevronRight, LuLayoutDashboard } from 'react-icons/lu';
-import { LogoIcon } from '@/app/(public)/_components/Icons/icons';
+import { LogoIcon } from '@/components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { createClient } from '@/utils/supabase/client';
-import { ConnectionBadge } from '@/app/(user)/_components/Badges/ConnectionBadge';
+import { ConnectionBadge } from '@/components/Badges/ConnectionBadge';
 
 export function AdminNavbar() {
     const pathname = usePathname();

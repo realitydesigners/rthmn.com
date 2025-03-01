@@ -3,9 +3,9 @@
 import Link from 'next/link';
 import { useEffect, useCallback } from 'react';
 import { FaArrowLeft, FaArrowRight, FaBookmark, FaClock, FaCheckCircle, FaLightbulb, FaNotesMedical } from 'react-icons/fa';
-import Blocks from '@/app/(public)/_components/blocks/Blocks';
-import type { BlockProps } from '@/app/(public)/_components/blocks/Blocks';
-import { TableOfContents } from '@/app/(public)/_components/TOC';
+import Blocks from '@/components/PageBuilder/blocks/Blocks';
+import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
+import { TableOfContents } from '@/components/TOC';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
 
 interface LessonClientProps {

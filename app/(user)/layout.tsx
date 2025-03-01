@@ -1,9 +1,9 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { DashboardNavigation } from '@/app/(user)/_components/DashboardNavigation';
-import { NavbarSignedIn } from '@/app/(user)/_components/NavbarSignedIn';
-import { SidebarLeft } from '@/app/(user)/_components/SidebarLeft';
-import { SidebarRight } from '@/app/(user)/_components/SidebarRight';
+import { DashboardNavigation } from '@/components/Navbars/DashboardNavigation';
+import { NavbarSignedIn } from '@/components/Navbars/NavbarSignedIn';
+import { SidebarLeft } from '@/components/Sidebars/SidebarLeft';
+import { SidebarRight } from '@/components/Sidebars/SidebarRight';
 import { DashboardProvider } from '@/providers/DashboardProvider/client';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { UserProvider } from '@/providers/UserProvider';
