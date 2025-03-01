@@ -59,14 +59,16 @@ export default function DiscordConnectionForm({ discordConnection, subscription 
     };
 
     return (
-        <div className='flex items-center justify-between'>
+        <div className='flex flex-col items-start justify-between gap-4'>
             <div className='flex items-center gap-3'>
-                <div className='rounded-md bg-white/5 p-2'>
-                    <FaDiscord className='h-5 w-5 text-[#5865F2]' />
+                <div className='flex-shrink-0 rounded-md bg-white/5 p-2'>
+                    <FaDiscord className='h-4 w-4 text-[#5865F2] sm:h-5 sm:w-5' />
                 </div>
-                <div>
-                    <h3 className='font-outfit text-lg font-semibold text-white'>Discord Connection</h3>
-                    <p className='font-outfit text-sm text-zinc-400'>{discordConnection ? `Connected as ${discordConnection.discord_username}` : 'Connect your Discord account'}</p>
+                <div className='min-w-0'>
+                    <h3 className='font-outfit text-base font-semibold text-white sm:text-lg'>Discord Connection</h3>
+                    <p className='font-outfit truncate text-xs text-zinc-400 sm:text-sm'>
+                        {discordConnection ? `Connected as ${discordConnection.discord_username}` : 'Connect your Discord account'}
+                    </p>
                 </div>
             </div>
 
@@ -74,14 +76,14 @@ export default function DiscordConnectionForm({ discordConnection, subscription 
                 <button
                     onClick={handleDisconnect}
                     disabled={isLoading}
-                    className='flex items-center gap-2 rounded-full bg-red-500/10 px-6 py-2 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50'>
-                    <span className='font-outfit text-sm'>{isLoading ? 'Disconnecting...' : 'Disconnect'}</span>
+                    className='flex w-full items-center justify-center gap-2 rounded-full bg-red-500/10 px-4 py-1.5 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50 sm:w-auto sm:px-6 sm:py-2'>
+                    <span className='font-outfit text-xs sm:text-sm'>{isLoading ? 'Disconnecting...' : 'Disconnect'}</span>
                 </button>
             ) : (
                 <button
                     onClick={() => (window.location.href = DISCORD_OAUTH_URL)}
-                    className='flex items-center gap-2 rounded-full bg-[#5865F2] px-6 py-2 text-white transition-all duration-200 hover:bg-[#4752C4]'>
-                    <span className='font-outfit text-sm'>Connect Discord</span>
+                    className='flex w-full items-center justify-center gap-2 rounded-full bg-[#5865F2] px-4 py-1.5 text-white transition-all duration-200 hover:bg-[#4752C4] sm:w-auto sm:px-6 sm:py-2'>
+                    <span className='font-outfit text-xs sm:text-sm'>Connect Discord</span>
                 </button>
             )}
         </div>

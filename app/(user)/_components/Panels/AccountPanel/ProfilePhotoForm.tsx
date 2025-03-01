@@ -92,38 +92,45 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
     };
 
     return (
-        <div className='font-outfit relative'>
+        <div className='font-outfit relative h-full w-full'>
             {/* Hidden file input */}
             <input ref={fileInputRef} type='file' accept='image/*' className='hidden' onChange={handleFileUpload} disabled={isLoading} />
 
             {/* Profile Image */}
             <button
                 onClick={handleClick}
-                className='group relative h-40 w-40 overflow-hidden rounded-full border-4 border-[#222] bg-[#222] shadow-xl transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]'
+                className='group relative h-full w-full overflow-hidden rounded-full border-2 border-[#222] bg-[#222] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl'
                 disabled={isLoading}>
                 {preview ? (
-                    <Image src={preview} alt='Profile' fill className='object-cover transition-opacity duration-200 group-hover:opacity-75' sizes='160px' priority />
+                    <Image
+                        src={preview}
+                        alt='Profile'
+                        fill
+                        className='object-cover transition-opacity duration-200 group-hover:opacity-75'
+                        sizes='(max-width: 640px) 96px, 112px'
+                        priority
+                    />
                 ) : (
                     <div className='flex h-full w-full items-center justify-center bg-[#333] transition-colors duration-200 group-hover:bg-[#444]'>
-                        <span className='text-4xl font-bold text-zinc-500'>{userId.charAt(0).toUpperCase()}</span>
+                        <span className='text-2xl font-bold text-zinc-500 sm:text-4xl'>{userId.charAt(0).toUpperCase()}</span>
                     </div>
                 )}
 
                 {/* Simple hover text */}
                 <div className='font-outfit absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-                    <span className='rounded-full bg-black/50 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm'>Change Photo</span>
+                    <span className='rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:py-2 sm:text-sm'>Change Photo</span>
                 </div>
             </button>
 
             {/* Loading Overlay */}
             {isLoading && (
                 <div className='absolute inset-0 flex items-center justify-center rounded-full bg-black/60 backdrop-blur-sm'>
-                    <div className='h-8 w-8 animate-spin rounded-full border-b-2 border-white'></div>
+                    <div className='h-6 w-6 animate-spin rounded-full border-b-2 border-white sm:h-8 sm:w-8'></div>
                 </div>
             )}
 
-            {/* Help Text */}
-            <div className='font-outfit mt-2 text-center text-xs text-zinc-500'>Click to change • Max 2MB</div>
+            {/* Help Text - Hidden on very small screens */}
+            <div className='font-outfit mt-2 hidden text-center text-xs text-zinc-500 sm:block'>Click to change • Max 2MB</div>
         </div>
     );
 }

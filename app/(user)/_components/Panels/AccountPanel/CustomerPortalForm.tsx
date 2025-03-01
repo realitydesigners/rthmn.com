@@ -40,17 +40,17 @@ export default function CustomerPortalForm({ subscription }: Props) {
     };
 
     return (
-        <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
+        <div className='space-y-4 sm:space-y-6'>
+            <div className='flex flex-col items-start justify-between gap-3'>
                 <div className='flex items-center gap-3'>
-                    <div className='rounded-md bg-white/5 p-2'>
-                        <LuCreditCard className='h-5 w-5 text-white' />
+                    <div className='flex-shrink-0 rounded-md bg-white/5 p-2'>
+                        <LuCreditCard className='h-4 w-4 text-white sm:h-5 sm:w-5' />
                     </div>
-                    <div>
-                        <h3 className='font-outfit text-lg font-semibold text-white'>
+                    <div className='min-w-0'>
+                        <h3 className='font-outfit truncate text-base font-semibold text-white sm:text-lg'>
                             {subscription?.prices ? `${subscription.prices.name || 'Pro'} Plan` : 'No active subscription'}
                         </h3>
-                        <p className='font-outfit text-sm text-zinc-400'>
+                        <p className='font-outfit text-xs text-zinc-400 sm:text-sm'>
                             {subscription ? `${subscriptionPrice}/${subscription.prices.interval}` : 'Choose a plan to get started'}
                         </p>
                     </div>
@@ -58,24 +58,20 @@ export default function CustomerPortalForm({ subscription }: Props) {
                 {!subscription && (
                     <Link
                         href='/pricing'
-                        className='rounded-full bg-gradient-to-r from-[#22c55e] to-[#16a34a] px-6 py-2 text-sm text-white transition-all duration-200 hover:from-[#16a34a] hover:to-[#15803d]'>
+                        className='rounded-full bg-gradient-to-r from-[#22c55e] to-[#16a34a] px-4 py-1.5 text-xs whitespace-nowrap text-white transition-all duration-200 hover:from-[#16a34a] hover:to-[#15803d] sm:px-6 sm:py-2 sm:text-sm'>
                         Choose Plan
                     </Link>
                 )}
             </div>
 
             {subscription && (
-                <div className='flex items-center justify-between border-t border-white/10 pt-6'>
-                    <div className='font-outfit flex items-center gap-2 text-sm text-zinc-400'>
-                        <FaStripe className='h-5 w-5' />
-                        <span>Manage your subscription</span>
-                    </div>
+                <div className='flex flex-col flex-wrap items-start justify-between gap-3'>
                     <button
                         onClick={handleStripePortalRequest}
                         disabled={isSubmitting}
-                        className='flex items-center gap-2 rounded-full bg-white/5 px-6 py-2 text-white transition-all duration-200 hover:bg-white/10 disabled:opacity-50'>
-                        <LuCreditCard className='h-5 w-5 text-white' />
-                        <span className='font-outfit text-sm'>{isSubmitting ? 'Loading...' : 'Manage Plan'}</span>
+                        className='flex w-full items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-1.5 text-white transition-all duration-200 hover:bg-white/10 disabled:opacity-50 sm:w-auto sm:px-6 sm:py-2'>
+                        <LuCreditCard className='h-4 w-4 text-white sm:h-5 sm:w-5' />
+                        <span className='font-outfit text-xs sm:text-sm'>{isSubmitting ? 'Loading...' : 'Manage Plan'}</span>
                     </button>
                 </div>
             )}
