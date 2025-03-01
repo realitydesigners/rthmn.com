@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { FaBook, FaChartLine, FaGraduationCap, FaArrowRight } from 'react-icons/fa';
-import { Background } from '@/app/(public)/_components/Background';
+import { Background } from '@/components/Backgrounds/Background';
 import { Course } from '@/types/types';
 
 export function LearnPageClient({ courses }: { courses: Course[] }) {

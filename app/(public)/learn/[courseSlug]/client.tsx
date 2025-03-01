@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { FaArrowLeft, FaBook, FaChartLine, FaChevronDown, FaGraduationCap, FaLightbulb, FaPlay, FaRocket, FaTools } from 'react-icons/fa';
-import { Background } from '@/app/(public)/_components/Background';
+import { Background } from '@/components/Backgrounds/Background';
 
 const CourseIcon = ({ icon }: { icon: string }) => {
     const icons = {
