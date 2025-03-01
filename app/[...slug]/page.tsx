@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { client, sanityFetch } from '@/sanity/lib/client';
 import { queryPortfolioItem, querySlugPageData, querySlugPagePaths } from '@/sanity/lib/query';
 import { getMetaData } from '@/sanity/lib/seo';
-import { PageBuilder } from '@/app/(public)/_components/PageBuilder';
+import { PageBuilder } from '@/components/PageBuilder';
 
 type PageTypeConfig = {
     query: string;

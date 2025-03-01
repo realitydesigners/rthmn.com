@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { FaBrain, FaChartLine, FaCode, FaCube } from 'react-icons/fa';
-import { StartButton } from '@/app/(public)/_components/Sections/StartNowButton';
+import { StartButton } from '@/components/Sections/StartNowButton';
 
 interface AutoBoxModuleProps {
     visibility?: {

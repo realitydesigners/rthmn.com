@@ -1,4 +1,4 @@
-import { ChartDataPoint } from '@/app/(user)/_components/Charts/CandleChart';
+import { ChartDataPoint } from '@/components/Charts/CandleChart';
 
 export interface ProcessedChartData {
     processedCandles: ChartDataPoint[];

@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { StartButton } from '@/app/(public)/_components/Sections/StartNowButton';
+import { StartButton } from '@/components/Sections/StartNowButton';
 
 interface AutoBoxModuleProps {
     visibility?: {

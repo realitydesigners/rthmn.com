@@ -1,7 +1,5 @@
-import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
-import { Toaster } from '@/app/(public)/_components/Toasts/toaster';
-import { NavbarSignedOut } from '@/app/(public)/_components/NavbarSignedOut';
+import { NavbarSignedOut } from '@/components/Navbars/NavbarSignedOut';
 import SupabaseProvider from '@/providers/SupabaseProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import ogImage from '@/public/opengraph-image.png';
@@ -12,7 +10,7 @@ import Script from 'next/script';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { kodeMono, outfit, oxanium, russo } from '@/utils/styles/fonts';
-import { SectionFooter } from '@/app/(public)/_components/Sections/SectionFooter';
+import { SectionFooter } from '@/components/Sections/SectionFooter';
 import { prefetchDNS, preconnect } from 'react-dom';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
@@ -65,9 +63,6 @@ export default async function RootLayout({
                         <NavbarSignedOut user={user} />
                         {children}
                         <SectionFooter />
-                        <Suspense>
-                            <Toaster />
-                        </Suspense>
                     </QueryProvider>
                 </SupabaseProvider>
                 <Analytics />
