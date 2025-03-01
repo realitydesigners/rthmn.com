@@ -113,27 +113,6 @@ const portfolioBlock = /* groq */ `
   }
 `;
 
-const teamBlock = /* groq */ `
-  _type == "team" => {
-    ...,
-    title,
-    subtitle,
-    description,
-    "teamMembers": *[_type == "teamMember"] | order(order asc) {
-      _id,
-      name,
-      role,
-      bio,
-      "image": image.asset->url,
-      socials,
-      bulletPoints[] {
-        "icon": icon.asset->url,
-        text
-      }
-    }
-  }
-`;
-
 const aboutHeroBlock = /* groq */ `
   _type == "aboutHero" => {
     ...,
@@ -251,6 +230,27 @@ const faqFragment = /* groq */ `
   }
 `;
 
+const teamFragment = /* groq */ `
+  _type == "teamGrid" => {
+    ...,
+    _key,
+    layout,
+    "members": *[_type == "team"] | order(order asc) {
+      _id,
+      name,
+      role,
+      shortBio,
+      twitter,
+      instagram,
+      "image": {
+        "asset": {
+          "url": image.asset->url
+        }
+      }
+    }
+  }
+`;
+
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
@@ -261,11 +261,6 @@ const pageBuilderFragment = /* groq */ `
       title,
       content,
       showFAQ
-    },
-    _type == "teamGrid" => {
-      ...,
-      _key,
-      layout
     },
     _type == "contentBlock" => {
       ...,
@@ -289,7 +284,7 @@ const pageBuilderFragment = /* groq */ `
     ${partnerCtaBlock},
     ${portfolioGridBlock},
     ${portfolioBlock},
-    ${teamBlock},
+    ${teamFragment},
     ${aboutHeroBlock},
     ${firstChecksBlock},
     ${investmentPrinciplesBlock},

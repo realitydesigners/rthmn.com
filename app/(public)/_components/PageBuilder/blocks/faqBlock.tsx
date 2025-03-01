@@ -185,8 +185,8 @@ export function FAQBlock({ title = 'Frequently Asked Questions', items = [] }: F
     };
 
     return (
-        <section className='relative min-h-screen overflow-hidden py-32'>
-            <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        <section className='relative flex items-center justify-center overflow-hidden py-32'>
+            <div className='px-4 sm:px-6 lg:w-3/4 2xl:w-1/2'>
                 <motion.div
                     ref={ref}
                     initial={{ opacity: 0, y: 20 }}
