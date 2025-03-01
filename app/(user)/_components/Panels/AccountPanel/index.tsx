@@ -24,9 +24,11 @@ const AccountPanel = () => {
     const handleSignOut = async () => {
         setIsSigningOut(true);
         try {
-            // Clear local state first to improve perceived performance
+            // Sign out and force a hard navigation to clear all React state
             await signOut();
-            // The redirect will happen via the useEffect above once user state is cleared
+
+            // Force a complete page reload to ensure all components reflect the signed-out state
+            window.location.href = '/';
         } catch (error) {
             console.error('Error signing out:', error);
             setIsSigningOut(false);
@@ -51,58 +53,60 @@ const AccountPanel = () => {
     }
 
     return (
-        <div className='scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 h-full w-full overflow-auto pb-6'>
-            <div className='mx-auto w-full max-w-md px-4 sm:px-6'>
+        <div className='scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 h-full w-full overflow-auto'>
+            <div className='w-full'>
                 {/* Profile Header */}
-                <div className='flex flex-col items-center justify-center pt-8 pb-8'>
-                    <div className='relative mb-5 h-28 w-28 overflow-hidden rounded-full border-2 border-gray-800/40 shadow-lg'>
+                <div className='flex flex-col items-center justify-center border-b border-white/5 py-6'>
+                    <div className='relative mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-gray-800/40'>
                         <ProfilePhotoForm avatarUrl={userDetails?.avatar_url} userId={user.id} />
                     </div>
-                    <h1 className='font-outfit mb-2 text-center text-2xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h1>
+                    <h1 className='font-outfit mb-1 text-center text-xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h1>
                     <p className='font-outfit max-w-full text-center text-sm break-words text-zinc-400'>{user.email}</p>
                 </div>
 
-                {/* Account Sections Container */}
-                <div className='rounded-xl border border-white/5 bg-black/30 shadow-sm backdrop-blur-sm'>
+                {/* Account Sections */}
+                <div>
                     {/* Subscription Section */}
                     {subscription && (
-                        <div className='border-b border-white/10 p-4'>
+                        <div className='border-b border-white/5 px-4 py-3'>
                             <CustomerPortalForm subscription={subscription} />
                         </div>
                     )}
 
                     {/* Discord Connection */}
-                    <div className='border-b border-white/10 p-4'>
+                    <div className='border-b border-white/5 px-4 py-3'>
                         <DiscordConnectionForm discordConnection={discordConnection} subscription={subscription} />
                     </div>
 
                     {/* Sign Out Section */}
-                    <div className='p-4'>
-                        <div className='flex flex-col items-start gap-4'>
+                    <div className='px-4 py-3'>
+                        <div>
                             <div className='flex items-center gap-3'>
                                 <div className='flex-shrink-0 rounded-md bg-white/5 p-2'>
-                                    <LuLogOut className='h-5 w-5 text-white' />
+                                    <LuLogOut className='h-4 w-4 text-white' />
                                 </div>
                                 <div className='min-w-0'>
-                                    <h3 className='font-outfit text-base font-semibold text-white sm:text-lg'>Account Access</h3>
-                                    <p className='font-outfit text-xs text-zinc-400 sm:text-sm'>Sign out of your account</p>
+                                    <h3 className='font-outfit text-base font-semibold text-white'>Account Access</h3>
+                                    <p className='font-outfit text-xs text-zinc-400'>Sign out of your account</p>
                                 </div>
                             </div>
 
-                            <button
-                                onClick={handleSignOut}
-                                disabled={isSigningOut}
-                                className='mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-red-500/10 px-6 py-2.5 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50'>
-                                <LuLogOut className='h-5 w-5' />
-                                <span className='font-outfit text-sm font-medium'>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
-                            </button>
+                            <div className='mt-3 pl-9'>
+                                <button
+                                    onClick={handleSignOut}
+                                    disabled={isSigningOut}
+                                    className='flex w-auto items-center justify-center gap-2 rounded-full bg-red-500/10 px-4 py-2 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50'>
+                                    <LuLogOut className='h-4 w-4' />
+                                    <span className='font-outfit text-sm'>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <div className='mt-6 text-center'>
-                    <p className='font-outfit text-xs text-zinc-500'>&copy; {new Date().getFullYear()} Rthmn. All rights reserved.</p>
+                <div className='mt-4 pb-4 text-center'>
+                    <p className='font-outfit text-xs text-zinc-500'>© {new Date().getFullYear()} Rthmn</p>
                 </div>
             </div>
         </div>

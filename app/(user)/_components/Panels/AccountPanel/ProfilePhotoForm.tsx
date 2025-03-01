@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import { createClient } from '@/utils/supabase/client';
 
@@ -11,9 +11,17 @@ interface Props {
 
 export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
     const [isLoading, setIsLoading] = useState(false);
-    const [preview, setPreview] = useState<string | null>(avatarUrl);
+    const [imageLoading, setImageLoading] = useState(true);
+    const [preview, setPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const supabase = createClient();
+
+    // Update preview when avatarUrl prop changes
+    useEffect(() => {
+        if (avatarUrl) {
+            setPreview(avatarUrl);
+        }
+    }, [avatarUrl]);
 
     const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         try {
@@ -91,6 +99,16 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
         }
     };
 
+    const handleImageLoad = () => {
+        setImageLoading(false);
+    };
+
+    const handleImageError = () => {
+        console.error('Failed to load profile image');
+        setImageLoading(false);
+        setPreview(null);
+    };
+
     return (
         <div className='font-outfit relative h-full w-full'>
             {/* Hidden file input */}
@@ -102,14 +120,23 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
                 className='group relative h-full w-full overflow-hidden rounded-full border-2 border-[#222] bg-[#222] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl'
                 disabled={isLoading}>
                 {preview ? (
-                    <Image
-                        src={preview}
-                        alt='Profile'
-                        fill
-                        className='object-cover transition-opacity duration-200 group-hover:opacity-75'
-                        sizes='(max-width: 640px) 96px, 112px'
-                        priority
-                    />
+                    <>
+                        <Image
+                            src={preview}
+                            alt='Profile'
+                            fill
+                            className={`object-cover transition-opacity duration-200 group-hover:opacity-75 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                            sizes='(max-width: 640px) 96px, 112px'
+                            priority
+                            onLoad={handleImageLoad}
+                            onError={handleImageError}
+                        />
+                        {imageLoading && (
+                            <div className='flex h-full w-full items-center justify-center bg-[#333]'>
+                                <div className='h-5 w-5 animate-spin rounded-full border-2 border-white border-b-transparent'></div>
+                            </div>
+                        )}
+                    </>
                 ) : (
                     <div className='flex h-full w-full items-center justify-center bg-[#333] transition-colors duration-200 group-hover:bg-[#444]'>
                         <span className='text-2xl font-bold text-zinc-500 sm:text-4xl'>{userId.charAt(0).toUpperCase()}</span>

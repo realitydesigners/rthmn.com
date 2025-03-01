@@ -10,6 +10,7 @@ import { LogoIcon } from '@/app/(public)/_components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { createClient } from '@/utils/supabase/client';
 import { GridControl } from '../Panels/BoxDataPanel/GridControl';
+import { useColorStore } from '@/stores/colorStore';
 
 interface NavbarSignedInProps {
     user: User | null;
@@ -21,7 +22,8 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const { signOut } = useAuth();
+    const { signOut, subscription } = useAuth();
+    const { boxColors } = useColorStore();
 
     // Get icon for path segment
     const getSegmentIcon = (segment: string) => {
@@ -86,17 +88,38 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 
     const userInitial = user?.user_metadata?.full_name?.[0].toUpperCase() || user?.email?.[0].toUpperCase() || '?';
 
+    // Get CSS color variables from boxColors
+    const positiveColor = boxColors.positive;
+    const negativeColor = boxColors.negative;
+
     return (
         <nav className='top-0 right-0 left-0 z-[100] hidden h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:fixed lg:flex lg:h-14'>
             <div className='group relative z-[110] h-full w-full rounded-lg p-[1px] transition-all duration-300 hover:from-[#1A1A1A]/50 hover:via-[#151515]/50 hover:to-[#111]/50'>
                 <div className='relative flex h-full w-full items-center justify-between rounded-lg px-2'>
                     <div className='relative z-[1] flex items-center gap-3'>
-                        <Link href='/dashboard' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/[0.03]'>
-                            <div className='flex h-7 w-7 items-center transition-transform duration-200 group-hover:scale-105'>
-                                <LogoIcon />
+                        <div className='flex items-center'>
+                            <Link href='/dashboard' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/[0.03]'>
+                                <div className='flex h-7 w-7 items-center transition-transform duration-200 group-hover:scale-105'>
+                                    <LogoIcon />
+                                </div>
+                                <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
+                            </Link>
+
+                            <div className='ml-2.5 flex items-center'>
+                                <div
+                                    className='rounded-md p-[1px] shadow-sm'
+                                    style={{
+                                        background: `linear-gradient(135deg, ${positiveColor}, ${negativeColor})`,
+                                    }}>
+                                    <div className='flex items-center justify-center rounded-sm bg-black px-[4px] py-[1px]'>
+                                        <span className='text-[8px] font-bold tracking-wide uppercase' style={{ color: positiveColor }}>
+                                            PRO
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
-                        </Link>
+                        </div>
+
                         {/* Breadcrumb */}
                         <div className='flex items-center gap-1.5 text-[#818181]'>
                             {Array.isArray(pathSegments) ? (
@@ -119,40 +142,6 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 
                     <div className='relative z-[110] flex items-center space-x-4'>
                         <GridControl />
-                        <div className='relative' ref={dropdownRef}>
-                            <button
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                                <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]'>
-                                    <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black'>
-                                        {avatarUrl ? (
-                                            <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
-                                        ) : (
-                                            <span className='text-xs font-bold'>{userInitial}</span>
-                                        )}
-                                    </div>
-                                </div>
-                            </button>
-                            {isDropdownOpen && (
-                                <div className='animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl'>
-                                    <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
-                                        <Link
-                                            href='/account'
-                                            className='flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5'
-                                            role='menuitem'>
-                                            Account
-                                        </Link>
-                                        <button
-                                            onClick={handleSignOut}
-                                            disabled={isSigningOut}
-                                            className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 transition-colors hover:bg-white/5'
-                                            role='menuitem'>
-                                            {isSigningOut ? 'Signing out...' : 'Sign out'}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
                     </div>
                 </div>
             </div>
