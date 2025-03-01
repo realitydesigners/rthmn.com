@@ -9,23 +9,7 @@ import { LogoIcon } from '@/app/(public)/_components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { createClient } from '@/utils/supabase/client';
-
-const ConnectionStatus = ({ isConnected }: { isConnected: boolean }) => {
-    return (
-        <div className='flex items-center gap-2 rounded-full border border-[#222] bg-black/50 px-3 py-1.5'>
-            <div className='relative flex items-center'>
-                <div className={`h-2 w-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
-                {isConnected && (
-                    <>
-                        <div className='absolute h-2 w-2 animate-ping rounded-full bg-green-500/40' />
-                        <div className='absolute -inset-1 h-4 w-4 animate-pulse rounded-full bg-green-500/10' />
-                    </>
-                )}
-            </div>
-            <span className={`text-xs font-medium ${isConnected ? 'text-green-400' : 'text-red-400'}`}>{isConnected ? 'Connected' : 'Disconnected'}</span>
-        </div>
-    );
-};
+import { ConnectionBadge } from '@/app/(user)/_components/Badges/ConnectionBadge';
 
 export function AdminNavbar() {
     const pathname = usePathname();
@@ -114,7 +98,7 @@ export function AdminNavbar() {
                 </div>
 
                 <div className='flex items-center gap-4'>
-                    <ConnectionStatus isConnected={isConnected} />
+                    <ConnectionBadge isConnected={isConnected} />
 
                     <div className='relative' ref={dropdownRef}>
                         <button
@@ -130,22 +114,6 @@ export function AdminNavbar() {
                                 </div>
                             </div>
                         </button>
-                        {isDropdownOpen && (
-                            <div className='animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl'>
-                                <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
-                                    <Link href='/account' className='flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5' role='menuitem'>
-                                        Account
-                                    </Link>
-                                    <button
-                                        onClick={handleSignOut}
-                                        disabled={isSigningOut}
-                                        className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 transition-colors hover:bg-white/5'
-                                        role='menuitem'>
-                                        {isSigningOut ? 'Signing out...' : 'Sign out'}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>
