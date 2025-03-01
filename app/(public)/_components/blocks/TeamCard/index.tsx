@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { groq } from 'next-sanity';
 import { FaInstagram, FaTwitter } from 'react-icons/fa';
-import { client } from '@/utils/sanity/client';
+import { client } from '@/sanity/lib/client';
 
 interface TeamMember {
     _id: string;

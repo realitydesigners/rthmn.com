@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { ChangelogTemplate } from '@/app/(public)/_components/blocks/templates/ChangelogTemplate';
 import { BackgroundGrid } from '@/app/(public)/_components/BackgroundGrid';
 import { ChangelogEntry } from '@/types/types';
-import { getChangeLog } from '@/utils/sanity/queries';
+import { getChangeLog } from '@/sanity/lib/queries';
 import { useQuery } from '@tanstack/react-query';
 
 export interface ChangelogBlockProps {

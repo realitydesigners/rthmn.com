@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getCourse, getLesson } from '@/utils/sanity/queries';
+import { getCourse, getLesson } from '@/sanity/lib/queries';
 import LessonClient from './client';
 
 export const revalidate = 60;
