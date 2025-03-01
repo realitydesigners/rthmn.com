@@ -12,12 +12,11 @@ import { formatPrice } from '@/utils/instruments';
 interface PairResoBoxProps {
     pair?: string;
     boxSlice?: BoxSlice;
-    currentOHLC?: OHLC;
     boxColors?: BoxColors;
     isLoading?: boolean;
 }
 
-export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, isLoading }: PairResoBoxProps) => {
+export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBoxProps) => {
     const { priceData } = useWebSocket();
 
     // Get timeframe state and actions - memoize selectors
