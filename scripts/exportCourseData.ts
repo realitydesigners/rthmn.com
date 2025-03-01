@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { client } from '@/utils/sanity/lib/client';
+import { client } from '@/sanity/lib/client';
 import { groq } from 'next-sanity';
 import fs from 'fs';
 import path from 'path';

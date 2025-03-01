@@ -1,6 +1,6 @@
-import { getCourses } from '@/utils/sanity/lib/queries';
+import { getCourses } from '@/sanity/lib/queries';
 import { LearnPageClient } from './client';
-import { sanityFetch } from '@/utils/sanity/lib/client';
+import { sanityFetch } from '@/sanity/lib/client';
 import { Course } from '@/types/types';
 
 export default async function LearnPage() {

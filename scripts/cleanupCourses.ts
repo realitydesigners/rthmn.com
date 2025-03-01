@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { client } from '@/utils/sanity/lib/client';
+import { client } from '@/sanity/lib/client';
 
 async function cleanupCourses() {
     try {
