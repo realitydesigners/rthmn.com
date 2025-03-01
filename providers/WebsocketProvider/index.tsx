@@ -39,13 +39,24 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
     const { session } = useAuth();
     const subscriptionsRef = useRef<Map<string, (data: BoxSlice) => void>>(new Map());
     const [priceData, setPriceData] = useState<Record<string, PriceData>>({});
+    const connectionAttemptRef = useRef<NodeJS.Timeout | null>(null);
 
     // Memoized connection initialization
     const initializeConnection = useCallback(() => {
         if (!session?.access_token) return;
-        wsClient.setAccessToken(session.access_token);
-        wsClient.connect();
-    }, [session?.access_token]);
+
+        // Clear any existing connection attempt
+        if (connectionAttemptRef.current) {
+            clearTimeout(connectionAttemptRef.current);
+            connectionAttemptRef.current = null;
+        }
+
+        // Only initialize if not already connected
+        if (!isConnected) {
+            wsClient.setAccessToken(session.access_token);
+            wsClient.connect();
+        }
+    }, [session?.access_token, isConnected]);
 
     // Optimized message handlers
     const handleBoxSliceMessage = useCallback((data: any) => {
@@ -125,7 +136,20 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
             fetchInitialCandleData();
             initializeConnection();
         }
+
+        return () => {
+            if (connectionAttemptRef.current) {
+                clearTimeout(connectionAttemptRef.current);
+            }
+        };
     }, [session?.access_token, isConnected, fetchInitialCandleData, initializeConnection]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            wsClient.disconnect();
+        };
+    }, []);
 
     // Event handlers setup
     useEffect(() => {

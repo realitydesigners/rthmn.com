@@ -37,6 +37,11 @@ class WebSocketClient {
             return;
         }
 
+        if (this.socket && (this.socket.readyState === WebSocket.CONNECTING || this.socket.readyState === WebSocket.OPEN)) {
+            console.log('WebSocket already connected or connecting');
+            return;
+        }
+
         try {
             this.socket = new WebSocket(wsUrl);
             this.socket.binaryType = 'arraybuffer';
@@ -125,14 +130,25 @@ class WebSocketClient {
     }
 
     private handleClose(event: CloseEvent) {
+        console.log('WebSocket closed with code:', event.code, 'reason:', event.reason);
+
+        const doNotReconnectCodes = [1000, 1001, 1008, 1011];
+
         this.isAuthenticated = false;
         this.handlers.close.forEach((handler) => handler());
-        this.handleReconnect();
+
+        if (!doNotReconnectCodes.includes(event.code)) {
+            this.handleReconnect();
+        } else {
+            console.log('WebSocket closed normally, not attempting reconnection');
+            this.reconnectAttempts = 0;
+        }
     }
 
     private handleReconnect() {
         if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             console.error('Max reconnection attempts reached');
+            this.reconnectAttempts = 0;
             return;
         }
 
@@ -140,7 +156,17 @@ class WebSocketClient {
         this.reconnectAttempts++;
 
         console.log(`Reconnecting in ${delay}ms... (attempt ${this.reconnectAttempts})`);
-        setTimeout(() => this.connect(), delay);
+
+        if (this.socket) {
+            this.socket.close();
+            this.socket = null;
+        }
+
+        setTimeout(() => {
+            if (!this.isAuthenticated) {
+                this.connect();
+            }
+        }, delay);
     }
 
     private authenticate() {
