@@ -55,25 +55,25 @@ export function getMetaData(data: MetaDataInput): Metadata {
     });
 
     return {
-        title: `${meta.title} | DGB`,
+        title: `${meta.title} | RTHMN`,
         description: meta.description,
         metadataBase: new URL(baseUrl),
-        creator: 'DGB',
-        authors: [{ name: 'Roboto' }],
+        creator: 'RTHMN',
+        authors: [{ name: 'RTHMN' }],
         icons: {
             icon: `${baseUrl}/favicon.ico`,
         },
-        keywords: ['dgb', 'investments', 'demo', 'sanity', 'next', 'react', 'template'],
+        keywords: ['rthmn', 'forex', 'stocks', 'trading', 'signals', 'automation', 'ai', 'trading platform'],
         twitter: {
             card: 'summary_large_image',
             images: [ogImage],
-            creator: '@dgb',
+            creator: '@rthmn',
             title: meta.title,
             description: meta.description,
         },
         openGraph: {
             type: 'website',
-            countryName: 'UK',
+            countryName: 'US',
             description: meta.description,
             title: meta.title,
             images: [

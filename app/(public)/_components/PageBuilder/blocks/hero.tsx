@@ -67,11 +67,7 @@ export function HeroBlock({ title, content }: HeroBlockProps) {
                             ))}
 
                         {/* Render text blocks with PortableText */}
-                        {textBlocks.length > 0 && (
-                            <div className='container mx-auto px-4'>
-                                <PortableText value={textBlocks} template='about' />
-                            </div>
-                        )}
+                        {textBlocks.length > 0 && <PortableText value={textBlocks} template='about' />}
                     </div>
                 ) : (
                     <div className='flex min-h-[50vh] items-center justify-center'>

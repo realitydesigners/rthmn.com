@@ -1,7 +1,7 @@
 import { processInitialBoxData } from './boxDataProcessor';
 import { processInitialChartData } from './chartDataProcessor';
-import { sanityFetch } from '@/utils/sanity/client';
-import { pairSnapshotQuery } from '@/utils/sanity/queries';
+import { sanityFetch } from '@/sanity/lib/client';
+import { pairSnapshotQuery } from '@/sanity/lib/queries';
 import { getSubscription } from '@/utils/supabase/queries';
 import { createClient } from '@/utils/supabase/server';
 import Client from './client';

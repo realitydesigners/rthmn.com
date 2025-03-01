@@ -11,17 +11,6 @@ export const teamGrid = defineType({
             type: 'string',
             description: 'Optional title above the team grid',
         },
-        {
-            name: 'layout',
-            title: 'Layout',
-            type: 'string',
-            options: {
-                list: [
-                    { title: 'Full Width', value: 'fullWidth' },
-                    { title: 'Contained', value: 'contained' },
-                ],
-            },
-        },
     ],
     preview: {
         select: {

@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-import { client } from '@/utils/sanity/client';
+import { client } from '@/sanity/lib/client';
 import { forexFoundationsCourse } from './templates/courses/forex-foundations-course';
 import { CourseStructure, generateCourseSlug } from './templates/courses/base-course';
 import { BaseLesson } from './templates/lessons/base-lesson';

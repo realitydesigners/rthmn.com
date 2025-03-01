@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
-import { client, sanityFetch } from '@/utils/sanity/client';
-import { queryPortfolioItem, querySlugPageData, querySlugPagePaths } from '@/utils/sanity/query';
-import { getMetaData } from '@/utils/sanity/seo';
+import { client, sanityFetch } from '@/sanity/lib/client';
+import { queryPortfolioItem, querySlugPageData, querySlugPagePaths } from '@/sanity/lib/query';
+import { getMetaData } from '@/sanity/lib/seo';
 import { PageBuilder } from '@/app/(public)/_components/PageBuilder';
 
 type PageTypeConfig = {
@@ -96,6 +96,6 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
             <p className='text-muted-foreground mb-6'>This page has no content blocks yet.</p>
         </div>
     ) : (
-        <PageBuilder pageBuilder={pageBuilder} id={_id} type={_type} />
+        <PageBuilder blocks={pageBuilder ?? []} id={_id} type={_type ?? 'page'} />
     );
 }

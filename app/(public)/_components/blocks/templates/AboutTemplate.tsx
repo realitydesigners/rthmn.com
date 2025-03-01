@@ -1,16 +1,15 @@
 import React from 'react';
 import type { PortableTextComponents } from '@portabletext/react';
 import { Scene } from '@/app/(public)/_components/Scene/Scene';
-import { TeamCard } from '@/app/(public)/_components/blocks/TeamCard';
 
 const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div className='flex w-full justify-center p-3'>
-        <p className='font-outfit w-full text-lg leading-relaxed text-white/70 md:w-3/4 lg:w-1/2'>{children}</p>
+        <p className='font-outfit w-full text-lg leading-relaxed text-white/70 md:w-3/4 lg:w-3/4 2xl:w-1/2'>{children}</p>
     </div>
 );
 
 const Heading: React.FC<{ children: React.ReactNode; level: number }> = ({ children, level }) => {
-    const baseStyle = 'font-outfit text-gray-gradient font-bold tracking-wide';
+    const baseStyle = 'font-outfit text-gray-gradient font-bold tracking-wide lg:w-3/4 2xl:w-1/2';
     const sizes = {
         1: 'pt-12 text-4xl lg:text-7xl',
         2: 'pt-12 text-4xl lg:text-6xl',
@@ -54,11 +53,6 @@ export const AboutTemplate: PortableTextComponents = {
         strong: ({ children }) => <strong className='font-outfit font-semibold text-white/90'>{children}</strong>,
     },
     types: {
-        teamGrid: () => (
-            <div className='w-full py-8 lg:px-[20vw]'>
-                <TeamCard />
-            </div>
-        ),
         sceneBlock: ({ value }) => (
             <div className={`w-full ${value.height || 'h-[500px]'}`}>
                 <Scene scene={value.sceneUrl} />

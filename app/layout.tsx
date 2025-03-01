@@ -13,6 +13,7 @@ import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { kodeMono, outfit, oxanium, russo } from '@/utils/styles/fonts';
 import { SectionFooter } from '@/app/(public)/_components/Sections/SectionFooter';
+import { prefetchDNS, preconnect } from 'react-dom';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -38,19 +39,27 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
     maximumScale: 1,
 };
+export default async function RootLayout({
+    children,
+}: Readonly<{
+    children: React.ReactNode;
+}>) {
+    preconnect('https://cdn.sanity.io');
+    prefetchDNS('https://cdn.sanity.io');
+    preconnect('https://prod.spline.design');
+    prefetchDNS('https://prod.spline.design');
+    preconnect('https://server.rthmn.com');
+    prefetchDNS('https://server.rthmn.com');
 
-export default async function RootLayout({ children, modal }: { children: React.ReactNode; modal: React.ReactNode }) {
     const supabase = await createClient();
-
     const {
         data: { user },
-        error,
     } = await supabase.auth.getUser();
 
     return (
-        <html lang='en' className={`${kodeMono.variable} ${outfit.variable} ${oxanium.variable} ${russo.variable} bg-black`}>
+        <html lang='en'>
             <GoogleTagManager gtmId='GTM-XYZ' />
-            <body className='bg-black'>
+            <body className={`${kodeMono.variable} ${outfit.variable} ${oxanium.variable} ${russo.variable} bg-black`}>
                 <SupabaseProvider initialUser={user}>
                     <QueryProvider>
                         <NavbarSignedOut user={user} />

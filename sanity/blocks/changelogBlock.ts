@@ -1,16 +1,21 @@
 import { defineField, defineType } from 'sanity';
 
-export const faqBlock = defineType({
-    name: 'faqBlock',
-    title: 'FAQ Section',
+export const changelogBlock = defineType({
     type: 'object',
+    name: 'changelogBlock',
+    title: 'Changelog Block',
     fields: [
         defineField({
             name: 'title',
             title: 'Title',
             type: 'string',
-            description: 'Title for the FAQ section',
-            initialValue: 'Frequently Asked Questions',
+            initialValue: 'Changelog',
+        }),
+        defineField({
+            name: 'subtitle',
+            title: 'Subtitle',
+            type: 'string',
+            initialValue: 'Track our journey as we build the future of data visualization for trading and investing.',
         }),
         defineField({
             name: 'layout',
@@ -34,7 +39,7 @@ export const faqBlock = defineType({
         },
         prepare({ title, layout }) {
             return {
-                title: title || 'FAQ Section',
+                title: title || 'Changelog Block',
                 subtitle: `Layout: ${layout || 'contained'}`,
             };
         },

@@ -113,27 +113,6 @@ const portfolioBlock = /* groq */ `
   }
 `;
 
-const teamBlock = /* groq */ `
-  _type == "team" => {
-    ...,
-    title,
-    subtitle,
-    description,
-    "teamMembers": *[_type == "teamMember"] | order(order asc) {
-      _id,
-      name,
-      role,
-      bio,
-      "image": image.asset->url,
-      socials,
-      bulletPoints[] {
-        "icon": icon.asset->url,
-        text
-      }
-    }
-  }
-`;
-
 const aboutHeroBlock = /* groq */ `
   _type == "aboutHero" => {
     ...,
@@ -189,6 +168,89 @@ const newsGridBlock = /* groq */ `
   }
 `;
 
+const changelogFragment = /* groq */ `
+  _type == "changelogBlock" => {
+    ...,
+    _key,
+    title,
+    subtitle,
+    "entries": *[_type == "changelog"] | order(releaseDate desc) {
+      _id,
+      title,
+      description,
+      version,
+      releaseDate,
+      type,
+      content[] {
+        ...,
+        _type,
+        style,
+        children,
+        markDefs[] {
+          ...,
+        }
+      },
+      status,
+      contributors[]->{
+        _id,
+        name,
+        "image": {
+          "asset": {
+            "url": image.asset->url
+          }
+        }
+      }
+    }
+  }
+`;
+
+const githubFragment = /* groq */ `
+  _type == "githubBlock" => {
+    ...,
+    _key,
+    title,
+    description,
+    buttonText,
+    githubUrl
+  }
+`;
+
+const faqFragment = /* groq */ `
+  _type == "faqBlock" => {
+    ...,
+    _key,
+    title,
+    "items": *[_type == "faq"] {
+      _id,
+      question,
+      answer,
+      category,
+      isPublished
+    }
+  }
+`;
+
+const teamFragment = /* groq */ `
+  _type == "teamGrid" => {
+    ...,
+    _key,
+    layout,
+    "members": *[_type == "team"] | order(order asc) {
+      _id,
+      name,
+      role,
+      shortBio,
+      twitter,
+      instagram,
+      "image": {
+        "asset": {
+          "url": image.asset->url
+        }
+      }
+    }
+  }
+`;
+
 const pageBuilderFragment = /* groq */ `
   pageBuilder[]{
     ...,
@@ -199,11 +261,6 @@ const pageBuilderFragment = /* groq */ `
       title,
       content,
       showFAQ
-    },
-    _type == "teamGrid" => {
-      ...,
-      _key,
-      layout
     },
     _type == "contentBlock" => {
       ...,
@@ -219,12 +276,15 @@ const pageBuilderFragment = /* groq */ `
       content,
       layout
     },
+    ${faqFragment},
+    ${changelogFragment},
+    ${githubFragment},
     ${heroBlock},
     ${foundingPartnersBlock},
     ${partnerCtaBlock},
     ${portfolioGridBlock},
     ${portfolioBlock},
-    ${teamBlock},
+    ${teamFragment},
     ${aboutHeroBlock},
     ${firstChecksBlock},
     ${investmentPrinciplesBlock},
