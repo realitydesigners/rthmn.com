@@ -18,13 +18,11 @@ interface TeamMember {
 export interface TeamGridBlockProps {
     _type: 'teamGrid';
     _key: string;
-    layout?: 'contained' | 'wide' | 'fullWidth';
+
     members: TeamMember[];
 }
 
-export function TeamGridBlock({ layout = 'fullWidth', members = [] }: TeamGridBlockProps) {
-    console.log('TeamGrid block with layout:', layout);
-
+export function TeamGridBlock({ members = [] }: TeamGridBlockProps) {
     return (
         <div className='w-full'>
             <div className='flex w-full flex-col'>
