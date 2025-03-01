@@ -37,5 +37,5 @@ export default async function Page() {
         return <div>Loading...</div>;
     }
 
-    return <PageBuilder pageBuilder={pageBuilder ?? []} id={_id} type={_type ?? 'page'} />;
+    return <PageBuilder blocks={pageBuilder ?? []} id={_id} type={_type ?? 'page'} />;
 }

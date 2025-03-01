@@ -219,6 +219,12 @@ const pageBuilderFragment = /* groq */ `
       content,
       layout
     },
+     _type == "changelogBlock" => {
+      ...,
+      _key,
+      title,
+      subtitle,
+    },
     ${heroBlock},
     ${foundingPartnersBlock},
     ${partnerCtaBlock},

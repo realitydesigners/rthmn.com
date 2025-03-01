@@ -96,6 +96,6 @@ export default async function SlugPage({ params }: { params: Promise<{ slug: str
             <p className='text-muted-foreground mb-6'>This page has no content blocks yet.</p>
         </div>
     ) : (
-        <PageBuilder pageBuilder={pageBuilder} id={_id} type={_type} />
+        <PageBuilder blocks={pageBuilder ?? []} id={_id} type={_type ?? 'page'} />
     );
 }
