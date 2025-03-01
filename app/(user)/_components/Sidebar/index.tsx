@@ -121,20 +121,6 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
         }
     };
 
-    const renderButtons = () =>
-        buttons.map((button) => (
-            <FeatureTour
-                key={button.id}
-                icon={button.icon}
-                onClick={() => handlePanelToggle(button.id)}
-                isActive={activePanel === button.id}
-                isOpen={isOpen}
-                tourId={button.id}
-                position={position}>
-                {button.tourContent}
-            </FeatureTour>
-        ));
-
     const renderPanelContent = () => {
         const activeButton = buttons.find((button) => button.id === activePanel);
         return activeButton?.panelContent || null;
@@ -144,10 +130,44 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
         <div className='sidebar-content' ref={sidebarRef}>
             <div
                 className={cn(
-                    'fixed top-14 bottom-0 z-[120] flex w-16 flex-col items-center justify-start border-l border-[#121212] bg-[#0a0a0a] py-4',
+                    'fixed top-14 bottom-0 z-[120] flex w-16 flex-col items-center justify-between border-l border-[#121212] bg-[#0a0a0a] py-4',
                     position === 'left' ? 'left-0 border-r' : 'right-0 border-l'
                 )}>
-                <div className='flex flex-col gap-2'>{renderButtons()}</div>
+                {/* Top buttons */}
+                <div className='flex flex-col gap-2'>
+                    {buttons
+                        .filter((button) => !['settings', 'account'].includes(button.id))
+                        .map((button) => (
+                            <FeatureTour
+                                key={button.id}
+                                icon={button.icon}
+                                onClick={() => handlePanelToggle(button.id)}
+                                isActive={activePanel === button.id}
+                                isOpen={isOpen}
+                                tourId={button.id}
+                                position={position}>
+                                {button.tourContent}
+                            </FeatureTour>
+                        ))}
+                </div>
+
+                {/* Bottom buttons */}
+                <div className='mb-2 flex flex-col gap-2'>
+                    {buttons
+                        .filter((button) => ['settings', 'account'].includes(button.id))
+                        .map((button) => (
+                            <FeatureTour
+                                key={button.id}
+                                icon={button.icon}
+                                onClick={() => handlePanelToggle(button.id)}
+                                isActive={activePanel === button.id}
+                                isOpen={isOpen}
+                                tourId={button.id}
+                                position={position}>
+                                {button.tourContent}
+                            </FeatureTour>
+                        ))}
+                </div>
             </div>
             <SidebarWrapper
                 isOpen={isOpen && !!activePanel}

@@ -96,7 +96,8 @@ export function FeatureTour({
             <button
                 onClick={!isCompleted && currentStepId && currentStepId !== tourId ? undefined : onClick}
                 className={cn(
-                    'group relative z-[120] flex h-10 w-10 items-center justify-center rounded-lg transition-all duration-200',
+                    'group relative z-[120] flex h-10 w-10 items-center justify-center transition-all duration-200',
+                    tourId === 'account' ? 'rounded-full' : 'rounded-lg',
                     'border border-transparent bg-transparent',
                     'hover:border-[#333] hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20',
                     isActive && 'text-white hover:border-[#444] hover:from-[#1c1c1c] hover:to-[#141414]',
