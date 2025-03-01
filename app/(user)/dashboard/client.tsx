@@ -6,7 +6,7 @@ import { useGridStore } from '@/stores/gridStore';
 import { NoInstruments } from './LoadingSkeleton';
 import { PairResoBox } from './PairResoBox';
 import { useEffect, useState, useCallback } from 'react';
-import { motion, Reorder } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { cn } from '@/utils/cn';
 
 export default function Dashboard() {
@@ -160,7 +160,6 @@ export default function Dashboard() {
                                     }}
                                     boxColors={boxColors}
                                     isLoading={isLoading}
-                                    currentOHLC={data.currentOHLC}
                                 />
                             </div>
                         </motion.div>

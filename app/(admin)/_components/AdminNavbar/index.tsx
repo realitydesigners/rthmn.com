@@ -73,33 +73,48 @@ export function AdminNavbar() {
     return (
         <nav className='fixed top-0 right-0 left-0 z-[100] flex h-14 border-b border-[#121212] bg-black px-2'>
             <div className='relative flex h-full w-full items-center justify-between rounded-lg px-2'>
-                <div className='relative z-[1] flex items-center gap-3'>
-                    <Link href='/admin' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-white/[0.03]'>
-                        <div className='flex h-7 w-7 items-center transition-transform duration-200 group-hover:scale-105'>
+                {/* Left section */}
+                <div className='flex items-center'>
+                    <Link href='/admin' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5'>
+                        <div className='flex h-7 w-7 items-center'>
                             <LogoIcon />
                         </div>
+                        <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
                     </Link>
-                    {/* Breadcrumb */}
-                    <div className='flex items-center gap-1.5 text-[#818181]'>
-                        {Array.isArray(pathSegments) ? (
-                            pathSegments.map((segment, index) => (
-                                <div key={index} className='flex items-center gap-1.5'>
-                                    <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1 transition-colors hover:bg-white/[0.03]'>
-                                        <LuLayoutDashboard size={14} className='text-[#666]' />
-                                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-gray-200/50 uppercase'>{segment}</span>
-                                    </div>
-                                    {index < pathSegments.length - 1 && <LuChevronRight size={14} className='text-[#444]' />}
-                                </div>
-                            ))
-                        ) : (
-                            <span className='font-mono text-[11px] font-medium tracking-wider text-gray-200/50 uppercase'>{pathSegments}</span>
-                        )}
+
+                    <p className='font-kodemono pl-1 text-[8px] font-bold text-zinc-400'>LAB</p>
+                </div>
+
+                {/* Center section - Navigation Links */}
+                <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+                    <div className='font-kodemono flex items-center gap-2'>
+                        <Link
+                            href='/admin'
+                            className={`rounded-md px-3 py-1.5 text-xs transition-colors ${
+                                pathname === '/admin' ? 'bg-green-500/10 text-green-400' : 'text-zinc-400 hover:text-zinc-200'
+                            }`}>
+                            Monitor
+                        </Link>
+                        <Link
+                            href='/admin/tests'
+                            className={`rounded-md px-3 py-1.5 text-xs transition-colors ${
+                                pathname === '/admin/tests' ? 'bg-green-500/10 text-green-400' : 'text-zinc-400 hover:text-zinc-200'
+                            }`}>
+                            Tests
+                        </Link>
+                        <Link
+                            href='/admin/settings'
+                            className={`rounded-md px-3 py-1.5 text-xs transition-colors ${
+                                pathname === '/admin/settings' ? 'bg-green-500/10 text-green-400' : 'text-zinc-400 hover:text-zinc-200'
+                            }`}>
+                            Settings
+                        </Link>
                     </div>
                 </div>
 
+                {/* Right section */}
                 <div className='flex items-center gap-4'>
                     <ConnectionBadge isConnected={isConnected} />
-
                     <div className='relative' ref={dropdownRef}>
                         <button
                             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
