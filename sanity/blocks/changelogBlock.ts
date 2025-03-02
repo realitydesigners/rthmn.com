@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export const changelogBlock = defineType({
+export default defineType({
     type: 'object',
     name: 'changelogBlock',
     title: 'Changelog Block',

@@ -24,7 +24,7 @@ export interface TeamGridBlockProps {
 
 export function TeamGridBlock({ members = [] }: TeamGridBlockProps) {
     return (
-        <div className='w-full'>
+        <div className='w-full py-12'>
             <div className='flex w-full flex-col'>
                 <h2 className='font-outfit mb-12 text-center text-5xl font-bold'>Our Team</h2>
                 <TeamCard members={members} />

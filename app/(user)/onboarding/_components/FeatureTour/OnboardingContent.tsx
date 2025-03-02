@@ -1,4 +1,5 @@
 import { LuBookOpen, LuGraduationCap, LuTrophy } from 'react-icons/lu';
+import { TourButton } from './TourButton';
 
 interface OnboardingContentProps {
     onComplete?: () => void;
@@ -15,8 +16,8 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
                 <div className='space-y-2'>
                     <div className='group relative overflow-hidden rounded-xl transition-all duration-300'>
                         <div className='relative flex items-start gap-3 rounded-xl p-2'>
-                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-blue-500/20 via-blue-500/10 to-blue-500/5 transition-colors duration-300 group-hover:from-blue-500/30'>
-                                <LuGraduationCap className='h-4 w-4 text-blue-400 transition-colors duration-300 group-hover:text-blue-300' />
+                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-[#3FFFA2]/20 via-[#3FFFA2]/10 to-[#3FFFA2]/5 transition-colors duration-300 group-hover:from-[#3FFFA2]/30'>
+                                <LuGraduationCap className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
                                 <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Onboarding Progress</div>
@@ -27,8 +28,8 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 
                     <div className='group relative overflow-hidden rounded-xl transition-all duration-300'>
                         <div className='relative flex items-start gap-3 rounded-xl p-2'>
-                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-blue-500/20 via-blue-500/10 to-blue-500/5 transition-colors duration-300 group-hover:from-blue-500/30'>
-                                <LuBookOpen className='h-4 w-4 text-blue-400 transition-colors duration-300 group-hover:text-blue-300' />
+                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-[#3FFFA2]/20 via-[#3FFFA2]/10 to-[#3FFFA2]/5 transition-colors duration-300 group-hover:from-[#3FFFA2]/30'>
+                                <LuBookOpen className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
                                 <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Trading Courses</div>
@@ -39,8 +40,8 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 
                     <div className='group relative overflow-hidden rounded-xl transition-all duration-300'>
                         <div className='relative flex items-start gap-3 rounded-xl p-2'>
-                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-blue-500/20 via-blue-500/10 to-blue-500/5 transition-colors duration-300 group-hover:from-blue-500/30'>
-                                <LuTrophy className='h-4 w-4 text-blue-400 transition-colors duration-300 group-hover:text-blue-300' />
+                            <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-[#3FFFA2]/20 via-[#3FFFA2]/10 to-[#3FFFA2]/5 transition-colors duration-300 group-hover:from-[#3FFFA2]/30'>
+                                <LuTrophy className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
                                 <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Skill Assessment</div>
@@ -49,12 +50,7 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
                         </div>
                     </div>
                 </div>
-                <button
-                    onClick={onComplete}
-                    className='group relative flex rounded-lg bg-gradient-to-b from-blue-500 to-blue-600 px-4 py-2 text-sm font-medium text-white transition-all duration-200 hover:from-blue-600 hover:to-blue-700 hover:shadow-lg hover:shadow-blue-500/20'>
-                    <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
-                    <span className='relative'>Continue</span>
-                </button>
+                <TourButton onClick={onComplete} />
             </div>
         </div>
     );

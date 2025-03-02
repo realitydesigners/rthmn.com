@@ -1,7 +1,7 @@
 import { EarthGlobeIcon } from '@sanity/icons';
 import { defineType } from 'sanity';
 
-export const sceneBlock = defineType({
+export default defineType({
     name: 'sceneBlock',
     title: '3D Scene',
     type: 'object',

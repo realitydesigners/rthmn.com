@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export const legalContentBlock = defineType({
+export default defineType({
     type: 'object',
     name: 'legalContentBlock',
     title: 'Legal Content Block',

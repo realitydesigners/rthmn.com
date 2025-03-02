@@ -3,7 +3,7 @@ import categoryType from '../schemas/category';
 import imgType from '../schemas/img';
 import teamType from '../schemas/team';
 
-export const headingBlock = defineType({
+export default defineType({
     type: 'object',
     name: 'headingBlock',
     title: 'Heading',

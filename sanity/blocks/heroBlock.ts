@@ -1,6 +1,6 @@
-import { defineField } from 'sanity';
+import { defineField, defineType } from 'sanity';
 
-export const heroBlock = {
+export default defineType({
     name: 'hero',
     title: 'Hero',
     type: 'object',
@@ -22,4 +22,4 @@ export const heroBlock = {
             };
         },
     },
-};
+});

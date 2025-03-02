@@ -1,6 +1,6 @@
 import { defineField, defineType } from 'sanity';
 
-export const githubBlock = defineType({
+export default defineType({
     name: 'githubBlock',
     title: 'GitHub Block',
     type: 'object',

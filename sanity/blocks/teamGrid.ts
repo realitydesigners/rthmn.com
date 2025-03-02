@@ -1,6 +1,6 @@
 import { defineType } from 'sanity';
 
-export const teamGrid = defineType({
+export default defineType({
     name: 'teamGrid',
     title: 'Team Grid',
     type: 'object',

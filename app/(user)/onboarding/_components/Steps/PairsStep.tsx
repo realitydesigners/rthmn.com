@@ -84,7 +84,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                 {[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
                                     <motion.div
                                         key={i}
-                                        className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? 'bg-blue-500/80' : 'bg-[#333]'}`}
+                                        className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? 'bg-[#3FFFA2]/80' : 'bg-[#333]'}`}
                                         initial={false}
                                         animate={{
                                             scale: i < selectedPairs.length ? 1 : 0.95,
@@ -92,7 +92,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                     />
                                 ))}
                             </div>
-                            <span className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-blue-400' : 'text-[#666]'}`}>
+                            <span className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-[#3FFFA2]' : 'text-[#666]'}`}>
                                 {selectedPairs.length}/{MIN_PAIRS_REQUIRED}
                             </span>
                         </motion.div>
@@ -163,8 +163,8 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                             onClick={() => handlePairClick(item)}
                                             className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b transition-all duration-300 ${
                                                 isSelected
-                                                    ? 'border-blue-500/50 from-blue-500/20 to-blue-500/0'
-                                                    : 'border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-blue-500/30 hover:from-[#1A1A1A] hover:to-[#111]'
+                                                    ? 'border-[#3FFFA2]/50 from-[#3FFFA2]/20 to-[#3FFFA2]/0'
+                                                    : 'border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-[#3FFFA2]/30 hover:from-[#1A1A1A] hover:to-[#111]'
                                             }`}>
                                             <motion.div
                                                 initial={false}
@@ -177,7 +177,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                                     stiffness: 200,
                                                     damping: 20,
                                                 }}
-                                                className={`absolute inset-0 bg-gradient-to-b from-blue-500/10 to-transparent`}
+                                                className={`absolute inset-0 bg-gradient-to-b from-[#3FFFA2]/10 to-transparent`}
                                             />
 
                                             <div className='relative flex items-center justify-between rounded-xl p-4'>
@@ -192,7 +192,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                                         initial={false}
                                                         animate={{
                                                             scale: isSelected ? 1.2 : 1,
-                                                            backgroundColor: isSelected ? 'rgb(59, 130, 246)' : 'rgb(51, 51, 51)',
+                                                            backgroundColor: isSelected ? '#3FFFA2' : 'rgb(51, 51, 51)',
                                                         }}
                                                         transition={{
                                                             type: 'spring',

@@ -108,10 +108,10 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                         <motion.div
                             animate={{
                                 scale: isDragging ? 1.02 : 1,
-                                borderColor: isDragging ? 'rgb(59, 130, 246)' : 'rgb(51, 51, 51)',
+                                borderColor: isDragging ? '#3FFFA2' : 'rgb(51, 51, 51)',
                             }}
                             className={`group relative flex h-64 w-64 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed bg-gradient-to-b from-[#1A1A1A] via-[#141414] to-[#0D0D0D] shadow-2xl transition-all duration-300 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-b before:from-white/[0.03] before:to-transparent before:transition-colors ${
-                                isDragging ? 'border-blue-500 before:from-blue-500/[0.05]' : 'border-[#333] hover:border-blue-500/50 hover:before:from-white/[0.05]'
+                                isDragging ? 'border-[#3FFFA2] before:from-[#3FFFA2]/[0.05]' : 'border-[#333] hover:border-[#3FFFA2]/50 hover:before:from-white/[0.05]'
                             }`}>
                             <div className='absolute inset-0 rounded-2xl bg-gradient-to-b from-black/0 via-black/5 to-black/20' />
                             <AnimatePresence mode='wait'>
@@ -133,8 +133,8 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
                                         className='relative z-10 flex flex-col items-center gap-4 p-6 text-center'>
-                                        <div className='rounded-full bg-gradient-to-b from-blue-500/30 via-blue-500/10 to-blue-500/5 p-4 transition-colors duration-300 group-hover:from-blue-500/40 group-hover:via-blue-500/20 group-hover:to-blue-500/10'>
-                                            <LuImagePlus className='h-8 w-8 text-blue-400' />
+                                        <div className='rounded-full bg-gradient-to-b from-[#3FFFA2]/30 via-[#3FFFA2]/10 to-[#3FFFA2]/5 p-4 transition-colors duration-300 group-hover:from-[#3FFFA2]/40 group-hover:via-[#3FFFA2]/20 group-hover:to-[#3FFFA2]/10'>
+                                            <LuImagePlus className='h-8 w-8 text-[#3FFFA2]' />
                                         </div>
                                         <div className='space-y-2'>
                                             <div className='text-sm font-medium text-white'>Drop your photo here</div>
