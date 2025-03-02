@@ -14,7 +14,7 @@ export function TourButton({ onClick, children = 'Continue' }: TourButtonProps) 
             <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3FFFA2]/20 to-transparent' />
             {/* Bottom highlight */}
             <div className='absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#3FFFA2]/10 to-transparent' />
-            <span className='relative font-mono tracking-wider'>{children}</span>
+            <span className='font-outfit relative'>{children}</span>
         </button>
     );
 }

@@ -22,7 +22,7 @@ const AuroraBackground = ({ isExiting }: { isExiting: boolean }) => (
                 ease: 'linear',
             },
         }}
-        className={`after:animate-aurora pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.5)_10%,rgba(99,102,241,0.5)_15%,rgba(147,197,253,0.5)_20%,rgba(167,139,250,0.5)_25%,rgba(96,165,250,0.5)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.1)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.1)_16%)] [mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,transparent_70%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed] after:mix-blend-plus-lighter after:content-[""]`}
+        className={`after:animate-aurora pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(63,255,162,0.5)_10%,rgba(63,255,162,0.5)_15%,rgba(63,255,162,0.5)_20%,rgba(63,255,162,0.5)_25%,rgba(63,255,162,0.5)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.1)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.1)_16%)] [mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,transparent_70%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed] after:mix-blend-plus-lighter after:content-[""]`}
     />
 );
 
@@ -43,7 +43,7 @@ const LightShadows = ({ isExiting }: { isExiting: boolean }) =>
                 ease: 'linear',
                 delay: i * 1,
             }}
-            className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-cyan-500/20 via-violet-500/10 to-transparent blur-3xl`}
+            className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-[#3FFFA2]/20 via-[#3FFFA2]/10 to-transparent blur-3xl`}
         />
     ));
 
