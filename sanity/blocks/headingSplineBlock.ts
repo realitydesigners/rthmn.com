@@ -3,7 +3,7 @@ import categoryType from '../schemas/category';
 import imgType from '../schemas/img';
 import teamType from '../schemas/team';
 
-export const headingSplineBlock = defineType({
+export default defineType({
     type: 'object',
     name: 'headingSplineBlock',
     title: 'Heading',

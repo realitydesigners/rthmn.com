@@ -1,7 +1,7 @@
 import { defineField, defineType } from 'sanity';
 import teamType from '../schemas/team';
 
-export const teamBlock = defineType({
+export default defineType({
     type: 'object',
     name: 'teamBlock',
     title: 'Team Block',

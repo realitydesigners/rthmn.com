@@ -25,11 +25,6 @@ const videoClassTitles: Record<VideoClassOption, string> = {
     transparent: 'Video | Transparent',
 };
 
-const quoteClassTitles: Record<QuoteClassOption, string> = {
-    'card-1': 'Card 1',
-    'card-2': 'Card 2',
-};
-
 const audioClassTitles: Record<AudioClassOption, string> = {
     'class-1': 'Audio | Style 1',
     'class-2': 'Audio | Style 2',
@@ -40,7 +35,7 @@ const imageOptionTitles: Record<ImageOption, string> = {
     'img-light': 'img-light',
 };
 
-export const contentBlock = defineType({
+export default defineType({
     type: 'object',
     name: 'contentBlock',
     title: 'Content',
