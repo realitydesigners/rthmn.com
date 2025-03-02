@@ -23,8 +23,8 @@ export interface ColorState {
 }
 
 const DEFAULT_BOX_COLORS: BoxColors = {
-    positive: '#00ffd5', // Cyan
-    negative: '#ff2975', // Hot pink
+    positive: '#3FFFA2', // Green
+    negative: '#212422', // Darker Green
     styles: {
         borderRadius: 4,
         shadowIntensity: 0.1,
