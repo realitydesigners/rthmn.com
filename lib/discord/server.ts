@@ -1,5 +1,5 @@
-import { getDiscordConnection } from '@/utils/supabase/queries';
-import { createClient } from '@/utils/supabase/server';
+import { getDiscordConnection } from '@/lib/supabase/queries';
+import { createClient } from '@/lib/supabase/server';
 import { getDiscordClient } from './client';
 
 export async function manageDiscordAccess(stripeCustomerId: string, isActive: boolean) {

@@ -1,7 +1,7 @@
-import { client } from '@/sanity/lib/client';
-import { allMarketDataQuery, postsQuery } from '@/sanity/lib/queries';
-import { getProducts } from '@/utils/supabase/queries';
-import { createClient } from '@/utils/supabase/server';
+import { client } from '@/lib/sanity/lib/client';
+import { allMarketDataQuery, postsQuery } from '@/lib/sanity/lib/queries';
+import { getProducts } from '@/lib/supabase/queries';
+import { createClient } from '@/lib/supabase/server';
 import ClientPage from './client';
 
 export default async function Page() {

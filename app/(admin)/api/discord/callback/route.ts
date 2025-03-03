@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getDiscordClient } from '@/utils/discord/client';
-import { createClient } from '@/utils/supabase/server';
+import { getDiscordClient } from '@/lib/discord/client';
+import { createClient } from '@/lib/supabase/server';
 
 // Constants for Discord OAuth
 const DISCORD_CLIENT_ID = '1297321318030639114';

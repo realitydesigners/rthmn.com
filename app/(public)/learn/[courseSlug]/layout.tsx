@@ -1,4 +1,4 @@
-import { getCourse } from '@/sanity/lib/queries';
+import { getCourse } from '@/lib/sanity/lib/queries';
 import { CourseNav } from '../_components/CourseNavigation';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';

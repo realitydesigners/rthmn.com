@@ -2,9 +2,9 @@
 
 import type Stripe from 'stripe';
 import { calculateTrialEndUnixTimestamp, getErrorRedirect, getURL } from '@/utils/helpers';
-import { stripe } from '@/utils/stripe/config';
-import { createOrRetrieveCustomer } from '@/utils/supabase/admin';
-import { createClient } from '@/utils/supabase/server';
+import { stripe } from '@/lib/stripe/config';
+import { createOrRetrieveCustomer } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 type Price = any;
 
