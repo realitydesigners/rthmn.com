@@ -3,7 +3,8 @@ import { TheHistoryOfCurrencyExchange } from '../lessons/TheHistoryOfCurrencyExc
 import { TheMarketEcosystem } from '../lessons/TheMarketEcosystem';
 import { CurrencyPairsExplained } from '../lessons/CurrencyPairsExplained';
 import { TradingSessionsAndMarketHours } from '../lessons/TradingSessionsAndMarketHours';
-
+import { TheAnatomyOfATrade } from '../lessons/TheAnatomyOfATrade';
+import { UnderstandingPriceQuotes } from '../lessons/UnderstandingPriceQuotes';
 export const forexBeginnersCourse = {
     title: 'Forex Fundamentals: A Fresh Perspective',
     description:
@@ -14,7 +15,7 @@ export const forexBeginnersCourse = {
             order: 1,
             lessons: [
                 { title: 'What is Trading At Its Core?', order: 1, lesson: WhatIsTradingAtItsCore },
-                { title: 'The Evolution of Exchange', order: 2, lesson: TheHistoryOfCurrencyExchange },
+                { title: 'The History of Currency Exchange', order: 2, lesson: TheHistoryOfCurrencyExchange },
                 { title: 'The Market Ecosystem: Key Participants', order: 3, lesson: TheMarketEcosystem },
                 { title: 'Currency Pairs Explained', order: 4, lesson: CurrencyPairsExplained },
                 { title: 'Trading Sessions and Market Hours', order: 5, lesson: TradingSessionsAndMarketHours },
@@ -24,9 +25,8 @@ export const forexBeginnersCourse = {
             title: 'Trading Mechanics',
             order: 2,
             lessons: [
-                { title: 'The Anatomy of a Trade', order: 1 },
-                { title: 'Understanding Price Quotes', order: 2 },
-                { title: 'Pips, Points, and Profit Calculation', order: 3 },
+                { title: 'The Anatomy of a Trade', order: 1, lesson: TheAnatomyOfATrade },
+                { title: 'Understanding Price Quotes', order: 2, lesson: UnderstandingPriceQuotes },
                 { title: 'Order Types and Execution', order: 4 },
                 { title: 'Leverage and Margin: Power and Risk', order: 5 },
                 { title: 'Position Sizing Fundamentals', order: 6 },
