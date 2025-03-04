@@ -5,6 +5,8 @@ import { CurrencyPairsExplained } from '../lessons/CurrencyPairsExplained';
 import { TradingSessionsAndMarketHours } from '../lessons/TradingSessionsAndMarketHours';
 import { TheAnatomyOfATrade } from '../lessons/TheAnatomyOfATrade';
 import { UnderstandingPriceQuotes } from '../lessons/UnderstandingPriceQuotes';
+import { OrderTypesAndExecution } from '../lessons/OrderTypesAndExecution';
+import { LeverageAndMargin } from '../lessons/LeverageAndMargin';
 export const forexBeginnersCourse = {
     title: 'Forex Fundamentals: A Fresh Perspective',
     description:
@@ -27,9 +29,9 @@ export const forexBeginnersCourse = {
             lessons: [
                 { title: 'The Anatomy of a Trade', order: 1, lesson: TheAnatomyOfATrade },
                 { title: 'Understanding Price Quotes', order: 2, lesson: UnderstandingPriceQuotes },
-                { title: 'Order Types and Execution', order: 4 },
-                { title: 'Leverage and Margin: Power and Risk', order: 5 },
-                { title: 'Position Sizing Fundamentals', order: 6 },
+                { title: 'Order Types and Execution', order: 3, lesson: OrderTypesAndExecution },
+                { title: 'Leverage and Margin: Power and Risk', order: 4, lesson: LeverageAndMargin },
+                { title: 'Position Sizing Fundamentals', order: 5 },
             ],
         },
         {
