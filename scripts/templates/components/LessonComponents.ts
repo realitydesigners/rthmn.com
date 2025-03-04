@@ -96,6 +96,26 @@ export const Quiz = (props: { question: string; options: string[]; correctAnswer
     explanation: props.explanation,
 });
 
+// Bullet List Components
+export const Bullet = (props: { text: string; key?: string }) => ({
+    _type: 'block',
+    _key: props.key || generateKey(),
+    style: 'normal',
+    listItem: 'bullet',
+    level: 1,
+    children: [{ _type: 'span', _key: generateKey(), text: props.text }],
+});
+
+export const BulletList = (props: { items: string[]; key?: string }) => {
+    const bulletKey = props.key || generateKey();
+    return props.items.map((item, index) =>
+        Bullet({
+            text: item,
+            key: `${bulletKey}-${index}`,
+        })
+    );
+};
+
 function generateKey(length = 12) {
     return Math.random()
         .toString(36)
