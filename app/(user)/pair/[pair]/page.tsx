@@ -1,7 +1,7 @@
-import { processInitialBoxData } from './boxDataProcessor';
-import { processInitialChartData } from './chartDataProcessor';
-import { getSubscription } from '@/utils/supabase/queries';
-import { createClient } from '@/utils/supabase/server';
+import { processInitialBoxData } from '@/utils/boxDataProcessor';
+import { processInitialChartData } from '@/utils/chartDataProcessor';
+import { getSubscription } from '@/lib/supabase/queries';
+import { createClient } from '@/lib/supabase/server';
 import AuthClient from './AuthClient';
 import Client from './client';
 

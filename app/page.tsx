@@ -1,6 +1,6 @@
-import { sanityFetch } from '@/sanity/lib/client';
-import { queryHomePageData } from '@/sanity/lib/query';
-import { getMetaData } from '@/sanity/lib/seo';
+import { sanityFetch } from '@/lib/sanity/lib/client';
+import { queryHomePageData } from '@/lib/sanity/lib/query';
+import { getMetaData } from '@/lib/sanity/lib/seo';
 import { PageBuilder } from '@/components/PageBuilder';
 
 // The response from sanityFetch directly matches the query result

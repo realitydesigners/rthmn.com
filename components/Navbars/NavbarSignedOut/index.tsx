@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 import { AnimatePresence } from 'motion/react';
 import { LogoIcon } from '@/components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { allLinks, LinkItem } from './allLinks';
 import styles from './styles.module.css';
 import { FcGoogle } from 'react-icons/fc';

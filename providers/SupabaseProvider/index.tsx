@@ -4,7 +4,7 @@ import { createContext, use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Session, User } from '@supabase/supabase-js';
 import { Database } from '@/types/supabase';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 type UserDetails = Database['public']['Tables']['users']['Row'];
 type DiscordConnection = Database['public']['Tables']['discord_connections']['Row'];

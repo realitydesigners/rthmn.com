@@ -1,8 +1,8 @@
 import { defineField, defineType } from 'sanity';
-import { GROUP, GROUPS, pageBuilderField } from '@/sanity/lib/constant';
-import { ogFields } from '@/sanity/lib/og-fields';
-import { seoFields } from '@/sanity/lib/seo-fields';
-import { createSlug, isUnique } from '@/sanity/lib/slug';
+import { GROUP, GROUPS, pageBuilderField } from '@/lib/sanity/lib/constant';
+import { ogFields } from '@/lib/sanity/lib/og-fields';
+import { seoFields } from '@/lib/sanity/lib/seo-fields';
+import { createSlug, isUnique } from '@/lib/sanity/lib/slug';
 
 export default defineType({
     name: 'page',

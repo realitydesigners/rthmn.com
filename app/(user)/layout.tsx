@@ -8,8 +8,8 @@ import { DashboardProvider } from '@/providers/DashboardProvider/client';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { UserProvider } from '@/providers/UserProvider';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
-import { getSubscription, getUser } from '@/utils/supabase/queries';
-import { createClient } from '@/utils/supabase/server';
+import { getSubscription, getUser } from '@/lib/supabase/queries';
+import { createClient } from '@/lib/supabase/server';
 
 interface UserLayoutProps {
     children: React.ReactNode;

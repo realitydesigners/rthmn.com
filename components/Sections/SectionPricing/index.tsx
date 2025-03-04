@@ -6,8 +6,8 @@ import type { User } from '@supabase/supabase-js';
 import { motion } from 'framer-motion';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
 import { getErrorRedirect } from '@/utils/helpers';
-import { getStripe } from '@/utils/stripe/client';
-import { checkoutWithStripe } from '@/utils/stripe/server';
+import { getStripe } from '@/lib/stripe/client';
+import { checkoutWithStripe } from '@/lib/stripe/server';
 
 type Subscription = any;
 type Product = any;

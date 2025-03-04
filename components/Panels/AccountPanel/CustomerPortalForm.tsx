@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { FaStripe } from 'react-icons/fa';
 import { LuCreditCard } from 'react-icons/lu';
-import { createStripePortal } from '@/utils/stripe/server';
+import { createStripePortal } from '@/lib/stripe/server';
 
 type Subscription = any;
 type Price = any;

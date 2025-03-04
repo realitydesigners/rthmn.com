@@ -1,8 +1,8 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { manageDiscordAccess } from '@/utils/discord/server';
-import { deleteProductRecord, manageSubscriptionStatusChange, upsertPriceRecord, upsertProductRecord } from '@/utils/supabase/admin';
+import { manageDiscordAccess } from '@/lib/discord/server';
+import { deleteProductRecord, manageSubscriptionStatusChange, upsertPriceRecord, upsertProductRecord } from '@/lib/supabase/admin';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
     apiVersion: '2025-01-27.acacia',
