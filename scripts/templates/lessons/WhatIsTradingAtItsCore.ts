@@ -37,15 +37,15 @@ export const WhatIsTradingAtItsCore = new PortableTextBuilder('What is Trading a
                 H2({ text: 'The Market as a Living Organism' }),
 
                 Text({
-                    text: 'To truly understand trading, we must first recognize that markets are not mechanical systems but living, breathing organisms composed of countless human decisions. Each tick of price movement represents the collective psychology of all participants—their fears, hopes, greed, and rational calculations all compressed into a single number that constantly changes.',
+                    text: 'To truly understand trading, we must recognize that markets, while influenced by human decisions, operate within an underlying structure and set of mechanical rules. Each price movement reflects countless decisions, yet these decisions collectively form patterns and structures that can be systematically analyzed and traded.',
                 }),
 
                 Text({
-                    text: "This living quality of markets explains why purely mechanical approaches to trading often fail. Markets don't follow rigid rules like machines; they pulse with the irregular rhythms of human emotion and institutional decision-making. They expand and contract, accelerate and pause, much like a human heartbeat rather than a metronome. This organic nature is why markets can sometimes seem irrational in the short term while following discernible patterns over longer periods.",
+                    text: "Markets indeed pulse with human emotion and institutional decision-making, but this doesn't mean they're unpredictable or chaotic. Instead, they follow discernible patterns and rhythms that, once understood, provide a clear framework for trading. To succeed, you need a new vision—a structured, mechanical approach that reveals the underlying order within the apparent complexity.",
                 }),
 
                 Text({
-                    text: "Understanding this living quality changes everything about how we approach trading. Instead of trying to impose our will on the market—forcing it to conform to our expectations—we can learn to sense its natural rhythms and flow with them. This shift in perspective is the first step toward trading mastery, and it's one that most traders never take because conventional trading education rarely acknowledges this fundamental truth.",
+                    text: 'This new vision involves seeing markets not as random or purely emotional entities, but as structured systems where price action communicates clear signals. By learning this new way of observing markets, you can systematically identify opportunities, manage risk effectively, and achieve consistent trading success.',
                 }),
 
                 H2({ text: 'Beyond Currency Exchange' }),
@@ -194,7 +194,7 @@ export const WhatIsTradingAtItsCore = new PortableTextBuilder('What is Trading a
                 H2({ text: 'Unlearning to Learn: The Path Forward' }),
 
                 Text({
-                    text: "One of the greatest challenges you'll face in mastering the Rhythm approach isn't learning new concepts—it's unlearning old ones. If you've studied traditional trading methods, you've likely accumulated a set of beliefs and habits that may actually hinder your progress with this new approach.",
+                    text: "One of the greatest challenges you'll face in mastering the Rthmn approach isn't learning new concepts—it's unlearning old ones. If you've studied traditional trading methods, you've likely accumulated a set of beliefs and habits that may actually hinder your progress with this new approach.",
                 }),
 
                 Text({
@@ -305,6 +305,18 @@ export const WhatIsTradingAtItsCore = new PortableTextBuilder('What is Trading a
 
                 Text({
                     text: "In our next lesson, we'll explore the evolution of exchange systems throughout human history and how this evolution reveals fundamental truths about market behavior that remain relevant today. This historical perspective will deepen your understanding of why markets move the way they do and how the Rhythm approach aligns with these timeless principles.",
+                }),
+
+                Text({
+                    text: 'While markets indeed reflect collective human behavior, trading success is not about sensing natural rhythms alone. Instead, it comes from following a clearly defined set of mechanical rules. These rules, when consistently applied, allow traders to systematically identify and capitalize on market opportunities, reducing emotional decision-making and enhancing consistency.',
+                }),
+
+                Text({
+                    text: "This mechanical approach doesn't negate the importance of understanding market psychology or institutional behavior. Rather, it integrates these insights into a structured framework that guides trading decisions. By adhering strictly to these mechanical rules, traders can objectively assess market conditions, manage risk effectively, and achieve sustainable success over time.",
+                }),
+
+                Text({
+                    text: "Throughout this course, we'll introduce you to these mechanical rules and demonstrate how they can be applied across various market conditions. You'll learn to recognize clear entry and exit signals, manage trades systematically, and maintain discipline in your trading approach. This structured methodology is the cornerstone of consistent trading success.",
                 }),
             ],
         })

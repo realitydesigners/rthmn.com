@@ -7,6 +7,9 @@ import { TheAnatomyOfATrade } from '../lessons/TheAnatomyOfATrade';
 import { UnderstandingPriceQuotes } from '../lessons/UnderstandingPriceQuotes';
 import { OrderTypesAndExecution } from '../lessons/OrderTypesAndExecution';
 import { LeverageAndMargin } from '../lessons/LeverageAndMargin';
+import { PriceActionTheLanguageOfMarkets } from '../lessons/PriceActionTheLanguageOfMarkets';
+import { ChartTypesAndTheirPerspectives } from '../lessons/ChartTypesAndTheirPerspectives';
+import { TimeframesVsPriceRanges } from '../lessons/TimeframesVsPriceRanges';
 export const forexBeginnersCourse = {
     title: 'Forex Fundamentals: A Fresh Perspective',
     description:
@@ -31,16 +34,15 @@ export const forexBeginnersCourse = {
                 { title: 'Understanding Price Quotes', order: 2, lesson: UnderstandingPriceQuotes },
                 { title: 'Order Types and Execution', order: 3, lesson: OrderTypesAndExecution },
                 { title: 'Leverage and Margin: Power and Risk', order: 4, lesson: LeverageAndMargin },
-                { title: 'Position Sizing Fundamentals', order: 5 },
             ],
         },
         {
             title: 'Market Analysis Foundations',
             order: 3,
             lessons: [
-                { title: 'Price Action: The Language of Markets', order: 1 },
-                { title: 'Chart Types and Their Perspectives', order: 2 },
-                { title: 'Timeframes vs. Price Ranges', order: 3 },
+                { title: 'Price Action: The Language of Markets', order: 1, lesson: PriceActionTheLanguageOfMarkets },
+                { title: 'Chart Types and Their Perspectives', order: 2, lesson: ChartTypesAndTheirPerspectives },
+                { title: 'Timeframes vs. Price Ranges', order: 3, lesson: TimeframesVsPriceRanges },
                 { title: 'Support and Resistance: A Critical View', order: 4 },
                 { title: 'Trend Recognition Principles', order: 5 },
                 { title: 'Market Context and Confluence', order: 6 },
