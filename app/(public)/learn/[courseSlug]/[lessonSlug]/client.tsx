@@ -8,6 +8,8 @@ import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
 import { TableOfContents } from '@/components/TOC';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
 import { CourseNav } from '../../_components/CourseNavigation';
+import { MobileNavigation } from '../../_components/MobileNavigation';
+
 interface LessonClientProps {
     course: any; // Add proper type
     lesson: any; // Add proper type
@@ -41,14 +43,14 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
 
     return (
         <div className='relative flex min-h-screen'>
-            {/* Fixed Left Sidebar - Course Navigation */}
-            <div className='fixed top-0 left-0 z-10 h-screen w-72 overflow-y-auto border-r border-white/10'>
+            {/* Fixed Left Sidebar - Course Navigation (hidden on mobile) */}
+            <div className='fixed top-0 left-0 z-10 hidden h-screen w-72 overflow-y-auto border-r border-white/10 lg:block'>
                 <CourseNav course={course} />
             </div>
 
-            {/* Main Content with offset for fixed sidebars */}
-            <div className='mr-72 ml-72 flex-1'>
-                <div className='w-full px-8 py-16'>
+            {/* Main Content with offset for fixed sidebars (adjusted for mobile) */}
+            <div className='w-full flex-1 lg:mr-72 lg:ml-72'>
+                <div className='w-full px-4 py-16 pb-28 lg:px-8 lg:pb-16'>
                     {/* Lesson Header */}
                     <div className='mb-12'>
                         <div className='mb-4 flex items-center gap-4 text-sm text-gray-400'>
@@ -150,12 +152,15 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                 </div>
             </div>
 
-            {/* Fixed Right Sidebar - Table of Contents */}
-            <div className='fixed top-0 right-0 z-10 h-screen w-72 overflow-y-auto border-l border-white/10 bg-black/50 backdrop-blur-xl'>
+            {/* Fixed Right Sidebar - Table of Contents (hidden on mobile) */}
+            <div className='fixed top-0 right-0 z-10 hidden h-screen w-72 overflow-y-auto border-l border-white/10 bg-black/50 backdrop-blur-xl lg:block'>
                 <div className='h-full p-6 pt-20'>
                     <TableOfContents blocks={lesson.content as BlockProps[]} />
                 </div>
             </div>
+
+            {/* Mobile Navigation */}
+            <MobileNavigation course={course} lesson={lesson} chapter={chapter} />
         </div>
     );
 }
