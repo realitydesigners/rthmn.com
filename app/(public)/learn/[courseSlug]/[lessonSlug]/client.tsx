@@ -43,14 +43,9 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
 
     return (
         <div className='relative flex min-h-screen'>
-            {/* Fixed Left Sidebar - Course Navigation (hidden on mobile) */}
-            <div className='fixed top-0 left-0 z-10 hidden h-screen w-72 overflow-y-auto border-r border-white/10 lg:block'>
-                <CourseNav course={course} />
-            </div>
-
-            {/* Main Content with offset for fixed sidebars (adjusted for mobile) */}
-            <div className='w-full flex-1 lg:mr-72 lg:ml-72'>
-                <div className='w-full px-4 py-16 pb-28 lg:px-8 lg:pb-16'>
+            <CourseNav course={course} />
+            <div className='w-full flex-1 lg:mr-80 lg:ml-80'>
+                <div className='w-full px-4 py-28 lg:px-8'>
                     {/* Lesson Header */}
                     <div className='mb-12'>
                         <div className='mb-4 flex items-center gap-4 text-sm text-gray-400'>
@@ -69,7 +64,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         {lesson.description && <p className='text-lg text-gray-400'>{lesson.description}</p>}
                     </div>
 
-                    <div className='w-full'>
+                    <div className='p w-full'>
                         {/* Lesson Content */}
                         {lesson.content?.map((block: BlockProps, index: number) => (
                             <Blocks
@@ -100,24 +95,6 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                             </Link>
                         )}
                     </div>
-
-                    {/* Related Content */}
-                    {lesson.relatedLessons && lesson.relatedLessons.length > 0 && (
-                        <div className='mt-16'>
-                            <h2 className='mb-4 text-2xl font-semibold'>Related Lessons</h2>
-                            <div className='grid gap-4 md:grid-cols-2'>
-                                {lesson.relatedLessons.map((related) => (
-                                    <Link
-                                        key={related._id}
-                                        href={`/learn/${course.slug.current}/${related.slug.current}`}
-                                        className='rounded-lg border border-white/10 bg-white/5 p-4 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5'>
-                                        <h3 className='font-medium text-white'>{related.title}</h3>
-                                        {related.description && <p className='mt-1 text-sm text-gray-400'>{related.description}</p>}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     {/* Add completion buttons */}
                     <div className='mt-8 flex items-center justify-end gap-2'>
@@ -151,15 +128,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                     </div>
                 </div>
             </div>
-
-            {/* Fixed Right Sidebar - Table of Contents (hidden on mobile) */}
-            <div className='fixed top-0 right-0 z-10 hidden h-screen w-72 overflow-y-auto border-l border-white/10 bg-black/50 backdrop-blur-xl lg:block'>
-                <div className='h-full p-6 pt-20'>
-                    <TableOfContents blocks={lesson.content as BlockProps[]} />
-                </div>
-            </div>
-
-            {/* Mobile Navigation */}
+            <TableOfContents blocks={lesson.content as BlockProps[]} />
             <MobileNavigation course={course} lesson={lesson} chapter={chapter} />
         </div>
     );

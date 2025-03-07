@@ -102,7 +102,7 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
     };
 
     return (
-        <nav className='w-full'>
+        <div className='fixed top-0 right-0 z-10 mt-20 mr-8 mb-8 flex hidden h-[calc(100vh-100px)] w-72 flex-col overflow-hidden overflow-y-auto rounded-xl border border-[#333] bg-gradient-to-b from-[#111] to-[#080808] p-4 pt-6 pr-6 shadow-xl lg:block'>
             <h4 className='mb-4 text-sm font-semibold text-gray-400'>On this page</h4>
             <ul className='space-y-3 text-sm'>
                 {headings.map((heading) => (
@@ -112,13 +112,15 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
                             scroll={false}
                             onClick={(e) => handleClick(e, heading.id)}
                             className={`inline-block w-full text-left transition-all duration-200 ${
-                                activeId === heading.id ? 'translate-x-2 rounded-lg bg-emerald-400/10 p-2 font-medium text-emerald-400' : 'text-gray-400 hover:text-white'
+                                activeId === heading.id
+                                    ? 'translate-x-2 rounded-lg bg-gradient-to-r from-[#111] to-[#161633] p-2 font-medium text-indigo-300'
+                                    : 'text-gray-400 hover:text-white'
                             }`}>
                             {heading.text}
                         </Link>
                     </li>
                 ))}
             </ul>
-        </nav>
+        </div>
     );
 }
