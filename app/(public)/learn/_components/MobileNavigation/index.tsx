@@ -276,12 +276,12 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                                 <div className='space-y-1'>
                                                     {chapter.lessons.map((lessonItem, index) => {
                                                         const isCompleted = store.isLessonCompleted(course._id, chapter._id, lessonItem._id);
-                                                        const isActive = lessonItem.slug.current === currentLessonSlug;
+                                                        const isActive = lessonItem.slug === currentLessonSlug;
 
                                                         return (
                                                             <Link
                                                                 key={lessonItem._id}
-                                                                href={`/learn/${course.slug.current}/${lessonItem.slug.current}`}
+                                                                href={`/learn/${course.slug}/${lessonItem.slug}`}
                                                                 className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
                                                                     isActive
                                                                         ? 'bg-gradient-to-r from-[#111] to-[#161633] text-indigo-300'
