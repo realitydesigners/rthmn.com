@@ -60,7 +60,6 @@ export default async function RootLayout({
             <body className={`${kodeMono.variable} ${outfit.variable} ${oxanium.variable} ${russo.variable} bg-black`}>
                 <SupabaseProvider initialUser={user}>
                     <QueryProvider>
-                        <NavbarSignedOut user={user} />
                         {children}
                         <SectionFooter />
                     </QueryProvider>
