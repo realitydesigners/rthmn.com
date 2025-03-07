@@ -39,7 +39,7 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
     const currentChapter = course.chapters.find((c) => c.lessons.some((l) => l.slug.current === currentLessonSlug));
 
     return (
-        <div className='flex flex-col p-4 pt-20'>
+        <div className='flex h-full flex-col p-4 pt-20'>
             {/* Course Header */}
             <div className='mb-8'>
                 <Link href='/learn' className='mb-6 flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-white'>
@@ -55,7 +55,6 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                         <Link href={`/learn/${course.slug}`} className='block text-xl font-semibold text-white hover:text-emerald-400'>
                             {course.title}
                         </Link>
-                        <p className='text-sm text-gray-400'>{course.description}</p>
                     </div>
                 </div>
 
@@ -72,7 +71,7 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
             </div>
 
             {/* Course Content */}
-            <div className='flex-1 overflow-y-auto px-4'>
+            <div className='flex-1 overflow-y-auto'>
                 {/* Show Course Progress only in lesson view */}
                 {view === 'lesson' && currentChapter && (
                     <div className='mb-6'>

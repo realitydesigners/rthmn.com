@@ -7,7 +7,7 @@ import Blocks from '@/components/PageBuilder/blocks/Blocks';
 import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
 import { TableOfContents } from '@/components/TOC';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
-
+import { CourseNav } from '../../_components/CourseNavigation';
 interface LessonClientProps {
     course: any; // Add proper type
     lesson: any; // Add proper type
@@ -41,8 +41,13 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
 
     return (
         <div className='relative flex min-h-screen'>
-            {/* Main Content */}
-            <div className='flex-1 pr-80'>
+            {/* Fixed Left Sidebar - Course Navigation */}
+            <div className='fixed top-0 left-0 z-10 h-screen w-72 overflow-y-auto border-r border-white/10'>
+                <CourseNav course={course} />
+            </div>
+
+            {/* Main Content with offset for fixed sidebars */}
+            <div className='mr-72 ml-72 flex-1'>
                 <div className='w-full px-8 py-16'>
                     {/* Lesson Header */}
                     <div className='mb-12'>
@@ -145,15 +150,9 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                 </div>
             </div>
 
-            {/* Right Sidebar - Table of Contents */}
-            <div className='fixed top-0 right-0 h-screen w-72 border-l border-white/10 bg-black/50 backdrop-blur-xl'>
-                <div className='h-full overflow-y-auto p-6'>
-                    <div className='mb-6 flex items-center justify-between'>
-                        <h3 className='text-sm font-semibold text-gray-400'>On this page</h3>
-                        <button className='rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-white'>
-                            <FaNotesMedical className='h-4 w-4' />
-                        </button>
-                    </div>
+            {/* Fixed Right Sidebar - Table of Contents */}
+            <div className='fixed top-0 right-0 z-10 h-screen w-72 overflow-y-auto border-l border-white/10 bg-black/50 backdrop-blur-xl'>
+                <div className='h-full p-6 pt-20'>
                     <TableOfContents blocks={lesson.content as BlockProps[]} />
                 </div>
             </div>

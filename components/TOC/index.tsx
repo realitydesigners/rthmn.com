@@ -57,15 +57,19 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
     useEffect(() => {
         const observer = new IntersectionObserver(
             (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setActiveId(entry.target.id);
-                    }
-                });
+                // Get all entries that are currently intersecting
+                const visibleEntries = entries.filter((entry) => entry.isIntersecting);
+
+                if (visibleEntries.length > 0) {
+                    // If multiple headings are visible, use the one with the highest intersection ratio
+                    const mostVisible = visibleEntries.reduce((prev, current) => (prev.intersectionRatio > current.intersectionRatio ? prev : current));
+
+                    setActiveId(mostVisible.target.id);
+                }
             },
             {
-                rootMargin: '-100px 0px -66%',
-                threshold: 1.0,
+                rootMargin: '-80px 0px -70% 0px',
+                threshold: [0.1, 0.5, 1.0],
             }
         );
 
@@ -83,9 +87,16 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
         e.preventDefault();
         const element = document.getElementById(id);
         if (element) {
-            const yOffset = -100; // Adjust this value based on your header height
-            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
-            window.scrollTo({ top: y, behavior: 'smooth' });
+            // Adjust this offset based on your fixed header height
+            const yOffset = -100;
+            const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+
+            window.scrollTo({
+                top: y,
+                behavior: 'smooth',
+            });
+
+            // Set active ID immediately for better UX
             setActiveId(id);
         }
     };

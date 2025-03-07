@@ -21,10 +21,38 @@ export const CourseTemplate: PortableTextComponents = {
                 <p className={`font-outfit leading-relaxed text-gray-400`}>{children}</p>
             </div>
         ),
-        h1: ({ children }) => <h1 className={`font-outfit mb-6 text-3xl leading-relaxed font-bold text-gray-400`}>{children}</h1>,
-        h2: ({ children }) => <h2 className={`font-outfit mb-4 text-2xl leading-relaxed font-bold text-white`}>{children}</h2>,
-        h3: ({ children }) => <h3 className={`font-outfit mb-3 text-xl leading-relaxed font-bold text-white`}>{children}</h3>,
-        h4: ({ children }) => <h4 className={`font-outfit mb-2 text-lg leading-relaxed font-bold text-white`}>{children}</h4>,
+        h1: ({ children }) => {
+            const id = generateHeadingId(children?.toString() || '');
+            return (
+                <h1 id={id} className={`font-outfit mb-6 scroll-mt-24 text-3xl leading-relaxed font-bold text-gray-400`}>
+                    {children}
+                </h1>
+            );
+        },
+        h2: ({ children }) => {
+            const id = generateHeadingId(children?.toString() || '');
+            return (
+                <h2 id={id} className={`font-outfit mb-4 scroll-mt-24 text-2xl leading-relaxed font-bold text-white`}>
+                    {children}
+                </h2>
+            );
+        },
+        h3: ({ children }) => {
+            const id = generateHeadingId(children?.toString() || '');
+            return (
+                <h3 id={id} className={`font-outfit mb-3 scroll-mt-24 text-xl leading-relaxed font-bold text-white`}>
+                    {children}
+                </h3>
+            );
+        },
+        h4: ({ children }) => {
+            const id = generateHeadingId(children?.toString() || '');
+            return (
+                <h4 id={id} className={`font-outfit mb-2 scroll-mt-24 text-lg leading-relaxed font-bold text-white`}>
+                    {children}
+                </h4>
+            );
+        },
         bullet: ({ children }) => <li className='font-outfit leading-relaxed text-gray-400'>{children}</li>,
         number: ({ children }) => <li className='font-outfit leading-relaxed text-gray-400'>{children}</li>,
     },
