@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import { client } from '@/lib/sanity/lib/client';
-import { forexFoundationsCourse } from './templates/courses/forex-foundations-course';
+
+import { forexBeginnersCourse } from './templates/courses/forex-beginners-course';
 
 export function generateKey(length = 12) {
     return Math.random()
@@ -15,7 +16,7 @@ async function generateCourse() {
         // 1. Create the course
         const course = await client.create({
             _type: 'course',
-            title: forexFoundationsCourse.title,
+            title: forexBeginnersCourse.title,
             slug: {
                 _type: 'slug',
                 current: 'forex-foundations',
@@ -32,7 +33,7 @@ async function generateCourse() {
         console.log('\nCreating Chapters and Lessons');
         console.log('-------------------------');
 
-        for (const chapter of forexFoundationsCourse.chapters) {
+        for (const chapter of forexBeginnersCourse.chapters) {
             console.log(`\nProcessing chapter: ${chapter.title}`);
 
             // Create lessons in Sanity
@@ -180,9 +181,9 @@ async function generateCourse() {
 
         console.log('\n=== Course Generation Completed Successfully! ===');
         console.log('Summary:');
-        console.log(`- Course: ${forexFoundationsCourse.title}`);
-        console.log(`- Chapters: ${forexFoundationsCourse.chapters.length}`);
-        console.log(`- Total Lessons: ${forexFoundationsCourse.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0)}`);
+        console.log(`- Course: ${forexBeginnersCourse.title}`);
+        console.log(`- Chapters: ${forexBeginnersCourse.chapters.length}`);
+        console.log(`- Total Lessons: ${forexBeginnersCourse.chapters.reduce((sum, ch) => sum + ch.lessons.length, 0)}`);
     } catch (error) {
         console.error('\n❌ Error generating course:', error);
         throw error;
