@@ -11,7 +11,7 @@ function useSignInWithOAuth() {
 
     return async (e: React.FormEvent<HTMLFormElement>, provider: Provider) => {
         e.preventDefault();
-        const redirectURL = getURL('/auth/callback');
+        const redirectURL = getURL('/api/auth/callback');
 
         if (provider === 'discord') {
             await supabase.auth.signInWithOAuth({
