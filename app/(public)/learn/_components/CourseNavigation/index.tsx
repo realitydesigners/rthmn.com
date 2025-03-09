@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+
 import { FaArrowLeft, FaBook, FaCheckCircle } from 'react-icons/fa';
 import { useEffect } from 'react';
 
 import { Course } from '@/types/types';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
+import { motion } from 'framer-motion';
 
 interface CourseNavProps {
     course: Course;
@@ -14,14 +15,6 @@ interface CourseNavProps {
 }
 
 export function CourseNav({ course, view: propView = 'course' }: CourseNavProps) {
-    if (!course || !course.slug || !course.chapters) {
-        console.error('Invalid course data:', course);
-        return <div>Error loading course</div>;
-    }
-
-    const params = useParams();
-    const currentLessonSlug = params.lessonSlug as string;
-
     const store = useCourseProgressStore();
     const progress = store.getProgress(course._id);
 
@@ -32,120 +25,80 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
         }
     }, [course, store.courses]);
 
-    // Determine view based on presence of lessonSlug in params
-    const view = params.lessonSlug ? 'lesson' : propView;
-
-    // Find the current chapter and lesson
-    const currentChapter = course.chapters.find((c) => c.lessons.some((l) => l.slug.current === currentLessonSlug));
-
     return (
-        <div className='flex flex-col p-4 pt-20'>
+        <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            className='fixed top-0 left-0 z-10 mt-20 mb-8 ml-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'>
             {/* Course Header */}
             <div className='mb-8'>
-                <Link href='/learn' className='mb-6 flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-white'>
+                <Link href='/learn' className='mb-6 flex items-center gap-2 text-[13px] text-[#888] transition-all duration-200 hover:text-white'>
                     <FaArrowLeft className='h-3 w-3' />
                     Back to Learning Center
                 </Link>
                 <div className='flex items-start gap-3'>
-                    <div className='rounded-lg bg-emerald-400/10 p-2'>
-                        <FaBook className='h-5 w-5 text-emerald-400' />
+                    <div className='relative flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-b from-white/[0.08] to-transparent p-2 ring-1 ring-white/[0.08] ring-inset'>
+                        <FaBook className='h-5 w-5 text-white/70' />
                     </div>
-                    <div className='space-y-1'>
-                        {view === 'lesson' && <div className='text-xs font-medium tracking-wider text-emerald-400 uppercase'>Current Course</div>}
-                        <Link href={`/learn/${course.slug}`} className='block text-xl font-semibold text-white hover:text-emerald-400'>
+                    <div className='space-y-1.5'>
+                        <div className='text-[11px] font-medium tracking-wide text-[#888]'>CURRENT COURSE</div>
+                        <Link href={`/learn/${course.slug}`} className='block text-[15px] font-semibold text-white transition-all duration-200 hover:text-white/90'>
                             {course.title}
                         </Link>
-                        <p className='text-sm text-gray-400'>{course.description}</p>
+                        {/* <p className='text-[13px] leading-relaxed text-[#888]'>{course.description}</p> */}
                     </div>
                 </div>
 
                 {/* Progress Bar */}
-                <div className='mt-4'>
+                <div className='mt-6'>
                     <div className='mb-2 flex items-center justify-between'>
-                        <span className='text-sm text-gray-400'>Course Progress</span>
-                        <span className='text-sm font-medium text-emerald-400'>{Math.round(progress)}%</span>
+                        <span className='text-[13px] text-[#888]'>Course Progress</span>
+                        <span className='text-[13px] font-medium text-white'>{Math.round(progress)}%</span>
                     </div>
-                    <div className='h-2 rounded-full bg-white/5'>
-                        <div className='h-full rounded-full bg-emerald-400/50 transition-all duration-300' style={{ width: `${progress}%` }} />
+                    <div className='h-1 overflow-hidden rounded-full bg-white/[0.08]'>
+                        <motion.div
+                            className='h-full rounded-full bg-gradient-to-r from-white/25 to-white/20'
+                            initial={{ width: 0 }}
+                            animate={{ width: `${progress}%` }}
+                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        />
                     </div>
                 </div>
             </div>
 
-            {/* Course Content */}
-            <div className='flex-1 overflow-y-auto px-4'>
-                {/* Show Course Progress only in lesson view */}
-                {view === 'lesson' && currentChapter && (
-                    <div className='mb-6'>
-                        <div className='mb-2 flex items-center justify-between'>
-                            <span className='text-sm text-gray-400'>Course Progress</span>
-                            <span className='text-sm font-medium text-emerald-400'>60%</span>
-                        </div>
-                        <div className='h-2 rounded-full bg-white/5'>
-                            <div className='h-full w-[60%] rounded-full bg-emerald-400/50' />
+            {course.chapters.map((chapter) => {
+                return (
+                    <div key={chapter._id} className='space-y-3'>
+                        <div>
+                            <h3 className='text-[11px] font-medium tracking-wide text-[#888]'>{chapter.title.toUpperCase()}</h3>
                         </div>
 
-                        {/* Lesson Navigation */}
-                        <div className='mt-6 space-y-4'>
-                            {currentChapter.lessons.map((lessonItem, index) => (
-                                <Link
-                                    key={lessonItem._id}
-                                    href={`/learn/${course.slug}/${lessonItem.slug}`}
-                                    className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
-                                        lessonItem.slug.current === currentLessonSlug ? 'bg-emerald-400/10 text-emerald-400' : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                                    }`}>
-                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm'>{index + 1}</div>
-                                    <span className='flex-1 text-sm'>{lessonItem.title}</span>
-                                    <FaCheckCircle className={`h-4 w-4 ${lessonItem.slug.current === currentLessonSlug ? 'text-emerald-400' : 'text-gray-600'}`} />
-                                </Link>
-                            ))}
-                        </div>
-                    </div>
-                )}
+                        <div className='space-y-[2px]'>
+                            {chapter.lessons.map((lessonItem, index) => {
+                                const isCompleted = store.isLessonCompleted(course._id, chapter._id, lessonItem._id);
 
-                {/* Chapter List */}
-                <div className='space-y-2'>
-                    {course.chapters.map((chapter, chapterIndex) => {
-                        const isCurrentChapter = chapter.lessons.some((lesson) => lesson.slug.current === currentLessonSlug);
-
-                        return (
-                            <div key={chapter._id} className='overflow-hidden rounded-lg'>
-                                <div className={`flex items-center justify-between p-3 transition-colors ${isCurrentChapter ? 'bg-emerald-400/10' : 'hover:bg-white/5'}`}>
-                                    <div className='flex items-center gap-3'>
-                                        <div
-                                            className={`flex h-6 w-6 items-center justify-center rounded-full text-sm ${
-                                                isCurrentChapter ? 'bg-emerald-400 text-black' : 'bg-white/10 text-white'
-                                            }`}>
-                                            {chapterIndex + 1}
+                                return (
+                                    <Link
+                                        key={lessonItem._id}
+                                        href={`/learn/${course.slug}/${lessonItem.slug}`}
+                                        className='group flex items-center gap-3 rounded-md p-2 transition-all duration-200 hover:bg-white/[0.03]'>
+                                        <div className='flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.08] text-[11px] font-medium text-[#888] ring-1 ring-white/[0.08] transition-colors duration-200 ring-inset group-hover:text-white'>
+                                            {index + 1}
                                         </div>
-                                        <h3 className={`text-sm font-medium ${isCurrentChapter ? 'text-emerald-400' : 'text-white'}`}>{chapter.title}</h3>
-                                    </div>
-                                </div>
-
-                                {/* Lesson list */}
-                                <div className='mt-2 ml-9 space-y-1'>
-                                    {chapter.lessons.map((lesson, lessonIndex) => {
-                                        // Get completion status from store
-                                        const completed = store.isLessonCompleted(course._id, chapter._id, lesson._id);
-
-                                        return (
-                                            <Link
-                                                key={lesson._id}
-                                                href={`/learn/${course.slug}/${lesson.slug}`}
-                                                className={`flex items-center gap-3 rounded-lg p-2 text-sm transition-colors ${completed ? 'text-emerald-400' : 'text-white/60'} ${
-                                                    lesson.slug.current === currentLessonSlug ? 'bg-emerald-400/10' : 'hover:bg-white/5'
-                                                }`}>
-                                                <span className='text-xs'>{lessonIndex + 1}</span>
-                                                <span className='flex-1'>{lesson.title}</span>
-                                                {completed && <FaCheckCircle className='h-4 w-4 text-emerald-400' />}
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
+                                        <span className='flex-1 text-[13px] text-[#888] transition-colors duration-200 group-hover:text-white/90'>{lessonItem.title}</span>
+                                        {isCompleted && (
+                                            <div className='text-white/40'>
+                                                <FaCheckCircle className='h-3.5 w-3.5' />
+                                            </div>
+                                        )}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            })}
+        </motion.div>
     );
 }

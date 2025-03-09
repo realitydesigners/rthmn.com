@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AnimatePresence, motion } from 'framer-motion';
-import { client } from '@/sanity/lib/client';
+import { client } from '@/lib/sanity/lib/client';
 
 interface Props {
     onComplete: () => void;

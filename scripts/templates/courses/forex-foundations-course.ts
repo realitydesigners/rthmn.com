@@ -1,102 +1,81 @@
-import { CourseStructure } from './base-course';
-import { WhatIsForexTradingLesson } from '../lessons/what-is-forex-trading';
-import { registerLessons } from '../utils/lesson-discovery';
+import { WhatIsTradingAtItsCore } from '../lessons/WhatIsTradingAtItsCore';
 
-// Define the initial set of lessons for each chapter
-// In the future, these could be auto-discovered using the discoverLessons function
-const introToTradingLessons = registerLessons([
-    WhatIsForexTradingLesson,
-    // Other lessons would be imported and added here
-]);
-
-export const forexFoundationsCourse: CourseStructure = {
-    metadata: {
-        title: 'Forex Foundations',
-        description: 'Master the core principles of forex trading through a comprehensive journey from basic concepts to practical trading psychology',
-        difficulty: 'beginner',
-        icon: 'FaChartLine',
-        order: 1,
-    },
+export const forexFoundationsCourse = {
+    title: 'Trading Through Rhythm: A New Paradigm',
+    description:
+        'Journey from conventional trading wisdom to a revolutionary approach that harnesses the natural rhythm of markets. Learn how multiple trends across different scales harmonize to reveal the true nature of price movement.',
     chapters: [
         {
-            metadata: {
-                title: 'Introduction to Trading',
-                description: 'Learn the fundamentals of forex markets and trading psychology',
-                order: 1,
-            },
-            lessons: introToTradingLessons,
+            title: 'The Essence of Markets',
+            order: 1,
+            lessons: [
+                { title: 'The Universal Game of Exchange', order: 1, lesson: WhatIsTradingAtItsCore },
+                { title: 'The Illusion of Random Markets', order: 2 },
+                { title: 'The Invisible Hand: Who Really Moves Markets', order: 3 },
+                { title: 'Price as Language: What Markets Are Telling Us', order: 4 },
+                { title: 'The Mathematical Truth of Trading', order: 5 },
+                { title: 'From Uncertainty to Probability', order: 6 },
+            ],
         },
         {
-            metadata: {
-                title: 'Market Mechanics',
-                description: 'Understand how forex markets function and price action basics',
-                order: 2,
-            },
-            lessons: [],
+            title: 'Deconstructing the Trading Narrative',
+            order: 2,
+            lessons: [
+                { title: 'The Pattern Illusion', order: 1 },
+                { title: 'Why Traditional Analysis Falls Short', order: 2 },
+                { title: 'The False Promise of Indicators', order: 3 },
+                { title: 'The Time Frame Paradox', order: 4 },
+                { title: 'The Psychology of Failed Trading', order: 5 },
+                { title: 'Unlearning to See Clearly', order: 6 },
+            ],
         },
         {
-            metadata: {
-                title: 'Essential Trading Concepts',
-                description: 'Master risk management and position sizing fundamentals',
-                order: 3,
-            },
-            lessons: [],
+            title: 'The Rhythm Revelation',
+            order: 3,
+            lessons: [
+                { title: 'Beyond Charts: Sensing Market Rhythm', order: 1 },
+                { title: 'Renko: Price Distilled to Its Essence', order: 2 },
+                { title: 'The Harmony of Multiple Timeframes', order: 3 },
+                { title: 'The Lock Mechanism: When Trends Align', order: 4 },
+                { title: 'Finding Order in Market Chaos', order: 5 },
+                { title: 'The Philosophy of Trend Alignment', order: 6 },
+            ],
         },
         {
-            metadata: {
-                title: 'Pattern Recognition',
-                description: 'Learn to identify and trade high-probability patterns',
-                order: 4,
-            },
-            lessons: [],
+            title: 'The Natural States of Markets',
+            order: 4,
+            lessons: [
+                { title: 'Understanding Market Consciousness', order: 1 },
+                { title: 'The Rhythm State Model', order: 2 },
+                { title: 'Transition Points: Where Opportunity Lives', order: 3 },
+                { title: 'The Dance of Range Values', order: 4 },
+                { title: 'When Markets Speak Clearly', order: 5 },
+                { title: 'The Perfect Alignment: Recognizing Inevitability', order: 6 },
+            ],
         },
         {
-            metadata: {
-                title: 'Trading Psychology Mastery',
-                description: 'Develop mental resilience and trading discipline',
-                order: 5,
-            },
-            lessons: [],
+            title: 'The Mindful Trader',
+            order: 5,
+            lessons: [
+                { title: 'Risk as the Only Constant', order: 1 },
+                { title: 'Position Sizing: The Art of Survival', order: 2 },
+                { title: 'Trading in Harmony with Transitions', order: 3 },
+                { title: 'The Flow State of Trading', order: 4 },
+                { title: 'Building Resilience Through Alignment', order: 5 },
+                { title: 'The Zen of Trading Decisions', order: 6 },
+            ],
         },
         {
-            metadata: {
-                title: 'Practical Trading Framework',
-                description: 'Build a complete trading system and management strategy',
-                order: 6,
-            },
-            lessons: [],
-        },
-        {
-            metadata: {
-                title: 'Market Analysis',
-                description: 'Master technical and contextual market analysis',
-                order: 7,
-            },
-            lessons: [],
-        },
-        {
-            metadata: {
-                title: 'Advanced Trading Concepts',
-                description: 'Explore institutional trading methods and advanced techniques',
-                order: 8,
-            },
-            lessons: [],
-        },
-        {
-            metadata: {
-                title: 'Market Psychology Deep Dive',
-                description: 'Understand mass psychology and institutional behavior',
-                order: 9,
-            },
-            lessons: [],
-        },
-        {
-            metadata: {
-                title: 'Professional Trading',
-                description: 'Build and manage a professional trading business',
-                order: 10,
-            },
-            lessons: [],
+            title: 'Living the Rhythm Method',
+            order: 6,
+            lessons: [
+                { title: 'Creating Your Trading Philosophy', order: 1 },
+                { title: 'The Art of Rhythm Entries', order: 2 },
+                { title: 'Exiting with the Changing Tide', order: 3 },
+                { title: 'The Feedback Loop: Learning from Results', order: 4 },
+                { title: 'Evolving Your System with Markets', order: 5 },
+                { title: 'Trading as a Lifelong Practice', order: 6 },
+            ],
         },
     ],
 };

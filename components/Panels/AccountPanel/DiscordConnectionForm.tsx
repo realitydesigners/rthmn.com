@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { FaDiscord } from 'react-icons/fa';
 import { Database } from '@/types/supabase';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 type DiscordConnection = Database['public']['Tables']['discord_connections']['Row'];
 

@@ -5,8 +5,10 @@ import { useEffect, useCallback } from 'react';
 import { FaArrowLeft, FaArrowRight, FaBookmark, FaClock, FaCheckCircle, FaLightbulb, FaNotesMedical } from 'react-icons/fa';
 import Blocks from '@/components/PageBuilder/blocks/Blocks';
 import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
-import { TableOfContents } from '@/components/TOC';
+import { TableOfContents } from '@/app/(public)/learn/_components/TOC';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
+import { CourseNav } from '../../_components/CourseNavigation';
+import { MobileNavigation } from '../../_components/MobileNavigation';
 
 interface LessonClientProps {
     course: any; // Add proper type
@@ -41,9 +43,9 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
 
     return (
         <div className='relative flex min-h-screen'>
-            {/* Main Content */}
-            <div className='flex-1 pr-80'>
-                <div className='w-full px-8 py-16'>
+            <CourseNav course={course} />
+            <div className='w-full flex-1 lg:mr-80 lg:ml-80'>
+                <div className='w-full px-4 py-28 lg:px-8'>
                     {/* Lesson Header */}
                     <div className='mb-12'>
                         <div className='mb-4 flex items-center gap-4 text-sm text-gray-400'>
@@ -58,11 +60,11 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                                 </span>
                             </div>
                         </div>
-                        <h1 className='font-outfit mb-4 text-6xl font-bold text-white'>{lesson.title}</h1>
+                        <h1 className='font-outfit mb-4 text-4xl font-bold text-white lg:text-6xl'>{lesson.title}</h1>
                         {lesson.description && <p className='text-lg text-gray-400'>{lesson.description}</p>}
                     </div>
 
-                    <div className='w-full'>
+                    <div className='p w-full'>
                         {/* Lesson Content */}
                         {lesson.content?.map((block: BlockProps, index: number) => (
                             <Blocks
@@ -93,24 +95,6 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                             </Link>
                         )}
                     </div>
-
-                    {/* Related Content */}
-                    {lesson.relatedLessons && lesson.relatedLessons.length > 0 && (
-                        <div className='mt-16'>
-                            <h2 className='mb-4 text-2xl font-semibold'>Related Lessons</h2>
-                            <div className='grid gap-4 md:grid-cols-2'>
-                                {lesson.relatedLessons.map((related) => (
-                                    <Link
-                                        key={related._id}
-                                        href={`/learn/${course.slug.current}/${related.slug.current}`}
-                                        className='rounded-lg border border-white/10 bg-white/5 p-4 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5'>
-                                        <h3 className='font-medium text-white'>{related.title}</h3>
-                                        {related.description && <p className='mt-1 text-sm text-gray-400'>{related.description}</p>}
-                                    </Link>
-                                ))}
-                            </div>
-                        </div>
-                    )}
 
                     {/* Add completion buttons */}
                     <div className='mt-8 flex items-center justify-end gap-2'>
@@ -144,19 +128,8 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                     </div>
                 </div>
             </div>
-
-            {/* Right Sidebar - Table of Contents */}
-            <div className='fixed top-0 right-0 h-screen w-72 border-l border-white/10 bg-black/50 backdrop-blur-xl'>
-                <div className='h-full overflow-y-auto p-6'>
-                    <div className='mb-6 flex items-center justify-between'>
-                        <h3 className='text-sm font-semibold text-gray-400'>On this page</h3>
-                        <button className='rounded-lg p-2 text-gray-400 hover:bg-white/5 hover:text-white'>
-                            <FaNotesMedical className='h-4 w-4' />
-                        </button>
-                    </div>
-                    <TableOfContents blocks={lesson.content as BlockProps[]} />
-                </div>
-            </div>
+            <TableOfContents blocks={lesson.content as BlockProps[]} />
+            <MobileNavigation course={course} lesson={lesson} chapter={chapter} />
         </div>
     );
 }

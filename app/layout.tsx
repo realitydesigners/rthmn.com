@@ -4,12 +4,12 @@ import SupabaseProvider from '@/providers/SupabaseProvider';
 import { QueryProvider } from '@/providers/QueryProvider';
 import ogImage from '@/public/opengraph-image.png';
 import { getURL } from '@/utils/helpers';
-import { createClient } from '@/utils/supabase/server';
-import '@/utils/styles/main.css';
+import { createClient } from '@/lib/supabase/server';
+import '@/lib/styles/main.css';
 import Script from 'next/script';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
-import { kodeMono, outfit, oxanium, russo } from '@/utils/styles/fonts';
+import { kodeMono, outfit, oxanium, russo } from '@/lib/styles/fonts';
 import { SectionFooter } from '@/components/Sections/SectionFooter';
 import { prefetchDNS, preconnect } from 'react-dom';
 

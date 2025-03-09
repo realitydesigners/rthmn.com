@@ -4,7 +4,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { motion } from 'framer-motion';
 import type { Provider } from '@supabase/supabase-js';
 import { getURL } from '@/utils/helpers';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 function useSignInWithOAuth() {
     const supabase = createClient();

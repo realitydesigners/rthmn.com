@@ -8,7 +8,7 @@ import { LuChevronRight, LuLayoutDashboard } from 'react-icons/lu';
 import { LogoIcon } from '@/components/Icons/icons';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { createClient } from '@/utils/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { ConnectionBadge } from '@/components/Badges/ConnectionBadge';
 
 export function AdminNavbar() {
