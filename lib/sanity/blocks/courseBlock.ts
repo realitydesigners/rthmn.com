@@ -45,19 +45,6 @@ export default defineType({
     name: 'courseBlock',
     title: 'Course Block',
     fields: [
-        defineField({
-            name: 'layout',
-            title: 'Layout',
-            type: 'string',
-            options: {
-                list: [
-                    { title: 'Dark', value: 'dark' },
-                    { title: 'Light', value: 'light' },
-                    { title: 'Course Template', value: 'course' },
-                    { title: 'Transparent', value: 'transparent' },
-                ],
-            },
-        }),
         {
             name: 'content',
             title: 'Content',

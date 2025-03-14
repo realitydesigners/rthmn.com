@@ -465,8 +465,8 @@ export async function getCourse(slug: string) {
                     description,
                     "slug": slug.current,
                     order,
-                    content
-                } | order(order asc)
+                    courseContent,
+                    },
             } | order(order asc)
         }`,
         { slug }

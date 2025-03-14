@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { useEffect, useCallback } from 'react';
 import { FaArrowLeft, FaArrowRight, FaBookmark, FaClock, FaCheckCircle, FaLightbulb, FaNotesMedical } from 'react-icons/fa';
-import Blocks from '@/components/PageBuilder/blocks/Blocks';
+import { PortableText } from '@portabletext/react';
 import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
 import { TableOfContents } from '@/app/(public)/learn/_components/TOC';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
 import { CourseNav } from '../../_components/CourseNavigation';
 import { MobileNavigation } from '../../_components/MobileNavigation';
+import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplate';
 
 interface LessonClientProps {
     course: any; // Add proper type
@@ -64,17 +65,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         {lesson.description && <p className='text-lg text-gray-400'>{lesson.description}</p>}
                     </div>
 
-                    <div className='p w-full'>
-                        {/* Lesson Content */}
-                        {lesson.content?.map((block: BlockProps, index: number) => (
-                            <Blocks
-                                key={index}
-                                block={{
-                                    ...block,
-                                }}
-                            />
-                        ))}
-                    </div>
+                    <PortableText value={lesson.courseContent?.content} components={CourseTemplate} />
 
                     {/* Navigation */}
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>
@@ -128,7 +119,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                     </div>
                 </div>
             </div>
-            <TableOfContents blocks={lesson.content as BlockProps[]} />
+            <TableOfContents blocks={lesson.courseContent?.content as BlockProps[]} />
             <MobileNavigation course={course} lesson={lesson} chapter={chapter} />
         </div>
     );

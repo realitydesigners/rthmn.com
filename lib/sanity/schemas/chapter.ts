@@ -26,11 +26,6 @@ export default defineType({
             type: 'text',
         }),
         defineField({
-            name: 'order',
-            title: 'Order',
-            type: 'number',
-        }),
-        defineField({
             name: 'lessons',
             title: 'Lessons',
             type: 'array',
@@ -49,13 +44,6 @@ export default defineType({
             type: 'string',
             description: 'e.g., "2 hours", "45 minutes"',
         }),
-    ],
-    orderings: [
-        {
-            title: 'Order',
-            name: 'order',
-            by: [{ field: 'order', direction: 'asc' }],
-        },
     ],
     preview: {
         select: {
