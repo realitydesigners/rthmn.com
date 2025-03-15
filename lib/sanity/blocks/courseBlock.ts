@@ -310,7 +310,6 @@ export default defineType({
                             return {
                                 title: title || 'Untitled',
                                 subtitle: classNameTitle,
-                                media,
                             };
                         },
                     },
@@ -479,6 +478,13 @@ export default defineType({
                             initialValue: true,
                         },
                         {
+                            name: 'pointOfChangeIndex',
+                            title: 'Point of Change Index',
+                            type: 'number',
+                            description: 'Index at which the sequence changes (default: 29)',
+                            initialValue: 29,
+                        },
+                        {
                             name: 'sequencesData',
                             title: 'Sequences Data',
                             type: 'text',
@@ -508,7 +514,6 @@ export default defineType({
                             type: 'number',
                             description: 'Speed of the animation in milliseconds (lower = faster)',
                             initialValue: 150,
-                            validation: (Rule) => Rule.required().min(50).max(1000),
                         },
                         {
                             name: 'pauseDuration',
@@ -516,7 +521,6 @@ export default defineType({
                             type: 'number',
                             description: 'How long to pause at pattern change points (in milliseconds)',
                             initialValue: 5000,
-                            validation: (Rule) => Rule.required().min(1000).max(10000),
                         },
                     ],
                     preview: {

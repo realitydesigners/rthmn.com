@@ -45,6 +45,7 @@ interface BoxVisualizerProps {
         mode?: 'animated' | 'static';
         sequencesData?: string;
         baseValuesData?: string;
+        pointOfChangeIndex?: number;
     };
 }
 
@@ -205,10 +206,11 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
                     demoStep={demoStep}
                     isPaused={isPaused}
                     colorScheme={value.colorScheme}
-                    showLabels={true}
+                    showLabels={value.showLabels}
                     mode={value.mode || 'animated'}
                     baseSize={400}
                     containerClassName='flex items-center justify-center'
+                    isPointOfChange={Math.floor(demoStep / 1) % activeSequences.length === (value.pointOfChangeIndex || POINT_OF_CHANGE_INDEX)}
                 />
             </div>
         </div>
