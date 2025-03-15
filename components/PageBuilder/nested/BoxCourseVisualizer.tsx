@@ -178,8 +178,9 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
 
         const interval = setInterval(() => {
             const currentPatternIndex = Math.floor(demoStep / 1) % activeSequences.length;
+            const shouldPauseAtChange = value.pointOfChangeIndex !== undefined && value.pauseDuration !== 0;
 
-            if (currentPatternIndex === activeSequences.length - 1 && !isPaused) {
+            if (shouldPauseAtChange && currentPatternIndex === activeSequences.length - 1 && !isPaused) {
                 setIsPaused(true);
                 setTimeout(() => {
                     setIsPaused(false);
@@ -194,7 +195,7 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
         }, value.animationSpeed || 150);
 
         return () => clearInterval(interval);
-    }, [demoStep, isPaused, value.animationSpeed, value.pauseDuration, value.mode, activeSequences]);
+    }, [demoStep, isPaused, value.animationSpeed, value.pauseDuration, value.mode, activeSequences, value.pointOfChangeIndex]);
 
     return (
         <div className='flex h-full w-full flex-col items-center justify-center space-y-6 py-8'>
