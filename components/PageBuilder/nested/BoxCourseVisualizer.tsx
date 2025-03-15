@@ -114,33 +114,38 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
     const activeSequences = useMemo(() => {
         if (!value.sequencesData) return sequences;
         try {
-            const parsed = JSON.parse(value.sequencesData);
-            if (Array.isArray(parsed) && parsed.every((arr) => Array.isArray(arr) && arr.length === 8)) {
-                return parsed;
-            }
-            console.warn('Invalid sequences data format, using default sequences');
-            return sequences;
-        } catch {
-            console.warn('Invalid sequences data, using default sequences');
+            // Split by newlines and parse each line as an array
+            const lines = value.sequencesData
+                .split('\n')
+                .map((line) => line.trim())
+                .filter((line) => line && !line.includes('//')) // Remove empty lines and comments
+                .map((line) => {
+                    // Extract the array part and parse it
+                    const match = line.match(/\[(.*?)\]/);
+                    if (!match) return null;
+                    return match[1].split(',').map((num) => parseInt(num.trim(), 10));
+                })
+                .filter((arr) => arr && arr.length === 8); // Ensure valid arrays only
+            return lines.length > 0 ? lines : sequences;
+        } catch (error) {
+            console.warn('Error parsing sequences data:', error);
             return sequences;
         }
     }, [value.sequencesData]);
 
-    // Parse base values from JSON string or use defaults
+    // Parse base values from string or use defaults
     const activeBaseValues = useMemo(() => {
-        const defaultValues = [1125, 800, 565, 400, 282, 200, 141, 100];
-        if (!value.baseValuesData) return defaultValues;
+        if (!value.baseValuesData) return BASE_VALUES;
         try {
-            const parsed = JSON.parse(value.baseValuesData);
-            if (Array.isArray(parsed) && parsed.every((n) => typeof n === 'number')) {
-                // Ensure values are sorted in descending order
-                return [...parsed].sort((a, b) => b - a);
-            }
-            console.warn('Invalid base values format, using defaults');
-            return defaultValues;
-        } catch {
-            console.warn('Invalid base values data, using defaults');
-            return defaultValues;
+            // Split by commas and parse each number
+            const values = value.baseValuesData
+                .split(',')
+                .map((num) => parseFloat(num.trim()))
+                .filter((num) => !isNaN(num));
+            return values.length === 8 ? values : BASE_VALUES;
+        } catch (error) {
+            console.warn('Error parsing base values:', error);
+            return BASE_VALUES;
         }
     }, [value.baseValuesData]);
 

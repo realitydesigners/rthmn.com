@@ -465,14 +465,31 @@ export async function getCourse(slug: string) {
                     description,
                     "slug": slug.current,
                     order,
-                    courseContent,
-                    },
+                    courseContent[] {
+                        ...,
+                        content[] {
+                            ...,
+                            _type == 'boxVisualizer' => {
+                                _type,
+                                title,
+                                description,
+                                mode,
+                                showLabels,
+                                sequencesData,
+                                baseValuesData,
+                                colorScheme,
+                                animationSpeed,
+                                pauseDuration
+                            }
+                        }
+                    }
+                },
             } | order(order asc)
         }`,
         { slug }
     );
 
-    console.log('Fetched course:', JSON.stringify(course, null, 2));
+    console.log('Fetched course data:', JSON.stringify(course, null, 2));
     return course;
 }
 
