@@ -145,17 +145,13 @@ export const NestedBoxes = ({
                     }`}
                 />
 
-                {/* High price line */}
-                <div className='absolute top-0 -right-32 flex items-center'>
-                    <div className='h-[1px] w-8 bg-gray-400/50'></div>
-                    <div className='ml-2 font-mono text-xs text-gray-400'>{box.value.toFixed(5)}</div>
-                </div>
-
-                {/* Low price line */}
-                <div className='absolute -right-32 bottom-0 flex items-center'>
-                    <div className='h-[1px] w-8 bg-gray-400/50'></div>
-                    <div className='ml-2 font-mono text-xs text-gray-400'>{(box.value * 0.707).toFixed(5)}</div>
-                </div>
+                {/* Price lines */}
+                {showLabels && (
+                    <div className={`absolute -right-20 flex items-center ${box.value > 0 ? '-bottom-[5px]' : '-top-[5px]'}`}>
+                        <div className='h-[1px] w-8 bg-white/50'></div>
+                        <div className='ml-2 font-mono text-[12px] text-white/90'>{Math.abs(box.value)}</div>
+                    </div>
+                )}
 
                 {index < boxes.length - 1 && renderBox(boxes[index + 1], index + 1, box)}
             </div>
