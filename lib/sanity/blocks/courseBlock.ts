@@ -4,7 +4,6 @@ import { defineField, defineType } from 'sanity';
 type ThemeOption = 'light' | 'dark';
 type ImageClassOption = 'image-standard' | 'image-standard-dark' | 'image-inset';
 type VideoClassOption = 'light' | 'dark' | 'transparent';
-type QuoteClassOption = 'card-1' | 'card-2';
 type AudioClassOption = 'class-1' | 'class-2';
 type ImageOption = 'img-dark' | 'img-light';
 
@@ -23,11 +22,6 @@ const videoClassTitles: Record<VideoClassOption, string> = {
     light: 'Video | Light',
     dark: 'Video | Dark',
     transparent: 'Video | Transparent',
-};
-
-const quoteClassTitles: Record<QuoteClassOption, string> = {
-    'card-1': 'Card 1',
-    'card-2': 'Card 2',
 };
 
 const audioClassTitles: Record<AudioClassOption, string> = {
@@ -444,6 +438,49 @@ export default defineType({
                             return {
                                 title: question || 'Untitled Quiz',
                                 subtitle: `${options.length} options | Correct: ${options[correctAnswer] || 'Not set'}`,
+                            };
+                        },
+                    },
+                }),
+                defineField({
+                    type: 'object',
+                    name: 'boxVisualizer',
+                    title: 'Box Visualizer',
+                    fields: [
+                        {
+                            name: 'colorScheme',
+                            title: 'Color Scheme',
+                            type: 'string',
+                            options: {
+                                list: [
+                                    { title: 'Green & Red', value: 'green-red' },
+                                    { title: 'Blue & Orange', value: 'blue-orange' },
+                                ],
+                            },
+                            initialValue: 'green-red',
+                        },
+                        {
+                            name: 'animationSpeed',
+                            title: 'Animation Speed',
+                            type: 'number',
+                            description: 'Speed of the animation in milliseconds (lower = faster)',
+                            initialValue: 150,
+                            validation: (Rule) => Rule.required().min(50).max(1000),
+                        },
+                        {
+                            name: 'pauseDuration',
+                            title: 'Pause Duration',
+                            type: 'number',
+                            description: 'How long to pause at pattern change points (in milliseconds)',
+                            initialValue: 5000,
+                            validation: (Rule) => Rule.required().min(1000).max(10000),
+                        },
+                    ],
+                    preview: {
+                        prepare() {
+                            return {
+                                title: 'Box Pattern Visualizer',
+                                subtitle: 'Interactive pattern visualization',
                             };
                         },
                     },

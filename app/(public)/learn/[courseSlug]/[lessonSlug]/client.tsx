@@ -61,11 +61,9 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                                 </span>
                             </div>
                         </div>
-                        <h1 className='font-outfit mb-4 text-4xl font-bold text-white lg:text-6xl'>{lesson.title}</h1>
-                        {lesson.description && <p className='text-lg text-gray-400'>{lesson.description}</p>}
                     </div>
 
-                    <PortableText value={lesson.courseContent?.content} components={CourseTemplate} />
+                    {lesson.courseContent?.content && <PortableText value={lesson.courseContent?.content} components={CourseTemplate} />}
 
                     {/* Navigation */}
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>
@@ -119,7 +117,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                     </div>
                 </div>
             </div>
-            <TableOfContents blocks={lesson.courseContent?.content as BlockProps[]} />
+            <TableOfContents blocks={lesson.courseContent?.content || []} />
             <MobileNavigation course={course} lesson={lesson} chapter={chapter} />
         </div>
     );

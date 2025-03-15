@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { PortableTextBlock } from '@portabletext/types';
+import type { PortableTextBlock } from '@portabletext/types';
 import { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
 import { motion, AnimatePresence } from 'framer-motion';
 import { createClient } from '@/lib/supabase/client';
@@ -30,7 +30,7 @@ export const generateHeadingId = (text: string): string => {
         .trim();
 };
 
-export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
+export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
     const [headings, setHeadings] = useState<TOCItem[]>([]);
     const [activeId, setActiveId] = useState<string>('');
     const [progress, setProgress] = useState<number>(0);
@@ -74,23 +74,20 @@ export function TableOfContents({ blocks }: { blocks: BlockProps[] }) {
     // Extract headings from blocks
     useEffect(() => {
         const items: TOCItem[] = [];
-        blocks?.forEach((block) => {
-            const contentBlock = block as ContentBlock;
-            contentBlock.content?.forEach((content: PortableTextBlock) => {
-                if (content.style?.match(/^h[1-6]$/)) {
-                    const text = content.children
-                        ?.map((child) => child.text)
-                        .filter(Boolean)
-                        .join('')
-                        .trim();
+        blocks?.forEach((content: PortableTextBlock) => {
+            if (content.style?.match(/^h[1-6]$/)) {
+                const text = content.children
+                    ?.map((child) => child.text)
+                    .filter(Boolean)
+                    .join('')
+                    .trim();
 
-                    if (text) {
-                        const level = parseInt(content.style[1]);
-                        const id = generateHeadingId(text);
-                        items.push({ id, text, level });
-                    }
+                if (text) {
+                    const level = parseInt(content.style[1]);
+                    const id = generateHeadingId(text);
+                    items.push({ id, text, level });
                 }
-            });
+            }
         });
         setHeadings(items);
     }, [blocks]);
