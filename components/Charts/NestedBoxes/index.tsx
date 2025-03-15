@@ -4,15 +4,39 @@ import type { Box } from '@/types/types';
 
 interface NestedBoxesProps {
     boxes: Box[];
-    demoStep: number;
-    isPaused: boolean;
+    demoStep?: number;
+    isPaused?: boolean;
     isPointOfChange?: boolean;
     maxSize?: number;
     baseSize?: number;
     colorScheme?: 'green-red' | 'white-gradient';
+    showLabels?: boolean;
+    mode?: 'animated' | 'static';
+    containerClassName?: string;
+    showPriceLines?: boolean;
+    boxColors?: {
+        styles?: {
+            boxColor?: string;
+            borderColor?: string;
+            highlightColor?: string;
+        };
+    };
 }
 
-export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSize: providedMaxSize, baseSize = 400, colorScheme = 'white-gradient' }: NestedBoxesProps) => {
+export const NestedBoxes = ({
+    boxes,
+    demoStep = 0,
+    isPaused = false,
+    isPointOfChange = false,
+    maxSize: providedMaxSize,
+    baseSize = 400,
+    colorScheme = 'white-gradient',
+    showLabels = false,
+    mode = 'animated',
+    containerClassName = '',
+    showPriceLines = false,
+    boxColors,
+}: NestedBoxesProps) => {
     if (!boxes || boxes.length === 0) return null;
 
     const maxSize = providedMaxSize || Math.abs(boxes[0].value);
@@ -22,6 +46,11 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
 
         const boxStyles = useMemo(() => {
             const getBoxColor = () => {
+                // If custom boxColors are provided, use them
+                if (boxColors?.styles?.boxColor) {
+                    return boxColors.styles.boxColor;
+                }
+
                 if (colorScheme === 'green-red') {
                     if (isFirstDifferent) {
                         return box.value > 0
@@ -36,6 +65,11 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
             };
 
             const getBorderColor = () => {
+                // If custom boxColors are provided, use them
+                if (boxColors?.styles?.borderColor) {
+                    return boxColors.styles.borderColor;
+                }
+
                 if (colorScheme === 'green-red') {
                     if (isFirstDifferent) {
                         return box.value > 0 ? 'border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)]' : 'border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)]';
@@ -49,7 +83,7 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
                 boxColor: getBoxColor(),
                 borderColor: getBorderColor(),
             };
-        }, [box.value, isFirstDifferent, colorScheme]);
+        }, [box.value, isFirstDifferent, colorScheme, boxColors]);
 
         const size = (Math.abs(box.value) / maxSize) * baseSize;
         const basePosition = prevBox
@@ -67,7 +101,7 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
             height: `${size}px`,
             ...basePosition,
             margin: '-1px',
-            ...(isPaused
+            ...(mode === 'animated' && isPaused
                 ? {
                       transform: `translateX(${index * 3}px) translateY(${index * 2}px)`,
                       transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)',
@@ -77,7 +111,7 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
 
         return (
             <div
-                key={`box-${index}-${box.value}-${demoStep}`}
+                key={`box-${index}-${box.value}-${mode === 'animated' ? demoStep : ''}`}
                 className={`absolute ${boxStyles.boxColor} ${boxStyles.borderColor} rounded-lg border transition-all duration-800 ease-out`}
                 style={style}>
                 <div
@@ -92,7 +126,7 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
                     }`}
                 />
 
-                {isFirstDifferent && (
+                {isFirstDifferent && mode === 'animated' && (
                     <div
                         className={`absolute inset-0 rounded-lg ${
                             box.value > 0
@@ -111,10 +145,14 @@ export const NestedBoxes = ({ boxes, demoStep, isPaused, isPointOfChange, maxSiz
                     }`}
                 />
 
+                {showLabels && <div className='absolute top-1/2 -right-16 -translate-y-1/2 font-mono text-xs text-gray-400'>Scale {boxes.length - index}</div>}
+
+                {showPriceLines && <div className='absolute top-1/2 -right-12 -translate-y-1/2 font-mono text-xs text-gray-400'>{box.value.toFixed(2)}</div>}
+
                 {index < boxes.length - 1 && renderBox(boxes[index + 1], index + 1, box)}
             </div>
         );
     };
 
-    return <>{renderBox(boxes[0], 0)}</>;
+    return <div className={`min-h-[200px] w-full ${containerClassName}`}>{renderBox(boxes[0], 0)}</div>;
 };

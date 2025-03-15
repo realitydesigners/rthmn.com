@@ -36,9 +36,15 @@ FeatureTags.displayName = 'FeatureTags';
 
 interface BoxVisualizerProps {
     value: {
-        colorScheme?: ColorScheme;
+        colorScheme?: 'green-red' | 'white-gradient';
         animationSpeed?: number;
         pauseDuration?: number;
+        title?: string;
+        description?: string;
+        showLabels?: boolean;
+        mode?: 'animated' | 'static';
+        sequencesData?: string;
+        baseValuesData?: string;
     };
 }
 
@@ -47,10 +53,11 @@ interface BoxVisualizationProps {
     demoStep: number;
     isPaused: boolean;
     colorScheme?: ColorScheme;
+    showLabels?: boolean;
 }
 
 // Memoize BoxVisualization component
-const BoxVisualization = memo(({ currentSlice, demoStep, isPaused, colorScheme = 'green-red' }: BoxVisualizationProps) => {
+const BoxVisualization = memo(({ currentSlice, demoStep, isPaused, colorScheme = 'green-red', showLabels }: BoxVisualizationProps) => {
     const [baseSize, setBaseSize] = useState(250);
 
     useEffect(() => {
@@ -78,22 +85,18 @@ const BoxVisualization = memo(({ currentSlice, demoStep, isPaused, colorScheme =
     }, [demoStep]);
 
     return (
-        <div className='relative h-[250px] w-[250px] rounded-lg border border-white/10 bg-white/[0.02] backdrop-blur-sm sm:h-[300px] sm:w-[300px] lg:h-[400px] lg:w-[400px]'>
-            <motion.div
-                className='absolute inset-0'
-                animate={{
-                    background: [
-                        'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
-                        'radial-gradient(circle at 100% 100%, #22c55e15 0%, transparent 50%)',
-                        'radial-gradient(circle at 0% 0%, #22c55e15 0%, transparent 50%)',
-                    ],
-                }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-            />
-
+        <div className='w-full'>
             {currentSlice && sortedBoxes.length > 0 && (
                 <div className='relative h-full w-full'>
-                    <NestedBoxes boxes={sortedBoxes} demoStep={demoStep} isPaused={isPaused} isPointOfChange={isPointOfChange} baseSize={baseSize} colorScheme={colorScheme} />
+                    <NestedBoxes
+                        boxes={sortedBoxes}
+                        demoStep={demoStep}
+                        isPaused={isPaused}
+                        isPointOfChange={isPointOfChange}
+                        baseSize={baseSize}
+                        colorScheme={colorScheme}
+                        showLabels={showLabels}
+                    />
                 </div>
             )}
         </div>
@@ -106,16 +109,53 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
     const [demoStep, setDemoStep] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
     const tableRef = useRef<HTMLDivElement>(null);
-    const totalStepsRef = useRef(sequences.length);
+
+    // Parse sequences from JSON string or use defaults
+    const activeSequences = useMemo(() => {
+        if (!value.sequencesData) return sequences;
+        try {
+            const parsed = JSON.parse(value.sequencesData);
+            if (Array.isArray(parsed) && parsed.every((arr) => Array.isArray(arr) && arr.length === 8)) {
+                return parsed;
+            }
+            console.warn('Invalid sequences data format, using default sequences');
+            return sequences;
+        } catch {
+            console.warn('Invalid sequences data, using default sequences');
+            return sequences;
+        }
+    }, [value.sequencesData]);
+
+    // Parse base values from JSON string or use defaults
+    const activeBaseValues = useMemo(() => {
+        const defaultValues = [1125, 800, 565, 400, 282, 200, 141, 100];
+        if (!value.baseValuesData) return defaultValues;
+        try {
+            const parsed = JSON.parse(value.baseValuesData);
+            if (Array.isArray(parsed) && parsed.every((n) => typeof n === 'number')) {
+                // Ensure values are sorted in descending order
+                return [...parsed].sort((a, b) => b - a);
+            }
+            console.warn('Invalid base values format, using defaults');
+            return defaultValues;
+        } catch {
+            console.warn('Invalid base values data, using defaults');
+            return defaultValues;
+        }
+    }, [value.baseValuesData]);
+
+    const totalStepsRef = useRef(activeSequences.length);
 
     const currentSlice = useMemo(() => {
-        const currentValues = createDemoStep(demoStep, sequences, BASE_VALUES);
+        const currentValues = createDemoStep(demoStep, activeSequences, activeBaseValues);
         const mockBoxData = createMockBoxData(currentValues);
+        // Ensure boxes are sorted by absolute value in descending order
+        const sortedBoxes = mockBoxData.sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
         return {
             timestamp: new Date().toISOString(),
-            boxes: mockBoxData,
+            boxes: sortedBoxes,
         };
-    }, [demoStep]);
+    }, [demoStep, activeSequences, activeBaseValues]);
 
     useEffect(() => {
         if (tableRef.current) {
@@ -128,10 +168,12 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
     }, [demoStep]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            const currentPatternIndex = Math.floor(demoStep / 1) % sequences.length;
+        if (value.mode === 'static') return; // Don't animate in static mode
 
-            if (currentPatternIndex === POINT_OF_CHANGE_INDEX && !isPaused) {
+        const interval = setInterval(() => {
+            const currentPatternIndex = Math.floor(demoStep / 1) % activeSequences.length;
+
+            if (currentPatternIndex === activeSequences.length - 1 && !isPaused) {
                 setIsPaused(true);
                 setTimeout(() => {
                     setIsPaused(false);
@@ -146,12 +188,25 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
         }, value.animationSpeed || 150);
 
         return () => clearInterval(interval);
-    }, [demoStep, isPaused, value.animationSpeed, value.pauseDuration]);
+    }, [demoStep, isPaused, value.animationSpeed, value.pauseDuration, value.mode, activeSequences]);
 
     return (
-        <section className='flex w-full items-center justify-center'>
-            <BoxVisualization currentSlice={currentSlice} demoStep={demoStep} isPaused={isPaused} colorScheme={value.colorScheme} />
-        </section>
+        <div className='flex h-full w-full flex-col items-center justify-center space-y-6 py-8'>
+            {value.title && <h3 className='font-outfit text-center text-xl font-semibold text-white'>{value.title}</h3>}
+            {value.description && <p className='font-outfit max-w-2xl text-center text-base text-gray-400'>{value.description}</p>}
+            <div className='relative flex h-[400px] w-[400px] items-center justify-center'>
+                <NestedBoxes
+                    boxes={currentSlice.boxes}
+                    demoStep={demoStep}
+                    isPaused={isPaused}
+                    colorScheme={value.colorScheme}
+                    showLabels={true}
+                    mode={value.mode || 'animated'}
+                    baseSize={400}
+                    containerClassName='flex items-center justify-center'
+                />
+            </div>
+        </div>
     );
 };
 

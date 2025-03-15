@@ -448,6 +448,49 @@ export default defineType({
                     title: 'Box Visualizer',
                     fields: [
                         {
+                            name: 'title',
+                            title: 'Title',
+                            type: 'string',
+                            description: 'Title to display above the box visualizer',
+                        },
+                        {
+                            name: 'description',
+                            title: 'Description',
+                            type: 'text',
+                            description: 'Description text to display below the title',
+                        },
+                        {
+                            name: 'mode',
+                            title: 'Mode',
+                            type: 'string',
+                            options: {
+                                list: [
+                                    { title: 'Animated', value: 'animated' },
+                                    { title: 'Static', value: 'static' },
+                                ],
+                            },
+                            initialValue: 'animated',
+                        },
+                        {
+                            name: 'showLabels',
+                            title: 'Show Labels',
+                            type: 'boolean',
+                            description: 'Whether to show labels on the boxes',
+                            initialValue: true,
+                        },
+                        {
+                            name: 'sequencesData',
+                            title: 'Sequences Data',
+                            type: 'text',
+                            description: 'JSON array of arrays, each inner array containing exactly 8 numbers (1 or -1). Example: [[1,1,1,1,-1,-1,-1,-1], [1,1,-1,-1,1,1,-1,-1]]',
+                        },
+                        {
+                            name: 'baseValuesData',
+                            title: 'Base Values Data',
+                            type: 'text',
+                            description: 'JSON array of numbers (1-8 values). Example: [795.375, 565.6, 399.455, 282.8, 199.374, 141.4, 99.687, 70.7]',
+                        },
+                        {
                             name: 'colorScheme',
                             title: 'Color Scheme',
                             type: 'string',
