@@ -32,6 +32,24 @@ function useSignInWithOAuth() {
     };
 }
 
+function useSignInWithEmail() {
+    const supabase = createClient();
+
+    return async (email: string) => {
+        const redirectURL = getURL('/api/auth/callback');
+
+        const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+                shouldCreateUser: true,
+                emailRedirectTo: redirectURL,
+            },
+        });
+
+        return { error };
+    };
+}
+
 const AuroraBackground = () => (
     <motion.div
         initial={{ opacity: 0 }}
@@ -125,6 +143,10 @@ const StarField = () => {
 
 export default function SignIn() {
     const signInWithOAuth = useSignInWithOAuth();
+    const signInWithEmail = useSignInWithEmail();
+    const [email, setEmail] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState('');
 
     const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -132,6 +154,30 @@ export default function SignIn() {
             await signInWithOAuth(e, 'google');
         } catch (error) {
             console.error('OAuth sign-in error:', error);
+        }
+    };
+
+    const handleEmailSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setMessage('');
+
+        try {
+            const { error } = await signInWithEmail(email);
+            if (error) {
+                if (error.message?.includes('already in use')) {
+                    setMessage('This email is already registered with a different sign-in method. Please use Google sign-in instead.');
+                } else {
+                    setMessage('Error sending login link. Please try again.');
+                }
+            } else {
+                setMessage('Check your email for the login link!');
+                setEmail('');
+            }
+        } catch (error) {
+            setMessage('An unexpected error occurred.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -155,6 +201,32 @@ export default function SignIn() {
                     </div>
 
                     <div className='space-y-4'>
+                        {/* Email Sign In Form */}
+                        <form onSubmit={handleEmailSignIn} className='mb-4'>
+                            <div className='space-y-2'>
+                                <input
+                                    type='email'
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder='Enter your email'
+                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/20 focus:outline-none'
+                                    required
+                                />
+                                <button
+                                    type='submit'
+                                    disabled={isLoading}
+                                    className='w-full rounded-lg bg-blue-500 px-4 py-2 font-mono text-white transition-all hover:bg-blue-600 disabled:opacity-50'>
+                                    {isLoading ? 'Sending...' : 'Sign in with Email'}
+                                </button>
+                            </div>
+                            {message && <p className='mt-2 text-center text-sm text-gray-300'>{message}</p>}
+                        </form>
+
+                        <div className='relative flex items-center justify-center'>
+                            <div className='absolute inset-x-0 top-1/2 h-px bg-white/10'></div>
+                            <span className='relative bg-black px-4 text-sm text-gray-400'>Or continue with</span>
+                        </div>
+
                         <form onSubmit={handleSignIn}>
                             <button
                                 className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-blue-500/20 focus:outline-none active:scale-[0.99]'
