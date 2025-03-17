@@ -63,25 +63,22 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
 
     // Extract headings from lesson content for TOC
     useEffect(() => {
-        if (lesson?.content && activeTab === 'toc') {
+        if (lesson?.courseContent?.content && activeTab === 'toc') {
             const items: TOCItem[] = [];
-            lesson.content.forEach((block: BlockProps) => {
-                const contentBlock = block as ContentBlock;
-                contentBlock.content?.forEach((content: PortableTextBlock) => {
-                    if (content.style?.match(/^h[1-6]$/)) {
-                        const text = content.children
-                            ?.map((child) => child.text)
-                            .filter(Boolean)
-                            .join('')
-                            .trim();
+            lesson.courseContent.content.forEach((content: PortableTextBlock) => {
+                if (content.style?.match(/^h[1-6]$/)) {
+                    const text = content.children
+                        ?.map((child) => child.text)
+                        .filter(Boolean)
+                        .join('')
+                        .trim();
 
-                        if (text) {
-                            const level = parseInt(content.style[1]);
-                            const id = generateHeadingId(text);
-                            items.push({ id, text, level });
-                        }
+                    if (text) {
+                        const level = parseInt(content.style[1]);
+                        const id = generateHeadingId(text);
+                        items.push({ id, text, level });
                     }
-                });
+                }
             });
             setHeadings(items);
         }

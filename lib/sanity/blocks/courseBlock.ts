@@ -4,7 +4,6 @@ import { defineField, defineType } from 'sanity';
 type ThemeOption = 'light' | 'dark';
 type ImageClassOption = 'image-standard' | 'image-standard-dark' | 'image-inset';
 type VideoClassOption = 'light' | 'dark' | 'transparent';
-type QuoteClassOption = 'card-1' | 'card-2';
 type AudioClassOption = 'class-1' | 'class-2';
 type ImageOption = 'img-dark' | 'img-light';
 
@@ -25,11 +24,6 @@ const videoClassTitles: Record<VideoClassOption, string> = {
     transparent: 'Video | Transparent',
 };
 
-const quoteClassTitles: Record<QuoteClassOption, string> = {
-    'card-1': 'Card 1',
-    'card-2': 'Card 2',
-};
-
 const audioClassTitles: Record<AudioClassOption, string> = {
     'class-1': 'Audio | Style 1',
     'class-2': 'Audio | Style 2',
@@ -45,19 +39,6 @@ export default defineType({
     name: 'courseBlock',
     title: 'Course Block',
     fields: [
-        defineField({
-            name: 'layout',
-            title: 'Layout',
-            type: 'string',
-            options: {
-                list: [
-                    { title: 'Dark', value: 'dark' },
-                    { title: 'Light', value: 'light' },
-                    { title: 'Course Template', value: 'course' },
-                    { title: 'Transparent', value: 'transparent' },
-                ],
-            },
-        }),
         {
             name: 'content',
             title: 'Content',
@@ -329,7 +310,6 @@ export default defineType({
                             return {
                                 title: title || 'Untitled',
                                 subtitle: classNameTitle,
-                                media,
                             };
                         },
                     },
@@ -457,6 +437,97 @@ export default defineType({
                             return {
                                 title: question || 'Untitled Quiz',
                                 subtitle: `${options.length} options | Correct: ${options[correctAnswer] || 'Not set'}`,
+                            };
+                        },
+                    },
+                }),
+                defineField({
+                    type: 'object',
+                    name: 'boxVisualizer',
+                    title: 'Box Visualizer',
+                    fields: [
+                        {
+                            name: 'title',
+                            title: 'Title',
+                            type: 'string',
+                            description: 'Title to display above the box visualizer',
+                        },
+                        {
+                            name: 'description',
+                            title: 'Description',
+                            type: 'text',
+                            description: 'Description text to display below the title',
+                        },
+                        {
+                            name: 'mode',
+                            title: 'Mode',
+                            type: 'string',
+                            options: {
+                                list: [
+                                    { title: 'Animated', value: 'animated' },
+                                    { title: 'Static', value: 'static' },
+                                ],
+                            },
+                            initialValue: 'animated',
+                        },
+                        {
+                            name: 'showLabels',
+                            title: 'Show Labels',
+                            type: 'boolean',
+                            description: 'Whether to show labels on the boxes',
+                            initialValue: true,
+                        },
+                        {
+                            name: 'pointOfChangeIndex',
+                            title: 'Point of Change Index',
+                            type: 'number',
+                            description: 'Index at which the sequence changes (default: 29)',
+                            initialValue: 29,
+                        },
+                        {
+                            name: 'sequencesData',
+                            title: 'Sequences Data',
+                            type: 'text',
+                            description: 'JSON array of arrays, each inner array containing exactly 8 numbers (1 or -1). Example: [[1,1,1,1,-1,-1,-1,-1], [1,1,-1,-1,1,1,-1,-1]]',
+                        },
+                        {
+                            name: 'baseValuesData',
+                            title: 'Base Values Data',
+                            type: 'text',
+                            description: 'JSON array of numbers (1-8 values). Example: [795.375, 565.6, 399.455, 282.8, 199.374, 141.4, 99.687, 70.7]',
+                        },
+                        {
+                            name: 'colorScheme',
+                            title: 'Color Scheme',
+                            type: 'string',
+                            options: {
+                                list: [
+                                    { title: 'Green & Red', value: 'green-red' },
+                                    { title: 'Blue & Orange', value: 'blue-orange' },
+                                ],
+                            },
+                            initialValue: 'green-red',
+                        },
+                        {
+                            name: 'animationSpeed',
+                            title: 'Animation Speed',
+                            type: 'number',
+                            description: 'Speed of the animation in milliseconds (lower = faster)',
+                            initialValue: 150,
+                        },
+                        {
+                            name: 'pauseDuration',
+                            title: 'Pause Duration',
+                            type: 'number',
+                            description: 'How long to pause at pattern change points (in milliseconds)',
+                            initialValue: 5000,
+                        },
+                    ],
+                    preview: {
+                        prepare() {
+                            return {
+                                title: 'Box Pattern Visualizer',
+                                subtitle: 'Interactive pattern visualization',
                             };
                         },
                     },

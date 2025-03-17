@@ -69,12 +69,6 @@ export default defineType({
                 ],
             },
         }),
-        defineField({
-            name: 'order',
-            title: 'Order',
-            type: 'number',
-            validation: (Rule) => Rule.required(),
-        }),
     ],
     preview: {
         select: {
