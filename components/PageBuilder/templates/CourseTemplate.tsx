@@ -11,6 +11,7 @@ import SplineRefBlock from '../nested/SplineRefBlock';
 import VideoRefBlock from '../nested/VideoRefBlock';
 import Callout from '../nested/Callout';
 import Quiz from '../nested/Quiz';
+import BoxCourseVisualizer from '../nested/BoxCourseVisualizer';
 
 import type { PortableTextComponents } from '@portabletext/react';
 
@@ -24,7 +25,7 @@ export const CourseTemplate: PortableTextComponents = {
         h1: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h1 id={id} className={`font-outfit mb-6 scroll-mt-24 text-3xl leading-relaxed font-bold text-gray-300`}>
+                <h1 id={id} className={`font-outfit mb-6 text-3xl leading-[1.25em] font-bold text-gray-300 lg:text-6xl`}>
                     {children}
                 </h1>
             );
@@ -32,7 +33,7 @@ export const CourseTemplate: PortableTextComponents = {
         h2: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h2 id={id} className={`font-outfit mb-4 scroll-mt-24 text-2xl leading-relaxed font-bold text-gray-300`}>
+                <h2 id={id} className={`font-outfit mb-4 scroll-mt-24 text-2xl leading-[1.25em] font-bold text-gray-300`}>
                     {children}
                 </h2>
             );
@@ -40,7 +41,7 @@ export const CourseTemplate: PortableTextComponents = {
         h3: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h3 id={id} className={`font-outfit mb-3 scroll-mt-24 text-xl leading-relaxed font-bold text-gray-300`}>
+                <h3 id={id} className={`font-outfit mb-3 scroll-mt-24 text-xl leading-[1.25em] font-bold text-gray-300`}>
                     {children}
                 </h3>
             );
@@ -87,5 +88,21 @@ export const CourseTemplate: PortableTextComponents = {
         quoteRef: ({ value }) => <QuoteRefBlock quote={value.quoteRef?.quoteTitle} image={value.quoteRef?.quoteImage} className={value.quoteRef?.className} />,
         callout: ({ value }) => <Callout type={value.type} title={value.title} points={value.points} />,
         quiz: ({ value }) => <Quiz question={value.question} options={value.options} correctAnswer={value.correctAnswer} explanation={value.explanation} />,
+        boxVisualizer: ({ value }) => {
+            console.log('BoxVisualizer raw value:', value);
+            const boxVisualizerValue = {
+                title: value.title,
+                description: value.description,
+                mode: value.mode,
+                showLabels: value.showLabels,
+                sequencesData: value.sequencesData,
+                baseValuesData: value.baseValuesData,
+                colorScheme: value.colorScheme,
+                animationSpeed: value.animationSpeed,
+                pauseDuration: value.pauseDuration,
+            };
+            console.log('BoxVisualizer processed value:', boxVisualizerValue);
+            return <BoxCourseVisualizer value={boxVisualizerValue} />;
+        },
     },
 };
