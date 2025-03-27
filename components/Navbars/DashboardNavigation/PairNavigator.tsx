@@ -91,7 +91,7 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
 
 const PairFilters = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
     <div className='absolute right-0 bottom-22 left-0 z-[1000]'>
-        <div className='scrollbar-none flex items-center justify-start gap-2 overflow-x-auto px-4 py-2'>
+        <div className='scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto px-4 py-2'>
             {navigationButtons.map((button) => (
                 <PairFilterButtons key={button.mode} isActive={viewMode === button.mode} onClick={() => setViewMode(button.mode)} label={button.label} />
             ))}
@@ -228,7 +228,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
 
     return (
         <div
-            className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
+            className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
                 isModalOpen ? 'h-[175px] lg:hidden' : 'h-[50vh]'
             }`}>
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -238,7 +238,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
                 {/* Scrollable list */}
                 <div
                     ref={scrollRef}
-                    className='scrollbar-none absolute inset-0 overflow-y-scroll'
+                    className='scrollbar-hide absolute inset-0 overflow-y-scroll'
                     style={{
                         scrollSnapType: 'y mandatory',
                         WebkitOverflowScrolling: 'touch',

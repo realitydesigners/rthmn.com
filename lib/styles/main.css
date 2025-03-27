@@ -279,11 +279,6 @@
     transform: rotate(180deg);
 }
 
-/* Hide navbar in user layout */
-:is([class*='dashboard'], [class*='test']) .user-layout-hidden {
-    display: none;
-}
-
 @keyframes pulse-subtle {
     0% {
         box-shadow:
