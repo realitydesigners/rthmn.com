@@ -2,10 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { LuArrowRight, LuBitcoin, LuBookmark, LuDollarSign, LuList, LuPlus, LuSearch, LuTrash2 } from 'react-icons/lu';
+import { LuArrowRight, LuBitcoin, LuBookmark, LuDollarSign, LuList, LuPlus, LuSearch, LuTrash2, LuLineChart, LuTrendingUp } from 'react-icons/lu';
 import { useLongPress } from '@/hooks/useLongPress';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { CRYPTO_PAIRS, FOREX_PAIRS } from '@/utils/instruments';
+import { CRYPTO_PAIRS, FOREX_PAIRS, EQUITY_PAIRS, ETF_PAIRS } from '@/utils/instruments';
 import { useUser } from '@/providers/UserProvider';
 
 const useSound = () => {
@@ -34,10 +34,12 @@ const useSound = () => {
 };
 
 const navigationButtons = [
-    { mode: 'favorites', label: 'Favorites', icon: LuBookmark },
-    { mode: 'fx', label: 'FX', icon: LuDollarSign },
-    { mode: 'crypto', label: 'Crypto', icon: LuBitcoin },
-    { mode: 'all', label: 'All', icon: LuList },
+    { mode: 'all', label: 'All' },
+    { mode: 'favorites', label: 'Favorites' },
+    { mode: 'fx', label: 'FX' },
+    { mode: 'crypto', label: 'Crypto' },
+    { mode: 'equity', label: 'Equity' },
+    { mode: 'etf', label: 'ETF' },
 ];
 
 const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, currentPairs: string[], setActiveIndex: (index: number) => void) => {
@@ -87,10 +89,12 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
 };
 
 const PairFilters = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
-    <div className='absolute right-0 bottom-22 left-0 z-[1000] flex items-center justify-center gap-2 py-2'>
-        {navigationButtons.map((button) => (
-            <PairFilterButtons key={button.mode} icon={button.icon} isActive={viewMode === button.mode} onClick={() => setViewMode(button.mode)} label={button.label} />
-        ))}
+    <div className='absolute right-0 bottom-22 left-0 z-[1000]'>
+        <div className='scrollbar-none flex items-center justify-start gap-2 overflow-x-auto px-4 py-2'>
+            {navigationButtons.map((button) => (
+                <PairFilterButtons key={button.mode} isActive={viewMode === button.mode} onClick={() => setViewMode(button.mode)} label={button.label} />
+            ))}
+        </div>
     </div>
 );
 
@@ -109,6 +113,34 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     const [showAddForPair, setShowAddForPair] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Add scroll handler to cancel actions
+    useEffect(() => {
+        const container = scrollRef.current;
+        if (!container) return;
+
+        let scrollTimeout: NodeJS.Timeout;
+        const handleScroll = () => {
+            // Clear any existing timeout
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+
+            // Set a new timeout to cancel actions after scrolling stops
+            scrollTimeout = setTimeout(() => {
+                setShowRemoveForPair(null);
+                setShowAddForPair(null);
+            }, 100);
+        };
+
+        container.addEventListener('scroll', handleScroll);
+        return () => {
+            container.removeEventListener('scroll', handleScroll);
+            if (scrollTimeout) {
+                clearTimeout(scrollTimeout);
+            }
+        };
+    }, []);
+
     const currentPairs =
         viewMode === 'favorites'
             ? selectedPairs
@@ -116,7 +148,11 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
               ? [...FOREX_PAIRS]
               : viewMode === 'crypto'
                 ? [...CRYPTO_PAIRS]
-                : ([...FOREX_PAIRS, ...CRYPTO_PAIRS] as string[]);
+                : viewMode === 'equity'
+                  ? [...EQUITY_PAIRS]
+                  : viewMode === 'etf'
+                    ? [...ETF_PAIRS]
+                    : ([...FOREX_PAIRS, ...CRYPTO_PAIRS, ...EQUITY_PAIRS, ...ETF_PAIRS] as string[]);
 
     const handleIndexChange = (index: number) => {
         if (index >= 0 && index < currentPairs.length) {
@@ -235,7 +271,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     );
 };
 
-export const PairFilterButtons = ({ icon: Icon, isActive, onClick, label }: { icon: any; isActive: boolean; onClick: () => void; label: string }) => {
+export const PairFilterButtons = ({ isActive, onClick, label }: { isActive: boolean; onClick: () => void; label: string }) => {
     return (
         <button onClick={onClick} className='group relative flex items-center'>
             <div
@@ -243,10 +279,9 @@ export const PairFilterButtons = ({ icon: Icon, isActive, onClick, label }: { ic
                     isActive ? 'from-[#444444] to-[#282828]' : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
                 }`}>
                 <div
-                    className={`font-outfit flex h-full w-full items-center justify-center gap-1 rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] py-2 pr-4 pl-3 text-sm font-medium ${
+                    className={`font-outfit flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium ${
                         isActive ? 'text-gray-200' : 'text-[#818181]'
                     }`}>
-                    <Icon size={14} />
                     {label}
                 </div>
             </div>
@@ -274,18 +309,6 @@ export const SearchBar = ({ searchQuery, setSearchQuery }: { searchQuery: string
 };
 
 // Extract action buttons into separate components
-const ViewButton = ({ pair }: { pair: string }) => (
-    <Link
-        href={`/pair/${pair}`}
-        as={`/pair/${pair}`}
-        prefetch={false}
-        onClick={(e) => e.stopPropagation()}
-        className='-webkit-tap-highlight-color-transparent flex h-11 w-11 items-center justify-center rounded-full bg-white/10 text-gray-300 transition-all outline-none hover:bg-white/20 hover:text-white focus:outline-none'
-        style={{ WebkitTapHighlightColor: 'transparent' }}>
-        <LuArrowRight size={24} />
-    </Link>
-);
-
 const RemoveActions = ({ onCancel, onRemove }: { onCancel: (e: React.MouseEvent) => void; onRemove: (e: React.MouseEvent) => void }) => (
     <div className='-webkit-tap-highlight-color-transparent bg-red-500/05 flex h-11 w-11 items-center justify-center rounded-full text-red-400 transition-all hover:bg-red-500/20 hover:text-white'>
         {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
@@ -389,10 +412,6 @@ export const PairItem = ({
             );
         }
 
-        if (isActive) {
-            return <ViewButton pair={pair} />;
-        }
-
         return null;
     };
 
@@ -420,7 +439,7 @@ export const PairItem = ({
 
                         {currentPrice && <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} isActive={isActive} />}
 
-                        {isFavorite && viewMode !== 'favorites' && <LuBookmark size={15} className='ml-1 inline-block text-blue-400/70' />}
+                        {isFavorite && <LuBookmark size={15} className='ml-1 inline-block text-blue-400/70' />}
                     </div>
 
                     <div className='flex items-center gap-3'>{renderActions()}</div>
