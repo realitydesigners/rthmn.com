@@ -41,7 +41,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const pathSegments = formatPathname(pathname);
 
     return (
-        <nav className='top-0 right-0 left-0 z-[100] hidden h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:fixed lg:flex lg:h-14'>
+        <nav className='fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:flex lg:h-14'>
             <div className='group relative z-[110] h-full w-full'>
                 <div className='relative flex h-full w-full items-center justify-between rounded-lg px-2'>
                     {/* Left section */}
@@ -56,7 +56,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                             <ProBadge />
                         </div>
                         {/* Breadcrumb */}
-                        <div className='flex items-center text-[#818181]'>
+                        <div className='flex hidden items-center text-[#818181] lg:flex'>
                             {Array.isArray(pathSegments) ? (
                                 pathSegments.map((segment, index) => (
                                     <div key={index} className='flex items-center gap-1.5'>
@@ -74,7 +74,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                     </div>
 
                     {/* Center section - GridControl */}
-                    <div className='absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2'>
+                    <div className='absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block'>
                         <GridControl />
                     </div>
 

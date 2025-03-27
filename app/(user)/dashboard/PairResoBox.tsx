@@ -66,7 +66,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                     </div>
 
                     {/* Chart Section */}
-                    <div className={`relative flex h-full w-full ${settings.showPriceLines ? 'pr-12' : 'p-0'} transition-all duration-300`}>
+                    <div className={`relative flex h-full w-full ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}>
                         <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
                     </div>
 

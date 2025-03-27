@@ -117,7 +117,7 @@ export default function Dashboard() {
     }
 
     return (
-        <main className='w-full px-2 pt-16 sm:px-4 lg:pt-18'>
+        <main className='w-full px-2 py-18 sm:px-4'>
             <div className={cn(gridClass, 'transition-[grid-template-columns] duration-300 ease-in-out')}>
                 {orderedPairs.map((pair) => {
                     const data = pairData[pair];
