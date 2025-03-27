@@ -104,7 +104,7 @@ export const DashboardNavigation = () => {
         const handleClose = () => setActivePanel(null);
 
         const panels = {
-            pairs: <PairNavigator isModalOpen={isPairModalOpen} />,
+            pairs: <PairNavigator isModalOpen={isPairModalOpen} onClose={handleClose} />,
             settings: (
                 <div className='fixed z-[2050] h-[100vh] w-screen overflow-y-auto bg-black'>
                     <div className='p-4 pb-30'>
@@ -124,12 +124,13 @@ export const DashboardNavigation = () => {
 
     return (
         <>
-            <div className={`fixed inset-0 z-[2040] transition-all duration-300 ${activePanel ? 'pointer-events-auto bg-black/80' : 'pointer-events-none bg-transparent'}`}>
+            <div
+                className={`fixed inset-0 z-[2040] transition-all duration-500 ease-in-out ${activePanel ? 'pointer-events-auto bg-black/80' : 'pointer-events-none bg-transparent'}`}>
                 {renderPanel()}
             </div>
 
             <div
-                className={`fixed bottom-4 left-1/2 z-[2060] flex -translate-x-1/2 transform transition-transform duration-300 lg:hidden ${
+                className={`fixed bottom-4 left-1/2 z-[2060] flex -translate-x-1/2 transform transition-all duration-500 ease-in-out lg:hidden ${
                     scrollDirection === 'down' ? 'translate-y-24' : 'translate-y-0'
                 }`}>
                 <div className='flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2'>
