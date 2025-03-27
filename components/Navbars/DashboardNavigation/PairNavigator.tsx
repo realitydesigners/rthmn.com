@@ -7,6 +7,7 @@ import { useLongPress } from '@/hooks/useLongPress';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { CRYPTO_PAIRS, FOREX_PAIRS, EQUITY_PAIRS, ETF_PAIRS } from '@/utils/instruments';
 import { useUser } from '@/providers/UserProvider';
+import React from 'react';
 
 const useSound = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -100,9 +101,10 @@ const PairFilters = ({ viewMode, setViewMode }: { viewMode: string; setViewMode:
 
 interface PairNavigatorProps {
     isModalOpen?: boolean;
+    onClose?: () => void;
 }
 
-export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
+export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
     const { pairData } = useDashboard();
     const { selectedPairs, togglePair } = useUser();
     const [activeIndex, setActiveIndex] = useState(0);
@@ -112,6 +114,31 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
     const [showRemoveForPair, setShowRemoveForPair] = useState<string | null>(null);
     const [showAddForPair, setShowAddForPair] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+
+    const handlePairClick = useCallback(
+        (pair: string) => {
+            if (!selectedPairs.includes(pair)) {
+                return; // Do nothing if not a favorite
+            }
+
+            // Close the navigation panel first
+            if (onClose) {
+                onClose();
+            }
+
+            // Wait for the panel to close, then scroll to the pair
+            setTimeout(() => {
+                const pairElement = document.querySelector(`[data-pair="${pair}"]`);
+                if (pairElement) {
+                    pairElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center',
+                    });
+                }
+            }, 500); // Increased delay to match the panel transition
+        },
+        [selectedPairs, onClose]
+    );
 
     // Add scroll handler to cancel actions
     useEffect(() => {
@@ -201,7 +228,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
 
     return (
         <div
-            className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-300 ${
+            className={`scrollbar-none fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
                 isModalOpen ? 'h-[175px] lg:hidden' : 'h-[50vh]'
             }`}>
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -215,6 +242,7 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
                     style={{
                         scrollSnapType: 'y mandatory',
                         WebkitOverflowScrolling: 'touch',
+                        scrollBehavior: 'smooth',
                     }}>
                     {/* Top spacer */}
                     <div className='h-[calc(40vh-32px)]' />
@@ -248,13 +276,14 @@ export const PairNavigator = ({ isModalOpen }: PairNavigatorProps) => {
                                     setShowAddForPair={setShowAddForPair}
                                     toggleFavorite={() => togglePair(pair)}
                                     viewMode={viewMode}
-                                    onViewClick={() => {}}
+                                    onViewClick={() => handlePairClick(pair)}
                                     onLongPressReset={() => {}}
                                     style={{
                                         height: '50px',
                                         opacity: activeIndex === index ? 1 : 0.3,
                                         transform: `scale(${activeIndex === index ? 1 : 0.95})`,
                                         transition: 'all 0.2s ease-out',
+                                        cursor: selectedPairs.includes(pair) ? 'pointer' : 'default',
                                     }}
                                 />
                             </div>
@@ -360,10 +389,10 @@ export const PairItem = ({
     setShowAddForPair: (pair: string | null) => void;
     toggleFavorite: () => void;
     viewMode: string;
-    onViewClick: (pair: string) => void;
+    onViewClick: () => void;
     onLongPressReset: () => void;
     style?: React.CSSProperties;
-}) => {
+}): React.ReactElement => {
     const { isPressed, handlers } = useLongPress(() => {
         setTimeout(() => {
             onIndexChange(index);
@@ -379,6 +408,15 @@ export const PairItem = ({
     useEffect(() => {
         setShowAddForPair(null);
     }, [onLongPressReset]);
+
+    const handleClick = () => {
+        if (!showRemove && !showAdd) {
+            onIndexChange(index);
+            if (isFavorite) {
+                onViewClick();
+            }
+        }
+    };
 
     const renderActions = () => {
         if (showRemove) {
@@ -418,7 +456,7 @@ export const PairItem = ({
     return (
         <div
             data-index={index}
-            className={`pair-item relative shrink-0 cursor-pointer touch-none px-2 py-4 transition-all duration-300 select-none ${isPressed ? 'scale-[0.98]' : ''}`}
+            className={`pair-item relative shrink-0 touch-none px-2 py-4 transition-all duration-300 ease-in-out select-none ${isPressed ? 'scale-[0.98]' : ''}`}
             style={{
                 scrollSnapAlign: 'center',
                 WebkitTapHighlightColor: 'transparent',
@@ -426,19 +464,19 @@ export const PairItem = ({
                 userSelect: 'none',
                 touchAction: 'manipulation',
                 WebkitTouchCallout: 'none',
+                cursor: isFavorite ? 'pointer' : 'default',
                 ...style,
             }}
-            onClick={() => !showRemove && !showAdd && onIndexChange(index)}
+            onClick={handleClick}
             {...handlers}>
             <div className='relative z-10 flex flex-col'>
                 <div className='group flex w-full items-center justify-between'>
                     <div className='flex items-baseline gap-2'>
-                        <h3 className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ${isActive ? 'scale-105 text-white' : 'scale-90 text-[#444]'}`}>
-                            {pair.replace('_', '/')}
+                        <h3
+                            className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ease-in-out ${isActive ? 'scale-105 text-white' : 'scale-90 text-[#444]'}`}>
+                            {pair}
                         </h3>
-
                         {currentPrice && <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} isActive={isActive} />}
-
                         {isFavorite && <LuBookmark size={15} className='ml-1 inline-block text-blue-400/70' />}
                     </div>
 
