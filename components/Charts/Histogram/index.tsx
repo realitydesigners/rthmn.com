@@ -79,10 +79,9 @@ const useHistogramData = (
 
     const visibleBoxes = useMemo(() => {
         if (!currentFrame) return [];
-        const totalBoxes = currentFrame.boxes.length;
-        const start = Math.max(0, boxOffset);
-        const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
-        return currentFrame.boxes.slice(start, end);
+
+        // Get visible boxes based on offset
+        return currentFrame.boxes.slice(boxOffset, boxOffset + visibleBoxesCount);
     }, [currentFrame, boxOffset, visibleBoxesCount]);
 
     // Use uniqueFrames for framesWithPoints
@@ -92,10 +91,8 @@ const useHistogramData = (
             const baseFrame = preProcessedData.initialFramesWithPoints[data.findIndex((f) => f.timestamp === slice.timestamp)];
             const isSelected = selectedFrameIndex === data.findIndex((f) => f.timestamp === slice.timestamp);
 
-            const totalBoxes = slice.boxes.length;
-            const start = Math.max(0, boxOffset);
-            const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
-            const visibleBoxes = slice.boxes.slice(start, end);
+            // Get visible boxes based on offset
+            const visibleBoxes = slice.boxes.slice(boxOffset, boxOffset + visibleBoxesCount);
             const positiveBoxesCount = visibleBoxes.filter((box) => box.value > 0).length;
             const negativeBoxesCount = visibleBoxesCount - positiveBoxesCount;
 
@@ -120,98 +117,87 @@ const useHistogramData = (
 
 const HistogramChart: React.FC<{
     data: BoxSlice[];
-    framesWithPoints: ReturnType<typeof useHistogramData>['framesWithPoints'];
     height: number;
+    boxOffset: number;
+    visibleBoxesCount: number;
     onFrameSelect: (frame: BoxSlice | null, index: number | null) => void;
-    renderNestedBoxes: any;
-    onMouseMove: (e: React.MouseEvent<HTMLDivElement>) => void;
-    onMouseLeave: () => void;
-    hoverInfo: any;
-    scrollContainerRef: React.RefObject<HTMLDivElement | null>;
-    onScroll: () => void;
-}> = React.memo(({ data, framesWithPoints, height, onFrameSelect, renderNestedBoxes, onMouseMove, onMouseLeave, hoverInfo, scrollContainerRef, onScroll }) => {
-    // Memoize the hover info component
-    const HoverInfo = useMemo(() => {
-        return ({ x, y, color, linePrice, high, low }: { x: number; y: number; color: string; linePrice: number; high: number; low: number }) => (
-            <div
-                className='pointer-events-none absolute z-1000'
-                style={{
-                    left: `${x}px`,
-                    top: `${y}px`,
-                    transform: 'translate(-50%, -100%)',
-                }}>
-                <div className='shadow-x mb-4 rounded-sm px-2 py-1 text-xs font-bold text-black' style={{ backgroundColor: color }}>
-                    <div>{linePrice}</div>
-                </div>
-            </div>
-        );
-    }, []);
-
+}> = React.memo(({ data, height, boxOffset, visibleBoxesCount, onFrameSelect }) => {
     return (
-        <div className='relative h-full w-full pr-16' onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}>
-            <div ref={scrollContainerRef} className='hide-scrollbar flex h-full w-full items-end overflow-x-auto' onScroll={onScroll}>
-                <div
-                    className='flex h-full'
-                    style={{
-                        width: `${data.length * INITIAL_BAR_WIDTH}px`,
-                    }}>
-                    {framesWithPoints.map((frameWithPoint, index) => {
-                        const { frameData, meetingPointY, sliceWidth } = frameWithPoint;
-                        const prevMeetingPointY = index > 0 ? framesWithPoints[index - 1].meetingPointY : null;
-                        const nextMeetingPointY = index < framesWithPoints.length - 1 ? framesWithPoints[index + 1].meetingPointY : null;
-
-                        return (
-                            <div
-                                key={`${index}`}
-                                className='relative shrink-0 cursor-pointer'
-                                style={{
-                                    width: sliceWidth,
-                                    height: `${height}px`,
-                                }}
-                                onClick={() => onFrameSelect(data[index], index)}>
-                                {renderNestedBoxes(
-                                    frameData.boxArray,
-                                    frameData.isSelected,
-                                    meetingPointY,
-                                    prevMeetingPointY,
-                                    nextMeetingPointY,
-                                    sliceWidth,
-                                    index,
-                                    frameData.price,
-                                    frameData.high,
-                                    frameData.low
-                                )}
-                            </div>
-                        );
-                    })}
+        <div className='relative h-full w-full pr-16'>
+            <div className='hide-scrollbar flex h-full w-full items-end overflow-x-auto'>
+                <div className='flex h-full' style={{ width: `${data.length * INITIAL_BAR_WIDTH}px` }}>
+                    {data.map((frame, index) => (
+                        <div
+                            key={`${index}`}
+                            className='relative shrink-0 cursor-pointer'
+                            style={{ width: INITIAL_BAR_WIDTH, height: `${height}px` }}
+                            onClick={() => onFrameSelect(frame, index)}>
+                            <VerticalFrame boxes={frame.boxes} height={height} boxOffset={boxOffset} visibleBoxesCount={visibleBoxesCount} />
+                        </div>
+                    ))}
                 </div>
             </div>
-            {hoverInfo && (
-                <>
-                    <div
-                        className='pointer-events-none absolute top-0 bottom-0 w-[1px]'
-                        style={{
-                            left: `${hoverInfo.x}px`,
-                            background: hoverInfo.color,
-                            boxShadow: `0 0 5px ${hoverInfo.color}`,
-                        }}
-                    />
-                    <div
-                        className='pointer-events-none absolute h-3 w-3 rounded-full'
-                        style={{
-                            left: `${hoverInfo.x}px`,
-                            top: `${hoverInfo.y}px`,
-                            transform: 'translate(-50%, -50%)',
-                            background: hoverInfo.color,
-                            boxShadow: `0 0 5px ${hoverInfo.color}`,
-                        }}
-                    />
-                    <HoverInfo {...hoverInfo} />
-                </>
-            )}
         </div>
     );
 });
+
+const VerticalFrame: React.FC<{
+    boxes: Box[];
+    height: number;
+    boxOffset: number;
+    visibleBoxesCount: number;
+}> = ({ boxes, height, boxOffset, visibleBoxesCount }) => {
+    const canvasRef = useRef<HTMLCanvasElement>(null);
+
+    const drawCanvas = useCallback(() => {
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d', { alpha: false });
+        if (!ctx) return;
+
+        // Clear background
+        ctx.fillStyle = '#121212';
+        ctx.fillRect(0, 0, INITIAL_BAR_WIDTH, height);
+
+        // Get visible boxes based on offset
+        const visibleBoxes = boxes.slice(boxOffset, boxOffset + visibleBoxesCount);
+        const boxHeight = height / visibleBoxesCount;
+
+        // Draw grid lines
+        ctx.beginPath();
+        ctx.strokeStyle = '#181818';
+        ctx.lineWidth = 0.3;
+        for (let i = 0; i <= visibleBoxesCount; i++) {
+            const y = Math.round(i * boxHeight);
+            ctx.moveTo(0, y);
+            ctx.lineTo(INITIAL_BAR_WIDTH, y);
+        }
+        ctx.stroke();
+
+        // Draw boxes and values
+        visibleBoxes.forEach((box, index) => {
+            const y = Math.round(index * boxHeight);
+
+            // Draw box
+            ctx.fillStyle = box.value > 0 ? 'rgba(34, 255, 231, 0.1)' : 'rgba(255, 110, 134, 0.1)';
+            ctx.fillRect(0, y, INITIAL_BAR_WIDTH, boxHeight);
+
+            // Draw value
+            ctx.fillStyle = box.value > 0 ? '#22FFE7' : '#FF6E86';
+            ctx.font = '8px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(box.value.toString(), INITIAL_BAR_WIDTH / 2, y + boxHeight / 2);
+        });
+    }, [boxes, height, boxOffset, visibleBoxesCount]);
+
+    useEffect(() => {
+        drawCanvas();
+    }, [drawCanvas]);
+
+    return <canvas ref={canvasRef} width={INITIAL_BAR_WIDTH} height={height} className='absolute inset-0' />;
+};
 
 const TimeBar: React.FC<{
     data: BoxSlice[];
@@ -642,18 +628,7 @@ const Histogram: React.FC<{
                     <DraggableBorder isDragging={isDragging} onDragStart={onDragStart} direction='top' />
                     {data && data.length > 0 && (
                         <div className='flex h-full w-full'>
-                            <HistogramChart
-                                data={data}
-                                framesWithPoints={framesWithPoints}
-                                height={height}
-                                onFrameSelect={handleFrameClick}
-                                renderNestedBoxes={renderNestedBoxes}
-                                onMouseMove={handleMouseMove}
-                                onMouseLeave={handleMouseLeave}
-                                hoverInfo={hoverInfo}
-                                scrollContainerRef={scrollContainerRef}
-                                onScroll={handleScroll}
-                            />
+                            <HistogramChart data={data} height={height} boxOffset={boxOffset} visibleBoxesCount={visibleBoxesCount} onFrameSelect={handleFrameClick} />
                             <HistogramControls
                                 boxOffset={boxOffset}
                                 onOffsetChange={onOffsetChange}
