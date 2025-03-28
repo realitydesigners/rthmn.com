@@ -129,7 +129,7 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
         <div className='relative h-full w-full' {...handlers}>
             <div
                 ref={scrollRef}
-                className='scrollbar-none flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'
+                className='scrollbar-hide flex h-full touch-pan-y flex-col overflow-y-scroll scroll-smooth'
                 style={{
                     scrollSnapType: 'y mandatory',
                     scrollPaddingTop: '50%',

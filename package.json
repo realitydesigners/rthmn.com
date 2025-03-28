@@ -5,18 +5,9 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
-        "lint": "next lint",
         "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\" --ignore-path .prettierignore",
-        "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md,html}\" --ignore-path .prettierignore",
-        "prettier-check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,css,scss,md}\"",
-        "stripe:login": "stripe login",
-        "stripe:listen": "stripe listen --forward-to=localhost:3000/api/webhooks",
         "prepare": "bunx husky install",
-        "lint-staged": "lint-staged",
-        "remove-unused": "eslint . --fix --rule 'unused-imports/no-unused-imports: error'",
-        "export-courses": "bun run scripts/exportCourseData.ts",
-        "generate-course": "bun run scripts/generateCourse.ts",
-        "cleanup-courses": "bun run scripts/cleanupCourses.ts"
+        "lint-staged": "lint-staged"
     },
     "dependencies": {
         "@msgpack/msgpack": "^3.0.0-beta2",
