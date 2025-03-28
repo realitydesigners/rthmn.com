@@ -14,6 +14,7 @@ export interface ProcessedBoxData {
                 price: number;
                 high: number;
                 low: number;
+                progressiveValues: number[];
             };
             meetingPointY: number;
             sliceWidth: number;
@@ -35,6 +36,23 @@ export interface ProcessedBoxData {
     };
 }
 
+// Track the previous frame's values for comparison
+let previousFrameValues: number[] = [];
+
+export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
+    // Sort boxes by absolute value
+    const sortedBoxes = [...boxes];
+
+    // First add all negative boxes in ascending order (most negative first)
+    const negativeBoxes = sortedBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
+
+    // Then add all positive boxes in ascending order (smallest to largest)
+    const positiveBoxes = sortedBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
+
+    // Combine the arrays with negatives first, then positives ascending
+    return [...negativeBoxes, ...positiveBoxes];
+};
+
 export function processInitialBoxData(
     processedCandles: { timestamp: number; open: number; high: number; low: number; close: number }[],
     pair: string,
@@ -42,7 +60,9 @@ export function processInitialBoxData(
     defaultHeight: number = 200,
     initialBarWidth: number = 20
 ): ProcessedBoxData {
-    // Process box data
+    // Reset previous values at the start of processing
+    previousFrameValues = [];
+
     const boxCalculator = createBoxCalculator(pair.toUpperCase());
     const boxTimeseriesData = processedCandles.map((candle, index) => {
         const candleSlice = processedCandles.slice(0, index + 1).map((c) => ({
@@ -71,24 +91,32 @@ export function processInitialBoxData(
         };
     });
 
-    // Transform box data for HistogramManager
-    const histogramBoxes = boxTimeseriesData.map((timepoint) => ({
-        timestamp: timepoint.timestamp,
-        boxes: Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
+    const histogramBoxes = boxTimeseriesData.map((timepoint) => {
+        const boxes = Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
             high: Number(data.high),
             low: Number(data.low),
             value: data.value,
-        })),
-        currentOHLC: timepoint.currentOHLC,
-    }));
+        }));
 
-    // Calculate max size once
+        // Process the boxes to get them in the new order
+        const progressiveBoxes = processProgressiveBoxValues(boxes);
+
+        // Get just the values array as a simple array
+        const progressiveValues = Array.from(progressiveBoxes.map((box) => box.value));
+
+        return {
+            timestamp: timepoint.timestamp,
+            boxes,
+            currentOHLC: timepoint.currentOHLC,
+            progressiveValues,
+        };
+    });
+
     const maxSize = histogramBoxes.reduce((max, slice) => {
         const sliceMax = slice.boxes.reduce((boxMax, box) => Math.max(boxMax, Math.abs(box.value)), 0);
         return Math.max(max, sliceMax);
     }, 0);
 
-    // Pre-calculate initial frames data
     const initialFramesWithPoints = histogramBoxes.map((slice, index) => {
         const isSelected = false;
         const boxHeight = defaultHeight / defaultVisibleBoxesCount;
@@ -104,7 +132,6 @@ export function processInitialBoxData(
         const high = Math.max(...visibleBoxes.map((box) => box.high));
         const low = Math.min(...visibleBoxes.map((box) => box.low));
 
-        // Pre-calculate box positions and dimensions for each box
         const boxVisualData = visibleBoxes.map((box, boxIndex) => {
             const y = Math.round(boxIndex * boxHeight);
             const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
@@ -131,6 +158,7 @@ export function processInitialBoxData(
                 price,
                 high,
                 low,
+                progressiveValues: slice.progressiveValues,
             },
             meetingPointY,
             sliceWidth: initialBarWidth,

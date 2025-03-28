@@ -4,6 +4,7 @@ import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
 import AuthClient from './AuthClient';
 import Client from './client';
+import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
 
 interface PageProps {
     params: Promise<{
@@ -46,10 +47,16 @@ export default async function PairPage(props: PageProps) {
     const { processedCandles, initialVisibleData } = processInitialChartData(rawCandleData);
     const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(processedCandles, pair);
 
+    // Process the boxes to get the progressive values
+    const processedBoxes = histogramBoxes.map((frame) => ({
+        ...frame,
+        boxes: processProgressiveBoxValues(frame.boxes),
+    }));
+
     const chartData = {
         processedCandles,
         initialVisibleData,
-        histogramBoxes,
+        histogramBoxes: processedBoxes, // Use the processed boxes instead of original
         histogramPreProcessed,
     };
 
