@@ -4,30 +4,6 @@ import { useColorStore } from '@/stores/colorStore';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useParams } from 'next/navigation';
 
-const GRADIENT_COLORS = {
-    GREEN: {
-        DARK: '#212422',
-        MEDIUM: '#2A2F2B',
-        LIGHT: '#3FFFA2',
-        GRID: '#2F3B33',
-        DOT: '#3FFFA2',
-    },
-    RED: {
-        DARK: '#222221',
-        MEDIUM: '#2A2F2A',
-        LIGHT: '#3FFFA2',
-        GRID: '#2F3B32',
-        DOT: '#3FFFA2',
-    },
-    NEUTRAL: {
-        DARK: '#212422',
-        MEDIUM: '#242624',
-        LIGHT: '#3FFFA2',
-        GRID: '#2A2D2A',
-        DOT: '#3FFFA2',
-    },
-};
-
 const HistogramControls: React.FC<{
     boxOffset: number;
     onOffsetChange: (newOffset: number) => void;
@@ -167,6 +143,7 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
         };
     };
 
+    // Update canvas when frames or container dimensions change
     useEffect(() => {
         const canvas = canvasRef.current;
         if (!canvas || !uniqueFrames.length) return;
@@ -178,13 +155,15 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
         const totalWidth = visibleFrames.length * BOX_WIDTH;
         const boxHeight = containerHeight / VISIBLE_BOXES_COUNT;
 
+        // Ensure canvas size matches the number of frames
         canvas.width = totalWidth;
         canvas.height = containerHeight;
 
-        // Clear canvas
+        // Clear canvas with background color
         ctx.fillStyle = '#121212';
         ctx.fillRect(0, 0, totalWidth, containerHeight);
 
+        // Draw each frame
         visibleFrames.forEach((frame, frameIndex) => {
             const x = frameIndex * BOX_WIDTH;
 
@@ -210,6 +189,8 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
             // Sort and draw boxes
             const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
             const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
+
+            // Sort boxes by sign and value for consistent ordering
             const negativeBoxes = visibleBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
             const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
             const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
@@ -217,6 +198,14 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
             // Find largest box to determine coloring
             const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
             const isLargestPositive = largestBox.value > 0;
+
+            // Add frame index as a tiny label at the bottom of the frame
+            if (boxOffset === 0) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.font = '8px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText(`${frameIndex}`, x + BOX_WIDTH / 2, containerHeight - 2);
+            }
 
             orderedBoxes.forEach((box, boxIndex) => {
                 const currentY = boxIndex * boxHeight;
@@ -264,10 +253,16 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
                 ctx.font = `${fontSize}px monospace`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                const displayValue = box.value.toString();
+                const absValue = Math.abs(box.value);
+                const displayValue = absValue.toString();
                 ctx.fillText(box.value >= 0 ? displayValue : `-${displayValue}`, x + BOX_WIDTH / 2, currentY + boxHeight / 2);
             });
         });
+
+        // Scroll to the latest frame after rendering
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
+        }
     }, [uniqueFrames, boxColors, boxOffset, containerHeight]);
 
     if (!uniqueFrames.length) return null;
