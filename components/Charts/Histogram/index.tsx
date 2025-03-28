@@ -34,6 +34,49 @@ const useHistogramData = (
         return selectedFrame || (data.length > 0 ? data[0] : null);
     }, [selectedFrame, data]);
 
+    // Helper to check if two box arrays are identical
+    const areBoxArraysEqual = useCallback((boxes1: Box[], boxes2: Box[]) => {
+        if (boxes1.length !== boxes2.length) return false;
+        return boxes1.every((box, i) => box.high === boxes2[i].high && box.low === boxes2[i].low && box.value === boxes2[i].value);
+    }, []);
+
+    // Filter out frames with duplicate visible boxes
+    const uniqueFrames = useMemo(() => {
+        if (!data.length) return [];
+
+        const getFrameSignature = (boxes: Box[]) => {
+            // Only use values for comparison, ignore high/low
+            return boxes.map((box) => `${box.value}`).join('|');
+        };
+
+        return data.reduce((acc: BoxSlice[], frame, index) => {
+            const totalBoxes = frame.boxes.length;
+            const start = Math.max(0, boxOffset);
+            const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
+            const currentVisibleBoxes = frame.boxes.slice(start, end);
+
+            // Always include the first frame
+            if (index === 0) {
+                return [frame];
+            }
+
+            // Get previous frame's visible boxes
+            const prevFrame = acc[acc.length - 1];
+            const prevVisibleBoxes = prevFrame.boxes.slice(start, end);
+
+            // Compare only the values
+            const currentSignature = getFrameSignature(currentVisibleBoxes);
+            const prevSignature = getFrameSignature(prevVisibleBoxes);
+
+            // Only add frame if the values are different
+            if (currentSignature !== prevSignature) {
+                return [...acc, frame];
+            }
+
+            return acc;
+        }, []);
+    }, [data, boxOffset, visibleBoxesCount]);
+
     const visibleBoxes = useMemo(() => {
         if (!currentFrame) return [];
         const totalBoxes = currentFrame.boxes.length;
@@ -42,17 +85,13 @@ const useHistogramData = (
         return currentFrame.boxes.slice(start, end);
     }, [currentFrame, boxOffset, visibleBoxesCount]);
 
-    // Use pre-calculated maxSize
-    const maxSize = preProcessedData.maxSize;
-
+    // Use uniqueFrames for framesWithPoints
     const framesWithPoints = useMemo(() => {
         const boxHeight = height / visibleBoxesCount;
-        return data.map((slice, index) => {
-            // Start with pre-processed data
-            const baseFrame = preProcessedData.initialFramesWithPoints[index];
-            const isSelected = index === selectedFrameIndex;
+        return uniqueFrames.map((slice, index) => {
+            const baseFrame = preProcessedData.initialFramesWithPoints[data.findIndex((f) => f.timestamp === slice.timestamp)];
+            const isSelected = selectedFrameIndex === data.findIndex((f) => f.timestamp === slice.timestamp);
 
-            // Only recalculate what's necessary based on current state
             const totalBoxes = slice.boxes.length;
             const start = Math.max(0, boxOffset);
             const end = Math.min(totalBoxes, boxOffset + visibleBoxesCount);
@@ -74,9 +113,9 @@ const useHistogramData = (
                 sliceWidth: isSelected ? ZOOMED_BAR_WIDTH : INITIAL_BAR_WIDTH,
             };
         });
-    }, [data, selectedFrameIndex, height, boxOffset, visibleBoxesCount, preProcessedData.initialFramesWithPoints]);
+    }, [uniqueFrames, data, selectedFrameIndex, height, boxOffset, visibleBoxesCount, preProcessedData.initialFramesWithPoints]);
 
-    return { currentFrame, visibleBoxes, maxSize, framesWithPoints };
+    return { currentFrame, visibleBoxes, maxSize: preProcessedData.maxSize, framesWithPoints };
 };
 
 const HistogramChart: React.FC<{
@@ -320,21 +359,13 @@ const Oscillator: React.FC<{
         if (currentProps === lastDrawnPropsRef.current) return;
         lastDrawnPropsRef.current = currentProps;
 
-        // Create gradient once
-        if (!gradientRef.current) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, colors.DARK);
-            gradient.addColorStop(1, colors.MEDIUM);
-            gradientRef.current = gradient;
-        }
-
-        // Clear and fill background
-        ctx.fillStyle = gradientRef.current;
+        // Clear background
+        ctx.fillStyle = '#121212';
         ctx.fillRect(0, 0, sliceWidth, height);
 
         // Draw grid in a single pass
         ctx.beginPath();
-        ctx.strokeStyle = colors.GRID;
+        ctx.strokeStyle = '#181818';
         ctx.lineWidth = 0.3;
 
         // Draw horizontal grid lines
@@ -344,19 +375,6 @@ const Oscillator: React.FC<{
             ctx.lineTo(sliceWidth, y);
         }
         ctx.stroke();
-
-        // Draw boxes and dots in a single pass
-        boxData.forEach(({ rangeY, rangeHeight, centerX, centerY }) => {
-            // Draw range
-            ctx.fillStyle = colors.MEDIUM;
-            ctx.fillRect(sliceWidth * 0.25, rangeY, sliceWidth * 0.5, rangeHeight);
-
-            // Draw center dot
-            ctx.beginPath();
-            ctx.arc(centerX, centerY, 1, 0, 2 * Math.PI);
-            ctx.fillStyle = colors.DOT;
-            ctx.fill();
-        });
     }, [boxData, colors, height, sliceWidth, visibleBoxesCount, boxHeight]);
 
     // Use RAF for smooth rendering
