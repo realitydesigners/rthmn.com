@@ -10,7 +10,11 @@ interface ExtendedBoxSlice extends Omit<BoxSlice, 'currentOHLC'> {
         low: number;
         close: number;
     };
-    progressiveValues: number[];
+    progressiveValues: {
+        high: number;
+        low: number;
+        value: number;
+    }[];
 }
 
 export interface ProcessedBoxData {
@@ -26,7 +30,11 @@ export interface ProcessedBoxData {
                 price: number;
                 high: number;
                 low: number;
-                progressiveValues: number[];
+                progressiveValues: {
+                    high: number;
+                    low: number;
+                    value: number;
+                }[];
             };
             meetingPointY: number;
             sliceWidth: number;
@@ -35,9 +43,6 @@ export interface ProcessedBoxData {
         defaultHeight: number;
     };
 }
-
-// Track the previous frame's values for comparison
-let previousFrameValues: number[] = [];
 
 export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
     // Sort boxes by absolute value
@@ -87,7 +92,6 @@ export function processInitialBoxData(
     initialBarWidth: number = 20
 ): ProcessedBoxData {
     // Reset previous values at the start of processing
-    previousFrameValues = [];
 
     const boxCalculator = createBoxCalculator(pair.toUpperCase());
     const boxTimeseriesData = processedCandles.map((candle, index) => {
@@ -126,7 +130,12 @@ export function processInitialBoxData(
         }));
 
         const progressiveBoxes = processProgressiveBoxValues(boxes);
-        const progressiveValues = progressiveBoxes.map((box) => box.value);
+        // Store the complete box objects in progressiveValues, not just the numeric values
+        const progressiveValues = progressiveBoxes.map((box) => ({
+            high: box.high,
+            low: box.low,
+            value: box.value,
+        }));
 
         return {
             timestamp: timepoint.timestamp,
@@ -296,7 +305,11 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
             frames.push({
                 ...currentFrame,
                 boxes: newBoxes,
-                progressiveValues: newBoxes.map((box) => box.value),
+                progressiveValues: newBoxes.map((box) => ({
+                    high: box.high,
+                    low: box.low,
+                    value: box.value,
+                })),
             });
 
             // Update the current boxes for the next iteration
@@ -328,7 +341,11 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
             frames.push({
                 ...currentFrame,
                 boxes: newBoxes,
-                progressiveValues: newBoxes.map((box) => box.value),
+                progressiveValues: newBoxes.map((box) => ({
+                    high: box.high,
+                    low: box.low,
+                    value: box.value,
+                })),
             });
 
             // Update the current boxes for the next iteration
@@ -363,7 +380,11 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
         frames.push({
             ...currentFrame,
             boxes: transitionBoxes,
-            progressiveValues: transitionBoxes.map((box) => box.value),
+            progressiveValues: transitionBoxes.map((box) => ({
+                high: box.high,
+                low: box.low,
+                value: box.value,
+            })),
         });
     }
 
