@@ -163,7 +163,7 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
         ctx.fillStyle = '#121212';
         ctx.fillRect(0, 0, totalWidth, containerHeight);
 
-        // Draw each frame
+        // Draw each frame - boxes first
         visibleFrames.forEach((frame, frameIndex) => {
             const x = frameIndex * BOX_WIDTH;
 
@@ -186,11 +186,9 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
             }
             ctx.stroke();
 
-            // Sort and draw boxes
+            // Sort boxes
             const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
             const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
-
-            // Sort boxes by sign and value for consistent ordering
             const negativeBoxes = visibleBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
             const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
             const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
@@ -199,14 +197,7 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
             const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
             const isLargestPositive = largestBox.value > 0;
 
-            // Add frame index as a tiny label at the bottom of the frame
-            if (boxOffset === 0) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.font = '8px monospace';
-                ctx.textAlign = 'center';
-                ctx.fillText(`${frameIndex}`, x + BOX_WIDTH / 2, containerHeight - 2);
-            }
-
+            // Draw boxes and values
             orderedBoxes.forEach((box, boxIndex) => {
                 const currentY = boxIndex * boxHeight;
                 const isPositiveBox = box.value > 0;
@@ -258,6 +249,113 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
                 ctx.fillText(box.value >= 0 ? displayValue : `-${displayValue}`, x + BOX_WIDTH / 2, currentY + boxHeight / 2);
             });
         });
+
+        // Now draw the continuous line on top of all boxes
+        ctx.beginPath();
+
+        // Calculate points for the line based on smallest absolute values
+        const linePoints: { x: number; y: number; isPositive: boolean }[] = [];
+
+        visibleFrames.forEach((frame, frameIndex) => {
+            const x = frameIndex * BOX_WIDTH;
+
+            // Find smallest absolute value box
+            const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+            const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
+            const smallestBox = visibleBoxes[0]; // First one is smallest absolute value
+            const isPositive = smallestBox.value > 0;
+
+            // Find vertical position of this box
+            const negativeBoxes = visibleBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
+            const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
+            const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
+            const boxIndex = orderedBoxes.findIndex((box) => box.value === smallestBox.value);
+
+            // Calculate line Y position
+            const lineY = isPositive
+                ? boxIndex * boxHeight // Top of box for positive
+                : (boxIndex + 1) * boxHeight; // Bottom of box for negative
+
+            // Store points for later use
+            linePoints.push({ x, y: lineY, isPositive });
+        });
+
+        // Determine overall trend (positive/negative) based on the most common trend
+        const positiveCount = linePoints.filter((p) => p.isPositive).length;
+        const negativeCount = linePoints.length - positiveCount;
+        const isOverallPositive = positiveCount >= negativeCount;
+
+        // Draw gradient area fill
+        if (linePoints.length > 0) {
+            // Create a new path for the area
+            ctx.beginPath();
+
+            // Start at the bottom-left for the area
+            ctx.moveTo(linePoints[0].x, containerHeight);
+
+            // Draw line to the first point
+            ctx.lineTo(linePoints[0].x, linePoints[0].y);
+
+            // Draw the top line through all points
+            linePoints.forEach((point, index) => {
+                if (index > 0) {
+                    ctx.lineTo(point.x, point.y);
+                }
+            });
+
+            // Complete the path by drawing to the bottom-right and back to start
+            ctx.lineTo(linePoints[linePoints.length - 1].x + BOX_WIDTH, linePoints[linePoints.length - 1].y);
+            ctx.lineTo(linePoints[linePoints.length - 1].x + BOX_WIDTH, containerHeight);
+            ctx.lineTo(linePoints[0].x, containerHeight);
+
+            // Create gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, containerHeight);
+            if (isOverallPositive) {
+                // Green gradient for positive trend
+                gradient.addColorStop(
+                    0,
+                    `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`
+                );
+                gradient.addColorStop(
+                    1,
+                    `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.05)`
+                );
+            } else {
+                // Red gradient for negative trend
+                gradient.addColorStop(
+                    0,
+                    `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
+                );
+                gradient.addColorStop(
+                    1,
+                    `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.05)`
+                );
+            }
+
+            // Fill with gradient
+            ctx.fillStyle = gradient;
+            ctx.fill();
+        }
+
+        // Now draw the white line on top of the area fill
+        ctx.beginPath();
+        linePoints.forEach((point, index) => {
+            if (index === 0) {
+                ctx.moveTo(point.x, point.y);
+            } else {
+                ctx.lineTo(point.x, point.y);
+            }
+        });
+
+        // Add the final segment to complete the line
+        if (linePoints.length > 0) {
+            ctx.lineTo(linePoints[linePoints.length - 1].x + BOX_WIDTH, linePoints[linePoints.length - 1].y);
+        }
+
+        // Draw the white line
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.stroke();
 
         // Scroll to the latest frame after rendering
         if (scrollContainerRef.current) {

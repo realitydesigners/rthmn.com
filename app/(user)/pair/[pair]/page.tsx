@@ -58,5 +58,5 @@ export default async function PairPage(props: PageProps) {
         return <AuthClient pair={pair} chartData={chartData} />;
     }
 
-    return <Client pair={pair} chartData={chartData} />;
+    return null;
 }

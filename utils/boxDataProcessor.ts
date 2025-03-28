@@ -12,33 +12,6 @@ interface ExtendedBoxSlice {
     }[];
 }
 
-export interface ProcessedBoxData {
-    histogramBoxes: ExtendedBoxSlice[];
-    histogramPreProcessed: {
-        maxSize: number;
-        initialFramesWithPoints: {
-            frameData: {
-                boxArray: Box[];
-                isSelected: boolean;
-                meetingPointY: number;
-                sliceWidth: number;
-                price: number;
-                high: number;
-                low: number;
-                progressiveValues: {
-                    high: number;
-                    low: number;
-                    value: number;
-                }[];
-            };
-            meetingPointY: number;
-            sliceWidth: number;
-        }[];
-        defaultVisibleBoxesCount: number;
-        defaultHeight: number;
-    };
-}
-
 export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
     // Sort boxes by absolute value
     const sortedBoxes = [...boxes];
@@ -85,7 +58,7 @@ export function processInitialBoxData(
     defaultVisibleBoxesCount: number = 8,
     defaultHeight: number = 200,
     initialBarWidth: number = 20
-): ProcessedBoxData {
+) {
     // Reset previous values at the start of processing
 
     const boxCalculator = createBoxCalculator(pair.toUpperCase());
@@ -244,7 +217,6 @@ export function processInitialBoxData(
         },
     };
 }
-
 // Helper function to create intermediate frames when values flip sign or change significantly
 const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: ExtendedBoxSlice): ExtendedBoxSlice[] => {
     // Find values that flipped from positive to negative
