@@ -5,14 +5,23 @@ import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
 import { useDraggableHeight } from '@/hooks/useDraggableHeight';
 import { useSelectedFrame } from '@/hooks/useSelectedFrame';
 import { useUrlParams } from '@/hooks/useUrlParams';
-import { Box, BoxSlice } from '@/types/types';
+import { Box } from '@/types/types';
 import Histogram from '@/components/Charts/Histogram';
 import HistogramSimple from '@/components/Charts/Histogram/HistogramSimple';
+
+interface ExtendedBoxSlice {
+    timestamp: string;
+    progressiveValues: {
+        high: number;
+        low: number;
+        value: number;
+    }[];
+}
 
 interface ChartData {
     processedCandles: ChartDataPoint[];
     initialVisibleData: ChartDataPoint[];
-    histogramBoxes: BoxSlice[];
+    histogramBoxes: ExtendedBoxSlice[];
     histogramPreProcessed: {
         maxSize: number;
         initialFramesWithPoints: {
@@ -35,7 +44,7 @@ interface ChartData {
 
 const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
-    const [histogramData, setHistogramData] = useState<BoxSlice[]>(chartData.histogramBoxes);
+    const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
     const { boxOffset, handleOffsetChange } = useUrlParams(pair);
     const { selectedFrame, selectedFrameIndex, handleFrameSelect } = useSelectedFrame();
     const [visibleBoxesCount, setVisibleBoxesCount] = useState(chartData.histogramPreProcessed.defaultVisibleBoxesCount);
@@ -88,24 +97,16 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                 <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} pair={pair} />
             </div> */}
             <div className='absolute right-0 bottom-0 left-0 z-[2000]'>
-                <HistogramSimple data={histogramData} />
-                {/* <Histogram
-                    data={histogramData}
-                    height={histogramHeight}
-                    boxOffset={boxOffset}
-                    onOffsetChange={handleOffsetChange}
-                    visibleBoxesCount={visibleBoxesCount}
-                    selectedFrame={selectedFrame}
-                    selectedFrameIndex={selectedFrameIndex}
-                    onFrameSelect={handleFrameSelect}
-                    isDragging={isDragging}
-                    onDragStart={handleDragStart}
-                    containerWidth={rthmnVisionDimensions.width}
-                    preProcessedData={{
-                        maxSize: chartData.histogramPreProcessed.maxSize,
-                        initialFramesWithPoints: chartData.histogramPreProcessed.initialFramesWithPoints,
-                    }}
-                /> */}
+                <HistogramSimple
+                    data={histogramData.map((frame) => ({
+                        timestamp: frame.timestamp,
+                        boxes: frame.progressiveValues.map((box) => ({
+                            high: box.high,
+                            low: box.low,
+                            value: box.value,
+                        })),
+                    }))}
+                />
             </div>
         </div>
     );

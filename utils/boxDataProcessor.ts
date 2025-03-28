@@ -3,13 +3,8 @@ import { Box, BoxSlice } from '@/types/types';
 import { BoxSizes } from '@/utils/instruments';
 
 // Extend BoxSlice type to include progressiveValues
-interface ExtendedBoxSlice extends Omit<BoxSlice, 'currentOHLC'> {
-    currentOHLC: {
-        open: number;
-        high: number;
-        low: number;
-        close: number;
-    };
+interface ExtendedBoxSlice {
+    timestamp: string;
     progressiveValues: {
         high: number;
         low: number;
@@ -139,8 +134,6 @@ export function processInitialBoxData(
 
         return {
             timestamp: timepoint.timestamp,
-            boxes: progressiveBoxes,
-            currentOHLC: timepoint.currentOHLC,
             progressiveValues,
         };
     });
@@ -157,19 +150,19 @@ export function processInitialBoxData(
         const prevFrame = processedFrames[processedFrames.length - 1];
 
         // Check for sign changes between frames
-        const prevPositives = prevFrame.boxes.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
-        const currentNegatives = frame.boxes.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
+        const prevPositives = prevFrame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
+        const currentNegatives = frame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
 
-        const prevNegatives = prevFrame.boxes.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
-        const currentPositives = frame.boxes.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
+        const prevNegatives = prevFrame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
+        const currentPositives = frame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
 
         // Find values that switched signs
         const posToNegFlips = prevPositives.filter((value) => currentNegatives.includes(value));
         const negToPosFlips = prevNegatives.filter((value) => currentPositives.includes(value));
 
         // Find values that appeared or disappeared
-        const allPrevValues = prevFrame.boxes.map((box) => box.value);
-        const allCurrentValues = frame.boxes.map((box) => box.value);
+        const allPrevValues = prevFrame.progressiveValues.map((box) => box.value);
+        const allCurrentValues = frame.progressiveValues.map((box) => box.value);
 
         // Values that are in either frame but not both
         const uniqueToPrev = allPrevValues.filter((value) => !allCurrentValues.includes(value));
@@ -179,8 +172,8 @@ export function processInitialBoxData(
         const hasSignificantChanges = posToNegFlips.length > 0 || negToPosFlips.length > 0 || uniqueToPrev.length > 0 || uniqueToCurrent.length > 0;
 
         // Also check if any box values have changed by a significant amount
-        const hasLargeValueChange = prevFrame.boxes.some((prevBox) => {
-            const matchingBox = frame.boxes.find((currBox) => Math.abs(currBox.value) === Math.abs(prevBox.value));
+        const hasLargeValueChange = prevFrame.progressiveValues.some((prevBox) => {
+            const matchingBox = frame.progressiveValues.find((currBox) => Math.abs(currBox.value) === Math.abs(prevBox.value));
             if (!matchingBox) return false;
             return Math.abs(matchingBox.value - prevBox.value) > 1;
         });
@@ -203,13 +196,13 @@ export function processInitialBoxData(
 
     // Calculate maxSize and prepare initialFramesWithPoints
     const maxSize = processedFrames.reduce((max, slice) => {
-        const sliceMax = slice.boxes.reduce((boxMax, box) => Math.max(boxMax, Math.abs(box.value)), 0);
+        const sliceMax = slice.progressiveValues.reduce((boxMax, box) => Math.max(boxMax, Math.abs(box.value)), 0);
         return Math.max(max, sliceMax);
     }, 0);
 
     const initialFramesWithPoints = processedFrames.map((slice) => {
         const boxHeight = defaultHeight / defaultVisibleBoxesCount;
-        const visibleBoxes = slice.boxes.slice(0, defaultVisibleBoxesCount);
+        const visibleBoxes = slice.progressiveValues.slice(0, defaultVisibleBoxesCount);
         const positiveBoxesCount = visibleBoxes.filter((box) => box.value > 0).length;
         const negativeBoxesCount = defaultVisibleBoxesCount - positiveBoxesCount;
 
@@ -223,7 +216,11 @@ export function processInitialBoxData(
 
         return {
             frameData: {
-                boxArray: slice.boxes,
+                boxArray: slice.progressiveValues.map((box) => ({
+                    high: box.high,
+                    low: box.low,
+                    value: box.value,
+                })),
                 isSelected: false,
                 meetingPointY,
                 sliceWidth: initialBarWidth,
@@ -251,12 +248,12 @@ export function processInitialBoxData(
 // Helper function to create intermediate frames when values flip sign or change significantly
 const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: ExtendedBoxSlice): ExtendedBoxSlice[] => {
     // Find values that flipped from positive to negative
-    const prevPositives = prevFrame.boxes.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
-    const currentNegatives = currentFrame.boxes.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
+    const prevPositives = prevFrame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
+    const currentNegatives = currentFrame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
 
     // Find values that flipped from negative to positive
-    const prevNegatives = prevFrame.boxes.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
-    const currentPositives = currentFrame.boxes.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
+    const prevNegatives = prevFrame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
+    const currentPositives = currentFrame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
 
     // Get values that flipped from positive to negative
     const posToNegFlips = prevPositives.filter((value) => currentNegatives.includes(value));
@@ -279,7 +276,7 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
 
     // Create intermediate frames
     const frames: ExtendedBoxSlice[] = [];
-    let currentBoxes = [...prevFrame.boxes];
+    let currentBoxes = [...prevFrame.progressiveValues];
 
     // 1. First handle value flips from positive to negative
     if (posToNegFlips.length > 0) {
@@ -294,8 +291,8 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
                         ...box,
                         value: -box.value,
                         // Use high/low from matching box in current frame
-                        high: currentFrame.boxes.find((b) => Math.abs(b.value) === value)?.high || box.high,
-                        low: currentFrame.boxes.find((b) => Math.abs(b.value) === value)?.low || box.low,
+                        high: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.high || box.high,
+                        low: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.low || box.low,
                     };
                 }
                 return box;
@@ -304,12 +301,7 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
             // Create a new frame with the updated boxes
             frames.push({
                 ...currentFrame,
-                boxes: newBoxes,
-                progressiveValues: newBoxes.map((box) => ({
-                    high: box.high,
-                    low: box.low,
-                    value: box.value,
-                })),
+                progressiveValues: newBoxes,
             });
 
             // Update the current boxes for the next iteration
@@ -330,8 +322,8 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
                         ...box,
                         value: Math.abs(box.value),
                         // Use high/low from matching box in current frame
-                        high: currentFrame.boxes.find((b) => Math.abs(b.value) === value)?.high || box.high,
-                        low: currentFrame.boxes.find((b) => Math.abs(b.value) === value)?.low || box.low,
+                        high: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.high || box.high,
+                        low: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.low || box.low,
                     };
                 }
                 return box;
@@ -340,12 +332,7 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
             // Create a new frame with the updated boxes
             frames.push({
                 ...currentFrame,
-                boxes: newBoxes,
-                progressiveValues: newBoxes.map((box) => ({
-                    high: box.high,
-                    low: box.low,
-                    value: box.value,
-                })),
+                progressiveValues: newBoxes,
             });
 
             // Update the current boxes for the next iteration
@@ -355,7 +342,7 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
 
     // 3. Handle any dramatic box changes that need intermediate frames
     const finalBoxes = [...currentBoxes];
-    const targetBoxes = [...currentFrame.boxes];
+    const targetBoxes = [...currentFrame.progressiveValues];
 
     // Create a transition frame to help smooth any remaining differences
     if (newValues.length > 0 || removedValues.length > 0) {
@@ -379,12 +366,7 @@ const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: Ext
         // Create a transition frame with the merged boxes
         frames.push({
             ...currentFrame,
-            boxes: transitionBoxes,
-            progressiveValues: transitionBoxes.map((box) => ({
-                high: box.high,
-                low: box.low,
-                value: box.value,
-            })),
+            progressiveValues: transitionBoxes,
         });
     }
 
