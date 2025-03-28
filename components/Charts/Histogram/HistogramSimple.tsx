@@ -130,15 +130,41 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
 
-    // Add section color calculation
-    const getFrameSectionColor = (frame: BoxSlice) => {
+    // Update gradient calculation
+    const getFrameGradient = (frame: BoxSlice, ctx: CanvasRenderingContext2D) => {
         const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
         const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
 
-        if (visibleBoxes.length === 0) return 'NEUTRAL';
+        if (visibleBoxes.length === 0) return null;
 
         const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
-        return largestBox.value > 0 ? 'GREEN' : 'RED';
+        const isPositive = largestBox.value > 0;
+        const baseColor = isPositive ? boxColors.positive : boxColors.negative;
+
+        // Create a unique key for this gradient
+        const gradientKey = `${isPositive ? 'pos' : 'neg'}-${containerHeight}`;
+
+        // Create gradient if it doesn't exist
+        if (!gradientRef.current[gradientKey]) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, containerHeight);
+
+            // Convert hex to RGB for manipulation
+            const r = parseInt(baseColor.slice(1, 3), 16);
+            const g = parseInt(baseColor.slice(3, 5), 16);
+            const b = parseInt(baseColor.slice(5, 7), 16);
+
+            // Create gradient from darker to lighter
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
+
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.05)`);
+            gradientRef.current[gradientKey] = gradient;
+        }
+
+        return {
+            gradient: gradientRef.current[gradientKey],
+            baseColor,
+            gridColor: `rgba(${parseInt(baseColor.slice(1, 3), 16)}, ${parseInt(baseColor.slice(3, 5), 16)}, ${parseInt(baseColor.slice(5, 7), 16)}, 0.05)`,
+        };
     };
 
     useEffect(() => {
@@ -162,25 +188,17 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
         visibleFrames.forEach((frame, frameIndex) => {
             const x = frameIndex * BOX_WIDTH;
 
-            // Get section color for this frame
-            const sectionColor = getFrameSectionColor(frame);
-            const colors = GRADIENT_COLORS[sectionColor as keyof typeof GRADIENT_COLORS];
-
-            // Create gradient if it doesn't exist
-            if (!gradientRef.current[sectionColor]) {
-                const gradient = ctx.createLinearGradient(0, 0, 0, containerHeight);
-                gradient.addColorStop(0, colors.DARK);
-                gradient.addColorStop(1, colors.MEDIUM);
-                gradientRef.current[sectionColor] = gradient;
-            }
+            // Get gradient and colors for this frame
+            const colors = getFrameGradient(frame, ctx);
+            if (!colors) return;
 
             // Draw background gradient for this section
-            ctx.fillStyle = gradientRef.current[sectionColor];
+            ctx.fillStyle = colors.gradient;
             ctx.fillRect(x, 0, BOX_WIDTH, containerHeight);
 
             // Draw grid lines
             ctx.beginPath();
-            ctx.strokeStyle = colors.GRID;
+            ctx.strokeStyle = colors.gridColor;
             ctx.lineWidth = 0.3;
             for (let i = 0; i <= VISIBLE_BOXES_COUNT; i++) {
                 const y = Math.round(i * boxHeight);
@@ -196,34 +214,38 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
             const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
             const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
 
+            // Find largest box to determine coloring
+            const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+            const isLargestPositive = largestBox.value > 0;
+
             orderedBoxes.forEach((box, boxIndex) => {
                 const currentY = boxIndex * boxHeight;
-                // Use boxColors from the store for the actual boxes
-                const color = box.value > 0 ? boxColors.positive : boxColors.negative;
-                const opacity = boxColors.styles?.opacity || 0.2;
+                const isPositiveBox = box.value > 0;
 
-                // Draw box background with store colors
-                ctx.fillStyle = `${color}${Math.round(opacity * 255)
-                    .toString(16)
-                    .padStart(2, '0')}`;
+                // Draw box background
+                if (isLargestPositive) {
+                    // If largest is positive, make positive boxes lighter and negative boxes darker
+                    if (isPositiveBox) {
+                        // Lighter positive boxes
+                        ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`;
+                    } else {
+                        // Darker negative boxes
+                        ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 1)`;
+                    }
+                } else {
+                    // If largest is negative, make negative boxes lighter and positive boxes darker
+                    if (isPositiveBox) {
+                        // Darker positive boxes
+                        ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 1)`;
+                    } else {
+                        // Lighter negative boxes
+                        ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+                    }
+                }
                 ctx.fillRect(x, currentY, BOX_WIDTH, boxHeight);
 
-                // Draw borders if enabled in store
-                if (boxColors.styles?.showBorder) {
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = 1;
-                    ctx.beginPath();
-                    ctx.moveTo(x, currentY);
-                    ctx.lineTo(x + BOX_WIDTH, currentY);
-                    ctx.stroke();
-                    ctx.beginPath();
-                    ctx.moveTo(x, currentY + boxHeight);
-                    ctx.lineTo(x + BOX_WIDTH, currentY + boxHeight);
-                    ctx.stroke();
-                }
-
-                // Draw value text with store colors
-                ctx.fillStyle = color;
+                // Draw value text with higher contrast
+                ctx.fillStyle = '#000000';
                 const fontSize = Math.min(10, boxHeight / 3);
                 ctx.font = `${fontSize}px monospace`;
                 ctx.textAlign = 'center';
