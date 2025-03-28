@@ -4,7 +4,6 @@ import { BoxSizes } from '@/utils/instruments';
 
 // Create a Set of valid box sizes for quick lookup
 const validBoxSizes = new Set(BoxSizes);
-
 // Helper function to find the nearest valid box size
 const findNearestBoxSize = (value: number): number => {
     const absValue = Math.abs(value);
@@ -141,10 +140,27 @@ export function processInitialBoxData(
         };
     });
 
-    // Initial deduplication
+    // Improved deduplication that focuses on meaningful changes
     histogramBoxes = histogramBoxes.filter((frame, index) => {
-        if (index === 0) return true;
+        if (index === 0) return true; // Always keep first frame
+
         const prevFrame = histogramBoxes[index - 1];
+
+        // Find the smallest absolute value from both frames
+        const getCurrentSmallestValue = (boxes: Box[]) => {
+            return boxes.reduce((smallest, box) => (Math.abs(box.value) < Math.abs(smallest.value) ? box : smallest));
+        };
+
+        const prevSmallest = getCurrentSmallestValue(prevFrame.boxes);
+        const currentSmallest = getCurrentSmallestValue(frame.boxes);
+
+        // If the smallest values are different, this is a significant change
+        if (prevSmallest.value !== currentSmallest.value) {
+            return true;
+        }
+
+        // If we get here, check if ANY box has changed
+        // This catches cases where larger boxes change while smaller ones remain the same
         return frame.boxes.some((box, boxIndex) => box.value !== prevFrame.boxes[boxIndex].value);
     });
 
@@ -173,8 +189,19 @@ export function processInitialBoxData(
 
         // Add the frame if it represents a meaningful change
         const lastProcessedFrame = processedFrames[processedFrames.length - 1];
+
+        // Get smallest box from both frames
+        const getCurrentSmallestValue = (boxes: Box[]) => {
+            return boxes.reduce((smallest, box) => (Math.abs(box.value) < Math.abs(smallest.value) ? box : smallest));
+        };
+
+        const lastSmallest = getCurrentSmallestValue(lastProcessedFrame.boxes);
+        const currentSmallest = getCurrentSmallestValue(frame.boxes);
+
+        // Only add frame if smallest value changed or there's another significant change
         const hasSignificantChange =
-            !lastProcessedFrame || frame.boxes.some((box, i) => Math.abs(box.value - lastProcessedFrame.boxes[i].value) >= 1 && validBoxSizes.has(Math.abs(box.value)));
+            lastSmallest.value !== currentSmallest.value ||
+            frame.boxes.some((box, i) => Math.abs(box.value - lastProcessedFrame.boxes[i].value) >= 1 && validBoxSizes.has(Math.abs(box.value)));
 
         if (hasSignificantChange) {
             // Ensure all box values are valid before adding
@@ -190,10 +217,25 @@ export function processInitialBoxData(
         }
     }
 
-    // Final deduplication pass
+    // Final deduplication pass focusing on smallest value changes
     const finalFrames = processedFrames.filter((frame, index) => {
         if (index === 0) return true;
         const prevFrame = processedFrames[index - 1];
+
+        // Get smallest box from both frames
+        const getCurrentSmallestValue = (boxes: Box[]) => {
+            return boxes.reduce((smallest, box) => (Math.abs(box.value) < Math.abs(smallest.value) ? box : smallest));
+        };
+
+        const prevSmallest = getCurrentSmallestValue(prevFrame.boxes);
+        const currentSmallest = getCurrentSmallestValue(frame.boxes);
+
+        // Keep frame if smallest value changed
+        if (prevSmallest.value !== currentSmallest.value) {
+            return true;
+        }
+
+        // Or if any other value had a significant change
         return frame.boxes.some((box, boxIndex) => Math.abs(box.value - prevFrame.boxes[boxIndex].value) >= 1);
     });
 
@@ -219,23 +261,6 @@ export function processInitialBoxData(
         const price = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
         const high = Math.max(...visibleBoxes.map((box) => box.high));
         const low = Math.min(...visibleBoxes.map((box) => box.low));
-
-        const boxVisualData = visibleBoxes.map((box, boxIndex) => {
-            const y = Math.round(boxIndex * boxHeight);
-            const rangeHeight = ((box.high - box.low) / (box.high + Math.abs(box.low))) * boxHeight;
-            const rangeY = Math.round(box.value > 0 ? y + boxHeight - rangeHeight : y);
-            const centerX = initialBarWidth / 2;
-            const centerY = Math.round(y + boxHeight / 2);
-
-            return {
-                y,
-                rangeY,
-                rangeHeight,
-                centerX,
-                centerY,
-                value: box.value,
-            };
-        });
 
         return {
             frameData: {

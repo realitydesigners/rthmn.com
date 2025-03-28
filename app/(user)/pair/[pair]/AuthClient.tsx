@@ -7,6 +7,7 @@ import { useSelectedFrame } from '@/hooks/useSelectedFrame';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { Box, BoxSlice } from '@/types/types';
 import Histogram from '@/components/Charts/Histogram';
+import { useColorStore } from '@/stores/colorStore';
 
 interface ChartData {
     processedCandles: ChartDataPoint[];
@@ -35,8 +36,9 @@ interface ChartData {
 const HistogramValues: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const BOX_WIDTH = 35;
-    const BOX_HEIGHT = 20;
+    const HEIGHT_MULTIPLIER = 0.3;
     const MAX_FRAMES = 1000;
+    const { boxColors } = useColorStore();
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -45,53 +47,63 @@ const HistogramValues: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Get last 1000 frames
         const visibleFrames = data.slice(Math.max(0, data.length - MAX_FRAMES));
         console.log('Number of frames after deduplication:', visibleFrames.length);
 
-        // Calculate dimensions
         const totalWidth = visibleFrames.length * BOX_WIDTH;
-        const totalHeight = visibleFrames[0].boxes.length * BOX_HEIGHT;
+        const totalHeight = 800;
 
-        // Set canvas size
         canvas.width = totalWidth;
         canvas.height = totalHeight;
 
-        // Clear canvas with dark background
         ctx.fillStyle = '#121212';
         ctx.fillRect(0, 0, totalWidth, totalHeight);
 
-        // Draw each frame's boxes
         visibleFrames.forEach((frame, frameIndex) => {
-            frame.boxes.forEach((box, boxIndex) => {
-                const x = frameIndex * BOX_WIDTH;
-                const y = boxIndex * BOX_HEIGHT;
+            const x = frameIndex * BOX_WIDTH;
+            let currentY = 0;
 
-                // Draw box background
-                ctx.fillStyle = box.value > 0 ? 'rgba(34, 255, 231, 0.1)' : 'rgba(255, 110, 134, 0.1)';
-                ctx.fillRect(x, y, BOX_WIDTH, BOX_HEIGHT);
+            frame.boxes.forEach((box) => {
+                const height = Math.abs(box.value) * HEIGHT_MULTIPLIER;
+                const color = box.value > 0 ? boxColors.positive : boxColors.negative;
+                const opacity = boxColors.styles?.opacity || 0.2;
+
+                // Draw box background with configured opacity
+                ctx.fillStyle = `${color}${Math.round(opacity * 255)
+                    .toString(16)
+                    .padStart(2, '0')}`;
+                ctx.fillRect(x, currentY, BOX_WIDTH, height);
+
+                if (boxColors.styles?.showBorder) {
+                    // Draw borders with full opacity
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1;
+
+                    // Draw top border
+                    ctx.beginPath();
+                    ctx.moveTo(x, currentY);
+                    ctx.lineTo(x + BOX_WIDTH, currentY);
+                    ctx.stroke();
+
+                    // Draw bottom border
+                    ctx.beginPath();
+                    ctx.moveTo(x, currentY + height);
+                    ctx.lineTo(x + BOX_WIDTH, currentY + height);
+                    ctx.stroke();
+                }
 
                 // Draw value text
-                ctx.fillStyle = box.value > 0 ? '#22FFE7' : '#FF6E86';
+                ctx.fillStyle = color;
                 ctx.font = '8px monospace';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-
-                // Preserve trailing zeros by padding the number to match the box size pattern
                 const displayValue = box.value.toString();
+                ctx.fillText(box.value >= 0 ? displayValue : `-${displayValue}`, x + BOX_WIDTH / 2, currentY + height / 2);
 
-                // Adjust font size if the text is too wide
-                const textWidth = ctx.measureText(displayValue).width;
-                if (textWidth > BOX_WIDTH - 4) {
-                    const newFontSize = Math.floor(((BOX_WIDTH - 4) * 8) / textWidth);
-                    ctx.font = `8px monospace`;
-                }
-
-                // Draw the value with proper sign
-                ctx.fillText(box.value >= 0 ? displayValue : `-${displayValue}`, x + BOX_WIDTH / 2, y + BOX_HEIGHT / 2);
+                currentY += height;
             });
         });
-    }, [data]);
+    }, [data, boxColors]);
 
     if (!data.length) return null;
 
