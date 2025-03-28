@@ -121,134 +121,38 @@ export function processInitialBoxData(
         };
     });
 
-    // First create base histogram boxes with initial deduplication
-    let histogramBoxes = boxTimeseriesData.map((timepoint) => {
-        const boxes = Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
+    // Process initial frames with progressive values
+    let processedFrames: BoxSlice[] = [];
+
+    boxTimeseriesData.forEach((frame, index) => {
+        const boxes = Object.entries(frame.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
             high: Number(data.high),
             low: Number(data.low),
             value: data.value,
         }));
 
-        const progressiveBoxes = processProgressiveBoxValues(boxes);
-        const progressiveValues = Array.from(progressiveBoxes.map((box) => box.value));
-
-        return {
-            timestamp: timepoint.timestamp,
-            boxes: progressiveBoxes,
-            currentOHLC: timepoint.currentOHLC,
-            progressiveValues,
+        const currentFrame = {
+            ...frame,
+            boxes: processProgressiveBoxValues(boxes),
+            progressiveValues: boxes.map((box) => box.value),
         };
+
+        if (index === 0) {
+            processedFrames.push(currentFrame);
+        } else {
+            // Create intermediate frames when needed
+            const intermediateFrames = createIntermediateFrames(processedFrames[processedFrames.length - 1], currentFrame);
+            processedFrames.push(...intermediateFrames);
+        }
     });
 
-    // Improved deduplication that focuses on meaningful changes
-    histogramBoxes = histogramBoxes.filter((frame, index) => {
-        if (index === 0) return true; // Always keep first frame
-
-        const prevFrame = histogramBoxes[index - 1];
-
-        // Find the smallest absolute value from both frames
-        const getCurrentSmallestValue = (boxes: Box[]) => {
-            return boxes.reduce((smallest, box) => (Math.abs(box.value) < Math.abs(smallest.value) ? box : smallest));
-        };
-
-        const prevSmallest = getCurrentSmallestValue(prevFrame.boxes);
-        const currentSmallest = getCurrentSmallestValue(frame.boxes);
-
-        // If the smallest values are different, this is a significant change
-        if (prevSmallest.value !== currentSmallest.value) {
-            return true;
-        }
-
-        // If we get here, check if ANY box has changed
-        // This catches cases where larger boxes change while smaller ones remain the same
-        return frame.boxes.some((box, boxIndex) => box.value !== prevFrame.boxes[boxIndex].value);
-    });
-
-    // Process frames with improved smoothing and deduplication
-    const processedFrames: ExtendedBoxSlice[] = [];
-    let lastFrame: ExtendedBoxSlice | null = null;
-
-    for (const frame of histogramBoxes) {
-        if (!lastFrame) {
-            processedFrames.push(frame);
-            lastFrame = frame;
-            continue;
-        }
-
-        // Check if box values have changed
-        const valueChanges = frame.boxes
-            .map((box, index) => ({
-                boxIndex: index,
-                prevValue: lastFrame!.boxes[index].value,
-                newValue: box.value,
-                difference: box.value - lastFrame!.boxes[index].value,
-            }))
-            .filter((change) => change.difference !== 0);
-
-        if (valueChanges.length === 0) continue;
-
-        // Add the frame if it represents a meaningful change
-        const lastProcessedFrame = processedFrames[processedFrames.length - 1];
-
-        // Get smallest box from both frames
-        const getCurrentSmallestValue = (boxes: Box[]) => {
-            return boxes.reduce((smallest, box) => (Math.abs(box.value) < Math.abs(smallest.value) ? box : smallest));
-        };
-
-        const lastSmallest = getCurrentSmallestValue(lastProcessedFrame.boxes);
-        const currentSmallest = getCurrentSmallestValue(frame.boxes);
-
-        // Only add frame if smallest value changed or there's another significant change
-        const hasSignificantChange =
-            lastSmallest.value !== currentSmallest.value ||
-            frame.boxes.some((box, i) => Math.abs(box.value - lastProcessedFrame.boxes[i].value) >= 1 && validBoxSizes.has(Math.abs(box.value)));
-
-        if (hasSignificantChange) {
-            // Ensure all box values are valid before adding
-            const validatedFrame = {
-                ...frame,
-                boxes: frame.boxes.map((box) => ({
-                    ...box,
-                    value: findNearestBoxSize(box.value),
-                })),
-            };
-            processedFrames.push(validatedFrame);
-            lastFrame = validatedFrame;
-        }
-    }
-
-    // Final deduplication pass focusing on smallest value changes
-    const finalFrames = processedFrames.filter((frame, index) => {
-        if (index === 0) return true;
-        const prevFrame = processedFrames[index - 1];
-
-        // Get smallest box from both frames
-        const getCurrentSmallestValue = (boxes: Box[]) => {
-            return boxes.reduce((smallest, box) => (Math.abs(box.value) < Math.abs(smallest.value) ? box : smallest));
-        };
-
-        const prevSmallest = getCurrentSmallestValue(prevFrame.boxes);
-        const currentSmallest = getCurrentSmallestValue(frame.boxes);
-
-        // Keep frame if smallest value changed
-        if (prevSmallest.value !== currentSmallest.value) {
-            return true;
-        }
-
-        // Or if any other value had a significant change
-        return frame.boxes.some((box, boxIndex) => Math.abs(box.value - prevFrame.boxes[boxIndex].value) >= 1);
-    });
-
-    // Use final frames for the rest
-    histogramBoxes = finalFrames;
-
-    const maxSize = histogramBoxes.reduce((max, slice) => {
+    // Calculate maxSize and prepare initialFramesWithPoints
+    const maxSize = processedFrames.reduce((max, slice) => {
         const sliceMax = slice.boxes.reduce((boxMax, box) => Math.max(boxMax, Math.abs(box.value)), 0);
         return Math.max(max, sliceMax);
     }, 0);
 
-    const initialFramesWithPoints = histogramBoxes.map((slice, index) => {
-        const isSelected = false;
+    const initialFramesWithPoints = processedFrames.map((slice) => {
         const boxHeight = defaultHeight / defaultVisibleBoxesCount;
         const visibleBoxes = slice.boxes.slice(0, defaultVisibleBoxesCount);
         const positiveBoxesCount = visibleBoxes.filter((box) => box.value > 0).length;
@@ -257,21 +161,16 @@ export function processInitialBoxData(
         const totalNegativeHeight = negativeBoxesCount * boxHeight;
         const meetingPointY = totalNegativeHeight + (defaultHeight - totalNegativeHeight - positiveBoxesCount * boxHeight) / 2;
 
-        const smallestBox = visibleBoxes.reduce((smallest, current) => (Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest));
-        const price = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
-        const high = Math.max(...visibleBoxes.map((box) => box.high));
-        const low = Math.min(...visibleBoxes.map((box) => box.low));
-
         return {
             frameData: {
                 boxArray: slice.boxes,
-                isSelected,
+                isSelected: false,
                 meetingPointY,
                 sliceWidth: initialBarWidth,
-                price,
-                high,
-                low,
-                progressiveValues: slice.progressiveValues,
+                price: slice.currentOHLC.close,
+                high: slice.currentOHLC.high,
+                low: slice.currentOHLC.low,
+                progressiveValues: slice.boxes.map((box) => box.value),
             },
             meetingPointY,
             sliceWidth: initialBarWidth,
@@ -279,7 +178,7 @@ export function processInitialBoxData(
     });
 
     return {
-        histogramBoxes,
+        histogramBoxes: processedFrames,
         histogramPreProcessed: {
             maxSize,
             initialFramesWithPoints,
@@ -288,3 +187,53 @@ export function processInitialBoxData(
         },
     };
 }
+const createIntermediateFrames = (prevFrame: BoxSlice, currentFrame: BoxSlice): BoxSlice[] => {
+    const frames: BoxSlice[] = [];
+
+    // Sort boxes by absolute value
+    const prevBoxes = [...prevFrame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+    const currentBoxes = [...currentFrame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+
+    // Find boxes that flipped from positive to negative or vice versa
+    const flippedBoxes = prevBoxes.filter((prevBox) => {
+        const matchingCurrentBox = currentBoxes.find(
+            (currentBox) => Math.abs(currentBox.value) === Math.abs(prevBox.value) && Math.sign(currentBox.value) !== Math.sign(prevBox.value)
+        );
+        return matchingCurrentBox !== undefined;
+    });
+
+    if (flippedBoxes.length === 0) {
+        return [currentFrame];
+    }
+
+    // Create intermediate frames for each flip
+    let intermediateBoxes = [...prevBoxes];
+
+    flippedBoxes.forEach((flippedBox) => {
+        // Create new frame with this box flipped
+        const newBoxes = intermediateBoxes.map((box) => {
+            if (Math.abs(box.value) === Math.abs(flippedBox.value)) {
+                // Flip the sign
+                return {
+                    ...box,
+                    value: -box.value,
+                    high: currentBoxes.find((b) => Math.abs(b.value) === Math.abs(box.value))?.high || box.high,
+                    low: currentBoxes.find((b) => Math.abs(b.value) === Math.abs(box.value))?.low || box.low,
+                };
+            }
+            return box;
+        });
+
+        frames.push({
+            ...currentFrame,
+            boxes: newBoxes,
+        });
+
+        intermediateBoxes = newBoxes;
+    });
+
+    // Add the final frame
+    frames.push(currentFrame);
+
+    return frames;
+};

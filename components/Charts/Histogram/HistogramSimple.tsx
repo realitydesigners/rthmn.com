@@ -244,6 +244,20 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
                 }
                 ctx.fillRect(x, currentY, BOX_WIDTH, boxHeight);
 
+                if (boxColors.styles?.showBorder) {
+                    const currentColor = isLargestPositive ? boxColors.positive : boxColors.negative;
+                    ctx.strokeStyle = `rgba(${parseInt(currentColor.slice(1, 3), 16)}, ${parseInt(currentColor.slice(3, 5), 16)}, ${parseInt(currentColor.slice(5, 7), 16)}, ${isPositiveBox === isLargestPositive ? 0.2 : 1})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(x, currentY);
+                    ctx.lineTo(x + BOX_WIDTH, currentY);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(x, currentY + boxHeight);
+                    ctx.lineTo(x + BOX_WIDTH, currentY + boxHeight);
+                    ctx.stroke();
+                }
+
                 // Draw value text with higher contrast
                 ctx.fillStyle = '#000000';
                 const fontSize = Math.min(10, boxHeight / 3);
