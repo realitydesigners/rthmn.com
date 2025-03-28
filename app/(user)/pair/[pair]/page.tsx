@@ -4,6 +4,7 @@ import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
 import AuthClient from './AuthClient';
 import Client from './client';
+import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
 
 interface PageProps {
     params: Promise<{
@@ -57,5 +58,5 @@ export default async function PairPage(props: PageProps) {
         return <AuthClient pair={pair} chartData={chartData} />;
     }
 
-    return <Client pair={pair} chartData={chartData} />;
+    return null;
 }
