@@ -10,6 +10,12 @@ interface ExtendedBoxSlice {
         low: number;
         value: number;
     }[];
+    currentOHLC: {
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+    };
 }
 
 export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
@@ -108,6 +114,7 @@ export function processInitialBoxData(
         return {
             timestamp: timepoint.timestamp,
             progressiveValues,
+            currentOHLC: timepoint.currentOHLC,
         };
     });
 

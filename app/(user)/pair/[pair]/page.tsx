@@ -3,7 +3,7 @@ import { processInitialChartData } from '@/utils/chartDataProcessor';
 import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
 import AuthClient from './AuthClient';
-import Client from './client';
+
 import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
 
 interface PageProps {

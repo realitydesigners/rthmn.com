@@ -358,7 +358,7 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
 
     return (
         <div className='relative flex w-full flex-col'>
-            <div ref={containerRef} className='relative flex h-[200px] w-full bg-[#121212]'>
+            <div ref={containerRef} className='relative flex h-[200px] w-full'>
                 <div ref={scrollContainerRef} className='flex h-full w-full overflow-auto'>
                     <canvas ref={canvasRef} className='block pr-20' />
                     <HistogramControls
