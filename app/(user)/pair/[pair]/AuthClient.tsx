@@ -64,6 +64,9 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
 
+    // Add state for box visibility filter
+    const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
+
     // Convert pair to uppercase for consistency with pairData keys
     const uppercasePair = pair.toUpperCase();
     const currentPrice = priceData[uppercasePair]?.price;
@@ -105,6 +108,8 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     // console.log('candleData', candleData);
     // console.log(filteredBoxSlice);
 
+    console.log(histogramData, '    histogramData');
+
     return (
         <div className='flex h-screen w-full flex-col bg-[#0a0a0a] pt-14'>
             {/* Main Content Area */}
@@ -134,6 +139,26 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
                             <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
                         </div>
+
+                        {/* Add Visibility Toggle Buttons */}
+                        <div className='mb-2 flex justify-end gap-2'>
+                            <button
+                                onClick={() => setBoxVisibilityFilter('all')}
+                                className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                                All Boxes
+                            </button>
+                            <button
+                                onClick={() => setBoxVisibilityFilter('positive')}
+                                className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'positive' ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                                Positive Boxes
+                            </button>
+                            <button
+                                onClick={() => setBoxVisibilityFilter('negative')}
+                                className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'negative' ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                                Negative Boxes
+                            </button>
+                        </div>
+
                         <div className='relative min-h-[500px] w-full flex-1'>
                             <CandleChart
                                 candles={candleData}
@@ -146,6 +171,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     boxes: frame.progressiveValues,
                                     currentOHLC: frame.currentOHLC,
                                 }))}
+                                boxVisibilityFilter={boxVisibilityFilter}
                             />
                         </div>
                     </div>
