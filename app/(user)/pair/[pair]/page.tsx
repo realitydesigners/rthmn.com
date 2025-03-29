@@ -44,8 +44,12 @@ export default async function PairPage(props: PageProps) {
     }
 
     const rawCandleData = await fetchApiData(pair, session.data.session.access_token);
+
+    // Process chart data only if needed for charting
     const { processedCandles, initialVisibleData } = processInitialChartData(rawCandleData);
-    const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(processedCandles, pair);
+
+    // Use raw candle data directly for box calculations
+    const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(rawCandleData, pair);
 
     const chartData = {
         processedCandles,
