@@ -13,7 +13,7 @@ interface PageProps {
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 1000;
+    const CANDLE_LIMIT = 800; // bug where if i render 1000 candles on candle chart it stetchse tghe chart but if less the visibel amount is good
     const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}`, {
         headers: {
             Authorization: `Bearer ${token}`,

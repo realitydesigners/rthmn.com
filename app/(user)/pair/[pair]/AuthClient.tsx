@@ -102,6 +102,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         };
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
+    console.log('candleData', candleData);
     console.log(filteredBoxSlice);
 
     return (
