@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { ChartDataPoint } from '@/components/Charts/CandleChart';
 import { Box, BoxSlice } from '@/types/types';
 import { PairResoBox } from '@/app/(user)/dashboard/PairResoBox';
@@ -9,6 +9,9 @@ import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
 import HistogramSimple from '@/components/Charts/Histogram/HistogramSimple';
 import { useDashboard } from '@/providers/DashboardProvider/client';
+import { ResoBox } from '@/components/Charts/ResoBox';
+import { useTimeframeStore } from '@/stores/timeframeStore';
+import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
 
 interface ExtendedBoxSlice {
     timestamp: string;
@@ -49,90 +52,98 @@ interface ChartData {
     };
 }
 
-interface PriceStats {
-    dailyHigh: number;
-    dailyLow: number;
-    dailyChange: number;
-    dailyChangePercent: number;
-}
-
 const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
     const { pairData, isLoading } = useDashboard();
     const { priceData } = useWebSocket();
     const { boxColors } = useUser();
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
+    const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
+    const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
+    const initializePair = useTimeframeStore((state) => state.initializePair);
 
     // Convert pair to uppercase for consistency with pairData keys
     const uppercasePair = pair.toUpperCase();
-
-    // Debug logs
-    useEffect(() => {
-        console.log('Pair (uppercase):', uppercasePair);
-        console.log('PairData:', pairData);
-        console.log('Box data for pair:', pairData[uppercasePair]);
-        console.log('Box slice being passed:', pairData[uppercasePair]?.boxes?.[0]);
-    }, [uppercasePair, pairData]);
-
-    const [priceStats, setPriceStats] = useState<PriceStats>({
-        dailyHigh: 0,
-        dailyLow: 0,
-        dailyChange: 0,
-        dailyChangePercent: 0,
-    });
-
-    // Calculate price statistics
-    useEffect(() => {
-        if (chartData.processedCandles.length > 0) {
-            const last24Hours = chartData.processedCandles.slice(-24);
-            const high = Math.max(...last24Hours.map((c) => c.high));
-            const low = Math.min(...last24Hours.map((c) => c.low));
-            const openPrice = last24Hours[0].open;
-            const currentPrice = priceData[uppercasePair]?.price || last24Hours[last24Hours.length - 1].close;
-            const change = currentPrice - openPrice;
-            const changePercent = (change / openPrice) * 100;
-
-            setPriceStats({
-                dailyHigh: high,
-                dailyLow: low,
-                dailyChange: change,
-                dailyChangePercent: changePercent,
-            });
-        }
-    }, [chartData.processedCandles, priceData, uppercasePair]);
-
     const currentPrice = priceData[uppercasePair]?.price;
+    const boxSlice = pairData[uppercasePair]?.boxes?.[0];
+
+    // Initialize timeframe settings for this pair when component mounts
+    useEffect(() => {
+        if (pair) {
+            initializePair(pair);
+        }
+    }, [pair, initializePair]);
+
+    const handleTimeframeChange = useCallback(
+        (property: string, value: number | boolean) => {
+            if (pair) {
+                updatePairSettings(pair, { [property]: value });
+            }
+        },
+        [pair, updatePairSettings]
+    );
+
+    // Memoize the filtered boxes based on timeframe settings
+    const filteredBoxSlice = useMemo(() => {
+        if (!boxSlice?.boxes) {
+            console.log('No boxes available:', { boxSlice });
+            return undefined;
+        }
+        const filtered = {
+            ...boxSlice,
+            boxes: boxSlice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
+        };
+        console.log('Filtered boxes:', {
+            boxCount: filtered.boxes.length,
+            startIndex: settings.startIndex,
+            maxBoxCount: settings.maxBoxCount,
+        });
+        return filtered;
+    }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
+
+    // Debug data availability
+    useEffect(() => {
+        console.log('Data check:', {
+            hasPairData: !!pairData[uppercasePair],
+            hasBoxes: !!pairData[uppercasePair]?.boxes,
+            boxCount: pairData[uppercasePair]?.boxes?.[0]?.boxes?.length,
+            isLoading,
+        });
+    }, [pairData, uppercasePair, isLoading]);
 
     return (
         <div className='flex h-screen w-full flex-col bg-[#0a0a0a] pt-14'>
             {/* Header Section */}
 
             {/* Main Content Area */}
-            <div className='relative flex flex-1'>
+            <div className='relative flex w-full flex-wrap'>
                 {/* Side Panel - PairResoBox */}
-                <div className='h-[calc(100%-300px)] w-[300px] border-r border-[#222] p-4'>
-                    <PairResoBox
-                        pair={uppercasePair}
-                        boxSlice={pairData[uppercasePair]?.boxes?.[0]}
-                        boxColors={boxColors}
-                        isLoading={isLoading || !pairData[uppercasePair]?.boxes?.[0]}
-                    />
+                <div className='h-full w-1/4 border-r border-[#222] p-4'>
+                    <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
+                        <div className='relative aspect-square min-h-[400px] flex-1'>
+                            {filteredBoxSlice && boxColors && (
+                                <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                            )}
+                        </div>
+
+                        {/* Timeframe Control */}
+                        {boxSlice?.boxes && (
+                            <div className='mt-4 h-16 w-full'>
+                                <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Main Chart Area */}
-                <div className='h-[calc(100%-300px)] flex-1'>
-                    <div className='h-full p-4'>
-                        <div className='h-full rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-1'>
-                            <div className='flex items-center gap-6'>
-                                <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
-                                <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
-                            </div>
-                            <div className='flex h-full items-center justify-center text-gray-500'>Main Chart Area</div>
-                        </div>
+                <div className='h-full w-3/4 p-4'>
+                    <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
+                        <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
+                        <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
                     </div>
                 </div>
 
                 {/* Histogram Section */}
-                <div className='absolute right-0 bottom-0 left-0 h-[300px]'>
+                <div className='relative right-0 bottom-0 left-0 h-[300px]'>
                     <HistogramSimple
                         data={histogramData.map((frame) => ({
                             timestamp: frame.timestamp,
