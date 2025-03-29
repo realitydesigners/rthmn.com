@@ -3,7 +3,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatTime } from '@/utils/dateUtils';
 import { INSTRUMENTS } from '@/utils/instruments';
-import { BoxColors, useColorStore } from '@/stores/colorStore';
+import { useColorStore } from '@/stores/colorStore';
 
 interface ChartDataResult {
     visibleData: ChartDataPoint[];
@@ -34,7 +34,6 @@ export const useChartData = (data: ChartDataPoint[], scrollLeft: number, chartWi
 
         // Calculate how many points can fit in the visible area
         const pointWidth = Math.max(2, chartWidth / visiblePoints); // Ensure minimum width of 2px per point
-        const visiblePointCount = Math.floor(chartWidth / pointWidth);
 
         const RIGHT_MARGIN = chartWidth * 0.1;
         const totalWidth = chartWidth + RIGHT_MARGIN;
@@ -197,7 +196,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
 
     // Get the timestamp of the most recent candle
     const lastCandleTime = data[data.length - 1].timestamp;
-    const oneHourAgo = lastCandleTime - 60 * 60 * 1000;
+    const oneHourAgo = lastCandleTime - 60 * 120 * 1000;
 
     // Create a map of timestamp to candle data for scaling
     const candleMap = new Map(data.map((point) => [point.timestamp, point]));

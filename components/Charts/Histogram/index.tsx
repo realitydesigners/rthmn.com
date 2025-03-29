@@ -1,23 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-// Remove BoxSlice import if not used elsewhere, otherwise keep it
-// import { BoxSlice } from '@/types/types';
-import { Box } from '@/types/types'; // Assuming Box has { high, low, value }
-import { BoxColors } from '@/stores/colorStore'; // Assuming this provides { positive: string, negative: string }
-import { BoxSizes } from '@/utils/instruments'; // Import BoxSizes
-// Remove the import for the separate file
-// import { drawBoxTimelineLine } from './BoxTimelineLine';
-
-// Define the expected shape of the data items passed in the data prop
-interface BoxTimelineFrame {
-    timestamp: string; // Or number if that's what histogramData uses
-    progressiveValues: Box[];
-    // Add other properties if they exist on histogramData items, e.g., currentOHLC
-}
+import React, { useEffect, useRef, useState } from 'react';
+import { Box } from '@/types/types';
+import { BoxColors } from '@/stores/colorStore';
+import { BoxSizes } from '@/utils/instruments';
 
 interface BoxTimelineProps {
-    data: BoxTimelineFrame[]; // Use the correct frame type
+    data: { timestamp: string; progressiveValues: Box[] }[];
     boxOffset: number;
     visibleBoxesCount: number;
     boxVisibilityFilter: 'all' | 'positive' | 'negative';
@@ -31,20 +20,16 @@ interface BoxTimelineProps {
 // Define the findNearestBoxSize helper function locally
 const findNearestBoxSize = (value: number): number => {
     const absValue = Math.abs(value);
-    // Find the closest absolute size in BoxSizes
     let nearest = BoxSizes.reduce((prev, curr) => {
         return Math.abs(curr - absValue) < Math.abs(prev - absValue) ? curr : prev;
     });
-    // Return the nearest size, preserving the original sign
+
     return value >= 0 ? nearest : -nearest;
 };
 
-const BOX_WIDTH = 15; // Width of each timestamp column
-const BOX_HEIGHT = 15; // Height of each box cell
 const MAX_FRAMES = 1000; // Limit drawn frames for performance
-const FONT_SIZE = 8;
 
-const BoxTimeline: React.FC<BoxTimelineProps> = ({
+const Histogram: React.FC<BoxTimelineProps> = ({
     data,
     boxOffset,
     visibleBoxesCount,
@@ -76,8 +61,7 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         setIsClient(true);
     }, []);
 
-    // Add the getFrameSignature function
-    const getFrameSignature = (frame: BoxTimelineFrame) => {
+    const getFrameSignature = (frame: { timestamp: string; progressiveValues: Box[] }) => {
         const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
         const negativeBoxes = slicedBoxes
             .filter((box) => box.value < 0)
@@ -375,4 +359,4 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
     );
 };
 
-export default BoxTimeline;
+export default Histogram;

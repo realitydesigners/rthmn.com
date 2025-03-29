@@ -15,7 +15,7 @@ import { useDashboard } from '@/providers/DashboardProvider/client';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
-import BoxTimeline from '@/components/Charts/BoxTimeline';
+import Histogram from '@/components/Charts/Histogram';
 
 interface ExtendedBoxSlice {
     timestamp: string;
@@ -36,27 +36,9 @@ interface ChartData {
     processedCandles: ChartDataPoint[];
     initialVisibleData: ChartDataPoint[];
     histogramBoxes: ExtendedBoxSlice[];
-    histogramPreProcessed: {
-        maxSize: number;
-        initialFramesWithPoints: {
-            frameData: {
-                boxArray: Box[];
-                isSelected: boolean;
-                meetingPointY: number;
-                sliceWidth: number;
-                price: number;
-                high: number;
-                low: number;
-            };
-            meetingPointY: number;
-            sliceWidth: number;
-        }[];
-        defaultVisibleBoxesCount: number;
-        defaultHeight: number;
-    };
 }
 
-const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
+const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
     const { pairData, isLoading } = useDashboard();
     const { priceData } = useWebSocket();
     const { boxColors } = useUser();
@@ -212,14 +194,13 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                     {/* Added height and bottom border */}
                     <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
                         {boxColors && histogramData && (
-                            <BoxTimeline
+                            <Histogram
                                 data={histogramData}
                                 boxOffset={settings.startIndex}
                                 visibleBoxesCount={settings.maxBoxCount}
                                 boxVisibilityFilter={boxVisibilityFilter}
                                 boxColors={boxColors}
-                                className='h-full' // Ensure it fills its container
-                                // --- Pass hover state down ---
+                                className='h-full'
                                 hoveredTimestamp={hoveredTimestamp}
                                 onHoverChange={handleHoverChange}
                             />
@@ -231,4 +212,4 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     );
 };
 
-export default React.memo(AuthClient);
+export default React.memo(PairClient);

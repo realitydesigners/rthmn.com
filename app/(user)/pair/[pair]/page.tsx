@@ -2,7 +2,7 @@ import { processInitialBoxData } from '@/utils/boxDataProcessor';
 import { processInitialChartData } from '@/utils/chartDataProcessor';
 import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
-import AuthClient from './AuthClient';
+import PairClient from './client';
 
 interface PageProps {
     params: Promise<{
@@ -11,7 +11,7 @@ interface PageProps {
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 70;
+    const CANDLE_LIMIT = 60;
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min`, {
             headers: {
@@ -35,10 +35,7 @@ async function fetchApiData(pair: string, token: string) {
                     // If already a Unix timestamp, return as is
                     return timestamp;
                 }
-                // If timestamp includes 'Z' or timezone offset, parse as ISO
-                if (timestamp.includes('Z') || timestamp.includes('+')) {
-                    return new Date(timestamp).getTime();
-                }
+
                 // If timestamp is in format "YYYY-MM-DD HH:mm:ss", assume UTC
                 return new Date(timestamp.replace(' ', 'T') + 'Z').getTime();
             };
@@ -51,7 +48,6 @@ async function fetchApiData(pair: string, token: string) {
                 high: Number(candle.high),
                 low: Number(candle.low),
                 open: Number(candle.open),
-                volume: 0,
             };
         });
 
@@ -96,7 +92,7 @@ export default async function PairPage(props: PageProps) {
     };
 
     if (hasSubscription) {
-        return <AuthClient pair={pair} chartData={chartData} />;
+        return <PairClient pair={pair} chartData={chartData} />;
     }
 
     return null;
