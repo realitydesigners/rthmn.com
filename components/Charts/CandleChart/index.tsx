@@ -155,9 +155,6 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
         return isVisible;
     });
 
-    // Log the number of rendered candles vs total
-    console.log('Rendered candles:', visibleCandles.length, 'of', data.length);
-
     return (
         <g>
             {visibleCandles.map((point, i) => {
@@ -256,12 +253,6 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                 scaledHigh: scaleY(level.high),
                 scaledLow: scaleY(level.low),
             }));
-            // Log the values after slicing inside BoxLevels
-            console.log(
-                `[BoxLevels Frame ${boxTime}] Slice Values:`,
-                slicedBoxes.map((b) => b.value)
-            );
-            // --- End: Reverted Logic ---
 
             return {
                 timestamp: boxTime,
@@ -526,7 +517,7 @@ const CandleChart = ({
     return (
         <div
             ref={containerRef}
-            className='absolute inset-0 overflow-hidden bg-black'
+            className='absolute inset-0 h-full overflow-hidden'
             onMouseDown={dragHandlers.onMouseDown}
             onMouseMove={dragHandlers.onMouseMove}
             onMouseUp={dragHandlers.onMouseUp}

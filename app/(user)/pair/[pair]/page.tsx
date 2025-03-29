@@ -18,6 +18,7 @@ async function fetchApiData(pair: string, token: string) {
                 Authorization: `Bearer ${token}`,
             },
         });
+
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const { data } = await response.json();
 
@@ -26,14 +27,35 @@ async function fetchApiData(pair: string, token: string) {
             return [];
         }
 
-        return [...data].reverse().map((candle) => ({
-            timestamp: new Date(candle.timestamp).getTime(),
-            close: Number(candle.close),
-            high: Number(candle.high),
-            low: Number(candle.low),
-            open: Number(candle.open),
-            volume: 0,
-        }));
+        // Convert all timestamps to Unix timestamps (milliseconds since epoch)
+        const processedData = [...data].reverse().map((candle) => {
+            // Parse timestamp considering different formats
+            const getUnixTimestamp = (timestamp: string | number): number => {
+                if (typeof timestamp === 'number') {
+                    // If already a Unix timestamp, return as is
+                    return timestamp;
+                }
+                // If timestamp includes 'Z' or timezone offset, parse as ISO
+                if (timestamp.includes('Z') || timestamp.includes('+')) {
+                    return new Date(timestamp).getTime();
+                }
+                // If timestamp is in format "YYYY-MM-DD HH:mm:ss", assume UTC
+                return new Date(timestamp.replace(' ', 'T') + 'Z').getTime();
+            };
+
+            const timestamp = getUnixTimestamp(candle.timestamp);
+
+            return {
+                timestamp,
+                close: Number(candle.close),
+                high: Number(candle.high),
+                low: Number(candle.low),
+                open: Number(candle.open),
+                volume: 0,
+            };
+        });
+
+        return processedData;
     } catch (error) {
         console.error('Error fetching candle data:', error);
         return [];

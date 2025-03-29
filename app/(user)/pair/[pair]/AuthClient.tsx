@@ -100,11 +100,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         }
     }, [pair, initializePair]);
 
-    useEffect(() => {
-        setCandleData(chartData.processedCandles);
-        setHistogramData(chartData.histogramBoxes);
-    }, [chartData]);
-
     // Memoize the filtered boxes for ResoBox
     const filteredBoxSlice = useMemo(() => {
         if (!boxSlice?.boxes) {
@@ -114,29 +109,60 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
             ...boxSlice,
             boxes: boxSlice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
         };
-        // console.log('[AuthClient] ResoBox Slice Values:', sliced.boxes.map(b => b.value));
         return sliced;
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
-    // Calculate the slice from the *actual processed data* used by Chart/Histogram
-    const chartActualSliceValues = useMemo(() => {
-        // Get the latest frame from the processed histogram data
-        const latestFrame = histogramData && histogramData.length > 0 ? histogramData[histogramData.length - 1] : null;
+    // Add timestamp verification and data synchronization
+    useEffect(() => {
+        if (filteredBoxSlice?.timestamp && candleData.length > 0) {
+            const getUnixTimestamp = (timestamp: string | number): number => {
+                if (typeof timestamp === 'number') {
+                    return timestamp;
+                }
+                // If timestamp includes 'Z' or timezone offset, parse as ISO
+                if (timestamp.includes('Z') || timestamp.includes('+')) {
+                    return new Date(timestamp).getTime();
+                }
+                // If timestamp is in format "YYYY-MM-DD HH:mm:ss", assume UTC
+                return new Date(timestamp.replace(' ', 'T') + 'Z').getTime();
+            };
 
-        if (!latestFrame?.progressiveValues) {
-            return [];
+            const boxUnixTime = getUnixTimestamp(filteredBoxSlice.timestamp);
+            const lastCandle = candleData[candleData.length - 1];
+            const diffSeconds = Math.abs(boxUnixTime - lastCandle.timestamp) / 1000;
+
+            // Only log if there's a significant difference (more than 1 second)
+            if (diffSeconds > 1) {
+                console.log('Timestamp update detected:', {
+                    boxData: {
+                        raw: filteredBoxSlice.timestamp,
+                        unix: boxUnixTime,
+                        utc: new Date(boxUnixTime).toISOString(),
+                    },
+                    candleData: {
+                        unix: lastCandle.timestamp,
+                        utc: new Date(lastCandle.timestamp).toISOString(),
+                    },
+                    diffSeconds,
+                });
+
+                // If the box data is significantly behind (more than 2 minutes),
+                // we might want to trigger a data refresh
+                if (diffSeconds > 120) {
+                    console.warn('Box data is significantly behind candle data');
+                    // Here you could add logic to refresh the data if needed
+                }
+            }
         }
-        // Apply the same slice to the *already processed* values for the latest frame
-        // (These values should already be sorted by descending absolute value)
-        const sliced = latestFrame.progressiveValues.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount);
-        // Extract values
-        return sliced.map((b) => b.value);
-    }, [histogramData, settings.startIndex, settings.maxBoxCount]);
+    }, [filteredBoxSlice, candleData]);
 
-    // console.log('candleData', candleData);
-    // console.log(filteredBoxSlice);
-
-    console.log(histogramData, '    histogramData');
+    // Update candleData and histogramData when chartData changes
+    useEffect(() => {
+        if (chartData.processedCandles.length > 0) {
+            setCandleData(chartData.processedCandles);
+            setHistogramData(chartData.histogramBoxes);
+        }
+    }, [chartData]);
 
     return (
         <div className='flex h-auto w-full flex-col pt-14'>
@@ -150,14 +176,17 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                     {/* Adjusted height for new rows */}
                     {/* Main Chart Area */}
                     <div className='h-full w-3/4 p-4'>
-                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-4'>
-                            <div className='mb-4 flex items-center gap-6'>
-                                <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
-                                <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
-                            </div>
+                        <div className='relative flex h-full flex-col overflow-hidden rounded-xl border border-[#222] bg-black'>
+                            {/* Absolute positioned overlay for header content */}
+                            <div className='absolute top-0 right-0 left-0 z-10 p-4'>
+                                <div className='mb-4 flex items-center gap-6'>
+                                    <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
+                                    <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
+                                </div>
 
-                            {/* Add Visibility Toggle Buttons */}
-                            <div className='mb-2 flex justify-end gap-2'>
+                                {/* Box Visibility Toggle Buttons */}
+                            </div>
+                            <div className='absolute top-4 right-12 left-0 z-10 flex hidden justify-end gap-2'>
                                 <button
                                     onClick={() => setBoxVisibilityFilter('all')}
                                     className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
@@ -175,11 +204,12 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                 </button>
                             </div>
 
-                            <div className='relative min-h-[500px] w-full flex-1'>
+                            {/* Full-size container for CandleChart */}
+                            <div className='h-full min-h-[600px] w-full'>
                                 {candleData && candleData.length > 0 ? (
                                     <CandleChart
                                         candles={candleData}
-                                        initialVisibleData={candleData.slice(-100)} // Example initial slice
+                                        initialVisibleData={candleData.slice(-100)}
                                         pair={pair}
                                         histogramBoxes={histogramData.map((frame) => ({
                                             timestamp: frame.timestamp,
@@ -188,7 +218,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                         boxOffset={settings.startIndex}
                                         visibleBoxesCount={settings.maxBoxCount}
                                         boxVisibilityFilter={boxVisibilityFilter}
-                                        // --- Pass hover state down ---
                                         hoveredTimestamp={hoveredTimestamp}
                                         onHoverChange={handleHoverChange}
                                     />
