@@ -4,15 +4,16 @@ import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { IconType } from 'react-icons';
-import { LuSearch, LuSettings } from 'react-icons/lu';
+import { LuSearch, LuSettings, LuHelpCircle } from 'react-icons/lu';
 import { PairNavigator } from '@/components/Navbars/DashboardNavigation/PairNavigator';
 import { ProfilePanel } from '@/components/Navbars/DashboardNavigation/ProfilePanel';
 import { SettingsBar } from '@/components/Panels/BoxUXPanel';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
+import SupportPanel from '@/components/Panels/SupportPanel';
 
-type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | null;
+type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | 'support' | null;
 
 const ProfileIcon = ({ setActivePanel }: { setActivePanel: (panel: Panel) => void }) => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -113,6 +114,7 @@ export const DashboardNavigation = () => {
                 </div>
             ),
             profile: <ProfilePanel />,
+            support: <SupportPanel isOpen={true} onClose={handleClose} />,
         };
 
         const content = panels[activePanel as keyof typeof panels];
@@ -136,6 +138,7 @@ export const DashboardNavigation = () => {
                 <div className='flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2'>
                     <ProfileIcon setActivePanel={setActivePanel} />
                     <SidebarIconButton icon={LuSearch} isActive={activePanel === 'pairs'} onClick={() => handleButtonClick('pairs')} />
+                    <SidebarIconButton icon={LuHelpCircle} isActive={activePanel === 'support'} onClick={() => handleButtonClick('support')} />
                     <SidebarIconButton icon={LuSettings} isActive={activePanel === 'settings'} onClick={() => handleButtonClick('settings')} />
                 </div>
             </div>

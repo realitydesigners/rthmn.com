@@ -126,3 +126,150 @@ export const getDiscordConnection = cache(async (supabase: SupabaseClient) => {
         return null;
     }
 });
+
+export const getSupportThreads = cache(async (supabase: SupabaseClient) => {
+    try {
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return null;
+
+        const { data, error } = await supabase.from('support_threads').select('*').eq('user_id', user.id).order('last_message_time', { ascending: false });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error fetching support threads:', error);
+        return null;
+    }
+});
+
+export const getSupportMessages = cache(async (supabase: SupabaseClient, threadId: string) => {
+    try {
+        const { data, error } = await supabase.from('support_messages').select('*').eq('thread_id', threadId).order('created_at', { ascending: true });
+
+        if (error) throw error;
+        return data;
+    } catch (error) {
+        console.error('Error fetching support messages:', error);
+        return null;
+    }
+});
+
+export const createSupportThread = cache(async (supabase: SupabaseClient, subject: string) => {
+    try {
+        const {
+            data: { user },
+            error: userError,
+        } = await supabase.auth.getUser();
+
+        if (userError) {
+            console.error('Auth error:', userError);
+            throw new Error('Authentication error');
+        }
+
+        if (!user) {
+            throw new Error('No user found');
+        }
+
+        // First, get a valid product_id
+        const { data: products, error: productsError } = await supabase.from('products').select('id').eq('active', true).limit(1).single();
+
+        if (productsError) {
+            console.error('Error fetching products:', productsError);
+            throw new Error('Failed to fetch product information');
+        }
+
+        if (!products) {
+            throw new Error('No active products found');
+        }
+
+        const { data, error } = await supabase
+            .from('support_threads')
+            .insert({
+                product_id: products.id,
+                user_id: user.id,
+                user_name: user.user_metadata?.full_name || 'User',
+                user_email: user.email,
+                subject: subject.trim(),
+                status: 'open',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Supabase error details:', {
+                code: error.code,
+                message: error.message,
+                details: error.details,
+                hint: error.hint,
+            });
+            throw new Error(error.message || 'Failed to create support thread');
+        }
+
+        if (!data) {
+            throw new Error('No data returned from insert');
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error creating support thread:', error);
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error('An unexpected error occurred');
+    }
+});
+
+export const sendSupportMessage = cache(async (supabase: SupabaseClient, threadId: string, content: string) => {
+    try {
+        const {
+            data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) throw new Error('No user found');
+
+        const { data, error } = await supabase
+            .from('support_messages')
+            .insert({
+                thread_id: threadId,
+                sender_id: user.id,
+                sender_name: user.user_metadata?.full_name || 'User',
+                sender_type: 'user',
+                content: content.trim(),
+                created_at: new Date().toISOString(),
+            })
+            .select()
+            .single();
+
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
+
+        if (!data) {
+            throw new Error('No data returned from insert');
+        }
+
+        // Update the last message in the thread
+        const { error: updateError } = await supabase
+            .from('support_threads')
+            .update({
+                last_message: content.trim(),
+                last_message_time: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+            })
+            .eq('id', threadId);
+
+        if (updateError) {
+            console.error('Error updating thread:', updateError);
+            throw updateError;
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error sending support message:', error);
+        throw error;
+    }
+});
