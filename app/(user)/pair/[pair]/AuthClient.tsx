@@ -1,13 +1,21 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useCallback, useState, useMemo } from 'react';
+
+import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
+
+import { Box, BoxSlice } from '@/types/types';
+import { PairResoBox } from '@/app/(user)/dashboard/PairResoBox';
+import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
-import { useDraggableHeight } from '@/hooks/useDraggableHeight';
-import { useSelectedFrame } from '@/hooks/useSelectedFrame';
-import { useUrlParams } from '@/hooks/useUrlParams';
-import { Box } from '@/types/types';
-import Histogram from '@/components/Charts/Histogram';
+import { useUser } from '@/providers/UserProvider';
+import { formatPrice } from '@/utils/instruments';
 import HistogramSimple from '@/components/Charts/Histogram/HistogramSimple';
+import { useDashboard } from '@/providers/DashboardProvider/client';
+import { ResoBox } from '@/components/Charts/ResoBox';
+import { useTimeframeStore } from '@/stores/timeframeStore';
+import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
+import BoxTimeline from '@/components/Charts/BoxTimeline';
 
 interface ExtendedBoxSlice {
     timestamp: string;
@@ -16,6 +24,12 @@ interface ExtendedBoxSlice {
         low: number;
         value: number;
     }[];
+    currentOHLC: {
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+    };
 }
 
 interface ChartData {
@@ -43,70 +57,188 @@ interface ChartData {
 }
 
 const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
+    const { pairData, isLoading } = useDashboard();
+    const { priceData } = useWebSocket();
+    const { boxColors } = useUser();
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
-    const { boxOffset, handleOffsetChange } = useUrlParams(pair);
-    const { selectedFrame, selectedFrameIndex, handleFrameSelect } = useSelectedFrame();
-    const [visibleBoxesCount, setVisibleBoxesCount] = useState(chartData.histogramPreProcessed.defaultVisibleBoxesCount);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [rthmnVisionDimensions, setRthmnVisionDimensions] = useState({
-        width: 0,
-        height: 0,
-    });
+    const [showHistogramLine, setShowHistogramLine] = useState(false);
+    const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
+    const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
+    const initializePair = useTimeframeStore((state) => state.initializePair);
 
-    const {
-        height: histogramHeight,
-        isDragging,
-        handleDragStart,
-    } = useDraggableHeight({
-        initialHeight: chartData.histogramPreProcessed.defaultHeight,
-        minHeight: 100,
-        maxHeight: 350,
-    });
+    // Add state for box visibility filter
+    const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
+
+    // --- Add state for shared hover ---
+    const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
+
+    // --- Add callback for hover changes ---
+    const handleHoverChange = useCallback((timestamp: number | null) => {
+        setHoveredTimestamp(timestamp);
+    }, []);
+
+    // Convert pair to uppercase for consistency with pairData keys
+    const uppercasePair = pair.toUpperCase();
+    const currentPrice = priceData[uppercasePair]?.price;
+    const boxSlice = pairData[uppercasePair]?.boxes?.[0];
+
+    // Handle timeframe changes for both ResoBox and Histogram
+    const handleTimeframeChange = useCallback(
+        (property: string, value: number | boolean) => {
+            if (pair && typeof value === 'number') {
+                updatePairSettings(pair, { [property]: value });
+            }
+        },
+        [pair, updatePairSettings]
+    );
+
+    // Initialize timeframe settings
+    useEffect(() => {
+        if (pair) {
+            initializePair(pair);
+        }
+    }, [pair, initializePair]);
 
     useEffect(() => {
         setCandleData(chartData.processedCandles);
         setHistogramData(chartData.histogramBoxes);
     }, [chartData]);
 
-    useEffect(() => {
-        const updateDimensions = () => {
-            if (containerRef.current) {
-                const containerHeight = containerRef.current.clientHeight;
-                const containerWidth = containerRef.current.clientWidth;
-                const newRthmnVisionHeight = containerHeight - histogramHeight - 80;
-                setRthmnVisionDimensions({
-                    width: containerWidth,
-                    height: Math.max(newRthmnVisionHeight, 200),
-                });
-            }
+    // Memoize the filtered boxes for ResoBox
+    const filteredBoxSlice = useMemo(() => {
+        if (!boxSlice?.boxes) {
+            return undefined;
+        }
+        const sliced = {
+            ...boxSlice,
+            boxes: boxSlice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
         };
+        // console.log('[AuthClient] ResoBox Slice Values:', sliced.boxes.map(b => b.value));
+        return sliced;
+    }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
-        updateDimensions();
-        window.addEventListener('resize', updateDimensions);
+    // Calculate the slice from the *actual processed data* used by Chart/Histogram
+    const chartActualSliceValues = useMemo(() => {
+        // Get the latest frame from the processed histogram data
+        const latestFrame = histogramData && histogramData.length > 0 ? histogramData[histogramData.length - 1] : null;
 
-        return () => {
-            window.removeEventListener('resize', updateDimensions);
-        };
-    }, [histogramHeight]);
-    console.log(histogramData);
+        if (!latestFrame?.progressiveValues) {
+            return [];
+        }
+        // Apply the same slice to the *already processed* values for the latest frame
+        // (These values should already be sorted by descending absolute value)
+        const sliced = latestFrame.progressiveValues.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount);
+        // Extract values
+        return sliced.map((b) => b.value);
+    }, [histogramData, settings.startIndex, settings.maxBoxCount]);
+
+    // console.log('candleData', candleData);
+    // console.log(filteredBoxSlice);
+
+    console.log(histogramData, '    histogramData');
 
     return (
-        <div className='relative flex h-screen w-full'>
-            {/* <div className='relative h-full w-full'>
-                <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} pair={pair} />
-            </div> */}
-            <div className='absolute right-0 bottom-0 left-0 z-[2000]'>
-                <HistogramSimple
-                    data={histogramData.map((frame) => ({
-                        timestamp: frame.timestamp,
-                        boxes: frame.progressiveValues.map((box) => ({
-                            high: box.high,
-                            low: box.low,
-                            value: box.value,
-                        })),
-                    }))}
-                />
+        <div className='flex h-auto w-full flex-col pt-14'>
+            {/* Main Content Area - Adjust layout */}
+            <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
+                {' '}
+                {/* Adjusted height calc */}
+                {/* Top row: ResoBox and Chart */}
+                <div className='flex h-full w-full flex-1'>
+                    {' '}
+                    {/* Adjusted height for new rows */}
+                    {/* Main Chart Area */}
+                    <div className='h-full w-3/4 p-4'>
+                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-4'>
+                            <div className='mb-4 flex items-center gap-6'>
+                                <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
+                                <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
+                            </div>
+
+                            {/* Add Visibility Toggle Buttons */}
+                            <div className='mb-2 flex justify-end gap-2'>
+                                <button
+                                    onClick={() => setBoxVisibilityFilter('all')}
+                                    className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                                    All Boxes
+                                </button>
+                                <button
+                                    onClick={() => setBoxVisibilityFilter('positive')}
+                                    className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'positive' ? 'bg-green-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                                    Positive Boxes
+                                </button>
+                                <button
+                                    onClick={() => setBoxVisibilityFilter('negative')}
+                                    className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'negative' ? 'bg-red-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
+                                    Negative Boxes
+                                </button>
+                            </div>
+
+                            <div className='relative min-h-[500px] w-full flex-1'>
+                                {candleData && candleData.length > 0 ? (
+                                    <CandleChart
+                                        candles={candleData}
+                                        initialVisibleData={candleData.slice(-100)} // Example initial slice
+                                        pair={pair}
+                                        histogramBoxes={histogramData.map((frame) => ({
+                                            timestamp: frame.timestamp,
+                                            boxes: frame.progressiveValues,
+                                        }))}
+                                        boxOffset={settings.startIndex}
+                                        visibleBoxesCount={settings.maxBoxCount}
+                                        boxVisibilityFilter={boxVisibilityFilter}
+                                        // --- Pass hover state down ---
+                                        hoveredTimestamp={hoveredTimestamp}
+                                        onHoverChange={handleHoverChange}
+                                    />
+                                ) : (
+                                    <div className='flex h-full items-center justify-center'>Loading Chart...</div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className='h-full w-1/4 border-r border-[#222] p-4'>
+                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-4'>
+                            <div className='relative flex-1 p-2 pr-16'>
+                                {filteredBoxSlice && boxColors && (
+                                    <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                                )}
+                            </div>
+
+                            {/* Timeframe Control */}
+                            {boxSlice?.boxes && (
+                                <div className='mt-4 h-16 w-full'>
+                                    <TimeFrameSlider
+                                        startIndex={settings.startIndex}
+                                        maxBoxCount={settings.maxBoxCount}
+                                        boxes={boxSlice.boxes}
+                                        onStyleChange={handleTimeframeChange}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className='h-[200px] w-full px-4'>
+                    {' '}
+                    {/* Added height and bottom border */}
+                    <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
+                        {boxColors && histogramData && (
+                            <BoxTimeline
+                                data={histogramData}
+                                boxOffset={settings.startIndex}
+                                visibleBoxesCount={settings.maxBoxCount}
+                                boxVisibilityFilter={boxVisibilityFilter}
+                                boxColors={boxColors}
+                                className='h-full' // Ensure it fills its container
+                                // --- Pass hover state down ---
+                                hoveredTimestamp={hoveredTimestamp}
+                                onHoverChange={handleHoverChange}
+                            />
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );

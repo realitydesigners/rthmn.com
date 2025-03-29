@@ -26,7 +26,7 @@ interface TimeframeState {
 
 const DEFAULT_SETTINGS: TimeframeSettings = {
     startIndex: 0,
-    maxBoxCount: 38,
+    maxBoxCount: 7,
     showPriceLines: true,
 };
 

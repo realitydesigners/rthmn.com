@@ -10,12 +10,72 @@ interface ExtendedBoxSlice {
         low: number;
         value: number;
     }[];
+    currentOHLC: {
+        open: number;
+        high: number;
+        low: number;
+        close: number;
+    };
 }
 
-export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
-    // Sort boxes by absolute value
-    const sortedBoxes = [...boxes];
+// Helper function to safely convert timestamp to ISO string
+const safeISOString = (timestamp: number | string): string => {
+    try {
+        // Ensure consistent timestamp handling between server and client
+        // If timestamp is already a number (milliseconds), use it directly
+        if (typeof timestamp === 'number') {
+            // Use a fixed format instead of toISOString() to avoid timezone issues
+            const date = new Date(timestamp);
+            return (
+                date.getUTCFullYear() +
+                '-' +
+                String(date.getUTCMonth() + 1).padStart(2, '0') +
+                '-' +
+                String(date.getUTCDate()).padStart(2, '0') +
+                'T' +
+                String(date.getUTCHours()).padStart(2, '0') +
+                ':' +
+                String(date.getUTCMinutes()).padStart(2, '0') +
+                ':' +
+                String(date.getUTCSeconds()).padStart(2, '0') +
+                '.' +
+                String(date.getUTCMilliseconds()).padStart(3, '0') +
+                'Z'
+            );
+        }
+        // If it's a string, parse it as a date
+        const date = new Date(timestamp);
+        return (
+            date.getUTCFullYear() +
+            '-' +
+            String(date.getUTCMonth() + 1).padStart(2, '0') +
+            '-' +
+            String(date.getUTCDate()).padStart(2, '0') +
+            'T' +
+            String(date.getUTCHours()).padStart(2, '0') +
+            ':' +
+            String(date.getUTCMinutes()).padStart(2, '0') +
+            ':' +
+            String(date.getUTCSeconds()).padStart(2, '0') +
+            '.' +
+            String(date.getUTCMilliseconds()).padStart(3, '0') +
+            'Z'
+        );
+    } catch (e) {
+        console.error('Invalid timestamp:', timestamp);
+        // Use a fixed timestamp as fallback instead of current time to ensure consistency
+        return '2023-01-01T00:00:00.000Z';
+    }
+};
 
+export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
+    // Sort boxes purely by ASCENDING absolute value to match ResoBox apparent order
+    const sortedBoxes = [...boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+
+    // Return the boxes sorted by absolute value, WITHOUT snapping
+    return sortedBoxes;
+
+    /* Remove value snapping logic:
     const findNearestBoxSize = (value: number): number => {
         const absValue = Math.abs(value);
         let nearest = BoxSizes[0];
@@ -30,32 +90,20 @@ export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice[
         }
         return value >= 0 ? nearest : -nearest;
     };
-    // First add all negative boxes in ascending order (most negative first)
-    const negativeBoxes = sortedBoxes
-        .filter((box) => box.value < 0)
-        .sort((a, b) => a.value - b.value)
-        .map((box) => ({
-            ...box,
-            value: findNearestBoxSize(box.value),
-        }));
 
-    // Then add all positive boxes in ascending order (smallest to largest)
-    const positiveBoxes = sortedBoxes
-        .filter((box) => box.value > 0)
-        .sort((a, b) => a.value - b.value)
-        .map((box) => ({
-            ...box,
-            value: findNearestBoxSize(box.value),
-        }));
-
-    // Combine the arrays with negatives first, then positives ascending
-    return [...negativeBoxes, ...positiveBoxes];
+    // Apply size snapping if needed, but maintain the absolute value sort order
+    // Note: We map directly over the abs-sorted list now.
+    return sortedBoxes.map((box) => ({
+        ...box,
+        value: findNearestBoxSize(box.value), // Snap value if needed
+    }));
+    */
 };
 
 export function processInitialBoxData(
     processedCandles: { timestamp: number; open: number; high: number; low: number; close: number }[],
     pair: string,
-    defaultVisibleBoxesCount: number = 8,
+    defaultVisibleBoxesCount: number = 7,
     defaultHeight: number = 200,
     initialBarWidth: number = 20
 ) {
@@ -64,7 +112,7 @@ export function processInitialBoxData(
     const boxCalculator = createBoxCalculator(pair.toUpperCase());
     const boxTimeseriesData = processedCandles.map((candle, index) => {
         const candleSlice = processedCandles.slice(0, index + 1).map((c) => ({
-            timestamp: new Date(c.timestamp).toISOString(),
+            timestamp: safeISOString(c.timestamp),
             open: c.open,
             high: c.high,
             low: c.low,
@@ -78,7 +126,7 @@ export function processInitialBoxData(
         }));
 
         return {
-            timestamp: new Date(candle.timestamp).toISOString(),
+            timestamp: safeISOString(candle.timestamp),
             boxes: boxCalculator.calculateBoxArrays(candleSlice),
             currentOHLC: {
                 open: candle.open,
@@ -108,6 +156,7 @@ export function processInitialBoxData(
         return {
             timestamp: timepoint.timestamp,
             progressiveValues,
+            currentOHLC: timepoint.currentOHLC,
         };
     });
 
