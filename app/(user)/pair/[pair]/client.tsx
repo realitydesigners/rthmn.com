@@ -1,21 +1,15 @@
 'use client';
 
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
-
-import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
-
-import { Box, BoxSlice } from '@/types/types';
-import { PairResoBox } from '@/app/(user)/dashboard/PairResoBox';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
 import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
-import HistogramSimple from '@/components/Charts/Histogram/HistogramSimple';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
-import BoxTimeline from '@/components/Charts/BoxTimeline';
+import Histogram from '@/components/Charts/Histogram';
 
 interface ExtendedBoxSlice {
     timestamp: string;
@@ -36,49 +30,24 @@ interface ChartData {
     processedCandles: ChartDataPoint[];
     initialVisibleData: ChartDataPoint[];
     histogramBoxes: ExtendedBoxSlice[];
-    histogramPreProcessed: {
-        maxSize: number;
-        initialFramesWithPoints: {
-            frameData: {
-                boxArray: Box[];
-                isSelected: boolean;
-                meetingPointY: number;
-                sliceWidth: number;
-                price: number;
-                high: number;
-                low: number;
-            };
-            meetingPointY: number;
-            sliceWidth: number;
-        }[];
-        defaultVisibleBoxesCount: number;
-        defaultHeight: number;
-    };
 }
 
-const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
-    const { pairData, isLoading } = useDashboard();
+const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
+    const { pairData } = useDashboard();
     const { priceData } = useWebSocket();
     const { boxColors } = useUser();
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
-    const [showHistogramLine, setShowHistogramLine] = useState(false);
     const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
-
-    // Add state for box visibility filter
     const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
-
-    // --- Add state for shared hover ---
     const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
 
-    // --- Add callback for hover changes ---
     const handleHoverChange = useCallback((timestamp: number | null) => {
         setHoveredTimestamp(timestamp);
     }, []);
 
-    // Convert pair to uppercase for consistency with pairData keys
     const uppercasePair = pair.toUpperCase();
     const currentPrice = priceData[uppercasePair]?.price;
     const boxSlice = pairData[uppercasePair]?.boxes?.[0];
@@ -100,11 +69,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         }
     }, [pair, initializePair]);
 
-    useEffect(() => {
-        setCandleData(chartData.processedCandles);
-        setHistogramData(chartData.histogramBoxes);
-    }, [chartData]);
-
     // Memoize the filtered boxes for ResoBox
     const filteredBoxSlice = useMemo(() => {
         if (!boxSlice?.boxes) {
@@ -114,50 +78,32 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
             ...boxSlice,
             boxes: boxSlice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
         };
-        // console.log('[AuthClient] ResoBox Slice Values:', sliced.boxes.map(b => b.value));
         return sliced;
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
-    // Calculate the slice from the *actual processed data* used by Chart/Histogram
-    const chartActualSliceValues = useMemo(() => {
-        // Get the latest frame from the processed histogram data
-        const latestFrame = histogramData && histogramData.length > 0 ? histogramData[histogramData.length - 1] : null;
+    // Add timestamp verification and data synchronization
 
-        if (!latestFrame?.progressiveValues) {
-            return [];
+    // Update candleData and histogramData when chartData changes
+    useEffect(() => {
+        if (chartData.processedCandles.length > 0) {
+            setCandleData(chartData.processedCandles);
+            setHistogramData(chartData.histogramBoxes);
         }
-        // Apply the same slice to the *already processed* values for the latest frame
-        // (These values should already be sorted by descending absolute value)
-        const sliced = latestFrame.progressiveValues.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount);
-        // Extract values
-        return sliced.map((b) => b.value);
-    }, [histogramData, settings.startIndex, settings.maxBoxCount]);
-
-    // console.log('candleData', candleData);
-    // console.log(filteredBoxSlice);
-
-    console.log(histogramData, '    histogramData');
+    }, [chartData]);
 
     return (
         <div className='flex h-auto w-full flex-col pt-14'>
-            {/* Main Content Area - Adjust layout */}
             <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
-                {' '}
-                {/* Adjusted height calc */}
-                {/* Top row: ResoBox and Chart */}
                 <div className='flex h-full w-full flex-1'>
-                    {' '}
-                    {/* Adjusted height for new rows */}
-                    {/* Main Chart Area */}
                     <div className='h-full w-3/4 p-4'>
-                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-4'>
-                            <div className='mb-4 flex items-center gap-6'>
-                                <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
-                                <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
+                        <div className='relative flex h-full flex-col overflow-hidden rounded-xl border border-[#222] bg-black'>
+                            <div className='absolute top-0 right-0 left-0 z-10 p-4'>
+                                <div className='mb-4 flex items-center gap-6'>
+                                    <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
+                                    <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
+                                </div>
                             </div>
-
-                            {/* Add Visibility Toggle Buttons */}
-                            <div className='mb-2 flex justify-end gap-2'>
+                            <div className='absolute top-4 right-12 left-0 z-10 flex justify-end gap-2'>
                                 <button
                                     onClick={() => setBoxVisibilityFilter('all')}
                                     className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
@@ -175,11 +121,12 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                 </button>
                             </div>
 
-                            <div className='relative min-h-[500px] w-full flex-1'>
+                            {/* Full-size container for CandleChart */}
+                            <div className='h-full min-h-[600px] w-full'>
                                 {candleData && candleData.length > 0 ? (
                                     <CandleChart
                                         candles={candleData}
-                                        initialVisibleData={candleData.slice(-100)} // Example initial slice
+                                        initialVisibleData={candleData.slice(-100)}
                                         pair={pair}
                                         histogramBoxes={histogramData.map((frame) => ({
                                             timestamp: frame.timestamp,
@@ -188,7 +135,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                         boxOffset={settings.startIndex}
                                         visibleBoxesCount={settings.maxBoxCount}
                                         boxVisibilityFilter={boxVisibilityFilter}
-                                        // --- Pass hover state down ---
                                         hoveredTimestamp={hoveredTimestamp}
                                         onHoverChange={handleHoverChange}
                                     />
@@ -205,8 +151,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
                                 )}
                             </div>
-
-                            {/* Timeframe Control */}
                             {boxSlice?.boxes && (
                                 <div className='mt-4 h-16 w-full'>
                                     <TimeFrameSlider
@@ -221,18 +165,15 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                     </div>
                 </div>
                 <div className='h-[200px] w-full px-4'>
-                    {' '}
-                    {/* Added height and bottom border */}
                     <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
                         {boxColors && histogramData && (
-                            <BoxTimeline
+                            <Histogram
                                 data={histogramData}
                                 boxOffset={settings.startIndex}
                                 visibleBoxesCount={settings.maxBoxCount}
                                 boxVisibilityFilter={boxVisibilityFilter}
                                 boxColors={boxColors}
-                                className='h-full' // Ensure it fills its container
-                                // --- Pass hover state down ---
+                                className='h-full'
                                 hoveredTimestamp={hoveredTimestamp}
                                 onHoverChange={handleHoverChange}
                             />
@@ -244,4 +185,4 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     );
 };
 
-export default React.memo(AuthClient);
+export default React.memo(PairClient);
