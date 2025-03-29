@@ -3,6 +3,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatTime } from '@/utils/dateUtils';
 import { INSTRUMENTS } from '@/utils/instruments';
+import { BoxColors, useColorStore } from '@/stores/colorStore';
 
 interface ChartDataResult {
     visibleData: ChartDataPoint[];
@@ -104,8 +105,6 @@ const CHART_CONFIG = {
     MAX_ZOOM: 2,
     PADDING: { top: 20, right: 70, bottom: 40, left: 0 },
     COLORS: {
-        BULLISH: '#22c55e', // Green for bullish
-        BEARISH: '#ef4444', // Red for bearish
         AXIS: '#ffffff',
         HOVER_BG: '#fff',
         LAST_PRICE: '#2563eb',
@@ -144,6 +143,8 @@ const useInstrumentConfig = (pair: string) => {
 
 // Core chart components
 const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
+    const { boxColors } = useColorStore();
+
     // Calculate candle width to use 80% of available space (leaving 20% for gaps)
     const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
     const halfCandleWidth = candleWidth / 2;
@@ -161,7 +162,7 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
         <g>
             {visibleCandles.map((point, i) => {
                 const candle = point.close > point.open;
-                const candleColor = candle ? CHART_CONFIG.COLORS.BULLISH : CHART_CONFIG.COLORS.BEARISH;
+                const candleColor = candle ? boxColors.positive : boxColors.negative;
 
                 const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
                 const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
@@ -171,7 +172,7 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
                     <g key={point.timestamp} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
                         <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={bodyTop} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
                         <line x1={halfCandleWidth} y1={bodyBottom} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
-                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill={candle ? 'none' : candleColor} stroke={candleColor} strokeWidth={1} />
+                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill='none' stroke={candleColor} strokeWidth={1} />
                     </g>
                 );
             })}
@@ -193,6 +194,8 @@ interface BoxLevelsProps {
 
 // Add this new component after CandleSticks
 const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOffset, visibleBoxesCount, boxVisibilityFilter }: BoxLevelsProps) => {
+    const { boxColors } = useColorStore();
+
     if (!histogramBoxes?.length || !data.length) return null;
 
     // Get the timestamp of the most recent candle
@@ -291,7 +294,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                     <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
                         {/* Map over the FILTERED levels */}
                         {filteredLevels.map((level) => {
-                            const color = level.value > 0 ? '#22c55e' : '#ef4444';
+                            const color = level.value > 0 ? boxColors.positive : boxColors.negative;
                             const opacity = 0.8;
 
                             return (
