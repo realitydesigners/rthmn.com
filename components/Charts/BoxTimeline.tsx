@@ -70,16 +70,43 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         const rect = canvasRef.current.getBoundingClientRect();
         const x = event.clientX - rect.left; // X position within the canvas
 
-        // Calculate index based on position and box width
-        const frameIndex = Math.floor(x / BOX_WIDTH);
-        const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES)); // Use the same slice as in drawing
+        // Get the deduplicated frames first
+        const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
+        const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
+            if (index === 0) return [frame];
 
-        if (frameIndex >= 0 && frameIndex < framesToDraw.length) {
-            const hoveredFrame = framesToDraw[frameIndex];
-            const timestamp = new Date(hoveredFrame.timestamp).getTime(); // Convert timestamp string/number to number
+            const prevFrame = acc[acc.length - 1];
+            const getFrameSignature = (frame: BoxTimelineFrame) => {
+                const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+                const negativeBoxes = slicedBoxes
+                    .filter((box) => box.value < 0)
+                    .sort((a, b) => a.value - b.value)
+                    .map((box) => findNearestBoxSize(box.value));
+                const positiveBoxes = slicedBoxes
+                    .filter((box) => box.value > 0)
+                    .sort((a, b) => a.value - b.value)
+                    .map((box) => findNearestBoxSize(box.value));
+                return [...negativeBoxes, ...positiveBoxes].join('|');
+            };
+
+            const currentSignature = getFrameSignature(frame);
+            const prevSignature = getFrameSignature(prevFrame);
+
+            if (currentSignature !== prevSignature) {
+                return [...acc, frame];
+            }
+            return acc;
+        }, []);
+
+        // Calculate index based on position and box width using unique frames
+        const frameIndex = Math.floor(x / BOX_WIDTH);
+
+        if (frameIndex >= 0 && frameIndex < uniqueFrames.length) {
+            const hoveredFrame = uniqueFrames[frameIndex];
+            const timestamp = new Date(hoveredFrame.timestamp).getTime();
             onHoverChange(timestamp);
         } else {
-            onHoverChange(null); // Clear hover if outside canvas bounds
+            onHoverChange(null);
         }
     };
 
@@ -100,7 +127,42 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
 
         // Limit frames drawn for performance
         const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
-        const canvasWidth = framesToDraw.length * BOX_WIDTH;
+
+        // Add deduplication logic here
+        const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
+            // Always include the first frame
+            if (index === 0) {
+                return [frame];
+            }
+
+            const prevFrame = acc[acc.length - 1];
+
+            // Create signatures for comparison based on box values
+            const getFrameSignature = (frame: BoxTimelineFrame) => {
+                const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+                const negativeBoxes = slicedBoxes
+                    .filter((box) => box.value < 0)
+                    .sort((a, b) => a.value - b.value)
+                    .map((box) => findNearestBoxSize(box.value));
+                const positiveBoxes = slicedBoxes
+                    .filter((box) => box.value > 0)
+                    .sort((a, b) => a.value - b.value)
+                    .map((box) => findNearestBoxSize(box.value));
+                return [...negativeBoxes, ...positiveBoxes].join('|');
+            };
+
+            const currentSignature = getFrameSignature(frame);
+            const prevSignature = getFrameSignature(prevFrame);
+
+            // Only add frame if the box values are different
+            if (currentSignature !== prevSignature) {
+                return [...acc, frame];
+            }
+
+            return acc;
+        }, []);
+
+        const canvasWidth = uniqueFrames.length * BOX_WIDTH;
         const canvasHeight = visibleBoxesCount * BOX_HEIGHT;
 
         canvas.width = canvasWidth;
@@ -113,7 +175,7 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         // --- Array to store points for the line ---
         const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
 
-        framesToDraw.forEach((frame, frameIndex) => {
+        uniqueFrames.forEach((frame, frameIndex) => {
             const x = frameIndex * BOX_WIDTH;
             const frameTimestamp = new Date(frame.timestamp).getTime(); // Get timestamp for comparison
             const isHovered = frameTimestamp === hoveredTimestamp;
