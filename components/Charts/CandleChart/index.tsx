@@ -113,11 +113,10 @@ export const CHART_CONFIG = {
         MAX_WIDTH: 15,
         MIN_SPACING: 1,
         WICK_WIDTH: 1.5,
-        GAP_RATIO: 0.4, // 40% gap between candles
+        GAP_RATIO: 0.5, // 40% gap between candles
     },
     BOX_LEVELS: {
         LINE_WIDTH: 4, // Moderate line width
-        GAP_RATIO: 0.4, // 40% gap between box lines
     },
 } as const;
 
@@ -223,9 +222,6 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
 
     // Calculate line width with gap
     const lineWidth = CHART_CONFIG.BOX_LEVELS.LINE_WIDTH;
-    const gapWidth = lineWidth * CHART_CONFIG.BOX_LEVELS.GAP_RATIO;
-    const totalLineWidth = lineWidth + gapWidth;
-
     // Process each box to get its position and dimensions
     const processedBoxes = recentBoxes
         .map((box) => {
@@ -271,11 +267,6 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                     return true; // 'all'
                 });
 
-                // If no levels are visible after filtering, skip rendering this frame
-                if (filteredLevels.length === 0) {
-                    return null;
-                }
-
                 return (
                     <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
                         {/* Map over the FILTERED levels */}
@@ -292,7 +283,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                                         x2={lineWidth / 2}
                                         y2={level.scaledHigh}
                                         stroke={color}
-                                        strokeWidth={1.5}
+                                        strokeWidth={0.5}
                                         strokeOpacity={opacity}
                                     />
                                     <line
@@ -301,7 +292,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                                         x2={lineWidth / 2}
                                         y2={level.scaledLow}
                                         stroke={color}
-                                        strokeWidth={1.5}
+                                        strokeWidth={0.5}
                                         strokeOpacity={opacity}
                                     />
                                 </g>
