@@ -80,7 +80,7 @@ async function fetchApiData(pair: string, token: string) {
                 }
 
                 return {
-                    timestamp: timestamp, // Use explicit assignment
+                    timestamp: timestamp,
                     open: candleOpen,
                     high: candleHigh,
                     low: candleLow,
