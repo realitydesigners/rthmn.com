@@ -15,6 +15,7 @@ import { useDashboard } from '@/providers/DashboardProvider/client';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
+import BoxTimeline from '@/components/Charts/BoxTimeline';
 
 interface ExtendedBoxSlice {
     timestamp: string;
@@ -68,6 +69,14 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
 
     // Add state for box visibility filter
     const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
+
+    // --- Add state for shared hover ---
+    const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
+
+    // --- Add callback for hover changes ---
+    const handleHoverChange = useCallback((timestamp: number | null) => {
+        setHoveredTimestamp(timestamp);
+    }, []);
 
     // Convert pair to uppercase for consistency with pairData keys
     const uppercasePair = pair.toUpperCase();
@@ -130,11 +139,15 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     console.log(histogramData, '    histogramData');
 
     return (
-        <div className='flex h-screen w-full flex-col bg-[#0a0a0a] pt-14'>
-            {/* Main Content Area */}
-            <div className='relative flex h-full w-full flex-1 flex-col'>
-                <div className='flex h-full w-full flex-1'>
-                    {/* Side Panel - PairResoBox */}
+        <div className='flex h-auto w-full flex-col bg-[#0a0a0a] pt-14'>
+            {/* Main Content Area - Adjust layout */}
+            <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
+                {' '}
+                {/* Adjusted height calc */}
+                {/* Top row: ResoBox and Chart */}
+                <div className='flex h-[calc(100%-120px)] w-full flex-1'>
+                    {' '}
+                    {/* Adjusted height for new rows */}
                     <div className='h-full w-1/4 border-r border-[#222] p-4'>
                         <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
                             <div className='relative min-h-[400px] flex-1 p-2 pr-16'>
@@ -156,7 +169,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             )}
                         </div>
                     </div>
-
                     {/* Main Chart Area */}
                     <div className='h-full w-3/4 p-4'>
                         <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
@@ -185,26 +197,31 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             </div>
 
                             <div className='relative min-h-[500px] w-full flex-1'>
-                                <CandleChart
-                                    candles={candleData}
-                                    initialVisibleData={chartData.initialVisibleData}
-                                    pair={pair}
-                                    boxOffset={settings.startIndex}
-                                    visibleBoxesCount={settings.maxBoxCount}
-                                    histogramBoxes={histogramData.map((frame) => ({
-                                        timestamp: frame.timestamp,
-                                        boxes: frame.progressiveValues,
-                                        currentOHLC: frame.currentOHLC,
-                                    }))}
-                                    boxVisibilityFilter={boxVisibilityFilter}
-                                />
+                                {candleData && candleData.length > 0 ? (
+                                    <CandleChart
+                                        candles={candleData}
+                                        initialVisibleData={candleData.slice(-100)} // Example initial slice
+                                        pair={pair}
+                                        histogramBoxes={histogramData.map((frame) => ({
+                                            timestamp: frame.timestamp,
+                                            boxes: frame.progressiveValues,
+                                        }))}
+                                        boxOffset={settings.startIndex}
+                                        visibleBoxesCount={settings.maxBoxCount}
+                                        boxVisibilityFilter={boxVisibilityFilter}
+                                        // --- Pass hover state down ---
+                                        hoveredTimestamp={hoveredTimestamp}
+                                        onHoverChange={handleHoverChange}
+                                    />
+                                ) : (
+                                    <div className='flex h-full items-center justify-center'>Loading Chart...</div>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {/* Debug Comparison Table */}
-                <div className='w-full border-t border-[#222] bg-[#0f0f0f] p-4 text-xs text-gray-400'>
+                {/* Middle row: Debug Table */}
+                {/* <div className='w-full border-t border-[#222] bg-[#0f0f0f] p-4 text-xs text-gray-400'>
                     <h3 className='mb-2 font-semibold text-gray-200'>Debug: Box Slice Comparison (Live Data)</h3>
                     <div className='grid grid-cols-2 gap-4'>
                         <div>
@@ -217,29 +234,25 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                         </div>
                     </div>
                     <p className='mt-2 text-gray-500'>Comparing slice applied to raw live data (ResoBox) vs slice applied to latest processed data frame (Chart/Histogram).</p>
-                </div>
-            </div>
-
-            <div className='relative h-[250px] w-full p-4'>
-                <div className='flex items-center justify-end px-4 py-2'>
-                    <button
-                        onClick={() => setShowHistogramLine(!showHistogramLine)}
-                        className={`rounded px-3 py-1 text-sm ${showHistogramLine ? 'bg-white text-black' : 'bg-[#222] text-white'}`}>
-                        Show Line
-                    </button>
-                </div>
-                <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
-                    <HistogramSimple
-                        data={histogramData.map((frame) => ({
-                            timestamp: frame.timestamp,
-                            boxes: frame.progressiveValues,
-                            currentOHLC: frame.currentOHLC,
-                        }))}
-                        boxOffset={settings.startIndex}
-                        visibleBoxesCount={settings.maxBoxCount}
-                        onOffsetChange={(offset: number) => handleTimeframeChange('startIndex', offset)}
-                        showLine={showHistogramLine}
-                    />
+                </div> */}
+                {/* Bottom row: BoxTimeline Component */}
+                <div className='h-[200px] w-full border-t border-b border-[#222] bg-[#111] p-2'>
+                    {' '}
+                    {/* Added height and bottom border */}
+                    <h3 className='mb-1 pl-2 text-sm font-semibold text-gray-200'>Box Timeline</h3>
+                    {boxColors && histogramData && (
+                        <BoxTimeline
+                            data={histogramData}
+                            boxOffset={settings.startIndex}
+                            visibleBoxesCount={settings.maxBoxCount}
+                            boxVisibilityFilter={boxVisibilityFilter}
+                            boxColors={boxColors}
+                            className='h-full' // Ensure it fills its container
+                            // --- Pass hover state down ---
+                            hoveredTimestamp={hoveredTimestamp}
+                            onHoverChange={handleHoverChange}
+                        />
+                    )}
                 </div>
             </div>
         </div>

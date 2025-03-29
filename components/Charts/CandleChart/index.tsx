@@ -270,7 +270,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
 
     return (
         <g className='box-levels'>
-            {processedBoxes.map((boxFrame) => {
+            {processedBoxes.map((boxFrame, index) => {
                 // 2. Apply visibility filter *after* slicing
                 const filteredLevels = boxFrame.boxes.filter((level) => {
                     if (boxVisibilityFilter === 'positive') {
@@ -288,7 +288,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                 }
 
                 return (
-                    <g key={boxFrame.timestamp} transform={`translate(${boxFrame.xPosition}, 0)`}>
+                    <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
                         {/* Map over the FILTERED levels */}
                         {filteredLevels.map((level) => {
                             const color = level.value > 0 ? '#22c55e' : '#ef4444';
@@ -333,6 +333,8 @@ const CandleChart = ({
     boxOffset = 0,
     visibleBoxesCount = 7,
     boxVisibilityFilter = 'all',
+    hoveredTimestamp,
+    onHoverChange,
 }: {
     candles?: ChartDataPoint[];
     initialVisibleData: ChartDataPoint[];
@@ -341,6 +343,8 @@ const CandleChart = ({
     boxOffset?: number;
     visibleBoxesCount?: number;
     boxVisibilityFilter?: 'all' | 'positive' | 'negative';
+    hoveredTimestamp?: number | null;
+    onHoverChange?: (timestamp: number | null) => void;
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -350,7 +354,6 @@ const CandleChart = ({
     const [isYAxisDragging, setIsYAxisDragging] = useState(false);
     const [dragStart, setDragStart] = useState(0);
     const [scrollStart, setScrollStart] = useState(0);
-    const [hoverInfo, setHoverInfo] = useState<any | null>(null);
 
     const chartPadding = CHART_CONFIG.PADDING;
     const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
@@ -447,42 +450,74 @@ const CandleChart = ({
         };
     }, [isDragging, isYAxisDragging, dragStart, scrollStart, chartWidth, candles.length, scrollLeft]);
 
-    // Update hover handlers to use scaled prices
+    // --- Derive displayed hover info from the hoveredTimestamp prop ---
+    const displayedHoverInfo = useMemo(() => {
+        if (hoveredTimestamp === null || !visibleData || visibleData.length === 0 || !chartHeight || !minY || !maxY) {
+            return null;
+        }
+
+        // Find the visible data point matching the timestamp
+        const point = visibleData.find((p) => p.timestamp === hoveredTimestamp);
+
+        if (point) {
+            // Calculate Y position based on the point's *actual* close price,
+            // rather than trying to guess from a potentially inaccurate cursor Y
+            // (especially if hover originated elsewhere)
+            const yRatio = (point.close - minY) / (maxY - minY);
+            const y = chartHeight * (1 - yRatio);
+
+            return {
+                x: point.scaledX, // Use the point's calculated X
+                y: y, // Use the point's price-derived Y
+                price: point.close, // Show the point's closing price
+                time: formatTime(new Date(point.timestamp)),
+                // Add raw timestamp if needed by subcomponents
+                timestamp: point.timestamp,
+            };
+        }
+
+        return null; // No matching point found in visible data
+    }, [hoveredTimestamp, visibleData, chartHeight, minY, maxY]);
+
+    // Update hover handlers to use shared state
     const hoverHandlers = useMemo(
         () => ({
             onSvgMouseMove: (event: React.MouseEvent<SVGSVGElement>) => {
-                if (isDragging) return;
+                if (isDragging || !onHoverChange) return;
 
                 const svgRect = event.currentTarget.getBoundingClientRect();
                 const x = event.clientX - svgRect.left - chartPadding.left;
-                const y = event.clientY - svgRect.top - chartPadding.top;
 
                 if (x >= 0 && x <= chartWidth) {
-                    const xRatio = x / chartWidth;
-                    const index = Math.floor(xRatio * (visibleData.length - 1));
+                    // Find the closest data point based on X coordinate
+                    let closestPoint: ChartDataPoint | null = null;
+                    let minDist = Infinity;
 
-                    // Find the closest data point
-                    if (index >= 0 && index < visibleData.length) {
-                        const point = visibleData[index];
-                        // Calculate the actual price at hover position
-                        const yRatio = (chartHeight - y) / chartHeight;
-                        const hoverPrice = minY + (maxY - minY) * yRatio;
+                    visibleData.forEach((point) => {
+                        const dist = Math.abs(point.scaledX - x);
+                        if (dist < minDist) {
+                            minDist = dist;
+                            closestPoint = point;
+                        }
+                    });
 
-                        setHoverInfo({
-                            x, // Use exact cursor X position instead of point.scaledX
-                            y,
-                            price: hoverPrice,
-                            actualPrice: point.close,
-                            time: formatTime(new Date(point.timestamp)),
-                        });
+                    if (closestPoint) {
+                        // Call the shared handler with the timestamp
+                        onHoverChange(closestPoint.timestamp);
+                    } else {
+                        onHoverChange(null); // No close point found
                     }
                 } else {
-                    setHoverInfo(null);
+                    onHoverChange(null); // Cursor is outside chart area
                 }
             },
-            onMouseLeave: () => setHoverInfo(null),
+            onMouseLeave: () => {
+                if (onHoverChange) {
+                    onHoverChange(null);
+                }
+            },
         }),
-        [isDragging, chartWidth, chartHeight, chartPadding.left, chartPadding.top, visibleData, minY, maxY]
+        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange] // Add onHoverChange dependency
     );
 
     return (
@@ -519,21 +554,21 @@ const CandleChart = ({
                             boxVisibilityFilter={boxVisibilityFilter}
                         />
                         <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
-                        <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
+                        <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={displayedHoverInfo} formatTime={formatTime} />
                         <YAxis
                             minY={minY}
                             maxY={maxY}
                             chartHeight={chartHeight}
                             chartWidth={chartWidth}
                             onDrag={handleYAxisDrag}
-                            hoverInfo={hoverInfo}
+                            hoverInfo={displayedHoverInfo}
                             onYAxisDragStart={() => setIsYAxisDragging(true)}
                             onYAxisDragEnd={() => setIsYAxisDragging(false)}
                             pair={pair}
                             lastPrice={visibleData[visibleData.length - 1].close}
                             lastPriceY={visibleData[visibleData.length - 1].scaledClose}
                         />
-                        {hoverInfo && <HoverInfoComponent x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
+                        {displayedHoverInfo && <HoverInfoComponent x={displayedHoverInfo.x} y={displayedHoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
                     </g>
                 </svg>
             ) : (
