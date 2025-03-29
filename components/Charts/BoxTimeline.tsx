@@ -373,7 +373,7 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
 
     return (
         <div className={`relative ${className}`}>
-            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+            <div className='scrollbar-hide h-full w-full overflow-x-auto' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
                 <div style={{ width: `${initialWidth}px` }} className='relative'>
                     {/* Trend Change Markers */}
                     <div className='absolute -top-6 right-0 left-0 ml-4 h-6 w-full'>
@@ -391,7 +391,7 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                     </div>
 
                     {/* Canvas */}
-                    <div className='mt-6'>
+                    <div className='mt-6 w-full'>
                         <canvas ref={canvasRef} width={initialWidth > 0 ? initialWidth : 300} height={initialHeight > 0 ? initialHeight : 100} className='block' />
                     </div>
                 </div>
