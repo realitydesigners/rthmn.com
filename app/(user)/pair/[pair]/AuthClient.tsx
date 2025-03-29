@@ -139,39 +139,18 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     console.log(histogramData, '    histogramData');
 
     return (
-        <div className='flex h-auto w-full flex-col bg-[#0a0a0a] pt-14'>
+        <div className='flex h-auto w-full flex-col pt-14'>
             {/* Main Content Area - Adjust layout */}
             <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
                 {' '}
                 {/* Adjusted height calc */}
                 {/* Top row: ResoBox and Chart */}
-                <div className='flex h-[calc(100%-120px)] w-full flex-1'>
+                <div className='flex h-full w-full flex-1'>
                     {' '}
                     {/* Adjusted height for new rows */}
-                    <div className='h-full w-1/4 border-r border-[#222] p-4'>
-                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
-                            <div className='relative min-h-[400px] flex-1 p-2 pr-16'>
-                                {filteredBoxSlice && boxColors && (
-                                    <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
-                                )}
-                            </div>
-
-                            {/* Timeframe Control */}
-                            {boxSlice?.boxes && (
-                                <div className='mt-4 h-16 w-full'>
-                                    <TimeFrameSlider
-                                        startIndex={settings.startIndex}
-                                        maxBoxCount={settings.maxBoxCount}
-                                        boxes={boxSlice.boxes}
-                                        onStyleChange={handleTimeframeChange}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </div>
                     {/* Main Chart Area */}
                     <div className='h-full w-3/4 p-4'>
-                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
+                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-4'>
                             <div className='mb-4 flex items-center gap-6'>
                                 <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
                                 <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
@@ -219,40 +198,46 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             </div>
                         </div>
                     </div>
-                </div>
-                {/* Middle row: Debug Table */}
-                {/* <div className='w-full border-t border-[#222] bg-[#0f0f0f] p-4 text-xs text-gray-400'>
-                    <h3 className='mb-2 font-semibold text-gray-200'>Debug: Box Slice Comparison (Live Data)</h3>
-                    <div className='grid grid-cols-2 gap-4'>
-                        <div>
-                            <h4 className='mb-1 font-medium text-gray-300'>ResoBox Slice Values:</h4>
-                            <pre className='overflow-x-auto rounded bg-black p-2 text-xs'>{JSON.stringify(filteredBoxSlice?.boxes.map((b) => b.value) || [], null, 2)}</pre>
-                        </div>
-                        <div>
-                            <h4 className='mb-1 font-medium text-gray-300'>Chart/Histogram Slice Values (Latest Processed):</h4>
-                            <pre className='overflow-x-auto rounded bg-black p-2 text-xs'>{JSON.stringify(chartActualSliceValues, null, 2)}</pre>
+                    <div className='h-full w-1/4 border-r border-[#222] p-4'>
+                        <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-4'>
+                            <div className='relative flex-1 p-2 pr-16'>
+                                {filteredBoxSlice && boxColors && (
+                                    <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                                )}
+                            </div>
+
+                            {/* Timeframe Control */}
+                            {boxSlice?.boxes && (
+                                <div className='mt-4 h-16 w-full'>
+                                    <TimeFrameSlider
+                                        startIndex={settings.startIndex}
+                                        maxBoxCount={settings.maxBoxCount}
+                                        boxes={boxSlice.boxes}
+                                        onStyleChange={handleTimeframeChange}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
-                    <p className='mt-2 text-gray-500'>Comparing slice applied to raw live data (ResoBox) vs slice applied to latest processed data frame (Chart/Histogram).</p>
-                </div> */}
-                {/* Bottom row: BoxTimeline Component */}
-                <div className='h-[200px] w-full border-t border-b border-[#222] bg-[#111] p-2'>
+                </div>
+                <div className='h-[200px] w-full px-4'>
                     {' '}
                     {/* Added height and bottom border */}
-                    <h3 className='mb-1 pl-2 text-sm font-semibold text-gray-200'>Box Timeline</h3>
-                    {boxColors && histogramData && (
-                        <BoxTimeline
-                            data={histogramData}
-                            boxOffset={settings.startIndex}
-                            visibleBoxesCount={settings.maxBoxCount}
-                            boxVisibilityFilter={boxVisibilityFilter}
-                            boxColors={boxColors}
-                            className='h-full' // Ensure it fills its container
-                            // --- Pass hover state down ---
-                            hoveredTimestamp={hoveredTimestamp}
-                            onHoverChange={handleHoverChange}
-                        />
-                    )}
+                    <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
+                        {boxColors && histogramData && (
+                            <BoxTimeline
+                                data={histogramData}
+                                boxOffset={settings.startIndex}
+                                visibleBoxesCount={settings.maxBoxCount}
+                                boxVisibilityFilter={boxVisibilityFilter}
+                                boxColors={boxColors}
+                                className='h-full' // Ensure it fills its container
+                                // --- Pass hover state down ---
+                                hoveredTimestamp={hoveredTimestamp}
+                                onHoverChange={handleHoverChange}
+                            />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

@@ -4,8 +4,6 @@ import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
 import AuthClient from './AuthClient';
 
-import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
-
 interface PageProps {
     params: Promise<{
         pair: string;
@@ -13,7 +11,7 @@ interface PageProps {
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 100;
+    const CANDLE_LIMIT = 70;
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min`, {
             headers: {
