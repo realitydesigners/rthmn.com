@@ -53,7 +53,7 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
     className = '',
     hoveredTimestamp,
     onHoverChange,
-    showLine = false,
+    showLine = true,
 }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -153,13 +153,34 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
 
             const orderedAndSnappedBoxes = [...negativeBoxes, ...positiveBoxes];
 
+            // Find smallest absolute value box for line position
+            const smallestBox = orderedAndSnappedBoxes.length > 0 ? orderedAndSnappedBoxes.reduce((min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min)) : null;
+
             // --- Determine frame background tint based on largest visible box ---
             let isLargestPositive = true; // Default if no boxes
-            if (orderedAndSnappedBoxes.length > 0) {
-                const largestBox = orderedAndSnappedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+            const largestBox = orderedAndSnappedBoxes.length > 0 ? orderedAndSnappedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max)) : null;
+
+            if (largestBox) {
                 isLargestPositive = largestBox.value >= 0;
             }
-            // --- End background tint logic ---
+
+            // Calculate line point position
+            if (smallestBox) {
+                const isPositive = smallestBox.value >= 0;
+                const boxIndex = orderedAndSnappedBoxes.findIndex((box) => box.value === smallestBox.value);
+
+                // Calculate Y position based on box position and whether it's positive/negative
+                const y = isPositive
+                    ? boxIndex * BOX_HEIGHT // Top of box for positive
+                    : (boxIndex + 1) * BOX_HEIGHT; // Bottom of box for negative
+
+                linePoints.push({
+                    x: x,
+                    y: y,
+                    isPositive: isPositive,
+                    isLargestPositive: isLargestPositive,
+                });
+            }
 
             // 3. Filter based on visibility setting (applied *after* sorting/snapping)
             const filteredAndVisibleBoxes = orderedAndSnappedBoxes.filter((level) => {
@@ -201,44 +222,37 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                 ctx.textBaseline = 'middle';
                 const displayValue = snappedValue.toFixed(0); // Display snapped integer value
                 ctx.fillText(displayValue, x + BOX_WIDTH / 2, y + BOX_HEIGHT / 2);
-
-                // Draw thin grid lines (adjust if hovered?)
-                ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.1)';
-                ctx.lineWidth = 0.5;
-                ctx.strokeRect(x, y, BOX_WIDTH, BOX_HEIGHT);
-
-                // Make sure this part calculates and pushes to linePoints correctly
-                linePoints.push({ x, y: y, isPositive: isPositiveBox, isLargestPositive });
             });
         });
 
         // === Conditionally Draw Line and Fill Area (Integrated Logic) ===
-        if (showLine) {
-            if (linePoints.length > 0) {
-                // --- Draw Fill Area ---
-                for (let i = 0; i < linePoints.length - 1; i++) {
-                    const currentPoint = linePoints[i];
-                    const nextPoint = linePoints[i + 1];
+        if (showLine && linePoints.length > 0) {
+            // Draw fill areas first
+            for (let i = 0; i < linePoints.length - 1; i++) {
+                const currentPoint = linePoints[i];
+                const nextPoint = linePoints[i + 1];
 
-                    ctx.beginPath();
-                    if (currentPoint.isLargestPositive) {
-                        ctx.moveTo(currentPoint.x, 0);
-                        ctx.lineTo(nextPoint.x, 0);
-                        ctx.lineTo(nextPoint.x, nextPoint.y);
-                        ctx.lineTo(currentPoint.x, currentPoint.y);
-                    } else {
-                        ctx.moveTo(currentPoint.x, currentPoint.y);
-                        ctx.lineTo(nextPoint.x, nextPoint.y);
-                        ctx.lineTo(nextPoint.x, canvasHeight);
-                        ctx.lineTo(currentPoint.x, canvasHeight);
-                    }
-                    ctx.closePath();
-
-                    const fillColor = currentPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
-                    ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.8)`;
-                    ctx.fill();
+                ctx.beginPath();
+                if (currentPoint.isLargestPositive) {
+                    ctx.moveTo(currentPoint.x, 0);
+                    ctx.lineTo(nextPoint.x, 0);
+                    ctx.lineTo(nextPoint.x, nextPoint.y);
+                    ctx.lineTo(currentPoint.x, currentPoint.y);
+                } else {
+                    ctx.moveTo(currentPoint.x, currentPoint.y);
+                    ctx.lineTo(nextPoint.x, nextPoint.y);
+                    ctx.lineTo(nextPoint.x, canvasHeight);
+                    ctx.lineTo(currentPoint.x, canvasHeight);
                 }
-                // Last segment fill
+                ctx.closePath();
+
+                const fillColor = currentPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
+                ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.3)`;
+                ctx.fill();
+            }
+
+            // Handle last segment
+            if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
                 ctx.beginPath();
                 if (lastPoint.isLargestPositive) {
@@ -253,28 +267,32 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                     ctx.lineTo(lastPoint.x, canvasHeight);
                 }
                 ctx.closePath();
+
                 const fillColor = lastPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
-                ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.8)`;
+                ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.3)`;
                 ctx.fill();
-
-                // --- Draw the white line itself on top ---
-                ctx.beginPath();
-                linePoints.forEach((point, index) => {
-                    const actualX = point.x + BOX_WIDTH / 2;
-                    if (index === 0) {
-                        ctx.moveTo(actualX, point.y);
-                    } else {
-                        ctx.lineTo(actualX, point.y);
-                    }
-                });
-                // Extend line to the end of the last box
-                const lastP = linePoints[linePoints.length - 1];
-                ctx.lineTo(lastP.x + BOX_WIDTH, lastP.y);
-
-                ctx.lineWidth = 1.5;
-                ctx.strokeStyle = '#FFFFFF';
-                ctx.stroke();
             }
+
+            // Draw the white line on top
+            ctx.beginPath();
+            linePoints.forEach((point, index) => {
+                const x = point.x; // Remove the BOX_WIDTH/2 offset
+                if (index === 0) {
+                    ctx.moveTo(x, point.y);
+                } else {
+                    ctx.lineTo(x, point.y);
+                }
+            });
+
+            // Extend the line to the end of the last box
+            if (linePoints.length > 0) {
+                const lastPoint = linePoints[linePoints.length - 1];
+                ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y);
+            }
+
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.stroke();
         }
         // === End Line and Fill Area ===
 
