@@ -6,6 +6,8 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box } from '@/types/types'; // Assuming Box has { high, low, value }
 import { BoxColors } from '@/stores/colorStore'; // Assuming this provides { positive: string, negative: string }
 import { BoxSizes } from '@/utils/instruments'; // Import BoxSizes
+// Remove the import for the separate file
+// import { drawBoxTimelineLine } from './BoxTimelineLine';
 
 // Define the expected shape of the data items passed in the data prop
 interface BoxTimelineFrame {
@@ -23,6 +25,7 @@ interface BoxTimelineProps {
     className?: string;
     hoveredTimestamp?: number | null;
     onHoverChange?: (timestamp: number | null) => void;
+    showLine?: boolean; // Ensure showLine prop is defined
 }
 
 // Define the findNearestBoxSize helper function locally
@@ -41,7 +44,17 @@ const BOX_HEIGHT = 15; // Height of each box cell
 const MAX_FRAMES = 1000; // Limit drawn frames for performance
 const FONT_SIZE = 8;
 
-const BoxTimeline: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, className = '', hoveredTimestamp, onHoverChange }) => {
+const BoxTimeline: React.FC<BoxTimelineProps> = ({
+    data,
+    boxOffset,
+    visibleBoxesCount,
+    boxVisibilityFilter,
+    boxColors,
+    className = '',
+    hoveredTimestamp,
+    onHoverChange,
+    showLine = false,
+}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = useState(false);
@@ -97,6 +110,9 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxes
         ctx.fillStyle = '#0a0a0a'; // Background color
         ctx.fillRect(0, 0, canvasWidth, canvasHeight);
 
+        // --- Array to store points for the line ---
+        const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
+
         framesToDraw.forEach((frame, frameIndex) => {
             const x = frameIndex * BOX_WIDTH;
             const frameTimestamp = new Date(frame.timestamp).getTime(); // Get timestamp for comparison
@@ -137,6 +153,14 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxes
 
             const orderedAndSnappedBoxes = [...negativeBoxes, ...positiveBoxes];
 
+            // --- Determine frame background tint based on largest visible box ---
+            let isLargestPositive = true; // Default if no boxes
+            if (orderedAndSnappedBoxes.length > 0) {
+                const largestBox = orderedAndSnappedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+                isLargestPositive = largestBox.value >= 0;
+            }
+            // --- End background tint logic ---
+
             // 3. Filter based on visibility setting (applied *after* sorting/snapping)
             const filteredAndVisibleBoxes = orderedAndSnappedBoxes.filter((level) => {
                 if (boxVisibilityFilter === 'positive') return level.value > 0;
@@ -148,12 +172,30 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxes
             filteredAndVisibleBoxes.forEach((box, boxIndex) => {
                 const y = boxIndex * BOX_HEIGHT; // Y position determined by final sorted/filtered order
                 const snappedValue = box.value; // Value is already snapped from step 2
-                const isPositive = snappedValue >= 0;
-                ctx.fillStyle = isPositive ? boxColors.positive : boxColors.negative;
+                const isPositiveBox = snappedValue >= 0; // Sign of the current box
+
+                // --- Apply conditional background color from HistogramSimple ---
+                const posColor = boxColors.positive;
+                const negColor = boxColors.negative;
+                if (isLargestPositive) {
+                    if (isPositiveBox) {
+                        ctx.fillStyle = `rgba(${parseInt(posColor.slice(1, 3), 16)}, ${parseInt(posColor.slice(3, 5), 16)}, ${parseInt(posColor.slice(5, 7), 16)}, 0.1)`;
+                    } else {
+                        ctx.fillStyle = `rgba(${parseInt(posColor.slice(1, 3), 16)}, ${parseInt(posColor.slice(3, 5), 16)}, ${parseInt(posColor.slice(5, 7), 16)}, 0.3)`;
+                    }
+                } else {
+                    if (isPositiveBox) {
+                        ctx.fillStyle = `rgba(${parseInt(negColor.slice(1, 3), 16)}, ${parseInt(negColor.slice(3, 5), 16)}, ${parseInt(negColor.slice(5, 7), 16)}, 0.3)`;
+                    } else {
+                        ctx.fillStyle = `rgba(${parseInt(negColor.slice(1, 3), 16)}, ${parseInt(negColor.slice(3, 5), 16)}, ${parseInt(negColor.slice(5, 7), 16)}, 0.1)`;
+                    }
+                }
+                // --- End conditional background color ---
+
                 ctx.fillRect(x, y, BOX_WIDTH, BOX_HEIGHT);
 
                 // Draw value text (optional) - Use snapped value
-                ctx.fillStyle = '#ffffff'; // White text
+                ctx.fillStyle = '#000000'; // White text
                 ctx.font = `${FONT_SIZE}px monospace`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -164,14 +206,83 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxes
                 ctx.strokeStyle = isHovered ? 'rgba(255, 255, 255, 0.3)' : 'rgba(255, 255, 255, 0.1)';
                 ctx.lineWidth = 0.5;
                 ctx.strokeRect(x, y, BOX_WIDTH, BOX_HEIGHT);
+
+                // Make sure this part calculates and pushes to linePoints correctly
+                linePoints.push({ x, y: y, isPositive: isPositiveBox, isLargestPositive });
             });
         });
+
+        // === Conditionally Draw Line and Fill Area (Integrated Logic) ===
+        if (showLine) {
+            if (linePoints.length > 0) {
+                // --- Draw Fill Area ---
+                for (let i = 0; i < linePoints.length - 1; i++) {
+                    const currentPoint = linePoints[i];
+                    const nextPoint = linePoints[i + 1];
+
+                    ctx.beginPath();
+                    if (currentPoint.isLargestPositive) {
+                        ctx.moveTo(currentPoint.x, 0);
+                        ctx.lineTo(nextPoint.x, 0);
+                        ctx.lineTo(nextPoint.x, nextPoint.y);
+                        ctx.lineTo(currentPoint.x, currentPoint.y);
+                    } else {
+                        ctx.moveTo(currentPoint.x, currentPoint.y);
+                        ctx.lineTo(nextPoint.x, nextPoint.y);
+                        ctx.lineTo(nextPoint.x, canvasHeight);
+                        ctx.lineTo(currentPoint.x, canvasHeight);
+                    }
+                    ctx.closePath();
+
+                    const fillColor = currentPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
+                    ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.8)`;
+                    ctx.fill();
+                }
+                // Last segment fill
+                const lastPoint = linePoints[linePoints.length - 1];
+                ctx.beginPath();
+                if (lastPoint.isLargestPositive) {
+                    ctx.moveTo(lastPoint.x, 0);
+                    ctx.lineTo(lastPoint.x + BOX_WIDTH, 0);
+                    ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y);
+                    ctx.lineTo(lastPoint.x, lastPoint.y);
+                } else {
+                    ctx.moveTo(lastPoint.x, lastPoint.y);
+                    ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y);
+                    ctx.lineTo(lastPoint.x + BOX_WIDTH, canvasHeight);
+                    ctx.lineTo(lastPoint.x, canvasHeight);
+                }
+                ctx.closePath();
+                const fillColor = lastPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
+                ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.8)`;
+                ctx.fill();
+
+                // --- Draw the white line itself on top ---
+                ctx.beginPath();
+                linePoints.forEach((point, index) => {
+                    const actualX = point.x + BOX_WIDTH / 2;
+                    if (index === 0) {
+                        ctx.moveTo(actualX, point.y);
+                    } else {
+                        ctx.lineTo(actualX, point.y);
+                    }
+                });
+                // Extend line to the end of the last box
+                const lastP = linePoints[linePoints.length - 1];
+                ctx.lineTo(lastP.x + BOX_WIDTH, lastP.y);
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = '#FFFFFF';
+                ctx.stroke();
+            }
+        }
+        // === End Line and Fill Area ===
 
         // Scroll to end
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
         }
-    }, [data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, isClient, hoveredTimestamp]);
+    }, [data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, isClient, hoveredTimestamp, showLine]);
 
     // Calculate dimensions for initial render / SSR safety
     const initialFrames = data ? data.slice(Math.max(0, data.length - MAX_FRAMES)) : [];
