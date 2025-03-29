@@ -59,6 +59,18 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = useState(false);
     const [trendChanges, setTrendChanges] = useState<Array<{ timestamp: string; x: number; isPositive: boolean }>>([]);
+    const [effectiveBoxWidth, setEffectiveBoxWidth] = useState(0);
+
+    // Calculate dynamic box dimensions based on container and visible boxes
+    const calculateBoxDimensions = (containerHeight: number, frameCount: number) => {
+        // Force boxes to fill the container height
+        const boxSize = Math.floor(containerHeight / visibleBoxesCount);
+
+        // Calculate required width for square boxes
+        const requiredWidth = boxSize * frameCount;
+
+        return { boxSize, requiredWidth };
+    };
 
     useEffect(() => {
         setIsClient(true);
@@ -78,14 +90,14 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         return [...negativeBoxes, ...positiveBoxes].join('|');
     };
 
-    // --- Handle mouse move to detect hover ---
-    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        if (!canvasRef.current || !onHoverChange || !data || data.length === 0) return;
+    // Handle mouse events
+    const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+        if (!canvasRef.current || !onHoverChange || !data || data.length === 0 || effectiveBoxWidth === 0) return;
 
         const rect = canvasRef.current.getBoundingClientRect();
-        const x = event.clientX - rect.left; // X position within the canvas
+        const x = event.clientX - rect.left;
+        const frameIndex = Math.floor(x / effectiveBoxWidth);
 
-        // Get the deduplicated frames first
         const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
         const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
             if (index === 0) return [frame];
@@ -99,9 +111,6 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
             }
             return acc;
         }, []);
-
-        // Calculate index based on position and box width using unique frames
-        const frameIndex = Math.floor(x / BOX_WIDTH);
 
         if (frameIndex >= 0 && frameIndex < uniqueFrames.length) {
             const hoveredFrame = uniqueFrames[frameIndex];
@@ -127,6 +136,12 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
+        // Get container dimensions
+        const container = canvas.parentElement;
+        if (!container) return;
+        const rect = container.getBoundingClientRect();
+
+        // Get frames to draw
         const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
         const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
             if (index === 0) return [frame];
@@ -141,15 +156,35 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
             return acc;
         }, []);
 
+        // Calculate box dimensions based on container height
+        const { boxSize, requiredWidth } = calculateBoxDimensions(rect.height - 24, uniqueFrames.length);
+        setEffectiveBoxWidth(boxSize);
+
+        // Set canvas size
+        canvas.style.width = `${requiredWidth}px`;
+        canvas.style.height = `${rect.height}px`;
+
+        // Set high-DPI canvas
+        const scale = window.devicePixelRatio;
+        canvas.width = Math.floor(requiredWidth * scale);
+        canvas.height = Math.floor(rect.height * scale);
+        ctx.scale(scale, scale);
+
+        // Clear canvas
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, requiredWidth, rect.height);
+
         // Track trend changes
         const newTrendChanges: Array<{ timestamp: string; x: number; isPositive: boolean }> = [];
         let prevIsLargestPositive: boolean | null = null;
 
+        // --- Array to store points for the line ---
+        const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
+
         uniqueFrames.forEach((frame, frameIndex) => {
-            const x = frameIndex * BOX_WIDTH;
+            const x = frameIndex * boxSize;
             const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
             const largestBox = boxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), boxes[0]);
-
             const isLargestPositive = largestBox.value >= 0;
 
             if (prevIsLargestPositive !== null && prevIsLargestPositive !== isLargestPositive) {
@@ -160,48 +195,21 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                 });
             }
             prevIsLargestPositive = isLargestPositive;
-        });
 
-        setTrendChanges(newTrendChanges);
-
-        const canvasWidth = uniqueFrames.length * BOX_WIDTH;
-        const canvasHeight = visibleBoxesCount * BOX_HEIGHT;
-
-        canvas.width = canvasWidth;
-        canvas.height = canvasHeight;
-
-        // Clear canvas
-        ctx.fillStyle = '#0a0a0a'; // Background color
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-
-        // --- Array to store points for the line ---
-        const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
-
-        uniqueFrames.forEach((frame, frameIndex) => {
-            const x = frameIndex * BOX_WIDTH;
-            const frameTimestamp = new Date(frame.timestamp).getTime(); // Get timestamp for comparison
+            // Draw boxes
+            const frameTimestamp = new Date(frame.timestamp).getTime();
             const isHovered = frameTimestamp === hoveredTimestamp;
 
-            // Draw background highlight if hovered
             if (isHovered) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)'; // Semi-transparent white highlight
-                ctx.fillRect(x, 0, BOX_WIDTH, canvasHeight);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.fillRect(x, 0, boxSize, rect.height);
             }
 
-            // Ensure progressiveValues exists and is an array
-            if (!frame.progressiveValues || !Array.isArray(frame.progressiveValues)) {
-                console.warn(`Frame at index ${frameIndex} missing or invalid progressiveValues.`);
-                return;
-            }
-
-            // Data is assumed sorted by ascending absolute value from processProgressiveBoxValues
-            // 1. Slice based on timeframe slider
+            // Process boxes
             const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-
-            // 2. Apply negative-then-positive sorting and snapping (User's Logic)
             const negativeBoxes = slicedBoxes
                 .filter((box) => box.value < 0)
-                .sort((a, b) => a.value - b.value) // Sort ascending (most negative first)
+                .sort((a, b) => a.value - b.value)
                 .map((box) => ({
                     ...box,
                     value: findNearestBoxSize(box.value),
@@ -209,7 +217,7 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
 
             const positiveBoxes = slicedBoxes
                 .filter((box) => box.value > 0)
-                .sort((a, b) => a.value - b.value) // Sort ascending (smallest positive first)
+                .sort((a, b) => a.value - b.value)
                 .map((box) => ({
                     ...box,
                     value: findNearestBoxSize(box.value),
@@ -220,23 +228,11 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
             // Find smallest absolute value box for line position
             const smallestBox = orderedAndSnappedBoxes.length > 0 ? orderedAndSnappedBoxes.reduce((min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min)) : null;
 
-            // --- Determine frame background tint based on largest visible box ---
-            let isLargestPositive = true; // Default if no boxes
-            const largestBox = orderedAndSnappedBoxes.length > 0 ? orderedAndSnappedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max)) : null;
-
-            if (largestBox) {
-                isLargestPositive = largestBox.value >= 0;
-            }
-
             // Calculate line point position
             if (smallestBox) {
                 const isPositive = smallestBox.value >= 0;
                 const boxIndex = orderedAndSnappedBoxes.findIndex((box) => box.value === smallestBox.value);
-
-                // Calculate Y position based on box position and whether it's positive/negative
-                const y = isPositive
-                    ? boxIndex * BOX_HEIGHT // Top of box for positive
-                    : (boxIndex + 1) * BOX_HEIGHT; // Bottom of box for negative
+                const y = isPositive ? boxIndex * boxSize : (boxIndex + 1) * boxSize;
 
                 linePoints.push({
                     x: x,
@@ -246,50 +242,38 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                 });
             }
 
-            // 3. Filter based on visibility setting (applied *after* sorting/snapping)
-            const filteredAndVisibleBoxes = orderedAndSnappedBoxes.filter((level) => {
-                if (boxVisibilityFilter === 'positive') return level.value > 0;
-                if (boxVisibilityFilter === 'negative') return level.value < 0;
-                return true; // 'all'
-            });
+            // Draw boxes with new dimensions
+            orderedAndSnappedBoxes.forEach((box, boxIndex) => {
+                const y = boxIndex * boxSize;
+                const snappedValue = box.value;
+                const isPositiveBox = snappedValue >= 0;
 
-            // 4. Draw the final filtered and ordered boxes
-            filteredAndVisibleBoxes.forEach((box, boxIndex) => {
-                const y = boxIndex * BOX_HEIGHT; // Y position determined by final sorted/filtered order
-                const snappedValue = box.value; // Value is already snapped from step 2
-                const isPositiveBox = snappedValue >= 0; // Sign of the current box
-
-                // --- Apply conditional background color from HistogramSimple ---
-                const posColor = boxColors.positive;
-                const negColor = boxColors.negative;
+                // Set colors
                 if (isLargestPositive) {
-                    if (isPositiveBox) {
-                        ctx.fillStyle = `rgba(${parseInt(posColor.slice(1, 3), 16)}, ${parseInt(posColor.slice(3, 5), 16)}, ${parseInt(posColor.slice(5, 7), 16)}, 0.1)`;
-                    } else {
-                        ctx.fillStyle = `rgba(${parseInt(posColor.slice(1, 3), 16)}, ${parseInt(posColor.slice(3, 5), 16)}, ${parseInt(posColor.slice(5, 7), 16)}, 0.3)`;
-                    }
+                    ctx.fillStyle = isPositiveBox
+                        ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
+                        : `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
                 } else {
-                    if (isPositiveBox) {
-                        ctx.fillStyle = `rgba(${parseInt(negColor.slice(1, 3), 16)}, ${parseInt(negColor.slice(3, 5), 16)}, ${parseInt(negColor.slice(5, 7), 16)}, 0.3)`;
-                    } else {
-                        ctx.fillStyle = `rgba(${parseInt(negColor.slice(1, 3), 16)}, ${parseInt(negColor.slice(3, 5), 16)}, ${parseInt(negColor.slice(5, 7), 16)}, 0.1)`;
-                    }
+                    ctx.fillStyle = isPositiveBox
+                        ? `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
+                        : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
                 }
-                // --- End conditional background color ---
 
-                ctx.fillRect(x, y, BOX_WIDTH, BOX_HEIGHT);
+                // Draw box
+                ctx.fillRect(x, y, boxSize, boxSize);
 
-                // Draw value text (optional) - Use snapped value
-                ctx.fillStyle = '#000000'; // White text
-                ctx.font = `${FONT_SIZE}px monospace`;
+                // Draw text
+                ctx.fillStyle = '#000000';
+                const fontSize = Math.min(boxSize / 2, boxSize / 2);
+                ctx.font = `${fontSize}px monospace`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                const displayValue = snappedValue.toFixed(0); // Display snapped integer value
-                ctx.fillText(displayValue, x + BOX_WIDTH / 2, y + BOX_HEIGHT / 2);
+                const displayValue = snappedValue.toFixed(0);
+                ctx.fillText(displayValue, x + boxSize / 2, y + boxSize / 2);
             });
         });
 
-        // === Conditionally Draw Line and Fill Area (Integrated Logic) ===
+        // === Draw Line and Fill Area ===
         if (showLine && linePoints.length > 0) {
             // Draw fill areas first
             for (let i = 0; i < linePoints.length - 1; i++) {
@@ -305,8 +289,8 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                 } else {
                     ctx.moveTo(currentPoint.x, currentPoint.y);
                     ctx.lineTo(nextPoint.x, nextPoint.y);
-                    ctx.lineTo(nextPoint.x, canvasHeight);
-                    ctx.lineTo(currentPoint.x, canvasHeight);
+                    ctx.lineTo(nextPoint.x, rect.height);
+                    ctx.lineTo(currentPoint.x, rect.height);
                 }
                 ctx.closePath();
 
@@ -321,14 +305,14 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                 ctx.beginPath();
                 if (lastPoint.isLargestPositive) {
                     ctx.moveTo(lastPoint.x, 0);
-                    ctx.lineTo(lastPoint.x + BOX_WIDTH, 0);
-                    ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y);
+                    ctx.lineTo(lastPoint.x + boxSize, 0);
+                    ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
                     ctx.lineTo(lastPoint.x, lastPoint.y);
                 } else {
                     ctx.moveTo(lastPoint.x, lastPoint.y);
-                    ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y);
-                    ctx.lineTo(lastPoint.x + BOX_WIDTH, canvasHeight);
-                    ctx.lineTo(lastPoint.x, canvasHeight);
+                    ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
+                    ctx.lineTo(lastPoint.x + boxSize, rect.height);
+                    ctx.lineTo(lastPoint.x, rect.height);
                 }
                 ctx.closePath();
 
@@ -340,18 +324,17 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
             // Draw the white line on top
             ctx.beginPath();
             linePoints.forEach((point, index) => {
-                const x = point.x; // Remove the BOX_WIDTH/2 offset
                 if (index === 0) {
-                    ctx.moveTo(x, point.y);
+                    ctx.moveTo(point.x, point.y);
                 } else {
-                    ctx.lineTo(x, point.y);
+                    ctx.lineTo(point.x, point.y);
                 }
             });
 
             // Extend the line to the end of the last box
             if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
-                ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y);
+                ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
             }
 
             ctx.lineWidth = 2;
@@ -360,23 +343,15 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         }
         // === End Line and Fill Area ===
 
-        // Scroll to end
-        if (scrollContainerRef.current) {
-            scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
-        }
+        setTrendChanges(newTrendChanges);
     }, [data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, isClient, hoveredTimestamp, showLine]);
-
-    // Calculate dimensions for initial render / SSR safety
-    const initialFrames = data ? data.slice(Math.max(0, data.length - MAX_FRAMES)) : [];
-    const initialWidth = initialFrames.length * BOX_WIDTH;
-    const initialHeight = visibleBoxesCount * BOX_HEIGHT;
 
     return (
         <div className={`relative ${className}`}>
-            <div className='scrollbar-hide h-full w-full overflow-x-auto' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-                <div style={{ width: `${initialWidth}px` }} className='relative'>
+            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto'>
+                <div className='relative h-full'>
                     {/* Trend Change Markers */}
-                    <div className='absolute -top-6 right-0 left-0 ml-4 h-6 w-full'>
+                    <div className='absolute -top-6 right-0 left-0 ml-4 h-6'>
                         {trendChanges.map((change, index) => (
                             <div
                                 key={`${change.timestamp}-${index}`}
@@ -391,8 +366,8 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
                     </div>
 
                     {/* Canvas */}
-                    <div className='mt-6 w-full'>
-                        <canvas ref={canvasRef} width={initialWidth > 0 ? initialWidth : 300} height={initialHeight > 0 ? initialHeight : 100} className='block' />
+                    <div className='mt-6 h-full'>
+                        <canvas ref={canvasRef} className='block h-full' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} />
                     </div>
                 </div>
             </div>
