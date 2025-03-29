@@ -73,43 +73,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         return [...negativeBoxes, ...positiveBoxes].join('|');
     };
 
-    // Handle mouse events
-    const handleMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-        if (!canvasRef.current || !onHoverChange || !data || data.length === 0 || effectiveBoxWidth === 0) return;
-
-        const rect = canvasRef.current.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const frameIndex = Math.floor(x / effectiveBoxWidth);
-
-        const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
-        const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
-            if (index === 0) return [frame];
-
-            const prevFrame = acc[acc.length - 1];
-            const currentSignature = getFrameSignature(frame);
-            const prevSignature = getFrameSignature(prevFrame);
-
-            if (currentSignature !== prevSignature) {
-                return [...acc, frame];
-            }
-            return acc;
-        }, []);
-
-        if (frameIndex >= 0 && frameIndex < uniqueFrames.length) {
-            const hoveredFrame = uniqueFrames[frameIndex];
-            const timestamp = new Date(hoveredFrame.timestamp).getTime();
-            onHoverChange(timestamp);
-        } else {
-            onHoverChange(null);
-        }
-    };
-
-    const handleMouseLeave = () => {
-        if (onHoverChange) {
-            onHoverChange(null);
-        }
-    };
-
     useEffect(() => {
         if (!isClient || !data || data.length === 0) return;
 
@@ -329,6 +292,49 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         setTrendChanges(newTrendChanges);
     }, [data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, isClient, hoveredTimestamp, showLine]);
 
+    // Effect to scroll the histogram when hoveredTimestamp changes
+    useEffect(() => {
+        if (hoveredTimestamp && scrollContainerRef.current && effectiveBoxWidth > 0 && data.length > 0) {
+            // Regenerate uniqueFrames based on current data (consistent with drawing logic)
+            // Note: This might be inefficient if data is huge. Consider optimizing if needed.
+            const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
+            const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
+                if (index === 0) return [frame];
+                const prevFrame = acc[acc.length - 1];
+                const currentSignature = getFrameSignature(frame);
+                const prevSignature = getFrameSignature(prevFrame);
+                if (currentSignature !== prevSignature) {
+                    return [...acc, frame];
+                }
+                return acc;
+            }, []);
+
+            // Find the index of the frame matching the hovered timestamp
+            const targetIndex = uniqueFrames.findIndex((frame) => new Date(frame.timestamp).getTime() === hoveredTimestamp);
+
+            if (targetIndex !== -1) {
+                const container = scrollContainerRef.current;
+                const containerWidth = container.clientWidth;
+
+                // Calculate the target scrollLeft position
+                // We want the right edge of the target frame to be at the right edge of the container
+                const targetFrameRightEdge = (targetIndex + 1) * effectiveBoxWidth;
+                let targetScrollLeft = targetFrameRightEdge - containerWidth;
+
+                // Clamp the scroll value
+                const maxScrollLeft = container.scrollWidth - containerWidth;
+                targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+
+                // Scroll smoothly to the calculated position
+                container.scrollTo({
+                    left: targetScrollLeft,
+                    behavior: 'smooth',
+                });
+            }
+        }
+        // Dependencies: React when hover changes, or when data/layout impacting scroll calculations change.
+    }, [hoveredTimestamp, data, effectiveBoxWidth, boxOffset, visibleBoxesCount]);
+
     return (
         <div className={`relative ${className}`}>
             <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto'>
@@ -350,7 +356,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
                     {/* Canvas */}
                     <div className='mt-6 h-full'>
-                        <canvas ref={canvasRef} className='block h-full' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave} />
+                        <canvas ref={canvasRef} className='block h-full' />
                     </div>
                 </div>
             </div>

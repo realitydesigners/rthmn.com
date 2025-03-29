@@ -138,6 +138,22 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     <div className='flex h-full items-center justify-center'>Loading Chart...</div>
                                 )}
                             </div>
+                            <div className='h-[200px] w-full px-4'>
+                                <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
+                                    {boxColors && histogramData && (
+                                        <Histogram
+                                            data={histogramData}
+                                            boxOffset={settings.startIndex}
+                                            visibleBoxesCount={settings.maxBoxCount}
+                                            boxVisibilityFilter={boxVisibilityFilter}
+                                            boxColors={boxColors}
+                                            className='h-full'
+                                            hoveredTimestamp={hoveredTimestamp}
+                                            onHoverChange={handleHoverChange}
+                                        />
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className='h-full w-1/4 border-r border-[#222] p-4'>
@@ -158,22 +174,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                 </div>
                             )}
                         </div>
-                    </div>
-                </div>
-                <div className='h-[200px] w-full px-4'>
-                    <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
-                        {boxColors && histogramData && (
-                            <Histogram
-                                data={histogramData}
-                                boxOffset={settings.startIndex}
-                                visibleBoxesCount={settings.maxBoxCount}
-                                boxVisibilityFilter={boxVisibilityFilter}
-                                boxColors={boxColors}
-                                className='h-full'
-                                hoveredTimestamp={hoveredTimestamp}
-                                onHoverChange={handleHoverChange}
-                            />
-                        )}
                     </div>
                 </div>
             </div>
