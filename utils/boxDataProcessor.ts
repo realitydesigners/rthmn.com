@@ -18,6 +18,56 @@ interface ExtendedBoxSlice {
     };
 }
 
+// Helper function to safely convert timestamp to ISO string
+const safeISOString = (timestamp: number | string): string => {
+    try {
+        // Ensure consistent timestamp handling between server and client
+        // If timestamp is already a number (milliseconds), use it directly
+        if (typeof timestamp === 'number') {
+            // Use a fixed format instead of toISOString() to avoid timezone issues
+            const date = new Date(timestamp);
+            return (
+                date.getUTCFullYear() +
+                '-' +
+                String(date.getUTCMonth() + 1).padStart(2, '0') +
+                '-' +
+                String(date.getUTCDate()).padStart(2, '0') +
+                'T' +
+                String(date.getUTCHours()).padStart(2, '0') +
+                ':' +
+                String(date.getUTCMinutes()).padStart(2, '0') +
+                ':' +
+                String(date.getUTCSeconds()).padStart(2, '0') +
+                '.' +
+                String(date.getUTCMilliseconds()).padStart(3, '0') +
+                'Z'
+            );
+        }
+        // If it's a string, parse it as a date
+        const date = new Date(timestamp);
+        return (
+            date.getUTCFullYear() +
+            '-' +
+            String(date.getUTCMonth() + 1).padStart(2, '0') +
+            '-' +
+            String(date.getUTCDate()).padStart(2, '0') +
+            'T' +
+            String(date.getUTCHours()).padStart(2, '0') +
+            ':' +
+            String(date.getUTCMinutes()).padStart(2, '0') +
+            ':' +
+            String(date.getUTCSeconds()).padStart(2, '0') +
+            '.' +
+            String(date.getUTCMilliseconds()).padStart(3, '0') +
+            'Z'
+        );
+    } catch (e) {
+        console.error('Invalid timestamp:', timestamp);
+        // Use a fixed timestamp as fallback instead of current time to ensure consistency
+        return '2023-01-01T00:00:00.000Z';
+    }
+};
+
 export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
     // Sort boxes by absolute value
     const sortedBoxes = [...boxes];
@@ -61,7 +111,7 @@ export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice[
 export function processInitialBoxData(
     processedCandles: { timestamp: number; open: number; high: number; low: number; close: number }[],
     pair: string,
-    defaultVisibleBoxesCount: number = 8,
+    defaultVisibleBoxesCount: number = 7,
     defaultHeight: number = 200,
     initialBarWidth: number = 20
 ) {
@@ -70,7 +120,7 @@ export function processInitialBoxData(
     const boxCalculator = createBoxCalculator(pair.toUpperCase());
     const boxTimeseriesData = processedCandles.map((candle, index) => {
         const candleSlice = processedCandles.slice(0, index + 1).map((c) => ({
-            timestamp: new Date(c.timestamp).toISOString(),
+            timestamp: safeISOString(c.timestamp),
             open: c.open,
             high: c.high,
             low: c.low,
@@ -84,7 +134,7 @@ export function processInitialBoxData(
         }));
 
         return {
-            timestamp: new Date(candle.timestamp).toISOString(),
+            timestamp: safeISOString(candle.timestamp),
             boxes: boxCalculator.calculateBoxArrays(candleSlice),
             currentOHLC: {
                 open: candle.open,

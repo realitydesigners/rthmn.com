@@ -130,7 +130,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                         {/* Box Values Table */}
                         {filteredBoxSlice && (
                             <>
-                                <div className='font-kodemono mb-2 text-sm text-gray-400'>Timestamp: {new Date(filteredBoxSlice.timestamp).toLocaleString()}</div>
+                                <div className='font-kodemono mb-2 text-sm text-gray-400'>Timestamp: {filteredBoxSlice.timestamp}</div>
                                 <div className='font-kodemono mb-2 text-sm text-gray-400'>
                                     OHLC: O:{filteredBoxSlice.currentOHLC.open.toFixed(5)} H:{filteredBoxSlice.currentOHLC.high.toFixed(5)} L:
                                     {filteredBoxSlice.currentOHLC.low.toFixed(5)} C:{filteredBoxSlice.currentOHLC.close.toFixed(5)}

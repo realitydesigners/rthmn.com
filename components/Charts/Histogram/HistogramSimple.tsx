@@ -11,11 +11,15 @@ const HistogramControls: React.FC<{
     totalBoxes: number;
     visibleBoxesCount: number;
 }> = ({ boxOffset, onOffsetChange, totalBoxes, visibleBoxesCount }) => {
+    // Convert boolean values to string attributes for consistency
+    const isFirstDisabled = boxOffset === 0 ? true : false;
+    const isLastDisabled = boxOffset >= totalBoxes - visibleBoxesCount ? true : false;
+
     return (
         <div className='top-0 right-0 bottom-0 flex h-full w-16 flex-col items-center justify-center border-l border-[#181818] bg-black'>
             <button
                 onClick={() => onOffsetChange(Math.max(0, boxOffset - 1))}
-                disabled={boxOffset === 0}
+                disabled={isFirstDisabled}
                 className='flex h-8 w-8 items-center justify-center rounded-sm border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50'>
                 <div className='text-2xl'>+</div>
             </button>
@@ -25,7 +29,7 @@ const HistogramControls: React.FC<{
             </div>
             <button
                 onClick={() => onOffsetChange(Math.min(totalBoxes - visibleBoxesCount, boxOffset + 1))}
-                disabled={boxOffset >= totalBoxes - visibleBoxesCount}
+                disabled={isLastDisabled}
                 className='flex h-8 w-8 items-center justify-center rounded-sm border border-[#181818] bg-black text-white hover:bg-[#181818] disabled:opacity-50'>
                 <div className='text-2xl'>-</div>
             </button>
@@ -39,7 +43,7 @@ const HistogramSimple: React.FC<{
     visibleBoxesCount?: number;
     onOffsetChange?: (newOffset: number) => void;
     showLine?: boolean;
-}> = ({ data, boxOffset = 0, visibleBoxesCount = 8, onOffsetChange, showLine = false }) => {
+}> = ({ data, boxOffset = 0, visibleBoxesCount = 7, onOffsetChange, showLine = false }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -50,6 +54,12 @@ const HistogramSimple: React.FC<{
     const { boxColors } = useColorStore();
     const params = useParams();
     const { handleOffsetChange } = useUrlParams(params.pair as string);
+    const [isClient, setIsClient] = useState(false);
+
+    // Set isClient to true after component mounts
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     // Improved frame deduplication logic
     const uniqueFrames = useMemo(() => {
@@ -99,8 +109,10 @@ const HistogramSimple: React.FC<{
         }
     }, [boxOffset, uniqueFrames]);
 
-    // Update canvas when frames change
+    // Update canvas when frames change - only on client side
     useEffect(() => {
+        if (!isClient) return;
+
         const canvas = canvasRef.current;
         if (!canvas || !uniqueFrames.length) return;
 
@@ -194,20 +206,19 @@ const HistogramSimple: React.FC<{
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
         }
-    }, [uniqueFrames, boxColors, boxOffset, showLine]);
+    }, [uniqueFrames, boxColors, boxOffset, showLine, isClient]);
 
     if (!uniqueFrames.length) return null;
 
+    // Fixed dimensions for the canvas to ensure hydration consistency
+    const canvasWidth = uniqueFrames.length * BOX_WIDTH;
+    const canvasHeight = VISIBLE_BOXES_COUNT * BOX_HEIGHT;
+
+    // Fixed canvas dimensions for consistent server/client rendering
     return (
         <div className='relative h-full w-full' ref={containerRef}>
             <div ref={scrollContainerRef} className='scrollbar-hide flex h-full w-full items-center overflow-x-auto pr-20'>
-                <canvas
-                    ref={canvasRef}
-                    style={{
-                        width: `${uniqueFrames.length * BOX_WIDTH}px`,
-                        height: `${VISIBLE_BOXES_COUNT * BOX_HEIGHT}px`,
-                    }}
-                />
+                <canvas ref={canvasRef} className='histogram-canvas' width={canvasWidth > 0 ? canvasWidth : 100} height={canvasHeight} />
             </div>
             <div className='absolute top-0 right-0 bottom-0'>
                 <HistogramControls
