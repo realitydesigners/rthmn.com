@@ -11,49 +11,19 @@ interface PageProps {
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 60;
+    const CANDLE_LIMIT = 120;
+    const INTERVAL = '1min';
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        const apiUrl = `${baseUrl}/api/getCandles?pair=${pair.toUpperCase()}&limit=${CANDLE_LIMIT}&interval=${INTERVAL}&token=${encodeURIComponent(token)}`;
+        const response = await fetch(apiUrl, {
+            cache: 'no-store',
         });
 
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const { data } = await response.json();
-
-        if (!data || !Array.isArray(data)) {
-            console.error('Invalid data format received:', data);
-            return [];
-        }
-
-        // Convert all timestamps to Unix timestamps (milliseconds since epoch)
-        const processedData = [...data].reverse().map((candle) => {
-            // Parse timestamp considering different formats
-            const getUnixTimestamp = (timestamp: string | number): number => {
-                if (typeof timestamp === 'number') {
-                    // If already a Unix timestamp, return as is
-                    return timestamp;
-                }
-
-                // If timestamp is in format "YYYY-MM-DD HH:mm:ss", assume UTC
-                return new Date(timestamp.replace(' ', 'T') + 'Z').getTime();
-            };
-
-            const timestamp = getUnixTimestamp(candle.timestamp);
-
-            return {
-                timestamp,
-                close: Number(candle.close),
-                high: Number(candle.high),
-                low: Number(candle.low),
-                open: Number(candle.open),
-            };
-        });
-
-        return processedData;
+        return data;
     } catch (error) {
-        console.error('Error fetching candle data:', error);
+        console.error('Error in fetchApiData:', error);
         return [];
     }
 }
@@ -72,16 +42,11 @@ export default async function PairPage(props: PageProps) {
 
     const rawCandleData = await fetchApiData(pair, session.data.session.access_token);
 
-    // Return early if no data
     if (!rawCandleData.length) {
-        console.error('No candle data available');
         return null;
     }
 
-    // Process chart data only if needed for charting
     const { processedCandles, initialVisibleData } = processInitialChartData(rawCandleData);
-
-    // Use raw candle data directly for box calculations
     const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(rawCandleData, pair);
 
     const chartData = {

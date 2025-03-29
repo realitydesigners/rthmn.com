@@ -69,7 +69,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         }
     }, [pair, initializePair]);
 
-    // Memoize the filtered boxes for ResoBox
     const filteredBoxSlice = useMemo(() => {
         if (!boxSlice?.boxes) {
             return undefined;
@@ -81,9 +80,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         return sliced;
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
-    // Add timestamp verification and data synchronization
-
-    // Update candleData and histogramData when chartData changes
     useEffect(() => {
         if (chartData.processedCandles.length > 0) {
             setCandleData(chartData.processedCandles);
