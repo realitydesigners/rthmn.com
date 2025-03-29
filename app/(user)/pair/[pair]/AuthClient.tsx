@@ -66,60 +66,42 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const currentPrice = priceData[uppercasePair]?.price;
     const boxSlice = pairData[uppercasePair]?.boxes?.[0];
 
-    // Initialize timeframe settings for this pair when component mounts
-    useEffect(() => {
-        if (pair) {
-            initializePair(pair);
-        }
-    }, [pair, initializePair]);
-
+    // Handle timeframe changes for both ResoBox and Histogram
     const handleTimeframeChange = useCallback(
         (property: string, value: number | boolean) => {
-            if (pair) {
+            if (pair && typeof value === 'number') {
                 updatePairSettings(pair, { [property]: value });
             }
         },
         [pair, updatePairSettings]
     );
 
+    // Initialize timeframe settings
+    useEffect(() => {
+        if (pair) {
+            initializePair(pair);
+        }
+    }, [pair, initializePair]);
+
     // Memoize the filtered boxes based on timeframe settings
     const filteredBoxSlice = useMemo(() => {
         if (!boxSlice?.boxes) {
-            console.log('No boxes available:', { boxSlice });
             return undefined;
         }
-        const filtered = {
+        return {
             ...boxSlice,
             boxes: boxSlice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount) || [],
         };
-        console.log('Filtered boxes:', {
-            boxCount: filtered.boxes.length,
-            startIndex: settings.startIndex,
-            maxBoxCount: settings.maxBoxCount,
-        });
-        return filtered;
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
-
-    // Debug data availability
-    useEffect(() => {
-        console.log('Data check:', {
-            hasPairData: !!pairData[uppercasePair],
-            hasBoxes: !!pairData[uppercasePair]?.boxes,
-            boxCount: pairData[uppercasePair]?.boxes?.[0]?.boxes?.length,
-            isLoading,
-        });
-    }, [pairData, uppercasePair, isLoading]);
 
     return (
         <div className='flex h-screen w-full flex-col bg-[#0a0a0a] pt-14'>
-            {/* Header Section */}
-
             {/* Main Content Area */}
-            <div className='relative flex w-full flex-wrap'>
+            <div className='relative flex h-[calc(100vh-300px)] w-full'>
                 {/* Side Panel - PairResoBox */}
                 <div className='h-full w-1/4 border-r border-[#222] p-4'>
                     <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
-                        <div className='relative aspect-square min-h-[400px] flex-1'>
+                        <div className='relative min-h-[400px] flex-1 p-2 pr-16'>
                             {filteredBoxSlice && boxColors && (
                                 <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
                             )}
@@ -137,19 +119,26 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                 {/* Main Chart Area */}
                 <div className='h-full w-3/4 p-4'>
                     <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
-                        <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
-                        <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
+                        <div className='mb-4 flex items-center gap-6'>
+                            <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
+                            <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Histogram Section */}
-                <div className='relative right-0 bottom-0 left-0 h-[300px]'>
+            {/* Histogram Section */}
+            <div className='relative h-[250px] w-full p-4'>
+                <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
                     <HistogramSimple
                         data={histogramData.map((frame) => ({
                             timestamp: frame.timestamp,
                             boxes: frame.progressiveValues,
                             currentOHLC: frame.currentOHLC,
                         }))}
+                        boxOffset={settings.startIndex}
+                        visibleBoxesCount={settings.maxBoxCount}
+                        onOffsetChange={(offset: number) => handleTimeframeChange('startIndex', offset)}
                     />
                 </div>
             </div>

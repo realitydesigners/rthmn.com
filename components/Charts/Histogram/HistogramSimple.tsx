@@ -11,7 +11,7 @@ const HistogramControls: React.FC<{
     visibleBoxesCount: number;
 }> = ({ boxOffset, onOffsetChange, totalBoxes, visibleBoxesCount }) => {
     return (
-        <div className='absolute top-0 right-0 bottom-1 flex h-full w-16 flex-col items-center justify-center border-l border-[#181818] bg-black'>
+        <div className='top-0 right-0 bottom-0 flex h-full w-16 flex-col items-center justify-center border-l border-[#181818] bg-black'>
             <button
                 onClick={() => onOffsetChange(Math.max(0, boxOffset - 1))}
                 disabled={boxOffset === 0}
@@ -32,17 +32,22 @@ const HistogramControls: React.FC<{
     );
 };
 
-const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
+const HistogramSimple: React.FC<{
+    data: BoxSlice[];
+    boxOffset?: number;
+    visibleBoxesCount?: number;
+    onOffsetChange?: (newOffset: number) => void;
+}> = ({ data, boxOffset = 0, visibleBoxesCount = 8, onOffsetChange }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const gradientRef = useRef<{ [key: string]: CanvasGradient }>({});
     const BOX_WIDTH = 25;
     const MAX_FRAMES = 1000;
-    const VISIBLE_BOXES_COUNT = 8;
+    const VISIBLE_BOXES_COUNT = visibleBoxesCount;
     const { boxColors } = useColorStore();
     const params = useParams();
-    const { boxOffset, handleOffsetChange } = useUrlParams(params.pair as string);
+    const { handleOffsetChange } = useUrlParams(params.pair as string);
     const [containerHeight, setContainerHeight] = useState(500);
 
     // Improved frame deduplication logic
@@ -357,13 +362,15 @@ const HistogramSimple: React.FC<{ data: BoxSlice[] }> = ({ data }) => {
     if (!uniqueFrames.length) return null;
 
     return (
-        <div className='relative flex w-full flex-col'>
-            <div ref={containerRef} className='relative flex h-[200px] w-full'>
-                <div ref={scrollContainerRef} className='flex h-full w-full overflow-auto'>
-                    <canvas ref={canvasRef} className='block pr-20' />
+        <div className='relative h-full w-full'>
+            <div ref={containerRef} className='relative h-full w-full bg-[#0a0a0a]'>
+                <div ref={scrollContainerRef} className='mr-12 h-full w-full overflow-x-auto'>
+                    <canvas ref={canvasRef} className='block h-full' style={{ width: `${uniqueFrames.length * BOX_WIDTH}px` }} />
+                </div>
+                <div className='absolute top-0 right-0 bottom-0'>
                     <HistogramControls
                         boxOffset={boxOffset}
-                        onOffsetChange={handleOffsetChange}
+                        onOffsetChange={onOffsetChange || handleOffsetChange}
                         totalBoxes={Math.max(...uniqueFrames.map((frame) => frame.boxes.length))}
                         visibleBoxesCount={VISIBLE_BOXES_COUNT}
                     />
