@@ -113,48 +113,6 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
     // Add timestamp verification and data synchronization
-    useEffect(() => {
-        if (filteredBoxSlice?.timestamp && candleData.length > 0) {
-            const getUnixTimestamp = (timestamp: string | number): number => {
-                if (typeof timestamp === 'number') {
-                    return timestamp;
-                }
-                // If timestamp includes 'Z' or timezone offset, parse as ISO
-                if (timestamp.includes('Z') || timestamp.includes('+')) {
-                    return new Date(timestamp).getTime();
-                }
-                // If timestamp is in format "YYYY-MM-DD HH:mm:ss", assume UTC
-                return new Date(timestamp.replace(' ', 'T') + 'Z').getTime();
-            };
-
-            const boxUnixTime = getUnixTimestamp(filteredBoxSlice.timestamp);
-            const lastCandle = candleData[candleData.length - 1];
-            const diffSeconds = Math.abs(boxUnixTime - lastCandle.timestamp) / 1000;
-
-            // Only log if there's a significant difference (more than 1 second)
-            if (diffSeconds > 1) {
-                console.log('Timestamp update detected:', {
-                    boxData: {
-                        raw: filteredBoxSlice.timestamp,
-                        unix: boxUnixTime,
-                        utc: new Date(boxUnixTime).toISOString(),
-                    },
-                    candleData: {
-                        unix: lastCandle.timestamp,
-                        utc: new Date(lastCandle.timestamp).toISOString(),
-                    },
-                    diffSeconds,
-                });
-
-                // If the box data is significantly behind (more than 2 minutes),
-                // we might want to trigger a data refresh
-                if (diffSeconds > 120) {
-                    console.warn('Box data is significantly behind candle data');
-                    // Here you could add logic to refresh the data if needed
-                }
-            }
-        }
-    }, [filteredBoxSlice, candleData]);
 
     // Update candleData and histogramData when chartData changes
     useEffect(() => {
