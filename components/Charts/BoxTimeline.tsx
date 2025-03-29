@@ -58,10 +58,25 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = useState(false);
+    const [trendChanges, setTrendChanges] = useState<Array<{ timestamp: string; x: number; isPositive: boolean }>>([]);
 
     useEffect(() => {
         setIsClient(true);
     }, []);
+
+    // Add the getFrameSignature function
+    const getFrameSignature = (frame: BoxTimelineFrame) => {
+        const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+        const negativeBoxes = slicedBoxes
+            .filter((box) => box.value < 0)
+            .sort((a, b) => a.value - b.value)
+            .map((box) => findNearestBoxSize(box.value));
+        const positiveBoxes = slicedBoxes
+            .filter((box) => box.value > 0)
+            .sort((a, b) => a.value - b.value)
+            .map((box) => findNearestBoxSize(box.value));
+        return [...negativeBoxes, ...positiveBoxes].join('|');
+    };
 
     // --- Handle mouse move to detect hover ---
     const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -76,19 +91,6 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
             if (index === 0) return [frame];
 
             const prevFrame = acc[acc.length - 1];
-            const getFrameSignature = (frame: BoxTimelineFrame) => {
-                const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-                const negativeBoxes = slicedBoxes
-                    .filter((box) => box.value < 0)
-                    .sort((a, b) => a.value - b.value)
-                    .map((box) => findNearestBoxSize(box.value));
-                const positiveBoxes = slicedBoxes
-                    .filter((box) => box.value > 0)
-                    .sort((a, b) => a.value - b.value)
-                    .map((box) => findNearestBoxSize(box.value));
-                return [...negativeBoxes, ...positiveBoxes].join('|');
-            };
-
             const currentSignature = getFrameSignature(frame);
             const prevSignature = getFrameSignature(prevFrame);
 
@@ -125,42 +127,42 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Limit frames drawn for performance
         const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
-
-        // Add deduplication logic here
         const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
-            // Always include the first frame
-            if (index === 0) {
-                return [frame];
-            }
+            if (index === 0) return [frame];
 
             const prevFrame = acc[acc.length - 1];
-
-            // Create signatures for comparison based on box values
-            const getFrameSignature = (frame: BoxTimelineFrame) => {
-                const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-                const negativeBoxes = slicedBoxes
-                    .filter((box) => box.value < 0)
-                    .sort((a, b) => a.value - b.value)
-                    .map((box) => findNearestBoxSize(box.value));
-                const positiveBoxes = slicedBoxes
-                    .filter((box) => box.value > 0)
-                    .sort((a, b) => a.value - b.value)
-                    .map((box) => findNearestBoxSize(box.value));
-                return [...negativeBoxes, ...positiveBoxes].join('|');
-            };
-
             const currentSignature = getFrameSignature(frame);
             const prevSignature = getFrameSignature(prevFrame);
 
-            // Only add frame if the box values are different
             if (currentSignature !== prevSignature) {
                 return [...acc, frame];
             }
-
             return acc;
         }, []);
+
+        // Track trend changes
+        const newTrendChanges: Array<{ timestamp: string; x: number; isPositive: boolean }> = [];
+        let prevIsLargestPositive: boolean | null = null;
+
+        uniqueFrames.forEach((frame, frameIndex) => {
+            const x = frameIndex * BOX_WIDTH;
+            const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+            const largestBox = boxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), boxes[0]);
+
+            const isLargestPositive = largestBox.value >= 0;
+
+            if (prevIsLargestPositive !== null && prevIsLargestPositive !== isLargestPositive) {
+                newTrendChanges.push({
+                    timestamp: frame.timestamp,
+                    x: x,
+                    isPositive: isLargestPositive,
+                });
+            }
+            prevIsLargestPositive = isLargestPositive;
+        });
+
+        setTrendChanges(newTrendChanges);
 
         const canvasWidth = uniqueFrames.length * BOX_WIDTH;
         const canvasHeight = visibleBoxesCount * BOX_HEIGHT;
@@ -370,13 +372,30 @@ const BoxTimeline: React.FC<BoxTimelineProps> = ({
     const initialHeight = visibleBoxesCount * BOX_HEIGHT;
 
     return (
-        <div ref={scrollContainerRef} className={`scrollbar-hide h-full w-full overflow-x-auto ${className}`} onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
-            <canvas
-                ref={canvasRef}
-                width={initialWidth > 0 ? initialWidth : 300} // Default width
-                height={initialHeight > 0 ? initialHeight : 100} // Default height
-                className='block' // Ensure canvas takes space
-            />
+        <div className={`relative ${className}`}>
+            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto' onMouseMove={handleMouseMove} onMouseLeave={handleMouseLeave}>
+                <div style={{ width: `${initialWidth}px` }} className='relative'>
+                    {/* Trend Change Markers */}
+                    <div className='absolute -top-6 right-0 left-0 ml-4 h-6 w-full'>
+                        {trendChanges.map((change, index) => (
+                            <div
+                                key={`${change.timestamp}-${index}`}
+                                className='absolute -translate-x-1/2 transform'
+                                style={{
+                                    left: `${change.x}px`,
+                                    color: change.isPositive ? boxColors.positive : boxColors.negative,
+                                }}>
+                                <div className='text-[8px] whitespace-nowrap'>{new Date(change.timestamp).toLocaleTimeString()}</div>▼
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Canvas */}
+                    <div className='mt-6'>
+                        <canvas ref={canvasRef} width={initialWidth > 0 ? initialWidth : 300} height={initialHeight > 0 ? initialHeight : 100} className='block' />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
