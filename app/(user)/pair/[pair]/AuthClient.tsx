@@ -57,6 +57,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const { priceData } = useWebSocket();
     const { boxColors } = useUser();
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
+    const [showHistogramLine, setShowHistogramLine] = useState(false);
     const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
@@ -94,10 +95,12 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         };
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
+    console.log(filteredBoxSlice);
+
     return (
         <div className='flex h-screen w-full flex-col bg-[#0a0a0a] pt-14'>
             {/* Main Content Area */}
-            <div className='relative flex h-[calc(100vh-300px)] w-full'>
+            <div className='relative flex h-full w-full'>
                 {/* Side Panel - PairResoBox */}
                 <div className='h-full w-1/4 border-r border-[#222] p-4'>
                     <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
@@ -123,12 +126,52 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
                             <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
                         </div>
+
+                        {/* Box Values Table */}
+                        {filteredBoxSlice && (
+                            <>
+                                <div className='font-kodemono mb-2 text-sm text-gray-400'>Timestamp: {new Date(filteredBoxSlice.timestamp).toLocaleString()}</div>
+                                <div className='font-kodemono mb-2 text-sm text-gray-400'>
+                                    OHLC: O:{filteredBoxSlice.currentOHLC.open.toFixed(5)} H:{filteredBoxSlice.currentOHLC.high.toFixed(5)} L:
+                                    {filteredBoxSlice.currentOHLC.low.toFixed(5)} C:{filteredBoxSlice.currentOHLC.close.toFixed(5)}
+                                </div>
+                                <div className='overflow-auto'>
+                                    <table className='w-full border-collapse'>
+                                        <thead>
+                                            <tr className='border-b border-[#222] text-left'>
+                                                <th className='font-kodemono p-2 text-sm text-gray-400'>Box #</th>
+                                                <th className='font-kodemono p-2 text-sm text-gray-400'>Value</th>
+                                                <th className='font-kodemono p-2 text-sm text-gray-400'>High</th>
+                                                <th className='font-kodemono p-2 text-sm text-gray-400'>Low</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {filteredBoxSlice.boxes.map((box, index) => (
+                                                <tr key={index} className='border-b border-[#222] text-sm hover:bg-[#1a1a1a]'>
+                                                    <td className='font-kodemono p-2 text-gray-300'>{index}</td>
+                                                    <td className={`font-kodemono p-2 ${box.value >= 0 ? 'text-green-400' : 'text-red-400'}`}>{box.value.toFixed(5)}</td>
+                                                    <td className='font-kodemono p-2 text-gray-300'>{box.high.toFixed(5)}</td>
+                                                    <td className='font-kodemono p-2 text-gray-300'>{box.low.toFixed(5)}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </div>
 
             {/* Histogram Section */}
             <div className='relative h-[250px] w-full p-4'>
+                <div className='flex items-center justify-end px-4 py-2'>
+                    <button
+                        onClick={() => setShowHistogramLine(!showHistogramLine)}
+                        className={`rounded px-3 py-1 text-sm ${showHistogramLine ? 'bg-white text-black' : 'bg-[#222] text-white'}`}>
+                        Show Line
+                    </button>
+                </div>
                 <div className='flex h-full flex-col rounded-xl border border-[#222] bg-gradient-to-b from-[#111] to-[#0a0a0a] p-4'>
                     <HistogramSimple
                         data={histogramData.map((frame) => ({
@@ -139,6 +182,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                         boxOffset={settings.startIndex}
                         visibleBoxesCount={settings.maxBoxCount}
                         onOffsetChange={(offset: number) => handleTimeframeChange('startIndex', offset)}
+                        showLine={showHistogramLine}
                     />
                 </div>
             </div>

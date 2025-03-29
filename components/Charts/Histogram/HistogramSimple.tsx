@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { Box, BoxSlice } from '@/types/types';
-import { useColorStore } from '@/stores/colorStore';
+import { useColorStore, BoxColors } from '@/stores/colorStore';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { useParams } from 'next/navigation';
+import { drawHistogramLine } from './HistogramLine';
 
 const HistogramControls: React.FC<{
     boxOffset: number;
@@ -32,12 +33,91 @@ const HistogramControls: React.FC<{
     );
 };
 
+const drawHistogramBoxes = ({
+    ctx,
+    frame,
+    frameIndex,
+    boxOffset,
+    VISIBLE_BOXES_COUNT,
+    BOX_WIDTH,
+    containerHeight,
+    boxColors,
+}: {
+    ctx: CanvasRenderingContext2D;
+    frame: BoxSlice;
+    frameIndex: number;
+    boxOffset: number;
+    VISIBLE_BOXES_COUNT: number;
+    BOX_WIDTH: number;
+    containerHeight: number;
+    boxColors: BoxColors;
+}) => {
+    const x = frameIndex * BOX_WIDTH;
+    const boxHeight = containerHeight / VISIBLE_BOXES_COUNT;
+
+    // Sort boxes
+    const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
+    const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
+    const negativeBoxes = visibleBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
+    const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
+    const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
+
+    // Find largest box to determine coloring
+    const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+    const isLargestPositive = largestBox.value > 0;
+
+    // Draw grid lines
+    ctx.beginPath();
+    ctx.strokeStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.05)`;
+    ctx.lineWidth = 0.3;
+    for (let i = 0; i <= VISIBLE_BOXES_COUNT; i++) {
+        const y = Math.round(i * boxHeight);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + BOX_WIDTH, y);
+    }
+    ctx.stroke();
+
+    // Draw boxes and values
+    orderedBoxes.forEach((box, boxIndex) => {
+        const currentY = boxIndex * boxHeight;
+        const isPositiveBox = box.value > 0;
+
+        // Draw box background
+        if (isLargestPositive) {
+            // If largest is positive, make positive boxes lighter and negative boxes darker
+            if (isPositiveBox) {
+                ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`;
+            } else {
+                ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, .3)`;
+            }
+        } else {
+            // If largest is negative, make negative boxes lighter and positive boxes darker
+            if (isPositiveBox) {
+                ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, .3)`;
+            } else {
+                ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+            }
+        }
+        ctx.fillRect(x, currentY, BOX_WIDTH, boxHeight);
+
+        // Draw box value
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '8px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const absValue = Math.abs(box.value);
+        const displayValue = absValue.toString();
+        ctx.fillText(box.value >= 0 ? displayValue : `-${displayValue}`, x + BOX_WIDTH / 2, currentY + boxHeight / 2);
+    });
+};
+
 const HistogramSimple: React.FC<{
     data: BoxSlice[];
     boxOffset?: number;
     visibleBoxesCount?: number;
     onOffsetChange?: (newOffset: number) => void;
-}> = ({ data, boxOffset = 0, visibleBoxesCount = 8, onOffsetChange }) => {
+    showLine?: boolean;
+}> = ({ data, boxOffset = 0, visibleBoxesCount = 8, onOffsetChange, showLine = false }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -111,43 +191,6 @@ const HistogramSimple: React.FC<{
         return () => window.removeEventListener('resize', updateDimensions);
     }, []);
 
-    // Update gradient calculation
-    const getFrameGradient = (frame: BoxSlice, ctx: CanvasRenderingContext2D) => {
-        const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
-        const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
-
-        if (visibleBoxes.length === 0) return null;
-
-        const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
-        const isPositive = largestBox.value > 0;
-        const baseColor = isPositive ? boxColors.positive : boxColors.negative;
-
-        // Create a unique key for this gradient
-        const gradientKey = `${isPositive ? 'pos' : 'neg'}-${containerHeight}`;
-
-        // Create gradient if it doesn't exist
-        if (!gradientRef.current[gradientKey]) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, containerHeight);
-
-            // Convert hex to RGB for manipulation
-            const r = parseInt(baseColor.slice(1, 3), 16);
-            const g = parseInt(baseColor.slice(3, 5), 16);
-            const b = parseInt(baseColor.slice(5, 7), 16);
-
-            // Create gradient from darker to lighter
-            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
-
-            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.05)`);
-            gradientRef.current[gradientKey] = gradient;
-        }
-
-        return {
-            gradient: gradientRef.current[gradientKey],
-            baseColor,
-            gridColor: `rgba(${parseInt(baseColor.slice(1, 3), 16)}, ${parseInt(baseColor.slice(3, 5), 16)}, ${parseInt(baseColor.slice(5, 7), 16)}, 0.05)`,
-        };
-    };
-
     // Update canvas when frames or container dimensions change
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -158,213 +201,54 @@ const HistogramSimple: React.FC<{
 
         const visibleFrames = uniqueFrames.slice(Math.max(0, uniqueFrames.length - MAX_FRAMES));
         const totalWidth = visibleFrames.length * BOX_WIDTH;
-        const boxHeight = containerHeight / VISIBLE_BOXES_COUNT;
 
         // Ensure canvas size matches the number of frames
         canvas.width = totalWidth;
         canvas.height = containerHeight;
 
         // Clear canvas with background color
-        ctx.fillStyle = '#121212';
+
         ctx.fillRect(0, 0, totalWidth, containerHeight);
 
-        // Draw each frame - boxes first
+        // Draw boxes for each frame
         visibleFrames.forEach((frame, frameIndex) => {
-            const x = frameIndex * BOX_WIDTH;
-
-            // Get gradient and colors for this frame
-            const colors = getFrameGradient(frame, ctx);
-            if (!colors) return;
-
-            // Draw background gradient for this section
-            ctx.fillStyle = colors.gradient;
-            ctx.fillRect(x, 0, BOX_WIDTH, containerHeight);
-
-            // Draw grid lines
-            ctx.beginPath();
-            ctx.strokeStyle = colors.gridColor;
-            ctx.lineWidth = 0.3;
-            for (let i = 0; i <= VISIBLE_BOXES_COUNT; i++) {
-                const y = Math.round(i * boxHeight);
-                ctx.moveTo(x, y);
-                ctx.lineTo(x + BOX_WIDTH, y);
-            }
-            ctx.stroke();
-
-            // Sort boxes
-            const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
-            const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
-            const negativeBoxes = visibleBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
-            const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
-            const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
-
-            // Find largest box to determine coloring
-            const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
-            const isLargestPositive = largestBox.value > 0;
-
-            // Draw boxes and values
-            orderedBoxes.forEach((box, boxIndex) => {
-                const currentY = boxIndex * boxHeight;
-                const isPositiveBox = box.value > 0;
-
-                // Draw box background
-                if (isLargestPositive) {
-                    // If largest is positive, make positive boxes lighter and negative boxes darker
-                    if (isPositiveBox) {
-                        // Lighter positive boxes
-                        ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`;
-                    } else {
-                        // Darker negative boxes
-                        ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, .3)`;
-                    }
-                } else {
-                    // If largest is negative, make negative boxes lighter and positive boxes darker
-                    if (isPositiveBox) {
-                        // Darker positive boxes
-                        ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, .3)`;
-                    } else {
-                        // Lighter negative boxes
-                        ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
-                    }
-                }
-                ctx.fillRect(x, currentY, BOX_WIDTH, boxHeight);
-
-                ctx.fillStyle = '#000000';
-                ctx.font = `3px monospace`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                const absValue = Math.abs(box.value);
-                const displayValue = absValue.toString();
-                ctx.fillText(box.value >= 0 ? displayValue : `-${displayValue}`, x + BOX_WIDTH / 2, currentY + boxHeight / 2);
+            drawHistogramBoxes({
+                ctx,
+                frame,
+                frameIndex,
+                boxOffset,
+                VISIBLE_BOXES_COUNT,
+                BOX_WIDTH,
+                containerHeight,
+                boxColors,
             });
         });
 
-        // Now draw the white line on top of all boxes
-        ctx.beginPath();
-
-        // Calculate points for the line based on smallest absolute values
-        const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
-
-        visibleFrames.forEach((frame, frameIndex) => {
-            const x = frameIndex * BOX_WIDTH;
-
-            // Find smallest absolute value box for line position
-            const sortedBoxes = [...frame.boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
-            const visibleBoxes = sortedBoxes.slice(boxOffset, boxOffset + VISIBLE_BOXES_COUNT);
-            const smallestBox = visibleBoxes[0]; // First one is smallest absolute value
-            const isPositive = smallestBox.value > 0;
-
-            // Find largest box to determine coloring for this frame
-            const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
-            const isLargestPositive = largestBox.value > 0;
-
-            // Find vertical position of this box
-            const negativeBoxes = visibleBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
-            const positiveBoxes = visibleBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
-            const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
-            const boxIndex = orderedBoxes.findIndex((box) => box.value === smallestBox.value);
-
-            // Calculate line Y position
-            const lineY = isPositive
-                ? boxIndex * boxHeight // Top of box for positive
-                : (boxIndex + 1) * boxHeight; // Bottom of box for negative
-
-            // Store points for later use
-            linePoints.push({ x, y: lineY, isPositive, isLargestPositive });
-        });
-
-        // Create fill areas for each segment with its own color
-        for (let i = 0; i < linePoints.length - 1; i++) {
-            const currentPoint = linePoints[i];
-            const nextPoint = linePoints[i + 1];
-
-            ctx.beginPath();
-            if (currentPoint.isLargestPositive) {
-                // If largest is positive, draw from top down to line
-                ctx.moveTo(currentPoint.x, 0); // Start from top
-                ctx.lineTo(nextPoint.x, 0); // Go across the top
-                ctx.lineTo(nextPoint.x, nextPoint.y); // Down to the line
-                ctx.lineTo(currentPoint.x, currentPoint.y); // Back to start point on line
-            } else {
-                // If largest is negative, draw from bottom up to line
-                ctx.moveTo(currentPoint.x, currentPoint.y); // Start from line
-                ctx.lineTo(nextPoint.x, nextPoint.y); // Along the line
-                ctx.lineTo(nextPoint.x, containerHeight); // Down to bottom
-                ctx.lineTo(currentPoint.x, containerHeight); // Across bottom
-            }
-            ctx.closePath();
-
-            // Use color based on current frame's largest box
-            if (currentPoint.isLargestPositive) {
-                // If largest is positive, use positive colors
-                ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 1)`;
-            } else {
-                // If largest is negative, use negative colors
-                ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 1)`;
-            }
-            ctx.fill();
+        // Draw the line if enabled
+        if (showLine) {
+            drawHistogramLine({
+                ctx,
+                uniqueFrames: visibleFrames,
+                boxOffset,
+                VISIBLE_BOXES_COUNT,
+                BOX_WIDTH,
+                containerHeight,
+                boxColors,
+            });
         }
-
-        // Handle the last segment
-        if (linePoints.length > 0) {
-            const lastPoint = linePoints[linePoints.length - 1];
-            ctx.beginPath();
-            if (lastPoint.isLargestPositive) {
-                // If largest is positive, draw from top down to line
-                ctx.moveTo(lastPoint.x, 0); // Start from top
-                ctx.lineTo(lastPoint.x + BOX_WIDTH, 0); // Go across top
-                ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y); // Down to line
-                ctx.lineTo(lastPoint.x, lastPoint.y); // Back to start point on line
-            } else {
-                // If largest is negative, draw from bottom up to line
-                ctx.moveTo(lastPoint.x, lastPoint.y); // Start from line
-                ctx.lineTo(lastPoint.x + BOX_WIDTH, lastPoint.y); // Along the line
-                ctx.lineTo(lastPoint.x + BOX_WIDTH, containerHeight); // Down to bottom
-                ctx.lineTo(lastPoint.x, containerHeight); // Across bottom
-            }
-            ctx.closePath();
-
-            // Use color based on last frame's largest box
-            if (lastPoint.isLargestPositive) {
-                ctx.fillStyle = `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 1)`;
-            } else {
-                ctx.fillStyle = `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 1)`;
-            }
-            ctx.fill();
-        }
-
-        // Now draw the white line on top
-        ctx.beginPath();
-        linePoints.forEach((point, index) => {
-            if (index === 0) {
-                ctx.moveTo(point.x, point.y);
-            } else {
-                ctx.lineTo(point.x, point.y);
-            }
-        });
-
-        // Add the final segment to complete the line
-        if (linePoints.length > 0) {
-            ctx.lineTo(linePoints[linePoints.length - 1].x + BOX_WIDTH, linePoints[linePoints.length - 1].y);
-        }
-
-        // Draw the white line
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = '#FFFFFF';
-        ctx.stroke();
 
         // Scroll to the latest frame after rendering
         if (scrollContainerRef.current) {
             scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth;
         }
-    }, [uniqueFrames, boxColors, boxOffset, containerHeight]);
+    }, [uniqueFrames, boxColors, boxOffset, containerHeight, showLine]);
 
     if (!uniqueFrames.length) return null;
 
     return (
         <div className='relative h-full w-full'>
             <div ref={containerRef} className='relative h-full w-full bg-[#0a0a0a]'>
-                <div ref={scrollContainerRef} className='mr-12 h-full w-full overflow-x-auto'>
+                <div ref={scrollContainerRef} className='h-full w-full overflow-x-auto pr-16'>
                     <canvas ref={canvasRef} className='block h-full' style={{ width: `${uniqueFrames.length * BOX_WIDTH}px` }} />
                 </div>
                 <div className='absolute top-0 right-0 bottom-0'>
