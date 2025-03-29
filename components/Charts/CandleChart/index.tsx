@@ -23,8 +23,8 @@ export interface ChartDataPoint {
 const CHART_CONFIG = {
     VISIBLE_POINTS: 1000,
     MIN_ZOOM: 0.1,
-    MAX_ZOOM: 5,
-    PADDING: { top: 20, right: 70, bottom: 40, left: 0 },
+    MAX_ZOOM: 2,
+    PADDING: { top: 20, right: 70, bottom: 40, left: 70 },
     COLORS: {
         BULLISH: '#22c55e', // Green for bullish
         BEARISH: '#ef4444', // Red for bearish
@@ -38,9 +38,9 @@ const CHART_CONFIG = {
     },
     CANDLES: {
         MIN_WIDTH: 2,
-        MAX_WIDTH: 16,
+        MAX_WIDTH: 10,
         MIN_SPACING: 1,
-        WICK_WIDTH: 1,
+        WICK_WIDTH: 1.5,
     },
 } as const;
 
@@ -61,7 +61,8 @@ const useInstrumentConfig = (pair: string) => {
 
 // Core chart components
 const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
-    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * 0.7));
+    // Calculate candle width to use 90% of available space, with minimum and maximum constraints
+    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * 0.9));
     const halfCandleWidth = candleWidth / 2;
 
     // Filter visible candles before mapping
@@ -243,21 +244,22 @@ const CandleChart = ({ candles = [], initialVisibleData, pair }: { candles: Char
     return (
         <div
             ref={containerRef}
-            className='no-select h-full w-full overflow-hidden bg-black'
+            className='absolute inset-0 overflow-hidden bg-black'
             onMouseDown={dragHandlers.onMouseDown}
             onMouseMove={dragHandlers.onMouseMove}
             onMouseUp={dragHandlers.onMouseUp}
             onMouseLeave={dragHandlers.onMouseLeave}>
             {(!chartWidth || !chartHeight) && initialVisibleData ? (
-                <svg width='100%' height='100%'>
+                <svg width='100%' height='100%' className='min-h-[500px]'>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                        <CandleSticks data={initialVisibleData} width={chartWidth || 1000} height={chartHeight || 500} />
+                        <CandleSticks data={initialVisibleData} width={1000} height={500} />
                     </g>
                 </svg>
             ) : visibleData.length > 0 ? (
                 <svg
                     width='100%'
                     height='100%'
+                    className='min-h-[500px]'
                     onMouseMove={hoverHandlers.onSvgMouseMove}
                     onMouseLeave={hoverHandlers.onMouseLeave}
                     style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
@@ -403,28 +405,44 @@ const YAxis: React.FC<YAxisProps> = ({ minY, maxY, chartHeight, chartWidth, onDr
 
     const instrumentConfig = useInstrumentConfig(pair);
 
-    // Generate price levels with fixed 5-pip intervals
+    // Generate price levels with fixed pip intervals
     const PIP_SIZE = instrumentConfig.point * 10; // Adjust for actual pip size (point is usually 0.00001, pip is 0.0001)
-    const FIXED_INTERVAL_PIPS = 5; // Always show every 5 pips
-    const PRICE_INTERVAL = PIP_SIZE * FIXED_INTERVAL_PIPS;
     const priceRange = maxY - minY;
 
-    // Round min and max to nearest 5-pip interval
-    const roundedMin = Math.floor(minY / PRICE_INTERVAL) * PRICE_INTERVAL;
-    const roundedMax = Math.ceil(maxY / PRICE_INTERVAL) * PRICE_INTERVAL;
+    // Calculate a reasonable number of price levels based on chart height
+    const MIN_PRICE_SPACING = 40; // Increased from 30 for better readability
+    const maxLevels = Math.floor(chartHeight / MIN_PRICE_SPACING);
+
+    // Calculate pip interval to achieve desired number of levels
+    const pipsInRange = priceRange / PIP_SIZE;
+    const pipInterval = Math.ceil(pipsInRange / maxLevels / 5) * 5; // Round to nearest 5 pips
+    const PRICE_INTERVAL = PIP_SIZE * pipInterval;
+
+    // Calculate price levels centered around the last price
+    const numLevelsAboveBelow = Math.floor(maxLevels / 2);
+    const centerPrice = lastPrice;
+    const startPrice = Math.floor(centerPrice / PRICE_INTERVAL) * PRICE_INTERVAL;
 
     const levels = [];
-    for (let price = roundedMin; price <= roundedMax; price += PRICE_INTERVAL) {
+    // Add levels below center
+    for (let i = 0; i <= numLevelsAboveBelow; i++) {
+        const price = startPrice - i * PRICE_INTERVAL;
         const y = chartHeight - ((price - minY) / priceRange) * chartHeight;
-        // Only add levels that are visible or just slightly outside the view
-        if (y >= -20 && y <= chartHeight + 20) {
-            levels.push({
-                price,
-                y,
-                digits: instrumentConfig.digits,
-            });
+        if (y >= 0 && y <= chartHeight && price >= minY && price <= maxY) {
+            levels.push({ price, y, digits: instrumentConfig.digits });
         }
     }
+    // Add levels above center
+    for (let i = 1; i <= numLevelsAboveBelow; i++) {
+        const price = startPrice + i * PRICE_INTERVAL;
+        const y = chartHeight - ((price - minY) / priceRange) * chartHeight;
+        if (y >= 0 && y <= chartHeight && price >= minY && price <= maxY) {
+            levels.push({ price, y, digits: instrumentConfig.digits });
+        }
+    }
+
+    // Sort levels by price
+    levels.sort((a, b) => a.price - b.price);
 
     return (
         <g className='y-axis' transform={`translate(${chartWidth}, 0)`} onMouseDown={handleMouseDown}>

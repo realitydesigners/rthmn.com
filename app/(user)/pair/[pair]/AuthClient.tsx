@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
-import { ChartDataPoint } from '@/components/Charts/CandleChart';
+
 import { Box, BoxSlice } from '@/types/types';
 import { PairResoBox } from '@/app/(user)/dashboard/PairResoBox';
 import { useWebSocket } from '@/providers/WebsocketProvider';
+import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
 import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
 import HistogramSimple from '@/components/Charts/Histogram/HistogramSimple';
@@ -56,6 +57,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const { pairData, isLoading } = useDashboard();
     const { priceData } = useWebSocket();
     const { boxColors } = useUser();
+    const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
     const [showHistogramLine, setShowHistogramLine] = useState(false);
     const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
@@ -83,6 +85,11 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
             initializePair(pair);
         }
     }, [pair, initializePair]);
+
+    useEffect(() => {
+        setCandleData(chartData.processedCandles);
+        setHistogramData(chartData.histogramBoxes);
+    }, [chartData]);
 
     // Memoize the filtered boxes based on timeframe settings
     const filteredBoxSlice = useMemo(() => {
@@ -126,45 +133,14 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
                             <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
                         </div>
-
-                        {/* Box Values Table */}
-                        {filteredBoxSlice && (
-                            <>
-                                <div className='font-kodemono mb-2 text-sm text-gray-400'>Timestamp: {filteredBoxSlice.timestamp}</div>
-                                <div className='font-kodemono mb-2 text-sm text-gray-400'>
-                                    OHLC: O:{filteredBoxSlice.currentOHLC.open.toFixed(5)} H:{filteredBoxSlice.currentOHLC.high.toFixed(5)} L:
-                                    {filteredBoxSlice.currentOHLC.low.toFixed(5)} C:{filteredBoxSlice.currentOHLC.close.toFixed(5)}
-                                </div>
-                                <div className='overflow-auto'>
-                                    <table className='w-full border-collapse'>
-                                        <thead>
-                                            <tr className='border-b border-[#222] text-left'>
-                                                <th className='font-kodemono p-2 text-sm text-gray-400'>Box #</th>
-                                                <th className='font-kodemono p-2 text-sm text-gray-400'>Value</th>
-                                                <th className='font-kodemono p-2 text-sm text-gray-400'>High</th>
-                                                <th className='font-kodemono p-2 text-sm text-gray-400'>Low</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {filteredBoxSlice.boxes.map((box, index) => (
-                                                <tr key={index} className='border-b border-[#222] text-sm hover:bg-[#1a1a1a]'>
-                                                    <td className='font-kodemono p-2 text-gray-300'>{index}</td>
-                                                    <td className={`font-kodemono p-2 ${box.value >= 0 ? 'text-green-400' : 'text-red-400'}`}>{box.value.toFixed(5)}</td>
-                                                    <td className='font-kodemono p-2 text-gray-300'>{box.high.toFixed(5)}</td>
-                                                    <td className='font-kodemono p-2 text-gray-300'>{box.low.toFixed(5)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </>
-                        )}
+                        <div className='relative min-h-[500px] w-full flex-1'>
+                            <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} pair={pair} />
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Histogram Section */}
-            <div className='relative h-[250px] w-full p-4'>
+            {/* <div className='relative h-[250px] w-full p-4'>
                 <div className='flex items-center justify-end px-4 py-2'>
                     <button
                         onClick={() => setShowHistogramLine(!showHistogramLine)}
@@ -185,7 +161,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                         showLine={showHistogramLine}
                     />
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };
