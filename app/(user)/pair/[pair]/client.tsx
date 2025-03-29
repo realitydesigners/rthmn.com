@@ -1,16 +1,10 @@
 'use client';
 
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
-
-import { processProgressiveBoxValues } from '@/utils/boxDataProcessor';
-
-import { Box, BoxSlice } from '@/types/types';
-import { PairResoBox } from '@/app/(user)/dashboard/PairResoBox';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
 import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
-import HistogramSimple from '@/components/Charts/Histogram/HistogramSimple';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { useTimeframeStore } from '@/stores/timeframeStore';
@@ -39,28 +33,21 @@ interface ChartData {
 }
 
 const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData }) => {
-    const { pairData, isLoading } = useDashboard();
+    const { pairData } = useDashboard();
     const { priceData } = useWebSocket();
     const { boxColors } = useUser();
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
-    const [showHistogramLine, setShowHistogramLine] = useState(false);
     const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
-
-    // Add state for box visibility filter
     const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
-
-    // --- Add state for shared hover ---
     const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
 
-    // --- Add callback for hover changes ---
     const handleHoverChange = useCallback((timestamp: number | null) => {
         setHoveredTimestamp(timestamp);
     }, []);
 
-    // Convert pair to uppercase for consistency with pairData keys
     const uppercasePair = pair.toUpperCase();
     const currentPrice = priceData[uppercasePair]?.price;
     const boxSlice = pairData[uppercasePair]?.boxes?.[0];
@@ -106,27 +93,17 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
 
     return (
         <div className='flex h-auto w-full flex-col pt-14'>
-            {/* Main Content Area - Adjust layout */}
             <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
-                {' '}
-                {/* Adjusted height calc */}
-                {/* Top row: ResoBox and Chart */}
                 <div className='flex h-full w-full flex-1'>
-                    {' '}
-                    {/* Adjusted height for new rows */}
-                    {/* Main Chart Area */}
                     <div className='h-full w-3/4 p-4'>
                         <div className='relative flex h-full flex-col overflow-hidden rounded-xl border border-[#222] bg-black'>
-                            {/* Absolute positioned overlay for header content */}
                             <div className='absolute top-0 right-0 left-0 z-10 p-4'>
                                 <div className='mb-4 flex items-center gap-6'>
                                     <h1 className='font-outfit text-2xl font-bold tracking-wider text-white'>{uppercasePair}</h1>
                                     <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
                                 </div>
-
-                                {/* Box Visibility Toggle Buttons */}
                             </div>
-                            <div className='absolute top-4 right-12 left-0 z-10 flex hidden justify-end gap-2'>
+                            <div className='absolute top-4 right-12 left-0 z-10 flex justify-end gap-2'>
                                 <button
                                     onClick={() => setBoxVisibilityFilter('all')}
                                     className={`rounded px-2 py-1 text-xs ${boxVisibilityFilter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-600 text-gray-300'}`}>
@@ -174,8 +151,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
                                 )}
                             </div>
-
-                            {/* Timeframe Control */}
                             {boxSlice?.boxes && (
                                 <div className='mt-4 h-16 w-full'>
                                     <TimeFrameSlider
@@ -190,8 +165,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                     </div>
                 </div>
                 <div className='h-[200px] w-full px-4'>
-                    {' '}
-                    {/* Added height and bottom border */}
                     <div className='flex h-full flex-col rounded-xl border border-[#222] bg-black p-2'>
                         {boxColors && histogramData && (
                             <Histogram

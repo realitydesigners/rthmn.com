@@ -17,7 +17,6 @@ interface BoxTimelineProps {
     showLine?: boolean; // Ensure showLine prop is defined
 }
 
-// Define the findNearestBoxSize helper function locally
 const findNearestBoxSize = (value: number): number => {
     const absValue = Math.abs(value);
     let nearest = BoxSizes.reduce((prev, curr) => {
