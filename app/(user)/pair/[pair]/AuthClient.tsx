@@ -102,8 +102,8 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         };
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
-    console.log('candleData', candleData);
-    console.log(filteredBoxSlice);
+    // console.log('candleData', candleData);
+    // console.log(filteredBoxSlice);
 
     return (
         <div className='flex h-screen w-full flex-col bg-[#0a0a0a] pt-14'>
@@ -135,13 +135,24 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             <div className='font-kodemono text-xl font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, uppercasePair) : '-'}</div>
                         </div>
                         <div className='relative min-h-[500px] w-full flex-1'>
-                            <CandleChart candles={candleData} initialVisibleData={chartData.initialVisibleData} pair={pair} />
+                            <CandleChart
+                                candles={candleData}
+                                initialVisibleData={chartData.initialVisibleData}
+                                pair={pair}
+                                boxOffset={settings.startIndex}
+                                visibleBoxesCount={settings.maxBoxCount}
+                                histogramBoxes={histogramData.map((frame) => ({
+                                    timestamp: frame.timestamp,
+                                    boxes: frame.progressiveValues,
+                                    currentOHLC: frame.currentOHLC,
+                                }))}
+                            />
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* <div className='relative h-[250px] w-full p-4'>
+            <div className='relative h-[250px] w-full p-4'>
                 <div className='flex items-center justify-end px-4 py-2'>
                     <button
                         onClick={() => setShowHistogramLine(!showHistogramLine)}
@@ -162,7 +173,7 @@ const AuthClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                         showLine={showHistogramLine}
                     />
                 </div>
-            </div> */}
+            </div>
         </div>
     );
 };

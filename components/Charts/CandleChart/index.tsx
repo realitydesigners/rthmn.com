@@ -10,7 +10,7 @@ interface ChartDataResult {
     maxY: number;
 }
 
-interface ChartDataPoint {
+export interface ChartDataPoint {
     timestamp: number;
     open: number;
     high: number;
@@ -102,7 +102,7 @@ const CHART_CONFIG = {
     VISIBLE_POINTS: 1000,
     MIN_ZOOM: 0.1,
     MAX_ZOOM: 2,
-    PADDING: { top: 20, right: 70, bottom: 40, left: 70 },
+    PADDING: { top: 20, right: 70, bottom: 40, left: 0 },
     COLORS: {
         BULLISH: '#22c55e', // Green for bullish
         BEARISH: '#ef4444', // Red for bearish
@@ -116,9 +116,14 @@ const CHART_CONFIG = {
     },
     CANDLES: {
         MIN_WIDTH: 2,
-        MAX_WIDTH: 10,
+        MAX_WIDTH: 15,
         MIN_SPACING: 1,
         WICK_WIDTH: 1.5,
+        GAP_RATIO: 0.4, // 40% gap between candles
+    },
+    BOX_LEVELS: {
+        LINE_WIDTH: 4, // Moderate line width
+        GAP_RATIO: 0.4, // 40% gap between box lines
     },
 } as const;
 
@@ -139,13 +144,12 @@ const useInstrumentConfig = (pair: string) => {
 
 // Core chart components
 const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
-    // Calculate candle width to use 90% of available space, with minimum and maximum constraints
-    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * 0.9));
+    // Calculate candle width to use 80% of available space (leaving 20% for gaps)
+    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
     const halfCandleWidth = candleWidth / 2;
 
     // Filter visible candles before mapping
     const visibleCandles = data.filter((point) => {
-        // Add a buffer of one candle width on each side
         const isVisible = point.scaledX >= -candleWidth && point.scaledX <= width + candleWidth;
         return isVisible;
     });
@@ -175,7 +179,151 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
     );
 });
 
-const CandleChart = ({ candles = [], initialVisibleData, pair }: { candles: ChartDataPoint[]; initialVisibleData: ChartDataPoint[]; pair: string }) => {
+// Add this new component after CandleSticks
+const BoxLevels = memo(
+    ({
+        data,
+        histogramBoxes,
+        width,
+        height,
+        yAxisScale,
+        boxOffset,
+        visibleBoxesCount,
+    }: {
+        data: ChartDataPoint[];
+        histogramBoxes: any[];
+        width: number;
+        height: number;
+        yAxisScale: number;
+        boxOffset: number;
+        visibleBoxesCount: number;
+    }) => {
+        if (!histogramBoxes?.length || !data.length) return null;
+
+        // Get the timestamp of the most recent candle
+        const lastCandleTime = data[data.length - 1].timestamp;
+        const oneHourAgo = lastCandleTime - 60 * 60 * 1000;
+
+        // Create a map of timestamp to candle data for scaling
+        const candleMap = new Map(data.map((point) => [point.timestamp, point]));
+
+        // Find min/max prices in visible range
+        let minPrice = Infinity;
+        let maxPrice = -Infinity;
+        data.forEach((point) => {
+            minPrice = Math.min(minPrice, point.low);
+            maxPrice = Math.max(maxPrice, point.high);
+        });
+
+        // Calculate the center price and range (same as useChartData)
+        const centerPrice = (minPrice + maxPrice) / 2;
+        const baseRange = maxPrice - minPrice;
+        const scaledRange = baseRange / yAxisScale;
+        const padding = scaledRange * 0.05;
+        const paddedMin = centerPrice - scaledRange / 2 - padding;
+        const paddedMax = centerPrice + scaledRange / 2 + padding;
+
+        // Get boxes from the last hour relative to the last candle
+        const recentBoxes = histogramBoxes.filter((box) => {
+            const boxTime = new Date(box.timestamp).getTime();
+            return boxTime >= oneHourAgo && boxTime <= lastCandleTime;
+        });
+
+        if (!recentBoxes.length) return null;
+
+        // Calculate line width with gap
+        const lineWidth = CHART_CONFIG.BOX_LEVELS.LINE_WIDTH;
+        const gapWidth = lineWidth * CHART_CONFIG.BOX_LEVELS.GAP_RATIO;
+        const totalLineWidth = lineWidth + gapWidth;
+
+        // Process each box to get its position and dimensions
+        const processedBoxes = recentBoxes
+            .map((box) => {
+                const boxTime = new Date(box.timestamp).getTime();
+                const candle = candleMap.get(boxTime);
+                if (!candle) return null;
+
+                // Use the exact same scaling function as useChartData
+                const scaleY = (price: number) => {
+                    const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
+                    return height * (1 - normalizedPrice);
+                };
+
+                // Sort boxes by absolute value and split into negative and positive
+                const sortedBoxes = [...box.boxes].sort((a: any, b: any) => Math.abs(a.value) - Math.abs(b.value));
+                const negativeBoxes = sortedBoxes.filter((b: any) => b.value < 0).sort((a: any, b: any) => a.value - b.value);
+                const positiveBoxes = sortedBoxes.filter((b: any) => b.value > 0).sort((a: any, b: any) => a.value - b.value);
+
+                // Combine boxes in the correct order and slice based on offset and count
+                const orderedBoxes = [...negativeBoxes, ...positiveBoxes].slice(boxOffset, boxOffset + visibleBoxesCount).map((level: any, boxIndex: number) => ({
+                    ...level,
+                    id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
+                    scaledHigh: scaleY(level.high),
+                    scaledLow: scaleY(level.low),
+                }));
+
+                return {
+                    timestamp: boxTime,
+                    xPosition: candle.scaledX,
+                    boxes: orderedBoxes,
+                };
+            })
+            .filter(Boolean);
+
+        return (
+            <g className='box-levels'>
+                {processedBoxes.map((boxFrame) => (
+                    <g key={boxFrame.timestamp} transform={`translate(${boxFrame.xPosition}, 0)`}>
+                        {boxFrame.boxes.map((level) => {
+                            const color = level.value > 0 ? '#22c55e' : '#ef4444';
+                            const opacity = 0.8;
+
+                            return (
+                                <g key={level.id}>
+                                    {/* Draw horizontal lines at exact high and low points with gaps */}
+                                    <line
+                                        x1={-lineWidth / 2}
+                                        y1={level.scaledHigh}
+                                        x2={lineWidth / 2}
+                                        y2={level.scaledHigh}
+                                        stroke={color}
+                                        strokeWidth={1.5}
+                                        strokeOpacity={opacity}
+                                    />
+                                    <line
+                                        x1={-lineWidth / 2}
+                                        y1={level.scaledLow}
+                                        x2={lineWidth / 2}
+                                        y2={level.scaledLow}
+                                        stroke={color}
+                                        strokeWidth={1.5}
+                                        strokeOpacity={opacity}
+                                    />
+                                </g>
+                            );
+                        })}
+                    </g>
+                ))}
+            </g>
+        );
+    }
+);
+
+const CandleChart = ({
+    candles = [],
+    initialVisibleData,
+    pair,
+    histogramBoxes = [], // Add this prop
+    boxOffset = 0,
+    visibleBoxesCount = 7,
+}: {
+    candles: ChartDataPoint[];
+    initialVisibleData: ChartDataPoint[];
+    pair: string;
+    histogramBoxes?: any[]; // Add this type
+    boxOffset?: number;
+    visibleBoxesCount?: number;
+}) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
     const [yAxisScale, setYAxisScale] = useState(1);
@@ -342,6 +490,15 @@ const CandleChart = ({ candles = [], initialVisibleData, pair }: { candles: Char
                     onMouseLeave={hoverHandlers.onMouseLeave}
                     style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
+                        <BoxLevels
+                            data={visibleData}
+                            histogramBoxes={histogramBoxes}
+                            width={chartWidth}
+                            height={chartHeight}
+                            yAxisScale={yAxisScale}
+                            boxOffset={boxOffset}
+                            visibleBoxesCount={visibleBoxesCount}
+                        />
                         <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
                         <YAxis
