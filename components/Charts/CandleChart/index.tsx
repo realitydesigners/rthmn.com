@@ -238,48 +238,32 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
             const candle = candleMap.get(boxTime);
             if (!candle) return null;
 
-            // Add logging here to see the filter value being used for this frame
-            console.log(`[BoxLevels Frame ${boxTime}] Using filter: ${boxVisibilityFilter}`);
-
             // Use the exact same scaling function as useChartData
             const scaleY = (price: number) => {
                 const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
                 return height * (1 - normalizedPrice);
             };
 
-            // 1. Get initial sorted positive/negative lists from the raw box.boxes
-            const allSortedBoxes = [...box.boxes].sort((a: any, b: any) => Math.abs(a.value) - Math.abs(b.value));
-            const allNegativeBoxes = allSortedBoxes.filter((b: any) => b.value < 0).sort((a: any, b: any) => a.value - b.value);
-            const allPositiveBoxes = allSortedBoxes.filter((b: any) => b.value > 0).sort((a: any, b: any) => a.value - b.value);
-
-            // 2. Apply visibility filter *before* combining and slicing
-            let boxesToCombine = [];
-            if (boxVisibilityFilter === 'positive') {
-                boxesToCombine = allPositiveBoxes; // Only consider positive boxes
-            } else if (boxVisibilityFilter === 'negative') {
-                boxesToCombine = allNegativeBoxes; // Only consider negative boxes
-            } else {
-                // 'all'
-                boxesToCombine = [...allNegativeBoxes, ...allPositiveBoxes]; // Combine like before
-            }
-
-            // 3. Apply timeframe slicing *after* visibility filter and map scaling
-            const slicedAndScaledBoxes = boxesToCombine
-                .slice(boxOffset, boxOffset + visibleBoxesCount) // Slice the correctly filtered list
-                .map((level: any, boxIndex: number) => ({
-                    ...level,
-                    id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
-                    scaledHigh: scaleY(level.high),
-                    scaledLow: scaleY(level.low),
-                }));
-
-            // Add logging here to see the final boxes *after* filtering and slicing
-            console.log(`[BoxLevels Frame ${boxTime}] Final boxes for render:`, slicedAndScaledBoxes);
+            // --- Start: Reverted Logic (Slice first, then filter visibility) ---
+            // 1. Slice the boxes based on timeframe *first*. The input `box.boxes`
+            //    is now assumed to be sorted by absolute value from processProgressiveBoxValues.
+            const slicedBoxes = [...box.boxes].slice(boxOffset, boxOffset + visibleBoxesCount).map((level: any, boxIndex: number) => ({
+                ...level,
+                id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
+                scaledHigh: scaleY(level.high),
+                scaledLow: scaleY(level.low),
+            }));
+            // Log the values after slicing inside BoxLevels
+            console.log(
+                `[BoxLevels Frame ${boxTime}] Slice Values:`,
+                slicedBoxes.map((b) => b.value)
+            );
+            // --- End: Reverted Logic ---
 
             return {
                 timestamp: boxTime,
                 xPosition: candle.scaledX,
-                boxes: slicedAndScaledBoxes, // This is now the final list for this frame
+                boxes: slicedBoxes, // Use the sliced (but not yet visibility-filtered) boxes
             };
         })
         .filter(Boolean);
@@ -287,19 +271,27 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
     return (
         <g className='box-levels'>
             {processedBoxes.map((boxFrame) => {
-                // The boxFrame.boxes array is now pre-filtered and pre-sliced.
-                // No need for the additional filter here.
+                // 2. Apply visibility filter *after* slicing
+                const filteredLevels = boxFrame.boxes.filter((level) => {
+                    if (boxVisibilityFilter === 'positive') {
+                        return level.value > 0;
+                    }
+                    if (boxVisibilityFilter === 'negative') {
+                        return level.value < 0;
+                    }
+                    return true; // 'all'
+                });
 
-                // If no levels are visible after filtering and slicing, skip rendering this frame
-                if (boxFrame.boxes.length === 0) {
+                // If no levels are visible after filtering, skip rendering this frame
+                if (filteredLevels.length === 0) {
                     return null;
                 }
 
                 return (
                     <g key={boxFrame.timestamp} transform={`translate(${boxFrame.xPosition}, 0)`}>
-                        {/* Map directly over the final boxFrame.boxes */}
-                        {boxFrame.boxes.map((level) => {
-                            const color = level.value > 0 ? '#22c55e' : '#ef4444'; // Coloring logic remains correct
+                        {/* Map over the FILTERED levels */}
+                        {filteredLevels.map((level) => {
+                            const color = level.value > 0 ? '#22c55e' : '#ef4444';
                             const opacity = 0.8;
 
                             return (

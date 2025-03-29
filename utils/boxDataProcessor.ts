@@ -69,9 +69,13 @@ const safeISOString = (timestamp: number | string): string => {
 };
 
 export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
-    // Sort boxes by absolute value
-    const sortedBoxes = [...boxes];
+    // Sort boxes purely by ASCENDING absolute value to match ResoBox apparent order
+    const sortedBoxes = [...boxes].sort((a, b) => Math.abs(a.value) - Math.abs(b.value));
 
+    // Return the boxes sorted by absolute value, WITHOUT snapping
+    return sortedBoxes;
+
+    /* Remove value snapping logic:
     const findNearestBoxSize = (value: number): number => {
         const absValue = Math.abs(value);
         let nearest = BoxSizes[0];
@@ -86,26 +90,14 @@ export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice[
         }
         return value >= 0 ? nearest : -nearest;
     };
-    // First add all negative boxes in ascending order (most negative first)
-    const negativeBoxes = sortedBoxes
-        .filter((box) => box.value < 0)
-        .sort((a, b) => a.value - b.value)
-        .map((box) => ({
-            ...box,
-            value: findNearestBoxSize(box.value),
-        }));
 
-    // Then add all positive boxes in ascending order (smallest to largest)
-    const positiveBoxes = sortedBoxes
-        .filter((box) => box.value > 0)
-        .sort((a, b) => a.value - b.value)
-        .map((box) => ({
-            ...box,
-            value: findNearestBoxSize(box.value),
-        }));
-
-    // Combine the arrays with negatives first, then positives ascending
-    return [...negativeBoxes, ...positiveBoxes];
+    // Apply size snapping if needed, but maintain the absolute value sort order
+    // Note: We map directly over the abs-sorted list now.
+    return sortedBoxes.map((box) => ({
+        ...box,
+        value: findNearestBoxSize(box.value), // Snap value if needed
+    }));
+    */
 };
 
 export function processInitialBoxData(
