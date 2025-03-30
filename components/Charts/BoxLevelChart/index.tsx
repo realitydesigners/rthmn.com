@@ -1,12 +1,11 @@
 'use client';
 
-import React, { memo, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 type Point = { timestamp: number; open: number; high: number; low: number; close: number; volume?: number };
 type Box = { x?: number; high: number; low: number; value: any; timestamp?: number; boxIndex: number };
 
 const CONFIG = {
-    POINTS: 1000,
     PAD: { T: 20, R: 70, B: 40, L: 0 },
     COLOR: { P: '#3FFFA2', N: '#FF3F3F' },
     BOX: { T: 0.01 },
@@ -14,38 +13,28 @@ const CONFIG = {
     SCALE: 0.95,
 } as const;
 
-const useChart = (data: Point[], scroll = 0, w = 0, h = 0) =>
+const useChart = (data: Point[], w = 0, h = 0) =>
     useMemo(() => {
         if (!data.length || !w || !h) return { data: [], min: 0, max: 0 };
 
-        const visible = data.slice(
-            Math.max(0, Math.floor(scroll / Math.max(2, w / CONFIG.POINTS))),
-            Math.min(data.length, Math.ceil((scroll + w * 1.1) / Math.max(2, w / CONFIG.POINTS)))
-        );
+        const [min, max] = data.reduce(([a, b], p) => [Math.min(a, p.low), Math.max(b, p.high)], [Infinity, -Infinity]);
 
-        if (!visible.length) return { data: [], min: 0, max: 0 };
-
-        const [min, max] = visible.reduce(([a, b], p) => [Math.min(a, p.low), Math.max(b, p.high)], [Infinity, -Infinity]);
         const pad = (max - min) * 0.05;
         const yMin = min - pad,
             yMax = max + pad;
         const scaleY = (p: number) => h * (1 - (p - yMin) / (yMax - yMin));
-        const xStep = w / visible.length;
 
         return {
-            data: visible.map((p, i) => ({
+            data: data.map((p) => ({
                 ...p,
-                x: i * xStep,
                 y: scaleY(p.close),
-                yOpen: scaleY(p.open),
                 yHigh: scaleY(p.high),
                 yLow: scaleY(p.low),
-                yClose: scaleY(p.close),
             })),
             min: yMin,
             max: yMax,
         };
-    }, [data, scroll, w, h]);
+    }, [data, w, h]);
 
 const BoxLevels = memo(
     ({
@@ -83,7 +72,7 @@ const BoxLevels = memo(
         if (boxes.length < 2) return null;
 
         const [min, max] = data.reduce(([a, b], p) => [Math.min(a, p.low), Math.max(b, p.high)], [Infinity, -Infinity]);
-        const scaleY = useCallback((y: number) => h * (1 - (y - min) / (max - min)), [h, min, max]);
+        const scaleY = (y: number) => h * (1 - (y - min) / (max - min));
 
         const sorted = [...boxes[0].boxes].sort((a, b) => Math.abs(a.high - a.low) - Math.abs(b.high - b.low));
         const idxMap = new Map(boxes[0].boxes.map((_, i) => [i, i + boxes[0].idx]));
@@ -106,15 +95,14 @@ const BoxLevels = memo(
             const size = Math.abs(box.high - box.low);
 
             if (Math.abs(box.high - last.high) >= size * CONFIG.BOX.T || Math.abs(box.low - last.low) >= size * CONFIG.BOX.T) {
-                const point = {
+                level.points.push({
                     x: (last.x || 0) + Math.max(Math.abs(box.high - last.high), Math.abs(box.low - last.low)),
                     high: box.high,
                     low: box.low,
                     value: box.value,
                     boxIndex: last.boxIndex,
                     timestamp: i,
-                };
-                level.points.push(point);
+                });
             }
         }
 
@@ -160,11 +148,10 @@ interface ChartProps {
 const BoxLevelChart = ({ candles = [], histogramBoxes = [], boxOffset = 0, visibleBoxesCount = 7 }: ChartProps) => {
     const ref = useRef<HTMLDivElement>(null);
     const [size, setSize] = useState({ w: 0, h: 0 });
-    const [scroll, setScroll] = useState(0);
 
     const w = size.w - CONFIG.PAD.L - CONFIG.PAD.R;
     const h = size.h - CONFIG.PAD.T - CONFIG.PAD.B;
-    const { data } = useChart(candles, scroll, w, h);
+    const { data } = useChart(candles, w, h);
 
     useEffect(() => {
         const update = () => {
