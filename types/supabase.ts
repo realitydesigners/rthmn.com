@@ -227,6 +227,100 @@ export type Database = {
                     },
                 ];
             };
+            support_messages: {
+                Row: {
+                    content: string;
+                    created_at: string | null;
+                    id: string;
+                    metadata: Json | null;
+                    sender_id: string;
+                    sender_name: string;
+                    sender_type: string;
+                    thread_id: string;
+                };
+                Insert: {
+                    content: string;
+                    created_at?: string | null;
+                    id?: string;
+                    metadata?: Json | null;
+                    sender_id: string;
+                    sender_name: string;
+                    sender_type: string;
+                    thread_id: string;
+                };
+                Update: {
+                    content?: string;
+                    created_at?: string | null;
+                    id?: string;
+                    metadata?: Json | null;
+                    sender_id?: string;
+                    sender_name?: string;
+                    sender_type?: string;
+                    thread_id?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'support_messages_thread_id_fkey';
+                        columns: ['thread_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'support_threads';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
+            support_threads: {
+                Row: {
+                    created_at: string | null;
+                    id: string;
+                    last_message: string | null;
+                    last_message_time: string | null;
+                    metadata: Json | null;
+                    product_id: string;
+                    status: Database['public']['Enums']['thread_status'] | null;
+                    subject: string | null;
+                    updated_at: string | null;
+                    user_email: string;
+                    user_id: string;
+                    user_name: string;
+                };
+                Insert: {
+                    created_at?: string | null;
+                    id?: string;
+                    last_message?: string | null;
+                    last_message_time?: string | null;
+                    metadata?: Json | null;
+                    product_id: string;
+                    status?: Database['public']['Enums']['thread_status'] | null;
+                    subject?: string | null;
+                    updated_at?: string | null;
+                    user_email: string;
+                    user_id: string;
+                    user_name: string;
+                };
+                Update: {
+                    created_at?: string | null;
+                    id?: string;
+                    last_message?: string | null;
+                    last_message_time?: string | null;
+                    metadata?: Json | null;
+                    product_id?: string;
+                    status?: Database['public']['Enums']['thread_status'] | null;
+                    subject?: string | null;
+                    updated_at?: string | null;
+                    user_email?: string;
+                    user_id?: string;
+                    user_name?: string;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'support_threads_product_id_fkey';
+                        columns: ['product_id'];
+                        isOneToOne: false;
+                        referencedRelation: 'products';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
             users: {
                 Row: {
                     avatar_url: string | null;
@@ -265,6 +359,7 @@ export type Database = {
             pricing_plan_interval: 'day' | 'week' | 'month' | 'year';
             pricing_type: 'one_time' | 'recurring';
             subscription_status: 'trialing' | 'active' | 'canceled' | 'incomplete' | 'incomplete_expired' | 'past_due' | 'unpaid';
+            thread_status: 'open' | 'closed' | 'pending';
         };
         CompositeTypes: {
             [_ in never]: never;
