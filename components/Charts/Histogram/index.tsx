@@ -211,7 +211,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 // Draw text
                 ctx.fillStyle = '#000000';
                 const fontSize = Math.min(boxSize / 2, boxSize / 2);
-                ctx.font = `${fontSize}px monospace`;
+                ctx.font = `0px monospace`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 const displayValue = snappedValue.toFixed(0);

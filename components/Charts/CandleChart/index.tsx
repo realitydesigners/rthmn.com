@@ -6,6 +6,7 @@ import { INSTRUMENTS } from '@/utils/instruments';
 import { useColorStore } from '@/stores/colorStore';
 import { XAxis } from './Xaxis';
 import { YAxis } from './YAxis';
+import BoxLevels from './indicators/BoxLevels';
 
 export interface ChartDataPoint {
     timestamp: number;
@@ -98,7 +99,7 @@ export const CHART_CONFIG = {
     VISIBLE_POINTS: 1000,
     MIN_ZOOM: 0.1,
     MAX_ZOOM: 2,
-    PADDING: { top: 20, right: 70, bottom: 40, left: 0 },
+    PADDING: { top: 20, right: 50, bottom: 30, left: 0 },
     COLORS: {
         AXIS: '#ffffff',
         HOVER_BG: '#fff',
@@ -171,140 +172,6 @@ const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; wi
     );
 });
 
-// Update BoxLevels props interface
-interface BoxLevelsProps {
-    data: ChartDataPoint[];
-    histogramBoxes: any[];
-    width: number;
-    height: number;
-    yAxisScale: number;
-    boxOffset: number;
-    visibleBoxesCount: number;
-    boxVisibilityFilter: 'all' | 'positive' | 'negative';
-}
-
-// Add this new component after CandleSticks
-const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOffset, visibleBoxesCount, boxVisibilityFilter }: BoxLevelsProps) => {
-    const { boxColors } = useColorStore();
-
-    if (!histogramBoxes?.length || !data.length) return null;
-
-    // Get the timestamp of the most recent candle
-    const lastCandleTime = data[data.length - 1].timestamp;
-    const oneHourAgo = lastCandleTime - 60 * 120 * 1000;
-
-    // Create a map of timestamp to candle data for scaling
-    const candleMap = new Map(data.map((point) => [point.timestamp, point]));
-
-    // Find min/max prices in visible range
-    let minPrice = Infinity;
-    let maxPrice = -Infinity;
-    data.forEach((point) => {
-        minPrice = Math.min(minPrice, point.low);
-        maxPrice = Math.max(maxPrice, point.high);
-    });
-
-    // Calculate the center price and range (same as useChartData)
-    const centerPrice = (minPrice + maxPrice) / 2;
-    const baseRange = maxPrice - minPrice;
-    const scaledRange = baseRange / yAxisScale;
-    const padding = scaledRange * 0.05;
-    const paddedMin = centerPrice - scaledRange / 2 - padding;
-    const paddedMax = centerPrice + scaledRange / 2 + padding;
-
-    // Get boxes from the last hour relative to the last candle
-    const recentBoxes = histogramBoxes.filter((box) => {
-        const boxTime = new Date(box.timestamp).getTime();
-        return boxTime >= oneHourAgo && boxTime <= lastCandleTime;
-    });
-
-    if (!recentBoxes.length) return null;
-
-    // Calculate line width with gap
-    const lineWidth = CHART_CONFIG.BOX_LEVELS.LINE_WIDTH;
-    // Process each box to get its position and dimensions
-    const processedBoxes = recentBoxes
-        .map((box) => {
-            const boxTime = new Date(box.timestamp).getTime();
-            const candle = candleMap.get(boxTime);
-            if (!candle) return null;
-
-            // Use the exact same scaling function as useChartData
-            const scaleY = (price: number) => {
-                const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
-                return height * (1 - normalizedPrice);
-            };
-
-            // --- Start: Reverted Logic (Slice first, then filter visibility) ---
-            // 1. Slice the boxes based on timeframe *first*. The input `box.boxes`
-            //    is now assumed to be sorted by absolute value from processProgressiveBoxValues.
-            const slicedBoxes = [...box.boxes].slice(boxOffset, boxOffset + visibleBoxesCount).map((level: any, boxIndex: number) => ({
-                ...level,
-                id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
-                scaledHigh: scaleY(level.high),
-                scaledLow: scaleY(level.low),
-            }));
-
-            return {
-                timestamp: boxTime,
-                xPosition: candle.scaledX,
-                boxes: slicedBoxes, // Use the sliced (but not yet visibility-filtered) boxes
-            };
-        })
-        .filter(Boolean);
-
-    return (
-        <g className='box-levels'>
-            {processedBoxes.map((boxFrame, index) => {
-                // 2. Apply visibility filter *after* slicing
-                const filteredLevels = boxFrame.boxes.filter((level) => {
-                    if (boxVisibilityFilter === 'positive') {
-                        return level.value > 0;
-                    }
-                    if (boxVisibilityFilter === 'negative') {
-                        return level.value < 0;
-                    }
-                    return true; // 'all'
-                });
-
-                return (
-                    <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
-                        {/* Map over the FILTERED levels */}
-                        {filteredLevels.map((level) => {
-                            const color = level.value > 0 ? boxColors.positive : boxColors.negative;
-                            const opacity = 0.8;
-
-                            return (
-                                <g key={level.id}>
-                                    {/* Draw horizontal lines at exact high and low points with gaps */}
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledHigh}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledHigh}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledLow}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledLow}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                </g>
-                            );
-                        })}
-                    </g>
-                );
-            })}
-        </g>
-    );
-});
-
 const CandleChart = ({
     candles = [],
     initialVisibleData,
@@ -315,6 +182,7 @@ const CandleChart = ({
     boxVisibilityFilter = 'all',
     hoveredTimestamp,
     onHoverChange,
+    showBoxLevels = true,
 }: {
     candles?: ChartDataPoint[];
     initialVisibleData: ChartDataPoint[];
@@ -325,6 +193,7 @@ const CandleChart = ({
     boxVisibilityFilter?: 'all' | 'positive' | 'negative';
     hoveredTimestamp?: number | null;
     onHoverChange?: (timestamp: number | null) => void;
+    showBoxLevels?: boolean;
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -533,16 +402,18 @@ const CandleChart = ({
                     onMouseLeave={hoverHandlers.onMouseLeave}
                     style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                        <BoxLevels
-                            data={visibleData}
-                            histogramBoxes={histogramBoxes}
-                            width={chartWidth}
-                            height={chartHeight}
-                            yAxisScale={yAxisScale}
-                            boxOffset={boxOffset}
-                            visibleBoxesCount={visibleBoxesCount}
-                            boxVisibilityFilter={boxVisibilityFilter}
-                        />
+                        {showBoxLevels && (
+                            <BoxLevels
+                                data={visibleData}
+                                histogramBoxes={histogramBoxes}
+                                width={chartWidth}
+                                height={chartHeight}
+                                yAxisScale={yAxisScale}
+                                boxOffset={boxOffset}
+                                visibleBoxesCount={visibleBoxesCount}
+                                boxVisibilityFilter={boxVisibilityFilter}
+                            />
+                        )}
                         <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={displayedHoverInfo} formatTime={formatTime} />
                         <YAxis

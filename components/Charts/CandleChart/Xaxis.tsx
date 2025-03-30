@@ -8,10 +8,11 @@ export const XAxis: React.FC<{
     hoverInfo: any | null;
     formatTime: (date: Date) => string;
 }> = memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
-    const TICK_HEIGHT = 6;
-    const LABEL_PADDING = 5;
-    const FONT_SIZE = 12;
-    const HOVER_BG_HEIGHT = 15;
+    const TICK_HEIGHT = 4;
+    const LABEL_PADDING = 4;
+    const FONT_SIZE = 10;
+    const HOVER_BG_HEIGHT = 16;
+    const GRID_OPACITY = 0.06;
 
     const intervals = useMemo(() => {
         if (data.length === 0) return [];
@@ -27,8 +28,8 @@ export const XAxis: React.FC<{
             result.push(closestPoint);
         }
 
-        // Show fewer labels for better spacing
-        const maxPoints = chartWidth < 400 ? 4 : 6;
+        // Show more labels for better detail
+        const maxPoints = chartWidth < 400 ? 6 : chartWidth < 800 ? 8 : 12;
         if (result.length > maxPoints) {
             const step = Math.ceil(result.length / maxPoints);
             return result.filter((_, i) => i % step === 0);
@@ -45,30 +46,54 @@ export const XAxis: React.FC<{
 
     return (
         <g className='x-axis'>
+            {/* Grid lines */}
+            {intervals.map((point) => (
+                <line key={`grid-${point.timestamp}`} x1={point.scaledX} y1={0} x2={point.scaledX} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={GRID_OPACITY} />
+            ))}
+
             {/* Main axis line */}
-            <line x1={0} y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke='#777' strokeWidth='1' />
+            <line x1={0} y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.1} />
 
             {/* Time intervals */}
-            {intervals.map((point, index) => (
-                <g key={`time-${point.timestamp}-${index}`} transform={`translate(${point.scaledX}, ${chartHeight})`}>
-                    <line y2={TICK_HEIGHT} stroke='#777' strokeWidth='1' />
-                    <text y={labelY} textAnchor='middle' fill='#fff' fontSize={FONT_SIZE} style={{ userSelect: 'none' }}>
-                        {formatTime(new Date(point.timestamp))}
-                    </text>
-                </g>
-            ))}
+            {intervals.map((point, index) => {
+                const date = new Date(point.timestamp);
+                const isStartOfDay = date.getHours() === 0;
+                const timeLabel = formatTime(date);
+
+                return (
+                    <g key={`time-${point.timestamp}-${index}`} transform={`translate(${point.scaledX}, ${chartHeight})`}>
+                        <line y2={TICK_HEIGHT} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.3} />
+                        <text y={labelY} textAnchor='middle' fill='#ffffff' fillOpacity={0.6} fontSize={FONT_SIZE} fontFamily='monospace' style={{ userSelect: 'none' }}>
+                            {timeLabel}
+                        </text>
+                        {isStartOfDay && (
+                            <text
+                                y={labelY + FONT_SIZE + 2}
+                                textAnchor='middle'
+                                fill='#ffffff'
+                                fillOpacity={0.4}
+                                fontSize={FONT_SIZE - 1}
+                                fontFamily='monospace'
+                                style={{ userSelect: 'none' }}>
+                                {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+                            </text>
+                        )}
+                    </g>
+                );
+            })}
 
             {/* Hover time indicator */}
             {hoverInfo && (
                 <g transform={`translate(${hoverInfo.x}, ${chartHeight})`}>
-                    <rect x={-40} y={hoverY} width={80} height={HOVER_BG_HEIGHT} fill={CHART_CONFIG.COLORS.HOVER_BG} rx={4} />
+                    <rect x={-40} y={hoverY} width={80} height={HOVER_BG_HEIGHT} fill='#1a1a1a' stroke='rgba(255, 255, 255, 0.2)' strokeWidth={1} rx={4} />
                     <text
                         x={0}
                         y={hoverY + HOVER_BG_HEIGHT / 2 + FONT_SIZE / 3}
                         textAnchor='middle'
-                        fill='black'
+                        fill='#ffffff'
                         fontSize={FONT_SIZE}
-                        fontWeight='bold'
+                        fontFamily='monospace'
+                        fontWeight='medium'
                         style={{ userSelect: 'none' }}>
                         {hoverInfo.time}
                     </text>
