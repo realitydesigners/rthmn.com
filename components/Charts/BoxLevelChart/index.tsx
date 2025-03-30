@@ -4,8 +4,9 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from '
 import { formatTime } from '@/utils/dateUtils';
 import { INSTRUMENTS } from '@/utils/instruments';
 import { useColorStore } from '@/stores/colorStore';
-import { XAxis } from '../CandleChart/Xaxis';
-import { YAxis } from '../CandleChart/YAxis';
+import { XAxis } from './Xaxis';
+import { YAxis } from './YAxis';
+import { Box } from '@/types/types';
 
 export interface ChartDataPoint {
     timestamp: number;
@@ -108,8 +109,15 @@ export const CHART_CONFIG = {
         MIN_PRICE_HEIGHT: 50,
         LABEL_WIDTH: 65,
     },
+    CANDLES: {
+        MIN_WIDTH: 2,
+        MAX_WIDTH: 15,
+        MIN_SPACING: 1,
+        WICK_WIDTH: 1.5,
+        GAP_RATIO: 0.5, // 40% gap between candles
+    },
     BOX_LEVELS: {
-        LINE_WIDTH: 4,
+        LINE_WIDTH: 4, // Moderate line width
     },
 } as const;
 
@@ -128,6 +136,43 @@ export const useInstrumentConfig = (pair: string) => {
     }, [pair]);
 };
 
+// Core chart components
+const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
+    const { boxColors } = useColorStore();
+
+    // Calculate candle width to use 80% of available space (leaving 20% for gaps)
+    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
+    const halfCandleWidth = candleWidth / 2;
+
+    // Filter visible candles before mapping
+    const visibleCandles = data.filter((point) => {
+        const isVisible = point.scaledX >= -candleWidth && point.scaledX <= width + candleWidth;
+        return isVisible;
+    });
+
+    return (
+        <g>
+            {visibleCandles.map((point, i) => {
+                const candle = point.close > point.open;
+                const candleColor = candle ? boxColors.positive : boxColors.negative;
+
+                const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
+                const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
+                const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+
+                return (
+                    <g key={point.timestamp} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
+                        <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={bodyTop} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
+                        <line x1={halfCandleWidth} y1={bodyBottom} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
+                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill='none' stroke={candleColor} strokeWidth={1} />
+                    </g>
+                );
+            })}
+        </g>
+    );
+});
+
+// Update BoxLevels props interface
 interface BoxLevelsProps {
     data: ChartDataPoint[];
     histogramBoxes: any[];
@@ -139,6 +184,7 @@ interface BoxLevelsProps {
     boxVisibilityFilter: 'all' | 'positive' | 'negative';
 }
 
+// Add this new component after CandleSticks
 const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOffset, visibleBoxesCount, boxVisibilityFilter }: BoxLevelsProps) => {
     const { boxColors } = useColorStore();
 
@@ -178,75 +224,331 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
     // Calculate line width with gap
     const lineWidth = CHART_CONFIG.BOX_LEVELS.LINE_WIDTH;
 
-    // Process each box to get its position and dimensions
-    const processedBoxes = recentBoxes
+    // First, preprocess the data to get all the levels
+    const rawBoxData = recentBoxes
         .map((box) => {
             const boxTime = new Date(box.timestamp).getTime();
             const candle = candleMap.get(boxTime);
             if (!candle) return null;
 
-            const scaleY = (price: number) => {
-                const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
-                return height * (1 - normalizedPrice);
-            };
+            // Make sure we slice with the correct indices from the timeframe slider
+            // This ensures we use the correct boxOffset and visibleBoxesCount
+            const slicedBoxes = [...box.boxes].slice(boxOffset, boxOffset + visibleBoxesCount);
 
-            const slicedBoxes = [...box.boxes].slice(boxOffset, boxOffset + visibleBoxesCount).map((level: any, boxIndex: number) => ({
-                ...level,
-                id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
-                scaledHigh: scaleY(level.high),
-                scaledLow: scaleY(level.low),
-            }));
+            if (!slicedBoxes.length) return null;
 
             return {
                 timestamp: boxTime,
-                xPosition: candle.scaledX,
                 boxes: slicedBoxes,
+                originalIndex: box.boxes.findIndex((b) => b === slicedBoxes[0]), // Store original index for value lookup
+                currentOHLC: box.currentOHLC,
+                xPosition: candle.scaledX, // Store X position from candle
             };
         })
         .filter(Boolean);
 
+    if (rawBoxData.length < 2) return null; // Need at least 2 points to draw a line
+
+    // Find the smallest box size
+    let smallestBoxSize = Infinity;
+    rawBoxData.forEach((box) => {
+        box.boxes.forEach((level) => {
+            const boxSize = Math.abs(level.high - level.low);
+            smallestBoxSize = Math.min(smallestBoxSize, boxSize);
+        });
+    });
+
+    // Add a debug message to help track changes
+    console.log(`BoxLevelChart render: boxOffset=${boxOffset}, visibleBoxesCount=${visibleBoxesCount}, ${rawBoxData.length} data points`);
+
+    // Sort boxes by size and initialize paths
+    const sortedInitialBoxes = [...rawBoxData[0].boxes].sort((a, b) => {
+        const sizeA = Math.abs(a.high - a.low);
+        const sizeB = Math.abs(b.high - b.low);
+        return sizeA - sizeB;
+    });
+
+    // Initialize a mapping to track which box in the current slice corresponds to which original index
+    // This is critical when the timeframe slider changes
+    const boxIndexMap = new Map();
+
+    // Map each visible box index to its original position in the full array
+    // This ensures we can look up the correct value no matter what slice we're viewing
+    rawBoxData[0].boxes.forEach((box, idx) => {
+        const originalIdx = idx + rawBoxData[0].originalIndex;
+        boxIndexMap.set(idx, originalIdx);
+    });
+
+    console.log('Box index mapping:', Object.fromEntries(boxIndexMap));
+
+    // Helper to create a diagonal line segment
+    const createDiagonalSegment = (
+        start: { x: number; high: number; low: number; value?: any; timestamp?: number; boxIndex?: number },
+        end: { high: number; low: number; value?: any; timestamp?: number; boxIndex?: number }
+    ) => {
+        const highDiff = end.high - start.high;
+        const lowDiff = end.low - start.low;
+        const maxDiff = Math.max(Math.abs(highDiff), Math.abs(lowDiff));
+
+        // Calculate x step to maintain 45° angle
+        const xStep = maxDiff;
+
+        return {
+            x: start.x + xStep,
+            high: end.high,
+            low: end.low,
+            value: end.value,
+            timestamp: end.timestamp,
+            boxIndex: end.boxIndex,
+        };
+    };
+
+    // Initialize levels with value tracking and box indices
+    const levels = sortedInitialBoxes.map((box, idx) => ({
+        points: [
+            {
+                x: 0,
+                high: box.high,
+                low: box.low,
+                value: box.value, // Store value with each point
+                timestamp: 0, // Store timestamp index for coloring
+                boxIndex: boxIndexMap.get(idx), // Store ORIGINAL box index to use for lookups
+            },
+        ],
+        lastHigh: box.high,
+        lastLow: box.low,
+        currentX: 0,
+    }));
+
+    // Process each time slice
+    for (let i = 1; i < rawBoxData.length; i++) {
+        const currentBoxes = [...rawBoxData[i].boxes].sort((a, b) => {
+            const sizeA = Math.abs(a.high - a.low);
+            const sizeB = Math.abs(b.high - b.low);
+            return sizeA - sizeB;
+        });
+
+        // First process the smallest box
+        const smallestBox = currentBoxes[0];
+        const smallestLevel = levels[0];
+        const lastSmallPoint = smallestLevel.points[smallestLevel.points.length - 1];
+        const smallestBoxSize = Math.abs(smallestBox.high - smallestBox.low);
+
+        // Check if smallest box needs to move
+        const smallHighChange = smallestBox.high - lastSmallPoint.high;
+        const smallLowChange = smallestBox.low - lastSmallPoint.low;
+
+        if (Math.abs(smallHighChange) >= smallestBoxSize * 0.01 || Math.abs(smallLowChange) >= smallestBoxSize * 0.01) {
+            // Create new point with diagonal movement for smallest box
+            const newSmallPoint = createDiagonalSegment(
+                { ...lastSmallPoint, value: smallestBox.value },
+                {
+                    high: smallestBox.high,
+                    low: smallestBox.low,
+                    value: smallestBox.value,
+                    boxIndex: lastSmallPoint.boxIndex, // Maintain box index
+                }
+            );
+
+            // Store timestamp index for coloring
+            newSmallPoint.timestamp = i;
+
+            smallestLevel.points.push(newSmallPoint);
+            smallestLevel.currentX = newSmallPoint.x;
+            smallestLevel.lastHigh = smallestBox.high;
+            smallestLevel.lastLow = smallestBox.low;
+
+            // Group boxes by shared values
+            const boxGroups = new Map<string, number[]>();
+            currentBoxes.forEach((box, idx) => {
+                // Create keys for high and low values
+                const highKey = `high:${box.high}`;
+                const lowKey = `low:${box.low}`;
+
+                if (!boxGroups.has(highKey)) boxGroups.set(highKey, []);
+                if (!boxGroups.has(lowKey)) boxGroups.set(lowKey, []);
+
+                boxGroups.get(highKey)!.push(idx);
+                boxGroups.get(lowKey)!.push(idx);
+            });
+
+            // Process larger boxes
+            for (let j = 1; j < levels.length; j++) {
+                const currentBox = currentBoxes[j];
+                const currentLevel = levels[j];
+                const lastPoint = currentLevel.points[currentLevel.points.length - 1];
+                const boxSize = Math.abs(currentBox.high - currentBox.low);
+
+                // Find all boxes that share values with this box
+                const sharesHighWith = boxGroups.get(`high:${currentBox.high}`) || [];
+                const sharesLowWith = boxGroups.get(`low:${currentBox.low}`) || [];
+
+                // Remove self from shared groups using Array.from
+                const sharingBoxes = Array.from(new Set([...sharesHighWith, ...sharesLowWith])).filter((idx) => idx !== j);
+
+                // If this box shares values with any other box that has moved
+                const sharesWithMoved = sharingBoxes.some((idx) => idx < j);
+
+                if (sharesWithMoved) {
+                    // Find the leading box (the one that's moved the furthest)
+                    const leadingBox = sharingBoxes
+                        .filter((idx) => idx < j)
+                        .reduce(
+                            (lead, idx) => {
+                                const level = levels[idx];
+                                return level.currentX > lead.currentX ? level : lead;
+                            },
+                            { currentX: 0 }
+                        );
+
+                    // Move to align with the leading box
+                    const newPoint = {
+                        x: leadingBox.currentX,
+                        high: currentBox.high,
+                        low: currentBox.low,
+                        value: currentBox.value, // Store the current value
+                        timestamp: i, // Store timestamp index
+                        boxIndex: lastPoint.boxIndex, // Maintain the box index
+                    };
+
+                    currentLevel.points.push(newPoint);
+                    currentLevel.currentX = newPoint.x;
+                    currentLevel.lastHigh = currentBox.high;
+                    currentLevel.lastLow = currentBox.low;
+                }
+                // Otherwise check if box needs to move based on its own changes
+                else {
+                    const highChange = currentBox.high - lastPoint.high;
+                    const lowChange = currentBox.low - lastPoint.low;
+
+                    if (Math.abs(highChange) >= boxSize * 0.01 || Math.abs(lowChange) >= boxSize * 0.01) {
+                        const newPoint = createDiagonalSegment(
+                            { ...lastPoint, value: currentBox.value },
+                            {
+                                high: currentBox.high,
+                                low: currentBox.low,
+                                value: currentBox.value,
+                                boxIndex: lastPoint.boxIndex, // Maintain box index
+                            }
+                        );
+
+                        // Store timestamp index for coloring
+                        newPoint.timestamp = i;
+
+                        currentLevel.points.push(newPoint);
+                        currentLevel.currentX = newPoint.x;
+                        currentLevel.lastHigh = currentBox.high;
+                        currentLevel.lastLow = currentBox.low;
+                    } else {
+                        // Add a flatline point at the current X position of the smallest box's new point
+                        const flatPoint = {
+                            x: newSmallPoint.x, // Use the X position from the smallest box
+                            high: lastPoint.high, // Keep current high
+                            low: lastPoint.low, // Keep current low
+                            value: currentBox.value, // Store the current value
+                            timestamp: i, // Store timestamp index
+                            boxIndex: lastPoint.boxIndex, // Maintain box index
+                        };
+
+                        // Add the flat point
+                        currentLevel.points.push(flatPoint);
+                        currentLevel.currentX = flatPoint.x;
+
+                        // Update state for next iteration's comparison
+                        currentLevel.lastHigh = currentBox.high;
+                        currentLevel.lastLow = currentBox.low;
+                    }
+                }
+            }
+        }
+    }
+
+    // Scale x positions to fit width
+    const maxX = Math.max(...levels.flatMap((level) => level.points.map((p) => p.x)));
+    const xScale = (width * 0.95) / maxX;
+
+    // Define scale function for y-axis
+    const scaleY = (price: number) => {
+        const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
+        return height * (1 - normalizedPrice);
+    };
+
+    // Force colors for positive and negative values
+    const POSITIVE_COLOR = '#3FFFA2'; // Green
+    const NEGATIVE_COLOR = '#FF3F3F'; // Red
+
     return (
         <g className='box-levels'>
-            {processedBoxes.map((boxFrame, index) => {
-                const filteredLevels = boxFrame.boxes.filter((level) => {
-                    if (boxVisibilityFilter === 'positive') {
-                        return level.value > 0;
-                    }
-                    if (boxVisibilityFilter === 'negative') {
-                        return level.value < 0;
-                    }
-                    return true;
-                });
+            {levels.map((level, levelIndex) => {
+                // Get the latest box values for filtering
+                // Use the original boxIndex instead of levelIndex to account for timeframe slider changes
+                const latestBoxValue = rawBoxData[rawBoxData.length - 1].boxes[levelIndex]?.value;
+
+                // Apply visibility filter
+                if (boxVisibilityFilter === 'positive' && latestBoxValue <= 0) return null;
+                if (boxVisibilityFilter === 'negative' && latestBoxValue >= 0) return null;
+
+                // For each level, we'll create multiple line segments based on value changes
+                const points = level.points;
+                if (points.length < 2) return null;
+
+                // Create high and low segments, directly tied to the raw data
+                const segments = [];
+
+                // Create segments for high and low lines
+                for (let i = 1; i < points.length; i++) {
+                    const startPoint = points[i - 1];
+                    const endPoint = points[i];
+
+                    // Get the timestamp and boxIndex for accessing the original data
+                    const timeIndex = endPoint.timestamp;
+                    const boxIndex = endPoint.boxIndex ?? levelIndex; // Fallback to levelIndex if boxIndex missing
+
+                    // Skip if we don't have valid indices
+                    if (timeIndex === undefined || timeIndex >= rawBoxData.length) continue;
+
+                    // Determine color based on direction (not value)
+                    // For high line: if end point is higher than start point, it's going up (green)
+                    const highDirection = endPoint.high <= startPoint.high ? NEGATIVE_COLOR : POSITIVE_COLOR;
+
+                    // For low line: if end point is higher than start point, it's going up (green)
+                    const lowDirection = endPoint.low <= startPoint.low ? NEGATIVE_COLOR : POSITIVE_COLOR;
+
+                    // Create high segment
+                    segments.push({
+                        x1: startPoint.x * xScale,
+                        y1: scaleY(startPoint.high),
+                        x2: endPoint.x * xScale,
+                        y2: scaleY(endPoint.high),
+                        color: highDirection,
+                        type: 'high',
+                    });
+
+                    // Create low segment
+                    segments.push({
+                        x1: startPoint.x * xScale,
+                        y1: scaleY(startPoint.low),
+                        x2: endPoint.x * xScale,
+                        y2: scaleY(endPoint.low),
+                        color: lowDirection,
+                        type: 'low',
+                    });
+                }
 
                 return (
-                    <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
-                        {filteredLevels.map((level) => {
-                            const color = level.value > 0 ? boxColors.positive : boxColors.negative;
-                            const opacity = 0.8;
-
-                            return (
-                                <g key={level.id}>
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledHigh}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledHigh}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledLow}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledLow}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                </g>
-                            );
-                        })}
+                    <g key={`level-${levelIndex}`}>
+                        {segments.map((segment, idx) => (
+                            <line
+                                key={`${segment.type}-${levelIndex}-${idx}`}
+                                x1={segment.x1}
+                                y1={segment.y1}
+                                x2={segment.x2}
+                                y2={segment.y2}
+                                stroke={segment.color}
+                                strokeWidth={1}
+                                strokeOpacity={0.8}
+                            />
+                        ))}
                     </g>
                 );
             })}
@@ -288,8 +590,10 @@ const BoxLevelChart = ({
     const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
     const chartHeight = dimensions.height - chartPadding.top - chartPadding.bottom;
 
+    // Get chart data directly
     const { visibleData, minY, maxY } = useChartData(candles, scrollLeft, chartWidth, chartHeight, yAxisScale, CHART_CONFIG.VISIBLE_POINTS);
 
+    // Update dimension effect to use parent's full dimensions
     useEffect(() => {
         const updateDimensions = () => {
             if (containerRef.current) {
@@ -320,24 +624,29 @@ const BoxLevelChart = ({
             setYAxisScale((prev) => {
                 const newScale = prev * (1 - deltaY * 0.7);
                 const minScale = CHART_CONFIG.MIN_ZOOM;
-                const maxScale = Math.min(CHART_CONFIG.MAX_ZOOM, chartHeight / CHART_CONFIG.Y_AXIS.MIN_PRICE_HEIGHT);
+                const maxScale = Math.min(
+                    CHART_CONFIG.MAX_ZOOM,
+                    // Prevent scaling that would make prices too close together
+                    chartHeight / CHART_CONFIG.Y_AXIS.MIN_PRICE_HEIGHT
+                );
                 return Math.max(minScale, Math.min(maxScale, newScale));
             });
         },
         [chartHeight]
     );
 
+    // Optimize drag handlers with throttling
     const dragHandlers = useMemo(() => {
         let lastDragTime = 0;
         let lastScrollUpdate = 0;
-        const THROTTLE_MS = 16;
+        const THROTTLE_MS = 16; // Approx. 60fps
 
         const updateScroll = (clientX: number) => {
             const now = Date.now();
             if (now - lastScrollUpdate < THROTTLE_MS) return;
 
             const deltaX = clientX - dragStart;
-            const maxScroll = Math.max(0, candles.length * 2 - chartWidth);
+            const maxScroll = Math.max(0, candles.length * (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) - chartWidth);
             const newScrollLeft = Math.max(0, Math.min(maxScroll, scrollStart - deltaX));
 
             setScrollLeft(newScrollLeft);
@@ -372,29 +681,36 @@ const BoxLevelChart = ({
         };
     }, [isDragging, isYAxisDragging, dragStart, scrollStart, chartWidth, candles.length, scrollLeft]);
 
+    // --- Derive displayed hover info from the hoveredTimestamp prop ---
     const displayedHoverInfo = useMemo(() => {
         if (hoveredTimestamp === null || !visibleData || visibleData.length === 0 || !chartHeight || !minY || !maxY) {
             return null;
         }
 
+        // Find the visible data point matching the timestamp
         const point = visibleData.find((p) => p.timestamp === hoveredTimestamp);
 
         if (point) {
+            // Calculate Y position based on the point's *actual* close price,
+            // rather than trying to guess from a potentially inaccurate cursor Y
+            // (especially if hover originated elsewhere)
             const yRatio = (point.close - minY) / (maxY - minY);
             const y = chartHeight * (1 - yRatio);
 
             return {
-                x: point.scaledX,
-                y: y,
-                price: point.close,
+                x: point.scaledX, // Use the point's calculated X
+                y: y, // Use the point's price-derived Y
+                price: point.close, // Show the point's closing price
                 time: formatTime(new Date(point.timestamp)),
+                // Add raw timestamp if needed by subcomponents
                 timestamp: point.timestamp,
             };
         }
 
-        return null;
+        return null; // No matching point found in visible data
     }, [hoveredTimestamp, visibleData, chartHeight, minY, maxY]);
 
+    // Update hover handlers to use shared state
     const hoverHandlers = useMemo(
         () => ({
             onSvgMouseMove: (event: React.MouseEvent<SVGSVGElement>) => {
@@ -404,6 +720,7 @@ const BoxLevelChart = ({
                 const x = event.clientX - svgRect.left - chartPadding.left;
 
                 if (x >= 0 && x <= chartWidth) {
+                    // Find the closest data point based on X coordinate
                     let closestPoint: ChartDataPoint | null = null;
                     let minDist = Infinity;
 
@@ -416,12 +733,13 @@ const BoxLevelChart = ({
                     });
 
                     if (closestPoint) {
+                        // Call the shared handler with the timestamp
                         onHoverChange(closestPoint.timestamp);
                     } else {
-                        onHoverChange(null);
+                        onHoverChange(null); // No close point found
                     }
                 } else {
-                    onHoverChange(null);
+                    onHoverChange(null); // Cursor is outside chart area
                 }
             },
             onMouseLeave: () => {
@@ -430,7 +748,7 @@ const BoxLevelChart = ({
                 }
             },
         }),
-        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange]
+        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange] // Add onHoverChange dependency
     );
 
     const HoverInfoComponent = ({ x, y, chartHeight, chartWidth }: { x: number; y: number; chartHeight: number; chartWidth: number }) => {

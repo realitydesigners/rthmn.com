@@ -3,6 +3,7 @@
 import React, { useEffect, useCallback, useState, useMemo } from 'react';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
+import BoxLevelChart from '@/components/Charts/BoxLevelChart';
 import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
@@ -87,6 +88,8 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         }
     }, [chartData]);
 
+    console.log(histogramData);
+
     return (
         <div className='flex h-auto w-full flex-col pt-14'>
             <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
@@ -120,20 +123,36 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             {/* Full-size container for CandleChart */}
                             <div className='h-full min-h-[600px] w-full'>
                                 {candleData && candleData.length > 0 ? (
-                                    <CandleChart
-                                        candles={candleData}
-                                        initialVisibleData={candleData.slice(-100)}
-                                        pair={pair}
-                                        histogramBoxes={histogramData.map((frame) => ({
-                                            timestamp: frame.timestamp,
-                                            boxes: frame.progressiveValues,
-                                        }))}
-                                        boxOffset={settings.startIndex}
-                                        visibleBoxesCount={settings.maxBoxCount}
-                                        boxVisibilityFilter={boxVisibilityFilter}
-                                        hoveredTimestamp={hoveredTimestamp}
-                                        onHoverChange={handleHoverChange}
-                                    />
+                                    <>
+                                        {/* <CandleChart
+                                            candles={candleData}
+                                            initialVisibleData={candleData.slice(-100)}
+                                            pair={pair}
+                                            histogramBoxes={histogramData.map((frame) => ({
+                                                timestamp: frame.timestamp,
+                                                boxes: frame.progressiveValues,
+                                            }))}
+                                            boxOffset={settings.startIndex}
+                                            visibleBoxesCount={settings.maxBoxCount}
+                                            boxVisibilityFilter={boxVisibilityFilter}
+                                            hoveredTimestamp={hoveredTimestamp}
+                                            onHoverChange={handleHoverChange}
+                                        /> */}
+                                        <BoxLevelChart
+                                            candles={candleData}
+                                            initialVisibleData={candleData.slice(-100)}
+                                            pair={pair}
+                                            histogramBoxes={histogramData.map((frame) => ({
+                                                timestamp: frame.timestamp,
+                                                boxes: frame.progressiveValues,
+                                            }))}
+                                            boxOffset={settings.startIndex}
+                                            visibleBoxesCount={settings.maxBoxCount}
+                                            boxVisibilityFilter={boxVisibilityFilter}
+                                            hoveredTimestamp={hoveredTimestamp}
+                                            onHoverChange={handleHoverChange}
+                                        />
+                                    </>
                                 ) : (
                                     <div className='flex h-full items-center justify-center'>Loading Chart...</div>
                                 )}

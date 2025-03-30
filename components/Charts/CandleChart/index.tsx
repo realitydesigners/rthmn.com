@@ -543,7 +543,7 @@ const CandleChart = ({
                             visibleBoxesCount={visibleBoxesCount}
                             boxVisibilityFilter={boxVisibilityFilter}
                         />
-                        {/* <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} /> */}
+                        <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={displayedHoverInfo} formatTime={formatTime} />
                         <YAxis
                             minY={minY}
