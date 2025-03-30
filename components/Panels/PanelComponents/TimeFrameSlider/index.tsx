@@ -127,7 +127,7 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                     switch (type) {
                         case 'left': {
                             const newReversedStartIndex = Math.max(0, Math.min(36, previousIndex + newIndex));
-                            const newMaxBoxCount = Math.max(2, Math.min(38 - newReversedStartIndex, reversedMaxBoxCount + (previousIndex - newReversedStartIndex)));
+                            const newMaxBoxCount = Math.max(1, Math.min(38 - newReversedStartIndex, reversedMaxBoxCount + (previousIndex - newReversedStartIndex)));
                             const newStartIndex = Math.min(37 - (newReversedStartIndex + newMaxBoxCount - 1), 36);
 
                             if (newStartIndex !== lastUpdateRef.current.startIndex) {
@@ -140,10 +140,10 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(({ startIn
                         }
                         case 'right': {
                             const proposedMaxBoxCount = previousIndex + newIndex;
-                            const newMaxBoxCount = Math.max(2, Math.min(proposedMaxBoxCount, 38 - reversedStartIndex));
+                            const newMaxBoxCount = Math.max(1, Math.min(proposedMaxBoxCount, 38 - reversedStartIndex));
                             const newStartIndex = 37 - (reversedStartIndex + newMaxBoxCount - 1);
 
-                            if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount && newMaxBoxCount >= 2 && newStartIndex >= 0) {
+                            if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount && newMaxBoxCount >= 1 && newStartIndex >= 0) {
                                 updates.maxBoxCount = newMaxBoxCount;
                                 updates.startIndex = newStartIndex;
                             }
