@@ -4,8 +4,8 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from '
 import { formatTime } from '@/utils/dateUtils';
 import { INSTRUMENTS } from '@/utils/instruments';
 import { useColorStore } from '@/stores/colorStore';
-import { XAxis } from './Xaxis';
-import { YAxis } from './YAxis';
+import { XAxis } from '../CandleChart/Xaxis';
+import { YAxis } from '../CandleChart/YAxis';
 
 export interface ChartDataPoint {
     timestamp: number;
@@ -108,15 +108,8 @@ export const CHART_CONFIG = {
         MIN_PRICE_HEIGHT: 50,
         LABEL_WIDTH: 65,
     },
-    CANDLES: {
-        MIN_WIDTH: 2,
-        MAX_WIDTH: 15,
-        MIN_SPACING: 1,
-        WICK_WIDTH: 1.5,
-        GAP_RATIO: 0.5, // 40% gap between candles
-    },
     BOX_LEVELS: {
-        LINE_WIDTH: 4, // Moderate line width
+        LINE_WIDTH: 4,
     },
 } as const;
 
@@ -135,43 +128,6 @@ export const useInstrumentConfig = (pair: string) => {
     }, [pair]);
 };
 
-// Core chart components
-const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
-    const { boxColors } = useColorStore();
-
-    // Calculate candle width to use 80% of available space (leaving 20% for gaps)
-    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
-    const halfCandleWidth = candleWidth / 2;
-
-    // Filter visible candles before mapping
-    const visibleCandles = data.filter((point) => {
-        const isVisible = point.scaledX >= -candleWidth && point.scaledX <= width + candleWidth;
-        return isVisible;
-    });
-
-    return (
-        <g>
-            {visibleCandles.map((point, i) => {
-                const candle = point.close > point.open;
-                const candleColor = candle ? boxColors.positive : boxColors.negative;
-
-                const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
-                const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
-                const bodyHeight = Math.max(1, bodyBottom - bodyTop);
-
-                return (
-                    <g key={point.timestamp} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
-                        <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={bodyTop} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
-                        <line x1={halfCandleWidth} y1={bodyBottom} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
-                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill='none' stroke={candleColor} strokeWidth={1} />
-                    </g>
-                );
-            })}
-        </g>
-    );
-});
-
-// Update BoxLevels props interface
 interface BoxLevelsProps {
     data: ChartDataPoint[];
     histogramBoxes: any[];
@@ -183,7 +139,6 @@ interface BoxLevelsProps {
     boxVisibilityFilter: 'all' | 'positive' | 'negative';
 }
 
-// Add this new component after CandleSticks
 const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOffset, visibleBoxesCount, boxVisibilityFilter }: BoxLevelsProps) => {
     const { boxColors } = useColorStore();
 
@@ -222,6 +177,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
 
     // Calculate line width with gap
     const lineWidth = CHART_CONFIG.BOX_LEVELS.LINE_WIDTH;
+
     // Process each box to get its position and dimensions
     const processedBoxes = recentBoxes
         .map((box) => {
@@ -229,15 +185,11 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
             const candle = candleMap.get(boxTime);
             if (!candle) return null;
 
-            // Use the exact same scaling function as useChartData
             const scaleY = (price: number) => {
                 const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
                 return height * (1 - normalizedPrice);
             };
 
-            // --- Start: Reverted Logic (Slice first, then filter visibility) ---
-            // 1. Slice the boxes based on timeframe *first*. The input `box.boxes`
-            //    is now assumed to be sorted by absolute value from processProgressiveBoxValues.
             const slicedBoxes = [...box.boxes].slice(boxOffset, boxOffset + visibleBoxesCount).map((level: any, boxIndex: number) => ({
                 ...level,
                 id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
@@ -248,7 +200,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
             return {
                 timestamp: boxTime,
                 xPosition: candle.scaledX,
-                boxes: slicedBoxes, // Use the sliced (but not yet visibility-filtered) boxes
+                boxes: slicedBoxes,
             };
         })
         .filter(Boolean);
@@ -256,7 +208,6 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
     return (
         <g className='box-levels'>
             {processedBoxes.map((boxFrame, index) => {
-                // 2. Apply visibility filter *after* slicing
                 const filteredLevels = boxFrame.boxes.filter((level) => {
                     if (boxVisibilityFilter === 'positive') {
                         return level.value > 0;
@@ -264,19 +215,17 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                     if (boxVisibilityFilter === 'negative') {
                         return level.value < 0;
                     }
-                    return true; // 'all'
+                    return true;
                 });
 
                 return (
                     <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
-                        {/* Map over the FILTERED levels */}
                         {filteredLevels.map((level) => {
                             const color = level.value > 0 ? boxColors.positive : boxColors.negative;
                             const opacity = 0.8;
 
                             return (
                                 <g key={level.id}>
-                                    {/* Draw horizontal lines at exact high and low points with gaps */}
                                     <line
                                         x1={-lineWidth / 2}
                                         y1={level.scaledHigh}
@@ -305,7 +254,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
     );
 });
 
-const CandleChart = ({
+const BoxLevelChart = ({
     candles = [],
     initialVisibleData,
     pair,
@@ -339,10 +288,8 @@ const CandleChart = ({
     const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
     const chartHeight = dimensions.height - chartPadding.top - chartPadding.bottom;
 
-    // Get chart data directly
     const { visibleData, minY, maxY } = useChartData(candles, scrollLeft, chartWidth, chartHeight, yAxisScale, CHART_CONFIG.VISIBLE_POINTS);
 
-    // Update dimension effect to use parent's full dimensions
     useEffect(() => {
         const updateDimensions = () => {
             if (containerRef.current) {
@@ -373,29 +320,24 @@ const CandleChart = ({
             setYAxisScale((prev) => {
                 const newScale = prev * (1 - deltaY * 0.7);
                 const minScale = CHART_CONFIG.MIN_ZOOM;
-                const maxScale = Math.min(
-                    CHART_CONFIG.MAX_ZOOM,
-                    // Prevent scaling that would make prices too close together
-                    chartHeight / CHART_CONFIG.Y_AXIS.MIN_PRICE_HEIGHT
-                );
+                const maxScale = Math.min(CHART_CONFIG.MAX_ZOOM, chartHeight / CHART_CONFIG.Y_AXIS.MIN_PRICE_HEIGHT);
                 return Math.max(minScale, Math.min(maxScale, newScale));
             });
         },
         [chartHeight]
     );
 
-    // Optimize drag handlers with throttling
     const dragHandlers = useMemo(() => {
         let lastDragTime = 0;
         let lastScrollUpdate = 0;
-        const THROTTLE_MS = 16; // Approx. 60fps
+        const THROTTLE_MS = 16;
 
         const updateScroll = (clientX: number) => {
             const now = Date.now();
             if (now - lastScrollUpdate < THROTTLE_MS) return;
 
             const deltaX = clientX - dragStart;
-            const maxScroll = Math.max(0, candles.length * (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) - chartWidth);
+            const maxScroll = Math.max(0, candles.length * 2 - chartWidth);
             const newScrollLeft = Math.max(0, Math.min(maxScroll, scrollStart - deltaX));
 
             setScrollLeft(newScrollLeft);
@@ -430,36 +372,29 @@ const CandleChart = ({
         };
     }, [isDragging, isYAxisDragging, dragStart, scrollStart, chartWidth, candles.length, scrollLeft]);
 
-    // --- Derive displayed hover info from the hoveredTimestamp prop ---
     const displayedHoverInfo = useMemo(() => {
         if (hoveredTimestamp === null || !visibleData || visibleData.length === 0 || !chartHeight || !minY || !maxY) {
             return null;
         }
 
-        // Find the visible data point matching the timestamp
         const point = visibleData.find((p) => p.timestamp === hoveredTimestamp);
 
         if (point) {
-            // Calculate Y position based on the point's *actual* close price,
-            // rather than trying to guess from a potentially inaccurate cursor Y
-            // (especially if hover originated elsewhere)
             const yRatio = (point.close - minY) / (maxY - minY);
             const y = chartHeight * (1 - yRatio);
 
             return {
-                x: point.scaledX, // Use the point's calculated X
-                y: y, // Use the point's price-derived Y
-                price: point.close, // Show the point's closing price
+                x: point.scaledX,
+                y: y,
+                price: point.close,
                 time: formatTime(new Date(point.timestamp)),
-                // Add raw timestamp if needed by subcomponents
                 timestamp: point.timestamp,
             };
         }
 
-        return null; // No matching point found in visible data
+        return null;
     }, [hoveredTimestamp, visibleData, chartHeight, minY, maxY]);
 
-    // Update hover handlers to use shared state
     const hoverHandlers = useMemo(
         () => ({
             onSvgMouseMove: (event: React.MouseEvent<SVGSVGElement>) => {
@@ -469,7 +404,6 @@ const CandleChart = ({
                 const x = event.clientX - svgRect.left - chartPadding.left;
 
                 if (x >= 0 && x <= chartWidth) {
-                    // Find the closest data point based on X coordinate
                     let closestPoint: ChartDataPoint | null = null;
                     let minDist = Infinity;
 
@@ -482,13 +416,12 @@ const CandleChart = ({
                     });
 
                     if (closestPoint) {
-                        // Call the shared handler with the timestamp
                         onHoverChange(closestPoint.timestamp);
                     } else {
-                        onHoverChange(null); // No close point found
+                        onHoverChange(null);
                     }
                 } else {
-                    onHoverChange(null); // Cursor is outside chart area
+                    onHoverChange(null);
                 }
             },
             onMouseLeave: () => {
@@ -497,7 +430,7 @@ const CandleChart = ({
                 }
             },
         }),
-        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange] // Add onHoverChange dependency
+        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange]
     );
 
     const HoverInfoComponent = ({ x, y, chartHeight, chartWidth }: { x: number; y: number; chartHeight: number; chartWidth: number }) => {
@@ -522,7 +455,16 @@ const CandleChart = ({
             {(!chartWidth || !chartHeight) && initialVisibleData ? (
                 <svg width='100%' height='100%' className='min-h-[500px]'>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                        <CandleSticks data={initialVisibleData} width={1000} height={500} />
+                        <BoxLevels
+                            data={initialVisibleData}
+                            histogramBoxes={histogramBoxes}
+                            width={1000}
+                            height={500}
+                            yAxisScale={yAxisScale}
+                            boxOffset={boxOffset}
+                            visibleBoxesCount={visibleBoxesCount}
+                            boxVisibilityFilter={boxVisibilityFilter}
+                        />
                     </g>
                 </svg>
             ) : visibleData.length > 0 ? (
@@ -543,7 +485,6 @@ const CandleChart = ({
                             visibleBoxesCount={visibleBoxesCount}
                             boxVisibilityFilter={boxVisibilityFilter}
                         />
-                        {/* <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} /> */}
                         <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={displayedHoverInfo} formatTime={formatTime} />
                         <YAxis
                             minY={minY}
@@ -568,4 +509,4 @@ const CandleChart = ({
     );
 };
 
-export default CandleChart;
+export default BoxLevelChart;
