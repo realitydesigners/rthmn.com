@@ -148,9 +148,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                             }))}
                                             boxOffset={settings.startIndex}
                                             visibleBoxesCount={settings.maxBoxCount}
-                                            boxVisibilityFilter={boxVisibilityFilter}
-                                            hoveredTimestamp={hoveredTimestamp}
-                                            onHoverChange={handleHoverChange}
                                         />
                                     </>
                                 ) : (
