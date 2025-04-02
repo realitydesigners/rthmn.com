@@ -116,32 +116,47 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                     const isNewTrendPositive = currentLargestBox.value >= 0;
                     const steps = 5; // More steps for smoother transition
 
-                    for (let step = 1; step <= steps; step++) {
-                        const progress = step / steps;
+                    // First phase: Move all boxes to their extreme value
+                    for (let step = 1; step <= steps / 2; step++) {
+                        const zeroProgress = step / (steps / 2);
                         const intermediateBoxes = [...prevFrame.progressiveValues];
 
-                        // In first half of steps, move all boxes towards zero
-                        if (step <= steps / 2) {
-                            const zeroProgress = step / (steps / 2);
-                            prevBoxes.forEach((box, index) => {
-                                intermediateBoxes[index] = {
-                                    ...box,
-                                    value: box.value * (1 - zeroProgress),
-                                };
-                            });
-                        }
-                        // In second half, move all boxes to their new values in the new trend direction
-                        else {
-                            const newProgress = (step - steps / 2) / (steps / 2);
-                            boxes.forEach((box, index) => {
-                                const targetValue = isNewTrendPositive ? Math.abs(box.value) : -Math.abs(box.value);
+                        // Move all boxes to their extreme value based on current trend
+                        const extremeValue =
+                            prevLargestBox.value >= 0
+                                ? Math.max(...prevBoxes.map((b) => Math.abs(b.value))) // Move to top for positive trend
+                                : -Math.max(...prevBoxes.map((b) => Math.abs(b.value))); // Move to bottom for negative trend
 
-                                intermediateBoxes[index] = {
-                                    ...box,
-                                    value: targetValue * newProgress,
-                                };
-                            });
-                        }
+                        prevBoxes.forEach((box, index) => {
+                            intermediateBoxes[index] = {
+                                ...box,
+                                value: box.value + (extremeValue - box.value) * zeroProgress,
+                            };
+                        });
+
+                        processedFrames.push({
+                            timestamp: frame.timestamp,
+                            progressiveValues: intermediateBoxes,
+                            currentOHLC: frame.currentOHLC,
+                        });
+                    }
+
+                    // Second phase: Move from extreme to new values
+                    for (let step = 1; step <= steps / 2; step++) {
+                        const newProgress = step / (steps / 2);
+                        const intermediateBoxes = [...prevFrame.progressiveValues];
+
+                        // Start from the extreme value of the previous trend
+                        const startValue = !isNewTrendPositive
+                            ? Math.max(...prevBoxes.map((b) => Math.abs(b.value))) // Start from top
+                            : -Math.max(...prevBoxes.map((b) => Math.abs(b.value))); // Start from bottom
+
+                        boxes.forEach((box, index) => {
+                            intermediateBoxes[index] = {
+                                ...box,
+                                value: startValue + (box.value - startValue) * newProgress,
+                            };
+                        });
 
                         processedFrames.push({
                             timestamp: frame.timestamp,
@@ -295,6 +310,18 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
                 // Draw box
                 ctx.fillRect(x, y, boxSize, boxSize);
+
+                // Draw text
+                ctx.fillStyle = '#FFFFFF';
+                const fontSize = Math.min(boxSize / 2, 12);
+                ctx.font = `5px monospace`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const displayValue =
+                    Math.abs(box.value) < 0.1
+                        ? box.value.toFixed(3) // Show more decimals for small values
+                        : box.value.toFixed(2); // Show 2 decimals for larger values
+                ctx.fillText(displayValue, x + boxSize / 2, y + boxSize / 2);
             });
         });
 
