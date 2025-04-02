@@ -115,6 +115,7 @@ export const CHART_CONFIG = {
         MIN_SPACING: 1,
         WICK_WIDTH: 1.5,
         GAP_RATIO: 0.5, // 40% gap between candles
+        RIGHT_MARGIN: 64,
     },
     BOX_LEVELS: {
         LINE_WIDTH: 4, // Moderate line width
@@ -136,23 +137,39 @@ export const useInstrumentConfig = (pair: string) => {
     }, [pair]);
 };
 
-// Core chart components
-const CandleSticks = memo(({ data, width, height }: { data: ChartDataPoint[]; width: number; height: number }) => {
+// Update CandleSticks props interface
+interface CandleSticksProps {
+    data: ChartDataPoint[];
+    width: number;
+    height: number;
+    rightMargin: number;
+}
+
+const CandleSticks = memo(({ data, width, height, rightMargin }: CandleSticksProps) => {
     const { boxColors } = useColorStore();
 
+    // Use passed rightMargin
+    const adjustedWidth = width - rightMargin;
+
     // Calculate candle width to use 80% of available space (leaving 20% for gaps)
-    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (width / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
+    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (adjustedWidth / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
     const halfCandleWidth = candleWidth / 2;
 
+    // Adjust x positions to account for right margin
+    const adjustedData = data.map((point) => ({
+        ...point,
+        scaledX: (point.scaledX / width) * adjustedWidth,
+    }));
+
     // Filter visible candles before mapping
-    const visibleCandles = data.filter((point) => {
-        const isVisible = point.scaledX >= -candleWidth && point.scaledX <= width + candleWidth;
+    const visibleCandles = adjustedData.filter((point) => {
+        const isVisible = point.scaledX >= -candleWidth && point.scaledX <= adjustedWidth + candleWidth;
         return isVisible;
     });
 
     return (
         <g>
-            {visibleCandles.map((point, i) => {
+            {visibleCandles.map((point) => {
                 const candle = point.close > point.open;
                 const candleColor = candle ? boxColors.positive : boxColors.negative;
 
@@ -309,26 +326,27 @@ const CandleChart = ({
         const point = visibleData.find((p) => p.timestamp === hoveredTimestamp);
 
         if (point) {
-            // Calculate Y position based on the point's *actual* close price,
-            // rather than trying to guess from a potentially inaccurate cursor Y
-            // (especially if hover originated elsewhere)
+            // Calculate Y position based on the point's actual close price
             const yRatio = (point.close - minY) / (maxY - minY);
             const y = chartHeight * (1 - yRatio);
 
+            // Adjust x position for right margin
+            const adjustedWidth = chartWidth - CHART_CONFIG.CANDLES.RIGHT_MARGIN;
+            const adjustedX = (point.scaledX / chartWidth) * adjustedWidth;
+
             return {
-                x: point.scaledX, // Use the point's calculated X
-                y: y, // Use the point's price-derived Y
-                price: point.close, // Show the point's closing price
+                x: adjustedX, // Use adjusted X position
+                y: y,
+                price: point.close,
                 time: formatTime(new Date(point.timestamp)),
-                // Add raw timestamp if needed by subcomponents
                 timestamp: point.timestamp,
             };
         }
 
-        return null; // No matching point found in visible data
-    }, [hoveredTimestamp, visibleData, chartHeight, minY, maxY]);
+        return null;
+    }, [hoveredTimestamp, visibleData, chartHeight, minY, maxY, chartWidth]);
 
-    // Update hover handlers to use shared state
+    // Update hover handlers to account for RIGHT_MARGIN
     const hoverHandlers = useMemo(
         () => ({
             onSvgMouseMove: (event: React.MouseEvent<SVGSVGElement>) => {
@@ -336,14 +354,17 @@ const CandleChart = ({
 
                 const svgRect = event.currentTarget.getBoundingClientRect();
                 const x = event.clientX - svgRect.left - chartPadding.left;
+                const adjustedWidth = chartWidth - CHART_CONFIG.CANDLES.RIGHT_MARGIN;
 
-                if (x >= 0 && x <= chartWidth) {
-                    // Find the closest data point based on X coordinate
+                if (x >= 0 && x <= adjustedWidth) {
+                    // Find the closest data point based on cursor position
                     let closestPoint: ChartDataPoint | null = null;
                     let minDist = Infinity;
 
                     visibleData.forEach((point) => {
-                        const dist = Math.abs(point.scaledX - x);
+                        // Scale the point's x position to match the adjusted width
+                        const pointX = (point.scaledX / chartWidth) * adjustedWidth;
+                        const dist = Math.abs(pointX - x);
                         if (dist < minDist) {
                             minDist = dist;
                             closestPoint = point;
@@ -351,13 +372,12 @@ const CandleChart = ({
                     });
 
                     if (closestPoint) {
-                        // Call the shared handler with the timestamp
                         onHoverChange(closestPoint.timestamp);
                     } else {
-                        onHoverChange(null); // No close point found
+                        onHoverChange(null);
                     }
                 } else {
-                    onHoverChange(null); // Cursor is outside chart area
+                    onHoverChange(null);
                 }
             },
             onMouseLeave: () => {
@@ -366,7 +386,7 @@ const CandleChart = ({
                 }
             },
         }),
-        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange] // Add onHoverChange dependency
+        [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange]
     );
 
     const HoverInfoComponent = ({ x, y, chartHeight, chartWidth }: { x: number; y: number; chartHeight: number; chartWidth: number }) => {
@@ -391,7 +411,7 @@ const CandleChart = ({
             {(!chartWidth || !chartHeight) && initialVisibleData ? (
                 <svg width='100%' height='100%' className='min-h-[500px]'>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                        <CandleSticks data={initialVisibleData} width={1000} height={500} />
+                        <CandleSticks data={initialVisibleData} width={1000} height={500} rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN} />
                     </g>
                 </svg>
             ) : visibleData.length > 0 ? (
@@ -412,10 +432,18 @@ const CandleChart = ({
                                 boxOffset={boxOffset}
                                 visibleBoxesCount={visibleBoxesCount}
                                 boxVisibilityFilter={boxVisibilityFilter}
+                                rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
                             />
                         )}
-                        <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} />
-                        <XAxis data={visibleData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={displayedHoverInfo} formatTime={formatTime} />
+                        <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN} />
+                        <XAxis
+                            data={visibleData}
+                            chartWidth={chartWidth}
+                            chartHeight={chartHeight}
+                            hoverInfo={displayedHoverInfo}
+                            formatTime={formatTime}
+                            rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                        />
                         <YAxis
                             minY={minY}
                             maxY={maxY}

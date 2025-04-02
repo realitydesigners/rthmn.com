@@ -167,7 +167,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     <>
                                         <CandleChart
                                             candles={candleData}
-                                            initialVisibleData={candleData.slice(-100)}
+                                            initialVisibleData={candleData}
                                             pair={pair}
                                             histogramBoxes={histogramData.map((frame) => ({
                                                 timestamp: frame.timestamp,

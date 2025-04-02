@@ -11,7 +11,7 @@ interface PageProps {
 }
 
 async function fetchApiData(pair: string, token: string) {
-    const CANDLE_LIMIT = 50;
+    const CANDLE_LIMIT = 100;
     try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min`, {
             headers: {
