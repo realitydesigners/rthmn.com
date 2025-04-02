@@ -21,7 +21,6 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
 
     // Get the timestamp of the most recent candle
     const lastCandleTime = data[data.length - 1].timestamp;
-    const oneHourAgo = lastCandleTime - 60 * 120 * 1000;
 
     // Create a map of timestamp to candle data for scaling
     const candleMap = new Map(data.map((point) => [point.timestamp, point]));
@@ -42,18 +41,8 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
     const paddedMin = centerPrice - scaledRange / 2 - padding;
     const paddedMax = centerPrice + scaledRange / 2 + padding;
 
-    // Get boxes from the last hour relative to the last candle
-    const recentBoxes = histogramBoxes.filter((box) => {
-        const boxTime = new Date(box.timestamp).getTime();
-        return boxTime >= oneHourAgo && boxTime <= lastCandleTime;
-    });
-
-    if (!recentBoxes.length) return null;
-
-    // Calculate line width with gap
-    const lineWidth = 4; // Using the same value as CHART_CONFIG.BOX_LEVELS.LINE_WIDTH
     // Process each box to get its position and dimensions
-    const processedBoxes = recentBoxes
+    const processedBoxes = histogramBoxes
         .map((box) => {
             const boxTime = new Date(box.timestamp).getTime();
             const candle = candleMap.get(boxTime);
@@ -104,24 +93,8 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                             return (
                                 <g key={level.id}>
                                     {/* Draw horizontal lines at exact high and low points with gaps */}
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledHigh}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledHigh}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledLow}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledLow}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
+                                    <line x1={-4 / 2} y1={level.scaledHigh} x2={4 / 2} y2={level.scaledHigh} stroke={color} strokeWidth={0.5} strokeOpacity={opacity} />
+                                    <line x1={-4 / 2} y1={level.scaledLow} x2={4 / 2} y2={level.scaledLow} stroke={color} strokeWidth={0.5} strokeOpacity={opacity} />
                                 </g>
                             );
                         })}

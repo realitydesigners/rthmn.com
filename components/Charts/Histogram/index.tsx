@@ -114,97 +114,49 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 if (trendChanged) {
                     // Create transition frames where all boxes move in the same direction
                     const isNewTrendPositive = currentLargestBox.value >= 0;
-                    const steps = 5; // More steps for smoother transition
 
-                    // First phase: Move all boxes to their extreme value
-                    for (let step = 1; step <= steps / 2; step++) {
-                        const zeroProgress = step / (steps / 2);
-                        const intermediateBoxes = [...prevFrame.progressiveValues];
+                    // Get the maximum absolute value to ensure proper connections at extremes
+                    const maxAbsValue = Math.max(Math.max(...prevBoxes.map((b) => Math.abs(b.value))), Math.max(...boxes.map((b) => Math.abs(b.value))));
 
-                        // Move all boxes to their extreme value based on current trend
-                        const extremeValue =
-                            prevLargestBox.value >= 0
-                                ? Math.max(...prevBoxes.map((b) => Math.abs(b.value))) // Move to top for positive trend
-                                : -Math.max(...prevBoxes.map((b) => Math.abs(b.value))); // Move to bottom for negative trend
+                    // First frame: Move all boxes to their current extreme
+                    const extremeBoxes = [...prevFrame.progressiveValues];
+                    prevBoxes.forEach((box, index) => {
+                        extremeBoxes[index] = {
+                            ...box,
+                            value: prevLargestBox.value >= 0 ? maxAbsValue : -maxAbsValue,
+                        };
+                    });
+                    processedFrames.push({
+                        timestamp: frame.timestamp,
+                        progressiveValues: extremeBoxes,
+                        currentOHLC: frame.currentOHLC,
+                    });
 
-                        prevBoxes.forEach((box, index) => {
-                            intermediateBoxes[index] = {
-                                ...box,
-                                value: box.value + (extremeValue - box.value) * zeroProgress,
-                            };
-                        });
+                    // Second frame: Move to the opposite extreme before new trend
+                    const transitionBoxes = [...prevFrame.progressiveValues];
+                    boxes.forEach((box, index) => {
+                        transitionBoxes[index] = {
+                            ...box,
+                            value: isNewTrendPositive ? maxAbsValue : -maxAbsValue,
+                        };
+                    });
+                    processedFrames.push({
+                        timestamp: frame.timestamp,
+                        progressiveValues: transitionBoxes,
+                        currentOHLC: frame.currentOHLC,
+                    });
 
-                        processedFrames.push({
-                            timestamp: frame.timestamp,
-                            progressiveValues: intermediateBoxes,
-                            currentOHLC: frame.currentOHLC,
-                        });
-                    }
-
-                    // Second phase: Move from extreme to new values
-                    for (let step = 1; step <= steps / 2; step++) {
-                        const newProgress = step / (steps / 2);
-                        const intermediateBoxes = [...prevFrame.progressiveValues];
-
-                        // Start from the extreme value of the previous trend
-                        const startValue = !isNewTrendPositive
-                            ? Math.max(...prevBoxes.map((b) => Math.abs(b.value))) // Start from top
-                            : -Math.max(...prevBoxes.map((b) => Math.abs(b.value))); // Start from bottom
-
-                        boxes.forEach((box, index) => {
-                            intermediateBoxes[index] = {
-                                ...box,
-                                value: startValue + (box.value - startValue) * newProgress,
-                            };
-                        });
-
-                        processedFrames.push({
-                            timestamp: frame.timestamp,
-                            progressiveValues: intermediateBoxes,
-                            currentOHLC: frame.currentOHLC,
-                        });
-                    }
+                    // Final frame: Move to actual new values
+                    processedFrames.push(frame);
                 } else {
-                    // Handle normal value changes
-                    const changedBoxes = boxes
-                        .map((box, index) => {
-                            const prevBox = prevBoxes[index];
-                            if (!prevBox || box.value === prevBox.value) return null;
+                    // For non-trend changes, just add the frame if values changed
+                    const hasChanges = boxes.some((box, index) => {
+                        const prevBox = prevBoxes[index];
+                        return prevBox && Math.abs(box.value - prevBox.value) > 0.000001;
+                    });
 
-                            return {
-                                index,
-                                prevValue: prevBox.value,
-                                newValue: box.value,
-                                high: box.high,
-                                low: box.low,
-                                direction: box.value > prevBox.value ? 1 : -1,
-                            };
-                        })
-                        .filter(Boolean);
-
-                    if (changedBoxes.length > 0) {
-                        // Sort changes by magnitude
-                        changedBoxes.sort((a, b) => Math.abs(b.newValue - b.prevValue) - Math.abs(a.newValue - a.prevValue));
-
-                        const steps = changedBoxes.length;
-                        for (let step = 1; step <= steps; step++) {
-                            const intermediateBoxes = [...prevFrame.progressiveValues];
-                            const progress = step / steps;
-
-                            changedBoxes.slice(0, step).forEach((change) => {
-                                intermediateBoxes[change.index] = {
-                                    value: change.prevValue + (change.newValue - change.prevValue) * progress,
-                                    high: change.high,
-                                    low: change.low,
-                                };
-                            });
-
-                            processedFrames.push({
-                                timestamp: frame.timestamp,
-                                progressiveValues: intermediateBoxes,
-                                currentOHLC: frame.currentOHLC,
-                            });
-                        }
+                    if (hasChanges) {
+                        processedFrames.push(frame);
                     }
                 }
             }
@@ -314,7 +266,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 // Draw text
                 ctx.fillStyle = '#FFFFFF';
                 const fontSize = Math.min(boxSize / 2, 12);
-                ctx.font = `5px monospace`;
+                ctx.font = `0px monospace`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 const displayValue =
