@@ -12,19 +12,16 @@ interface BoxLevelsProps {
     boxOffset: number;
     visibleBoxesCount: number;
     boxVisibilityFilter: 'all' | 'positive' | 'negative';
+    rightMargin: number;
 }
 
-const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOffset, visibleBoxesCount, boxVisibilityFilter }: BoxLevelsProps) => {
+const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOffset, visibleBoxesCount, boxVisibilityFilter, rightMargin }: BoxLevelsProps) => {
     const { boxColors } = useColorStore();
 
     if (!histogramBoxes?.length || !data.length) return null;
 
-    // Get the timestamp of the most recent candle
-    const lastCandleTime = data[data.length - 1].timestamp;
-    const oneHourAgo = lastCandleTime - 60 * 120 * 1000;
-
     // Create a map of timestamp to candle data for scaling
-    const candleMap = new Map(data.map((point) => [point.timestamp, point]));
+    const candleMap = new Map(data.map((point) => [new Date(point.timestamp).getTime(), point]));
 
     // Find min/max prices in visible range
     let minPrice = Infinity;
@@ -34,7 +31,7 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
         maxPrice = Math.max(maxPrice, point.high);
     });
 
-    // Calculate the center price and range (same as useChartData)
+    // Calculate the center price and range
     const centerPrice = (minPrice + maxPrice) / 2;
     const baseRange = maxPrice - minPrice;
     const scaledRange = baseRange / yAxisScale;
@@ -42,92 +39,121 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
     const paddedMin = centerPrice - scaledRange / 2 - padding;
     const paddedMax = centerPrice + scaledRange / 2 + padding;
 
-    // Get boxes from the last hour relative to the last candle
-    const recentBoxes = histogramBoxes.filter((box) => {
-        const boxTime = new Date(box.timestamp).getTime();
-        return boxTime >= oneHourAgo && boxTime <= lastCandleTime;
-    });
+    // Scale Y values consistently
+    const scaleY = (price: number) => {
+        const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
+        return height * (1 - normalizedPrice);
+    };
 
-    if (!recentBoxes.length) return null;
+    // Constants for line appearance
+    const LINE_WIDTH = 5;
+    const LINE_STROKE_WIDTH = 0.2;
+    const LINE_OPACITY = 0.8;
+    const adjustedWidth = width - rightMargin;
 
-    // Calculate line width with gap
-    const lineWidth = 4; // Using the same value as CHART_CONFIG.BOX_LEVELS.LINE_WIDTH
-    // Process each box to get its position and dimensions
-    const processedBoxes = recentBoxes
-        .map((box) => {
+    // Process boxes
+    const processedBoxes = histogramBoxes
+        .map((box, index) => {
+            const isCurrentBox = index === histogramBoxes.length - 1;
             const boxTime = new Date(box.timestamp).getTime();
-            const candle = candleMap.get(boxTime);
+
+            let candle;
+            if (isCurrentBox) {
+                candle = data[data.length - 1];
+            } else {
+                candle = candleMap.get(boxTime);
+            }
+
             if (!candle) return null;
 
-            // Use the exact same scaling function as useChartData
-            const scaleY = (price: number) => {
-                const normalizedPrice = (price - paddedMin) / (paddedMax - paddedMin);
-                return height * (1 - normalizedPrice);
-            };
+            const relevantBoxes = box.boxes
+                .slice(boxOffset, boxOffset + visibleBoxesCount)
+                .filter((level: any) => {
+                    if (boxVisibilityFilter === 'positive') return level.value > 0;
+                    if (boxVisibilityFilter === 'negative') return level.value < 0;
+                    return true;
+                })
+                .map((level: any) => ({
+                    ...level,
+                    scaledHigh: scaleY(level.high),
+                    scaledLow: scaleY(level.low),
+                    timestamp: boxTime,
+                }));
 
-            // Slice the boxes based on timeframe first
-            const slicedBoxes = [...box.boxes].slice(boxOffset, boxOffset + visibleBoxesCount).map((level: any, boxIndex: number) => ({
-                ...level,
-                id: `${boxTime}-${boxIndex}-${level.high}-${level.low}-${level.value}`,
-                scaledHigh: scaleY(level.high),
-                scaledLow: scaleY(level.low),
-            }));
+            if (relevantBoxes.length === 0) return null;
+
+            const xPosition = (candle.scaledX / width) * adjustedWidth;
 
             return {
-                timestamp: boxTime,
-                xPosition: candle.scaledX,
-                boxes: slicedBoxes,
+                timestamp: box.timestamp,
+                xPosition,
+                boxes: relevantBoxes,
+                isCurrent: isCurrentBox,
             };
         })
         .filter(Boolean);
 
+    // Create a map to track seen levels
+    const seenLevels = new Map();
+
+    // Filter out duplicates across all frames
+    const uniqueProcessedBoxes = processedBoxes
+        .map((boxFrame) => {
+            const uniqueBoxes = boxFrame.boxes.filter((level) => {
+                const key = `${level.high}-${level.low}-${level.value > 0}`;
+
+                if (seenLevels.has(key)) {
+                    const existingLevel = seenLevels.get(key);
+                    // Keep the level if it's from a more recent timestamp
+                    if (level.timestamp > existingLevel.timestamp) {
+                        seenLevels.set(key, level);
+                        return true;
+                    }
+                    return false;
+                }
+
+                seenLevels.set(key, level);
+                return true;
+            });
+
+            return {
+                ...boxFrame,
+                boxes: uniqueBoxes,
+            };
+        })
+        .filter((boxFrame) => boxFrame.boxes.length > 0);
+
     return (
         <g className='box-levels'>
-            {processedBoxes.map((boxFrame, index) => {
-                // Apply visibility filter after slicing
-                const filteredLevels = boxFrame.boxes.filter((level) => {
-                    if (boxVisibilityFilter === 'positive') {
-                        return level.value > 0;
-                    }
-                    if (boxVisibilityFilter === 'negative') {
-                        return level.value < 0;
-                    }
-                    return true; // 'all'
-                });
-
-                return (
-                    <g key={`${boxFrame.timestamp}-${index}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
-                        {filteredLevels.map((level) => {
-                            const color = level.value > 0 ? boxColors.positive : boxColors.negative;
-                            const opacity = 0.8;
-
-                            return (
-                                <g key={level.id}>
-                                    {/* Draw horizontal lines at exact high and low points with gaps */}
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledHigh}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledHigh}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                    <line
-                                        x1={-lineWidth / 2}
-                                        y1={level.scaledLow}
-                                        x2={lineWidth / 2}
-                                        y2={level.scaledLow}
-                                        stroke={color}
-                                        strokeWidth={0.5}
-                                        strokeOpacity={opacity}
-                                    />
-                                </g>
-                            );
-                        })}
-                    </g>
-                );
-            })}
+            {uniqueProcessedBoxes.map((boxFrame, frameIndex) => (
+                <g key={`${boxFrame.timestamp}-${frameIndex}-${boxFrame.isCurrent ? 'current' : 'historical'}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
+                    {boxFrame.boxes.map((level, levelIndex) => {
+                        const color = level.value > 0 ? boxColors.positive : boxColors.negative;
+                        return (
+                            <g key={`${level.high}-${level.low}-${level.value}-${levelIndex}`}>
+                                <line
+                                    x1={-LINE_WIDTH / 2}
+                                    x2={LINE_WIDTH / 2}
+                                    y1={level.scaledHigh}
+                                    y2={level.scaledHigh}
+                                    stroke={color}
+                                    strokeWidth={LINE_STROKE_WIDTH}
+                                    opacity={LINE_OPACITY}
+                                />
+                                <line
+                                    x1={-LINE_WIDTH / 2}
+                                    x2={LINE_WIDTH / 2}
+                                    y1={level.scaledLow}
+                                    y2={level.scaledLow}
+                                    stroke={color}
+                                    strokeWidth={LINE_STROKE_WIDTH}
+                                    opacity={LINE_OPACITY}
+                                />
+                            </g>
+                        );
+                    })}
+                </g>
+            ))}
         </g>
     );
 });

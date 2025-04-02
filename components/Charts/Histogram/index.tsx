@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
 import { Box } from '@/types/types';
 import { BoxColors } from '@/stores/colorStore';
 import { BoxSizes } from '@/utils/instruments';
@@ -26,15 +26,6 @@ interface BoxTimelineProps {
     showLine?: boolean; // Ensure showLine prop is defined
 }
 
-const findNearestBoxSize = (value: number): number => {
-    const absValue = Math.abs(value);
-    let nearest = BoxSizes.reduce((prev, curr) => {
-        return Math.abs(curr - absValue) < Math.abs(prev - absValue) ? curr : prev;
-    });
-
-    return value >= 0 ? nearest : -nearest;
-};
-
 const MAX_FRAMES = 1000; // Limit drawn frames for performance
 
 const Histogram: React.FC<BoxTimelineProps> = ({
@@ -56,11 +47,13 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
     // Calculate dynamic box dimensions based on container and visible boxes
     const calculateBoxDimensions = (containerHeight: number, frameCount: number) => {
-        // Force boxes to fill the container height
+        // Force boxes to fill the container height exactly
         const boxSize = Math.floor(containerHeight / visibleBoxesCount);
+        // Calculate total height that will be filled by boxes
+        const totalHeight = boxSize * visibleBoxesCount;
         // Calculate required width for square boxes
         const requiredWidth = boxSize * frameCount;
-        return { boxSize, requiredWidth };
+        return { boxSize, requiredWidth, totalHeight };
     };
 
     useEffect(() => {
@@ -114,82 +107,49 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 if (trendChanged) {
                     // Create transition frames where all boxes move in the same direction
                     const isNewTrendPositive = currentLargestBox.value >= 0;
-                    const steps = 5; // More steps for smoother transition
 
-                    for (let step = 1; step <= steps; step++) {
-                        const progress = step / steps;
-                        const intermediateBoxes = [...prevFrame.progressiveValues];
+                    // Get the maximum absolute value to ensure proper connections at extremes
+                    const maxAbsValue = Math.max(Math.max(...prevBoxes.map((b) => Math.abs(b.value))), Math.max(...boxes.map((b) => Math.abs(b.value))));
 
-                        // In first half of steps, move all boxes towards zero
-                        if (step <= steps / 2) {
-                            const zeroProgress = step / (steps / 2);
-                            prevBoxes.forEach((box, index) => {
-                                intermediateBoxes[index] = {
-                                    ...box,
-                                    value: box.value * (1 - zeroProgress),
-                                };
-                            });
-                        }
-                        // In second half, move all boxes to their new values in the new trend direction
-                        else {
-                            const newProgress = (step - steps / 2) / (steps / 2);
-                            boxes.forEach((box, index) => {
-                                const targetValue = isNewTrendPositive ? Math.abs(box.value) : -Math.abs(box.value);
+                    // First frame: Move all boxes to their current extreme
+                    const extremeBoxes = [...prevFrame.progressiveValues];
+                    prevBoxes.forEach((box, index) => {
+                        extremeBoxes[index] = {
+                            ...box,
+                            value: prevLargestBox.value >= 0 ? maxAbsValue : -maxAbsValue,
+                        };
+                    });
+                    processedFrames.push({
+                        timestamp: frame.timestamp,
+                        progressiveValues: extremeBoxes,
+                        currentOHLC: frame.currentOHLC,
+                    });
 
-                                intermediateBoxes[index] = {
-                                    ...box,
-                                    value: targetValue * newProgress,
-                                };
-                            });
-                        }
+                    // Second frame: Move to the opposite extreme before new trend
+                    const transitionBoxes = [...prevFrame.progressiveValues];
+                    boxes.forEach((box, index) => {
+                        transitionBoxes[index] = {
+                            ...box,
+                            value: isNewTrendPositive ? maxAbsValue : -maxAbsValue,
+                        };
+                    });
+                    processedFrames.push({
+                        timestamp: frame.timestamp,
+                        progressiveValues: transitionBoxes,
+                        currentOHLC: frame.currentOHLC,
+                    });
 
-                        processedFrames.push({
-                            timestamp: frame.timestamp,
-                            progressiveValues: intermediateBoxes,
-                            currentOHLC: frame.currentOHLC,
-                        });
-                    }
+                    // Final frame: Move to actual new values
+                    processedFrames.push(frame);
                 } else {
-                    // Handle normal value changes
-                    const changedBoxes = boxes
-                        .map((box, index) => {
-                            const prevBox = prevBoxes[index];
-                            if (!prevBox || box.value === prevBox.value) return null;
+                    // For non-trend changes, just add the frame if values changed
+                    const hasChanges = boxes.some((box, index) => {
+                        const prevBox = prevBoxes[index];
+                        return prevBox && Math.abs(box.value - prevBox.value) > 0.000001;
+                    });
 
-                            return {
-                                index,
-                                prevValue: prevBox.value,
-                                newValue: box.value,
-                                high: box.high,
-                                low: box.low,
-                                direction: box.value > prevBox.value ? 1 : -1,
-                            };
-                        })
-                        .filter(Boolean);
-
-                    if (changedBoxes.length > 0) {
-                        // Sort changes by magnitude
-                        changedBoxes.sort((a, b) => Math.abs(b.newValue - b.prevValue) - Math.abs(a.newValue - a.prevValue));
-
-                        const steps = changedBoxes.length;
-                        for (let step = 1; step <= steps; step++) {
-                            const intermediateBoxes = [...prevFrame.progressiveValues];
-                            const progress = step / steps;
-
-                            changedBoxes.slice(0, step).forEach((change) => {
-                                intermediateBoxes[change.index] = {
-                                    value: change.prevValue + (change.newValue - change.prevValue) * progress,
-                                    high: change.high,
-                                    low: change.low,
-                                };
-                            });
-
-                            processedFrames.push({
-                                timestamp: frame.timestamp,
-                                progressiveValues: intermediateBoxes,
-                                currentOHLC: frame.currentOHLC,
-                            });
-                        }
+                    if (hasChanges) {
+                        processedFrames.push(frame);
                     }
                 }
             }
@@ -206,22 +166,22 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         const framesToDraw = processedFrames.slice(Math.max(0, processedFrames.length - MAX_FRAMES));
 
         // Calculate box dimensions based on container height
-        const { boxSize, requiredWidth } = calculateBoxDimensions(rect.height - 24, framesToDraw.length);
+        const { boxSize, requiredWidth, totalHeight } = calculateBoxDimensions(rect.height, framesToDraw.length);
         setEffectiveBoxWidth(boxSize);
 
         // Set canvas size
         canvas.style.width = `${requiredWidth}px`;
-        canvas.style.height = `${rect.height}px`;
+        canvas.style.height = `${totalHeight}px`;
 
         // Set high-DPI canvas
         const scale = window.devicePixelRatio;
         canvas.width = Math.floor(requiredWidth * scale);
-        canvas.height = Math.floor(rect.height * scale);
+        canvas.height = Math.floor(totalHeight * scale);
         ctx.scale(scale, scale);
 
         // Clear canvas
         ctx.fillStyle = '#0a0a0a';
-        ctx.fillRect(0, 0, requiredWidth, rect.height);
+        ctx.fillRect(0, 0, requiredWidth, totalHeight);
 
         // Track trend changes
         const newTrendChanges: Array<{ timestamp: string; x: number; isPositive: boolean }> = [];
@@ -233,26 +193,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         framesToDraw.forEach((frame, frameIndex) => {
             const x = frameIndex * boxSize;
             const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-            const largestBox = boxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), boxes[0]);
-            const isLargestPositive = largestBox.value >= 0;
-
-            if (prevIsLargestPositive !== null && prevIsLargestPositive !== isLargestPositive) {
-                newTrendChanges.push({
-                    timestamp: frame.timestamp,
-                    x: x,
-                    isPositive: isLargestPositive,
-                });
-            }
-            prevIsLargestPositive = isLargestPositive;
-
-            // Draw boxes
-            const frameTimestamp = new Date(frame.timestamp).getTime();
-            const isHovered = frameTimestamp === hoveredTimestamp;
-
-            if (isHovered) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-                ctx.fillRect(x, 0, boxSize, rect.height);
-            }
 
             // Process boxes
             const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
@@ -260,17 +200,21 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             const positiveBoxes = slicedBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
             const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
 
+            // Find largest absolute value box for trend
+            const largestBox = orderedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), orderedBoxes[0]);
+            const isLargestPositive = largestBox ? largestBox.value >= 0 : true;
+
             // Find smallest absolute value box for line position
-            const smallestBox = orderedBoxes.length > 0 ? orderedBoxes.reduce((min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min)) : null;
+            const smallestBox = orderedBoxes.length > 0 ? orderedBoxes.reduce((min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min), orderedBoxes[0]) : null;
 
             // Calculate line point position
             if (smallestBox) {
                 const isPositive = smallestBox.value >= 0;
-                const boxIndex = orderedBoxes.findIndex((box) => box.value === smallestBox.value);
-                const y = isPositive ? boxIndex * boxSize : (boxIndex + 1) * boxSize;
+                const boxIndex = orderedBoxes.findIndex((box) => box === smallestBox);
+                const y = (boxIndex + (isPositive ? 0 : 1)) * boxSize;
 
                 linePoints.push({
-                    x: x,
+                    x: x, // Start from left edge of box
                     y: y,
                     isPositive: isPositive,
                     isLargestPositive: isLargestPositive,
@@ -282,7 +226,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 const y = boxIndex * boxSize;
                 const isPositiveBox = box.value >= 0;
 
-                // Set colors
+                // Set colors based on largest trend
                 if (isLargestPositive) {
                     ctx.fillStyle = isPositiveBox
                         ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
@@ -296,6 +240,23 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 // Draw box
                 ctx.fillRect(x, y, boxSize, boxSize);
             });
+
+            // Track trend changes
+            if (prevIsLargestPositive !== null && prevIsLargestPositive !== isLargestPositive) {
+                newTrendChanges.push({
+                    timestamp: frame.timestamp,
+                    x: x,
+                    isPositive: isLargestPositive,
+                });
+            }
+            prevIsLargestPositive = isLargestPositive;
+
+            // Draw hover highlight if this is the hovered frame
+            const frameTimestamp = new Date(frame.timestamp).getTime();
+            if (hoveredTimestamp === frameTimestamp) {
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(x, 0, boxSize, rect.height); // Leave space for X-axis
+            }
         });
 
         // Draw fill areas and line
@@ -356,10 +317,9 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 }
             });
 
-            if (linePoints.length > 0) {
-                const lastPoint = linePoints[linePoints.length - 1];
-                ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
-            }
+            // Draw to the end of the last box
+            const lastPoint = linePoints[linePoints.length - 1];
+            ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
 
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#FFFFFF';
@@ -370,8 +330,30 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     }, [isClient, data, boxOffset, visibleBoxesCount, boxColors, hoveredTimestamp, showLine]);
 
     return (
-        <div ref={scrollContainerRef} className={`relative h-full w-full overflow-x-auto ${className}`}>
-            <canvas ref={canvasRef} className='absolute top-3 left-0' style={{ imageRendering: 'pixelated' }} />
+        <div className={`relative ${className}`}>
+            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto'>
+                <div className='relative h-full pt-6'>
+                    {/* Trend Change Markers */}
+                    <div className='absolute -top-0 right-0 left-0 z-0 ml-[18px] h-6'>
+                        {trendChanges.map((change, index) => (
+                            <div
+                                key={`${change.timestamp}-${index}`}
+                                className='absolute -translate-x-1/2 transform'
+                                style={{
+                                    left: `${change.x}px`,
+                                    color: change.isPositive ? boxColors.positive : boxColors.negative,
+                                }}>
+                                <div className='text-[8px] whitespace-nowrap'>{new Date(change.timestamp).toLocaleTimeString()}</div>▼
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Canvas */}
+                    <div className='h-full'>
+                        <canvas ref={canvasRef} className='block h-full overflow-y-hidden' style={{ imageRendering: 'pixelated' }} />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
