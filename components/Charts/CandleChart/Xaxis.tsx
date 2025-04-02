@@ -6,8 +6,9 @@ export const XAxis: React.FC<{
     chartWidth: number;
     chartHeight: number;
     hoverInfo: any | null;
+    rightMargin: number;
     formatTime: (date: Date) => string;
-}> = memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime }) => {
+}> = memo(({ data, chartWidth, chartHeight, hoverInfo, formatTime, rightMargin }) => {
     const TICK_HEIGHT = 4;
     const LABEL_PADDING = 4;
     const FONT_SIZE = 10;
@@ -44,12 +45,15 @@ export const XAxis: React.FC<{
     const labelY = TICK_HEIGHT + LABEL_PADDING + FONT_SIZE;
     const hoverY = TICK_HEIGHT + LABEL_PADDING;
 
+    const adjustedWidth = chartWidth - rightMargin;
+
     return (
         <g className='x-axis'>
             {/* Grid lines */}
-            {intervals.map((point) => (
-                <line key={`grid-${point.timestamp}`} x1={point.scaledX} y1={0} x2={point.scaledX} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={GRID_OPACITY} />
-            ))}
+            {intervals.map((point) => {
+                const adjustedX = (point.scaledX / chartWidth) * adjustedWidth;
+                return <line key={`grid-${point.timestamp}`} x1={adjustedX} y1={0} x2={adjustedX} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={GRID_OPACITY} />;
+            })}
 
             {/* Main axis line */}
             <line x1={0} y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.1} />
@@ -59,9 +63,10 @@ export const XAxis: React.FC<{
                 const date = new Date(point.timestamp);
                 const isStartOfDay = date.getHours() === 0;
                 const timeLabel = formatTime(date);
+                const adjustedX = (point.scaledX / chartWidth) * adjustedWidth;
 
                 return (
-                    <g key={`time-${point.timestamp}-${index}`} transform={`translate(${point.scaledX}, ${chartHeight})`}>
+                    <g key={`time-${point.timestamp}-${index}`} transform={`translate(${adjustedX}, ${chartHeight})`}>
                         <line y2={TICK_HEIGHT} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.3} />
                         <text y={labelY} textAnchor='middle' fill='#ffffff' fillOpacity={0.6} fontSize={FONT_SIZE} fontFamily='monospace' style={{ userSelect: 'none' }}>
                             {timeLabel}

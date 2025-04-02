@@ -3,7 +3,6 @@
 import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
-import BoxLevelChart from '@/components/Charts/BoxLevelChart';
 import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
@@ -12,10 +11,9 @@ import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
 import Histogram from '@/components/Charts/Histogram';
 import ChartControls from '@/components/Charts/CandleChart/ChartControls';
-import { RiBarChartBoxLine } from 'react-icons/ri';
-import { BsBoxes, BsBoxSeam, BsBoxArrowInDown, BsBoxArrowInUp } from 'react-icons/bs';
 import { Box } from '@/types/types';
 import { BoxValuesDebug } from '@/components/Debug/BoxValuesDebug';
+import { processLiveCandleUpdate } from '@/utils/chartDataProcessor';
 
 export interface ExtendedBoxSlice {
     timestamp: string;
@@ -48,6 +46,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     // Add refs for box management
     const boxMapRef = useRef<Map<string, Box[]>>(new Map());
     const lastPriceRef = useRef<number | null>(null);
+    const currentCandleRef = useRef<ChartDataPoint | null>(null);
 
     const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
@@ -88,13 +87,29 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         }
     }, [chartData]);
 
-    // Update histogram data when boxSlice updates
+    // Update candle data when price updates
     useEffect(() => {
-        if (!boxSlice?.boxes) return;
+        if (!currentPrice || !boxSlice?.currentOHLC) return;
 
+        // Update both candle and histogram data together to ensure synchronization
+        const timestamp = new Date().getTime();
+
+        setCandleData((prev) => {
+            return processLiveCandleUpdate(
+                prev,
+                {
+                    timestamp,
+                    price: currentPrice,
+                    ohlc: boxSlice.currentOHLC,
+                },
+                currentCandleRef
+            );
+        });
+
+        // Update histogram data with current box values
         setHistogramData((prev) => {
             const newSlice: ExtendedBoxSlice = {
-                timestamp: boxSlice.timestamp,
+                timestamp: new Date(timestamp).toISOString(),
                 progressiveValues: boxSlice.boxes.map((box) => ({
                     high: box.high,
                     low: box.low,
@@ -103,10 +118,12 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                 currentOHLC: boxSlice.currentOHLC,
             };
 
-            // Append the new slice instead of replacing the last one
-            return [...prev, newSlice];
+            // Keep only the last N frames to prevent memory buildup
+            const MAX_FRAMES = 2000;
+            const updatedFrames = [...prev, newSlice];
+            return updatedFrames.slice(-MAX_FRAMES);
         });
-    }, [boxSlice]);
+    }, [currentPrice, boxSlice?.currentOHLC, boxSlice?.boxes]);
 
     const filteredBoxSlice = useMemo(() => {
         if (!boxSlice?.boxes) {
@@ -134,10 +151,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                 <div className='flex h-full w-full flex-1'>
                     <div className='h-full w-3/4 p-4'>
                         <div className='relative flex h-full flex-col overflow-hidden border border-[#222] bg-black'>
-                            <div className='mt-4'>
-                                <BoxValuesDebug resoBoxes={boxSlice?.boxes} histogramData={histogramData} startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} />
-                            </div>
-                            {/* <ChartControls
+                            <ChartControls
                                 showBoxLevels={showBoxLevels}
                                 setShowBoxLevels={setShowBoxLevels}
                                 boxVisibilityFilter={boxVisibilityFilter}
@@ -150,7 +164,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     <>
                                         <CandleChart
                                             candles={candleData}
-                                            initialVisibleData={candleData.slice(-100)}
+                                            initialVisibleData={candleData}
                                             pair={pair}
                                             histogramBoxes={histogramData.map((frame) => ({
                                                 timestamp: frame.timestamp,
@@ -163,7 +177,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                             onHoverChange={handleHoverChange}
                                             showBoxLevels={showBoxLevels}
                                         />
-                                        <BoxLevelChart
+                                        {/* <BoxLevelChart
                                             candles={candleData}
                                             initialVisibleData={candleData.slice(-100)}
                                             pair={pair}
@@ -173,12 +187,12 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                             }))}
                                             boxOffset={settings.startIndex}
                                             visibleBoxesCount={settings.maxBoxCount}
-                                        />
+                                        /> */}
                                     </>
                                 ) : (
                                     <div className='flex h-full items-center justify-center'>Loading Chart...</div>
                                 )}
-                            </div> */}
+                            </div>
                             <div className='h-[200px] w-full px-4'>
                                 <div className='flex h-full flex-col border border-[#222] bg-black p-2'>
                                     {boxColors && histogramData && (
@@ -214,6 +228,9 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     />
                                 </div>
                             )}
+                        </div>
+                        <div className='mt-4'>
+                            <BoxValuesDebug resoBoxes={boxSlice?.boxes} histogramData={histogramData} startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} />
                         </div>
                     </div>
                 </div>
