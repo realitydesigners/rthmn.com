@@ -3,7 +3,6 @@
 import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
-import BoxLevelChart from '@/components/Charts/BoxLevelChart';
 import { useUser } from '@/providers/UserProvider';
 import { formatPrice } from '@/utils/instruments';
 import { useDashboard } from '@/providers/DashboardProvider/client';
@@ -12,11 +11,9 @@ import { useTimeframeStore } from '@/stores/timeframeStore';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
 import Histogram from '@/components/Charts/Histogram';
 import ChartControls from '@/components/Charts/CandleChart/ChartControls';
-import { RiBarChartBoxLine } from 'react-icons/ri';
-import { BsBoxes, BsBoxSeam, BsBoxArrowInDown, BsBoxArrowInUp } from 'react-icons/bs';
 import { Box } from '@/types/types';
 import { BoxValuesDebug } from '@/components/Debug/BoxValuesDebug';
-import { processInitialChartData, processLiveCandleUpdate } from '@/utils/chartDataProcessor';
+import { processLiveCandleUpdate } from '@/utils/chartDataProcessor';
 
 export interface ExtendedBoxSlice {
     timestamp: string;
@@ -122,7 +119,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
             };
 
             // Keep only the last N frames to prevent memory buildup
-            const MAX_FRAMES = 1000;
+            const MAX_FRAMES = 2000;
             const updatedFrames = [...prev, newSlice];
             return updatedFrames.slice(-MAX_FRAMES);
         });

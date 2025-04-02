@@ -125,12 +125,12 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
 
     return (
         <g className='box-levels'>
-            {uniqueProcessedBoxes.map((boxFrame) => (
-                <g key={boxFrame.timestamp} transform={`translate(${boxFrame.xPosition}, 0)`}>
+            {uniqueProcessedBoxes.map((boxFrame, frameIndex) => (
+                <g key={`${boxFrame.timestamp}-${frameIndex}-${boxFrame.isCurrent ? 'current' : 'historical'}`} transform={`translate(${boxFrame.xPosition}, 0)`}>
                     {boxFrame.boxes.map((level, levelIndex) => {
                         const color = level.value > 0 ? boxColors.positive : boxColors.negative;
                         return (
-                            <g key={`${level.high}-${level.low}-${levelIndex}`}>
+                            <g key={`${level.high}-${level.low}-${level.value}-${levelIndex}`}>
                                 <line
                                     x1={-LINE_WIDTH / 2}
                                     x2={LINE_WIDTH / 2}
