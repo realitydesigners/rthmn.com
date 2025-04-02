@@ -85,35 +85,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
     const isAuthenticated = useMemo(() => !!session?.access_token, [session?.access_token]);
     const isLoading = useMemo(() => !isAuthenticated || !isConnected || !isSidebarInitialized, [isAuthenticated, isConnected, isSidebarInitialized]);
 
-    // Optimized box slice subscription handler
-    const handleBoxSliceUpdate = useCallback((pair: string, wsData: BoxSlice) => {
-        setPairData((prev) => {
-            // Keep existing box data if it exists
-            const existingBoxes = boxMapRef.current.get(pair);
-            if (existingBoxes) {
-                return {
-                    ...prev,
-                    [pair]: {
-                        ...prev[pair],
-                        currentOHLC: wsData.currentOHLC,
-                    },
-                };
-            }
-
-            // Store new box values only if we don't have existing ones
-            boxMapRef.current.set(pair, [...wsData.boxes]);
-
-            return {
-                ...prev,
-                [pair]: {
-                    boxes: [wsData],
-                    currentOHLC: wsData.currentOHLC,
-                    initialBoxData: prev[pair]?.initialBoxData || wsData,
-                },
-            };
-        });
-    }, []);
-
     // WebSocket subscription effect
     useEffect(() => {
         if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;

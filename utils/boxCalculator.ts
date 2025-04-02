@@ -6,11 +6,13 @@ export class BoxCalculator {
     private boxValues: Int32Array;
     private boxHighs: Float64Array;
     private boxLows: Float64Array;
+    private calculationPoint: number;
 
     constructor(pair: string) {
         const details = Object.values(INSTRUMENTS).find((category) => pair in category)?.[pair] || { point: 0.00001, digits: 5 };
+        this.calculationPoint = details.point;
 
-        this.boxSizes = new Float64Array(BoxSizes.map((size) => this.roundToDigits(size * details.point, details.digits)));
+        this.boxSizes = new Float64Array(BoxSizes);
         this.boxValues = new Int32Array(BoxSizes);
         this.boxHighs = new Float64Array(BoxSizes.length);
         this.boxLows = new Float64Array(BoxSizes.length);
@@ -36,24 +38,27 @@ export class BoxCalculator {
 
     private initializeBoxArrays(latestPrice: number): void {
         for (let i = 0; i < this.boxSizes.length; i++) {
+            const boxSize = this.boxSizes[i] * this.calculationPoint;
             this.boxHighs[i] = latestPrice;
-            this.boxLows[i] = latestPrice - this.boxSizes[i];
+            this.boxLows[i] = latestPrice - boxSize;
             this.boxValues[i] = BoxSizes[i];
         }
     }
 
     private updateBoxArraysWithCandleData(high: number, low: number): void {
         for (let i = 0; i < this.boxSizes.length; i++) {
+            const boxSize = this.boxSizes[i] * this.calculationPoint;
+
             if (high > this.boxHighs[i]) {
                 this.boxHighs[i] = high;
-                this.boxLows[i] = this.boxHighs[i] - this.boxSizes[i];
+                this.boxLows[i] = this.boxHighs[i] - boxSize;
                 if (this.boxValues[i] < 0) {
                     this.boxValues[i] = Math.abs(this.boxValues[i]);
                 }
             }
             if (low < this.boxLows[i]) {
                 this.boxLows[i] = low;
-                this.boxHighs[i] = this.boxLows[i] + this.boxSizes[i];
+                this.boxHighs[i] = this.boxLows[i] + boxSize;
                 if (this.boxValues[i] > 0) {
                     this.boxValues[i] = -Math.abs(this.boxValues[i]);
                 }
@@ -67,7 +72,7 @@ export class BoxCalculator {
             boxArrays[BoxSizes[i].toString()] = {
                 high: this.boxHighs[i],
                 low: this.boxLows[i],
-                value: this.boxValues[i],
+                value: this.boxValues[i] * this.calculationPoint,
             };
         }
         return boxArrays;

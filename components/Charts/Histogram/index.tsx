@@ -6,7 +6,16 @@ import { BoxColors } from '@/stores/colorStore';
 import { BoxSizes } from '@/utils/instruments';
 
 interface BoxTimelineProps {
-    data: { timestamp: string; progressiveValues: Box[] }[];
+    data: {
+        timestamp: string;
+        progressiveValues: Box[];
+        currentOHLC?: {
+            open: number;
+            high: number;
+            low: number;
+            close: number;
+        };
+    }[];
     boxOffset: number;
     visibleBoxesCount: number;
     boxVisibilityFilter: 'all' | 'positive' | 'negative';
@@ -49,29 +58,14 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     const calculateBoxDimensions = (containerHeight: number, frameCount: number) => {
         // Force boxes to fill the container height
         const boxSize = Math.floor(containerHeight / visibleBoxesCount);
-
         // Calculate required width for square boxes
         const requiredWidth = boxSize * frameCount;
-
         return { boxSize, requiredWidth };
     };
 
     useEffect(() => {
         setIsClient(true);
     }, []);
-
-    const getFrameSignature = (frame: { timestamp: string; progressiveValues: Box[] }) => {
-        const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-        const negativeBoxes = slicedBoxes
-            .filter((box) => box.value < 0)
-            .sort((a, b) => a.value - b.value)
-            .map((box) => findNearestBoxSize(box.value));
-        const positiveBoxes = slicedBoxes
-            .filter((box) => box.value > 0)
-            .sort((a, b) => a.value - b.value)
-            .map((box) => findNearestBoxSize(box.value));
-        return [...negativeBoxes, ...positiveBoxes].join('|');
-    };
 
     useEffect(() => {
         if (!isClient || !data || data.length === 0) return;
@@ -87,23 +81,132 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         if (!container) return;
         const rect = container.getBoundingClientRect();
 
-        // Get frames to draw
-        const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
-        const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
-            if (index === 0) return [frame];
+        // Process frames to detect value changes
+        const processedFrames = [];
+        let prevFrame = null;
 
-            const prevFrame = acc[acc.length - 1];
-            const currentSignature = getFrameSignature(frame);
-            const prevSignature = getFrameSignature(prevFrame);
+        const isFrameDuplicate = (frame1, frame2) => {
+            if (!frame1 || !frame2) return false;
 
-            if (currentSignature !== prevSignature) {
-                return [...acc, frame];
+            const boxes1 = frame1.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+            const boxes2 = frame2.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+
+            return boxes1.every((box, index) => box.value === boxes2[index]?.value);
+        };
+
+        for (const frame of data) {
+            const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+
+            if (prevFrame) {
+                const prevBoxes = prevFrame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+
+                // Detect trend change
+                const prevLargestBox = prevBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), prevBoxes[0]);
+                const currentLargestBox = boxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), boxes[0]);
+                const trendChanged = prevLargestBox.value >= 0 !== currentLargestBox.value >= 0;
+
+                // Skip if frame is duplicate of previous frame (unless it's a trend change)
+                if (!trendChanged && isFrameDuplicate(frame, prevFrame)) {
+                    prevFrame = frame;
+                    continue;
+                }
+
+                if (trendChanged) {
+                    // Create transition frames where all boxes move in the same direction
+                    const isNewTrendPositive = currentLargestBox.value >= 0;
+                    const steps = 5; // More steps for smoother transition
+
+                    for (let step = 1; step <= steps; step++) {
+                        const progress = step / steps;
+                        const intermediateBoxes = [...prevFrame.progressiveValues];
+
+                        // In first half of steps, move all boxes towards zero
+                        if (step <= steps / 2) {
+                            const zeroProgress = step / (steps / 2);
+                            prevBoxes.forEach((box, index) => {
+                                intermediateBoxes[index] = {
+                                    ...box,
+                                    value: box.value * (1 - zeroProgress),
+                                };
+                            });
+                        }
+                        // In second half, move all boxes to their new values in the new trend direction
+                        else {
+                            const newProgress = (step - steps / 2) / (steps / 2);
+                            boxes.forEach((box, index) => {
+                                const targetValue = isNewTrendPositive ? Math.abs(box.value) : -Math.abs(box.value);
+
+                                intermediateBoxes[index] = {
+                                    ...box,
+                                    value: targetValue * newProgress,
+                                };
+                            });
+                        }
+
+                        processedFrames.push({
+                            timestamp: frame.timestamp,
+                            progressiveValues: intermediateBoxes,
+                            currentOHLC: frame.currentOHLC,
+                        });
+                    }
+                } else {
+                    // Handle normal value changes
+                    const changedBoxes = boxes
+                        .map((box, index) => {
+                            const prevBox = prevBoxes[index];
+                            if (!prevBox || box.value === prevBox.value) return null;
+
+                            return {
+                                index,
+                                prevValue: prevBox.value,
+                                newValue: box.value,
+                                high: box.high,
+                                low: box.low,
+                                direction: box.value > prevBox.value ? 1 : -1,
+                            };
+                        })
+                        .filter(Boolean);
+
+                    if (changedBoxes.length > 0) {
+                        // Sort changes by magnitude
+                        changedBoxes.sort((a, b) => Math.abs(b.newValue - b.prevValue) - Math.abs(a.newValue - a.prevValue));
+
+                        const steps = changedBoxes.length;
+                        for (let step = 1; step <= steps; step++) {
+                            const intermediateBoxes = [...prevFrame.progressiveValues];
+                            const progress = step / steps;
+
+                            changedBoxes.slice(0, step).forEach((change) => {
+                                intermediateBoxes[change.index] = {
+                                    value: change.prevValue + (change.newValue - change.prevValue) * progress,
+                                    high: change.high,
+                                    low: change.low,
+                                };
+                            });
+
+                            processedFrames.push({
+                                timestamp: frame.timestamp,
+                                progressiveValues: intermediateBoxes,
+                                currentOHLC: frame.currentOHLC,
+                            });
+                        }
+                    }
+                }
             }
-            return acc;
-        }, []);
+
+            // Only add the final frame if it's not a duplicate
+            const lastProcessedFrame = processedFrames[processedFrames.length - 1];
+            if (!isFrameDuplicate(frame, lastProcessedFrame)) {
+                processedFrames.push(frame);
+            }
+            prevFrame = frame;
+        }
+
+        // Get frames to draw - use processed frames
+        const framesToDraw = processedFrames.slice(Math.max(0, processedFrames.length - MAX_FRAMES));
 
         // Calculate box dimensions based on container height
-        const { boxSize, requiredWidth } = calculateBoxDimensions(rect.height - 24, uniqueFrames.length);
+        const { boxSize, requiredWidth } = calculateBoxDimensions(rect.height - 24, framesToDraw.length);
         setEffectiveBoxWidth(boxSize);
 
         // Set canvas size
@@ -124,10 +227,10 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         const newTrendChanges: Array<{ timestamp: string; x: number; isPositive: boolean }> = [];
         let prevIsLargestPositive: boolean | null = null;
 
-        // --- Array to store points for the line ---
+        // Array to store points for the line
         const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
 
-        uniqueFrames.forEach((frame, frameIndex) => {
+        framesToDraw.forEach((frame, frameIndex) => {
             const x = frameIndex * boxSize;
             const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
             const largestBox = boxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), boxes[0]);
@@ -153,31 +256,17 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
             // Process boxes
             const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-            const negativeBoxes = slicedBoxes
-                .filter((box) => box.value < 0)
-                .sort((a, b) => a.value - b.value)
-                .map((box) => ({
-                    ...box,
-                    value: findNearestBoxSize(box.value),
-                }));
-
-            const positiveBoxes = slicedBoxes
-                .filter((box) => box.value > 0)
-                .sort((a, b) => a.value - b.value)
-                .map((box) => ({
-                    ...box,
-                    value: findNearestBoxSize(box.value),
-                }));
-
-            const orderedAndSnappedBoxes = [...negativeBoxes, ...positiveBoxes];
+            const negativeBoxes = slicedBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
+            const positiveBoxes = slicedBoxes.filter((box) => box.value > 0).sort((a, b) => a.value - b.value);
+            const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
 
             // Find smallest absolute value box for line position
-            const smallestBox = orderedAndSnappedBoxes.length > 0 ? orderedAndSnappedBoxes.reduce((min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min)) : null;
+            const smallestBox = orderedBoxes.length > 0 ? orderedBoxes.reduce((min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min)) : null;
 
             // Calculate line point position
             if (smallestBox) {
                 const isPositive = smallestBox.value >= 0;
-                const boxIndex = orderedAndSnappedBoxes.findIndex((box) => box.value === smallestBox.value);
+                const boxIndex = orderedBoxes.findIndex((box) => box.value === smallestBox.value);
                 const y = isPositive ? boxIndex * boxSize : (boxIndex + 1) * boxSize;
 
                 linePoints.push({
@@ -188,11 +277,10 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 });
             }
 
-            // Draw boxes with new dimensions
-            orderedAndSnappedBoxes.forEach((box, boxIndex) => {
+            // Draw boxes
+            orderedBoxes.forEach((box, boxIndex) => {
                 const y = boxIndex * boxSize;
-                const snappedValue = box.value;
-                const isPositiveBox = snappedValue >= 0;
+                const isPositiveBox = box.value >= 0;
 
                 // Set colors
                 if (isLargestPositive) {
@@ -207,21 +295,12 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
                 // Draw box
                 ctx.fillRect(x, y, boxSize, boxSize);
-
-                // Draw text
-                ctx.fillStyle = '#000000';
-                const fontSize = Math.min(boxSize / 2, boxSize / 2);
-                ctx.font = `0px monospace`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                const displayValue = snappedValue.toFixed(0);
-                ctx.fillText(displayValue, x + boxSize / 2, y + boxSize / 2);
             });
         });
 
-        // === Draw Line and Fill Area ===
+        // Draw fill areas and line
         if (showLine && linePoints.length > 0) {
-            // Draw fill areas first
+            // Draw fill areas
             for (let i = 0; i < linePoints.length - 1; i++) {
                 const currentPoint = linePoints[i];
                 const nextPoint = linePoints[i + 1];
@@ -267,7 +346,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 ctx.fill();
             }
 
-            // Draw the white line on top
+            // Draw the white line
             ctx.beginPath();
             linePoints.forEach((point, index) => {
                 if (index === 0) {
@@ -277,7 +356,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 }
             });
 
-            // Extend the line to the end of the last box
             if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
                 ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
@@ -287,81 +365,15 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             ctx.strokeStyle = '#FFFFFF';
             ctx.stroke();
         }
-        // === End Line and Fill Area ===
 
         setTrendChanges(newTrendChanges);
-    }, [data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, isClient, hoveredTimestamp, showLine]);
-
-    // Effect to scroll the histogram when hoveredTimestamp changes
-    useEffect(() => {
-        if (hoveredTimestamp && scrollContainerRef.current && effectiveBoxWidth > 0 && data.length > 0) {
-            // Regenerate uniqueFrames based on current data (consistent with drawing logic)
-            // Note: This might be inefficient if data is huge. Consider optimizing if needed.
-            const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
-            const uniqueFrames = framesToDraw.reduce((acc: typeof framesToDraw, frame, index) => {
-                if (index === 0) return [frame];
-                const prevFrame = acc[acc.length - 1];
-                const currentSignature = getFrameSignature(frame);
-                const prevSignature = getFrameSignature(prevFrame);
-                if (currentSignature !== prevSignature) {
-                    return [...acc, frame];
-                }
-                return acc;
-            }, []);
-
-            // Find the index of the frame matching the hovered timestamp
-            const targetIndex = uniqueFrames.findIndex((frame) => new Date(frame.timestamp).getTime() === hoveredTimestamp);
-
-            if (targetIndex !== -1) {
-                const container = scrollContainerRef.current;
-                const containerWidth = container.clientWidth;
-
-                // Calculate the target scrollLeft position
-                // We want the right edge of the target frame to be at the right edge of the container
-                const targetFrameRightEdge = (targetIndex + 1) * effectiveBoxWidth;
-                let targetScrollLeft = targetFrameRightEdge - containerWidth;
-
-                // Clamp the scroll value
-                const maxScrollLeft = container.scrollWidth - containerWidth;
-                targetScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
-
-                // Scroll smoothly to the calculated position
-                container.scrollTo({
-                    left: targetScrollLeft,
-                    behavior: 'smooth',
-                });
-            }
-        }
-        // Dependencies: React when hover changes, or when data/layout impacting scroll calculations change.
-    }, [hoveredTimestamp, data, effectiveBoxWidth, boxOffset, visibleBoxesCount]);
+    }, [isClient, data, boxOffset, visibleBoxesCount, boxColors, hoveredTimestamp, showLine]);
 
     return (
-        <div className={`relative ${className}`}>
-            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto'>
-                <div className='relative h-full'>
-                    {/* Trend Change Markers */}
-                    <div className='absolute -top-6 right-0 left-0 ml-4 h-6'>
-                        {trendChanges.map((change, index) => (
-                            <div
-                                key={`${change.timestamp}-${index}`}
-                                className='absolute -translate-x-1/2 transform'
-                                style={{
-                                    left: `${change.x}px`,
-                                    color: change.isPositive ? boxColors.positive : boxColors.negative,
-                                }}>
-                                <div className='text-[8px] whitespace-nowrap'>{new Date(change.timestamp).toLocaleTimeString()}</div>▼
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Canvas */}
-                    <div className='mt-6 h-full'>
-                        <canvas ref={canvasRef} className='block h-full' />
-                    </div>
-                </div>
-            </div>
+        <div ref={scrollContainerRef} className={`relative h-full w-full overflow-x-auto ${className}`}>
+            <canvas ref={canvasRef} className='absolute top-3 left-0' style={{ imageRendering: 'pixelated' }} />
         </div>
     );
 };
 
-export default Histogram;
+export default React.memo(Histogram);

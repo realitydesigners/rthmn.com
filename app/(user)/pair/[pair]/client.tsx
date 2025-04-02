@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useCallback, useState, useMemo } from 'react';
+import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
 import BoxLevelChart from '@/components/Charts/BoxLevelChart';
@@ -14,8 +14,10 @@ import Histogram from '@/components/Charts/Histogram';
 import ChartControls from '@/components/Charts/CandleChart/ChartControls';
 import { RiBarChartBoxLine } from 'react-icons/ri';
 import { BsBoxes, BsBoxSeam, BsBoxArrowInDown, BsBoxArrowInUp } from 'react-icons/bs';
+import { Box } from '@/types/types';
+import { BoxValuesDebug } from '@/components/Debug/BoxValuesDebug';
 
-interface ExtendedBoxSlice {
+export interface ExtendedBoxSlice {
     timestamp: string;
     progressiveValues: {
         high: number;
@@ -42,6 +44,11 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const { boxColors } = useUser();
     const [candleData, setCandleData] = useState<ChartDataPoint[]>(chartData.processedCandles);
     const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>(chartData.histogramBoxes);
+
+    // Add refs for box management
+    const boxMapRef = useRef<Map<string, Box[]>>(new Map());
+    const lastPriceRef = useRef<number | null>(null);
+
     const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
@@ -74,6 +81,33 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         }
     }, [pair, initializePair]);
 
+    // Initialize box data
+    useEffect(() => {
+        if (chartData.histogramBoxes.length > 0) {
+            setHistogramData(chartData.histogramBoxes);
+        }
+    }, [chartData]);
+
+    // Update histogram data when boxSlice updates
+    useEffect(() => {
+        if (!boxSlice?.boxes) return;
+
+        setHistogramData((prev) => {
+            const newSlice: ExtendedBoxSlice = {
+                timestamp: boxSlice.timestamp,
+                progressiveValues: boxSlice.boxes.map((box) => ({
+                    high: box.high,
+                    low: box.low,
+                    value: box.value,
+                })),
+                currentOHLC: boxSlice.currentOHLC,
+            };
+
+            // Append the new slice instead of replacing the last one
+            return [...prev, newSlice];
+        });
+    }, [boxSlice]);
+
     const filteredBoxSlice = useMemo(() => {
         if (!boxSlice?.boxes) {
             return undefined;
@@ -100,7 +134,10 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                 <div className='flex h-full w-full flex-1'>
                     <div className='h-full w-3/4 p-4'>
                         <div className='relative flex h-full flex-col overflow-hidden border border-[#222] bg-black'>
-                            <ChartControls
+                            <div className='mt-4'>
+                                <BoxValuesDebug resoBoxes={boxSlice?.boxes} histogramData={histogramData} startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} />
+                            </div>
+                            {/* <ChartControls
                                 showBoxLevels={showBoxLevels}
                                 setShowBoxLevels={setShowBoxLevels}
                                 boxVisibilityFilter={boxVisibilityFilter}
@@ -126,7 +163,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                             onHoverChange={handleHoverChange}
                                             showBoxLevels={showBoxLevels}
                                         />
-                                        {/* <BoxLevelChart
+                                        <BoxLevelChart
                                             candles={candleData}
                                             initialVisibleData={candleData.slice(-100)}
                                             pair={pair}
@@ -136,12 +173,12 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                             }))}
                                             boxOffset={settings.startIndex}
                                             visibleBoxesCount={settings.maxBoxCount}
-                                        /> */}
+                                        />
                                     </>
                                 ) : (
                                     <div className='flex h-full items-center justify-center'>Loading Chart...</div>
                                 )}
-                            </div>
+                            </div> */}
                             <div className='h-[200px] w-full px-4'>
                                 <div className='flex h-full flex-col border border-[#222] bg-black p-2'>
                                     {boxColors && histogramData && (
