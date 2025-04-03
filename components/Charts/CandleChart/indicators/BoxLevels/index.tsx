@@ -164,14 +164,14 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
             {largestBox && (
                 <g transform={`translate(${width - rightMargin + 4}, 0)`}>
                     <g transform={`translate(0, ${scaleY(largestBox.high)})`}>
-                        <line x1={-4} y1={0} x2={0} y2={0} stroke={boxColors.positive} strokeWidth={1} />
-                        <text x={8} y={3} fill={boxColors.positive} fontSize={10} fontFamily='monospace' textAnchor='start'>
+                        <line x1={-4} y1={0} x2={0} y2={0} stroke={largestBox.value >= 0 ? boxColors.positive : boxColors.negative} strokeWidth={1} />
+                        <text x={8} y={3} fill={largestBox.value >= 0 ? boxColors.positive : boxColors.negative} fontSize={10} fontFamily='monospace' textAnchor='start'>
                             {formatPrice(largestBox.high, 'BTC/USD')}
                         </text>
                     </g>
                     <g transform={`translate(0, ${scaleY(largestBox.low)})`}>
-                        <line x1={-4} y1={0} x2={0} y2={0} stroke={boxColors.negative} strokeWidth={1} />
-                        <text x={8} y={3} fill={boxColors.negative} fontSize={10} fontFamily='monospace' textAnchor='start'>
+                        <line x1={-4} y1={0} x2={0} y2={0} stroke={largestBox.value >= 0 ? boxColors.positive : boxColors.negative} strokeWidth={1} />
+                        <text x={8} y={3} fill={largestBox.value >= 0 ? boxColors.positive : boxColors.negative} fontSize={10} fontFamily='monospace' textAnchor='start'>
                             {formatPrice(largestBox.low, 'BTC/USD')}
                         </text>
                     </g>

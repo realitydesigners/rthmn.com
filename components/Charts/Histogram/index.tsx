@@ -38,9 +38,12 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
     const frameToRealTimestampRef = useRef<Map<number, number>>(new Map());
 
     const calculateBoxDimensions = (containerHeight: number, frameCount: number) => {
-        const boxSize = Math.floor(containerHeight / visibleBoxesCount);
-        const totalHeight = boxSize * visibleBoxesCount;
-        const requiredWidth = boxSize * frameCount + 32;
+        // Calculate box size to exactly fill the container height
+        const boxSize = containerHeight / visibleBoxesCount;
+        const totalHeight = containerHeight;
+        // Add padding to the right for the white line
+        const RIGHT_PADDING = 60;
+        const requiredWidth = boxSize * frameCount + RIGHT_PADDING;
         return { boxSize, requiredWidth, totalHeight };
     };
 
@@ -61,17 +64,16 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
 
         const processedFrames: BoxTimelineProps['data'] = [];
         let prevFrame: BoxTimelineProps['data'][number] | null = null;
+        let lastRealTimestamp: number | null = null;
+
         const isFrameDuplicate = (frame1, frame2) => {
             if (!frame1 || !frame2) return false;
             const boxes1 = frame1.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
             const boxes2 = frame2.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-            if (boxes1.length !== boxes2.length) return false;
             return boxes1.every((box, index) => box.value === boxes2[index]?.value);
         };
 
         frameToRealTimestampRef.current.clear();
-
-        let lastRealTimestamp: number | null = null;
 
         for (const frame of data) {
             const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
@@ -205,28 +207,15 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             }
         });
 
-        const { boxSize, requiredWidth, totalHeight } = calculateBoxDimensions(rect.height, framesToDraw.length);
-        setEffectiveBoxWidth(boxSize);
-
-        canvas.style.width = `${requiredWidth}px`;
-        canvas.style.height = `${totalHeight}px`;
-        const dpr = window.devicePixelRatio || 1;
-        canvas.width = Math.floor(requiredWidth * dpr);
-        canvas.height = Math.floor(totalHeight * dpr);
-        ctx.scale(dpr, dpr);
-
-        ctx.fillStyle = '#0a0a0a';
-        ctx.fillRect(0, 0, requiredWidth, totalHeight);
-
+        // Find the frame index to highlight based on hoveredTimestamp
         let highlightIndex = -1;
-        if (hoveredTimestamp !== null && hoveredTimestamp !== undefined && framesToDraw.length > 0) {
+        if (hoveredTimestamp !== null && hoveredTimestamp !== undefined) {
             const targetTime = Number(hoveredTimestamp);
             let minDiff = Infinity;
 
             framesToDraw.forEach((frame, index) => {
                 const frameTime = new Date(frame.timestamp).getTime();
                 const diff = Math.abs(frameTime - targetTime);
-
                 if (diff < minDiff && diff < 500) {
                     minDiff = diff;
                     highlightIndex = index;
@@ -251,6 +240,19 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             }
         }
 
+        const { boxSize, requiredWidth, totalHeight } = calculateBoxDimensions(rect.height, framesToDraw.length);
+        setEffectiveBoxWidth(boxSize);
+
+        canvas.style.width = `${requiredWidth}px`;
+        canvas.style.height = `${totalHeight}px`;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(requiredWidth * dpr);
+        canvas.height = Math.floor(totalHeight * dpr);
+        ctx.scale(dpr, dpr);
+
+        ctx.fillStyle = '#0a0a0a';
+        ctx.fillRect(0, 0, requiredWidth, totalHeight);
+
         const newTrendChanges: Array<{ timestamp: string; x: number; isPositive: boolean }> = [];
         let prevIsLargestPositive: boolean | null = null;
         const linePoints: { x: number; y: number; isPositive: boolean; isLargestPositive: boolean }[] = [];
@@ -260,6 +262,12 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
             if (boxes.length === 0) return;
 
+            // Draw highlight for hovered frame
+            if (frameIndex === highlightIndex) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.fillRect(x, 0, boxSize, totalHeight);
+            }
+
             const slicedBoxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
             const negativeBoxes = slicedBoxes.filter((box) => box.value < 0).sort((a, b) => a.value - b.value);
             const positiveBoxes = slicedBoxes.filter((box) => box.value >= 0).sort((a, b) => a.value - b.value);
@@ -267,6 +275,24 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
 
             const largestBox = orderedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), orderedBoxes[0] || { value: 0 });
             const isLargestPositive = largestBox.value >= 0;
+
+            // Draw boxes with proper spacing
+            orderedBoxes.forEach((box, boxIndex) => {
+                const y = boxIndex * boxSize;
+                const isPositiveBox = box.value >= 0;
+
+                if (isLargestPositive) {
+                    ctx.fillStyle = isPositiveBox
+                        ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
+                        : `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
+                } else {
+                    ctx.fillStyle = isPositiveBox
+                        ? `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
+                        : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+                }
+
+                ctx.fillRect(x, y, boxSize, boxSize + (boxIndex === orderedBoxes.length - 1 ? 1 : 0));
+            });
 
             const smallestBoxData = orderedBoxes.reduce(
                 (minData, box) => {
@@ -284,20 +310,21 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                 const isPositive = smallestBox.value >= 0;
                 const boxIndex = orderedBoxes.findIndex((box) => box === smallestBox);
                 const y = (boxIndex + (isPositive ? 0 : 1)) * boxSize;
-                linePoints.push({ x: x, y: y, isPositive: isPositive, isLargestPositive: isLargestPositive });
+                linePoints.push({ x, y, isPositive, isLargestPositive });
             }
 
             if (prevIsLargestPositive !== null && prevIsLargestPositive !== isLargestPositive) {
-                newTrendChanges.push({ timestamp: frame.timestamp, x: x, isPositive: isLargestPositive });
+                newTrendChanges.push({ timestamp: frame.timestamp, x, isPositive: isLargestPositive });
             }
             prevIsLargestPositive = isLargestPositive;
         });
-        setTrendChanges(newTrendChanges);
 
         if (showLine && linePoints.length > 0) {
+            // Draw fill areas
             for (let i = 0; i < linePoints.length - 1; i++) {
                 const currentPoint = linePoints[i];
                 const nextPoint = linePoints[i + 1];
+
                 ctx.beginPath();
                 if (currentPoint.isLargestPositive) {
                     ctx.moveTo(currentPoint.x, 0);
@@ -311,6 +338,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     ctx.lineTo(currentPoint.x, totalHeight);
                 }
                 ctx.closePath();
+
                 const fillColor = currentPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
                 const gradient = ctx.createLinearGradient(currentPoint.x, 0, nextPoint.x, 0);
                 try {
@@ -325,13 +353,15 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     console.error('Error parsing fill color:', fillColor, e);
                 }
             }
+
+            // Draw last gradient fill
             if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
                 ctx.beginPath();
                 if (lastPoint.isLargestPositive) {
                     ctx.moveTo(lastPoint.x, 0);
                     ctx.lineTo(lastPoint.x + boxSize, 0);
-                    ctx.lineTo(lastPoint.x + boxSize, totalHeight);
+                    ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
                     ctx.lineTo(lastPoint.x, lastPoint.y);
                 } else {
                     ctx.moveTo(lastPoint.x, lastPoint.y);
@@ -340,6 +370,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     ctx.lineTo(lastPoint.x, totalHeight);
                 }
                 ctx.closePath();
+
                 const fillColor = lastPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
                 const gradient = ctx.createLinearGradient(lastPoint.x, 0, lastPoint.x + boxSize, 0);
                 try {
@@ -354,6 +385,8 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     console.error('Error parsing fill color:', fillColor, e);
                 }
             }
+
+            // Draw white line
             ctx.beginPath();
             linePoints.forEach((point, index) => {
                 if (index === 0) {
@@ -362,15 +395,17 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     ctx.lineTo(point.x, point.y);
                 }
             });
+
             if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
+                // Extend the line to include the padding
                 ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
             }
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#FFFFFF';
             ctx.stroke();
 
-            // Draw white circle at the end of the line
+            // Draw white circle at the end with padding
             if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
                 ctx.beginPath();
@@ -380,14 +415,8 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             }
         }
 
-        if (highlightIndex !== -1) {
-            const highlightX = highlightIndex * boxSize;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-            ctx.fillRect(highlightX, 0, boxSize, totalHeight);
-        }
-
-        // --- Auto-scroll to highlighted index ---
-        if (highlightIndex !== -1 && scrollContainerRef.current && boxSize > 0) {
+        // After all drawing is done, scroll to the highlighted frame if needed
+        if (highlightIndex !== -1 && scrollContainerRef.current) {
             const scrollContainer = scrollContainerRef.current;
             const highlightX = highlightIndex * boxSize;
             const containerWidth = scrollContainer.clientWidth;
@@ -403,7 +432,8 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                 behavior: 'smooth',
             });
         }
-        // --- End auto-scroll logic ---
+
+        setTrendChanges(newTrendChanges);
     }, [isClient, data, boxOffset, visibleBoxesCount, boxColors, showLine, boxVisibilityFilter, hoveredTimestamp]);
 
     return (
