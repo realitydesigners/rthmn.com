@@ -40,7 +40,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
     const calculateBoxDimensions = (containerHeight: number, frameCount: number) => {
         const boxSize = Math.floor(containerHeight / visibleBoxesCount);
         const totalHeight = boxSize * visibleBoxesCount;
-        const requiredWidth = boxSize * frameCount;
+        const requiredWidth = boxSize * frameCount + 32;
         return { boxSize, requiredWidth, totalHeight };
     };
 
@@ -369,6 +369,15 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             ctx.lineWidth = 2;
             ctx.strokeStyle = '#FFFFFF';
             ctx.stroke();
+
+            // Draw white circle at the end of the line
+            if (linePoints.length > 0) {
+                const lastPoint = linePoints[linePoints.length - 1];
+                ctx.beginPath();
+                ctx.arc(lastPoint.x + boxSize, lastPoint.y, 3, 0, Math.PI * 2);
+                ctx.fillStyle = '#FFFFFF';
+                ctx.fill();
+            }
         }
 
         if (highlightIndex !== -1) {
@@ -399,55 +408,64 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
 
     return (
         <div className={`relative ${className}`}>
-            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto'>
-                <div className='relative h-full pt-6'>
-                    <div className='pointer-events-none absolute -top-0 right-0 left-0 z-0 ml-[18px] h-6'>
-                        {trendChanges.map((change, index) => (
-                            <div
-                                key={`${change.timestamp}-${index}-${change.x}`}
-                                className='absolute -translate-x-1/2 transform'
-                                style={{
-                                    left: `${change.x}px`,
-                                    color: change.isPositive ? boxColors.positive : boxColors.negative,
-                                }}>
-                                ▼
-                            </div>
-                        ))}
-                    </div>
+            <div className='mr-12'>
+                <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto pr-12'>
+                    <div className='relative h-full pt-6'>
+                        <div className='pointer-events-none absolute -top-0 right-0 left-0 z-0 ml-[18px] h-6'>
+                            {trendChanges.map((change, index) => (
+                                <div
+                                    key={`${change.timestamp}-${index}-${change.x}`}
+                                    className='absolute -translate-x-1/2 transform'
+                                    style={{
+                                        left: `${change.x}px`,
+                                        color: change.isPositive ? boxColors.positive : boxColors.negative,
+                                    }}>
+                                    ▼
+                                </div>
+                            ))}
+                        </div>
 
-                    <div className='relative h-full'>
-                        <canvas ref={canvasRef} className='block h-full overflow-y-hidden pr-[48px]' style={{ imageRendering: 'pixelated' }} />
+                        <div className='relative mr-8 h-full'>
+                            <canvas ref={canvasRef} className='block h-full overflow-y-hidden' style={{ imageRendering: 'pixelated' }} />
+                        </div>
                     </div>
                 </div>
             </div>
-            {data.length > 0 && (
-                <div className='pointer-events-none absolute top-6 right-0 bottom-0 flex w-[48px] flex-col justify-between px-2 py-2'>
-                    {data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount).length > 0 && (
-                        <>
-                            {(() => {
-                                const visibleBoxes = data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-                                const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
-                                return (
-                                    <>
-                                        <div className='flex items-center gap-1'>
-                                            <div className='h-[1px] w-3' style={{ backgroundColor: boxColors.positive }} />
-                                            <span className='font-kodemono text-[10px] tracking-wider' style={{ color: boxColors.positive }}>
-                                                {formatPrice(largestBox.high, 'BTC/USD')}
-                                            </span>
-                                        </div>
-                                        <div className='flex items-center gap-1'>
-                                            <div className='h-[1px] w-3' style={{ backgroundColor: boxColors.negative }} />
-                                            <span className='font-kodemono text-[10px] tracking-wider' style={{ color: boxColors.negative }}>
-                                                {formatPrice(largestBox.low, 'BTC/USD')}
-                                            </span>
-                                        </div>
-                                    </>
-                                );
-                            })()}
-                        </>
-                    )}
-                </div>
-            )}
+            <div>
+                {data.length > 0 && (
+                    <div className='pointer-events-none absolute top-3 right-0 -bottom-0 flex w-12 flex-col justify-between shadow-2xl'>
+                        {data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount).length > 0 && (
+                            <>
+                                {(() => {
+                                    const visibleBoxes = data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+                                    const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+                                    const color = largestBox.value > 0 ? boxColors.positive : boxColors.negative;
+                                    return (
+                                        <>
+                                            <div className='flex items-center'>
+                                                <div className='h-[1px] flex-1' style={{ backgroundColor: color }} />
+                                                <div className='ml-1'>
+                                                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color }}>
+                                                        {formatPrice(largestBox.high, 'BTC/USD')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className='flex items-center'>
+                                                <div className='h-[1px] flex-1' style={{ backgroundColor: color }} />
+                                                <div className='ml-1'>
+                                                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color }}>
+                                                        {formatPrice(largestBox.low, 'BTC/USD')}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
+                            </>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };
