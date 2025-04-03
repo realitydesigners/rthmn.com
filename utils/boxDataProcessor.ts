@@ -138,29 +138,45 @@ export function processInitialBoxData(
     });
 
     // First create base histogram boxes with initial deduplication
-    let histogramBoxes: ExtendedBoxSlice[] = boxTimeseriesData.map((timepoint) => {
-        const boxes = Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
+    let histogramBoxes: ExtendedBoxSlice[] = [];
+    let previousBoxes: any[] = [];
+
+    boxTimeseriesData.forEach((timepoint, index) => {
+        // Convert current timepoint boxes to array format
+        const currentBoxes = Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
             high: Number(data.high),
             low: Number(data.low),
             value: data.value,
         }));
 
-        const progressiveBoxes = processProgressiveBoxValues(boxes);
-        // Store the complete box objects in progressiveValues, not just the numeric values
+        // Process boxes and get progressive values
+        const progressiveBoxes = processProgressiveBoxValues(currentBoxes);
         const progressiveValues = progressiveBoxes.map((box) => ({
             high: box.high,
             low: box.low,
             value: box.value,
         }));
 
-        return {
-            timestamp: timepoint.timestamp,
-            progressiveValues,
-            currentOHLC: timepoint.currentOHLC,
-        };
+        // Check if there are any changes from previous frame
+        const hasChanges =
+            index === 0 ||
+            progressiveValues.some((box, i) => {
+                const prevBox = previousBoxes[i];
+                return !prevBox || prevBox.high !== box.high || prevBox.low !== box.low || prevBox.value !== box.value;
+            });
+
+        // Always add the first frame and frames with changes
+        if (hasChanges) {
+            histogramBoxes.push({
+                timestamp: timepoint.timestamp,
+                progressiveValues,
+                currentOHLC: timepoint.currentOHLC,
+            });
+            previousBoxes = progressiveValues;
+        }
     });
 
-    // Process frames with improved smoothing for sign changes
+    // Process frames to ensure we capture all state changes
     const processedFrames: ExtendedBoxSlice[] = [];
 
     histogramBoxes.forEach((frame, index) => {
@@ -170,48 +186,22 @@ export function processInitialBoxData(
         }
 
         const prevFrame = processedFrames[processedFrames.length - 1];
+        const currentBoxes = frame.progressiveValues;
+        const prevBoxes = prevFrame.progressiveValues;
 
-        // Check for sign changes between frames
-        const prevPositives = prevFrame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
-        const currentNegatives = frame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
-
-        const prevNegatives = prevFrame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
-        const currentPositives = frame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
-
-        // Find values that switched signs
-        const posToNegFlips = prevPositives.filter((value) => currentNegatives.includes(value));
-        const negToPosFlips = prevNegatives.filter((value) => currentPositives.includes(value));
-
-        // Find values that appeared or disappeared
-        const allPrevValues = prevFrame.progressiveValues.map((box) => box.value);
-        const allCurrentValues = frame.progressiveValues.map((box) => box.value);
-
-        // Values that are in either frame but not both
-        const uniqueToPrev = allPrevValues.filter((value) => !allCurrentValues.includes(value));
-        const uniqueToCurrent = allCurrentValues.filter((value) => !allPrevValues.includes(value));
-
-        // Define what counts as a "significant change" requiring an intermediate frame
-        const hasSignificantChanges = posToNegFlips.length > 0 || negToPosFlips.length > 0 || uniqueToPrev.length > 0 || uniqueToCurrent.length > 0;
-
-        // Also check if any box values have changed by a significant amount
-        const hasLargeValueChange = prevFrame.progressiveValues.some((prevBox) => {
-            const matchingBox = frame.progressiveValues.find((currBox) => Math.abs(currBox.value) === Math.abs(prevBox.value));
-            if (!matchingBox) return false;
-            return Math.abs(matchingBox.value - prevBox.value) > 1;
+        // Check for any value changes or trend changes
+        const hasValueChanges = currentBoxes.some((box, i) => {
+            const prevBox = prevBoxes[i];
+            return Math.abs(box.value) !== Math.abs(prevBox.value);
         });
 
-        if (hasSignificantChanges || hasLargeValueChange) {
-            // Create intermediate frames for smooth transitions
-            const intermediates = createIntermediateFrames(prevFrame, frame);
-            if (intermediates.length > 1) {
-                // Only add intermediates if there are multiple (first is added, last is current frame)
-                processedFrames.push(...intermediates);
-            } else {
-                // No intermediates generated, just add the current frame
-                processedFrames.push(frame);
-            }
-        } else {
-            // No significant changes, just add the frame
+        const hasTrendChanges = currentBoxes.some((box, i) => {
+            const prevBox = prevBoxes[i];
+            return Math.sign(box.value) !== Math.sign(prevBox.value);
+        });
+
+        // Always add frames with changes
+        if (hasValueChanges || hasTrendChanges) {
             processedFrames.push(frame);
         }
     });
@@ -266,130 +256,3 @@ export function processInitialBoxData(
         },
     };
 }
-// Helper function to create intermediate frames when values flip sign or change significantly
-const createIntermediateFrames = (prevFrame: ExtendedBoxSlice, currentFrame: ExtendedBoxSlice): ExtendedBoxSlice[] => {
-    // Find values that flipped from positive to negative
-    const prevPositives = prevFrame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
-    const currentNegatives = currentFrame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
-
-    // Find values that flipped from negative to positive
-    const prevNegatives = prevFrame.progressiveValues.filter((box) => box.value < 0).map((box) => Math.abs(box.value));
-    const currentPositives = currentFrame.progressiveValues.filter((box) => box.value > 0).map((box) => Math.abs(box.value));
-
-    // Get values that flipped from positive to negative
-    const posToNegFlips = prevPositives.filter((value) => currentNegatives.includes(value));
-
-    // Get values that flipped from negative to positive
-    const negToPosFlips = prevNegatives.filter((value) => currentPositives.includes(value));
-
-    // Check for new values that appeared in the current frame
-    const allPrevValues = [...prevPositives, ...prevNegatives].sort((a, b) => a - b);
-    const allCurrentValues = [...currentPositives, ...currentNegatives].sort((a, b) => a - b);
-
-    // Values that appeared or disappeared
-    const newValues = allCurrentValues.filter((value) => !allPrevValues.includes(value));
-    const removedValues = allPrevValues.filter((value) => !allCurrentValues.includes(value));
-
-    // If no changes, return just the current frame
-    if (posToNegFlips.length === 0 && negToPosFlips.length === 0 && newValues.length === 0 && removedValues.length === 0) {
-        return [currentFrame];
-    }
-
-    // Create intermediate frames
-    const frames: ExtendedBoxSlice[] = [];
-    let currentBoxes = [...prevFrame.progressiveValues];
-
-    // 1. First handle value flips from positive to negative
-    if (posToNegFlips.length > 0) {
-        posToNegFlips.sort((a, b) => a - b); // Sort smallest to largest
-
-        posToNegFlips.forEach((value) => {
-            // Create a new set of boxes with this value flipped
-            const newBoxes = currentBoxes.map((box) => {
-                if (Math.abs(box.value) === value && box.value > 0) {
-                    // Flip from positive to negative
-                    return {
-                        ...box,
-                        value: -box.value,
-                        // Use high/low from matching box in current frame
-                        high: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.high || box.high,
-                        low: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.low || box.low,
-                    };
-                }
-                return box;
-            });
-
-            // Create a new frame with the updated boxes
-            frames.push({
-                ...currentFrame,
-                progressiveValues: newBoxes,
-            });
-
-            // Update the current boxes for the next iteration
-            currentBoxes = newBoxes;
-        });
-    }
-
-    // 2. Then handle flips from negative to positive
-    if (negToPosFlips.length > 0) {
-        negToPosFlips.sort((a, b) => a - b); // Sort smallest to largest
-
-        negToPosFlips.forEach((value) => {
-            // Create a new set of boxes with this value flipped
-            const newBoxes = currentBoxes.map((box) => {
-                if (Math.abs(box.value) === value && box.value < 0) {
-                    // Flip from negative to positive
-                    return {
-                        ...box,
-                        value: Math.abs(box.value),
-                        // Use high/low from matching box in current frame
-                        high: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.high || box.high,
-                        low: currentFrame.progressiveValues.find((b) => Math.abs(b.value) === value)?.low || box.low,
-                    };
-                }
-                return box;
-            });
-
-            // Create a new frame with the updated boxes
-            frames.push({
-                ...currentFrame,
-                progressiveValues: newBoxes,
-            });
-
-            // Update the current boxes for the next iteration
-            currentBoxes = newBoxes;
-        });
-    }
-
-    // 3. Handle any dramatic box changes that need intermediate frames
-    const finalBoxes = [...currentBoxes];
-    const targetBoxes = [...currentFrame.progressiveValues];
-
-    // Create a transition frame to help smooth any remaining differences
-    if (newValues.length > 0 || removedValues.length > 0) {
-        // Create a merged set that gradually transitions between the current intermediate and final states
-        const transitionBoxes = [];
-
-        // Add all boxes from the current state
-        for (const box of finalBoxes) {
-            transitionBoxes.push(box);
-        }
-
-        // Ensure the transition frame has all the target boxes with their correct values
-        for (const targetBox of targetBoxes) {
-            // If this target box doesn't exist in the current state by value, add it
-            const existingBox = transitionBoxes.find((b) => b.value === targetBox.value);
-            if (!existingBox) {
-                transitionBoxes.push(targetBox);
-            }
-        }
-
-        // Create a transition frame with the merged boxes
-        frames.push({
-            ...currentFrame,
-            progressiveValues: transitionBoxes,
-        });
-    }
-
-    return frames;
-};
