@@ -1,6 +1,7 @@
 import React, { memo } from 'react';
 import { useColorStore } from '@/stores/colorStore';
 import { ChartDataPoint } from '../../index';
+import { formatPrice } from '@/utils/instruments';
 
 // Update BoxLevels props interface
 interface BoxLevelsProps {
@@ -123,6 +124,11 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
         })
         .filter((boxFrame) => boxFrame.boxes.length > 0);
 
+    // Find the largest box in the current frame
+    const currentFrame = histogramBoxes[histogramBoxes.length - 1];
+    const visibleBoxes = currentFrame.boxes.slice(boxOffset, boxOffset + visibleBoxesCount);
+    const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+
     return (
         <g className='box-levels'>
             {uniqueProcessedBoxes.map((boxFrame, frameIndex) => (
@@ -154,6 +160,23 @@ const BoxLevels = memo(({ data, histogramBoxes, width, height, yAxisScale, boxOf
                     })}
                 </g>
             ))}
+            {/* Add price labels for the largest box */}
+            {largestBox && (
+                <g transform={`translate(${width - rightMargin + 4}, 0)`}>
+                    <g transform={`translate(0, ${scaleY(largestBox.high)})`}>
+                        <line x1={-4} y1={0} x2={0} y2={0} stroke={boxColors.positive} strokeWidth={1} />
+                        <text x={8} y={3} fill={boxColors.positive} fontSize={10} fontFamily='monospace' textAnchor='start'>
+                            {formatPrice(largestBox.high, 'BTC/USD')}
+                        </text>
+                    </g>
+                    <g transform={`translate(0, ${scaleY(largestBox.low)})`}>
+                        <line x1={-4} y1={0} x2={0} y2={0} stroke={boxColors.negative} strokeWidth={1} />
+                        <text x={8} y={3} fill={boxColors.negative} fontSize={10} fontFamily='monospace' textAnchor='start'>
+                            {formatPrice(largestBox.low, 'BTC/USD')}
+                        </text>
+                    </g>
+                </g>
+            )}
         </g>
     );
 });

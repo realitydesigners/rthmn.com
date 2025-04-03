@@ -183,7 +183,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                 )}
                             </div>
                         </div>
-                        <div className='mt-8 h-[200px] w-full px-4'>
+                        <div className='mt-8 h-[200px] w-full'>
                             <div className='flex h-full flex-col border border-[#222] bg-black p-2'>
                                 {boxColors && histogramData && (
                                     <Histogram
@@ -217,9 +217,9 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                 </div>
                             )}
                         </div>
-                        <div className='mt-4'>
+                        {/* <div className='mt-4'>
                             <BoxValuesDebug resoBoxes={boxSlice?.boxes} histogramData={histogramData} startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} />
-                        </div>
+                        </div> */}
                     </div>
                 </div>
             </div>

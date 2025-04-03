@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, memo } from 'react';
 import { Box } from '@/types/types';
 import { BoxColors } from '@/stores/colorStore';
 import { BoxSizes } from '@/utils/instruments';
+import { formatPrice } from '@/utils/instruments';
 
 interface BoxTimelineProps {
     data: {
@@ -316,7 +317,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     const r = parseInt(fillColor.slice(1, 3), 16) || 0;
                     const g = parseInt(fillColor.slice(3, 5), 16) || 0;
                     const b = parseInt(fillColor.slice(5, 7), 16) || 0;
-                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     ctx.fillStyle = gradient;
                     ctx.fill();
@@ -345,7 +346,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     const r = parseInt(fillColor.slice(1, 3), 16) || 0;
                     const g = parseInt(fillColor.slice(3, 5), 16) || 0;
                     const b = parseInt(fillColor.slice(5, 7), 16) || 0;
-                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.5)`);
+                    gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     ctx.fillStyle = gradient;
                     ctx.fill();
@@ -414,11 +415,39 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                         ))}
                     </div>
 
-                    <div className='h-full'>
-                        <canvas ref={canvasRef} className='block h-full overflow-y-hidden' style={{ imageRendering: 'pixelated' }} />
+                    <div className='relative h-full'>
+                        <canvas ref={canvasRef} className='block h-full overflow-y-hidden pr-[48px]' style={{ imageRendering: 'pixelated' }} />
                     </div>
                 </div>
             </div>
+            {data.length > 0 && (
+                <div className='pointer-events-none absolute top-6 right-0 bottom-0 flex w-[48px] flex-col justify-between px-2 py-2'>
+                    {data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount).length > 0 && (
+                        <>
+                            {(() => {
+                                const visibleBoxes = data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
+                                const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+                                return (
+                                    <>
+                                        <div className='flex items-center gap-1'>
+                                            <div className='h-[1px] w-3' style={{ backgroundColor: boxColors.positive }} />
+                                            <span className='font-kodemono text-[10px] tracking-wider' style={{ color: boxColors.positive }}>
+                                                {formatPrice(largestBox.high, 'BTC/USD')}
+                                            </span>
+                                        </div>
+                                        <div className='flex items-center gap-1'>
+                                            <div className='h-[1px] w-3' style={{ backgroundColor: boxColors.negative }} />
+                                            <span className='font-kodemono text-[10px] tracking-wider' style={{ color: boxColors.negative }}>
+                                                {formatPrice(largestBox.low, 'BTC/USD')}
+                                            </span>
+                                        </div>
+                                    </>
+                                );
+                            })()}
+                        </>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
