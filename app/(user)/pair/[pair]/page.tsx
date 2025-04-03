@@ -3,6 +3,7 @@ import { processInitialChartData } from '@/utils/chartDataProcessor';
 import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
 import PairClient from './client';
+import { getUnixTimestamp } from '@/utils/dateUtils';
 
 interface PageProps {
     params: Promise<{
@@ -31,40 +32,13 @@ async function fetchApiData(pair: string, token: string) {
         const processedData = [...data]
             .reverse()
             .map((candle) => {
-                // --- START: Robust Timestamp Parsing ---
-                const getUnixTimestamp = (tsInput: string | number | undefined | null): number => {
-                    if (tsInput === null || typeof tsInput === 'undefined') {
-                        console.error('Invalid timestamp received (null or undefined): skipping candle:', candle);
-                        return NaN;
-                    }
-                    if (typeof tsInput === 'number') {
-                        // Check if it looks like seconds, convert to ms if so
-                        return tsInput > 9999999999 ? tsInput : tsInput * 1000;
-                    }
-                    if (typeof tsInput === 'string') {
-                        // Check if it's a number string
-                        if (!isNaN(Number(tsInput))) {
-                            const numTs = Number(tsInput);
-                            return numTs > 9999999999 ? numTs : numTs * 1000;
-                        }
-                        // Check for specific "YYYY-MM-DD HH:mm:ss" format
-                        if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(tsInput)) {
-                            return new Date(tsInput.replace(' ', 'T') + 'Z').getTime();
-                        }
-                        // Fallback: Attempt standard Date parsing
-                        const parsedDate = new Date(tsInput);
-                        if (!isNaN(parsedDate.getTime())) {
-                            return parsedDate.getTime();
-                        }
-                    }
-                    console.error('Invalid or unparseable timestamp format received: skipping candle:', candle);
-                    return NaN;
-                };
+                // --- Corrected: Directly use getUnixTimestamp ---
                 const timestamp = getUnixTimestamp(candle.timestamp);
-                // --- END: Robust Timestamp Parsing ---
+                // --- End Correction ---
 
                 // Validate timestamp
                 if (isNaN(timestamp)) {
+                    console.error('Invalid or unparseable timestamp format received: skipping candle:', candle); // Log error here if needed
                     return null; // Mark for filtering (timestamp failed)
                 }
 
@@ -99,8 +73,8 @@ async function fetchApiData(pair: string, token: string) {
     } catch (error) {
         console.error('Error fetching candle data:', error);
         return [];
-    }
-}
+    } // Correctly closes the try...catch block
+} // Correctly closes the fetchApiData function
 
 export default async function PairPage(props: PageProps) {
     const params = await props.params;

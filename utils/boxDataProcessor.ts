@@ -1,6 +1,7 @@
 import { createBoxCalculator } from './boxCalculator';
-import { Box, BoxSlice } from '@/types/types';
-import { BoxSizes } from '@/utils/instruments';
+import { BoxSlice } from '@/types/types';
+
+import { safeISOString } from './dateUtils';
 
 // Extend BoxSlice type to include progressiveValues
 interface ExtendedBoxSlice {
@@ -17,56 +18,6 @@ interface ExtendedBoxSlice {
         close: number;
     };
 }
-
-// Helper function to safely convert timestamp to ISO string
-const safeISOString = (timestamp: number | string): string => {
-    try {
-        // Ensure consistent timestamp handling between server and client
-        // If timestamp is already a number (milliseconds), use it directly
-        if (typeof timestamp === 'number') {
-            // Use a fixed format instead of toISOString() to avoid timezone issues
-            const date = new Date(timestamp);
-            return (
-                date.getUTCFullYear() +
-                '-' +
-                String(date.getUTCMonth() + 1).padStart(2, '0') +
-                '-' +
-                String(date.getUTCDate()).padStart(2, '0') +
-                'T' +
-                String(date.getUTCHours()).padStart(2, '0') +
-                ':' +
-                String(date.getUTCMinutes()).padStart(2, '0') +
-                ':' +
-                String(date.getUTCSeconds()).padStart(2, '0') +
-                '.' +
-                String(date.getUTCMilliseconds()).padStart(3, '0') +
-                'Z'
-            );
-        }
-        // If it's a string, parse it as a date
-        const date = new Date(timestamp);
-        return (
-            date.getUTCFullYear() +
-            '-' +
-            String(date.getUTCMonth() + 1).padStart(2, '0') +
-            '-' +
-            String(date.getUTCDate()).padStart(2, '0') +
-            'T' +
-            String(date.getUTCHours()).padStart(2, '0') +
-            ':' +
-            String(date.getUTCMinutes()).padStart(2, '0') +
-            ':' +
-            String(date.getUTCSeconds()).padStart(2, '0') +
-            '.' +
-            String(date.getUTCMilliseconds()).padStart(3, '0') +
-            'Z'
-        );
-    } catch (e) {
-        console.error('Invalid timestamp:', timestamp);
-        // Use a fixed timestamp as fallback instead of current time to ensure consistency
-        return '2023-01-01T00:00:00.000Z';
-    }
-};
 
 export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice['boxes'] => {
     // Sort boxes purely by ASCENDING absolute value to match ResoBox apparent order
