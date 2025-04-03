@@ -45,6 +45,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     const [trendChanges, setTrendChanges] = useState<Array<{ timestamp: string; x: number; isPositive: boolean }>>([]);
     const [effectiveBoxWidth, setEffectiveBoxWidth] = useState(0);
     const framesToDrawRef = useRef<BoxTimelineProps['data']>([]);
+    const frameToRealTimestampRef = useRef<Map<number, number>>(new Map());
 
     const calculateBoxDimensions = (containerHeight: number, frameCount: number) => {
         const boxSize = Math.floor(containerHeight / visibleBoxesCount);
@@ -78,9 +79,16 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             return boxes1.every((box, index) => box.value === boxes2[index]?.value);
         };
 
+        frameToRealTimestampRef.current.clear();
+
+        let lastRealTimestamp: number | null = null;
+
         for (const frame of data) {
             const boxes = frame.progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
             if (boxes.length === 0) continue;
+
+            const currentRealTimestamp = new Date(frame.timestamp).getTime();
+            lastRealTimestamp = currentRealTimestamp;
 
             let frameToAdd = frame;
             let addFrameDirectly = false;
@@ -103,11 +111,11 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
                         let lastIntermediateValues = [...prevFrame.progressiveValues];
 
-                        // --- Timestamp Interpolation Setup ---
                         const prevTimestamp = new Date(prevFrame.timestamp).getTime();
                         const nextTimestamp = new Date(frame.timestamp).getTime();
                         const timeDiff = nextTimestamp - prevTimestamp;
-                        // --- End Timestamp Interpolation Setup ---
+
+                        const prevRealTimestamp = prevTimestamp;
 
                         for (let k = 1; k <= numIntermediateSteps; k++) {
                             const intermediateValues = [...lastIntermediateValues];
@@ -131,10 +139,8 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                                         flippedCount++;
                                     }
                                 } else if ((isNewTrendPositive && currentBoxValue > 0) || (!isNewTrendPositive && currentBoxValue < 0)) {
-                                    // Keep current value if already matches new trend
                                     intermediateValues[boxIndex] = { ...intermediateValues[boxIndex] };
                                 } else {
-                                    // Keep old value if not yet flipped
                                     intermediateValues[boxIndex] = {
                                         ...intermediateValues[boxIndex],
                                         value: isNewTrendPositive ? -Math.abs(originalBox.value) : Math.abs(originalBox.value),
@@ -142,24 +148,23 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                                 }
                             }
 
-                            // --- Calculate and Assign Interpolated Timestamp ---
-                            // Ensure timeDiff is positive to avoid issues
                             const safeTimeDiff = Math.max(0, timeDiff);
                             const interpolatedTimestampMillis = prevTimestamp + safeTimeDiff * (k / (numIntermediateSteps + 1));
                             const interpolatedTimestampISO = new Date(interpolatedTimestampMillis).toISOString();
-                            // --- End Timestamp Calculation ---
 
-                            processedFrames.push({
-                                // --- Use Interpolated Timestamp ---
+                            const intermediateFrame = {
                                 timestamp: interpolatedTimestampISO,
                                 progressiveValues: intermediateValues,
-                                // Use OHLC from the *next* real frame for context
                                 currentOHLC: frame.currentOHLC,
-                            });
+                            };
+
+                            processedFrames.push(intermediateFrame);
                             lastIntermediateValues = intermediateValues;
+
+                            const isFirstHalf = k <= numIntermediateSteps / 2;
+                            const parentTimestamp = isFirstHalf ? prevRealTimestamp : currentRealTimestamp;
                         }
 
-                        // Add the actual final frame state after transitions
                         frameToAdd = frame;
                         processedFrames.push(frameToAdd);
                     } else {
@@ -190,53 +195,71 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
         if (framesToDraw.length === 0) return;
 
+        let lastRealFrameIndex = -1;
+        let lastRealFrameTimestamp = -1;
+
+        framesToDraw.forEach((frame, index) => {
+            const frameTimestamp = new Date(frame.timestamp).getTime();
+
+            const isRealFrame = data.some((d) => {
+                const dTimestamp = new Date(d.timestamp).getTime();
+                return Math.abs(dTimestamp - frameTimestamp) < 5;
+            });
+
+            if (isRealFrame) {
+                lastRealFrameIndex = index;
+                lastRealFrameTimestamp = frameTimestamp;
+                frameToRealTimestampRef.current.set(index, frameTimestamp);
+            } else if (lastRealFrameIndex >= 0) {
+                frameToRealTimestampRef.current.set(index, lastRealFrameTimestamp);
+            }
+        });
+
         const { boxSize, requiredWidth, totalHeight } = calculateBoxDimensions(rect.height, framesToDraw.length);
         setEffectiveBoxWidth(boxSize);
 
         canvas.style.width = `${requiredWidth}px`;
         canvas.style.height = `${totalHeight}px`;
-        const scale = window.devicePixelRatio;
-        canvas.width = Math.floor(requiredWidth * scale);
-        canvas.height = Math.floor(totalHeight * scale);
-        ctx.scale(scale, scale);
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = Math.floor(requiredWidth * dpr);
+        canvas.height = Math.floor(totalHeight * dpr);
+        ctx.scale(dpr, dpr);
 
         ctx.fillStyle = '#0a0a0a';
         ctx.fillRect(0, 0, requiredWidth, totalHeight);
 
-        // --- Calculate Frame Time Boundaries for Hovering ---
         let highlightIndex = -1;
         if (hoveredTimestamp !== null && hoveredTimestamp !== undefined && framesToDraw.length > 0) {
             const targetTime = Number(hoveredTimestamp);
-            const frameTimestamps = framesToDraw.map((frame) => new Date(frame.timestamp).getTime());
+            let minDiff = Infinity;
 
-            // Calculate midpoints between frames to define hover zones
-            const boundaries: number[] = [-Infinity];
-            for (let i = 0; i < frameTimestamps.length - 1; i++) {
-                // Ensure timestamps are valid before calculating midpoint
-                if (!isNaN(frameTimestamps[i]) && !isNaN(frameTimestamps[i + 1])) {
-                    boundaries.push((frameTimestamps[i] + frameTimestamps[i + 1]) / 2);
-                } else {
-                    // Handle potential NaN - push the previous boundary or the current timestamp
-                    boundaries.push(boundaries[boundaries.length - 1] !== -Infinity ? boundaries[boundaries.length - 1] : frameTimestamps[i] || Date.now());
+            framesToDraw.forEach((frame, index) => {
+                const frameTime = new Date(frame.timestamp).getTime();
+                const diff = Math.abs(frameTime - targetTime);
+
+                if (diff < minDiff && diff < 500) {
+                    minDiff = diff;
+                    highlightIndex = index;
                 }
-            }
-            boundaries.push(Infinity);
+            });
 
-            // Find which time range the hoveredTimestamp falls into
-            if (!isNaN(targetTime)) {
-                for (let i = 0; i < boundaries.length - 1; i++) {
-                    if (targetTime >= boundaries[i] && targetTime < boundaries[i + 1]) {
-                        highlightIndex = i; // Frame i corresponds to the range between boundary i and i+1
-                        break;
+            if (highlightIndex === -1) {
+                let closestMappedIndex = -1;
+                let minMappedDiff = Infinity;
+                frameToRealTimestampRef.current.forEach((realTimestamp, index) => {
+                    if (index >= framesToDraw.length) return;
+                    const diff = Math.abs(realTimestamp - targetTime);
+                    if (diff < minMappedDiff) {
+                        minMappedDiff = diff;
+                        closestMappedIndex = index;
                     }
+                });
+
+                if (closestMappedIndex !== -1 && minMappedDiff < 1000) {
+                    highlightIndex = closestMappedIndex;
                 }
             }
-            // --- DEBUG LOG ---
-            // console.log(`[Highlight Debug] Target: ${targetTime}, Boundaries: ${boundaries.map(t => t === Infinity || t === -Infinity ? t : new Date(t).toISOString())}`);
-            // console.log(`[Highlight Debug] Highlight Index: ${highlightIndex}`);
-            // --- END DEBUG LOG ---
         }
-        // --- End Frame Time Boundaries Calculation ---
 
         const newTrendChanges: Array<{ timestamp: string; x: number; isPositive: boolean }> = [];
         let prevIsLargestPositive: boolean | null = null;
@@ -360,43 +383,60 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
         if (highlightIndex !== -1) {
             const highlightX = highlightIndex * boxSize;
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)'; // Subtle highlight
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             ctx.fillRect(highlightX, 0, boxSize, totalHeight);
         }
-    }, [isClient, data, boxOffset, visibleBoxesCount, boxColors, hoveredTimestamp, showLine]);
+    }, [isClient, data, boxOffset, visibleBoxesCount, boxColors, showLine, boxVisibilityFilter, hoveredTimestamp]);
 
     const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
         const currentFrames = framesToDrawRef.current;
-        if (!onHoverChange || !canvasRef.current || currentFrames.length === 0 || !effectiveBoxWidth) return;
+        if (!onHoverChange || !canvasRef.current || currentFrames.length === 0) return;
 
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
-        const x = event.clientX - rect.left;
 
-        // Ensure effectiveBoxWidth is positive to avoid division by zero
-        if (effectiveBoxWidth <= 0) return;
+        const canvasX = event.clientX - rect.left;
 
-        const frameIndex = Math.floor(x / effectiveBoxWidth);
+        const scrollContainer = scrollContainerRef.current;
+        const scrollOffset = scrollContainer ? scrollContainer.scrollLeft : 0;
+
+        const actualX = canvasX + scrollOffset;
+
+        if (!effectiveBoxWidth || effectiveBoxWidth <= 0) return;
+
+        const frameIndex = Math.floor(actualX / effectiveBoxWidth);
+
+        if (process.env.NODE_ENV === 'development') {
+            console.debug(
+                `Histogram hover: canvasX=${canvasX.toFixed(1)}, actualX=${actualX.toFixed(1)}, boxWidth=${effectiveBoxWidth.toFixed(1)}, frameIndex=${frameIndex}, scrollOffset=${scrollOffset}`
+            );
+        }
 
         if (frameIndex >= 0 && frameIndex < currentFrames.length) {
-            const frame = currentFrames[frameIndex];
-            if (frame) {
-                const timestamp = new Date(frame.timestamp).getTime();
-                // --- DEBUG LOG ---
-                // console.log(`Mouse Hover: x=${x.toFixed(1)}, width=${effectiveBoxWidth.toFixed(1)}, index=${frameIndex}, ts=${timestamp}`);
-                // --- END DEBUG LOG ---
-                if (!isNaN(timestamp)) {
-                    // Ensure valid timestamp before sending
-                    onHoverChange(timestamp);
+            if (onHoverChange) {
+                const mappedTimestamp = frameToRealTimestampRef.current.get(frameIndex);
+                let reportedTimestamp: number | null = null;
+
+                if (mappedTimestamp) {
+                    reportedTimestamp = mappedTimestamp;
+                } else {
+                    const frame = currentFrames[frameIndex];
+                    if (frame) {
+                        const timestamp = new Date(frame.timestamp).getTime();
+                        if (!isNaN(timestamp)) {
+                            reportedTimestamp = timestamp;
+                        }
+                    }
                 }
+                onHoverChange(reportedTimestamp);
             }
         } else {
-            // --- DEBUG LOG ---
-            // console.log(`Mouse Hover: x=${x.toFixed(1)}, width=${effectiveBoxWidth.toFixed(1)}, index=${frameIndex} (Out of bounds)`);
-            // --- END DEBUG LOG ---
-            onHoverChange(null);
+            if (onHoverChange) {
+                onHoverChange(null);
+            }
         }
     };
+
     const handleMouseLeave = () => {
         if (onHoverChange) {
             onHoverChange(null);
