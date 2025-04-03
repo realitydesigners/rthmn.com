@@ -222,6 +222,24 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             }
 
             // Draw boxes
+            orderedBoxes.forEach((box, boxIndex) => {
+                const y = boxIndex * boxSize;
+                const isPositiveBox = box.value >= 0;
+
+                // Set colors based on largest trend
+                if (isLargestPositive) {
+                    ctx.fillStyle = isPositiveBox
+                        ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
+                        : `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
+                } else {
+                    ctx.fillStyle = isPositiveBox
+                        ? `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
+                        : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+                }
+
+                // Draw box
+                ctx.fillRect(x, y, boxSize, boxSize);
+            });
 
             // Track trend changes
             if (prevIsLargestPositive !== null && prevIsLargestPositive !== isLargestPositive) {
@@ -241,7 +259,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             }
         });
 
-        // Draw fill areas
+        // Draw fill areas and line
         if (showLine && linePoints.length > 0) {
             // Draw fill areas
             for (let i = 0; i < linePoints.length - 1; i++) {
@@ -263,21 +281,18 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 ctx.closePath();
 
                 const fillColor = currentPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
-                const gradient = ctx.createLinearGradient(currentPoint.x, 0, nextPoint.x, 0);
-                gradient.addColorStop(0, `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.5)`);
-                gradient.addColorStop(1, `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.1)`);
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.3)`;
                 ctx.fill();
             }
 
-            // Handle last segment with full height
+            // Handle last segment
             if (linePoints.length > 0) {
                 const lastPoint = linePoints[linePoints.length - 1];
                 ctx.beginPath();
                 if (lastPoint.isLargestPositive) {
                     ctx.moveTo(lastPoint.x, 0);
                     ctx.lineTo(lastPoint.x + boxSize, 0);
-                    ctx.lineTo(lastPoint.x + boxSize, rect.height);
+                    ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
                     ctx.lineTo(lastPoint.x, lastPoint.y);
                 } else {
                     ctx.moveTo(lastPoint.x, lastPoint.y);
@@ -288,10 +303,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 ctx.closePath();
 
                 const fillColor = lastPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
-                const gradient = ctx.createLinearGradient(lastPoint.x, 0, lastPoint.x + boxSize, 0);
-                gradient.addColorStop(0, `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.5)`);
-                gradient.addColorStop(1, `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.1)`);
-                ctx.fillStyle = gradient;
+                ctx.fillStyle = `rgba(${parseInt(fillColor.slice(1, 3), 16)}, ${parseInt(fillColor.slice(3, 5), 16)}, ${parseInt(fillColor.slice(5, 7), 16)}, 0.3)`;
                 ctx.fill();
             }
 
@@ -305,6 +317,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
                 }
             });
 
+            // Draw to the end of the last box
             const lastPoint = linePoints[linePoints.length - 1];
             ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
 
