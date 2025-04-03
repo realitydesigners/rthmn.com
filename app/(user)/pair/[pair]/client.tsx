@@ -194,7 +194,6 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                         boxColors={boxColors}
                                         className='h-full'
                                         hoveredTimestamp={hoveredTimestamp}
-                                        onHoverChange={handleHoverChange}
                                     />
                                 )}
                             </div>

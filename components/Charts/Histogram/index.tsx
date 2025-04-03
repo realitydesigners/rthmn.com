@@ -22,23 +22,12 @@ interface BoxTimelineProps {
     boxColors: BoxColors;
     className?: string;
     hoveredTimestamp?: number | null;
-    onHoverChange?: (timestamp: number | null) => void;
     showLine?: boolean;
 }
 
 const MAX_FRAMES = 1000;
 
-const Histogram: React.FC<BoxTimelineProps> = ({
-    data,
-    boxOffset,
-    visibleBoxesCount,
-    boxVisibilityFilter,
-    boxColors,
-    className = '',
-    hoveredTimestamp,
-    onHoverChange,
-    showLine = true,
-}) => {
+const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, className = '', hoveredTimestamp, showLine = true }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = useState(false);
@@ -386,69 +375,30 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
             ctx.fillRect(highlightX, 0, boxSize, totalHeight);
         }
+
+        // --- Auto-scroll to highlighted index ---
+        if (highlightIndex !== -1 && scrollContainerRef.current && boxSize > 0) {
+            const scrollContainer = scrollContainerRef.current;
+            const highlightX = highlightIndex * boxSize;
+            const containerWidth = scrollContainer.clientWidth;
+            const targetScrollLeft = highlightX + boxSize / 2 - containerWidth / 2;
+
+            // Clamp scroll position to valid bounds
+            const maxScrollLeft = scrollContainer.scrollWidth - containerWidth;
+            const clampedScrollLeft = Math.max(0, Math.min(targetScrollLeft, maxScrollLeft));
+
+            // Scroll smoothly
+            scrollContainer.scrollTo({
+                left: clampedScrollLeft,
+                behavior: 'smooth',
+            });
+        }
+        // --- End auto-scroll logic ---
     }, [isClient, data, boxOffset, visibleBoxesCount, boxColors, showLine, boxVisibilityFilter, hoveredTimestamp]);
-
-    const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-        const currentFrames = framesToDrawRef.current;
-        if (!onHoverChange || !canvasRef.current || currentFrames.length === 0) return;
-
-        const canvas = canvasRef.current;
-        const rect = canvas.getBoundingClientRect();
-
-        const canvasX = event.clientX - rect.left;
-
-        const scrollContainer = scrollContainerRef.current;
-        const scrollOffset = scrollContainer ? scrollContainer.scrollLeft : 0;
-
-        const actualX = canvasX + scrollOffset;
-
-        if (!effectiveBoxWidth || effectiveBoxWidth <= 0) return;
-
-        const frameIndex = Math.floor(actualX / effectiveBoxWidth);
-
-        if (process.env.NODE_ENV === 'development') {
-            console.debug(
-                `Histogram hover: canvasX=${canvasX.toFixed(1)}, actualX=${actualX.toFixed(1)}, boxWidth=${effectiveBoxWidth.toFixed(1)}, frameIndex=${frameIndex}, scrollOffset=${scrollOffset}`
-            );
-        }
-
-        if (frameIndex >= 0 && frameIndex < currentFrames.length) {
-            if (onHoverChange) {
-                const mappedTimestamp = frameToRealTimestampRef.current.get(frameIndex);
-                let reportedTimestamp: number | null = null;
-
-                if (mappedTimestamp) {
-                    reportedTimestamp = mappedTimestamp;
-                } else {
-                    const frame = currentFrames[frameIndex];
-                    if (frame) {
-                        const timestamp = new Date(frame.timestamp).getTime();
-                        if (!isNaN(timestamp)) {
-                            reportedTimestamp = timestamp;
-                        }
-                    }
-                }
-                onHoverChange(reportedTimestamp);
-            }
-        } else {
-            if (onHoverChange) {
-                onHoverChange(null);
-            }
-        }
-    };
-
-    const handleMouseLeave = () => {
-        if (onHoverChange) {
-            onHoverChange(null);
-        }
-    };
 
     return (
         <div className={`relative ${className}`}>
-            <div
-                ref={scrollContainerRef}
-                className='scrollbar-hide h-full w-full overflow-x-auto'
-                {...(onHoverChange && { onMouseMove: handleMouseMove, onMouseLeave: handleMouseLeave })}>
+            <div ref={scrollContainerRef} className='scrollbar-hide h-full w-full overflow-x-auto'>
                 <div className='relative h-full pt-6'>
                     <div className='pointer-events-none absolute -top-0 right-0 left-0 z-0 ml-[18px] h-6'>
                         {trendChanges.map((change, index) => (
