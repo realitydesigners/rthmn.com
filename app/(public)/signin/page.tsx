@@ -190,7 +190,7 @@ export default function SignIn() {
 
             {/* Content Overlay */}
             <div className='relative flex min-h-screen flex-col items-center justify-center px-6 py-16'>
-                <div className='w-full max-w-[320px] space-y-12 sm:max-w-[380px] lg:w-[420px] lg:max-w-lg'>
+                <div className='w-full max-w-[400px] space-y-12 sm:max-w-[380px] lg:w-[420px] lg:max-w-lg'>
                     <div className='space-y-4'>
                         <div className='space-y-3'>
                             <h1 className='font-outfit bg-gradient-to-br from-white via-white to-gray-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl lg:text-5xl'>
