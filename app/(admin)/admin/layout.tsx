@@ -4,7 +4,7 @@ import { DashboardProvider } from '@/providers/DashboardProvider/client';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { getUser } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
-import { AUTHORIZED_IDS } from './tokens';
+import { AUTHORIZED_IDS } from '../tokens';
 import { UserProvider } from '@/providers/UserProvider';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
