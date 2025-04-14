@@ -209,27 +209,29 @@ export default function SignIn() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder='Enter your email'
-                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/20 focus:outline-none'
+                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-gray-400 focus:ring-2 focus:ring-gray-500/20 focus:outline-none'
                                     required
                                 />
                                 <button
                                     type='submit'
                                     disabled={isLoading}
-                                    className='w-full rounded-lg bg-blue-500 px-4 py-2 font-mono text-white transition-all hover:bg-blue-600 disabled:opacity-50'>
-                                    {isLoading ? 'Sending...' : 'Sign in with Email'}
+                                    className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-gray-500/20 focus:outline-none active:scale-[0.99]'>
+                                    <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-gray-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-gray-100 lg:py-2.5'>
+                                        <div className='absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]' />
+                                        <span className='relative text-base sm:text-base'>{isLoading ? 'Sending...' : 'Sign in with Email'}</span>
+                                    </span>
                                 </button>
                             </div>
                             {message && <p className='mt-2 text-center text-sm text-gray-300'>{message}</p>}
                         </form>
 
                         <div className='relative flex items-center justify-center'>
-                            <div className='absolute inset-x-0 top-1/2 h-px bg-white/10'></div>
-                            <span className='relative bg-black px-4 text-sm text-gray-400'>Or continue with</span>
+                            <span className='relative px-4 text-xs text-gray-400'>Or continue with</span>
                         </div>
 
                         <form onSubmit={handleSignIn}>
                             <button
-                                className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-blue-500/20 focus:outline-none active:scale-[0.99]'
+                                className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-gray-500/20 focus:outline-none active:scale-[0.99]'
                                 type='submit'>
                                 <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-gray-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-gray-100 lg:py-2.5'>
                                     <div className='absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]' />

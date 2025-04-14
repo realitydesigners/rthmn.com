@@ -5,13 +5,12 @@ import { QueryProvider } from '@/providers/QueryProvider';
 import ogImage from '@/public/opengraph-image.png';
 import { getURL } from '@/utils/helpers';
 import { createClient } from '@/lib/supabase/server';
-import '@/lib/styles/main.css';
-import Script from 'next/script';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import { kodeMono, outfit, oxanium, russo } from '@/lib/styles/fonts';
 import { SectionFooter } from '@/components/Sections/SectionFooter';
 import { prefetchDNS, preconnect } from 'react-dom';
+import '@/lib/styles/main.css';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';
 const description =
@@ -66,18 +65,7 @@ export default async function RootLayout({
                     </QueryProvider>
                 </SupabaseProvider>
                 <Analytics />
-                {/* Google Analytics */}
                 <script async src='https://www.googletagmanager.com/gtag/js?id=G-0PXQE0RL1G'></script>
-                {/* Microsoft Clarity */}
-                <Script strategy='lazyOnload' id='clarity-script'>
-                    {`
-            (function(c,l,a,r,i,t,y){
-              c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-              t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-              y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "o3awwft96h");
-          `}
-                </Script>
             </body>
         </html>
     );
