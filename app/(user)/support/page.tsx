@@ -3,9 +3,21 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/types/supabase';
+import { LuHelpCircle, LuMessageSquare, LuPlus } from 'react-icons/lu';
+import { FAQBlock } from '@/components/PageBuilder/blocks/faqBlock';
+import { sanityFetch } from '@/lib/sanity/lib/client';
+import { cn } from '@/utils/cn';
 
 type SupportThread = Database['public']['Tables']['support_threads']['Row'];
 type Message = Database['public']['Tables']['support_messages']['Row'];
+
+interface FAQ {
+    _id: string;
+    question: string;
+    answer: any[];
+    category: string;
+    isPublished: boolean;
+}
 
 export default function SupportPage() {
     const [threads, setThreads] = useState<SupportThread[]>([]);
@@ -14,8 +26,31 @@ export default function SupportPage() {
     const [newMessage, setNewMessage] = useState('');
     const [newThreadSubject, setNewThreadSubject] = useState('');
     const [isCreatingThread, setIsCreatingThread] = useState(false);
+    const [faqs, setFaqs] = useState<FAQ[]>([]);
+    const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const supabase = createClient();
+
+    useEffect(() => {
+        const fetchFaqs = async () => {
+            try {
+                const query = `*[_type == "faq"] {
+                    _id,
+                    question,
+                    answer,
+                    category,
+                    isPublished
+                }`;
+                const data = await sanityFetch<FAQ[]>({ query });
+                setFaqs(data);
+            } catch (error) {
+                console.error('Error fetching FAQs:', error);
+            }
+        };
+
+        fetchFaqs();
+    }, []);
 
     useEffect(() => {
         const fetchThreads = async () => {
@@ -100,7 +135,13 @@ export default function SupportPage() {
 
     const handleCreateThread = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newThreadSubject.trim()) return;
+        if (!newThreadSubject.trim()) {
+            setError('Please enter a subject');
+            return;
+        }
+
+        setError(null);
+        setIsLoading(true);
 
         try {
             const {
@@ -153,83 +194,139 @@ export default function SupportPage() {
     };
 
     return (
-        <div className='container mx-auto p-4'>
-            {!selectedThread && !isCreatingThread ? (
-                <div>
-                    <button onClick={() => setIsCreatingThread(true)} className='mb-4 rounded-md bg-blue-600 px-4 py-2 text-white'>
-                        Create New Support Thread
-                    </button>
-                    <div className='space-y-4'>
-                        {threads.map((thread) => (
-                            <div key={thread.id} onClick={() => setSelectedThread(thread)} className='cursor-pointer rounded-lg border p-4 hover:bg-gray-50'>
-                                <div className='flex items-center justify-between'>
-                                    <h3 className='font-medium'>{thread.subject || 'No Subject'}</h3>
-                                    <span className='text-sm text-gray-500'>{new Date(thread.last_message_time || '').toLocaleDateString()}</span>
-                                </div>
-                                <p className='mt-2 text-sm text-gray-600'>{thread.last_message}</p>
-                                <div className='mt-2 flex items-center gap-2'>
-                                    {thread.status === 'open' ? <span className='text-xs text-green-500'>Open</span> : <span className='text-xs text-gray-500'>Closed</span>}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : isCreatingThread ? (
-                <form onSubmit={handleCreateThread} className='space-y-4'>
-                    <div>
-                        <label className='block text-sm font-medium text-gray-700'>Subject</label>
-                        <input
-                            type='text'
-                            value={newThreadSubject}
-                            onChange={(e) => setNewThreadSubject(e.target.value)}
-                            className='mt-1 block w-full rounded-md border border-gray-300 px-3 py-2'
-                            placeholder='Enter subject'
-                        />
-                    </div>
-                    <div className='flex gap-2'>
-                        <button type='submit' className='rounded-md bg-blue-600 px-4 py-2 text-white'>
-                            Create Thread
-                        </button>
-                        <button type='button' onClick={() => setIsCreatingThread(false)} className='rounded-md border border-gray-300 px-4 py-2'>
-                            Cancel
-                        </button>
-                    </div>
-                </form>
-            ) : (
-                <div className='flex h-[calc(100vh-200px)] flex-col'>
-                    <div className='mb-4 flex items-center justify-between'>
-                        <h2 className='text-lg font-semibold'>{selectedThread.subject}</h2>
-                        <button onClick={() => setSelectedThread(null)} className='text-sm text-gray-500 hover:text-gray-700'>
-                            Back to Threads
-                        </button>
-                    </div>
-                    <div className='flex-1 space-y-4 overflow-y-auto'>
-                        {messages.map((message) => (
-                            <div key={message.id} className={`flex ${message.sender_type === 'support_team' ? 'justify-start' : 'justify-end'}`}>
-                                <div className={`max-w-[80%] rounded-lg p-3 ${message.sender_type === 'support_team' ? 'bg-gray-100 text-gray-900' : 'bg-blue-600 text-white'}`}>
-                                    <div className='mb-1 text-sm font-medium'>{message.sender_name}</div>
-                                    <div className='text-sm'>{message.content}</div>
-                                    <div className='mt-1 text-xs opacity-70'>{new Date(message.created_at || '').toLocaleTimeString()}</div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    <form onSubmit={handleSendMessage} className='mt-4'>
-                        <div className='flex gap-2'>
-                            <input
-                                type='text'
-                                value={newMessage}
-                                onChange={(e) => setNewMessage(e.target.value)}
-                                placeholder='Type your message...'
-                                className='flex-1 rounded-md border border-gray-300 px-4 py-2'
-                            />
-                            <button type='submit' className='rounded-md bg-blue-600 px-4 py-2 text-white'>
-                                Send
-                            </button>
+        <div className='min-h-screen bg-[#0a0a0a] pt-16'>
+            <div className='p-4 lg:p-8'>
+                <div className='mx-auto max-w-4xl'>
+                    <div className='mb-8 flex items-center gap-3'>
+                        <div className='rounded-md bg-white/5 p-2'>
+                            <LuHelpCircle className='h-6 w-6 text-white' />
                         </div>
-                    </form>
+                        <h1 className='font-outfit text-2xl font-bold text-white'>Support Center</h1>
+                    </div>
+
+                    {error && (
+                        <div className='mb-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4'>
+                            <p className='font-outfit text-sm text-red-500'>{error}</p>
+                        </div>
+                    )}
+
+                    {!selectedThread && !isCreatingThread ? (
+                        <div>
+                            <button
+                                onClick={() => setIsCreatingThread(true)}
+                                className='group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] lg:w-auto'>
+                                <LuPlus className='h-4 w-4 text-white' />
+                                <span className='font-outfit'>Create New Support Thread</span>
+                            </button>
+                            <div className='space-y-4'>
+                                {threads.map((thread) => (
+                                    <div
+                                        key={thread.id}
+                                        onClick={() => setSelectedThread(thread)}
+                                        className='cursor-pointer rounded-lg border border-white/5 bg-[#111] p-4 transition-all duration-200 hover:bg-[#151515]'>
+                                        <div className='flex items-center justify-between'>
+                                            <div className='flex items-center gap-3'>
+                                                <LuMessageSquare className='h-4 w-4 text-zinc-400' />
+                                                <h3 className='font-outfit text-white'>{thread.subject || 'No Subject'}</h3>
+                                            </div>
+                                            <span className='font-outfit text-sm text-zinc-400'>{new Date(thread.last_message_time || '').toLocaleDateString()}</span>
+                                        </div>
+                                        {thread.last_message && <p className='font-outfit mt-2 text-sm text-zinc-400'>{thread.last_message}</p>}
+                                        <div className='mt-2 flex items-center gap-2'>
+                                            {thread.status === 'open' ? (
+                                                <span className='font-outfit text-xs text-emerald-400'>Open</span>
+                                            ) : (
+                                                <span className='font-outfit text-xs text-zinc-500'>Closed</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ) : isCreatingThread ? (
+                        <div className='mx-auto max-w-2xl'>
+                            <div className='mb-8'>
+                                <label className='font-outfit block text-sm text-zinc-400'>Subject</label>
+                                <input
+                                    type='text'
+                                    value={newThreadSubject}
+                                    onChange={(e) => setNewThreadSubject(e.target.value)}
+                                    className='font-outfit mt-2 block w-full rounded-lg border border-emerald-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-none'
+                                    placeholder='Enter subject'
+                                    disabled={isLoading}
+                                />
+                            </div>
+                            <div className='flex flex-col gap-3 lg:flex-row'>
+                                <button
+                                    type='submit'
+                                    onClick={handleCreateThread}
+                                    disabled={isLoading}
+                                    className='font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] disabled:opacity-50'>
+                                    {isLoading ? 'Creating...' : 'Create Thread'}
+                                </button>
+                                <button
+                                    type='button'
+                                    onClick={() => {
+                                        setIsCreatingThread(false);
+                                        setError(null);
+                                    }}
+                                    disabled={isLoading}
+                                    className='font-outfit flex w-full items-center justify-center rounded-lg border border-white/10 px-6 py-3 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50'>
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className='flex h-[calc(100vh-200px)] flex-col overflow-hidden rounded-lg border border-white/5 bg-[#111]'>
+                            <div className='border-b border-white/5 p-4'>
+                                <div className='flex items-center justify-between'>
+                                    <div className='flex items-center gap-3'>
+                                        <LuMessageSquare className='h-4 w-4 text-zinc-400' />
+                                        <h2 className='font-outfit text-white'>{selectedThread.subject}</h2>
+                                    </div>
+                                    <button onClick={() => setSelectedThread(null)} className='font-outfit text-sm text-zinc-400 transition-colors hover:text-white'>
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+                            <div className='scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 flex-1 space-y-4 overflow-y-auto p-4'>
+                                {messages.map((message) => (
+                                    <div key={message.id} className={`flex ${message.sender_type === 'support_team' ? 'justify-start' : 'justify-end'}`}>
+                                        <div
+                                            className={cn(
+                                                'max-w-[80%] rounded-lg p-4',
+                                                message.sender_type === 'support_team' ? 'bg-white/5 text-white' : 'bg-emerald-500/10 text-white'
+                                            )}>
+                                            <div className='font-outfit mb-1 text-sm font-medium'>{message.sender_name}</div>
+                                            <div className='font-outfit text-sm'>{message.content}</div>
+                                            <div className='font-outfit mt-1 text-xs opacity-70'>{new Date(message.created_at || '').toLocaleTimeString()}</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                            <form onSubmit={handleSendMessage} className='border-t border-white/5 p-4'>
+                                <div className='flex gap-3'>
+                                    <input
+                                        type='text'
+                                        value={newMessage}
+                                        onChange={(e) => setNewMessage(e.target.value)}
+                                        placeholder='Type your message...'
+                                        className='font-outfit flex-1 rounded-lg border border-emerald-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-none'
+                                    />
+                                    <button
+                                        type='submit'
+                                        className='font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818]'>
+                                        Send
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
+
+            {/* FAQ Section */}
+            {!selectedThread && !isCreatingThread && <FAQBlock _type='faqBlock' _key='support-faq' title='Frequently Asked Questions' items={faqs} />}
         </div>
     );
 }
