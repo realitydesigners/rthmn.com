@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Database } from '@/types/supabase';
-import { LuHelpCircle, LuMessageSquare, LuPlus } from 'react-icons/lu';
+import { LuHelpCircle, LuMessageSquare, LuPlus, LuUser } from 'react-icons/lu';
 import { FAQBlock } from '@/components/PageBuilder/blocks/faqBlock';
 import { sanityFetch } from '@/lib/sanity/lib/client';
 import { cn } from '@/utils/cn';
+import Image from 'next/image';
+import { useAuth } from '@/providers/SupabaseProvider';
 
 type SupportThread = Database['public']['Tables']['support_threads']['Row'];
 type Message = Database['public']['Tables']['support_messages']['Row'];
@@ -18,6 +20,29 @@ interface FAQ {
     category: string;
     isPublished: boolean;
 }
+
+const MessageBubble = ({ message, isUser }: { message: Message; isUser: boolean }) => {
+    const { userDetails } = useAuth();
+
+    return (
+        <div className={cn('flex items-end gap-2', isUser ? 'flex-row-reverse' : 'flex-row')}>
+            <div className='flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-[#111]'>
+                {userDetails?.avatar_url && isUser ? (
+                    <Image src={userDetails.avatar_url} alt={message.sender_name} width={32} height={32} className='h-full w-full object-cover' />
+                ) : (
+                    <LuUser className='h-4 w-4 text-white/50' />
+                )}
+            </div>
+            <div className={cn('group relative max-w-[80%] space-y-1 rounded-2xl px-4 py-3', isUser ? 'bg-emerald-500/10' : 'bg-white/5', 'transition-all duration-200')}>
+                <div className='flex items-center gap-2'>
+                    <div className='font-outfit text-sm font-medium text-white/90'>{message.sender_name}</div>
+                    <div className='font-outfit text-xs text-white/40'>{new Date(message.created_at || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                </div>
+                <div className='font-outfit text-sm text-white/80'>{message.content}</div>
+            </div>
+        </div>
+    );
+};
 
 export default function SupportPage() {
     const [threads, setThreads] = useState<SupportThread[]>([]);
@@ -135,13 +160,7 @@ export default function SupportPage() {
 
     const handleCreateThread = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!newThreadSubject.trim()) {
-            setError('Please enter a subject');
-            return;
-        }
-
-        setError(null);
-        setIsLoading(true);
+        if (!newThreadSubject.trim()) return;
 
         try {
             const {
@@ -149,17 +168,24 @@ export default function SupportPage() {
             } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { data, error } = await supabase.from('support_threads').insert({
-                product_id: 'default', // You might want to make this configurable
-                user_id: user.id,
-                user_name: user.user_metadata?.full_name || 'User',
-                user_email: user.email,
-                subject: newThreadSubject.trim(),
-                status: 'open',
-            });
+            const { data, error } = await supabase
+                .from('support_threads')
+                .insert({
+                    product_id: 'prod_QnoSc9uLqG4nJ8', // Required due to database constraints - default product for support
+                    user_id: user.id,
+                    user_name: user.user_metadata?.full_name || 'User',
+                    user_email: user.email,
+                    subject: newThreadSubject.trim(),
+                    status: 'open',
+                })
+                .select();
 
-            if (error) throw error;
-            if (!data) throw new Error('No data returned from insert');
+            if (error) {
+                console.error('Supabase error:', error);
+                throw error;
+            }
+            if (!data || data.length === 0) throw new Error('No data returned from insert');
+
             setIsCreatingThread(false);
             setNewThreadSubject('');
             setSelectedThread(data[0]);
@@ -178,15 +204,24 @@ export default function SupportPage() {
             } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { error } = await supabase.from('support_messages').insert({
+            const newMessageData = {
                 thread_id: selectedThread.id,
                 sender_id: user.id,
                 sender_name: user.user_metadata?.full_name || 'User',
                 sender_type: 'user',
                 content: newMessage.trim(),
-            });
+                created_at: new Date().toISOString(),
+            };
+
+            const { data, error } = await supabase.from('support_messages').insert(newMessageData).select();
 
             if (error) throw error;
+
+            // Immediately update the messages state with the new message
+            if (data) {
+                setMessages((prev) => [...prev, data[0]]);
+            }
+
             setNewMessage('');
         } catch (error) {
             console.error('Error sending message:', error);
@@ -291,17 +326,7 @@ export default function SupportPage() {
                             </div>
                             <div className='scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 flex-1 space-y-4 overflow-y-auto p-4'>
                                 {messages.map((message) => (
-                                    <div key={message.id} className={`flex ${message.sender_type === 'support_team' ? 'justify-start' : 'justify-end'}`}>
-                                        <div
-                                            className={cn(
-                                                'max-w-[80%] rounded-lg p-4',
-                                                message.sender_type === 'support_team' ? 'bg-white/5 text-white' : 'bg-emerald-500/10 text-white'
-                                            )}>
-                                            <div className='font-outfit mb-1 text-sm font-medium'>{message.sender_name}</div>
-                                            <div className='font-outfit text-sm'>{message.content}</div>
-                                            <div className='font-outfit mt-1 text-xs opacity-70'>{new Date(message.created_at || '').toLocaleTimeString()}</div>
-                                        </div>
-                                    </div>
+                                    <MessageBubble key={message.id} message={message} isUser={message.sender_type === 'user'} />
                                 ))}
                             </div>
                             <form onSubmit={handleSendMessage} className='border-t border-white/5 p-4'>

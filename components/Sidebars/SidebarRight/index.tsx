@@ -13,7 +13,7 @@ import AccountPanel from '@/components/Panels/AccountPanel';
 
 // Custom ProfileIcon component that displays user avatar or fallback icon
 const ProfileIcon = ({ className }: { className?: string }) => {
-    const { user, userDetails } = useAuth();
+    const { userDetails } = useAuth();
 
     // Use user's avatar if available, otherwise use a fallback icon
     if (userDetails?.avatar_url) {

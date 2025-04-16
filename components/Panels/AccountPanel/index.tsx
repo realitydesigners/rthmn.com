@@ -6,8 +6,7 @@ import { useAuth } from '@/providers/SupabaseProvider';
 import CustomerPortalForm from './CustomerPortalForm';
 import DiscordConnectionForm from './DiscordConnectionForm';
 import ProfilePhotoForm from './ProfilePhotoForm';
-import { LuCreditCard, LuLogOut } from 'react-icons/lu';
-import { FaDiscord } from 'react-icons/fa';
+import { LuLogOut } from 'react-icons/lu';
 import { ProBadge } from '../../Badges/ProBadge';
 
 const AccountPanel = () => {

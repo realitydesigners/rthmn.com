@@ -80,12 +80,8 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 
                     {/* Right section - Connection Status */}
                     <div className='relative z-[110] flex items-center gap-2'>
-                        <Link
-                            href='/support'
-                            className='group flex h-8 w-8 items-center justify-center rounded-lg border border-[#222] bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                            <div className='flex h-full w-full items-center justify-center rounded-lg bg-gradient-to-b from-[#0A0A0A] to-[#181818]'>
-                                <LuHelpCircle className='h-4 w-4 text-[#818181] group-hover:text-white' />
-                            </div>
+                        <Link href='/support' className='flex h-4 w-4 items-center justify-center'>
+                            <LuHelpCircle className='h-4 w-4 text-[#818181] group-hover:text-white' />
                         </Link>
                         <ConnectionBadge isConnected={isConnected} />
                     </div>
