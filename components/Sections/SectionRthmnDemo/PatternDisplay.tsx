@@ -1,10 +1,11 @@
 'use client';
 
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { BASE_VALUES, createMockBoxData, sequences } from '@/components/Constants/constants';
+import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/components/Constants/constants';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import type { CandleData } from '@/types/types';
+import { formatPrice } from '@/utils/instruments';
 
 interface MarketData {
     pair: string;
@@ -12,21 +13,46 @@ interface MarketData {
     candleData: string;
 }
 
-interface PatternDisplayProps {
-    marketData: MarketData[];
-}
-
 const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData: string }) => {
     const [baseSize, setBaseSize] = useState(150);
-    const randomSequence = useMemo(() => {
+    const [demoStep, setDemoStep] = useState(() => {
+        // Create a different starting point for each pair based on its name
+        const startingOffset = pair.split('').reduce((acc, char) => {
+            return char.charCodeAt(0) + ((acc << 5) - acc);
+        }, 0);
+        return Math.abs(startingOffset) % sequences.length;
+    });
+
+    // Generate a random base interval for this pair (between 500ms and 1500ms)
+    const baseInterval = useMemo(() => {
         const pairHash = pair.split('').reduce((acc, char) => {
             return char.charCodeAt(0) + ((acc << 5) - acc);
         }, 0);
-        const randomIndex = Math.abs(pairHash) % sequences.length;
-        const sequence = sequences[randomIndex];
-        const values = BASE_VALUES.map((value, i) => value * (sequence[i] || 1));
-        return createMockBoxData(values);
+        return 500 + (Math.abs(pairHash) % 1000);
     }, [pair]);
+
+    const totalStepsRef = useRef(sequences.length);
+    const nextIntervalRef = useRef<number>(baseInterval);
+
+    // Get the latest price from candle data
+    const latestPrice = useMemo(() => {
+        try {
+            const data = JSON.parse(candleData) as CandleData[];
+            return parseFloat(data[data.length - 1].mid.c);
+        } catch (e) {
+            return null;
+        }
+    }, [candleData]);
+
+    // Memoize current slice calculation
+    const currentSlice = useMemo(() => {
+        const currentValues = createDemoStep(demoStep, sequences, BASE_VALUES);
+        const mockBoxData = createMockBoxData(currentValues);
+        return {
+            timestamp: new Date().toISOString(),
+            boxes: mockBoxData,
+        };
+    }, [demoStep]);
 
     useEffect(() => {
         const handleResize = () => {
@@ -38,101 +64,70 @@ const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData:
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    return (
-        <div className='relative flex items-center justify-center rounded-lg border border-white/10 backdrop-blur-sm' style={{ height: `${baseSize}px`, width: `${baseSize}px` }}>
-            <motion.div
-                className='absolute inset-0'
-                animate={{
-                    background: [
-                        'radial-gradient(circle at 0% 0%, #34d39915 0%, transparent 50%)',
-                        'radial-gradient(circle at 100% 100%, #34d39915 0%, transparent 50%)',
-                        'radial-gradient(circle at 0% 0%, #34d39915 0%, transparent 50%)',
-                    ],
-                }}
-                transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
-            />
+    useEffect(() => {
+        const updateStep = () => {
+            setDemoStep((prev) => (prev + 1) % totalStepsRef.current);
+            // Generate next random interval (±30% of base interval)
+            const variation = baseInterval * 0.3;
+            nextIntervalRef.current = baseInterval + Math.random() * variation * 2 - variation;
 
-            {randomSequence.length > 0 && (
-                <div className='absolute inset-0 flex items-center justify-center'>
-                    <div className='relative' style={{ width: baseSize, height: baseSize }}>
-                        <NestedBoxes
-                            boxes={randomSequence.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))}
-                            demoStep={0}
-                            isPaused={false}
-                            baseSize={baseSize}
-                            colorScheme='green-red'
-                        />
+            // Schedule next update
+            timeoutRef.current = setTimeout(updateStep, nextIntervalRef.current);
+        };
+
+        const timeoutRef = { current: setTimeout(updateStep, nextIntervalRef.current) };
+
+        return () => {
+            clearTimeout(timeoutRef.current);
+        };
+    }, [baseInterval]);
+
+    return (
+        <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
+            <div className='relative flex h-full flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
+                <div className='relative flex flex-col items-center justify-center gap-2 p-3'>
+                    {/* Price Display */}
+                    <div className='flex w-full flex-col items-center gap-2'>
+                        <div className='flex w-full items-center justify-between'>
+                            <div className='flex items-center gap-4'>
+                                <div className='font-outfit text-lg font-bold tracking-wider'>{pair.replace('_', '/')}</div>
+                                <div className='font-kodemono text-sm font-medium text-gray-200'>{latestPrice ? formatPrice(latestPrice, pair) : '-'}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Box Visualization */}
+                    <div className='relative flex items-center justify-center' style={{ height: `${baseSize}px`, width: `${baseSize}px` }}>
+                        {currentSlice && currentSlice.boxes.length > 0 && (
+                            <div className='absolute inset-0 flex items-center justify-center'>
+                                <div className='relative' style={{ width: baseSize, height: baseSize }}>
+                                    <NestedBoxes
+                                        boxes={currentSlice.boxes.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))}
+                                        demoStep={demoStep}
+                                        isPaused={false}
+                                        baseSize={baseSize}
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
-            )}
+            </div>
         </div>
     );
 });
 
 BoxVisualization.displayName = 'BoxVisualization';
 
-export const PatternDisplay = memo(({ marketData }: PatternDisplayProps) => {
-    const getLatestPrice = useMemo(
-        () => (candleData: string) => {
-            try {
-                const data = JSON.parse(candleData) as CandleData[];
-                return parseFloat(data[data.length - 1].mid.c);
-            } catch (e) {
-                return null;
-            }
-        },
-        []
-    );
-
-    const getPriceChange = useMemo(
-        () => (candleData: string) => {
-            try {
-                const data = JSON.parse(candleData) as CandleData[];
-                const firstPrice = parseFloat(data[0].mid.o);
-                const lastPrice = parseFloat(data[data.length - 1].mid.c);
-                return ((lastPrice - firstPrice) / firstPrice) * 100;
-            } catch (e) {
-                return null;
-            }
-        },
-        []
-    );
-
+export const PatternDisplay = memo(({ marketData }: { marketData: MarketData[] }) => {
     return (
-        <section className='relative z-100 h-full'>
-            <div className='scrollbar-thin scrollbar-track-white/5 h-[calc(100vh-20rem)] overflow-y-auto pr-2 2xl:h-[calc(75vh)]'>
-                <div className='grid grid-cols-2 gap-4 md:grid-cols-2 lg:grid-cols-3'>
-                    {marketData.map((item) => {
-                        const latestPrice = getLatestPrice(item.candleData);
-                        const priceChange = getPriceChange(item.candleData);
-
-                        return (
-                            <motion.div
-                                key={item.pair}
-                                className='relative flex flex-col items-center justify-center overflow-hidden rounded-lg border border-white/5 bg-black/40 p-4 transition-all duration-300 hover:border-white/10'>
-                                <div className='mb-4 flex items-center justify-between'>
-                                    <div className='flex items-center gap-3'>
-                                        <div>
-                                            <h3 className='font-outfit text-xl font-semibold text-white/90'>{item.pair.replace('_', '/')}</h3>
-                                            <div className='flex items-center gap-3'>
-                                                <span className='font-kodemono text-sm text-white/70'>{latestPrice?.toFixed(item.pair.includes('JPY') ? 3 : 5)}</span>
-                                                <span
-                                                    className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                                                        priceChange && priceChange >= 0 ? 'bg-emerald-400/10 text-emerald-400' : 'bg-red-500/10 text-red-500'
-                                                    }`}>
-                                                    {priceChange ? `${priceChange.toFixed(2)}%` : 'N/A'}
-                                                </span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <BoxVisualization pair={item.pair} candleData={item.candleData} />
-                            </motion.div>
-                        );
-                    })}
-                </div>
+        <div className='h-full'>
+            <div className='grid h-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+                {marketData.map((item) => (
+                    <BoxVisualization key={item.pair} pair={item.pair} candleData={item.candleData} />
+                ))}
             </div>
-        </section>
+        </div>
     );
 });
 

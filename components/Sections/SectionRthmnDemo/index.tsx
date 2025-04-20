@@ -2,7 +2,7 @@
 
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { FaChartArea, FaCube, FaTable, FaUserCircle } from 'react-icons/fa';
+import { FaChartArea, FaCube, FaTable } from 'react-icons/fa';
 import { LogoIcon } from '@/components/Icons/icons';
 import { CandleData } from '@/types/types';
 import { LineChart } from './LineChart';
@@ -10,6 +10,7 @@ import { MarketDisplay } from './MarketDisplay';
 import { MarketNavigator } from './MarketNavigator';
 import { PairSlider } from './PairSlider';
 import { PatternDisplay } from './PatternDisplay';
+import { ConnectionBadge } from '@/components/Badges/ConnectionBadge';
 
 interface MarketData {
     pair: string;
@@ -68,46 +69,52 @@ MarketCard.displayName = 'MarketCard';
 
 const DemoNavbar = memo(({ activeTab, setActiveTab }: { activeTab: TabType; setActiveTab: (tab: TabType) => void }) => {
     return (
-        <div className='mb-4 flex h-16 w-full items-center justify-between rounded-lg border border-white/5 bg-black/40 px-4 backdrop-blur-sm'>
-            {/* Left section */}
-            <div className='flex items-center gap-2'>
-                <div className='flex h-5 w-5 items-center'>
-                    <LogoIcon />
+        <nav className='h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:flex lg:h-14'>
+            <div className='group relative z-[110] h-full w-full'>
+                <div className='relative flex h-full w-full items-center justify-between rounded-lg px-2'>
+                    {/* Left section */}
+                    <div className='relative z-[1] flex items-center gap-3'>
+                        <div className='flex items-center'>
+                            <div className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5'>
+                                <div className='flex h-7 w-7 items-center'>
+                                    <LogoIcon />
+                                </div>
+                                <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Center section - Navigation Tabs */}
+                    <div className='absolute left-1/2 flex -translate-x-1/2 transform items-center gap-3'>
+                        {[
+                            { id: 'boxes', label: 'Boxes', icon: FaCube },
+                            { id: 'chart', label: 'Chart', icon: FaChartArea },
+                            { id: 'grid', label: 'Grid', icon: FaTable },
+                        ].map((tab) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id as TabType)}
+                                className={`flex h-auto items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]`}>
+                                <span
+                                    className={`font-outfit flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-xs font-semibold ${
+                                        activeTab === tab.id ? 'text-emerald-400' : 'text-white hover:text-white'
+                                    }`}>
+                                    <tab.icon className='h-3 w-3' />
+                                    {tab.label}
+                                </span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Right section */}
+                    <div className='relative z-[110] flex items-center gap-3'>
+                        <div className='relative z-[110] flex items-center gap-2'>
+                            <ConnectionBadge isConnected={true} />
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            {/* Center section - Navigation Tabs */}
-            <div className='absolute left-1/2 flex -translate-x-1/2 transform items-center gap-3'>
-                {[
-                    { id: 'boxes', label: 'Boxes', icon: FaCube },
-                    { id: 'chart', label: 'Chart', icon: FaChartArea },
-                    { id: 'grid', label: 'Grid', icon: FaTable },
-                    // { id: 'navigation', label: 'Navigation', icon: FaList }
-                ].map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id as TabType)}
-                        className='flex h-auto items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                        <span
-                            className={`font-outfit flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-xs font-semibold ${
-                                activeTab === tab.id ? 'text-emerald-400' : 'text-white hover:text-white'
-                            }`}>
-                            <tab.icon className='h-3 w-3' />
-                            {tab.label}
-                        </span>
-                    </button>
-                ))}
-            </div>
-
-            {/* Right section */}
-            <div className='flex items-center space-x-4'>
-                <button className='flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                    <div className='flex h-full w-full items-center justify-center rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818]'>
-                        <FaUserCircle className='h-6 w-6 text-gray-300' />
-                    </div>
-                </button>
-            </div>
-        </div>
+        </nav>
     );
 });
 
@@ -239,7 +246,7 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className='relative z-10 h-full [transform:translateZ(20px)]'>
+                    className='relative z-10 h-[calc(100%-80px)] [transform:translateZ(20px)] overflow-y-auto pt-2'>
                     {renderActiveTab}
                 </motion.div>
             </div>
