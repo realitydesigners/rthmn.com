@@ -1,4 +1,6 @@
 import { SectionBoxes } from '@/components/Sections/SectionBoxes';
+import { SectionHero } from '@/components/Sections/SectionHero';
+import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
 import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
 import { sanityFetch } from '@/lib/sanity/lib/client';
 import { groq } from 'next-sanity';
@@ -27,8 +29,11 @@ async function getMarketData(): Promise<MarketData[]> {
 export default async function TestPage() {
     const marketData = await getMarketData();
     return (
-        <div className='h-screen w-full overflow-y-auto'>
+        <div className='h-full'>
+            <SectionMarketDisplay marketData={marketData} />
             <SectionRthmnDemo marketData={marketData} />
+            <SectionHero marketData={marketData} />
+
             {/* <SectionBoxes /> */}
         </div>
     );

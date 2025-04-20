@@ -28,25 +28,28 @@ interface CardPosition {
 }
 
 // Constants
+// Updated positions for a wider, more dynamic spread
 const CARD_POSITIONS: CardPosition[] = [
-    { x: -900, y: -450, z: 25 },
-    { x: -700, y: -350, z: 30 },
-    { x: -500, y: -450, z: 35 },
-    { x: 900, y: -450, z: 20 },
-    { x: 700, y: -350, z: 35 },
-    { x: 500, y: -450, z: 30 },
-    { x: -900, y: 350, z: 40 },
-    { x: -700, y: 450, z: 30 },
-    { x: -500, y: 350, z: 25 },
-    { x: 900, y: 350, z: 25 },
-    { x: 700, y: 450, z: 35 },
-    { x: 500, y: 350, z: 30 },
+    // Push cards much further out to avoid central overlap
+    { x: -1800, y: -700, z: 10 }, // Top-left far
+    { x: -1300, y: -400, z: 40 }, // Top-left closer
+    { x: -800, y: -600, z: 25 }, // Top-left mid
+    { x: 1800, y: -700, z: 15 }, // Top-right far
+    { x: 1300, y: -400, z: 45 }, // Top-right closer
+    { x: 800, y: -600, z: 30 }, // Top-right mid
+    { x: -1600, y: 600, z: 35 }, // Bottom-left far
+    { x: -1100, y: 700, z: 20 }, // Bottom-left closer
+    { x: -600, y: 550, z: 50 }, // Bottom-left mid
+    { x: 1600, y: 600, z: 20 }, // Bottom-right far
+    { x: 1100, y: 700, z: 40 }, // Bottom-right closer
+    { x: 600, y: 550, z: 30 }, // Bottom-right mid
 ];
 
 const ANIMATION_DURATION = 10000;
+// Slightly adjusted scale for the new positions
 const POSITION_SCALE = {
-    MOBILE: 0.25,
-    DESKTOP: 0.7,
+    MOBILE: 0.2,
+    DESKTOP: 0.55, // Further reduced desktop scale
 };
 
 // Add default position
@@ -84,9 +87,9 @@ const MarketHeading = memo(() => (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className='mb-8'>
                 <h2 className='font-outfit text-gray-gradient relative text-[4em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
-                    Trading
+                    Unlock Market
                     <br />
-                    Simplified
+                    Patterns, Instantly.
                 </h2>
                 <p className='font-kodemono mx-auto mt-6 max-w-2xl px-4 text-base text-gray-400 sm:text-lg'>
                     Experience real-time market data visualization with our advanced pattern recognition system.
@@ -400,10 +403,27 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
     });
 
     const progress = useAnimationProgress(ANIMATION_DURATION);
-    const processedData = useProcessedMarketData(marketData, progress);
+    const rawProcessedData = useProcessedMarketData(marketData, progress);
+
+    // Add mobile detection here
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
+        };
+        checkMobile(); // Initial check
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Slice data for mobile and desktop
+    const processedData = useMemo(() => {
+        const limit = isMobile ? 6 : CARD_POSITIONS.length; // Use array length for desktop limit
+        return rawProcessedData.slice(0, limit);
+    }, [isMobile, rawProcessedData]);
 
     return (
-        <section ref={ref} className='relative min-h-screen overflow-hidden'>
+        <section ref={ref} className='relative overflow-hidden'>
             {/* Center content */}
             <div className='relative z-10 flex min-h-screen flex-col items-center justify-center px-4'>
                 {/* Centered heading */}
@@ -412,7 +432,8 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
                 </div>
                 {/* 3D Cards Container */}
                 <div className='absolute inset-0 z-10'>
-                    <div className='relative h-full [perspective:4000px]'>
+                    {/* Reduced perspective */}
+                    <div className='relative h-full [perspective:2500px]'>
                         {inView &&
                             processedData.map(({ item, data }, index) => (
                                 <CardTransform key={item.pair} position={CARD_POSITIONS[index] || DEFAULT_POSITION} index={index}>
