@@ -10,6 +10,7 @@ import { SectionCTA } from '@/components/Sections/SectionCTA';
 import { SectionPricing } from '@/components/Sections/SectionPricing';
 import { createClient } from '@/lib/supabase/server';
 import { getProducts } from '@/lib/supabase/queries';
+import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
 
 // Fetch all required datasets
 async function getPageData(): Promise<any> {
@@ -64,6 +65,7 @@ export default async function Homepage() {
         <div className='h-full'>
             <SectionMarketDisplay marketData={marketData} />
             <SectionRthmnDemo marketData={marketData} />
+            {/* <SectionMarketTicker marketData={marketData} /> */}
             {/* <SectionBoxes /> */}
             {/* <SectionHistogram />
             <SectionHero marketData={marketData} />

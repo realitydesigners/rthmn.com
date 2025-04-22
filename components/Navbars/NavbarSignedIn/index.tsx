@@ -6,7 +6,6 @@ import { User } from '@supabase/supabase-js';
 import { LuChevronRight, LuLayoutDashboard, LuOrbit, LuHelpCircle } from 'react-icons/lu';
 import { LogoIcon } from '@/components/Icons/icons';
 import { GridControl } from '../../Panels/BoxDataPanel/GridControl';
-import { ProBadge } from '@/components/Badges/ProBadge';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { ConnectionBadge } from '../../Badges/ConnectionBadge';
 
@@ -53,7 +52,6 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                 </div>
                                 <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
                             </Link>
-                            <ProBadge />
                         </div>
                         {/* Breadcrumb */}
                         <div className='flex hidden items-center text-[#818181] lg:flex'>

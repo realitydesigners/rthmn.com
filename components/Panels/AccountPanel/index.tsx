@@ -7,7 +7,6 @@ import CustomerPortalForm from './CustomerPortalForm';
 import DiscordConnectionForm from './DiscordConnectionForm';
 import ProfilePhotoForm from './ProfilePhotoForm';
 import { LuLogOut } from 'react-icons/lu';
-import { ProBadge } from '../../Badges/ProBadge';
 
 const AccountPanel = () => {
     const { user, userDetails, subscription, discordConnection, isLoading, signOut } = useAuth();
@@ -62,7 +61,6 @@ const AccountPanel = () => {
                     </div>
                     <div className='flex items-center'>
                         <h1 className='font-outfit mb-1 text-center text-xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h1>
-                        <ProBadge />
                     </div>
                     <p className='font-outfit max-w-full text-center text-sm break-words text-zinc-400'>{user.email}</p>
                 </div>
