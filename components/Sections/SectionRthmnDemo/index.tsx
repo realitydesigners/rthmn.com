@@ -184,9 +184,9 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
                         </div>
 
                         {/* Market Cards - Side on desktop, bottom on mobile */}
-                        <div className='w-full shrink-0 space-y-3 lg:w-[220px]'>
+                        <div className='w-full shrink-0 space-y-3 lg:w-[250px]'>
                             <div className='rounded-lg border border-white/5 bg-black/20 p-2 backdrop-blur-sm'>
-                                <div className='scrollbar-thin scrollbar-track-white/5 grid max-h-[200px] grid-cols-2 gap-1.5 overflow-y-auto pr-1 sm:grid-cols-3 lg:max-h-[500px] lg:grid-cols-1'>
+                                <div className='scrollbar-thin scrollbar-track-white/5 grid-cols- grid max-h-[200px] gap-1.5 overflow-y-auto pr-1 sm:max-h-[500px]'>
                                     {marketData.map((marketItem) => (
                                         <MarketCard
                                             key={marketItem.pair}
@@ -233,8 +233,8 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
     }, [activeTab, marketData, selectedPair, handlePairSelect, processedCandles]);
 
     return (
-        <section className='relative z-100 -mt-32 flex h-full flex-col items-center justify-center py-12'>
-            <div className='relative h-[90vh] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md md:w-[90vw] md:rounded-xl md:border 2xl:w-[75vw]'>
+        <section className='relative z-100 -mt-48 flex h-full flex-col items-center justify-center py-12'>
+            <div className='relative h-auto w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:w-[80vw] 2xl:w-[75vw]'>
                 <div className='pointer-events-none absolute inset-0'>
                     <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]' />
                     <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent' />

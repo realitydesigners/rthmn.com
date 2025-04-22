@@ -122,7 +122,7 @@ BoxVisualization.displayName = 'BoxVisualization';
 export const PatternDisplay = memo(({ marketData }: { marketData: MarketData[] }) => {
     return (
         <div className='h-full'>
-            <div className='grid h-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
+            <div className='grid h-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4'>
                 {marketData.map((item) => (
                     <BoxVisualization key={item.pair} pair={item.pair} candleData={item.candleData} />
                 ))}

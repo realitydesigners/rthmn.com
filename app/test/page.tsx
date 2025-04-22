@@ -31,7 +31,7 @@ interface PageData {
 // Fetch both datasets
 async function getPageData(): Promise<PageData> {
     const marketDataQuery = groq`
-        *[_type == "marketData"] | order(lastUpdated desc) [0...12] {
+        *[_type == "marketData"][0...8] | order(lastUpdated desc) [0...12] {
             pair,
             lastUpdated,
             candleData
@@ -64,7 +64,7 @@ export default async function TestPage() {
         <div className='h-full'>
             <SectionMarketDisplay marketData={marketData} />
             <SectionRthmnDemo marketData={marketData} />
-            <SectionBoxes />
+            {/* <SectionBoxes /> */}
             {/* <SectionHistogram />
             <SectionHero marketData={marketData} />
   */}

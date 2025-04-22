@@ -54,7 +54,7 @@ const CARD_MOBILE_POSITIONS: CardPosition[] = [
     { x: 150, y: 300, z: 20 }, // Bottom-right
 ];
 
-const ANIMATION_DURATION = 20000;
+const ANIMATION_DURATION = 10000;
 
 const POSITION_SCALE = {
     // MOBILE: 0.2, // No longer needed
@@ -88,6 +88,19 @@ const CARD_ANIMATION = {
     HOVER_SCALE: 0.95,
     FLOAT_RANGE: { x: 5, y: 10 },
     ROTATION: { x: 5, y: -5 },
+};
+
+// Re-add helper function to add random jitter
+const addRandomJitter = (value: number, maxOffsetScale: number = 0.0001): number => {
+    if (typeof value !== 'number' || !isFinite(value)) return value;
+    const valueString = String(value);
+    const decimalIndex = valueString.indexOf('.');
+    const originalPrecision = decimalIndex === -1 ? 0 : valueString.length - decimalIndex - 1;
+    const precision = Math.min(originalPrecision, 8);
+    const maxOffset = Math.abs(value * maxOffsetScale);
+    const offset = (Math.random() - 0.5) * 2 * maxOffset;
+    const newValue = value + offset;
+    return parseFloat(newValue.toFixed(precision));
 };
 
 // Memoize the MarketHeading component
@@ -429,11 +442,50 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
         return isMobile ? CARD_MOBILE_POSITIONS : CARD_POSITIONS;
     }, [isMobile]);
 
-    // Slice data based on the chosen positions array length
-    const processedData = useMemo(() => {
+    // Re-introduce displayData state
+    const [displayData, setDisplayData] = useState(() => {
         const limit = chosenPositions.length;
+        // Initialize based on initial raw data
         return rawProcessedData.slice(0, limit);
-    }, [chosenPositions, rawProcessedData]);
+    });
+
+    // Effect to update displayData during animation
+    useEffect(() => {
+        if (progress < 1) {
+            const limit = chosenPositions.length;
+            setDisplayData(rawProcessedData.slice(0, limit));
+        }
+        // Initialize if state is empty and raw data is available (handles edge cases)
+        else if (displayData.length === 0 && rawProcessedData.length > 0) {
+            const limit = chosenPositions.length;
+            setDisplayData(rawProcessedData.slice(0, limit));
+        }
+    }, [progress, rawProcessedData, chosenPositions, displayData.length]);
+
+    // Effect for post-animation randomization (Slow and Subtle Jitter)
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout | null = null;
+        if (progress === 1 && inView && displayData.length > 0) {
+            intervalId = setInterval(() => {
+                setDisplayData((currentDisplayData) => {
+                    if (!currentDisplayData || currentDisplayData.length === 0) return [];
+                    return currentDisplayData.map(({ item, data }) => {
+                        if (!data) return { item, data };
+                        const randomizedData: ProcessedMarketData = {
+                            ...data,
+                            // Use addRandomJitter with small scales
+                            price: addRandomJitter(data.price, 0.0001),
+                            change: addRandomJitter(data.change, 0.01),
+                        };
+                        return { item, data: randomizedData };
+                    });
+                });
+            }, 2500); // Slow interval (2.5 seconds)
+        }
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [progress, inView, displayData.length]);
 
     // Grid background style
     const gridStyle = {
@@ -459,14 +511,18 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
                 {/* 3D Cards Container */}
                 <div className='absolute inset-0 z-10'>
                     <div className='relative h-full [perspective:2500px]'>
+                        {/* Render using displayData */}
                         {inView &&
-                            processedData.map(({ item, data }, index) => (
-                                <CardTransform key={item.pair} position={chosenPositions[index] || DEFAULT_POSITION} index={index} change={data.change}>
-                                    <div className='relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80'>
-                                        <CardContent item={item} data={data} />
-                                    </div>
-                                </CardTransform>
-                            ))}
+                            displayData.map(({ item, data }, index) => {
+                                if (!data) return null;
+                                return (
+                                    <CardTransform key={item.pair} position={chosenPositions[index] || DEFAULT_POSITION} index={index} change={data.change}>
+                                        <div className='relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80'>
+                                            <CardContent item={item} data={data} />
+                                        </div>
+                                    </CardTransform>
+                                );
+                            })}
                     </div>
                 </div>
             </div>
