@@ -12,7 +12,6 @@ const iconMap = {
     contentBlock: <DashboardIcon style={iconStyle} />,
     teamBlock: <UserIcon style={iconStyle} />,
     imageCanvasBlock: <UserIcon style={iconStyle} />,
-    headingSplineBlock: <DatabaseIcon style={iconStyle} />,
 };
 
 const defaultIcon = <ClipboardIcon style={{ ...iconStyle, color: '#fff' }} />;

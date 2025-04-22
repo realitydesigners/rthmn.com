@@ -18,13 +18,11 @@ import audio from '@/lib/sanity/schemas/audio';
 import chapter from '@/lib/sanity/schemas/chapter';
 
 // Page Builder Blocks
-import heroBlock from '@/lib/sanity/blocks/heroBlock';
+
 import headingBlock from '@/lib/sanity/blocks/headingBlock';
 import contentBlock from '@/lib/sanity/blocks/contentBlock';
 import teamBlock from '@/lib/sanity/blocks/teamBlock';
-import headingSplineBlock from '@/lib/sanity/blocks/headingSplineBlock';
 import teamGrid from '@/lib/sanity/blocks/teamGrid';
-import sceneBlock from '@/lib/sanity/blocks/sceneBlock';
 import courseBlock from '@/lib/sanity/blocks/courseBlock';
 import faqBlock from '@/lib/sanity/blocks/faqBlock';
 import legalContentBlock from '@/lib/sanity/blocks/legalContentBlock';
@@ -32,20 +30,7 @@ import changelogBlock from '@/lib/sanity/blocks/changelogBlock';
 import githubBlock from '@/lib/sanity/blocks/githubBlock';
 
 // All page builder blocks in one array
-const PageBuilderBlocks = [
-    heroBlock,
-    headingBlock,
-    contentBlock,
-    teamBlock,
-    headingSplineBlock,
-    teamGrid,
-    sceneBlock,
-    courseBlock,
-    faqBlock,
-    legalContentBlock,
-    changelogBlock,
-    githubBlock,
-];
+const PageBuilderBlocks = [headingBlock, contentBlock, teamBlock, teamGrid, courseBlock, faqBlock, legalContentBlock, changelogBlock, githubBlock];
 
 // Page builder block types
 export const pagebuilderBlockTypes = PageBuilderBlocks.map(({ name }) => ({

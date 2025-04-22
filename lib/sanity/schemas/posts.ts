@@ -14,10 +14,7 @@ export default defineType({
                     type: 'headingBlock',
                     title: 'Heading',
                 },
-                {
-                    type: 'headingSplineBlock',
-                    title: 'Heading Spline',
-                },
+
                 {
                     type: 'contentBlock',
                     title: 'Content',

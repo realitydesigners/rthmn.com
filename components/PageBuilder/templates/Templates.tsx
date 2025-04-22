@@ -1,11 +1,11 @@
 import React from 'react';
-import { generateHeadingId } from '@/app/(user)/learn/_components/TOC';
+import { generateHeadingId } from '@/app/learn/_components/TOC';
 import AudioRefBlock from '../nested/AudioRefBlock';
 import ImageRefBlock from '../nested/ImageRefBlock';
 import InternalLink from '../nested/InternalLink';
 import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
-import SplineRefBlock from '../nested/SplineRefBlock';
+
 import VideoRefBlock from '../nested/VideoRefBlock';
 
 export type TemplateTheme = 'dark' | 'light';
@@ -222,10 +222,7 @@ const DarkTemplate = {
             const { videoTitle, videoUrl, className } = value.videoRef;
             return <VideoRefBlock videoTitle={videoTitle} videoUrl={videoUrl} className={className} />;
         },
-        spline: ({ value }) => {
-            const { url } = value;
-            return <SplineRefBlock url={url} />;
-        },
+
         imageRef: ({ value }) => {
             const { image, className } = value;
             return <ImageRefBlock image={image} className={className} />;
@@ -301,10 +298,7 @@ const LightTemplate = {
 
             return <VideoRefBlock videoTitle={videoTitle} videoUrl={videoUrl} className={className} />;
         },
-        spline: ({ value }) => {
-            const { url } = value;
-            return <SplineRefBlock url={url} />;
-        },
+
         imageRef: ({ value }) => {
             const { image, className } = value;
             return <ImageRefBlock image={image} className={className} />;

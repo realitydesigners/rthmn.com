@@ -1,6 +1,5 @@
 import React from 'react';
 import type { PortableTextComponents } from '@portabletext/react';
-import { Scene } from '@/components/Scene/Scene';
 
 const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div className='flex w-full justify-center p-3'>
@@ -53,11 +52,6 @@ export const AboutTemplate: PortableTextComponents = {
         strong: ({ children }) => <strong className='font-outfit font-semibold text-white/90'>{children}</strong>,
     },
     types: {
-        sceneBlock: ({ value }) => (
-            <div className={`w-full ${value.height || 'h-[500px]'}`}>
-                <Scene scene={value.sceneUrl} />
-            </div>
-        ),
         image: ({ value }) => (
             <div className='flex w-full justify-center p-3'>
                 <div className='w-full overflow-hidden rounded-xl md:w-3/4 lg:w-1/2'>
