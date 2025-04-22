@@ -7,7 +7,7 @@ import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/com
 import { FEATURE_TAGS } from '@/components/Constants/text';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { BoxSlice } from '@/types/types';
-
+import { StartButton } from '@/components/Sections/StartNowButton';
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
 
@@ -83,33 +83,68 @@ const StarField = () => {
     );
 };
 
-const AuroraBackground = () => (
-    <motion.div
-        initial={{ opacity: 0 }}
-        animate={{
-            opacity: 0.3,
-            backgroundPosition: ['0% 50%, 0% 50%', '100% 50%, 100% 50%'],
-            filter: 'blur(30px)',
-        }}
-        transition={{
-            backgroundPosition: {
-                duration: 60,
-                repeat: Infinity,
-                ease: 'linear',
-            },
-        }}
-        className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed]`}
-    />
-);
+const AuroraBackground = ({ dominantState }: { dominantState: string }) => {
+    // Define the colors to match NestedBoxes
+    const colors = {
+        green: {
+            primary: 'rgba(63, 255, 162, 0.3)', // #3FFFA2
+            secondary: 'rgba(63, 255, 162, 0.2)',
+            tertiary: 'rgba(63, 255, 162, 0.3)',
+        },
+        red: {
+            primary: 'rgba(255, 89, 89, 0.3)', // #FF5959
+            secondary: 'rgba(255, 89, 89, 0.2)',
+            tertiary: 'rgba(255, 89, 89, 0.3)',
+        },
+        neutral: {
+            primary: 'rgba(59, 130, 246, 0.3)',
+            secondary: 'rgba(99, 102, 241, 0.2)',
+            tertiary: 'rgba(147, 197, 253, 0.3)',
+        },
+    };
+
+    const currentColors = colors[dominantState as keyof typeof colors] || colors.neutral;
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{
+                opacity: 0.3,
+                backgroundPosition: ['0% 50%, 0% 50%', '100% 50%, 100% 50%'],
+                filter: 'blur(30px)',
+            }}
+            transition={{
+                backgroundPosition: {
+                    duration: 60,
+                    repeat: Infinity,
+                    ease: 'linear',
+                },
+            }}
+            className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform`}
+            style={
+                {
+                    '--aurora': `repeating-linear-gradient(100deg,
+                    ${currentColors.primary} 10%,
+                    ${currentColors.secondary} 15%,
+                    ${currentColors.tertiary} 20%,
+                    ${currentColors.secondary} 25%,
+                    ${currentColors.primary} 30%)`,
+                    '--white-gradient':
+                        'repeating-linear-gradient(100deg,rgba(255,255,255,0.05) 0%,rgba(255,255,255,0.05) 7%,transparent 10%,transparent 12%,rgba(255,255,255,0.05) 16%)',
+                } as React.CSSProperties
+            }
+        />
+    );
+};
 
 // Decorative Corner Element Component
 const CornerElement = ({ position, delay = 0 }: { position: string; delay?: number }) => {
     const baseClasses = 'absolute w-6 h-6 border-neutral-700/50';
     const positionClasses = {
-        'top-left': 'top-0 left-0 border-t border-l',
-        'top-right': 'top-0 right-0 border-t border-r',
-        'bottom-left': 'bottom-0 left-0 border-b border-l',
-        'bottom-right': 'bottom-0 right-0 border-b border-r',
+        'top-left': '-top-4 -left-4 border-t border-l',
+        'top-right': '-top-4 -right-4 border-t border-r',
+        'bottom-left': '-bottom-4 -left-4 border-b border-l',
+        'bottom-right': '-bottom-4 -right-4 border-b border-r',
     };
     return (
         <motion.div
@@ -123,7 +158,7 @@ const CornerElement = ({ position, delay = 0 }: { position: string; delay?: numb
 
 // Memoize FeatureTags component - Minimalist/Floating Style
 const FeatureTags = memo(() => (
-    <div className='font-outfit mt-8 flex flex-col items-center gap-3 lg:items-start lg:gap-4'>
+    <div className='font-outfit mt-8 flex flex-col items-center gap-3 lg:flex-row lg:items-start lg:gap-4'>
         {FEATURE_TAGS.map((feature, index) => (
             <motion.div
                 initial={{ opacity: 0, x: -15 }}
@@ -161,19 +196,6 @@ const BoxVisualization = memo(({ currentSlice, demoStep, isPaused }: BoxVisualiz
     const sortedBoxes = useMemo(() => currentSlice?.boxes?.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)) || [], [currentSlice]);
     const isPointOfChange = useMemo(() => Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX, [demoStep]);
 
-    // Determine dominant state for aura
-    const dominantState = useMemo(() => {
-        if (!currentSlice?.boxes || currentSlice.boxes.length === 0) return 'neutral';
-        return currentSlice.boxes[0].value > 0 ? 'green' : 'red';
-    }, [currentSlice]);
-
-    // Gradient variants for the aura
-    const gradientAuraVariants = {
-        neutral: { background: 'radial-gradient(circle at 50% 50%, rgba(150, 150, 150, 0.15) 0%, transparent 65%)', scale: 1.1 },
-        green: { background: 'radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.35) 0%, transparent 65%)', scale: 1.2 },
-        red: { background: 'radial-gradient(circle at 50% 50%, rgba(239, 68, 68, 0.35) 0%, transparent 65%)', scale: 1.2 },
-    };
-
     return (
         <motion.div
             className='relative h-[250px] w-[250px] sm:h-[300px] sm:w-[300px] lg:h-[400px] lg:w-[400px]'
@@ -182,17 +204,6 @@ const BoxVisualization = memo(({ currentSlice, demoStep, isPaused }: BoxVisualiz
             whileInView={{ rotateX: 0, rotateY: 0, opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}>
             {/* Decorative Corners */}
-
-            {/* Dynamic Gradient Aura - Enhanced */}
-            <motion.div
-                className='absolute inset-[-25%] -z-10 rounded-full blur-3xl' // Added z-index here
-                variants={gradientAuraVariants}
-                animate={dominantState}
-                transition={{
-                    background: { duration: 1.2, ease: 'easeInOut' },
-                    scale: { duration: 5, repeat: Infinity, repeatType: 'mirror', ease: 'easeInOut' },
-                }}
-            />
 
             {/* NestedBoxes container - Apply conditional rotation here */}
             <motion.div className='relative h-full w-full' style={{ transform: 'translateZ(20px)' }}>
@@ -213,7 +224,6 @@ const StaticContent = memo(() => (
         initial={{ rotateX: -8, rotateY: 10, opacity: 0, y: 30 }}
         whileInView={{ rotateX: 0, rotateY: 0, opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}>
-        {/* Inner container for positioning corners relative to content */}
         <div className='relative p-4 lg:p-0'>
             {/* Decorative Corners */}
             <CornerElement position='top-left' />
@@ -221,14 +231,24 @@ const StaticContent = memo(() => (
             <CornerElement position='bottom-left' delay={0.2} />
             <CornerElement position='bottom-right' delay={0.3} />
 
-            {/* Holographic text style */}
-            <h2 className='font-outfit text-neutral-gradient text-2xl leading-tight font-bold tracking-tight sm:text-2xl lg:text-3xl'>Multi-Dimensional</h2>
-            <h2 className='font-outfit text-neutral-gradient text-5xl leading-tight font-bold tracking-tight sm:text-6xl lg:text-7xl'>Trend Analysis</h2>
+            <div className='space-y-6'>
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className='space-y-3'>
+                    <h2 className='font-outfit text-neutral-gradient text-xl leading-none font-medium tracking-tight lg:text-2xl'>Multi-Dimensional</h2>
+                    <h2 className='font-outfit text-neutral-gradient -mt-4 text-5xl leading-none font-bold tracking-tight sm:text-6xl lg:text-7xl'>Trend Analysis</h2>
+                </motion.div>
 
-            <p className='font-outfit text-neutral-gradient mb-10 text-base leading-relaxed sm:text-lg' style={{ textShadow: '0 0 8px rgba(200, 200, 255, 0.1)' }}>
-                Rthmn takes the market high and lows, and compresses time into mesurable unites of price structure.
-            </p>
-            <FeatureTags />
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className='space-y-8'>
+                    <p className='font-outfit text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg' style={{ textShadow: '0 0 8px rgba(200, 200, 255, 0.1)' }}>
+                        Transform market data into clear visual insights. Rthmn analyzes price structure to reveal hidden patterns and key market levels.
+                    </p>
+                </motion.div>
+
+                <StartButton href='/dashboard' />
+
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+                    <FeatureTags />
+                </motion.div>
+            </div>
         </div>
     </motion.div>
 ));
@@ -238,11 +258,18 @@ StaticContent.displayName = 'StaticContent';
 export const SectionBoxes = memo(() => {
     const [demoStep, setDemoStep] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
+
     const currentSlice = useMemo(() => {
         const currentValues = createDemoStep(demoStep, sequences, BASE_VALUES);
         const mockBoxData = createMockBoxData(currentValues);
         return { timestamp: new Date().toISOString(), boxes: mockBoxData };
     }, [demoStep]);
+
+    const dominantState = useMemo(() => {
+        if (!currentSlice?.boxes || currentSlice.boxes.length === 0) return 'neutral';
+        return currentSlice.boxes[0].value > 0 ? 'green' : 'red';
+    }, [currentSlice]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -263,9 +290,25 @@ export const SectionBoxes = memo(() => {
     }, [demoStep, isPaused]);
 
     return (
-        <section className='relative h-full w-full overflow-hidden bg-black px-4 py-24 sm:px-8 lg:px-[10vw] lg:py-40' style={{ perspective: '1500px' }}>
+        <section
+            ref={containerRef}
+            className='relative h-full w-full overflow-hidden bg-black px-4 py-24 sm:px-8 lg:px-[10vw] lg:py-40'
+            style={{
+                perspective: '1500px',
+                backgroundImage: `
+                    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+                `,
+                backgroundSize: '40px 40px',
+            }}>
+            {/* Added Section-level Corners */}
+            <CornerElement position='top-left' delay={0} />
+            <CornerElement position='top-right' delay={0.1} />
+            <CornerElement position='bottom-left' delay={0.2} />
+            <CornerElement position='bottom-right' delay={0.3} />
+
             {/* Render Starfield in the background (-z-20) */}
-            {/* <AuroraBackground /> */}
+            <AuroraBackground dominantState={dominantState} />
             <StarField />
 
             <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-8'>
