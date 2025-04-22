@@ -1,3 +1,4 @@
+'use client';
 import { memo, useMemo, useState } from 'react';
 import { PortableText } from '@portabletext/react';
 import { motion } from 'framer-motion';
@@ -7,8 +8,8 @@ import { useInView } from 'react-intersection-observer';
 import { ChangelogTemplate } from '@/components/PageBuilder/templates/ChangelogTemplate';
 
 export interface FAQBlockProps {
-    _type: 'faqBlock';
-    _key: string;
+    _type?: 'faqBlock';
+    _key?: string;
     title?: string;
     items: FAQItem[];
 }
@@ -221,11 +222,6 @@ export function FAQBlock({ title = 'Frequently Asked Questions', items = [] }: F
                                         <LoadMoreButton onClick={handleLoadMore} />
                                     </motion.div>
                                 )}
-                                <div className='mt-6 text-center'>
-                                    <p className='font-kodemono text-sm text-gray-400'>
-                                        Showing {paginatedItems.length} of {filteredItems.length} questions
-                                    </p>
-                                </div>
                             </>
                         ) : (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='text-center text-gray-400'>
