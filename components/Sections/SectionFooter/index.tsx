@@ -10,7 +10,6 @@ export function SectionFooter() {
     if (
         pathname?.startsWith('/dashboard') ||
         pathname?.startsWith('/onboarding') ||
-        pathname?.startsWith('/test') ||
         pathname?.startsWith('/admin') ||
         pathname?.startsWith('/signin') ||
         pathname?.startsWith('/pair/') ||

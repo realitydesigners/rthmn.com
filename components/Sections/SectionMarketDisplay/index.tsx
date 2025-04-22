@@ -28,25 +28,37 @@ interface CardPosition {
 }
 
 // Constants
+// Desktop positions (values need scaling)
 const CARD_POSITIONS: CardPosition[] = [
-    { x: -900, y: -450, z: 25 },
-    { x: -700, y: -350, z: 30 },
-    { x: -500, y: -450, z: 35 },
-    { x: 900, y: -450, z: 20 },
-    { x: 700, y: -350, z: 35 },
-    { x: 500, y: -450, z: 30 },
-    { x: -900, y: 350, z: 40 },
-    { x: -700, y: 450, z: 30 },
-    { x: -500, y: 350, z: 25 },
-    { x: 900, y: 350, z: 25 },
-    { x: 700, y: 450, z: 35 },
-    { x: 500, y: 350, z: 30 },
+    { x: -1800, y: -700, z: 10 }, // Top-left far
+    { x: -1300, y: -400, z: 40 }, // Top-left closer
+    { x: -800, y: -600, z: 25 }, // Top-left mid
+    { x: 1800, y: -700, z: 15 }, // Top-right far
+    { x: 1300, y: -400, z: 45 }, // Top-right closer
+    { x: 800, y: -600, z: 30 }, // Top-right mid
+    { x: -1600, y: 600, z: 35 }, // Bottom-left far
+    { x: -1100, y: 700, z: 20 }, // Bottom-left closer
+    { x: -600, y: 550, z: 50 }, // Bottom-left mid
+    { x: 1600, y: 600, z: 20 }, // Bottom-right far
+    { x: 1100, y: 700, z: 40 }, // Bottom-right closer
+    { x: 600, y: 550, z: 30 }, // Bottom-right mid
+];
+
+// Mobile positions (direct pixel offsets, no scaling needed)
+const CARD_MOBILE_POSITIONS: CardPosition[] = [
+    { x: -150, y: -300, z: 20 }, // Top-left
+    { x: 150, y: -300, z: 25 }, // Top-right
+    { x: -200, y: 0, z: 30 }, // Mid-left
+    { x: 200, y: 0, z: 35 }, // Mid-right
+    { x: -150, y: 250, z: 25 }, // Bottom-left
+    { x: 150, y: 300, z: 20 }, // Bottom-right
 ];
 
 const ANIMATION_DURATION = 10000;
+
 const POSITION_SCALE = {
-    MOBILE: 0.25,
-    DESKTOP: 0.7,
+    // MOBILE: 0.2, // No longer needed
+    DESKTOP: 0.55,
 };
 
 // Add default position
@@ -78,18 +90,31 @@ const CARD_ANIMATION = {
     ROTATION: { x: 5, y: -5 },
 };
 
+// Re-add helper function to add random jitter
+const addRandomJitter = (value: number, maxOffsetScale: number = 0.0001): number => {
+    if (typeof value !== 'number' || !isFinite(value)) return value;
+    const valueString = String(value);
+    const decimalIndex = valueString.indexOf('.');
+    const originalPrecision = decimalIndex === -1 ? 0 : valueString.length - decimalIndex - 1;
+    const precision = Math.min(originalPrecision, 8);
+    const maxOffset = Math.abs(value * maxOffsetScale);
+    const offset = (Math.random() - 0.5) * 2 * maxOffset;
+    const newValue = value + offset;
+    return parseFloat(newValue.toFixed(precision));
+};
+
 // Memoize the MarketHeading component
 const MarketHeading = memo(() => (
     <div className='relative z-20 text-center'>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className='mb-8'>
-                <h2 className='font-outfit text-gray-gradient relative text-[4em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
-                    Trading
+                <h2 className='font-outfit text-gray-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
+                    Unlock Trading
                     <br />
-                    Simplified
+                    Patterns Instantly.
                 </h2>
-                <p className='font-kodemono mx-auto mt-6 max-w-2xl px-4 text-base text-gray-400 sm:text-lg'>
-                    Experience real-time market data visualization with our advanced pattern recognition system.
+                <p className='font-outfit text-md text-gray-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
+                    Our real-time market data visualization with our advanced pattern recognition system.
                 </p>
             </div>
 
@@ -98,13 +123,6 @@ const MarketHeading = memo(() => (
                 <StartButton href='#pricing' custom={0}>
                     Get Started
                 </StartButton>
-
-                <button className='g flex h-[60px] items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                    <div className='flex h-[56px] w-full items-center space-x-6 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2 text-sm'>
-                        <span className='text-md mr-4'>Watch Demo</span>
-                        <FaPlay />
-                    </div>
-                </button>
             </div>
         </motion.div>
     </div>
@@ -258,7 +276,7 @@ const useAnimationProgress = (duration: number) => {
 };
 
 // 2. Create a memoized transform component to handle card positioning
-const CardTransform = memo(({ children, position, index }: { children: React.ReactNode; position: CardPosition; index: number }) => {
+const CardTransform = memo(({ children, position, index, change }: { children: React.ReactNode; position: CardPosition; index: number; change: number }) => {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -270,16 +288,6 @@ const CardTransform = memo(({ children, position, index }: { children: React.Rea
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
-
-    const adjustedPosition = useMemo(() => {
-        return isMobile
-            ? {
-                  x: position.x / 2,
-                  y: position.y / 2,
-                  z: position.z,
-              }
-            : position;
-    }, [position, isMobile]);
 
     const floatAnimation: FloatAnimation = useMemo(
         () => ({
@@ -295,46 +303,62 @@ const CardTransform = memo(({ children, position, index }: { children: React.Rea
         [index]
     );
 
+    // Calculate final positions based on mobile state
+    const targetX = isMobile ? position.x : position.x * POSITION_SCALE.DESKTOP;
+    const targetY = isMobile ? position.y : position.y * POSITION_SCALE.DESKTOP;
+
+    // Define animation variants based on mobile state
+    const animateProps = {
+        y: isMobile ? targetY : targetY + Math.sin(index * 0.8) * CARD_ANIMATION.FLOAT_RANGE.y,
+        x: isMobile ? targetX : targetX + Math.cos(index * 0.5) * CARD_ANIMATION.FLOAT_RANGE.x,
+        opacity: 1,
+        transition: isMobile
+            ? {
+                  // Mobile: Simple fade-in
+                  opacity: {
+                      duration: 0.5,
+                      delay: index * 0.1,
+                  },
+              }
+            : {
+                  // Desktop: Floating + fade-in
+                  y: {
+                      duration: floatAnimation.y.duration,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                      delay: floatAnimation.y.delay,
+                  },
+                  x: {
+                      duration: floatAnimation.x.duration,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                      delay: floatAnimation.x.delay,
+                  },
+                  opacity: {
+                      duration: 0.5,
+                      delay: index * 0.1,
+                  },
+              },
+    };
+
     return (
         <motion.div
             className='absolute top-1/2 left-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]'
             initial={{
-                x: adjustedPosition.x * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP),
-                y: adjustedPosition.y * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP),
-                z: adjustedPosition.z,
+                x: targetX,
+                y: targetY,
+                z: position.z, // Use z directly
                 scale: CARD_ANIMATION.INITIAL_SCALE,
                 rotateX: (index % 3) * CARD_ANIMATION.ROTATION.x,
                 rotateY: (index % 2) * CARD_ANIMATION.ROTATION.y,
                 opacity: 0,
             }}
-            animate={{
-                y: adjustedPosition.y * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP) + Math.sin(index * 0.8) * CARD_ANIMATION.FLOAT_RANGE.y,
-                x: adjustedPosition.x * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP) + Math.cos(index * 0.5) * CARD_ANIMATION.FLOAT_RANGE.x,
-                opacity: 1,
-                transition: {
-                    y: {
-                        duration: floatAnimation.y.duration,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                        ease: 'easeInOut',
-                        delay: floatAnimation.y.delay,
-                    },
-                    x: {
-                        duration: floatAnimation.x.duration,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                        ease: 'easeInOut',
-                        delay: floatAnimation.x.delay,
-                    },
-                    opacity: {
-                        duration: 0.5,
-                        delay: index * 0.1,
-                    },
-                },
-            }}
+            animate={animateProps} // Use the conditional animateProps
             whileHover={{
                 scale: CARD_ANIMATION.HOVER_SCALE,
-                z: adjustedPosition.z + 100,
+                z: position.z + 100, // Use z directly
                 rotateX: 0,
                 rotateY: 0,
                 transition: HOVER_TRANSITION,
@@ -400,27 +424,105 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
     });
 
     const progress = useAnimationProgress(ANIMATION_DURATION);
-    const processedData = useProcessedMarketData(marketData, progress);
+    const rawProcessedData = useProcessedMarketData(marketData, progress);
+
+    // Add mobile detection here
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
+        };
+        checkMobile(); // Initial check
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
+
+    // Choose position array based on mobile state
+    const chosenPositions = useMemo(() => {
+        return isMobile ? CARD_MOBILE_POSITIONS : CARD_POSITIONS;
+    }, [isMobile]);
+
+    // Re-introduce displayData state
+    const [displayData, setDisplayData] = useState(() => {
+        const limit = chosenPositions.length;
+        // Initialize based on initial raw data
+        return rawProcessedData.slice(0, limit);
+    });
+
+    // Effect to update displayData during animation
+    useEffect(() => {
+        if (progress < 1) {
+            const limit = chosenPositions.length;
+            setDisplayData(rawProcessedData.slice(0, limit));
+        }
+        // Initialize if state is empty and raw data is available (handles edge cases)
+        else if (displayData.length === 0 && rawProcessedData.length > 0) {
+            const limit = chosenPositions.length;
+            setDisplayData(rawProcessedData.slice(0, limit));
+        }
+    }, [progress, rawProcessedData, chosenPositions, displayData.length]);
+
+    // Effect for post-animation randomization (Slow and Subtle Jitter)
+    useEffect(() => {
+        let intervalId: NodeJS.Timeout | null = null;
+        if (progress === 1 && inView && displayData.length > 0) {
+            intervalId = setInterval(() => {
+                setDisplayData((currentDisplayData) => {
+                    if (!currentDisplayData || currentDisplayData.length === 0) return [];
+                    return currentDisplayData.map(({ item, data }) => {
+                        if (!data) return { item, data };
+                        const randomizedData: ProcessedMarketData = {
+                            ...data,
+                            // Use addRandomJitter with small scales
+                            price: addRandomJitter(data.price, 0.0001),
+                            change: addRandomJitter(data.change, 0.01),
+                        };
+                        return { item, data: randomizedData };
+                    });
+                });
+            }, 2500); // Slow interval (2.5 seconds)
+        }
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [progress, inView, displayData.length]);
+
+    // Grid background style
+    const gridStyle = {
+        backgroundImage: `
+            linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '60px 60px', // Adjusted size for better visual density
+    };
 
     return (
-        <section ref={ref} className='relative min-h-screen overflow-hidden'>
-            {/* Center content */}
-            <div className='relative z-10 flex min-h-screen flex-col items-center justify-center px-4'>
+        <section
+            ref={ref}
+            className='relative min-h-screen overflow-hidden bg-black' // Ensure base bg color
+            style={gridStyle} // Apply grid style
+        >
+            {/* Center content wrapper */}
+            <div className='relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-16'>
                 {/* Centered heading */}
-                <div className='absolute top-1/2 left-1/2 z-20 w-full -translate-x-1/2 -translate-y-1/2 transform'>
+                <div className='absolute top-1/2 left-1/2 z-20 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 transform px-4'>
                     <MarketHeading />
                 </div>
                 {/* 3D Cards Container */}
                 <div className='absolute inset-0 z-10'>
-                    <div className='relative h-full [perspective:4000px]'>
+                    <div className='relative h-full [perspective:2500px]'>
+                        {/* Render using displayData */}
                         {inView &&
-                            processedData.map(({ item, data }, index) => (
-                                <CardTransform key={item.pair} position={CARD_POSITIONS[index] || DEFAULT_POSITION} index={index}>
-                                    <div className='group relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 hover:bg-black/80'>
-                                        <CardContent item={item} data={data} />
-                                    </div>
-                                </CardTransform>
-                            ))}
+                            displayData.map(({ item, data }, index) => {
+                                if (!data) return null;
+                                return (
+                                    <CardTransform key={item.pair} position={chosenPositions[index] || DEFAULT_POSITION} index={index} change={data.change}>
+                                        <div className='relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80'>
+                                            <CardContent item={item} data={data} />
+                                        </div>
+                                    </CardTransform>
+                                );
+                            })}
                     </div>
                 </div>
             </div>
