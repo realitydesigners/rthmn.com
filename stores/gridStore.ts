@@ -51,7 +51,7 @@ const getOrderFromLocalStorage = (): string[] => {
 const saveGridPreferences = (breakpoints: GridBreakpoint[], cols: number) => {
     try {
         localStorage.setItem('rthmn-grid-preferences', JSON.stringify({ breakpoints, lastCols: cols }));
-        console.log('Grid preferences saved:', { breakpoints, cols });
+        // console.log('Grid preferences saved:', { breakpoints, cols });
     } catch (e) {
         console.error('Failed to save grid preferences:', e);
     }
@@ -63,7 +63,7 @@ const getGridPreferences = (): { breakpoints: GridBreakpoint[]; lastCols: number
         if (typeof window === 'undefined') return null; // Don't run on server
         const saved = localStorage.getItem('rthmn-grid-preferences');
         const prefs = saved ? JSON.parse(saved) : null;
-        console.log('Grid preferences loaded:', prefs);
+        // console.log('Grid preferences loaded:', prefs);
         return prefs;
     } catch (e) {
         console.error('Failed to get grid preferences:', e);
@@ -112,7 +112,7 @@ export const useGridStore = create<GridState>()(
                 set((state) => {
                     if (width <= 0) return state;
 
-                    console.log(`Grid store - Updating cols to ${cols} for width ${width}`);
+                    // console.log(`Grid store - Updating cols to ${cols} for width ${width}`);
                     const newState = {
                         ...state,
                         lastWidth: width,
@@ -133,21 +133,21 @@ export const useGridStore = create<GridState>()(
                     }
                 }
                 const colsToUse = state.lastCols > 0 ? state.lastCols : calculatedCols;
-                console.log(`Grid store - getGridClass: width=${width}, lastCols=${state.lastCols}, calculatedCols=${calculatedCols}, using=${colsToUse}`);
+                // console.log(`Grid store - getGridClass: width=${width}, lastCols=${state.lastCols}, calculatedCols=${calculatedCols}, using=${colsToUse}`);
                 return `grid w-full gap-4 grid-cols-${colsToUse}`;
             },
         }),
         {
             name: 'grid-storage',
             merge: (persistedState: any, currentState: GridState) => {
-                console.log('Merging persisted state:', { persistedState, currentState });
+                // console.log('Merging persisted state:', { persistedState, currentState });
                 const mergedState = {
                     ...currentState,
                     ...(persistedState as Partial<GridState>),
                     initialized: currentState.initialized,
                 };
                 mergedState.lastCols = (persistedState as Partial<GridState>)?.lastCols || 1;
-                console.log('Final merged state:', mergedState);
+
                 return mergedState;
             },
         }

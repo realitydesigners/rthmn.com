@@ -28,19 +28,6 @@ export default function Dashboard() {
         setInitialPairs(selectedPairs);
     }, [selectedPairs, setInitialPairs]);
 
-    // Optional: Log width changes for debugging
-    useEffect(() => {
-        if (!isClient) return;
-        const main = document.querySelector('main');
-        if (!main) return;
-        const logResize = () => {
-            console.log(`Dashboard Client: Resized. Width: ${main.clientWidth}, Store lastCols: ${lastCols}`);
-        };
-        const observer = new ResizeObserver(() => requestAnimationFrame(logResize));
-        observer.observe(main);
-        return () => observer.disconnect();
-    }, [isClient, lastCols]);
-
     const handleDragStart = (pair: string) => {
         setDraggedItem(pair);
     };
@@ -114,6 +101,9 @@ export default function Dashboard() {
     // Determine columns for style, ensuring client-side check for hydration
     const gridColsStyle = isClient ? lastCols || 1 : 1;
 
+    // Render based on orderedPairs once available, or selectedPairs initially
+    const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
+
     return (
         <main className='w-full px-2 py-18 sm:px-4'>
             <div
@@ -122,51 +112,49 @@ export default function Dashboard() {
                     gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
                     gap: '1rem',
                 }}>
-                {orderedPairs.map((pair) => {
-                    const data = pairData[pair];
-                    if (!data?.boxes?.[0]) return null;
+                {/* Only render the list content after client-side mounting */}
+                {isClient &&
+                    pairsToRender.map((pair) => {
+                        const data = pairData[pair]; // Get data regardless of loading state
 
-                    return (
-                        <motion.div
-                            key={pair}
-                            initial={false}
-                            layout='position'
-                            dragSnapToOrigin
-                            dragElastic={0.1}
-                            dragTransition={{
-                                bounceStiffness: 300,
-                                bounceDamping: 20,
-                            }}
-                            onDragStart={() => handleDragStart(pair)}
-                            onDrag={(e) => handleDrag(e, pair)}
-                            onDragEnd={() => setDraggedItem(null)}
-                            whileDrag={{
-                                zIndex: 1,
-                            }}
-                            transition={{
-                                layout: {
-                                    type: 'spring',
-                                    stiffness: 250,
-                                    damping: 20,
-                                },
-                            }}
-                            className='relative cursor-grab active:cursor-grabbing'>
-                            <div data-pair={pair}>
-                                <PairResoBox
-                                    pair={pair}
-                                    boxSlice={{
-                                        ...data.boxes[0],
-                                        boxes: data.boxes[0].boxes.map((box) => ({
-                                            ...box,
-                                        })),
-                                    }}
-                                    boxColors={boxColors}
-                                    isLoading={isLoading}
-                                />
-                            </div>
-                        </motion.div>
-                    );
-                })}
+                        return (
+                            <motion.div
+                                key={pair}
+                                initial={false}
+                                layout='position'
+                                dragSnapToOrigin
+                                dragElastic={0.1}
+                                dragTransition={{
+                                    bounceStiffness: 300,
+                                    bounceDamping: 20,
+                                }}
+                                onDragStart={() => handleDragStart(pair)}
+                                onDrag={(e) => handleDrag(e, pair)}
+                                onDragEnd={() => setDraggedItem(null)}
+                                whileDrag={{
+                                    zIndex: 1,
+                                }}
+                                transition={{
+                                    layout: {
+                                        type: 'spring',
+                                        stiffness: 250,
+                                        damping: 20,
+                                    },
+                                }}
+                                className='relative cursor-grab active:cursor-grabbing'>
+                                <div data-pair={pair}>
+                                    <PairResoBox
+                                        pair={pair}
+                                        // Pass data slice even if potentially undefined initially
+                                        boxSlice={data?.boxes?.[0]}
+                                        boxColors={boxColors}
+                                        // Pass the isLoading state down
+                                        isLoading={isLoading}
+                                    />
+                                </div>
+                            </motion.div>
+                        );
+                    })}
             </div>
         </main>
     );
