@@ -8,18 +8,18 @@ const themeClasses = {
         isInset: false,
     },
     'image-standard-dark': {
-        textColor: 'text-gray-200',
+        textColor: 'text-neutral-200',
         isInset: false,
     },
     'image-inset': {
-        textColor: 'text-gray-200',
+        textColor: 'text-neutral-200',
         isInset: true,
     },
 };
 
 const ImageDisplay = ({ image, alt, className }) => {
     const { isInset } = themeClasses[className] || themeClasses['image-standard'];
-    const insetStyles = isInset ? 'border border-t border-gray-600/50' : '';
+    const insetStyles = isInset ? 'border border-t border-neutral-600/50' : '';
 
     return (
         <div className={`relative flex h-auto w-full items-center justify-center overflow-hidden rounded-[1.2em] lg:w-3/4 ${insetStyles}`}>

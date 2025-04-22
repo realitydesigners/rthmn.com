@@ -82,7 +82,7 @@ export default function Callout({ type = 'info', title, points }: CalloutProps) 
                             <Icon className={`h-5 w-5 ${style.text} ${style.shadow}`} />
                         </div>
                     </div>
-                    <h2 className='bg-gradient-to-r from-white to-gray-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>{title}</h2>
+                    <h2 className='bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>{title}</h2>
                 </div>
 
                 {/* Content */}
@@ -97,7 +97,7 @@ export default function Callout({ type = 'info', title, points }: CalloutProps) 
                             <div className={`relative mt-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/40 p-0.5 backdrop-blur-sm`}>
                                 <div className={`h-1.5 w-1.5 rounded-full ${style.text} ${style.shadow} bg-current`}></div>
                             </div>
-                            <span className='flex-1 text-gray-300'>{point}</span>
+                            <span className='flex-1 text-neutral-300'>{point}</span>
                         </motion.li>
                     ))}
                 </ul>

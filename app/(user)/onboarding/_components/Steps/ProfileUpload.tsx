@@ -92,7 +92,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                     className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
                     Welcome to Rthmn
                 </motion.h2>
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-gray-400'>
+                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-neutral-400'>
                     You can add a profile photo to personalize your experience, or skip this step.
                 </motion.p>
             </div>
@@ -138,7 +138,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                                         </div>
                                         <div className='space-y-2'>
                                             <div className='text-sm font-medium text-white'>Drop your photo here</div>
-                                            <div className='text-xs text-gray-500'>or click to browse</div>
+                                            <div className='text-xs text-neutral-500'>or click to browse</div>
                                         </div>
                                     </motion.div>
                                 )}
@@ -160,7 +160,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                     </div>
 
                     {/* File type info */}
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className='mt-4 text-center text-xs text-gray-500'>
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className='mt-4 text-center text-xs text-neutral-500'>
                         PNG or JPG (max. 2MB)
                     </motion.div>
                 </div>

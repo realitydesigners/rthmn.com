@@ -14,7 +14,7 @@ const QuoteCard = ({ quote, image, className }) => {
         case 'card-1':
             return (
                 <div className='flex w-full items-center justify-center py-6'>
-                    <div className='block w-11/12 overflow-hidden rounded-2xl rounded-[1em] border border-gray-600 bg-black md:w-4/5 lg:w-2/3'>
+                    <div className='block w-11/12 overflow-hidden rounded-2xl rounded-[1em] border border-neutral-600 bg-black md:w-4/5 lg:w-2/3'>
                         {image && (
                             <div className='relative w-full'>
                                 <Image
@@ -39,7 +39,7 @@ const QuoteCard = ({ quote, image, className }) => {
         case 'card-2':
             return (
                 <div className='flex w-full items-center justify-center p-2 py-4'>
-                    <div className='relative h-full w-full rounded-2xl border border-gray-600 bg-black md:w-1/2 lg:w-1/2'>
+                    <div className='relative h-full w-full rounded-2xl border border-neutral-600 bg-black md:w-1/2 lg:w-1/2'>
                         {image && (
                             <div className='relative flex h-full w-full flex-col'>
                                 <div className='absolute h-full w-full'>
@@ -63,7 +63,7 @@ const QuoteCard = ({ quote, image, className }) => {
         default:
             return (
                 <div className='flex w-full items-center justify-center py-6'>
-                    <div className='block w-11/12 overflow-hidden rounded-2xl rounded-[1em] border border-gray-600 bg-black md:w-4/5 lg:w-2/3'>
+                    <div className='block w-11/12 overflow-hidden rounded-2xl rounded-[1em] border border-neutral-600 bg-black md:w-4/5 lg:w-2/3'>
                         {image && (
                             <div className='relative w-full'>
                                 <Image

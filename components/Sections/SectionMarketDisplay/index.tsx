@@ -108,12 +108,12 @@ const MarketHeading = memo(() => (
     <div className='relative z-20 text-center'>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className='mb-8'>
-                <h2 className='font-outfit text-gray-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
+                <h2 className='font-outfit text-neutral-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
                     Unlock Trading
                     <br />
                     Patterns Instantly.
                 </h2>
-                <p className='font-outfit text-md text-gray-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
+                <p className='font-outfit text-md text-neutral-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
                     Our real-time market data visualization with our advanced pattern recognition system.
                 </p>
             </div>

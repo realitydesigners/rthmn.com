@@ -95,7 +95,7 @@ const HeadingBlock = ({ block }) => {
                         <div className='flex w-full flex-wrap p-2 lg:w-1/2'>
                             <div className='h-full w-full object-contain object-cover'>
                                 <Image src={imageUrl} alt={'this'} width={1000} height={1000} className='h-50 w-50' />
-                                <p className='flex py-2 text-xs tracking-wide text-gray-400 uppercase'>Image Of: {imageAlt}</p>
+                                <p className='flex py-2 text-xs tracking-wide text-neutral-400 uppercase'>Image Of: {imageAlt}</p>
                             </div>
                         </div>
                         <div className='flex-cols flex w-full justify-center p-2 pt-2 pr-4 lg:w-1/2 lg:pt-4 lg:pr-20'>
@@ -125,7 +125,7 @@ const HeadingBlock = ({ block }) => {
                 </div>
             );
         case 'light':
-            return <div className='h-auto w-full bg-gray-200 pt-20 lg:pt-32'></div>;
+            return <div className='h-auto w-full bg-neutral-200 pt-20 lg:pt-32'></div>;
 
         default:
             return null;

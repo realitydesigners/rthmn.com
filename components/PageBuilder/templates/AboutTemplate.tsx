@@ -9,7 +9,7 @@ const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
 );
 
 const Heading: React.FC<{ children: React.ReactNode; level: number }> = ({ children, level }) => {
-    const baseStyle = 'font-outfit text-gray-gradient font-bold tracking-wide lg:w-3/4 2xl:w-1/2';
+    const baseStyle = 'font-outfit text-neutral-gradient font-bold tracking-wide lg:w-3/4 2xl:w-1/2';
     const sizes = {
         1: 'pt-12 text-4xl lg:text-7xl',
         2: 'pt-12 text-4xl lg:text-6xl',

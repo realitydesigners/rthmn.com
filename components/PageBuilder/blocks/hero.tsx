@@ -49,7 +49,7 @@ export function HeroBlock({ title, content }: HeroBlockProps) {
             {/* Social Media Links */}
             <div className='fixed bottom-0 z-50 flex h-16 w-full items-center justify-center space-x-6 bg-black'>
                 {socialMediaLinks.map((social, index) => (
-                    <Link key={index} href={social.href} className='text-gray-400 transition-colors duration-200 hover:text-white'>
+                    <Link key={index} href={social.href} className='text-neutral-400 transition-colors duration-200 hover:text-white'>
                         <social.icon size={24} />
                     </Link>
                 ))}

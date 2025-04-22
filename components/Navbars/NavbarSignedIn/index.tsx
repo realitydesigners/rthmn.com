@@ -6,7 +6,6 @@ import { User } from '@supabase/supabase-js';
 import { LuChevronRight, LuLayoutDashboard, LuOrbit, LuHelpCircle } from 'react-icons/lu';
 import { LogoIcon } from '@/components/Icons/icons';
 import { GridControl } from '../../Panels/BoxDataPanel/GridControl';
-import { ProBadge } from '@/components/Badges/ProBadge';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { ConnectionBadge } from '../../Badges/ConnectionBadge';
 
@@ -53,7 +52,6 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                 </div>
                                 <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
                             </Link>
-                            <ProBadge />
                         </div>
                         {/* Breadcrumb */}
                         <div className='flex hidden items-center text-[#818181] lg:flex'>
@@ -62,13 +60,13 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                     <div key={index} className='flex items-center gap-1.5'>
                                         <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1'>
                                             {getSegmentIcon(segment) && <span className='text-[#666]'>{getSegmentIcon(segment)}</span>}
-                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-gray-200/50 uppercase'>{segment}</span>
+                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-neutral-200/50 uppercase'>{segment}</span>
                                         </div>
                                         {index < pathSegments.length - 1 && <LuChevronRight size={14} className='text-[#444]' />}
                                     </div>
                                 ))
                             ) : (
-                                <span className='font-mono text-[11px] font-medium tracking-wider text-gray-200/50 uppercase'>{pathSegments}</span>
+                                <span className='font-mono text-[11px] font-medium tracking-wider text-neutral-200/50 uppercase'>{pathSegments}</span>
                             )}
                         </div>
                     </div>

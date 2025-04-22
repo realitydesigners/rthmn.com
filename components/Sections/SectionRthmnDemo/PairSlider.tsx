@@ -155,7 +155,7 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
                                 <div className='flex items-center gap-8'>
                                     <h3
                                         className={`font-outfit text-5xl font-bold tracking-tight transition-all duration-300 ${
-                                            isActive ? 'text-gray-gradient scale-110' : 'scale-90 text-gray-500/40'
+                                            isActive ? 'text-neutral-gradient scale-110' : 'scale-90 text-neutral-500/40'
                                         }`}>
                                         {item.pair.replace('_', '/')}
                                     </h3>
@@ -194,7 +194,7 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
 
                                 {isActive && (
                                     <div className='mt-4 flex items-center gap-2'>
-                                        <div className='font-kodemono text-lg text-gray-400'>{latestPrice?.toFixed(item.pair.includes('JPY') ? 3 : 5)}</div>
+                                        <div className='font-kodemono text-lg text-neutral-400'>{latestPrice?.toFixed(item.pair.includes('JPY') ? 3 : 5)}</div>
                                         <div className='flex items-center gap-3'>
                                             {priceChange !== null && (
                                                 <span

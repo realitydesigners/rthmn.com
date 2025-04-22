@@ -309,7 +309,7 @@ export const PairFilterButtons = ({ isActive, onClick, label }: { isActive: bool
                 }`}>
                 <div
                     className={`font-outfit flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium ${
-                        isActive ? 'text-gray-200' : 'text-[#818181]'
+                        isActive ? 'text-neutral-200' : 'text-[#818181]'
                     }`}>
                     {label}
                 </div>
@@ -493,7 +493,7 @@ export const PairItem = ({
 
 const ActionButton = ({ onClick, icon, variant = 'default' }: { onClick: (e: React.MouseEvent) => void; icon: React.ReactNode; variant?: 'default' | 'danger' | 'success' }) => {
     const variantStyles = {
-        default: 'bg-white/10 hover:bg-white/20 text-gray-300',
+        default: 'bg-white/10 hover:bg-white/20 text-neutral-300',
         danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20',
         success: 'bg-green-500/10 text-green-400 hover:bg-green-500/20',
     };

@@ -91,7 +91,7 @@ const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData:
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair.replace('_', '/')}</div>
-                                <div className='font-kodemono text-sm font-medium text-gray-200'>{latestPrice ? formatPrice(latestPrice, pair) : '-'}</div>
+                                <div className='font-kodemono text-sm font-medium text-neutral-200'>{latestPrice ? formatPrice(latestPrice, pair) : '-'}</div>
                             </div>
                         </div>
                     </div>

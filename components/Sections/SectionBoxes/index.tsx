@@ -24,7 +24,7 @@ const FeatureTags = memo(() => (
                 <div className='items-centergap-1.5 relative flex'>
                     <div className='absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100' />
                     <feature.icon className='relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4' />
-                    <span className='font-kodemono text-gray-400 transition-colors duration-300 group-hover:text-white'>{feature.text}</span>
+                    <span className='font-kodemono text-neutral-400 transition-colors duration-300 group-hover:text-white'>{feature.text}</span>
                 </div>
             </motion.div>
         ))}
@@ -95,12 +95,12 @@ BoxVisualization.displayName = 'BoxVisualization';
 // Memoize the static content
 const StaticContent = memo(() => (
     <div className='flex flex-col justify-center'>
-        <h2 className='text-gray-gradient font-outfit mb-4 text-4xl leading-tight font-bold tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl'>
+        <h2 className='text-neutral-gradient font-outfit mb-4 text-4xl leading-tight font-bold tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl'>
             A New Era In Pattern
             <br />
             Recognition
         </h2>
-        <p className='font-kodemono mb-8 text-base leading-relaxed text-gray-400 sm:mb-12 sm:text-lg'>Discover hidden market patterns through advanced mathematics.</p>
+        <p className='font-kodemono mb-8 text-base leading-relaxed text-neutral-400 sm:mb-12 sm:text-lg'>Discover hidden market patterns through advanced mathematics.</p>
         <FeatureTags />
     </div>
 ));

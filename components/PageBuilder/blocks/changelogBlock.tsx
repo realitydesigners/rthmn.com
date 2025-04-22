@@ -28,7 +28,7 @@ function getTypeColor(type: string) {
         case 'breaking':
             return 'bg-red-500/10 text-red-400 border-red-500/20';
         default:
-            return 'bg-gray-500/10 text-gray-400 border-gray-500/20';
+            return 'bg-neutral-500/10 text-neutral-400 border-neutral-500/20';
     }
 }
 
@@ -61,8 +61,8 @@ export function ChangelogBlock({
                     {/* Header */}
                     <div className='flex flex-col items-center text-center'>
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className='mb-8'>
-                            <h1 className='text-gray-gradient font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl'>{title}</h1>
-                            <p className='font-kodemono mt-6 text-lg text-gray-400'>{subtitle}</p>
+                            <h1 className='text-neutral-gradient font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl'>{title}</h1>
+                            <p className='font-kodemono mt-6 text-lg text-neutral-400'>{subtitle}</p>
                         </motion.div>
                     </div>
 
@@ -99,19 +99,19 @@ export function ChangelogBlock({
                                             <div>
                                                 <h2 className='font-outfit text-4xl font-bold text-white/90'>{entry.title}</h2>
                                                 <div className='mt-2 flex items-center gap-4'>
-                                                    <span className='font-kodemono text-sm text-gray-400'>v{entry.version}</span>
-                                                    <span className='font-kodemono text-sm text-gray-400'>{new Date(entry.releaseDate).toLocaleDateString()}</span>
+                                                    <span className='font-kodemono text-sm text-neutral-400'>v{entry.version}</span>
+                                                    <span className='font-kodemono text-sm text-neutral-400'>{new Date(entry.releaseDate).toLocaleDateString()}</span>
                                                 </div>
                                             </div>
                                         </div>
 
                                         {/* Description */}
-                                        <p className='font-kodemono text-lg text-gray-400'>{entry.description}</p>
+                                        <p className='font-kodemono text-lg text-neutral-400'>{entry.description}</p>
 
                                         {/* Contributors */}
                                         {entry.contributors && entry.contributors.length > 0 && (
                                             <div className='mt-6 flex items-center gap-2'>
-                                                <span className='font-kodemono text-sm text-gray-400/50'>Contributors:</span>
+                                                <span className='font-kodemono text-sm text-neutral-400/50'>Contributors:</span>
                                                 <div className='flex -space-x-2'>
                                                     {entry.contributors.map((contributor) => (
                                                         <div key={contributor._id} className='relative h-8 w-8 rounded-full border-2 border-black'>
@@ -142,7 +142,7 @@ export function ChangelogBlock({
                                                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]' />
                                                 <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent' />
                                             </div>
-                                            <span className='font-kodemono text-sm text-gray-400'>{expandedEntries.has(entry._id) ? 'Show Less' : 'Read More'}</span>
+                                            <span className='font-kodemono text-sm text-neutral-400'>{expandedEntries.has(entry._id) ? 'Show Less' : 'Read More'}</span>
                                         </button>
                                     </div>
                                 </motion.div>
