@@ -2,7 +2,6 @@
 import { useOptimistic } from '@sanity/visual-editing/react';
 import { createDataAttribute, type SanityDocument } from 'next-sanity';
 import { dataset, projectId, studioUrl } from '@/lib/sanity/lib/api';
-import { HeroBlock, type HeroBlockProps } from './blocks/hero';
 import { TeamGridBlock, type TeamGridBlockProps } from './blocks/teamGrid';
 import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';
 import { ContentBlock, type ContentBlockProps } from './blocks/contentBlock';
@@ -10,7 +9,7 @@ import { LegalContentBlock, type LegalContentBlockProps } from './blocks/legalCo
 import { ChangelogBlock, type ChangelogBlockProps } from './blocks/changelogBlock';
 import { GitHubBlock, type GitHubBlockProps } from './blocks/githubBlock';
 
-export type PageBuilderBlock = HeroBlockProps | TeamGridBlockProps | FAQBlockProps | ContentBlockProps | LegalContentBlockProps | ChangelogBlockProps | GitHubBlockProps;
+export type PageBuilderBlock = TeamGridBlockProps | FAQBlockProps | ContentBlockProps | LegalContentBlockProps | ChangelogBlockProps | GitHubBlockProps;
 
 export interface PageBuilderProps {
     blocks: PageBuilderBlock[];
@@ -25,7 +24,6 @@ type PageData = {
 };
 
 const BLOCK_COMPONENTS = {
-    hero: HeroBlock,
     teamGrid: TeamGridBlock,
     faqBlock: FAQBlock,
     contentBlock: ContentBlock,

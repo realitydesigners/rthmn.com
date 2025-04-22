@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { generateHeadingId } from '@/app/(user)/learn/_components/TOC';
+import { generateHeadingId } from '@/app/learn/_components/TOC';
 import AudioRefBlock from '../nested/AudioRefBlock';
 import ImageRefBlock from '../nested/ImageRefBlock';
 import InternalLink from '../nested/InternalLink';
 import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
-import SplineRefBlock from '../nested/SplineRefBlock';
+
 import VideoRefBlock from '../nested/VideoRefBlock';
 import Callout from '../nested/Callout';
 import Quiz from '../nested/Quiz';
@@ -82,7 +82,6 @@ export const CourseTemplate: PortableTextComponents = {
     types: {
         postsRef: ({ value }) => <PostsRefBlock slug={value.postsRef?.postsSlug} heading={value.postsRef?.postsHeading} image={value.postsRef?.postsImage} />,
         videoRef: ({ value }) => <VideoRefBlock videoTitle={value.videoRef?.videoTitle} videoUrl={value.videoRef?.videoUrl} className={value.videoRef?.className} />,
-        spline: ({ value }) => <SplineRefBlock url={value.url} />,
         imageRef: ({ value }) => <ImageRefBlock image={value.image} className={value.className} />,
         audioRef: ({ value }) => <AudioRefBlock audioFileUrl={value.audioRefData?.audioFileUrl} audioTitle={value.audioRefData?.audioTitle} />,
         quoteRef: ({ value }) => <QuoteRefBlock quote={value.quoteRef?.quoteTitle} image={value.quoteRef?.quoteImage} className={value.quoteRef?.className} />,

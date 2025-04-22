@@ -353,20 +353,7 @@ export default defineType({
                         }),
                     ],
                 }),
-                defineField({
-                    type: 'object',
-                    icon: LinkIcon,
-                    name: 'spline',
-                    title: 'Spline',
-                    fields: [
-                        defineField({
-                            type: 'url',
-                            name: 'url',
-                            title: 'URL',
-                            validation: (rule) => rule.uri({ scheme: ['http', 'https'] }),
-                        }),
-                    ],
-                }),
+
                 defineField({
                     type: 'object',
                     name: 'callout',
