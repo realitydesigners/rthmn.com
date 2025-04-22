@@ -36,7 +36,7 @@ export const SectionCTA = () => {
                     <div
                         className='mt-12 flex justify-center drop-shadow-[0_0_8px_rgba(209,213,219,0.2)] filter transition-all duration-300 hover:drop-shadow-[0_0_12px_rgba(209,213,219,0.3)]' // Glow effect on wrapper
                     >
-                        <StartButton href='#pricing' custom={0}>
+                        <StartButton href='/pricing' custom={0}>
                             Get Started Now
                         </StartButton>
                     </div>
