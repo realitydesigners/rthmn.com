@@ -233,7 +233,7 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
     }, [activeTab, marketData, selectedPair, handlePairSelect, processedCandles]);
 
     return (
-        <section className='relative z-100 -mt-48 flex h-full flex-col items-center justify-center py-12 lg:-mt-[12.5vw]'>
+        <section className='relative z-100 -mt-48 flex h-full flex-col items-center justify-center pt-12 lg:-mt-[12.5vw] lg:py-12'>
             <div className='relative h-[820px] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:h-auto lg:w-[80vw] 2xl:w-[75vw]'>
                 <div className='pointer-events-none absolute inset-0'>
                     <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]' />
