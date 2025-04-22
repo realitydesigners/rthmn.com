@@ -6,8 +6,8 @@ const props = {
     '--my-brand': '#00cc7a',
     '--my-red': '#ff4444',
     '--my-green': '#00cc7a',
-    '--my-neutral': '#333333',
-    '--my-darker-neutral': '#1e1e1e',
+    '--my-gray': '#333333',
+    '--my-darker-gray': '#1e1e1e',
 };
 
 export const myTheme = buildLegacyTheme({
@@ -15,8 +15,8 @@ export const myTheme = buildLegacyTheme({
     '--black': props['--my-black'],
     '--white': props['--my-white'],
 
-    '--neutral': props['--my-neutral'],
-    '--neutral-base': props['--my-neutral'],
+    '--gray': props['--my-gray'],
+    '--gray-base': props['--my-gray'],
 
     '--component-bg': props['--my-black'],
     '--component-text-color': props['--my-white'],
