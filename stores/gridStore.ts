@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { getSelectedPairs } from '@/utils/localStorage';
 
 export interface GridBreakpoint {
     width: number;
@@ -25,6 +24,7 @@ const DEFAULT_BREAKPOINTS: GridBreakpoint[] = [
     { width: 640, cols: 2 }, // Small screens
     { width: 1024, cols: 3 }, // Medium screens
     { width: 1400, cols: 4 }, // Large screens
+    { width: 1600, cols: 5 }, // Add a breakpoint for 5 columns
 ];
 
 // Helper to save order to localStorage
@@ -47,23 +47,59 @@ const getOrderFromLocalStorage = (): string[] => {
     }
 };
 
+// Helper to save grid preferences to localStorage
+const saveGridPreferences = (breakpoints: GridBreakpoint[], cols: number) => {
+    try {
+        localStorage.setItem('rthmn-grid-preferences', JSON.stringify({ breakpoints, lastCols: cols }));
+        // console.log('Grid preferences saved:', { breakpoints, cols });
+    } catch (e) {
+        console.error('Failed to save grid preferences:', e);
+    }
+};
+
+// Helper to get grid preferences from localStorage
+const getGridPreferences = (): { breakpoints: GridBreakpoint[]; lastCols: number } | null => {
+    try {
+        if (typeof window === 'undefined') return null; // Don't run on server
+        const saved = localStorage.getItem('rthmn-grid-preferences');
+        const prefs = saved ? JSON.parse(saved) : null;
+        // console.log('Grid preferences loaded:', prefs);
+        return prefs;
+    } catch (e) {
+        console.error('Failed to get grid preferences:', e);
+        return null;
+    }
+};
+
+// Get saved preferences or use defaults
+let savedPreferences: { breakpoints: GridBreakpoint[]; lastCols: number } | null = null;
+if (typeof window !== 'undefined') {
+    savedPreferences = getGridPreferences();
+}
+const INITIAL_BREAKPOINTS = savedPreferences?.breakpoints || DEFAULT_BREAKPOINTS;
+const INITIAL_COLS = savedPreferences?.lastCols || DEFAULT_BREAKPOINTS[0].cols;
+
 export const useGridStore = create<GridState>()(
     persist(
         (set, get) => ({
-            breakpoints: DEFAULT_BREAKPOINTS,
+            breakpoints: INITIAL_BREAKPOINTS,
             orderedPairs: getOrderFromLocalStorage(),
-            lastWidth: 0,
-            lastCols: DEFAULT_BREAKPOINTS[0].cols,
+            lastWidth: typeof window !== 'undefined' ? window.innerWidth : 0,
+            lastCols: INITIAL_COLS,
             initialized: false,
 
             setInitialPairs: (pairs: string[]) => {
                 const state = get();
-                if (!state.initialized) {
+                if (!state.initialized && pairs.length > 0) {
+                    const initialOrder = getOrderFromLocalStorage();
+                    const finalOrder = initialOrder.length === pairs.length ? initialOrder : pairs;
                     set({
-                        orderedPairs: pairs,
+                        orderedPairs: finalOrder,
                         initialized: true,
                     });
-                    saveOrderToLocalStorage(pairs);
+                    if (initialOrder.length !== pairs.length) {
+                        saveOrderToLocalStorage(finalOrder);
+                    }
                 }
             },
 
@@ -74,57 +110,46 @@ export const useGridStore = create<GridState>()(
 
             updateBreakpoint: (width: number, cols: number) => {
                 set((state) => {
-                    const newBreakpoints = [...state.breakpoints];
-                    const matchingIndex = newBreakpoints.findIndex((bp) => Math.abs(bp.width - width) <= 50);
+                    if (width <= 0) return state;
 
-                    if (matchingIndex !== -1) {
-                        newBreakpoints[matchingIndex] = { width, cols };
-                    } else {
-                        const insertIndex = newBreakpoints.findIndex((bp) => bp.width > width);
-                        if (insertIndex === -1) {
-                            newBreakpoints.push({ width, cols });
-                        } else {
-                            newBreakpoints.splice(insertIndex, 0, { width, cols });
-                        }
-                    }
-
-                    const cleanedBreakpoints = newBreakpoints.reduce((acc, curr, i, arr) => {
-                        if (i === 0) return [curr];
-                        const prev = acc[acc.length - 1];
-                        if (prev.cols === curr.cols) return acc;
-                        return [...acc, curr];
-                    }, [] as GridBreakpoint[]);
-
-                    return {
+                    // console.log(`Grid store - Updating cols to ${cols} for width ${width}`);
+                    const newState = {
                         ...state,
-                        breakpoints: cleanedBreakpoints,
                         lastWidth: width,
                         lastCols: cols,
                     };
+                    saveGridPreferences(state.breakpoints, cols);
+                    return newState;
                 });
             },
 
             getGridClass: (width: number) => {
                 const state = get();
-                if (state.lastWidth === width) {
-                    return `grid w-full gap-4 grid-cols-${state.lastCols}`;
+                let calculatedCols = 1;
+                for (let i = state.breakpoints.length - 1; i >= 0; i--) {
+                    if (width >= state.breakpoints[i].width) {
+                        calculatedCols = state.breakpoints[i].cols;
+                        break;
+                    }
                 }
-                const breakpoint = state.breakpoints.reduce((prev, curr) => {
-                    if (width >= curr.width) return curr;
-                    return prev;
-                });
-                return `grid w-full gap-4 grid-cols-${breakpoint.cols}`;
+                const colsToUse = state.lastCols > 0 ? state.lastCols : calculatedCols;
+                // console.log(`Grid store - getGridClass: width=${width}, lastCols=${state.lastCols}, calculatedCols=${calculatedCols}, using=${colsToUse}`);
+                return `grid w-full gap-4 grid-cols-${colsToUse}`;
             },
         }),
         {
             name: 'grid-storage',
-            merge: (persistedState: any, currentState: GridState) => ({
-                ...currentState,
-                ...persistedState,
-                initialized: false,
-                lastWidth: 0,
-                lastCols: DEFAULT_BREAKPOINTS[0].cols,
-            }),
+            merge: (persistedState: any, currentState: GridState) => {
+                // console.log('Merging persisted state:', { persistedState, currentState });
+                const mergedState = {
+                    ...currentState,
+                    ...(persistedState as Partial<GridState>),
+                    initialized: currentState.initialized,
+                };
+                mergedState.lastCols = (persistedState as Partial<GridState>)?.lastCols || 1;
+
+                return mergedState;
+            },
         }
     )
 );

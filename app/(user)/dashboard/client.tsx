@@ -5,46 +5,28 @@ import { useUser } from '@/providers/UserProvider';
 import { useGridStore } from '@/stores/gridStore';
 import { NoInstruments } from './LoadingSkeleton';
 import { PairResoBox } from './PairResoBox';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '@/utils/cn';
 
 export default function Dashboard() {
     const { pairData, isLoading } = useDashboard();
     const { selectedPairs, boxColors } = useUser();
-    const getGridClass = useGridStore((state) => state.getGridClass);
-    const breakpoints = useGridStore((state) => state.breakpoints);
+    const lastCols = useGridStore((state) => state.lastCols);
     const orderedPairs = useGridStore((state) => state.orderedPairs);
     const reorderPairs = useGridStore((state) => state.reorderPairs);
     const setInitialPairs = useGridStore((state) => state.setInitialPairs);
-    const [gridClass, setGridClass] = useState('');
+    const [isClient, setIsClient] = useState(false);
     const [draggedItem, setDraggedItem] = useState<string | null>(null);
+
+    // Mark as client-side rendered
+    useEffect(() => {
+        setIsClient(true);
+    }, [lastCols]);
 
     // Initialize ordered pairs from selected pairs
     useEffect(() => {
         setInitialPairs(selectedPairs);
     }, [selectedPairs, setInitialPairs]);
-
-    const updateGridClass = useCallback(() => {
-        const width = document.querySelector('main')?.clientWidth || window.innerWidth;
-        setGridClass(getGridClass(width));
-    }, [getGridClass]);
-
-    // Handle resize events
-    useEffect(() => {
-        const resizeObserver = new ResizeObserver(updateGridClass);
-        const main = document.querySelector('main');
-        if (main) {
-            resizeObserver.observe(main);
-        }
-
-        return () => resizeObserver.disconnect();
-    }, [updateGridClass]);
-
-    // Handle store changes
-    useEffect(() => {
-        updateGridClass();
-    }, [updateGridClass, breakpoints]);
 
     const handleDragStart = (pair: string) => {
         setDraggedItem(pair);
@@ -116,55 +98,63 @@ export default function Dashboard() {
         );
     }
 
+    // Determine columns for style, ensuring client-side check for hydration
+    const gridColsStyle = isClient ? lastCols || 1 : 1;
+
+    // Render based on orderedPairs once available, or selectedPairs initially
+    const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
+
     return (
         <main className='w-full px-2 py-18 sm:px-4'>
-            <div className={cn(gridClass, 'transition-[grid-template-columns] duration-300 ease-in-out')}>
-                {orderedPairs.map((pair) => {
-                    const data = pairData[pair];
-                    if (!data?.boxes?.[0]) return null;
+            <div
+                className='grid w-full gap-4'
+                style={{
+                    gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
+                    gap: '1rem',
+                }}>
+                {/* Only render the list content after client-side mounting */}
+                {isClient &&
+                    pairsToRender.map((pair) => {
+                        const data = pairData[pair]; // Get data regardless of loading state
 
-                    return (
-                        <motion.div
-                            key={pair}
-                            initial={false}
-                            layout='position'
-                            // drag
-                            dragSnapToOrigin
-                            dragElastic={0.1}
-                            dragTransition={{
-                                bounceStiffness: 300,
-                                bounceDamping: 20,
-                            }}
-                            onDragStart={() => handleDragStart(pair)}
-                            onDrag={(e) => handleDrag(e, pair)}
-                            onDragEnd={() => setDraggedItem(null)}
-                            whileDrag={{
-                                zIndex: 1,
-                            }}
-                            transition={{
-                                layout: {
-                                    type: 'spring',
-                                    stiffness: 250,
-                                    damping: 20,
-                                },
-                            }}
-                            className='relative cursor-grab active:cursor-grabbing'>
-                            <div data-pair={pair}>
-                                <PairResoBox
-                                    pair={pair}
-                                    boxSlice={{
-                                        ...data.boxes[0],
-                                        boxes: data.boxes[0].boxes.map((box) => ({
-                                            ...box,
-                                        })),
-                                    }}
-                                    boxColors={boxColors}
-                                    isLoading={isLoading}
-                                />
-                            </div>
-                        </motion.div>
-                    );
-                })}
+                        return (
+                            <motion.div
+                                key={pair}
+                                initial={false}
+                                layout='position'
+                                dragSnapToOrigin
+                                dragElastic={0.1}
+                                dragTransition={{
+                                    bounceStiffness: 300,
+                                    bounceDamping: 20,
+                                }}
+                                onDragStart={() => handleDragStart(pair)}
+                                onDrag={(e) => handleDrag(e, pair)}
+                                onDragEnd={() => setDraggedItem(null)}
+                                whileDrag={{
+                                    zIndex: 1,
+                                }}
+                                transition={{
+                                    layout: {
+                                        type: 'spring',
+                                        stiffness: 250,
+                                        damping: 20,
+                                    },
+                                }}
+                                className='relative cursor-grab active:cursor-grabbing'>
+                                <div data-pair={pair}>
+                                    <PairResoBox
+                                        pair={pair}
+                                        // Pass data slice even if potentially undefined initially
+                                        boxSlice={data?.boxes?.[0]}
+                                        boxColors={boxColors}
+                                        // Pass the isLoading state down
+                                        isLoading={isLoading}
+                                    />
+                                </div>
+                            </motion.div>
+                        );
+                    })}
             </div>
         </main>
     );

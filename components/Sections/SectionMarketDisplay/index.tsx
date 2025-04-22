@@ -33,25 +33,25 @@ const CARD_POSITIONS: CardPosition[] = [
     { x: -1800, y: -700, z: 10 }, // Top-left far
     { x: -1300, y: -400, z: 40 }, // Top-left closer
     { x: -800, y: -600, z: 25 }, // Top-left mid
-    { x: 1800, y: -700, z: 15 }, // Top-right far
-    { x: 1300, y: -400, z: 45 }, // Top-right closer
+    { x: 1200, y: -700, z: 15 }, // Top-right far
+    { x: 1300, y: -100, z: 45 }, // Top-right closer
     { x: 800, y: -600, z: 30 }, // Top-right mid
     { x: -1600, y: 600, z: 35 }, // Bottom-left far
     { x: -1100, y: 700, z: 20 }, // Bottom-left closer
     { x: -600, y: 550, z: 50 }, // Bottom-left mid
-    { x: 1600, y: 600, z: 20 }, // Bottom-right far
+    { x: 1200, y: 200, z: 20 }, // Bottom-right far
     { x: 1100, y: 700, z: 40 }, // Bottom-right closer
     { x: 600, y: 550, z: 30 }, // Bottom-right mid
 ];
 
 // Mobile positions (direct pixel offsets, no scaling needed)
 const CARD_MOBILE_POSITIONS: CardPosition[] = [
-    { x: -150, y: -300, z: 20 }, // Top-left
-    { x: 150, y: -300, z: 25 }, // Top-right
+    { x: -160, y: -310, z: 20 }, // Top-left
+    { x: 160, y: -310, z: 25 }, // Top-right
     { x: -200, y: 0, z: 30 }, // Mid-left
     { x: 200, y: 0, z: 35 }, // Mid-right
-    { x: -150, y: 250, z: 25 }, // Bottom-left
-    { x: 150, y: 300, z: 20 }, // Bottom-right
+    { x: -160, y: 260, z: 25 }, // Bottom-left
+    { x: 160, y: 310, z: 20 }, // Bottom-right
 ];
 
 const ANIMATION_DURATION = 10000;
@@ -109,12 +109,12 @@ const MarketHeading = memo(() => (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className='mb-8'>
                 <h2 className='font-outfit text-neutral-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
-                    Unlock Trading
+                    Find Patterns.
                     <br />
-                    Patterns Instantly.
+                    Unlock Your Edge.
                 </h2>
-                <p className='font-outfit text-md text-neutral-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
-                    Our real-time market data visualization with our advanced pattern recognition system.
+                <p className='font-outfit text-md text-neutral-gradient mx-auto max-w-2xl px-4 sm:text-lg lg:text-2xl'>
+                    Enter a new dimension to trading and discover the same patterns you already trade, visualized in a way never seen before.
                 </p>
             </div>
 

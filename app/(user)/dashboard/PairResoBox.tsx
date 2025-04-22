@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
-import { BoxSlice, OHLC } from '@/types/types';
+import { BoxSlice } from '@/types/types';
 import type { BoxColors } from '@/stores/colorStore';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { useTimeframeStore } from '@/stores/timeframeStore';
@@ -15,6 +15,13 @@ interface PairResoBoxProps {
     boxColors?: BoxColors;
     isLoading?: boolean;
 }
+
+// Simple inline skeleton components
+const TextSkeleton = ({ className }: { className?: string }) => <div className={`animate-pulse rounded bg-[#333] ${className}`}></div>;
+
+const ChartSkeleton = () => <div className='aspect-square h-full w-full animate-pulse rounded bg-[#222]'></div>;
+
+const SliderSkeleton = () => <div className='h-16 w-full animate-pulse rounded bg-[#282828]'></div>;
 
 export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBoxProps) => {
     const { priceData } = useWebSocket();
@@ -51,33 +58,45 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
         };
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
+    const showChart = !isLoading && filteredBoxSlice;
+    const showSlider = !isLoading && boxSlice?.boxes;
+
     return (
         <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
-            <div className='relative flex flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
-                <div className='relative flex h-auto flex-col items-center justify-center gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
-                    {/* Price Display */}
+            <div className='relative flex min-h-[250px] flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]'>
+                <div className='relative flex flex-grow flex-col items-center justify-start gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
+                    {/* Price Display - Always render structure, show skeleton for value */}
                     <div className='flex w-full flex-col items-center gap-2'>
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
-                                <div className='font-kodemono text-sm font-medium text-neutral-200'>{currentPrice ? formatPrice(currentPrice, pair) : '-'}</div>
+                                {/* Conditional Skeleton for Price */}
+                                {isLoading || !currentPrice ? (
+                                    <TextSkeleton className='h-4 w-16' />
+                                ) : (
+                                    <div className='font-kodemono text-sm font-medium text-neutral-200'>{formatPrice(currentPrice, pair)}</div>
+                                )}
                             </div>
                         </div>
                     </div>
 
-                    {/* Chart Section */}
-                    <div className={`relative flex h-full w-full ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}>
-                        <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                    {/* Chart Section - Conditionally render skeleton or ResoBox */}
+                    <div className={`relative flex h-full min-h-[100px] w-full flex-grow ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}>
+                        {showChart ? (
+                            <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                        ) : (
+                            <ChartSkeleton />
+                        )}
                     </div>
 
-                    {/* Timeframe Control */}
-                    {boxSlice?.boxes && (
-                        <div className='relative h-16 w-full'>
-                            <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
-                                <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
-                            </div>
-                        </div>
-                    )}
+                    {/* Timeframe Control - Conditionally render skeleton or Slider */}
+                    <div className='relative h-16 w-full flex-shrink-0'>
+                        {showSlider ? (
+                            <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
+                        ) : (
+                            <SliderSkeleton />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

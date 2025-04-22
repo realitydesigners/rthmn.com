@@ -1,6 +1,6 @@
+'use client';
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useGridStore } from '@/stores/gridStore';
-import { LuLayoutGrid } from 'react-icons/lu';
 
 // Pre-calculate grid cells to avoid recreation
 const GRID_CELLS = {
@@ -44,9 +44,15 @@ GridIcon.displayName = 'GridIcon';
 const BASE_COLUMN_OPTIONS = [1, 2, 3, 4];
 
 export const GridControl = () => {
-    const { updateBreakpoint, getGridClass } = useGridStore();
+    const { updateBreakpoint, getGridClass, lastCols } = useGridStore();
     const [currentWidth, setCurrentWidth] = useState(0);
     const [selectedCols, setSelectedCols] = useState<number | null>(null);
+    const [isClient, setIsClient] = useState(false);
+
+    // Mark as client-side mounted
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
 
     // Update width when main container changes
     const updateWidth = useCallback(() => {
@@ -54,59 +60,53 @@ export const GridControl = () => {
         if (!main) return;
 
         const newWidth = main.clientWidth;
-        setCurrentWidth(newWidth);
-    }, []); // Remove currentWidth dependency to avoid stale updates
+        // Only update if width actually changes to prevent unnecessary renders
+        setCurrentWidth((prevWidth) => (newWidth !== prevWidth ? newWidth : prevWidth));
+    }, []);
 
-    // Initial width setup
+    // Initial width setup and resize observer
     useEffect(() => {
-        // Try to get width immediately
         updateWidth();
-
-        // Also wait for any dynamic content to load
-        const timer = setTimeout(updateWidth, 100);
-
-        // Watch for resize
+        const timer = setTimeout(updateWidth, 150);
         const resizeObserver = new ResizeObserver(() => {
             requestAnimationFrame(updateWidth);
         });
-
         const main = document.querySelector('main');
         if (main) {
             resizeObserver.observe(main);
         }
-
         return () => {
             resizeObserver.disconnect();
             clearTimeout(timer);
         };
     }, [updateWidth]);
 
-    // Force update when width changes significantly
-    useEffect(() => {
+    // Determine current columns based on width and selected/persisted state
+    const currentCols = useMemo(() => {
+        // Prefer explicitly selected columns first
+        if (selectedCols !== null) {
+            return selectedCols;
+        }
+        // Then use persisted lastCols if client is ready
+        if (isClient && lastCols > 0) {
+            return lastCols;
+        }
+        // Fallback based on width (or default 1 if width is 0)
         if (currentWidth > 0) {
             const gridClass = getGridClass(currentWidth);
             const match = gridClass.match(/grid-cols-(\d+)/);
-            const cols = match ? parseInt(match[1], 10) : 1;
-            setSelectedCols(cols);
+            return match ? parseInt(match[1], 10) : 1;
         }
-    }, [currentWidth, getGridClass]);
+        return 1; // Default before width is known
+    }, [selectedCols, isClient, lastCols, currentWidth, getGridClass]);
 
     // Determine if we should show the 5-column option based on width
     const showFiveColumns = currentWidth > 1400;
 
-    // Get current columns directly from the grid class
-    const currentCols = useMemo(() => {
-        if (selectedCols !== null) return selectedCols;
-        const gridClass = getGridClass(currentWidth);
-        const match = gridClass.match(/grid-cols-(\d+)/);
-        return match ? parseInt(match[1], 10) : 1;
-    }, [getGridClass, currentWidth, selectedCols]);
-
-    // Memoize click handlers
+    // Handle clicking a grid button
     const handleClick = useCallback(
         (cols: number) => {
             if (currentWidth > 0) {
-                // Only allow clicks if width is initialized
                 setSelectedCols(cols);
                 updateBreakpoint(currentWidth, cols);
             }
@@ -114,17 +114,32 @@ export const GridControl = () => {
         [currentWidth, updateBreakpoint]
     );
 
-    // Reset selected cols when width changes significantly
+    // Reset selected cols when width changes significantly (causing currentCols to recalculate)
     useEffect(() => {
-        setSelectedCols(null);
+        // Resetting based on width changes might be too aggressive,
+        // let's rely on the currentCols calculation instead.
+        // setSelectedCols(null);
     }, [currentWidth]);
 
     return (
         <div className='flex items-center gap-2 px-2 py-1.5'>
             {BASE_COLUMN_OPTIONS.map((cols) => (
-                <GridIcon key={cols} cols={cols} isActive={currentCols === cols} onClick={() => handleClick(cols)} />
+                <GridIcon
+                    key={cols}
+                    cols={cols}
+                    // Only determine actual active state after mounting
+                    isActive={isClient ? currentCols === cols : false}
+                    onClick={() => handleClick(cols)}
+                />
             ))}
-            {showFiveColumns && <GridIcon cols={5} isActive={currentCols === 5} onClick={() => handleClick(5)} />}
+            {showFiveColumns && (
+                <GridIcon
+                    cols={5}
+                    // Only determine actual active state after mounting
+                    isActive={isClient ? currentCols === 5 : false}
+                    onClick={() => handleClick(5)}
+                />
+            )}
         </div>
     );
 };
