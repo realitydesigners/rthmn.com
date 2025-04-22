@@ -28,9 +28,9 @@ interface NestedBoxesProps {
 
 const defaultColors = {
     positive: '#3FFFA2', // Green
-    negative: '#FF5959', // Darker Green
+    negative: '#FF5959', // Red
     styles: {
-        borderRadius: 0,
+        borderRadius: 4,
         shadowIntensity: 1,
         opacity: 0.4,
         showBorder: true,
@@ -45,10 +45,8 @@ export const NestedBoxes = ({
     boxes,
     demoStep = 0,
     isPaused = false,
-    isPointOfChange = false,
     maxSize: providedMaxSize,
     baseSize = 400,
-    colorScheme = 'white-gradient',
     showLabels = false,
     mode = 'animated',
     containerClassName = '',
@@ -57,8 +55,15 @@ export const NestedBoxes = ({
 }: NestedBoxesProps) => {
     if (!boxes || boxes.length === 0) return null;
 
-    const maxSize = providedMaxSize || Math.abs(boxes[0].value);
-    const colors = { ...defaultColors, ...propBoxColors };
+    const calculatedMaxSize = useMemo(() => Math.max(...boxes.map((b) => Math.abs(b.value)), 1), [boxes]);
+    const maxSize = providedMaxSize || calculatedMaxSize;
+
+    const stylesConfig = { ...defaultColors.styles, ...propBoxColors?.styles };
+    const colors = {
+        positive: propBoxColors?.positive || defaultColors.positive,
+        negative: propBoxColors?.negative || defaultColors.negative,
+        styles: stylesConfig,
+    };
 
     const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
         const isFirstDifferent = prevBox && ((prevBox.value > 0 && box.value < 0) || (prevBox.value < 0 && box.value > 0));
@@ -67,22 +72,26 @@ export const NestedBoxes = ({
             const baseColor = box.value > 0 ? colors.positive : colors.negative;
             const opacity = colors.styles.opacity;
             const shadowIntensity = colors.styles.shadowIntensity;
-            const shadowY = Math.floor(shadowIntensity * 16);
-            const shadowBlur = Math.floor(shadowIntensity * 80);
-            const shadowColor = (alpha: number) => baseColor.replace(')', `, ${alpha})`);
+            const hexToRgba = (hex: string, alpha: number) => {
+                if (!hex || hex.length < 7) return `rgba(100, 100, 100, ${alpha})`;
+                const r = parseInt(hex.slice(1, 3), 16);
+                const g = parseInt(hex.slice(3, 5), 16);
+                const b = parseInt(hex.slice(5, 7), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            };
+            const shadowColor = (alpha: number) => hexToRgba(baseColor, alpha * opacity);
 
             return {
                 baseColor,
                 opacity,
-                shadowY,
-                shadowBlur,
                 shadowColor,
                 borderRadius: `${colors.styles.borderRadius}px`,
                 shadowIntensity,
             };
-        }, [box.value]);
+        }, [box.value, colors.positive, colors.negative, colors.styles.opacity, colors.styles.shadowIntensity, colors.styles.borderRadius]);
 
         const size = (Math.abs(box.value) / maxSize) * baseSize;
+
         const basePosition = prevBox
             ? isFirstDifferent
                 ? prevBox.value > 0
@@ -100,47 +109,39 @@ export const NestedBoxes = ({
             margin: colors.styles.showBorder ? '-1px' : '0',
             borderRadius: boxStyles.borderRadius,
             borderWidth: colors.styles.showBorder ? '1px' : '0',
-            border: colors.styles.showBorder ? '1px solid rgba(0, 0, 0, 0.3)' : 'none',
+            borderColor: colors.styles.showBorder ? boxStyles.shadowColor(0.25) : 'transparent',
             transition: 'all 0.15s ease-out',
             position: 'absolute',
-            ...(mode === 'animated' && isPaused
-                ? {
-                      transform: `translateX(${index * 3}px) translateY(${index * 2}px)`,
-                      transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)',
-                  }
-                : {}),
+            boxShadow: colors.styles.showBorder ? `0 0px 0 ${boxStyles.shadowColor(0.12 * boxStyles.shadowIntensity)}` : 'none',
+            ...(mode === 'animated' && isPaused ? { transform: `translateX(${index * 3}px) translateY(${index * 2}px)`, transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)' } : {}),
+            opacity: 1,
         };
 
         return (
             <div key={`box-${index}-${box.value}-${mode === 'animated' ? demoStep : ''}`} className='absolute' style={style}>
-                {/* Base shadow layer */}
-
-                {/* Main gradient layer */}
                 <div
                     className='absolute inset-0'
                     style={{
                         borderRadius: boxStyles.borderRadius,
-                        background: `linear-gradient(to bottom right, ${boxStyles.baseColor.replace(')', `, ${boxStyles.opacity}`)} 100%, transparent 100%)`,
-                        opacity: boxStyles.opacity,
+                        background: `linear-gradient(135deg, ${boxStyles.shadowColor(0.9 * boxStyles.opacity)} 0%, ${boxStyles.shadowColor(0.5 * boxStyles.opacity)} 60%, ${boxStyles.shadowColor(0.2 * boxStyles.opacity)} 100%)`,
+                        opacity: 1,
                         transition: 'all 0.15s ease-out',
                     }}
                 />
 
-                {/* First different highlight with extra glow */}
                 {isFirstDifferent && (
                     <div
                         className='absolute inset-0'
                         style={{
                             borderRadius: boxStyles.borderRadius,
-                            backgroundColor: boxStyles.baseColor,
-                            opacity: boxStyles.opacity * 1,
-                            boxShadow: `inset 0 2px 15px ${boxStyles.shadowColor(0.5)}`,
+                            backgroundColor: boxStyles.shadowColor(0.45),
+                            boxShadow: `inset 0 0px 0 ${boxStyles.shadowColor(0.4 * boxStyles.shadowIntensity)}, inset 0 0 0 ${boxStyles.shadowColor(0.15 * boxStyles.shadowIntensity)}`,
+                            opacity: 1,
                             transition: 'all 0.15s ease-out',
                         }}
                     />
                 )}
 
-                {/* Labels */}
                 {showLabels && (
                     <div className={`absolute -right-20 flex items-center ${box.value > 0 ? '-bottom-[5px]' : '-top-[5px]'}`}>
                         <div className='h-[1px] w-8' style={{ backgroundColor: boxStyles.baseColor }}></div>
@@ -155,5 +156,5 @@ export const NestedBoxes = ({
         );
     };
 
-    return <div className={`min-h-[200px] w-full ${containerClassName}`}>{renderBox(boxes[0], 0)}</div>;
+    return <div className={`relative min-h-[200px] w-full ${containerClassName}`}>{renderBox(boxes[0], 0)}</div>;
 };

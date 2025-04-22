@@ -64,10 +64,10 @@ export default async function TestPage() {
         <div className='h-full'>
             <SectionMarketDisplay marketData={marketData} />
             <SectionRthmnDemo marketData={marketData} />
-            {/* <SectionBoxes />
-            <SectionHistogram />
+            <SectionBoxes />
+            {/* <SectionHistogram />
             <SectionHero marketData={marketData} />
-        */}
+  */}
 
             <FAQBlock items={faqItems} />
             <SectionCTA />
