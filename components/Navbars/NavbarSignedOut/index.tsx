@@ -198,15 +198,15 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                             </nav>
                         )}
 
-                        <div className='flex items-center space-x-4 justify-self-end pr-2'>
-                            <div className='hidden items-center space-x-4 lg:flex'>
+                        <div className='absolute top-1/2 right-0 flex -translate-y-1/2 items-center space-x-4 pr-2'>
+                            <div className='hidden items-center space-x-4 sm:flex'>
                                 {SOCIAL_LINKS.map((item) => (
                                     <a
                                         key={item.name}
                                         href={item.href}
                                         target='_blank'
                                         rel='noopener noreferrer'
-                                        className='text-neutral-400 transition-colors duration-200 hover:text-white'
+                                        className='text-gray-400 transition-colors duration-200 hover:text-white'
                                         aria-label={item.name}>
                                         <item.icon className='h-5 w-5' />
                                     </a>
