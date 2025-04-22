@@ -79,7 +79,7 @@ const DemoNavbar = memo(({ activeTab, setActiveTab }: { activeTab: TabType; setA
                                 <div className='flex h-7 w-7 items-center'>
                                     <LogoIcon />
                                 </div>
-                                <span className='font-russo tracking ml-2 text-[16px] text-white'>RTHMN</span>
+                                <span className='font-russo tracking ml-2 hidden text-[16px] text-white lg:block'>RTHMN</span>
                             </div>
                         </div>
                     </div>
@@ -234,7 +234,7 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
 
     return (
         <section className='relative z-100 -mt-48 flex h-full flex-col items-center justify-center py-12 lg:-mt-[12.5vw]'>
-            <div className='relative h-auto w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:w-[80vw] 2xl:w-[75vw]'>
+            <div className='relative h-[820px] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:h-auto lg:w-[80vw] 2xl:w-[75vw]'>
                 <div className='pointer-events-none absolute inset-0'>
                     <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]' />
                     <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent' />

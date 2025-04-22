@@ -96,11 +96,14 @@ BoxVisualization.displayName = 'BoxVisualization';
 const StaticContent = memo(() => (
     <div className='flex flex-col justify-center'>
         <h2 className='text-neutral-gradient font-outfit mb-4 text-4xl leading-tight font-bold tracking-tight sm:mb-8 sm:text-5xl lg:text-6xl'>
-            A New Era In Pattern
+            Fractal Finder:
             <br />
-            Recognition
+            Visualize Market Structure
         </h2>
-        <p className='font-kodemono mb-8 text-base leading-relaxed text-neutral-400 sm:mb-12 sm:text-lg'>Discover hidden market patterns through advanced mathematics.</p>
+        <p className='font-kodemono mb-8 text-base leading-relaxed text-neutral-400 sm:mb-12 sm:text-lg'>
+            See market momentum and exhaustion patterns unfold in real-time. The Fractal Finder visualizes nested market structure, revealing potential turning points and trend
+            continuation signals like never before.
+        </p>
         <FeatureTags />
     </div>
 ));
