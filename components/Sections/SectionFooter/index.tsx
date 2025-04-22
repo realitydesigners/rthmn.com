@@ -11,6 +11,7 @@ export function SectionFooter() {
         pathname?.startsWith('/dashboard') ||
         pathname?.startsWith('/onboarding') ||
         pathname?.startsWith('/admin') ||
+        pathname?.startsWith('/home') ||
         pathname?.startsWith('/signin') ||
         pathname?.startsWith('/pair/') ||
         pathname?.startsWith('/account') ||

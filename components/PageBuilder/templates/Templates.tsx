@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateHeadingId } from '@/app/(public)/learn/_components/TOC';
+import { generateHeadingId } from '@/app/(user)/learn/_components/TOC';
 import AudioRefBlock from '../nested/AudioRefBlock';
 import ImageRefBlock from '../nested/ImageRefBlock';
 import InternalLink from '../nested/InternalLink';
