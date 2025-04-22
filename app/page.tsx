@@ -11,46 +11,8 @@ import { SectionPricing } from '@/components/Sections/SectionPricing';
 import { createClient } from '@/lib/supabase/server';
 import { getProducts } from '@/lib/supabase/queries';
 
-// Define types for the data
-interface MarketData {
-    pair: string;
-    lastUpdated: string;
-    candleData: string;
-}
-
-interface FaqItem {
-    _id: string; // Add _id or other necessary fields if needed by FAQBlock internal logic
-    question: string;
-    answer: any; // Or specific type for Portable Text if known
-    category?: string;
-    isPublished: boolean; // Make required
-}
-
-// Assuming ProductWithPrice type exists or defining a basic structure
-type ProductPrice = {
-    id: string;
-    unit_amount: number | null;
-    currency: string | null;
-    interval: string | null;
-    type: string | null;
-};
-type Product = {
-    id: string;
-    name: string | null;
-    description: string | null;
-    prices: ProductPrice[];
-};
-
-interface PageData {
-    marketData: MarketData[];
-    faqItems: FaqItem[];
-    products: Product[] | null; // Add products type
-    user: any | null; // Add user type (use specific User type if available)
-    // Subscription is likely fetched client-side or derived, passing null as per pricing/client.tsx
-}
-
 // Fetch all required datasets
-async function getPageData(): Promise<PageData> {
+async function getPageData(): Promise<any> {
     const marketDataQuery = groq`
         *[_type == "marketData"][0...8] | order(lastUpdated desc) [0...12] {
             pair,
@@ -80,8 +42,8 @@ async function getPageData(): Promise<PageData> {
             data: { user },
         },
     ] = await Promise.all([
-        sanityFetch<MarketData[]>({ query: marketDataQuery, tags: ['marketData'] }),
-        sanityFetch<FaqItem[]>({ query: faqItemsQuery, tags: ['faqItem'] }),
+        sanityFetch({ query: marketDataQuery, tags: ['marketData'] }),
+        sanityFetch({ query: faqItemsQuery, tags: ['faqItem'] }),
         getProducts(supabase), // Fetch products
         supabase.auth.getUser(), // Fetch user session
     ]);
