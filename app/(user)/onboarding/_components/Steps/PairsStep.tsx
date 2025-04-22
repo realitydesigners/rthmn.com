@@ -146,7 +146,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
 
                     return (
                         <div key={group.label}>
-                            <h3 className='font-kodemono z-90 sticky top-0 py-2 text-xs font-medium uppercase tracking-wider text-[#666]'>{group.label}</h3>
+                            <h3 className='font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#666] uppercase'>{group.label}</h3>
                             <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
                                 {pairs.map((item, index) => {
                                     const isSelected = selectedPairs.includes(item);

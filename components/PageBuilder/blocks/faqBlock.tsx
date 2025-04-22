@@ -104,7 +104,7 @@ const SearchInput = memo(({ value, onChange }: { value: string; onChange: (value
             value={value}
             onChange={(e) => onChange(e.target.value)}
             placeholder='Search questions...'
-            className='w-full rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:outline-none focus:ring-2 focus:ring-emerald-400/20'
+            className='w-full rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none'
         />
         <div className='absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100' />
     </div>

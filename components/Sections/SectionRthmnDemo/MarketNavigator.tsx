@@ -60,13 +60,13 @@ export function MarketNavigator({ marketData, selectedPair, onPairSelect }: Mark
         <div className='flex h-full flex-col gap-4'>
             {/* Search Bar */}
             <div className='relative'>
-                <FaSearch className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400' />
+                <FaSearch className='absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400' />
                 <input
                     type='text'
                     placeholder='Search pairs...'
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className='font-outfit outline-hidden w-full rounded-lg border border-white/5 bg-black/40 py-2 pl-10 pr-4 text-sm text-white placeholder-white/40 focus:border-white/10'
+                    className='font-outfit w-full rounded-lg border border-white/5 bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-white/10'
                 />
             </div>
 

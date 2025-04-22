@@ -45,7 +45,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
     return (
         <div className='relative flex min-h-screen'>
             <CourseNav course={course} />
-            <div className='w-full flex-1 lg:ml-80 lg:mr-80'>
+            <div className='w-full flex-1 lg:mr-80 lg:ml-80'>
                 <div className='w-full px-4 py-28 lg:px-8'>
                     {/* Lesson Header */}
                     <div className='mb-12'>

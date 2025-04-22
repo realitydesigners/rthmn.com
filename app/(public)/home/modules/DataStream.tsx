@@ -19,11 +19,11 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
                 y: visibility?.isVisible ? 0 : 20,
             }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
-            className='absolute left-1/2 top-1/2 z-10 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 px-4'>
+            className='absolute top-1/2 left-1/2 z-10 w-full max-w-5xl -translate-x-1/2 -translate-y-1/2 px-4'>
             <div className='relative'>
                 <div className='space-y-8 text-center'>
                     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}>
-                        <h2 className='font-outfit text-[2.5em] font-bold leading-[1em] text-white lg:text-[6em]'>
+                        <h2 className='font-outfit text-[2.5em] leading-[1em] font-bold text-white lg:text-[6em]'>
                             The First Smart
                             <br />
                             Pattern Recognition
@@ -48,8 +48,8 @@ export const DataStream: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
                 </div>
 
                 <div className='pointer-events-none absolute inset-0 -z-10'>
-                    <div className='absolute left-1/2 top-1/2 h-48 w-96 -translate-x-1/2 -translate-y-1/2 bg-blue-500/5 blur-[120px]' />
-                    <div className='absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400/10 blur-2xl' />
+                    <div className='absolute top-1/2 left-1/2 h-48 w-96 -translate-x-1/2 -translate-y-1/2 bg-blue-500/5 blur-[120px]' />
+                    <div className='absolute top-1/2 left-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-400/10 blur-2xl' />
                 </div>
             </div>
         </motion.div>

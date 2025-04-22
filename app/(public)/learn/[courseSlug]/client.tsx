@@ -68,7 +68,7 @@ export default function CourseClient({ course }: { course: Course }) {
                                 {course.difficulty && (
                                     <div className='flex items-center gap-2'>
                                         <FaLightbulb className='h-5 w-5 text-emerald-400' />
-                                        <span className='text-sm capitalize text-neutral-400'>{course.difficulty}</span>
+                                        <span className='text-sm text-neutral-400 capitalize'>{course.difficulty}</span>
                                     </div>
                                 )}
                                 {course.estimatedTime && (

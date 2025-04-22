@@ -73,7 +73,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                     {/* Timeframe Control */}
                     {boxSlice?.boxes && (
                         <div className='relative h-16 w-full'>
-                            <div className={`absolute bottom-0 left-0 right-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                            <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
                             </div>
                         </div>

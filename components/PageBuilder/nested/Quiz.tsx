@@ -67,7 +67,7 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
 
             <div className='relative rounded-[14px] bg-black/30 p-8 backdrop-blur-sm'>
                 {/* Decorative elements */}
-                <div className='absolute -right-12 -top-12 h-24 w-24 rounded-full bg-gradient-to-br from-white/5 to-transparent opacity-20 blur-2xl'></div>
+                <div className='absolute -top-12 -right-12 h-24 w-24 rounded-full bg-gradient-to-br from-white/5 to-transparent opacity-20 blur-2xl'></div>
                 <div className='absolute -bottom-4 -left-4 h-20 w-20 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-400 opacity-10 blur-2xl'></div>
 
                 {/* Question */}

@@ -68,9 +68,9 @@ const AlgorithmPage = () => {
                     <div className='flex flex-col items-center text-center'>
                         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className='mb-8'>
                             <div className={`font-kodemonomb-6 flex items-center gap-3 text-sm tracking-wider text-white/60`}>
-                                <div className='bg-linear-to-r h-[1px] w-12 from-transparent via-white/20 to-transparent' />
+                                <div className='h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent' />
                                 THE TECHNOLOGY
-                                <div className='bg-linear-to-r h-[1px] w-12 from-transparent via-white/20 to-transparent' />
+                                <div className='h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent' />
                             </div>
                             <h1
                                 className={`font-outfit bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-6xl font-bold tracking-tight text-transparent lg:text-7xl`}>
@@ -145,9 +145,9 @@ const AlgorithmPage = () => {
                 <div className='mx-auto max-w-7xl px-8'>
                     <div className='mb-16 text-center'>
                         <div className={`font-kodemonomb-6 flex items-center justify-center gap-3 text-sm tracking-wider text-white/60`}>
-                            <div className='bg-linear-to-r h-[1px] w-12 from-transparent via-white/20 to-transparent' />
+                            <div className='h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent' />
                             PERFORMANCE METRICS
-                            <div className='bg-linear-to-r h-[1px] w-12 from-transparent via-white/20 to-transparent' />
+                            <div className='h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent' />
                         </div>
                         <h2 className={`font-outfit bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
                             Algorithm Performance
@@ -197,7 +197,7 @@ const AlgorithmPage = () => {
                         <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
                             <div className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}>WAVE MECHANICS</div>
                             <h2
-                                className={`font-outfit bg-linear-to-b mb-8 from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
+                                className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
                                 Position Wave Analysis
                             </h2>
                             <div className='space-y-6'>
@@ -233,7 +233,7 @@ const AlgorithmPage = () => {
                             whileInView={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.5 }}
                             className='relative aspect-square rounded-lg border border-white/10 bg-white/5 p-8'>
-                            <div className='bg-linear-to-br absolute inset-0 -z-10 from-white/[0.03] to-transparent' />
+                            <div className='absolute inset-0 -z-10 bg-linear-to-br from-white/[0.03] to-transparent' />
                             <div className='flex h-full items-center justify-center'>
                                 <div className={`font-kodemonotext-center text-neutral-400`}>[Wave Visualization Placeholder]</div>
                             </div>
@@ -247,12 +247,12 @@ const AlgorithmPage = () => {
                 <div className='mx-auto max-w-7xl px-8'>
                     <div className='mb-16 text-center'>
                         <div className={`font-kodemonomb-6 flex items-center justify-center gap-3 text-sm tracking-wider text-white/60`}>
-                            <div className='bg-linear-to-r h-[1px] w-12 from-transparent via-white/20 to-transparent' />
+                            <div className='h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent' />
                             POSITION STATES
-                            <div className='bg-linear-to-r h-[1px] w-12 from-transparent via-white/20 to-transparent' />
+                            <div className='h-[1px] w-12 bg-linear-to-r from-transparent via-white/20 to-transparent' />
                         </div>
                         <h2
-                            className={`font-outfit bg-linear-to-b mb-8 from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
+                            className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
                             8-Dimensional Analysis
                         </h2>
                     </div>
@@ -327,7 +327,7 @@ const AlgorithmPage = () => {
                         <div>
                             <div className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}>PHILOSOPHICAL FOUNDATION</div>
                             <h2
-                                className={`font-outfit bg-linear-to-b mb-8 from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
+                                className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
                                 Beyond Traditional
                                 <br />
                                 Market Theory
@@ -342,7 +342,7 @@ const AlgorithmPage = () => {
                                     market positions exist in a state of probabilistic flux until they crystallize into definitive patterns.
                                 </p>
                                 <div className='mt-12 flex items-center gap-8'>
-                                    <div className='bg-linear-to-r h-[2px] w-12 from-white/40 to-transparent' />
+                                    <div className='h-[2px] w-12 bg-linear-to-r from-white/40 to-transparent' />
                                     <span className={`font-kodemonotext-neutral-400`}>Position State Theory</span>
                                 </div>
                             </div>
@@ -384,7 +384,7 @@ const AlgorithmPage = () => {
                     <div className='mx-auto max-w-3xl text-center'>
                         <div className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}>MARKET MECHANICS</div>
                         <h2
-                            className={`font-outfit bg-linear-to-b mb-8 from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
+                            className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
                             The Mathematics of Markets
                         </h2>
                         <p className='text-lg text-white/60'>
@@ -395,7 +395,7 @@ const AlgorithmPage = () => {
                     <div className='mt-24 space-y-24'>
                         {/* Core Equations Section */}
                         <div className='relative rounded-lg border border-white/10 bg-white/5 p-12'>
-                            <div className='bg-linear-to-b absolute -inset-px rounded-lg from-white/10 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100' />
+                            <div className='absolute -inset-px rounded-lg bg-linear-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-500 hover:opacity-100' />
                             <div className='relative'>
                                 <h3 className={`font-outfit mb-6 text-3xl font-semibold text-white/90`}>Core Position State Mathematics</h3>
                                 <div className='grid gap-12 lg:grid-cols-2'>
@@ -405,7 +405,7 @@ const AlgorithmPage = () => {
                                             <div className={`font-kodemonotext-lg text-neutral-400`}>P(t+1) = ∑[P(t) × W(s)] + ε</div>
                                             <div className='mt-4 text-sm text-white/60'>
                                                 Where:
-                                                <ul className='ml-4 mt-2 space-y-1'>
+                                                <ul className='mt-2 ml-4 space-y-1'>
                                                     <li>• P(t) = Current position state</li>
                                                     <li>• W(s) = State transition weights</li>
                                                     <li>• ε = Market noise factor</li>
@@ -418,7 +418,7 @@ const AlgorithmPage = () => {
                                             <div className={`font-kodemonotext-lg text-neutral-400`}>ψ(p,t) = A·sin(kp - ωt + φ)</div>
                                             <div className='mt-4 text-sm text-white/60'>
                                                 Where:
-                                                <ul className='ml-4 mt-2 space-y-1'>
+                                                <ul className='mt-2 ml-4 space-y-1'>
                                                     <li>• A = Wave amplitude</li>
                                                     <li>• k = Position wavenumber</li>
                                                     <li>• ω = Angular frequency</li>
@@ -515,7 +515,7 @@ const AlgorithmPage = () => {
                     <div className='mx-auto max-w-3xl text-center'>
                         <div className={`font-kodemonomb-6 text-sm tracking-wider text-white/60`}>UNDERSTANDING RTHMN</div>
                         <h2
-                            className={`font-outfit bg-linear-to-b mb-8 from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
+                            className={`font-outfit mb-8 bg-linear-to-b from-white via-white to-white/60 bg-clip-text text-4xl font-bold tracking-tight text-transparent lg:text-5xl`}>
                             The Algorithm Explained
                         </h2>
                         <p className='text-lg text-white/60'>Let's break down how Rthmn sees and understands markets, from the ground up.</p>

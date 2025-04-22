@@ -96,12 +96,12 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                     <table className='w-full text-xs'>
                                         <thead>
                                             <tr className='text-left text-neutral-500'>
-                                                <th className='whitespace-nowrap p-2'>Box #</th>
+                                                <th className='p-2 whitespace-nowrap'>Box #</th>
                                                 <th className='p-2'>
                                                     <div className='space-y-1'>
                                                         <div className='whitespace-nowrap'>Initial Box Data</div>
                                                         <div className='text-[10px] text-neutral-600'>Raw WebSocket Response</div>
-                                                        <div className='text-[10px] italic text-neutral-600'>
+                                                        <div className='text-[10px] text-neutral-600 italic'>
                                                             Initial timestamp: {initialBoxData?.timestamp ? new Date(initialBoxData.timestamp).toLocaleTimeString() : 'Loading...'}
                                                         </div>
                                                     </div>
@@ -110,7 +110,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                                     <div className='space-y-1'>
                                                         <div className='whitespace-nowrap'>Current Box Data</div>
                                                         <div className='text-[10px] text-neutral-600'>Processed by GridCalculator</div>
-                                                        <div className='text-[10px] italic text-neutral-600'>Current price: {currentOHLC?.close.toFixed(5)}</div>
+                                                        <div className='text-[10px] text-neutral-600 italic'>Current price: {currentOHLC?.close.toFixed(5)}</div>
                                                     </div>
                                                 </th>
                                             </tr>
@@ -126,10 +126,10 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                                 const initialBox = sortedInitialBoxes[idx];
                                                 return (
                                                     <tr key={idx} className='border-b border-[#181818]/50 hover:bg-[#0f0f0f]'>
-                                                        <td className='whitespace-nowrap p-2 text-neutral-500'>Box {idx + 1}</td>
+                                                        <td className='p-2 whitespace-nowrap text-neutral-500'>Box {idx + 1}</td>
 
                                                         {/* Initial Box Data Column */}
-                                                        <td className='whitespace-nowrap p-2'>
+                                                        <td className='p-2 whitespace-nowrap'>
                                                             <div className='flex items-center gap-4 font-mono'>
                                                                 {initialBox ? (
                                                                     <>
@@ -155,7 +155,7 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                                         </td>
 
                                                         {/* Current Box Data Column */}
-                                                        <td className='whitespace-nowrap p-2'>
+                                                        <td className='p-2 whitespace-nowrap'>
                                                             <div className='flex items-center gap-4 font-mono'>
                                                                 <div>
                                                                     <span className='text-neutral-400'>H:</span>

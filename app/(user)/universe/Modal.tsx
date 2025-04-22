@@ -34,7 +34,7 @@ export const Modal = ({ isOpen, onClose, pairName }: ModalProps) => {
                         </div>
                         <button
                             type='button'
-                            className='absolute bottom-0 right-0 rounded border border-neutral-600/50 bg-black/50 px-6 py-2 font-mono text-sm text-white transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-800'
+                            className='absolute right-0 bottom-0 rounded border border-neutral-600/50 bg-black/50 px-6 py-2 font-mono text-sm text-white transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-800'
                             onClick={onClose}>
                             Close
                         </button>
@@ -65,7 +65,7 @@ export const Modal = ({ isOpen, onClose, pairName }: ModalProps) => {
                         </div>
                         <button
                             type='button'
-                            className='absolute bottom-0 right-0 rounded border border-neutral-600/50 bg-black/50 px-6 py-2 font-mono text-sm text-white transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-800'
+                            className='absolute right-0 bottom-0 rounded border border-neutral-600/50 bg-black/50 px-6 py-2 font-mono text-sm text-white transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-800'
                             onClick={onClose}>
                             Close
                         </button>
@@ -93,7 +93,7 @@ export const Modal = ({ isOpen, onClose, pairName }: ModalProps) => {
                         </div>
                         <button
                             type='button'
-                            className='absolute bottom-0 right-0 rounded border border-neutral-600/50 bg-black/50 px-6 py-2 font-mono text-sm text-white transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-800'
+                            className='absolute right-0 bottom-0 rounded border border-neutral-600/50 bg-black/50 px-6 py-2 font-mono text-sm text-white transition-all duration-300 hover:border-neutral-400 hover:bg-neutral-800'
                             onClick={onClose}>
                             Close
                         </button>
@@ -104,7 +104,7 @@ export const Modal = ({ isOpen, onClose, pairName }: ModalProps) => {
 
     return (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm'>
-            <div className='fixed left-1/2 top-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-neutral-600/50 bg-black/90 p-8 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-neutral-500'>
+            <div className='fixed top-1/2 left-1/2 h-[50vh] w-[50vw] -translate-x-1/2 -translate-y-1/2 rounded-lg border border-neutral-600/50 bg-black/90 p-8 shadow-xl backdrop-blur-sm transition-all duration-300 hover:border-neutral-500'>
                 {modalContent}
             </div>
         </div>

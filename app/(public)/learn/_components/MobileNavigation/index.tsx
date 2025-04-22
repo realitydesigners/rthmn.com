@@ -198,7 +198,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                 {isOpen && (
                     <motion.div
                         ref={panelRef}
-                        className='fixed bottom-0 left-0 right-0 z-[120] flex flex-col rounded-t-xl border-t border-[#333] bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden'
+                        className='fixed right-0 bottom-0 left-0 z-[120] flex flex-col rounded-t-xl border-t border-[#333] bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden'
                         style={{ height: '60vh', maxHeight: 'calc(100vh - 80px)' }}
                         initial={{ opacity: 0, y: 300 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -269,7 +269,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                     <div className='space-y-6'>
                                         {course.chapters.map((chapter) => (
                                             <div key={chapter._id} className='space-y-2'>
-                                                <h3 className='text-sm font-semibold uppercase tracking-wider text-neutral-400'>{chapter.title}</h3>
+                                                <h3 className='text-sm font-semibold tracking-wider text-neutral-400 uppercase'>{chapter.title}</h3>
                                                 <div className='space-y-1'>
                                                     {chapter.lessons.map((lessonItem, index) => {
                                                         const isCompleted = store.isLessonCompleted(course._id, chapter._id, lessonItem._id);

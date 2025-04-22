@@ -81,7 +81,7 @@ export function SectionFooter() {
     };
 
     return (
-        <footer className='z-90 relative flex items-center justify-center border-t border-white/5 bg-black'>
+        <footer className='relative z-90 flex items-center justify-center border-t border-white/5 bg-black'>
             <div className='w-full px-6 py-12 lg:px-[5vw] 2xl:px-[10vw]'>
                 <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
                     {/* Left Side */}
@@ -111,7 +111,7 @@ export function SectionFooter() {
                         {/* Links Sections */}
                         {Object.entries(FOOTER_LINKS).map(([category, links]) => (
                             <div key={category} className='font-kodemono'>
-                                <h3 className='text-sm font-semibold uppercase text-white'>{category}</h3>
+                                <h3 className='text-sm font-semibold text-white uppercase'>{category}</h3>
                                 <ul className='mt-4 space-y-2'>
                                     {links.map((link) => (
                                         <li key={link.name}>
@@ -129,7 +129,7 @@ export function SectionFooter() {
                     </div>
                 </div>
                 <div className='font-kodemono mt-8 border-t border-white/10 pt-8 text-[11px] leading-relaxed text-neutral-400'>
-                    <h4 className='mb-2 text-xs font-semibold uppercase text-white'>Risk Disclosure & Disclaimer</h4>
+                    <h4 className='mb-2 text-xs font-semibold text-white uppercase'>Risk Disclosure & Disclaimer</h4>
                     <p className='text-neutral-400'>
                         RTHMN is pattern recognition platform providing algorithmic trading indicators and analysis tools. Built by traders, for traders. Trading in financial
                         instruments involves high risks including the risk of losing some, or all, of your investment amount, and may not be suitable for all investors. Before

@@ -90,7 +90,7 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
 };
 
 const PairFilters = ({ viewMode, setViewMode }: { viewMode: string; setViewMode: (mode: string) => void }) => (
-    <div className='bottom-22 absolute left-0 right-0 z-[1000]'>
+    <div className='absolute right-0 bottom-22 left-0 z-[1000]'>
         <div className='scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto px-4 py-2'>
             {navigationButtons.map((button) => (
                 <PairFilterButtons key={button.mode} isActive={viewMode === button.mode} onClick={() => setViewMode(button.mode)} label={button.label} />
@@ -228,7 +228,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
 
     return (
         <div
-            className={`scrollbar-hide fixed bottom-0 left-0 right-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
+            className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
                 isModalOpen ? 'h-[175px] lg:hidden' : 'h-[50vh]'
             }`}>
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -456,7 +456,7 @@ export const PairItem = ({
     return (
         <div
             data-index={index}
-            className={`pair-item relative shrink-0 touch-none select-none px-2 py-4 transition-all duration-300 ease-in-out ${isPressed ? 'scale-[0.98]' : ''}`}
+            className={`pair-item relative shrink-0 touch-none px-2 py-4 transition-all duration-300 ease-in-out select-none ${isPressed ? 'scale-[0.98]' : ''}`}
             style={{
                 scrollSnapAlign: 'center',
                 WebkitTapHighlightColor: 'transparent',
@@ -512,5 +512,5 @@ const PairIndicator = ({ type }: { type: 'active' | 'remove' | 'add' }) => {
         add: 'animate-pulse bg-gradient-to-r from-green-400/20 to-transparent',
     };
 
-    return <div className={`absolute -left-4 top-1/2 h-[2px] w-3 -translate-y-1/2 ${styles[type]}`} />;
+    return <div className={`absolute top-1/2 -left-4 h-[2px] w-3 -translate-y-1/2 ${styles[type]}`} />;
 };

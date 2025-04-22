@@ -27,7 +27,7 @@ export const CurrencySelector = memo(({ currency, onCurrencyChange }: CurrencySe
             <select
                 value={currency}
                 onChange={(e) => onCurrencyChange(e.target.value as Currency)}
-                className='w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-4 pl-12 pr-4 text-white shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:outline-none focus:ring-2 focus:ring-emerald-400/20'>
+                className='w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none'>
                 {CURRENCIES.map((curr) => (
                     <option key={curr.value} value={curr.value} className='bg-black'>
                         {curr.symbol} {curr.label}

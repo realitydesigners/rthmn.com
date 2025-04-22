@@ -58,8 +58,8 @@ export const NavigationDots: React.FC<NavigationDotsProps> = ({ currentSection, 
                     <div
                         className={`absolute bottom-full left-1/2 mb-3 -translate-x-1/2 rounded-lg bg-neutral-900/90 px-3 py-1.5 backdrop-blur-sm transition-all duration-200 ${
                             hoveredButton === button.sectionId ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-1 opacity-0'
-                        } before:absolute before:left-1/2 before:top-full before:-translate-x-1/2 before:border-4 before:border-transparent before:border-t-neutral-900/90`}>
-                        <span className='whitespace-nowrap text-sm font-medium text-white'>{button.name}</span>
+                        } before:absolute before:top-full before:left-1/2 before:-translate-x-1/2 before:border-4 before:border-transparent before:border-t-neutral-900/90`}>
+                        <span className='text-sm font-medium whitespace-nowrap text-white'>{button.name}</span>
                     </div>
                 </div>
             ))}

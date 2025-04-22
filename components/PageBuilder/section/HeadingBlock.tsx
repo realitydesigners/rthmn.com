@@ -8,8 +8,8 @@ const RenderCategory = ({ category }) => {
     if (!category) return null;
 
     return (
-        <div className='bg-linear-to-r my-1 flex items-center justify-center from-blue-100/100 to-blue-100/90 p-1 pl-2 pr-2'>
-            <span className={`flex h-auto items-center justify-center whitespace-nowrap text-xs font-semibold uppercase tracking-widest text-black`}>{category.title}</span>
+        <div className='my-1 flex items-center justify-center bg-linear-to-r from-blue-100/100 to-blue-100/90 p-1 pr-2 pl-2'>
+            <span className={`flex h-auto items-center justify-center text-xs font-semibold tracking-widest whitespace-nowrap text-black uppercase`}>{category.title}</span>
         </div>
     );
 };
@@ -60,7 +60,7 @@ const TeamSection = ({ team, theme }) => {
                                 priority={true}
                                 className='cover h-[2em] max-h-[2em] w-[2em] max-w-[2em] rounded-lg object-cover'
                             />
-                            <span className='bg-linear-to-r ml-2 cursor-pointer from-blue-100/100 to-blue-100/90 bg-clip-text text-sm font-bold uppercase leading-none tracking-wide text-transparent'>
+                            <span className='ml-2 cursor-pointer bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-sm leading-none font-bold tracking-wide text-transparent uppercase'>
                                 Written by {team.name}
                             </span>
                         </div>
@@ -88,29 +88,29 @@ const HeadingBlock = ({ block }) => {
 
                             <FormattedDate
                                 date={publicationDate}
-                                className={`bg-linear-to-r my-1 w-auto from-blue-100/100 to-blue-100/90 bg-clip-text text-xs uppercase tracking-widest text-transparent`}
+                                className={`my-1 w-auto bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xs tracking-widest text-transparent uppercase`}
                             />
                         </div>
 
                         <div className='flex w-full flex-wrap p-2 lg:w-1/2'>
                             <div className='h-full w-full object-contain object-cover'>
                                 <Image src={imageUrl} alt={'this'} width={1000} height={1000} className='h-50 w-50' />
-                                <p className='flex py-2 text-xs uppercase tracking-wide text-neutral-400'>Image Of: {imageAlt}</p>
+                                <p className='flex py-2 text-xs tracking-wide text-neutral-400 uppercase'>Image Of: {imageAlt}</p>
                             </div>
                         </div>
-                        <div className='flex-cols flex w-full justify-center p-2 pr-4 pt-2 lg:w-1/2 lg:pr-20 lg:pt-4'>
+                        <div className='flex-cols flex w-full justify-center p-2 pt-2 pr-4 lg:w-1/2 lg:pt-4 lg:pr-20'>
                             <div className='w-full'>
                                 <div className='mb-6 hidden w-full items-center justify-between lg:flex'>
                                     {block.category && <RenderCategory category={block.category} />}
 
                                     <FormattedDate
                                         date={publicationDate}
-                                        className={`bg-linear-to-r w-auto from-blue-100/100 to-blue-100/90 bg-clip-text text-xs uppercase tracking-widest text-transparent`}
+                                        className={`w-auto bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xs tracking-widest text-transparent uppercase`}
                                     />
                                 </div>
                                 <Heading
                                     heading={block.heading}
-                                    className={`font-russo bg-linear-to-r cursor-pointer from-blue-100/100 to-blue-100/90 bg-clip-text p-1 text-[10vw] font-bold uppercase leading-none text-transparent lg:text-[4vw]`}
+                                    className={`font-russo cursor-pointer bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text p-1 text-[10vw] leading-none font-bold text-transparent uppercase lg:text-[4vw]`}
                                 />
                                 <SubHeading
                                     heading={block.subheading}

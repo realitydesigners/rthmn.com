@@ -117,7 +117,7 @@ const InputField = memo(
                     value={value || ''}
                     onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
                     placeholder={placeholder}
-                    className={`w-full rounded-xl border bg-white/5 py-4 pl-12 pr-4 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
+                    className={`w-full rounded-xl border bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
                         error
                             ? 'border-red-400/50 focus:border-red-400/50 focus:bg-red-400/5 focus:ring-2 focus:ring-red-400/20'
                             : 'border-white/10 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20'
@@ -309,7 +309,7 @@ export const SectionCalculator = () => {
             <div className='pointer-events-none absolute inset-0'>
                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]' />
                 <div className='absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl' />
-                <div className='absolute -bottom-1/2 right-0 h-96 w-96 translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl' />
+                <div className='absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl' />
             </div>
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>

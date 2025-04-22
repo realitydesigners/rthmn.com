@@ -69,7 +69,7 @@ export function ChangelogBlock({
                     {/* Changelog Entries */}
                     <div className='mx-auto mt-12 max-w-4xl'>
                         <div className='relative space-y-8'>
-                            <div className='absolute left-0 top-0 h-full w-[1px] bg-[#333] lg:left-[29px]' />
+                            <div className='absolute top-0 left-0 h-full w-[1px] bg-[#333] lg:left-[29px]' />
 
                             {entries.map((entry: ChangelogEntry, index: number) => (
                                 <motion.div
@@ -81,7 +81,7 @@ export function ChangelogBlock({
                                     {/* Card gradient effects */}
                                     <div className='pointer-events-none absolute inset-0 rounded-xl'>
                                         <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]' />
-                                        <div className='bg-linear-to-r absolute inset-x-0 top-0 h-px from-transparent via-white/30 to-transparent' />
+                                        <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent' />
                                     </div>
 
                                     {/* Timeline dot and connector */}
@@ -89,7 +89,7 @@ export function ChangelogBlock({
                                         <div className='relative top-0 z-10 flex h-4 w-4 items-center justify-center'>
                                             <div className='absolute h-4 w-4 rounded-full border border-[#333] bg-black' />
                                         </div>
-                                        <div className='absolute left-1/2 top-[8px] h-[1px] w-[16px] bg-[#333] lg:w-[36px]' />
+                                        <div className='absolute top-[8px] left-1/2 h-[1px] w-[16px] bg-[#333] lg:w-[36px]' />
                                     </div>
 
                                     <div className='space-y-6'>
@@ -140,7 +140,7 @@ export function ChangelogBlock({
                                             className='group relative ml-auto flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] px-6 py-2 transition-all duration-200 hover:bg-white/[0.05]'>
                                             <div className='pointer-events-none absolute inset-0'>
                                                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]' />
-                                                <div className='bg-linear-to-r absolute inset-x-0 top-0 h-px from-transparent via-white/30 to-transparent' />
+                                                <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent' />
                                             </div>
                                             <span className='font-kodemono text-sm text-neutral-400'>{expandedEntries.has(entry._id) ? 'Show Less' : 'Read More'}</span>
                                         </button>

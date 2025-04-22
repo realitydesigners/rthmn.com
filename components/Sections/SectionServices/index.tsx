@@ -100,19 +100,19 @@ export const ServiceSection = () => {
                             onClick={() => handleServiceClick(label)}
                             onKeyDown={(e) => handleKeyPress(e, label)}>
                             {getIcon(icon)}
-                            <div className={`text-oxanium ml-2 text-lg font-bold uppercase leading-[1.2em]`}>{label}</div>
+                            <div className={`text-oxanium ml-2 text-lg leading-[1.2em] font-bold uppercase`}>{label}</div>
                         </li>
                     ))}
                 </ul>
             </div>
             {isDetailVisible && (
                 <div
-                    className='lg:-16 ml-0 mt-4 h-[80vh] grow overflow-hidden border border-neutral-600/25 p-4 transition-all duration-500 ease-in-out lg:ml-4 lg:mt-0 lg:w-3/4'
+                    className='lg:-16 mt-4 ml-0 h-[80vh] grow overflow-hidden border border-neutral-600/25 p-4 transition-all duration-500 ease-in-out lg:mt-0 lg:ml-4 lg:w-3/4'
                     style={{
                         maxHeight: isDetailVisible ? '100%' : '0',
                         opacity: isDetailVisible ? 1 : 0,
                     }}>
-                    <h2 className={`heading-text fade-in text-oxanium mb-4 text-4xl font-bold uppercase leading-none lg:text-5xl`}>{activeService}</h2>
+                    <h2 className={`heading-text fade-in text-oxanium mb-4 text-4xl leading-none font-bold uppercase lg:text-5xl`}>{activeService}</h2>
                     <p className={`primary-text fade-in text-oxanium text-xl text-neutral-400`}>{Services.find((service) => service.label === activeService)?.desc}</p>
                 </div>
             )}

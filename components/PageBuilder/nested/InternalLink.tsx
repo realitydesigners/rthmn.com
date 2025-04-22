@@ -40,7 +40,7 @@ const TeamLink = ({ team, theme }) => {
         <Link href={`/team/${team.slug.current}`}>
             <div className={`flex w-auto items-center p-2 ${style.textColor}`}>
                 {team.image && <Image src={team.image} width={100} height={100} priority={true} alt='Team Image' className='h-[30px] max-w-[30px] rounded-[1em] object-cover' />}
-                <span className='ml-2 text-sm uppercase tracking-wide'>{team.name || 'no title'}</span>
+                <span className='ml-2 text-sm tracking-wide uppercase'>{team.name || 'no title'}</span>
             </div>
         </Link>
     );
@@ -76,10 +76,10 @@ const PostPreviewDialog = ({
                             <div className='flex w-full justify-between'>
                                 <Link
                                     href={`/posts/${postData.slug.current}`}
-                                    className={`${style.textColor} lg:text-md flex w-1/2 items-center pl-4 text-sm font-bold leading-[1.3em]`}>
+                                    className={`${style.textColor} lg:text-md flex w-1/2 items-center pl-4 text-sm leading-[1.3em] font-bold`}>
                                     {content.heading || 'no title'}
                                 </Link>
-                                <span className={`${style.textColor} mb-2 flex h-auto w-auto items-center pr-2 pt-1 text-[.6em] uppercase leading-[1em] tracking-widest`}>
+                                <span className={`${style.textColor} mb-2 flex h-auto w-auto items-center pt-1 pr-2 text-[.6em] leading-[1em] tracking-widest uppercase`}>
                                     {formatDate(content.publicationDate)}
                                 </span>
                             </div>
@@ -93,7 +93,7 @@ const PostPreviewDialog = ({
                                 <TeamLink team={content?.team} theme={theme} />
                                 <Link
                                     href={`/posts/${postData.slug.current}`}
-                                    className={`${style.buttonTextColor} ${style.buttonBackgroundColor} absolute bottom-1 right-2 flex items-center justify-center rounded-[.7em] px-4 py-2 text-sm font-bold uppercase hover:transition-colors`}
+                                    className={`${style.buttonTextColor} ${style.buttonBackgroundColor} absolute right-2 bottom-1 flex items-center justify-center rounded-[.7em] px-4 py-2 text-sm font-bold uppercase hover:transition-colors`}
                                     prefetch={true}>
                                     Read More
                                 </Link>
@@ -131,7 +131,7 @@ const InternalLink: React.FC<{
         <>
             <Link href='#popup' onClick={openDialog}>
                 <span className='text-xl font-bold capitalize underline'>{children}</span>
-                <span className={`font-russo ml-2 rounded-full bg-[#c4b5fd] pb-[5px] pl-2 pr-2 pt-[5px] text-[16px] text-black`}>POST</span>
+                <span className={`font-russo ml-2 rounded-full bg-[#c4b5fd] pt-[5px] pr-2 pb-[5px] pl-2 text-[16px] text-black`}>POST</span>
             </Link>
             <PostPreviewDialog isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} postData={previewPostData} theme={theme} />
             {isDialogOpen && isLoading && <LoadingIndicator />}
@@ -143,7 +143,7 @@ export default React.memo(InternalLink);
 
 const LoadingIndicator = () => (
     <div className='my-4 flex items-center justify-center'>
-        <div className='bg-linear-to-r flex h-auto w-full animate-pulse items-center justify-center rounded-lg from-blue-200/10 to-blue-200/5 p-4 shadow-lg'>
+        <div className='flex h-auto w-full animate-pulse items-center justify-center rounded-lg bg-linear-to-r from-blue-200/10 to-blue-200/5 p-4 shadow-lg'>
             {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg width='100' height='100' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'>
                 <circle cx='25' cy='25' r='20' stroke='#333' strokeWidth='5' fill='none' strokeDasharray='31.415, 31.415' strokeDashoffset='0'>

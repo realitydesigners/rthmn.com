@@ -13,7 +13,7 @@ interface ChartControlsProps {
 
 const ChartControls: React.FC<ChartControlsProps> = ({ showBoxLevels, setShowBoxLevels, boxVisibilityFilter, setBoxVisibilityFilter, currentPrice, pair }) => {
     return (
-        <div className='absolute left-0 right-16 top-4 z-10 flex items-center justify-between px-4'>
+        <div className='absolute top-4 right-16 left-0 z-10 flex items-center justify-between px-4'>
             <div className='flex items-baseline gap-2'>
                 <h1 className='font-outfit text-xl font-bold tracking-wider text-white'>{pair}</h1>
                 <div className='font-kodemono text-sm font-medium text-neutral-200'>{currentPrice || '-'}</div>

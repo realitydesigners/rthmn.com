@@ -71,7 +71,7 @@ export default function Callout({ type = 'info', title, points }: CalloutProps) 
             className={`relative my-10 overflow-hidden rounded-2xl border ${style.border} bg-gradient-to-br ${style.bg} p-0.5 backdrop-blur-lg before:absolute before:inset-0 before:-z-10 before:translate-y-[60%] before:transform before:rounded-full before:opacity-20 before:blur-3xl before:content-[''] ${style.glow}`}>
             <div className='relative rounded-[14px] bg-black/30 p-6 backdrop-blur-sm'>
                 {/* Decorative elements */}
-                <div className='absolute -right-12 -top-12 h-24 w-24 rounded-full bg-gradient-to-br from-white/5 to-transparent opacity-20 blur-2xl'></div>
+                <div className='absolute -top-12 -right-12 h-24 w-24 rounded-full bg-gradient-to-br from-white/5 to-transparent opacity-20 blur-2xl'></div>
                 <div className={`absolute -bottom-4 -left-4 h-20 w-20 rounded-full ${style.accent} opacity-10 blur-2xl`}></div>
 
                 {/* Header */}

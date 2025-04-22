@@ -43,12 +43,12 @@ export const BoxInfo: React.FC<AutoBoxModuleProps> = ({ visibility }) => {
                 x: visibility?.isVisible ? 0 : -20,
             }}
             transition={{ duration: 0.5 }}
-            className='fixed left-20 top-1/2 w-[800px] -translate-y-1/2 space-y-12'>
+            className='fixed top-1/2 left-20 w-[800px] -translate-y-1/2 space-y-12'>
             {/* Main Content */}
             <div className='space-y-8'>
                 {/* Header */}
                 <div className='space-y-4'>
-                    <h2 className='text-neutral-gradient font-outfit relative z-10 text-[3em] font-bold leading-[1em] tracking-tight lg:text-[6em] lg:leading-[1em]'>
+                    <h2 className='text-neutral-gradient font-outfit relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[6em] lg:leading-[1em]'>
                         The Future of
                         <br />
                         Market Analysis

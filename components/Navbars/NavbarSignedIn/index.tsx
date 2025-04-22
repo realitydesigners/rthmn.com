@@ -41,7 +41,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const pathSegments = formatPathname(pathname);
 
     return (
-        <nav className='fixed left-0 right-0 top-0 z-[100] h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:flex lg:h-14'>
+        <nav className='fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:flex lg:h-14'>
             <div className='group relative z-[110] h-full w-full'>
                 <div className='relative flex h-full w-full items-center justify-between rounded-lg px-2'>
                     {/* Left section */}
@@ -62,19 +62,19 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                     <div key={index} className='flex items-center gap-1.5'>
                                         <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1'>
                                             {getSegmentIcon(segment) && <span className='text-[#666]'>{getSegmentIcon(segment)}</span>}
-                                            <span className='font-kodemono text-[10px] font-bold font-medium uppercase tracking-widest text-neutral-200/50'>{segment}</span>
+                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-neutral-200/50 uppercase'>{segment}</span>
                                         </div>
                                         {index < pathSegments.length - 1 && <LuChevronRight size={14} className='text-[#444]' />}
                                     </div>
                                 ))
                             ) : (
-                                <span className='font-mono text-[11px] font-medium uppercase tracking-wider text-neutral-200/50'>{pathSegments}</span>
+                                <span className='font-mono text-[11px] font-medium tracking-wider text-neutral-200/50 uppercase'>{pathSegments}</span>
                             )}
                         </div>
                     </div>
 
                     {/* Center section - GridControl */}
-                    <div className='absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block'>
+                    <div className='absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block'>
                         <GridControl />
                     </div>
 

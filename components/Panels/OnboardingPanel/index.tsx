@@ -19,7 +19,7 @@ const OnboardingCard = ({ step, isCompleted, isCurrent, stepNumber }: { step: (t
             {/* Content */}
             <div className='relative flex items-center gap-4 rounded-xl bg-black/40 p-3'>
                 {isCompleted && (
-                    <div className='absolute right-2 top-2'>
+                    <div className='absolute top-2 right-2'>
                         <div className='flex h-4 w-4 items-center justify-center rounded-full bg-[#3FFFA2]/20'>
                             <LuCheck className='h-3 w-3 text-[#3FFFA2]' />
                         </div>

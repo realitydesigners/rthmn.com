@@ -65,7 +65,7 @@ const AuroraBackground = () => (
                 ease: 'linear',
             },
         }}
-        className={`pointer-events-none absolute inset-0 overflow-hidden backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] [background-image:var(--white-gradient),var(--aurora)] [background-position:0%_50%,0%_50%] [background-size:200%,_200%] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-attachment:fixed] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%]`}
+        className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed]`}
     />
 );
 
@@ -209,13 +209,13 @@ export default function SignIn() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder='Enter your email'
-                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-500/20'
+                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-neutral-500/20 focus:outline-none'
                                     required
                                 />
                                 <button
                                     type='submit'
                                     disabled={isLoading}
-                                    className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-neutral-500/20 active:scale-[0.99]'>
+                                    className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-neutral-500/20 focus:outline-none active:scale-[0.99]'>
                                     <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-neutral-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-neutral-100 lg:py-2.5'>
                                         <div className='absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]' />
                                         <span className='relative text-base sm:text-base'>{isLoading ? 'Sending...' : 'Sign in with Email'}</span>
@@ -231,7 +231,7 @@ export default function SignIn() {
 
                         <form onSubmit={handleSignIn}>
                             <button
-                                className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-neutral-500/20 active:scale-[0.99]'
+                                className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-neutral-500/20 focus:outline-none active:scale-[0.99]'
                                 type='submit'>
                                 <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-neutral-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-neutral-100 lg:py-2.5'>
                                     <div className='absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]' />

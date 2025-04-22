@@ -64,7 +64,7 @@ const AccountPanel = () => {
                         <h1 className='font-outfit mb-1 text-center text-xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h1>
                         <ProBadge />
                     </div>
-                    <p className='font-outfit max-w-full break-words text-center text-sm text-zinc-400'>{user.email}</p>
+                    <p className='font-outfit max-w-full text-center text-sm break-words text-zinc-400'>{user.email}</p>
                 </div>
 
                 {/* Account Sections */}

@@ -170,7 +170,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
         <>
             {isNavOpen && !isproduction && (
                 <div
-                    className='z-1000 fixed inset-0 bg-black/75 backdrop-blur-sm lg:hidden'
+                    className='fixed inset-0 z-1000 bg-black/75 backdrop-blur-sm lg:hidden'
                     onClick={handleBackdropClick}
                     onKeyDown={(e) => e.key === 'Escape' && handleBackdropClick()}
                     role='button'
@@ -179,7 +179,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             )}
 
             <motion.div
-                className={`z-1001 bg-linear-to-b fixed left-0 right-0 top-0 z-50 h-16 from-black via-black/50 to-transparent font-mono lg:h-20`}
+                className={`fixed top-0 right-0 left-0 z-50 z-1001 h-16 bg-linear-to-b from-black via-black/50 to-transparent font-mono lg:h-20`}
                 initial='hidden'
                 animate='visible'
                 variants={navVariants}>
@@ -217,8 +217,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                     <div className='flex items-center gap-3'>
                                         <Link
                                             href='/dashboard'
-                                            className='font-outfit bg-linear-to-b flex items-center justify-center space-x-3 rounded-md from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
-                                            <span className='bg-linear-to-b flex w-full items-center justify-center rounded-md from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
+                                            className='font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                            <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
                                                 Dashboard
                                             </span>
                                         </Link>
@@ -259,8 +259,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                 ) : pathname !== '/signin' ? (
                                     <Link
                                         href='/signin'
-                                        className='font-outfit bg-linear-to-b group flex items-center justify-center space-x-3 rounded-md from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
-                                        <span className='bg-linear-to-b flex w-full items-center justify-center rounded-md from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium'>
+                                        className='font-outfit group flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                        <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium'>
                                             Start now
                                             <HiChevronRight className='ml-1 h-4 w-4 opacity-60 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100' />
                                         </span>
@@ -276,7 +276,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 <AnimatePresence>
                     {isNavOpen && (
                         <motion.div
-                            className={`z-1000 fixed inset-0 bg-black bg-opacity-95 pt-16 font-mono backdrop-blur-sm lg:hidden`}
+                            className={`bg-opacity-95 fixed inset-0 z-1000 bg-black pt-16 font-mono backdrop-blur-sm lg:hidden`}
                             initial={{ opacity: 0, y: -100 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -100 }}
@@ -288,8 +288,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                         <div className='flex items-center gap-3'>
                                             <Link
                                                 href='/dashboard'
-                                                className='font-outfit bg-linear-to-b flex w-full items-center justify-center space-x-3 rounded-md from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
-                                                <span className='bg-linear-to-b flex w-full items-center justify-center rounded-md from-[#0A0A0A] to-[#181818] px-4 py-3 text-sm font-medium'>
+                                                className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                                <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-sm font-medium'>
                                                     Dashbaord
                                                 </span>
                                             </Link>
@@ -330,8 +330,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                     ) : (
                                         <Link
                                             href='/signin'
-                                            className='font-outfit bg-linear-to-b flex w-full items-center justify-center space-x-3 rounded-md from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
-                                            <span className='bg-linear-to-b flex w-full items-center justify-center rounded-md from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
+                                            className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                            <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
                                                 Start now
                                             </span>
                                         </Link>
@@ -375,9 +375,9 @@ export const NavButton: FC<NavButtonProps> = ({ href, children, onMouseEnter, on
             <motion.div variants={buttonVariants} initial='hidden' animate='visible' custom={custom}>
                 <Link
                     href={href}
-                    className='bg-linear-to-b flex items-center rounded-full from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'
+                    className='flex items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'
                     onClick={onClick}>
-                    <span className='bg-linear-to-b flex w-full items-center space-x-3 rounded-full from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm'>{children}</span>
+                    <span className='flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm'>{children}</span>
                 </Link>
             </motion.div>
         </div>
@@ -486,7 +486,7 @@ export const DesktopMenuContent = ({ activeDropdown, onMouseEnter, onMouseLeave,
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    className={`fixed left-0 right-0 z-50 flex justify-center ${activeDropdown ? styles.active : styles.inactive}`}
+                    className={`fixed right-0 left-0 z-50 flex justify-center ${activeDropdown ? styles.active : styles.inactive}`}
                     onMouseEnter={onMouseEnter}
                     onMouseLeave={onMouseLeave}
                     variants={dropdownVariants}

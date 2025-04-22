@@ -101,7 +101,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
                 {/* Single Pricing Card */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className='mx-auto max-w-2xl'>
-                    <div className='inset-shadow-sm inset-shadow-white/5 relative overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-xl shadow-black/20 backdrop-blur-sm'>
+                    <div className='relative overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-xl inset-shadow-sm shadow-black/20 inset-shadow-white/5 backdrop-blur-sm'>
                         {/* Enhanced glow effects */}
                         <div className='pointer-events-none absolute inset-0'>
                             <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]' />
@@ -113,7 +113,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
                             <div className='mb-8 text-center'>
                                 <h2 className='font-outfit mb-4 text-3xl font-bold text-white'>{product.name}</h2>
                                 <div className='mb-4'>
-                                    <div className='inline-flexrounded-full inset-shadow-xs px-6 py-2 shadow-lg'>
+                                    <div className='inline-flexrounded-full px-6 py-2 shadow-lg inset-shadow-xs'>
                                         <span className='font-outfit text-6xl font-bold text-white'>{priceString}</span>
                                         <span className='font-kodemono ml-2 text-lg text-neutral-400'>/month</span>
                                     </div>
@@ -127,8 +127,8 @@ export function SectionPricing({ user, products, subscription }: Props) {
                                     {PricingBenefits.map((benefit, index) => (
                                         <div
                                             key={index}
-                                            className='hover:inset-shadow-2xs hover:inset-shadow-white/10 flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-neutral-400 transition-all duration-300 hover:bg-white/5'>
-                                            <div className='inset-shadow-xs inset-shadow-white/10 flex h-6 w-6 items-center justify-center rounded-full bg-white/5 shadow-sm'>
+                                            className='flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-neutral-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10'>
+                                            <div className='flex h-6 w-6 items-center justify-center rounded-full bg-white/5 shadow-sm inset-shadow-xs inset-shadow-white/10'>
                                                 <FaCheck className='h-3 w-3 text-emerald-400' />
                                             </div>
                                             <span className='font-kodemono text-md'>{benefit}</span>
@@ -141,8 +141,8 @@ export function SectionPricing({ user, products, subscription }: Props) {
                             <button
                                 onClick={() => handleStripeCheckout(price)}
                                 disabled={priceIdLoading === price.id}
-                                className='bg-linear-to-b inset-shadow-sm inset-ring inset-shadow-white/10 inset-ring-white/5 group relative flex w-full items-center justify-center rounded-full from-[#333333] to-[#181818] p-[1px] text-white shadow-lg shadow-black/20 ring-1 ring-white/10 transition-all duration-300 hover:from-[#444444] hover:to-[#282828] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50'>
-                                <span className='font-outfit bg-linear-to-b group-hover:inset-shadow-sm group-hover:inset-shadow-white/5 relative flex w-full items-center justify-center gap-2 rounded-full from-[#0A0A0A] to-[#181818] px-4 py-3 text-lg font-medium transition-all duration-300'>
+                                className='group relative flex w-full items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white shadow-lg ring-1 inset-shadow-sm inset-ring shadow-black/20 ring-white/10 inset-shadow-white/10 inset-ring-white/5 transition-all duration-300 hover:from-[#444444] hover:to-[#282828] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50'>
+                                <span className='font-outfit relative flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-lg font-medium transition-all duration-300 group-hover:inset-shadow-sm group-hover:inset-shadow-white/5'>
                                     {priceIdLoading === price.id ? (
                                         <span className='flex items-center gap-2'>
                                             <svg className='h-4 w-4 animate-spin' viewBox='0 0 24 24'>
@@ -173,7 +173,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
             {/* Add floating elements */}
             <div className='pointer-events-none absolute inset-0 overflow-hidden'>
                 <div className='absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-white/5 blur-3xl' />
-                <div className='absolute -bottom-1/2 right-0 h-96 w-96 translate-x-1/2 rounded-full bg-white/5 blur-3xl' />
+                <div className='absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-white/5 blur-3xl' />
             </div>
         </section>
     );

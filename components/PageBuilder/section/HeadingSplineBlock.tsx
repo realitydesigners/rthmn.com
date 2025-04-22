@@ -29,17 +29,17 @@ const HeadingSplineBlock = ({ block }) => {
 
             const renderCategory = block.category ? (
                 <span
-                    className={`font-russo mr-1 h-auto items-center justify-center whitespace-nowrap bg-neutral-200 p-1 pl-2 pr-2 text-xs font-semibold uppercase tracking-widest text-black`}>
+                    className={`font-russo mr-1 h-auto items-center justify-center bg-neutral-200 p-1 pr-2 pl-2 text-xs font-semibold tracking-widest whitespace-nowrap text-black uppercase`}>
                     {block.category.title}
                 </span>
             ) : null;
 
             return (
-                <div className='h-auto w-full bg-black pb-20 pt-20 lg:pb-0 lg:pt-32'>
+                <div className='h-auto w-full bg-black pt-20 pb-20 lg:pt-32 lg:pb-0'>
                     <div className='flex w-full flex-wrap justify-center'>
                         <div className='flex-cols flex w-11/12 flex-wrap items-center justify-between'>
                             <div className='flex w-auto'>
-                                <span className={`font-russo ml-2 w-auto text-xs uppercase tracking-widest text-neutral-200`}>POSTED ON {formattedDate}</span>
+                                <span className={`font-russo ml-2 w-auto text-xs tracking-widest text-neutral-200 uppercase`}>POSTED ON {formattedDate}</span>
                             </div>
                             {renderCategory}
                         </div>
@@ -63,7 +63,7 @@ const HeadingSplineBlock = ({ block }) => {
                                                         priority={true}
                                                         className='cover h-[30px] w-[30px] rounded-[2em] object-cover'
                                                     />
-                                                    {block.team.name && <span className='ml-2 text-sm uppercase tracking-wide text-neutral-200'>{block.team.name}</span>}
+                                                    {block.team.name && <span className='ml-2 text-sm tracking-wide text-neutral-200 uppercase'>{block.team.name}</span>}
                                                 </div>
                                             )}
                                         </div>
