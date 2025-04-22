@@ -5,7 +5,6 @@ import { NavbarSignedIn } from '@/components/Navbars/NavbarSignedIn';
 import { SidebarLeft } from '@/components/Sidebars/SidebarLeft';
 import { SidebarRight } from '@/components/Sidebars/SidebarRight';
 import { DashboardProvider } from '@/providers/DashboardProvider/client';
-import { QueryProvider } from '@/providers/QueryProvider';
 import { UserProvider } from '@/providers/UserProvider';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
 import { getSubscription, getUser } from '@/lib/supabase/queries';
