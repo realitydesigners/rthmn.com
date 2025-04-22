@@ -32,7 +32,7 @@ export function HeroBlock({ title, content }: HeroBlockProps) {
           }
         : {
               href: '/signin',
-              text: 'Beta Access',
+              text: 'Start now',
           };
 
     console.log('Hero block content:', content);

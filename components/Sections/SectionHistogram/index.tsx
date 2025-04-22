@@ -4,6 +4,26 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { sequences } from '@/components/Constants/constants';
 import { Histogram } from './Histogram';
+import { FaCrosshairs, FaLayerGroup, FaSignal } from 'react-icons/fa';
+
+// Define histogramBenefits constant here
+const histogramBenefits = [
+    {
+        icon: FaLayerGroup,
+        title: 'Pinpoint Key Levels',
+        description: 'Instantly see high-volume nodes acting as crucial support and resistance zones.',
+    },
+    {
+        icon: FaSignal,
+        title: 'Gauge Market Strength',
+        description: 'Understand where conviction lies by visualizing volume concentration at specific price points.',
+    },
+    {
+        icon: FaCrosshairs,
+        title: 'Spot Activity Hotspots',
+        description: 'Identify price levels with the most trading activity, revealing areas of high interest.',
+    },
+];
 
 export const SectionHistogram = () => {
     const [containerHeight, setContainerHeight] = useState(200);
@@ -73,8 +93,17 @@ export const SectionHistogram = () => {
     }, []);
 
     return (
-        <section className='relative overflow-hidden'>
-            <div className='w-full bg-black px-[0vw] lg:px-[10vw]'>
+        <section className='relative overflow-hidden bg-black py-16 text-center sm:py-24'>
+            {/* Text Content Container */}
+            <div className='mx-auto mb-12 max-w-3xl px-4 sm:px-6 lg:px-8'>
+                <h2 className='font-outfit text-gray-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl'>Visualize Market Dynamics</h2>
+                <p className='font-outfit text-md mx-auto mt-4 max-w-2xl text-gray-400 sm:text-lg lg:text-xl'>
+                    Dive deep into order flow with our volume profile histogram. Identify key support/resistance levels and understand market conviction at a glance.
+                </p>
+            </div>
+
+            {/* Histogram Container - Add relative positioning for overlay */}
+            <div className='relative mx-auto w-full max-w-7xl rounded-xl border border-white/10 bg-white/5 p-4 shadow-lg lg:px-[5vw]'>
                 <Histogram
                     tableRef={tableRef}
                     demoStep={demoStep}
@@ -86,6 +115,21 @@ export const SectionHistogram = () => {
                     onPrevious={() => setDemoStep((prev) => (prev - 1 + totalStepsRef.current) % totalStepsRef.current)}
                     isPaused={isPaused}
                 />
+                {/* Gradient Overlay */}
+                <div className='pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/80 to-transparent'></div>
+            </div>
+
+            {/* Benefits Section */}
+            <div className='mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-3 lg:px-8'>
+                {histogramBenefits.map((benefit) => (
+                    <div key={benefit.title} className='text-center'>
+                        <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-800'>
+                            <benefit.icon className='h-6 w-6 text-gray-400' aria-hidden='true' />
+                        </div>
+                        <h3 className='font-outfit mt-6 text-lg font-semibold text-white'>{benefit.title}</h3>
+                        <p className='mt-2 text-base text-gray-400'>{benefit.description}</p>
+                    </div>
+                ))}
             </div>
         </section>
     );

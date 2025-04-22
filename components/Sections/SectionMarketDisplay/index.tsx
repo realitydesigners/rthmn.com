@@ -28,9 +28,8 @@ interface CardPosition {
 }
 
 // Constants
-// Updated positions for a wider, more dynamic spread
+// Desktop positions (values need scaling)
 const CARD_POSITIONS: CardPosition[] = [
-    // Push cards much further out to avoid central overlap
     { x: -1800, y: -700, z: 10 }, // Top-left far
     { x: -1300, y: -400, z: 40 }, // Top-left closer
     { x: -800, y: -600, z: 25 }, // Top-left mid
@@ -45,11 +44,21 @@ const CARD_POSITIONS: CardPosition[] = [
     { x: 600, y: 550, z: 30 }, // Bottom-right mid
 ];
 
-const ANIMATION_DURATION = 10000;
-// Slightly adjusted scale for the new positions
+// Mobile positions (direct pixel offsets, no scaling needed)
+const CARD_MOBILE_POSITIONS: CardPosition[] = [
+    { x: -150, y: -300, z: 20 }, // Top-left
+    { x: 150, y: -300, z: 25 }, // Top-right
+    { x: -200, y: 0, z: 30 }, // Mid-left
+    { x: 200, y: 0, z: 35 }, // Mid-right
+    { x: -150, y: 250, z: 25 }, // Bottom-left
+    { x: 150, y: 300, z: 20 }, // Bottom-right
+];
+
+const ANIMATION_DURATION = 20000;
+
 const POSITION_SCALE = {
-    MOBILE: 0.2,
-    DESKTOP: 0.55, // Further reduced desktop scale
+    // MOBILE: 0.2, // No longer needed
+    DESKTOP: 0.55,
 };
 
 // Add default position
@@ -86,13 +95,13 @@ const MarketHeading = memo(() => (
     <div className='relative z-20 text-center'>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className='mb-8'>
-                <h2 className='font-outfit text-gray-gradient relative text-[4em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
-                    Unlock Market
+                <h2 className='font-outfit text-gray-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
+                    Unlock Trading
                     <br />
-                    Patterns, Instantly.
+                    Patterns Instantly.
                 </h2>
-                <p className='font-kodemono mx-auto mt-6 max-w-2xl px-4 text-base text-gray-400 sm:text-lg'>
-                    Experience real-time market data visualization with our advanced pattern recognition system.
+                <p className='font-outfit text-md text-gray-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
+                    Our real-time market data visualization with our advanced pattern recognition system.
                 </p>
             </div>
 
@@ -101,13 +110,6 @@ const MarketHeading = memo(() => (
                 <StartButton href='#pricing' custom={0}>
                     Get Started
                 </StartButton>
-
-                <button className='g flex h-[60px] items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                    <div className='flex h-[56px] w-full items-center space-x-6 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-2 text-sm'>
-                        <span className='text-md mr-4'>Watch Demo</span>
-                        <FaPlay />
-                    </div>
-                </button>
             </div>
         </motion.div>
     </div>
@@ -261,7 +263,7 @@ const useAnimationProgress = (duration: number) => {
 };
 
 // 2. Create a memoized transform component to handle card positioning
-const CardTransform = memo(({ children, position, index }: { children: React.ReactNode; position: CardPosition; index: number }) => {
+const CardTransform = memo(({ children, position, index, change }: { children: React.ReactNode; position: CardPosition; index: number; change: number }) => {
     const [isMobile, setIsMobile] = useState(false);
 
     useEffect(() => {
@@ -273,16 +275,6 @@ const CardTransform = memo(({ children, position, index }: { children: React.Rea
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
-
-    const adjustedPosition = useMemo(() => {
-        return isMobile
-            ? {
-                  x: position.x / 2,
-                  y: position.y / 2,
-                  z: position.z,
-              }
-            : position;
-    }, [position, isMobile]);
 
     const floatAnimation: FloatAnimation = useMemo(
         () => ({
@@ -298,46 +290,62 @@ const CardTransform = memo(({ children, position, index }: { children: React.Rea
         [index]
     );
 
+    // Calculate final positions based on mobile state
+    const targetX = isMobile ? position.x : position.x * POSITION_SCALE.DESKTOP;
+    const targetY = isMobile ? position.y : position.y * POSITION_SCALE.DESKTOP;
+
+    // Define animation variants based on mobile state
+    const animateProps = {
+        y: isMobile ? targetY : targetY + Math.sin(index * 0.8) * CARD_ANIMATION.FLOAT_RANGE.y,
+        x: isMobile ? targetX : targetX + Math.cos(index * 0.5) * CARD_ANIMATION.FLOAT_RANGE.x,
+        opacity: 1,
+        transition: isMobile
+            ? {
+                  // Mobile: Simple fade-in
+                  opacity: {
+                      duration: 0.5,
+                      delay: index * 0.1,
+                  },
+              }
+            : {
+                  // Desktop: Floating + fade-in
+                  y: {
+                      duration: floatAnimation.y.duration,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                      delay: floatAnimation.y.delay,
+                  },
+                  x: {
+                      duration: floatAnimation.x.duration,
+                      repeat: Infinity,
+                      repeatType: 'reverse',
+                      ease: 'easeInOut',
+                      delay: floatAnimation.x.delay,
+                  },
+                  opacity: {
+                      duration: 0.5,
+                      delay: index * 0.1,
+                  },
+              },
+    };
+
     return (
         <motion.div
             className='absolute top-1/2 left-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]'
             initial={{
-                x: adjustedPosition.x * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP),
-                y: adjustedPosition.y * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP),
-                z: adjustedPosition.z,
+                x: targetX,
+                y: targetY,
+                z: position.z, // Use z directly
                 scale: CARD_ANIMATION.INITIAL_SCALE,
                 rotateX: (index % 3) * CARD_ANIMATION.ROTATION.x,
                 rotateY: (index % 2) * CARD_ANIMATION.ROTATION.y,
                 opacity: 0,
             }}
-            animate={{
-                y: adjustedPosition.y * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP) + Math.sin(index * 0.8) * CARD_ANIMATION.FLOAT_RANGE.y,
-                x: adjustedPosition.x * (isMobile ? POSITION_SCALE.MOBILE : POSITION_SCALE.DESKTOP) + Math.cos(index * 0.5) * CARD_ANIMATION.FLOAT_RANGE.x,
-                opacity: 1,
-                transition: {
-                    y: {
-                        duration: floatAnimation.y.duration,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                        ease: 'easeInOut',
-                        delay: floatAnimation.y.delay,
-                    },
-                    x: {
-                        duration: floatAnimation.x.duration,
-                        repeat: Infinity,
-                        repeatType: 'reverse',
-                        ease: 'easeInOut',
-                        delay: floatAnimation.x.delay,
-                    },
-                    opacity: {
-                        duration: 0.5,
-                        delay: index * 0.1,
-                    },
-                },
-            }}
+            animate={animateProps} // Use the conditional animateProps
             whileHover={{
                 scale: CARD_ANIMATION.HOVER_SCALE,
-                z: adjustedPosition.z + 100,
+                z: position.z + 100, // Use z directly
                 rotateX: 0,
                 rotateY: 0,
                 transition: HOVER_TRANSITION,
@@ -416,28 +424,45 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Slice data for mobile and desktop
+    // Choose position array based on mobile state
+    const chosenPositions = useMemo(() => {
+        return isMobile ? CARD_MOBILE_POSITIONS : CARD_POSITIONS;
+    }, [isMobile]);
+
+    // Slice data based on the chosen positions array length
     const processedData = useMemo(() => {
-        const limit = isMobile ? 6 : CARD_POSITIONS.length; // Use array length for desktop limit
+        const limit = chosenPositions.length;
         return rawProcessedData.slice(0, limit);
-    }, [isMobile, rawProcessedData]);
+    }, [chosenPositions, rawProcessedData]);
+
+    // Grid background style
+    const gridStyle = {
+        backgroundImage: `
+            linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '60px 60px', // Adjusted size for better visual density
+    };
 
     return (
-        <section ref={ref} className='relative overflow-hidden'>
-            {/* Center content */}
-            <div className='relative z-10 flex min-h-screen flex-col items-center justify-center px-4'>
+        <section
+            ref={ref}
+            className='relative min-h-screen overflow-hidden bg-black' // Ensure base bg color
+            style={gridStyle} // Apply grid style
+        >
+            {/* Center content wrapper */}
+            <div className='relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-16'>
                 {/* Centered heading */}
-                <div className='absolute top-1/2 left-1/2 z-20 w-full -translate-x-1/2 -translate-y-1/2 transform'>
+                <div className='absolute top-1/2 left-1/2 z-20 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 transform px-4'>
                     <MarketHeading />
                 </div>
                 {/* 3D Cards Container */}
                 <div className='absolute inset-0 z-10'>
-                    {/* Reduced perspective */}
                     <div className='relative h-full [perspective:2500px]'>
                         {inView &&
                             processedData.map(({ item, data }, index) => (
-                                <CardTransform key={item.pair} position={CARD_POSITIONS[index] || DEFAULT_POSITION} index={index}>
-                                    <div className='group relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 hover:bg-black/80'>
+                                <CardTransform key={item.pair} position={chosenPositions[index] || DEFAULT_POSITION} index={index} change={data.change}>
+                                    <div className='relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80'>
                                         <CardContent item={item} data={data} />
                                     </div>
                                 </CardTransform>

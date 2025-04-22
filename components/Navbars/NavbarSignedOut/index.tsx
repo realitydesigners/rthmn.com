@@ -241,7 +241,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                         href='/signin'
                                         className='font-outfit group flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
                                         <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium'>
-                                            Beta Access
+                                            Start now
                                             <HiChevronRight className='ml-1 h-4 w-4 opacity-60 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100' />
                                         </span>
                                     </Link>
@@ -323,7 +323,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                             href='/signin'
                                             className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
                                             <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
-                                                Beta Access
+                                                Start now
                                             </span>
                                         </Link>
                                     )}
