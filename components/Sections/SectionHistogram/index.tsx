@@ -96,8 +96,8 @@ export const SectionHistogram = () => {
         <section className='relative overflow-hidden bg-black py-16 text-center sm:py-24'>
             {/* Text Content Container */}
             <div className='mx-auto mb-12 max-w-3xl px-4 sm:px-6 lg:px-8'>
-                <h2 className='font-outfit text-gray-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl'>Visualize Market Dynamics</h2>
-                <p className='font-outfit text-md mx-auto mt-4 max-w-2xl text-gray-400 sm:text-lg lg:text-xl'>
+                <h2 className='font-outfit text-neutral-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl'>Visualize Market Dynamics</h2>
+                <p className='font-outfit text-md mx-auto mt-4 max-w-2xl text-neutral-400 sm:text-lg lg:text-xl'>
                     Dive deep into order flow with our volume profile histogram. Identify key support/resistance levels and understand market conviction at a glance.
                 </p>
             </div>
@@ -123,11 +123,11 @@ export const SectionHistogram = () => {
             <div className='mx-auto mt-16 grid max-w-7xl grid-cols-1 gap-8 px-4 sm:px-6 md:grid-cols-3 lg:px-8'>
                 {histogramBenefits.map((benefit) => (
                     <div key={benefit.title} className='text-center'>
-                        <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-gray-800'>
-                            <benefit.icon className='h-6 w-6 text-gray-400' aria-hidden='true' />
+                        <div className='mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-neutral-800'>
+                            <benefit.icon className='h-6 w-6 text-neutral-400' aria-hidden='true' />
                         </div>
                         <h3 className='font-outfit mt-6 text-lg font-semibold text-white'>{benefit.title}</h3>
-                        <p className='mt-2 text-base text-gray-400'>{benefit.description}</p>
+                        <p className='mt-2 text-base text-neutral-400'>{benefit.description}</p>
                     </div>
                 ))}
             </div>

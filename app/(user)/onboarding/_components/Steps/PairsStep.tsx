@@ -74,7 +74,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                         Select Trading Instruments
                     </motion.h2>
                     <div className='flex items-center justify-between'>
-                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='pr-4 text-base text-gray-400'>
+                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='pr-4 text-base text-neutral-400'>
                             Choose your favorite trading pairs, you can always add more later
                         </motion.p>
 

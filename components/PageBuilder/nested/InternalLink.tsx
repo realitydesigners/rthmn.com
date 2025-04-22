@@ -8,9 +8,9 @@ import { TemplateTheme } from '../templates/Templates';
 const themeClasses = {
     light: {
         textColor: 'text-black',
-        backgroundColor: 'bg-gray-300',
-        topBackgroundColor: 'bg-gray-200/50',
-        buttonTextColor: 'text-gray-200',
+        backgroundColor: 'bg-neutral-300',
+        topBackgroundColor: 'bg-neutral-200/50',
+        buttonTextColor: 'text-neutral-200',
         buttonBackgroundColor: 'bg-black hover:bg-black/80',
     },
     dark: {

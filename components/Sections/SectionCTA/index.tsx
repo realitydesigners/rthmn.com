@@ -24,12 +24,12 @@ export const SectionCTA = () => {
                 <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.1 }} viewport={{ once: true }}>
                     {/* Larger, glowing heading */}
                     <h2
-                        className='font-outfit text-gray-gradient mb-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl'
+                        className='font-outfit text-neutral-gradient mb-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl'
                         style={{ textShadow: '0 0 15px rgba(209, 213, 219, 0.3)' }} // Subtle glow matching gradient
                     >
                         Ready to Elevate Your Trading?
                     </h2>
-                    <p className='font-outfit mx-auto mt-6 max-w-xl text-lg text-gray-400'>
+                    <p className='font-outfit mx-auto mt-6 max-w-xl text-lg text-neutral-400'>
                         Join RTHMN today and start identifying high-probability patterns with confidence. Gain your edge.
                     </p>
                     {/* Button with potential glow wrapper */}

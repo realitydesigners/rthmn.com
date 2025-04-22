@@ -43,8 +43,6 @@ export default async function RootLayout({
 }>) {
     preconnect('https://cdn.sanity.io');
     prefetchDNS('https://cdn.sanity.io');
-    preconnect('https://prod.spline.design');
-    prefetchDNS('https://prod.spline.design');
     preconnect('https://server.rthmn.com');
     prefetchDNS('https://server.rthmn.com');
 

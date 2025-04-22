@@ -39,7 +39,7 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
                     className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
                     Trading Experience
                 </motion.h2>
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-gray-400'>
+                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-neutral-400'>
                     Help us personalize your experience by telling us about your trading background.
                 </motion.p>
             </div>
@@ -75,15 +75,15 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
                                     className={`rounded-lg bg-gradient-to-b p-3 transition-colors duration-300 ${
                                         isSelected
                                             ? 'from-[#3FFFA2]/30 via-[#3FFFA2]/10 to-[#3FFFA2]/5 text-[#3FFFA2]'
-                                            : 'from-white/10 via-white/5 to-transparent text-gray-400 group-hover:text-gray-300'
+                                            : 'from-white/10 via-white/5 to-transparent text-neutral-400 group-hover:text-neutral-300'
                                     }`}>
                                     <Icon className='h-6 w-6' />
                                 </div>
 
                                 {/* Text Content */}
                                 <div className='flex-1 text-left'>
-                                    <div className={`font-medium transition-colors duration-300 ${isSelected ? 'text-white' : 'text-gray-300'}`}>{level.title}</div>
-                                    <div className={`text-sm transition-colors duration-300 ${isSelected ? 'text-gray-300' : 'text-gray-500'}`}>{level.description}</div>
+                                    <div className={`font-medium transition-colors duration-300 ${isSelected ? 'text-white' : 'text-neutral-300'}`}>{level.title}</div>
+                                    <div className={`text-sm transition-colors duration-300 ${isSelected ? 'text-neutral-300' : 'text-neutral-500'}`}>{level.description}</div>
                                 </div>
 
                                 {/* Selection Indicator */}

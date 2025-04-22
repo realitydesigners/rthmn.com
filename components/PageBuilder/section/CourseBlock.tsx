@@ -8,7 +8,7 @@ import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplat
 
 const templateStyles = {
     dark: 'w-full bg-black',
-    light: 'w-full bg-gray-200',
+    light: 'w-full bg-neutral-200',
 };
 
 const templateComponents = {

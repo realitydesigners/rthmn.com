@@ -38,7 +38,6 @@ export const getProducts = cache(async (supabase: SupabaseClient) => {
         // Combine products with their prices
         const productsWithPrices = products.map((product) => {
             const productPrices = prices.filter((price) => price.product_id === product.id);
-            console.log(`Product ID: ${product.id}, Prices: ${productPrices.length}`);
             return {
                 ...product,
                 prices: productPrices,

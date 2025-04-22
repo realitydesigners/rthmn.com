@@ -120,7 +120,7 @@ The right sidebar displays:
 
 - Completed steps (green)
 - Current step (blue)
-- Pending steps (gray)
+- Pending steps (neutral)
 - Clear progress option
 
 ### 3. Visual Feedback

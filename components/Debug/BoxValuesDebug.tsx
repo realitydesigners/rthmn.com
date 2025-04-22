@@ -23,7 +23,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
     return (
         <div className='h-full overflow-auto rounded-lg bg-black/50 p-4 font-mono text-xs'>
             {/* Settings Info */}
-            <div className='mb-4 flex justify-between rounded border border-gray-800 bg-black/40 p-2 text-gray-400'>
+            <div className='mb-4 flex justify-between rounded border border-neutral-800 bg-black/40 p-2 text-neutral-400'>
                 <div className='space-y-1'>
                     <div>Start Index: {startIndex}</div>
                     <div>Max Box Count: {maxBoxCount}</div>
@@ -35,7 +35,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
             </div>
 
             {/* Timestamps */}
-            <div className='mb-4 grid grid-cols-2 gap-4 rounded border border-gray-800 bg-black/40 p-2 text-gray-400'>
+            <div className='mb-4 grid grid-cols-2 gap-4 rounded border border-neutral-800 bg-black/40 p-2 text-neutral-400'>
                 <div>
                     <span className='text-emerald-500'>ResoBox Last Update: </span>
                     <span>{latestHistogramSlice?.timestamp ? formatTimestamp(latestHistogramSlice.timestamp) : 'N/A'}</span>
@@ -59,8 +59,8 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
                         {visibleResoBoxes?.map((box, i) => (
                             <div key={i} className='grid grid-cols-[1fr_1fr_1fr] gap-2 text-right'>
                                 <span className={box.value >= 0 ? 'text-emerald-400' : 'text-red-400'}>{box.value}</span>
-                                <span className='text-gray-300'>{box.high}</span>
-                                <span className='text-gray-300'>{box.low}</span>
+                                <span className='text-neutral-300'>{box.high}</span>
+                                <span className='text-neutral-300'>{box.low}</span>
                             </div>
                         ))}
                     </div>
@@ -80,8 +80,8 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
                         {visibleHistogramBoxes?.map((box, i) => (
                             <div key={i} className='grid grid-cols-[1fr_1fr_1fr] gap-2 text-right'>
                                 <span className={box.value >= 0 ? 'text-emerald-400' : 'text-red-400'}>{box.value}</span>
-                                <span className='text-gray-300'>{box.high}</span>
-                                <span className='text-gray-300'>{box.low}</span>
+                                <span className='text-neutral-300'>{box.high}</span>
+                                <span className='text-neutral-300'>{box.low}</span>
                             </div>
                         ))}
                     </div>

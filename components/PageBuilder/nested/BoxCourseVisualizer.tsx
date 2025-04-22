@@ -25,7 +25,7 @@ const FeatureTags = memo(() => (
                 <div className='items-centergap-1.5 relative flex'>
                     <div className='absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100' />
                     <feature.icon className='relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4' />
-                    <span className='font-kodemono text-gray-400 transition-colors duration-300 group-hover:text-white'>{feature.text}</span>
+                    <span className='font-kodemono text-neutral-400 transition-colors duration-300 group-hover:text-white'>{feature.text}</span>
                 </div>
             </motion.div>
         ))}
@@ -200,7 +200,7 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
     return (
         <div className='flex h-full w-full flex-col items-center justify-center space-y-6 py-8'>
             {value.title && <h3 className='font-outfit text-center text-xl font-semibold text-white'>{value.title}</h3>}
-            {value.description && <p className='font-outfit max-w-2xl text-center text-base text-gray-400'>{value.description}</p>}
+            {value.description && <p className='font-outfit max-w-2xl text-center text-base text-neutral-400'>{value.description}</p>}
             <div className='relative flex h-[400px] w-[400px] items-center justify-center'>
                 <NestedBoxes
                     boxes={currentSlice.boxes}

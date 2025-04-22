@@ -95,8 +95,8 @@ export function SectionPricing({ user, products, subscription }: Props) {
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
                 {/* Enhanced Header Section */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className='mx-auto mb-12 max-w-3xl text-center'>
-                    <h1 className='text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Elevate Your Trading Strategy</h1>
-                    <p className='font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg'>Join an elite community of traders using trading tools from the future.</p>
+                    <h1 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Elevate Your Trading Strategy</h1>
+                    <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>Join an elite community of traders using trading tools from the future.</p>
                 </motion.div>
 
                 {/* Single Pricing Card */}
@@ -115,10 +115,10 @@ export function SectionPricing({ user, products, subscription }: Props) {
                                 <div className='mb-4'>
                                     <div className='inline-flexrounded-full px-6 py-2 shadow-lg inset-shadow-xs'>
                                         <span className='font-outfit text-6xl font-bold text-white'>{priceString}</span>
-                                        <span className='font-kodemono ml-2 text-lg text-gray-400'>/month</span>
+                                        <span className='font-kodemono ml-2 text-lg text-neutral-400'>/month</span>
                                     </div>
                                 </div>
-                                <p className='font-kodemono text-md text-gray-400'>{product.description}</p>
+                                <p className='font-kodemono text-md text-neutral-400'>{product.description}</p>
                             </div>
 
                             {/* Benefits List */}
@@ -127,7 +127,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
                                     {PricingBenefits.map((benefit, index) => (
                                         <div
                                             key={index}
-                                            className='flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-gray-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10'>
+                                            className='flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-neutral-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10'>
                                             <div className='flex h-6 w-6 items-center justify-center rounded-full bg-white/5 shadow-sm inset-shadow-xs inset-shadow-white/10'>
                                                 <FaCheck className='h-3 w-3 text-emerald-400' />
                                             </div>

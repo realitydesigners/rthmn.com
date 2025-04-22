@@ -2,14 +2,12 @@ import React from 'react';
 import type { PortableTextBlock } from '@portabletext/types';
 import ContentBlock from '@/components/PageBuilder/section/ContentBlock';
 import HeadingBlock from '@/components/PageBuilder/section/HeadingBlock';
-import HeadingSplineBlock from '@/components/PageBuilder/section/HeadingSplineBlock';
 import TeamBlock from '@/components/PageBuilder/section/TeamBlock';
 import CourseBlock from '@/components/PageBuilder/section/CourseBlock';
 
 export interface BlockProps {
     _type: {
         headingBlock: 'headingBlock';
-        headingSplineBlock: 'headingSplineBlock';
         contentBlock: 'contentBlock';
         teamBlock: 'teamBlock';
         courseBlock: 'courseBlock';
@@ -44,7 +42,6 @@ export interface ContentBlockProps {
 
 const blockComponents = {
     headingBlock: HeadingBlock,
-    headingSplineBlock: HeadingSplineBlock,
     contentBlock: ContentBlock,
     teamBlock: TeamBlock,
     courseBlock: CourseBlock,

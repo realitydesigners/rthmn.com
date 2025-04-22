@@ -26,11 +26,11 @@
     ::before,
     ::backdrop,
     ::file-selector-button {
-        border-color: var(--color-gray-200, currentColor);
+        border-color: var(--color-neutral-200, currentColor);
     }
 }
 
-@utility text-gray-gradient {
+@utility text-neutral-gradient {
     @apply bg-linear-to-b from-white via-white to-white/50 bg-clip-text py-2 text-transparent;
 }
 
@@ -42,15 +42,15 @@
     cursor: default;
 }
 
-@utility text-gray {
-    @apply bg-linear-to-b from-white to-gray-200/50 bg-clip-text text-transparent;
+@utility text-neutral {
+    @apply bg-linear-to-b from-white to-neutral-200/50 bg-clip-text text-transparent;
 }
 
-@utility text-dark-gray {
-    @apply bg-linear-to-b from-gray-200/40 to-gray-200/30 bg-clip-text text-transparent;
+@utility text-dark-neutral {
+    @apply bg-linear-to-b from-neutral-200/40 to-neutral-200/30 bg-clip-text text-transparent;
 }
 
-@utility border-gray {
+@utility border-neutral {
     @apply border border-[#181818];
 }
 
@@ -76,7 +76,7 @@
     body {
         font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Helvetica Neue', 'Helvetica', sans-serif;
         text-rendering: optimizeLegibility;
-        -moz-osx-font-smoothing: grayscale;
+        -moz-osx-font-smoothing: neutralscale;
         @apply bg-black text-white antialiased;
     }
 

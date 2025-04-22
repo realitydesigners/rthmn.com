@@ -94,8 +94,8 @@ export const ServiceSection = () => {
                     {Services.map(({ label, icon }) => (
                         <li
                             key={label}
-                            className={`heading-text w-full cursor-pointer border border-gray-600/50 p-4 ${
-                                activeService === label ? 'bg-gray-600/25' : 'bg-black hover:bg-gray-600/25'
+                            className={`heading-text w-full cursor-pointer border border-neutral-600/50 p-4 ${
+                                activeService === label ? 'bg-neutral-600/25' : 'bg-black hover:bg-neutral-600/25'
                             } flex items-center transition duration-300 ease-in-out`}
                             onClick={() => handleServiceClick(label)}
                             onKeyDown={(e) => handleKeyPress(e, label)}>
@@ -107,13 +107,13 @@ export const ServiceSection = () => {
             </div>
             {isDetailVisible && (
                 <div
-                    className='lg:-16 mt-4 ml-0 h-[80vh] grow overflow-hidden border border-gray-600/25 p-4 transition-all duration-500 ease-in-out lg:mt-0 lg:ml-4 lg:w-3/4'
+                    className='lg:-16 mt-4 ml-0 h-[80vh] grow overflow-hidden border border-neutral-600/25 p-4 transition-all duration-500 ease-in-out lg:mt-0 lg:ml-4 lg:w-3/4'
                     style={{
                         maxHeight: isDetailVisible ? '100%' : '0',
                         opacity: isDetailVisible ? 1 : 0,
                     }}>
                     <h2 className={`heading-text fade-in text-oxanium mb-4 text-4xl leading-none font-bold uppercase lg:text-5xl`}>{activeService}</h2>
-                    <p className={`primary-text fade-in text-oxanium text-xl text-gray-400`}>{Services.find((service) => service.label === activeService)?.desc}</p>
+                    <p className={`primary-text fade-in text-oxanium text-xl text-neutral-400`}>{Services.find((service) => service.label === activeService)?.desc}</p>
                 </div>
             )}
         </div>

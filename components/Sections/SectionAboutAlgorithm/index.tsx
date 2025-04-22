@@ -63,7 +63,7 @@ export function SectionAboutAlgorithm() {
 
                             <p className='mb-4 text-base text-white/70'>{market.description}</p>
 
-                            <div className='font-kodemono text-sm text-gray-400'>{market.highlight}</div>
+                            <div className='font-kodemono text-sm text-neutral-400'>{market.highlight}</div>
                         </motion.div>
                     ))}
                 </div>

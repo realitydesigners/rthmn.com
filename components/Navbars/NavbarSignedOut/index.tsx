@@ -12,10 +12,18 @@ import { createClient } from '@/lib/supabase/client';
 import { allLinks, LinkItem } from './allLinks';
 import styles from './styles.module.css';
 import { HiChevronRight } from 'react-icons/hi';
+import { FaGithub, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
 
 interface NavbarSignedOutProps {
     user: User | null;
 }
+
+const SOCIAL_LINKS = [
+    { name: 'Twitter', icon: FaTwitter, href: 'https://x.com/rthmnapp' },
+    { name: 'Instagram', icon: FaInstagram, href: 'https://www.instagram.com/rthmnapp/' },
+    { name: 'GitHub', icon: FaGithub, href: 'https://github.com/rthmnapp' },
+    { name: 'Youtube', icon: FaYoutube, href: 'https://www.youtube.com/@rthmnco' },
+];
 
 const Links = () => {
     if (process.env.NODE_ENV === 'production') {
@@ -175,23 +183,35 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 initial='hidden'
                 animate='visible'
                 variants={navVariants}>
-                <div className='mx-auto h-full w-full lg:w-11/12'>
-                    <div className='flex h-full items-center justify-between'>
-                        <Link href='/' className='z-50 flex items-center gap-2 pl-4 xl:pl-0'>
+                <div className='relative mx-auto h-full w-full lg:w-11/12'>
+                    <div className='grid h-full grid-cols-3 items-center'>
+                        <Link href='/' className='z-50 flex items-center gap-2 justify-self-start pl-4 xl:pl-0'>
                             <div className='flex h-8 w-8 items-center'>
                                 <LogoIcon />
                             </div>
                             <div className={`font-russo text-xl lg:text-2xl`}>RTHMN</div>
                         </Link>
 
-                        <div className='flex items-center space-x-4'>
-                            {!isproduction && (
-                                <nav className='hidden space-x-4 lg:flex'>
-                                    <Links />
-                                </nav>
-                            )}
-                        </div>
-                        <div className='flex items-center space-x-4 pr-2'>
+                        {!isproduction && (
+                            <nav className='hidden justify-self-center lg:flex'>
+                                <Links />
+                            </nav>
+                        )}
+
+                        <div className='flex items-center space-x-4 justify-self-end pr-2'>
+                            <div className='hidden items-center space-x-4 lg:flex'>
+                                {SOCIAL_LINKS.map((item) => (
+                                    <a
+                                        key={item.name}
+                                        href={item.href}
+                                        target='_blank'
+                                        rel='noopener noreferrer'
+                                        className='text-neutral-400 transition-colors duration-200 hover:text-white'
+                                        aria-label={item.name}>
+                                        <item.icon className='h-5 w-5' />
+                                    </a>
+                                ))}
+                            </div>
                             <motion.div className='mr-2 flex' variants={linkVariants} custom={3}>
                                 {user ? (
                                     <div className='flex items-center gap-3'>
@@ -221,13 +241,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                                     <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
                                                         <Link
                                                             href='/account'
-                                                            className='flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                            className='flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5'
                                                             role='menuitem'>
                                                             Account
                                                         </Link>
                                                         <button
                                                             onClick={handleSignOut}
-                                                            className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                            className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-white/5'
                                                             role='menuitem'>
                                                             Sign out
                                                         </button>
@@ -248,21 +268,10 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                 ) : null}
                             </motion.div>
                         </div>
-
-                        {/* {!isproduction && (
-              <button
-                onClick={toggleNav}
-                className="menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden"
-                aria-label="Toggle navigation"
-              >
-                <MenuIcon isOpen={isNavOpen} />
-              </button>
-            )} */}
                     </div>
                 </div>
             </motion.div>
 
-            {/* Mobile Navigation Menu - Only in production */}
             {!isproduction && (
                 <AnimatePresence>
                     {isNavOpen && (
@@ -303,13 +312,13 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                                         <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
                                                             <Link
                                                                 href='/account'
-                                                                className='flex items-center gap-2 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                                className='flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5'
                                                                 role='menuitem'>
                                                                 Account
                                                             </Link>
                                                             <button
                                                                 onClick={handleSignOut}
-                                                                className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 transition-colors hover:bg-white/5'
+                                                                className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-white/5'
                                                                 role='menuitem'>
                                                                 Sign out
                                                             </button>
@@ -332,6 +341,12 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                         </motion.div>
                     )}
                 </AnimatePresence>
+            )}
+
+            {!isproduction && (
+                <button onClick={toggleNav} className='menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden' aria-label='Toggle navigation'>
+                    {/* ... burger icon ... */}
+                </button>
             )}
         </>
     );
@@ -356,7 +371,7 @@ const buttonVariants = {
 
 export const NavButton: FC<NavButtonProps> = ({ href, children, onMouseEnter, onClick, custom = 0 }) => {
     return (
-        <div className='relative flex h-20 items-center px-2 transition-colors duration-200 hover:text-gray-600' onMouseEnter={onMouseEnter}>
+        <div className='relative flex h-20 items-center px-2 transition-colors duration-200 hover:text-neutral-600' onMouseEnter={onMouseEnter}>
             <motion.div variants={buttonVariants} initial='hidden' animate='visible' custom={custom}>
                 <Link
                     href={href}
@@ -491,7 +506,7 @@ export const MobileMenuContent = () => {
     }
 
     return (
-        <div className='font-outfit relative z-100 grid grid-cols-2 gap-8 pt-8'>
+        <div className='flex h-full flex-col items-center justify-center'>
             {allLinks.map((item) => (
                 <div key={item.title} className='flex flex-col'>
                     <h2 className={`mb-2 text-lg text-[#555]`}>{item.title}</h2>
@@ -502,6 +517,20 @@ export const MobileMenuContent = () => {
                     ))}
                 </div>
             ))}
+
+            <div className='mt-12 flex justify-center space-x-6'>
+                {SOCIAL_LINKS.map((item) => (
+                    <a
+                        key={item.name}
+                        href={item.href}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-neutral-400 transition-colors duration-200 hover:text-white'
+                        aria-label={item.name}>
+                        <item.icon className='h-6 w-6' />
+                    </a>
+                ))}
+            </div>
         </div>
     );
 };

@@ -60,7 +60,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
-                                <div className='font-kodemono text-sm font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, pair) : '-'}</div>
+                                <div className='font-kodemono text-sm font-medium text-neutral-200'>{currentPrice ? formatPrice(currentPrice, pair) : '-'}</div>
                             </div>
                         </div>
                     </div>

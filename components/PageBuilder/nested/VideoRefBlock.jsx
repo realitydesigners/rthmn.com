@@ -25,7 +25,7 @@ const VideoRefBlock = ({ videoTitle, className, videoUrl }) => {
         case 'light':
             return (
                 <div className='mb-6 flex w-full justify-center p-2'>
-                    <div className='flex w-full flex-col items-end rounded-[.7em] bg-gray-300 p-2 pb-4 shadow-lg lg:w-3/4'>
+                    <div className='flex w-full flex-col items-end rounded-[.7em] bg-neutral-300 p-2 pb-4 shadow-lg lg:w-3/4'>
                         <span className='mb-2 ml-2 rounded-full bg-[#5eead4] pt-[3px] pr-2 pb-[5px] pl-2 text-[16px]'>VIDEO</span>
                         <YouTubeEmbed videoUrl={videoUrl} />
                         <p className='ml-2 pt-4 text-center text-2xl leading-[1em] tracking-wide text-black uppercase'>{videoTitle}</p>

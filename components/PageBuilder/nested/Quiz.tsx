@@ -79,7 +79,7 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                 <FaQuestionCircle className='h-5 w-5 text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.5)]' />
                             </div>
                         </div>
-                        <h3 className='bg-gradient-to-r from-white to-gray-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>{question}</h3>
+                        <h3 className='bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>{question}</h3>
                     </div>
                 </div>
 
@@ -113,10 +113,10 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                                     ? 'text-emerald-300'
                                                     : index === selectedAnswer
                                                       ? 'text-rose-300'
-                                                      : 'text-gray-400'
+                                                      : 'text-neutral-400'
                                                 : selectedAnswer === index
                                                   ? 'text-white'
-                                                  : 'text-gray-300 group-hover:text-white'
+                                                  : 'text-neutral-300 group-hover:text-white'
                                         }`}>
                                         {option}
                                     </span>
@@ -230,7 +230,7 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                         </div>
                                         <div>
                                             <p className='mb-1 font-medium text-white'>Explanation</p>
-                                            <p className='text-sm text-gray-300'>{explanation}</p>
+                                            <p className='text-sm text-neutral-300'>{explanation}</p>
                                         </div>
                                     </motion.div>
                                 )}
