@@ -198,7 +198,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                 {isOpen && (
                     <motion.div
                         ref={panelRef}
-                        className='fixed right-0 bottom-0 left-0 z-[120] flex flex-col rounded-t-xl border-t border-[#333] bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden'
+                        className='fixed bottom-0 left-0 right-0 z-[120] flex flex-col rounded-t-xl border-t border-[#333] bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden'
                         style={{ height: '60vh', maxHeight: 'calc(100vh - 80px)' }}
                         initial={{ opacity: 0, y: 300 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -214,7 +214,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                 </div>
                                 <button
                                     onClick={() => setIsOpen(false)}
-                                    className='flex h-8 w-8 items-center justify-center rounded-full bg-[#222] text-gray-400 shadow-inner hover:text-white'>
+                                    className='flex h-8 w-8 items-center justify-center rounded-full bg-[#222] text-neutral-400 shadow-inner hover:text-white'>
                                     <FaTimes className='h-4 w-4' />
                                 </button>
                             </div>
@@ -224,7 +224,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                         <div className='flex border-b border-[#333]'>
                             <button
                                 className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
-                                    activeTab === 'course' ? 'border-b-2 border-indigo-500 text-indigo-300' : 'text-gray-400 hover:text-white'
+                                    activeTab === 'course' ? 'border-b-2 border-indigo-500 text-indigo-300' : 'text-neutral-400 hover:text-white'
                                 }`}
                                 onClick={() => setActiveTab('course')}>
                                 Course Lessons
@@ -232,7 +232,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                             {lesson && (
                                 <button
                                     className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
-                                        activeTab === 'toc' ? 'border-b-2 border-indigo-500 text-indigo-300' : 'text-gray-400 hover:text-white'
+                                        activeTab === 'toc' ? 'border-b-2 border-indigo-500 text-indigo-300' : 'text-neutral-400 hover:text-white'
                                     }`}
                                     onClick={() => setActiveTab('toc')}>
                                     On This Page
@@ -246,7 +246,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                             {activeTab === 'course' && (
                                 <div className='space-y-6 p-4'>
                                     {/* Back to Learning Center */}
-                                    <Link href='/learn' className='mb-6 flex items-center gap-2 text-sm text-gray-400 transition-colors hover:text-white'>
+                                    <Link href='/learn' className='mb-6 flex items-center gap-2 text-sm text-neutral-400 transition-colors hover:text-white'>
                                         <FaArrowLeft className='h-3 w-3' />
                                         Back to Learning Center
                                     </Link>
@@ -254,7 +254,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                     {/* Progress Bar */}
                                     <div>
                                         <div className='mb-2 flex items-center justify-between'>
-                                            <span className='text-sm text-gray-400'>Course Progress</span>
+                                            <span className='text-sm text-neutral-400'>Course Progress</span>
                                             <span className='text-sm font-medium text-indigo-300'>{Math.round(progress)}%</span>
                                         </div>
                                         <div className='h-2 rounded-full bg-[#222]'>
@@ -269,7 +269,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                     <div className='space-y-6'>
                                         {course.chapters.map((chapter) => (
                                             <div key={chapter._id} className='space-y-2'>
-                                                <h3 className='text-sm font-semibold tracking-wider text-gray-400 uppercase'>{chapter.title}</h3>
+                                                <h3 className='text-sm font-semibold uppercase tracking-wider text-neutral-400'>{chapter.title}</h3>
                                                 <div className='space-y-1'>
                                                     {chapter.lessons.map((lessonItem, index) => {
                                                         const isCompleted = store.isLessonCompleted(course._id, chapter._id, lessonItem._id);
@@ -282,7 +282,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                                                 className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
                                                                     isActive
                                                                         ? 'bg-gradient-to-r from-[#111] to-[#161633] text-indigo-300'
-                                                                        : 'text-gray-400 hover:bg-[#111] hover:text-white'
+                                                                        : 'text-neutral-400 hover:bg-[#111] hover:text-white'
                                                                 }`}
                                                                 onClick={() => setIsOpen(false)}>
                                                                 <div className='flex h-6 w-6 items-center justify-center rounded-full bg-[#222] text-sm shadow-inner'>
@@ -303,7 +303,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                             {/* Table of Contents Tab */}
                             {activeTab === 'toc' && lesson && (
                                 <div className='p-4'>
-                                    <h4 className='mb-4 text-sm font-semibold text-gray-400'>On this page</h4>
+                                    <h4 className='mb-4 text-sm font-semibold text-neutral-400'>On this page</h4>
                                     <ul className='space-y-2 text-sm'>
                                         {headings.map((heading) => (
                                             <li key={heading.id} style={{ paddingLeft: `${(heading.level - 1) * 16}px` }}>
@@ -314,7 +314,7 @@ export function MobileNavigation({ course, lesson, chapter }: MobileNavigationPr
                                                     className={`inline-block w-full text-left transition-all duration-200 ${
                                                         activeId === heading.id
                                                             ? 'rounded-lg bg-gradient-to-r from-[#111] to-[#161633] p-2 font-medium text-indigo-300'
-                                                            : 'text-gray-400 hover:text-white'
+                                                            : 'text-neutral-400 hover:text-white'
                                                     }`}>
                                                     {heading.text}
                                                 </Link>

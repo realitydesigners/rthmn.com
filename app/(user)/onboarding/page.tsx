@@ -148,7 +148,7 @@ export default function OnboardingPage() {
                         {stepNumber > 1 && (
                             <button
                                 onClick={handleBack}
-                                className='group relative rounded-lg border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#0F0F0F] px-4 py-2 text-sm font-medium text-gray-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20'>
+                                className='group relative rounded-lg border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#0F0F0F] px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20'>
                                 <div className='absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100' />
                                 Back
                             </button>
@@ -176,7 +176,7 @@ export default function OnboardingPage() {
 
             {/* Step title with enhanced styling */}
             <div className='absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4'>
-                <div className='group no-select relative flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-[#3FFFA2]/20 hover:shadow-[#3FFFA2]/10'>
+                <div className='no-select group relative flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-[#3FFFA2]/20 hover:shadow-[#3FFFA2]/10'>
                     <div className='flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-[#3FFFA2]/20 to-[#3FFFA2]/10'>
                         <div className='h-1.5 w-1.5 rounded-full bg-[#3FFFA2]' />
                     </div>

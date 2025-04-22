@@ -29,12 +29,12 @@ const MARKETS = [
 
 export function SectionAboutAlgorithm() {
     return (
-        <section className='relative z-100 px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]'>
+        <section className='z-100 relative px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]'>
             <div className='relative rounded-xl border border-white/10 bg-black/90 p-6 backdrop-blur-md'>
                 {/* Effects */}
                 <div className='pointer-events-none absolute inset-0'>
                     <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]' />
-                    <div className='absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent' />
+                    <div className='bg-linear-to-r absolute inset-x-0 top-0 h-px from-transparent via-white/50 to-transparent' />
                 </div>
 
                 <div className='mb-8 text-center'>
@@ -63,7 +63,7 @@ export function SectionAboutAlgorithm() {
 
                             <p className='mb-4 text-base text-white/70'>{market.description}</p>
 
-                            <div className='font-kodemono text-sm text-gray-400'>{market.highlight}</div>
+                            <div className='font-kodemono text-sm text-neutral-400'>{market.highlight}</div>
                         </motion.div>
                     ))}
                 </div>

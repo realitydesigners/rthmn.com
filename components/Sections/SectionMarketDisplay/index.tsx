@@ -108,12 +108,12 @@ const MarketHeading = memo(() => (
     <div className='relative z-20 text-center'>
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className='mb-8'>
-                <h2 className='font-outfit text-gray-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]'>
+                <h2 className='font-outfit text-neutral-gradient relative text-[3em] font-bold leading-[1em] tracking-tight sm:text-[5em] lg:text-[7em]'>
                     Unlock Trading
                     <br />
                     Patterns Instantly.
                 </h2>
-                <p className='font-outfit text-md text-gray-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
+                <p className='font-outfit text-md text-neutral-gradient mx-auto mt-6 max-w-2xl px-4 sm:text-lg lg:text-2xl'>
                     Our real-time market data visualization with our advanced pattern recognition system.
                 </p>
             </div>
@@ -227,7 +227,7 @@ const CardContent = memo(({ item, data }: { item: MarketData; data: ProcessedMar
                     {data.change.toFixed(2)}%
                 </motion.div>
             </div>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className='mb-3 text-xl font-bold text-white tabular-nums'>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className='mb-3 text-xl font-bold tabular-nums text-white'>
                 {data.price.toFixed(item.pair.includes('JPY') ? 3 : 5)}
             </motion.div>
             <div className='h-12 w-full'>
@@ -345,7 +345,7 @@ const CardTransform = memo(({ children, position, index, change }: { children: R
 
     return (
         <motion.div
-            className='absolute top-1/2 left-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]'
+            className='absolute left-1/2 top-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]'
             initial={{
                 x: targetX,
                 y: targetY,
@@ -505,7 +505,7 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
             {/* Center content wrapper */}
             <div className='relative z-10 flex min-h-screen flex-col items-center justify-center px-4 py-16'>
                 {/* Centered heading */}
-                <div className='absolute top-1/2 left-1/2 z-20 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 transform px-4'>
+                <div className='absolute left-1/2 top-1/2 z-20 w-full max-w-6xl -translate-x-1/2 -translate-y-1/2 transform px-4'>
                     <MarketHeading />
                 </div>
                 {/* 3D Cards Container */}

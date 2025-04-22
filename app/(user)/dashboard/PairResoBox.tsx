@@ -60,7 +60,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
                                 <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
-                                <div className='font-kodemono text-sm font-medium text-gray-200'>{currentPrice ? formatPrice(currentPrice, pair) : '-'}</div>
+                                <div className='font-kodemono text-sm font-medium text-neutral-200'>{currentPrice ? formatPrice(currentPrice, pair) : '-'}</div>
                             </div>
                         </div>
                     </div>
@@ -73,7 +73,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                     {/* Timeframe Control */}
                     {boxSlice?.boxes && (
                         <div className='relative h-16 w-full'>
-                            <div className={`absolute right-0 bottom-0 left-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
+                            <div className={`absolute bottom-0 left-0 right-0 transition-opacity delay-200 duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
                                 <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
                             </div>
                         </div>

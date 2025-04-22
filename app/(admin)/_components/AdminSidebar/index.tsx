@@ -92,17 +92,17 @@ export function AdminSidebar({ priceData, selectedPairs, onPairSelect, selectedP
 
     if (pairSections.length === 0) {
         return (
-            <div className='fixed top-0 left-0 h-screen w-[300px] border-r border-[#181818] bg-black p-4'>
-                <h3 className='mb-4 text-lg font-medium text-gray-200'>Market Prices</h3>
-                <div className='text-gray-400'>Loading pairs data...</div>
-                <div className='mt-2 text-xs text-gray-500'>Selected Pairs: {selectedPairs.join(', ')}</div>
+            <div className='fixed left-0 top-0 h-screen w-[300px] border-r border-[#181818] bg-black p-4'>
+                <h3 className='mb-4 text-lg font-medium text-neutral-200'>Market Prices</h3>
+                <div className='text-neutral-400'>Loading pairs data...</div>
+                <div className='mt-2 text-xs text-neutral-500'>Selected Pairs: {selectedPairs.join(', ')}</div>
             </div>
         );
     }
 
     return (
-        <div className='fixed top-0 left-0 mt-14 h-screen w-[300px] border-r border-[#181818] bg-black p-4'>
-            <h3 className='mb-4 text-lg font-medium text-gray-200'>Market Prices</h3>
+        <div className='fixed left-0 top-0 mt-14 h-screen w-[300px] border-r border-[#181818] bg-black p-4'>
+            <h3 className='mb-4 text-lg font-medium text-neutral-200'>Market Prices</h3>
 
             <div className='space-y-2'>
                 {pairSections.map((section) => (
@@ -113,11 +113,15 @@ export function AdminSidebar({ priceData, selectedPairs, onPairSelect, selectedP
                                 onPairSelect(section.pair);
                             }}
                             className='flex w-full items-center justify-between p-3 hover:bg-[#111111]'>
-                            <span className='text-sm font-medium text-gray-300'>{section.pair}</span>
+                            <span className='text-sm font-medium text-neutral-300'>{section.pair}</span>
                             <div className='flex items-center gap-3'>
                                 <span
                                     className={`text-sm ${
-                                        section.lastPrice > section.previousPrice ? 'text-green-500' : section.lastPrice < section.previousPrice ? 'text-red-500' : 'text-gray-300'
+                                        section.lastPrice > section.previousPrice
+                                            ? 'text-green-500'
+                                            : section.lastPrice < section.previousPrice
+                                              ? 'text-red-500'
+                                              : 'text-neutral-300'
                                     }`}>
                                     {section.lastPrice.toFixed(getInstrumentDigits(section.pair))}
                                 </span>
@@ -129,7 +133,7 @@ export function AdminSidebar({ priceData, selectedPairs, onPairSelect, selectedP
                             <div className='border-t border-[#181818] p-2'>
                                 <div className='max-h-[300px] space-y-1 overflow-y-auto'>
                                     {section.prices.map((price, idx) => (
-                                        <div key={idx} className='flex items-center justify-between px-2 py-1 text-xs text-gray-400'>
+                                        <div key={idx} className='flex items-center justify-between px-2 py-1 text-xs text-neutral-400'>
                                             <span>{formatTime(price.timestamp)}</span>
                                             <span>{price.price.toFixed(getInstrumentDigits(section.pair))}</span>
                                         </div>

@@ -57,14 +57,14 @@ const AccountPanel = () => {
             <div className='w-full'>
                 {/* Profile Header */}
                 <div className='flex flex-col items-center justify-center border-b border-white/5 py-6'>
-                    <div className='relative mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-gray-800/40'>
+                    <div className='relative mb-4 h-24 w-24 overflow-hidden rounded-full border-2 border-neutral-800/40'>
                         <ProfilePhotoForm avatarUrl={userDetails?.avatar_url} userId={user.id} />
                     </div>
                     <div className='flex items-center'>
                         <h1 className='font-outfit mb-1 text-center text-xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h1>
                         <ProBadge />
                     </div>
-                    <p className='font-outfit max-w-full text-center text-sm break-words text-zinc-400'>{user.email}</p>
+                    <p className='font-outfit max-w-full break-words text-center text-sm text-zinc-400'>{user.email}</p>
                 </div>
 
                 {/* Account Sections */}

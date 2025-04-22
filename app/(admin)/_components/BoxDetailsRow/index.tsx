@@ -42,7 +42,7 @@ export const BoxDetailsRow: React.FC<BoxDetailsRowProps> = ({ boxes, maxBoxCount
                     style={{ height: LABEL_HEIGHT }}>
                     {sortedBoxes.map((box, index) => (
                         <div key={`size-${index}`} className='flex-1 text-center' style={{ minWidth: 30 }}>
-                            <span className='font-mono text-[9px] text-gray-400'>{formatNumber(box.value)}</span>
+                            <span className='font-mono text-[9px] text-neutral-400'>{formatNumber(box.value)}</span>
                         </div>
                     ))}
                 </div>

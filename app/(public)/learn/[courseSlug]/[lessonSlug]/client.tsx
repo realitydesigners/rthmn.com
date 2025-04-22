@@ -45,11 +45,11 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
     return (
         <div className='relative flex min-h-screen'>
             <CourseNav course={course} />
-            <div className='w-full flex-1 lg:mr-80 lg:ml-80'>
+            <div className='w-full flex-1 lg:ml-80 lg:mr-80'>
                 <div className='w-full px-4 py-28 lg:px-8'>
                     {/* Lesson Header */}
                     <div className='mb-12'>
-                        <div className='mb-4 flex items-center gap-4 text-sm text-gray-400'>
+                        <div className='mb-4 flex items-center gap-4 text-sm text-neutral-400'>
                             <div className='flex items-center gap-2'>
                                 <FaClock className='h-4 w-4' />
                                 <span>{lesson.estimatedTime || '15 min read'}</span>
@@ -70,7 +70,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         {prevLesson && (
                             <Link
                                 href={`/learn/${course.slug.current}/${prevLesson.slug.current}`}
-                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
+                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
                                 <FaArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
                                 Previous Lesson
                             </Link>
@@ -78,7 +78,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         {nextLesson && (
                             <Link
                                 href={`/learn/${course.slug.current}/${nextLesson.slug}`}
-                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-gray-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
+                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
                                 Next Lesson
                                 <FaArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-1' />
                             </Link>

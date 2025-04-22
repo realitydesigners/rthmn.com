@@ -86,7 +86,7 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
     };
 
     return (
-        <section className='relative z-100'>
+        <section className='z-100 relative'>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
                 {sortedPairs.map((item) => {
                     const latestPrice = getLatestPrice(item.candleData);
@@ -94,7 +94,10 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
                     const volume = getVolume(item.candleData);
 
                     return (
-                        <motion.div key={item.pair} className='border-gray cursor-pointer rounded-lg bg-black/50 p-4 transition-colors' onClick={() => setSelectedPair(item.pair)}>
+                        <motion.div
+                            key={item.pair}
+                            className='border-neutral cursor-pointer rounded-lg bg-black/50 p-4 transition-colors'
+                            onClick={() => setSelectedPair(item.pair)}>
                             <div className='mb-2 flex items-start justify-between'>
                                 <div className='flex items-center gap-2'>
                                     <h4 className='font-outfit text-lg font-medium text-white'>{item.pair.replace('_', '/')}</h4>

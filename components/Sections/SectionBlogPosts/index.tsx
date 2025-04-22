@@ -50,9 +50,9 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 
                 <div className='relative z-10 p-6'>
                     {/* Meta Information */}
-                    <div className='mb-4 flex items-center gap-4 text-xs text-gray-400'>
+                    <div className='mb-4 flex items-center gap-4 text-xs text-neutral-400'>
                         <div className='flex items-center gap-2'>
-                            <FaCalendar className='h-3 w-3 text-gray-400' />
+                            <FaCalendar className='h-3 w-3 text-neutral-400' />
                             <span className='font-kodemono'>
                                 {new Date(block?.publicationDate).toLocaleDateString('en-US', {
                                     year: 'numeric',
@@ -62,7 +62,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
                             </span>
                         </div>
                         <div className='flex items-center gap-2'>
-                            <FaClock className='h-3 w-3 text-gray-400' />
+                            <FaClock className='h-3 w-3 text-neutral-400' />
                             <span className='font-kodemono'>5 min read</span>
                         </div>
                     </div>
@@ -75,14 +75,14 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
                     </Link>
 
                     {/* Description */}
-                    <p className='font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-gray-400'>{block?.subheading || 'No subheading'}</p>
+                    <p className='font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-neutral-400'>{block?.subheading || 'No subheading'}</p>
 
                     {/* Read More Button - Updated to match NavButton style */}
                     <Link href={`/posts/${post.slug.current}`}>
                         <motion.div
                             whileHover={{ x: 5 }}
-                            className='flex w-fit items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
-                            <span className='flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm'>
+                            className='bg-linear-to-b flex w-fit items-center rounded-full from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                            <span className='bg-linear-to-b flex w-full items-center gap-2 rounded-full from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm'>
                                 <span>Read Article</span>
                                 <FaArrowRight className='h-3 w-3' />
                             </span>
@@ -111,8 +111,8 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
             <div className='mx-auto max-w-7xl'>
                 {/* Section Header */}
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className='mb-16 text-center'>
-                    <h2 className='text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Latest Insights</h2>
-                    <p className='font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg'>
+                    <h2 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Latest Insights</h2>
+                    <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>
                         Explore our latest thoughts on market analysis, trading strategies, and technological innovations.
                     </p>
                 </motion.div>

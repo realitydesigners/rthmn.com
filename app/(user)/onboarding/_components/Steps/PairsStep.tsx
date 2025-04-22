@@ -74,7 +74,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                         Select Trading Instruments
                     </motion.h2>
                     <div className='flex items-center justify-between'>
-                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='pr-4 text-base text-gray-400'>
+                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='pr-4 text-base text-neutral-400'>
                             Choose your favorite trading pairs, you can always add more later
                         </motion.p>
 
@@ -146,7 +146,7 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
 
                     return (
                         <div key={group.label}>
-                            <h3 className='font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#666] uppercase'>{group.label}</h3>
+                            <h3 className='font-kodemono z-90 sticky top-0 py-2 text-xs font-medium uppercase tracking-wider text-[#666]'>{group.label}</h3>
                             <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
                                 {pairs.map((item, index) => {
                                     const isSelected = selectedPairs.includes(item);

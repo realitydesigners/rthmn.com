@@ -56,24 +56,24 @@ export default function CourseClient({ course }: { course: Course }) {
                             <CourseIcon icon={course.icon} />
                         </div>
                         <div className='flex-1 space-y-4'>
-                            <h1 className='font-outfit bg-gradient-to-br from-white via-white to-gray-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl'>
+                            <h1 className='font-outfit bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl'>
                                 {course.title}
                             </h1>
-                            <p className='max-w-2xl text-lg text-gray-400'>{course.description}</p>
+                            <p className='max-w-2xl text-lg text-neutral-400'>{course.description}</p>
                             <div className='flex flex-wrap items-center gap-6'>
                                 <div className='flex items-center gap-2'>
                                     <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>{course.chapters.length}</div>
-                                    <span className='text-sm text-gray-400'>Chapters</span>
+                                    <span className='text-sm text-neutral-400'>Chapters</span>
                                 </div>
                                 {course.difficulty && (
                                     <div className='flex items-center gap-2'>
                                         <FaLightbulb className='h-5 w-5 text-emerald-400' />
-                                        <span className='text-sm text-gray-400 capitalize'>{course.difficulty}</span>
+                                        <span className='text-sm capitalize text-neutral-400'>{course.difficulty}</span>
                                     </div>
                                 )}
                                 {course.estimatedTime && (
                                     <div className='flex items-center gap-2'>
-                                        <span className='text-sm text-gray-400'>{course.estimatedTime}</span>
+                                        <span className='text-sm text-neutral-400'>{course.estimatedTime}</span>
                                     </div>
                                 )}
                             </div>
@@ -95,9 +95,9 @@ export default function CourseClient({ course }: { course: Course }) {
                                             </div>
                                             <div className='flex-1'>
                                                 <h3 className='text-lg font-medium text-white'>{chapter.title}</h3>
-                                                {chapter.description && <p className='mt-1 text-sm text-gray-400'>{chapter.description}</p>}
+                                                {chapter.description && <p className='mt-1 text-sm text-neutral-400'>{chapter.description}</p>}
                                             </div>
-                                            <div className='flex items-center gap-2 text-sm text-gray-400'>
+                                            <div className='flex items-center gap-2 text-sm text-neutral-400'>
                                                 <div className='flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-xs text-emerald-400'>
                                                     {chapter.lessons.length}
                                                 </div>
@@ -117,7 +117,7 @@ export default function CourseClient({ course }: { course: Course }) {
                                                 </div>
                                                 <div className='flex-1'>
                                                     <h4 className='text-white'>{lesson.title}</h4>
-                                                    {lesson.description && <p className='mt-1 text-sm text-gray-400'>{lesson.description}</p>}
+                                                    {lesson.description && <p className='mt-1 text-sm text-neutral-400'>{lesson.description}</p>}
                                                 </div>
                                                 <FaPlay className='h-4 w-4 text-emerald-400' />
                                             </Link>

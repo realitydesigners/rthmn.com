@@ -19,7 +19,7 @@ const OnboardingCard = ({ step, isCompleted, isCurrent, stepNumber }: { step: (t
             {/* Content */}
             <div className='relative flex items-center gap-4 rounded-xl bg-black/40 p-3'>
                 {isCompleted && (
-                    <div className='absolute top-2 right-2'>
+                    <div className='absolute right-2 top-2'>
                         <div className='flex h-4 w-4 items-center justify-center rounded-full bg-[#3FFFA2]/20'>
                             <LuCheck className='h-3 w-3 text-[#3FFFA2]' />
                         </div>
@@ -27,15 +27,15 @@ const OnboardingCard = ({ step, isCompleted, isCurrent, stepNumber }: { step: (t
                 )}
                 <div className='flex min-w-0 flex-1 flex-col'>
                     <div className='flex items-center justify-between'>
-                        <h3 className={cn('truncate text-sm font-medium transition-colors duration-300', isCompleted || isCurrent ? 'text-white' : 'text-gray-400')}>
+                        <h3 className={cn('truncate text-sm font-medium transition-colors duration-300', isCompleted || isCurrent ? 'text-white' : 'text-neutral-400')}>
                             {step.title}
                         </h3>
-                        <button onClick={() => setIsExpanded(!isExpanded)} className='ml-2 rounded-md p-0.5 text-gray-500 hover:bg-white/5 hover:text-gray-300'>
+                        <button onClick={() => setIsExpanded(!isExpanded)} className='ml-2 rounded-md p-0.5 text-neutral-500 hover:bg-white/5 hover:text-neutral-300'>
                             {isExpanded ? <LuChevronUp size={14} /> : <LuChevronDown size={14} />}
                         </button>
                     </div>
 
-                    {isExpanded && <p className='mt-1 text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-400'>{step.description}</p>}
+                    {isExpanded && <p className='mt-1 text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400'>{step.description}</p>}
 
                     <div className='mt-1'>
                         {isCompleted ? (
@@ -47,7 +47,7 @@ const OnboardingCard = ({ step, isCompleted, isCurrent, stepNumber }: { step: (t
                                 In Progress
                             </span>
                         ) : (
-                            <span className='inline-flex items-center gap-1 rounded-full border border-[#222] bg-[#111] px-2 py-0.5 text-[10px] font-medium text-gray-500'>
+                            <span className='inline-flex items-center gap-1 rounded-full border border-[#222] bg-[#111] px-2 py-0.5 text-[10px] font-medium text-neutral-500'>
                                 Not Started
                             </span>
                         )}
@@ -79,7 +79,7 @@ export const Onboarding = () => {
                             style={{ width: `${(completedSteps.length / ONBOARDING_STEPS.length) * 100}%` }}
                         />
                     </div>
-                    <span className='text-xs font-medium text-gray-400'>
+                    <span className='text-xs font-medium text-neutral-400'>
                         {completedSteps.length}/{ONBOARDING_STEPS.length}
                     </span>
                 </div>

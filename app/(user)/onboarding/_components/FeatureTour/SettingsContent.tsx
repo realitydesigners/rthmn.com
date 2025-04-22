@@ -11,7 +11,7 @@ export function SettingsContent({ onComplete }: SettingsContentProps) {
             <div className='relative flex h-full flex-col items-end justify-end space-y-2'>
                 <div className='w-full p-2'>
                     <h3 className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl font-bold text-transparent'>Settings</h3>
-                    <p className='text-[13px] leading-relaxed text-gray-400'>Customize your trading view and visualization preferences.</p>
+                    <p className='text-[13px] leading-relaxed text-neutral-400'>Customize your trading view and visualization preferences.</p>
                 </div>
                 <div className='space-y-2'>
                     <div className='group relative overflow-hidden rounded-xl transition-all duration-300'>
@@ -20,8 +20,8 @@ export function SettingsContent({ onComplete }: SettingsContentProps) {
                                 <LuPalette className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
-                                <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Color Themes</div>
-                                <div className='text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-400'>
+                                <div className='text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white'>Color Themes</div>
+                                <div className='text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400'>
                                     Choose from preset themes or customize your colors
                                 </div>
                             </div>
@@ -34,8 +34,10 @@ export function SettingsContent({ onComplete }: SettingsContentProps) {
                                 <LuLayoutGrid className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
-                                <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Timeframe Control</div>
-                                <div className='text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-400'>Adjust visible timeframes and global controls</div>
+                                <div className='text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white'>Timeframe Control</div>
+                                <div className='text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400'>
+                                    Adjust visible timeframes and global controls
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -46,8 +48,10 @@ export function SettingsContent({ onComplete }: SettingsContentProps) {
                                 <LuBox className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
-                                <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Visual Style</div>
-                                <div className='text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-400'>Configure box styles, borders, and opacity</div>
+                                <div className='text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white'>Visual Style</div>
+                                <div className='text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400'>
+                                    Configure box styles, borders, and opacity
+                                </div>
                             </div>
                         </div>
                     </div>

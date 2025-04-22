@@ -62,25 +62,25 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                         <div className='rounded border border-[#181818] bg-[#0a0a0a] p-4'>
                             <div className='space-y-2'>
                                 <div className='flex items-center justify-between'>
-                                    <span className='text-sm font-medium text-gray-300'>{pair}</span>
-                                    <span className='font-mono text-sm text-gray-200'>{currentOHLC?.close.toFixed(getInstrumentDigits(pair || ''))}</span>
+                                    <span className='text-sm font-medium text-neutral-300'>{pair}</span>
+                                    <span className='font-mono text-sm text-neutral-200'>{currentOHLC?.close.toFixed(getInstrumentDigits(pair || ''))}</span>
                                 </div>
                                 <div className='grid grid-cols-2 gap-2 text-xs'>
                                     <div>
-                                        <span className='text-gray-500'>Open: </span>
-                                        <span className='font-mono text-gray-300'>{currentOHLC?.open.toFixed(getInstrumentDigits(pair || ''))}</span>
+                                        <span className='text-neutral-500'>Open: </span>
+                                        <span className='font-mono text-neutral-300'>{currentOHLC?.open.toFixed(getInstrumentDigits(pair || ''))}</span>
                                     </div>
                                     <div>
-                                        <span className='text-gray-500'>High: </span>
+                                        <span className='text-neutral-500'>High: </span>
                                         <span className='font-mono text-green-400'>{currentOHLC?.high.toFixed(getInstrumentDigits(pair || ''))}</span>
                                     </div>
                                     <div>
-                                        <span className='text-gray-500'>Low: </span>
+                                        <span className='text-neutral-500'>Low: </span>
                                         <span className='font-mono text-red-400'>{currentOHLC?.low.toFixed(getInstrumentDigits(pair || ''))}</span>
                                     </div>
                                     <div>
-                                        <span className='text-gray-500'>Close: </span>
-                                        <span className='font-mono text-gray-300'>{currentOHLC?.close.toFixed(getInstrumentDigits(pair || ''))}</span>
+                                        <span className='text-neutral-500'>Close: </span>
+                                        <span className='font-mono text-neutral-300'>{currentOHLC?.close.toFixed(getInstrumentDigits(pair || ''))}</span>
                                     </div>
                                 </div>
                             </div>
@@ -95,13 +95,13 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                 <div className='border-b border-[#181818] p-4'>
                                     <table className='w-full text-xs'>
                                         <thead>
-                                            <tr className='text-left text-gray-500'>
-                                                <th className='p-2 whitespace-nowrap'>Box #</th>
+                                            <tr className='text-left text-neutral-500'>
+                                                <th className='whitespace-nowrap p-2'>Box #</th>
                                                 <th className='p-2'>
                                                     <div className='space-y-1'>
                                                         <div className='whitespace-nowrap'>Initial Box Data</div>
-                                                        <div className='text-[10px] text-gray-600'>Raw WebSocket Response</div>
-                                                        <div className='text-[10px] text-gray-600 italic'>
+                                                        <div className='text-[10px] text-neutral-600'>Raw WebSocket Response</div>
+                                                        <div className='text-[10px] italic text-neutral-600'>
                                                             Initial timestamp: {initialBoxData?.timestamp ? new Date(initialBoxData.timestamp).toLocaleTimeString() : 'Loading...'}
                                                         </div>
                                                     </div>
@@ -109,8 +109,8 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                                 <th className='p-2'>
                                                     <div className='space-y-1'>
                                                         <div className='whitespace-nowrap'>Current Box Data</div>
-                                                        <div className='text-[10px] text-gray-600'>Processed by GridCalculator</div>
-                                                        <div className='text-[10px] text-gray-600 italic'>Current price: {currentOHLC?.close.toFixed(5)}</div>
+                                                        <div className='text-[10px] text-neutral-600'>Processed by GridCalculator</div>
+                                                        <div className='text-[10px] italic text-neutral-600'>Current price: {currentOHLC?.close.toFixed(5)}</div>
                                                     </div>
                                                 </th>
                                             </tr>
@@ -126,47 +126,47 @@ export const PairResoBox = ({ pair, boxSlice, currentOHLC, boxColors, initialBox
                                                 const initialBox = sortedInitialBoxes[idx];
                                                 return (
                                                     <tr key={idx} className='border-b border-[#181818]/50 hover:bg-[#0f0f0f]'>
-                                                        <td className='p-2 whitespace-nowrap text-gray-500'>Box {idx + 1}</td>
+                                                        <td className='whitespace-nowrap p-2 text-neutral-500'>Box {idx + 1}</td>
 
                                                         {/* Initial Box Data Column */}
-                                                        <td className='p-2 whitespace-nowrap'>
+                                                        <td className='whitespace-nowrap p-2'>
                                                             <div className='flex items-center gap-4 font-mono'>
                                                                 {initialBox ? (
                                                                     <>
                                                                         <div>
-                                                                            <span className='text-gray-400'>H:</span>
-                                                                            <span className='ml-1 text-gray-300'>{initialBox.high.toFixed(5)}</span>
+                                                                            <span className='text-neutral-400'>H:</span>
+                                                                            <span className='ml-1 text-neutral-300'>{initialBox.high.toFixed(5)}</span>
                                                                         </div>
                                                                         <div>
-                                                                            <span className='text-gray-400'>L:</span>
-                                                                            <span className='ml-1 text-gray-300'>{initialBox.low.toFixed(5)}</span>
+                                                                            <span className='text-neutral-400'>L:</span>
+                                                                            <span className='ml-1 text-neutral-300'>{initialBox.low.toFixed(5)}</span>
                                                                         </div>
                                                                         <div>
-                                                                            <span className='text-gray-400'>V:</span>
+                                                                            <span className='text-neutral-400'>V:</span>
                                                                             <span className={`ml-1 ${initialBox.value > 0 ? 'text-green-400' : 'text-red-400'}`}>
                                                                                 {initialBox.value.toFixed(5)}
                                                                             </span>
                                                                         </div>
                                                                     </>
                                                                 ) : (
-                                                                    <span className='text-gray-500'>Waiting for data...</span>
+                                                                    <span className='text-neutral-500'>Waiting for data...</span>
                                                                 )}
                                                             </div>
                                                         </td>
 
                                                         {/* Current Box Data Column */}
-                                                        <td className='p-2 whitespace-nowrap'>
+                                                        <td className='whitespace-nowrap p-2'>
                                                             <div className='flex items-center gap-4 font-mono'>
                                                                 <div>
-                                                                    <span className='text-gray-400'>H:</span>
-                                                                    <span className='ml-1 text-gray-300'>{box.high.toFixed(5)}</span>
+                                                                    <span className='text-neutral-400'>H:</span>
+                                                                    <span className='ml-1 text-neutral-300'>{box.high.toFixed(5)}</span>
                                                                 </div>
                                                                 <div>
-                                                                    <span className='text-gray-400'>L:</span>
-                                                                    <span className='ml-1 text-gray-300'>{box.low.toFixed(5)}</span>
+                                                                    <span className='text-neutral-400'>L:</span>
+                                                                    <span className='ml-1 text-neutral-300'>{box.low.toFixed(5)}</span>
                                                                 </div>
                                                                 <div>
-                                                                    <span className='text-gray-400'>V:</span>
+                                                                    <span className='text-neutral-400'>V:</span>
                                                                     <span className={`ml-1 ${box.value > 0 ? 'text-green-400' : 'text-red-400'}`}>{box.value.toFixed(5)}</span>
                                                                 </div>
                                                             </div>

@@ -19,13 +19,13 @@ export const CourseTemplate: PortableTextComponents = {
     block: {
         normal: ({ children }) => (
             <div className='mb-4'>
-                <p className={`font-outfit text-xl leading-relaxed text-gray-400`}>{children}</p>
+                <p className={`font-outfit text-xl leading-relaxed text-neutral-400`}>{children}</p>
             </div>
         ),
         h1: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h1 id={id} className={`font-outfit mb-6 text-3xl leading-[1.25em] font-bold text-gray-300 lg:text-6xl`}>
+                <h1 id={id} className={`font-outfit mb-6 text-3xl font-bold leading-[1.25em] text-neutral-300 lg:text-6xl`}>
                     {children}
                 </h1>
             );
@@ -33,7 +33,7 @@ export const CourseTemplate: PortableTextComponents = {
         h2: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h2 id={id} className={`font-outfit mb-4 scroll-mt-24 text-2xl leading-[1.25em] font-bold text-gray-300`}>
+                <h2 id={id} className={`font-outfit mb-4 scroll-mt-24 text-2xl font-bold leading-[1.25em] text-neutral-300`}>
                     {children}
                 </h2>
             );
@@ -41,7 +41,7 @@ export const CourseTemplate: PortableTextComponents = {
         h3: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h3 id={id} className={`font-outfit mb-3 scroll-mt-24 text-xl leading-[1.25em] font-bold text-gray-300`}>
+                <h3 id={id} className={`font-outfit mb-3 scroll-mt-24 text-xl font-bold leading-[1.25em] text-neutral-300`}>
                     {children}
                 </h3>
             );
@@ -49,30 +49,30 @@ export const CourseTemplate: PortableTextComponents = {
         h4: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h4 id={id} className={`font-outfit mb-2 scroll-mt-24 text-lg leading-relaxed font-bold text-gray-300`}>
+                <h4 id={id} className={`font-outfit mb-2 scroll-mt-24 text-lg font-bold leading-relaxed text-neutral-300`}>
                     {children}
                 </h4>
             );
         },
-        bullet: ({ children }) => <li className='font-outfit py-1 leading-relaxed text-gray-400 marker:text-white'>{children}</li>,
-        number: ({ children }) => <li className='font-outfit py-1 leading-relaxed text-gray-400 marker:text-white'>{children}</li>,
+        bullet: ({ children }) => <li className='font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white'>{children}</li>,
+        number: ({ children }) => <li className='font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white'>{children}</li>,
     },
     list: {
         bullet: ({ children }) => (
             <div className='my-4 w-full'>
-                <ul className='font-outfit w-full list-disc space-y-1 pr-4 pl-8 text-gray-400'>{children}</ul>
+                <ul className='font-outfit w-full list-disc space-y-1 pl-8 pr-4 text-neutral-400'>{children}</ul>
             </div>
         ),
         number: ({ children }) => (
             <div className='my-4 w-full'>
-                <ol className='font-outfit w-full list-decimal space-y-1 pr-4 pl-8 text-gray-400'>{children}</ol>
+                <ol className='font-outfit w-full list-decimal space-y-1 pl-8 pr-4 text-neutral-400'>{children}</ol>
             </div>
         ),
     },
     marks: {
-        strong: ({ children }) => <strong className='font-bold text-gray-400'>{children}</strong>,
-        em: ({ children }) => <em className='text-gray-400 italic'>{children}</em>,
-        code: ({ children }) => <code className='rounded-sm bg-gray-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400'>{children}</code>,
+        strong: ({ children }) => <strong className='font-bold text-neutral-400'>{children}</strong>,
+        em: ({ children }) => <em className='italic text-neutral-400'>{children}</em>,
+        code: ({ children }) => <code className='rounded-sm bg-neutral-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400'>{children}</code>,
         link: ({ children, value }) => (
             <a href={value?.href} className='font-bold text-white underline' target='_blank' rel='noopener noreferrer'>
                 {children}

@@ -65,7 +65,7 @@ const AuroraBackground = () => (
                 ease: 'linear',
             },
         }}
-        className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed]`}
+        className={`pointer-events-none absolute inset-0 overflow-hidden backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] [background-image:var(--white-gradient),var(--aurora)] [background-position:0%_50%,0%_50%] [background-size:200%,_200%] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-attachment:fixed] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%]`}
     />
 );
 
@@ -193,10 +193,10 @@ export default function SignIn() {
                 <div className='w-full max-w-[400px] space-y-12 sm:max-w-[380px] lg:w-[420px] lg:max-w-lg'>
                     <div className='space-y-4'>
                         <div className='space-y-3'>
-                            <h1 className='font-outfit bg-gradient-to-br from-white via-white to-gray-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl lg:text-5xl'>
+                            <h1 className='font-outfit bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl lg:text-5xl'>
                                 Trading from another dimension
                             </h1>
-                            <p className='font-kodemono max-w-[90%] text-base text-gray-400/90 sm:text-lg'>Take your trading to a new level.</p>
+                            <p className='font-kodemono max-w-[90%] text-base text-neutral-400/90 sm:text-lg'>Take your trading to a new level.</p>
                         </div>
                     </div>
 
@@ -209,44 +209,44 @@ export default function SignIn() {
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder='Enter your email'
-                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-gray-400 focus:ring-2 focus:ring-gray-500/20 focus:outline-none'
+                                    className='w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-500/20'
                                     required
                                 />
                                 <button
                                     type='submit'
                                     disabled={isLoading}
-                                    className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-gray-500/20 focus:outline-none active:scale-[0.99]'>
-                                    <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-gray-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-gray-100 lg:py-2.5'>
+                                    className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-neutral-500/20 active:scale-[0.99]'>
+                                    <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-neutral-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-neutral-100 lg:py-2.5'>
                                         <div className='absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]' />
                                         <span className='relative text-base sm:text-base'>{isLoading ? 'Sending...' : 'Sign in with Email'}</span>
                                     </span>
                                 </button>
                             </div>
-                            {message && <p className='mt-2 text-center text-sm text-gray-300'>{message}</p>}
+                            {message && <p className='mt-2 text-center text-sm text-neutral-300'>{message}</p>}
                         </form>
 
                         <div className='relative flex items-center justify-center'>
-                            <span className='relative px-4 text-xs text-gray-400'>Or continue with</span>
+                            <span className='relative px-4 text-xs text-neutral-400'>Or continue with</span>
                         </div>
 
                         <form onSubmit={handleSignIn}>
                             <button
-                                className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-gray-500/20 focus:outline-none active:scale-[0.99]'
+                                className='group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:outline-none focus:ring-2 focus:ring-neutral-500/20 active:scale-[0.99]'
                                 type='submit'>
-                                <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-gray-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-gray-100 lg:py-2.5'>
+                                <span className='relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-neutral-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-neutral-100 lg:py-2.5'>
                                     <div className='absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]' />
                                     <FcGoogle className='relative mr-3 h-5 w-5 transition-transform duration-300 group-hover:scale-110 sm:h-5 sm:w-5' />
                                     <span className='relative text-base sm:text-base'>Continue with Google</span>
                                 </span>
                             </button>
                         </form>
-                        <p className='text-center font-mono text-xs text-gray-500/90'>
+                        <p className='text-center font-mono text-xs text-neutral-500/90'>
                             Currently in beta. By signing in, you agree to our{' '}
-                            <a href='/terms' className='text-gray-400 transition-colors hover:text-gray-300'>
+                            <a href='/terms' className='text-neutral-400 transition-colors hover:text-neutral-300'>
                                 Terms of Service
                             </a>{' '}
                             and{' '}
-                            <a href='/privacy' className='text-gray-400 transition-colors hover:text-gray-300'>
+                            <a href='/privacy' className='text-neutral-400 transition-colors hover:text-neutral-300'>
                                 Privacy Policy
                             </a>
                         </p>

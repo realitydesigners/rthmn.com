@@ -11,7 +11,7 @@ export function InstrumentsContent({ onComplete }: InstrumentsContentProps) {
             <div className='relative flex h-full flex-col items-end justify-end space-y-2'>
                 <div className='w-full p-2'>
                     <h3 className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl font-bold text-transparent'>Instruments</h3>
-                    <p className='text-[13px] leading-relaxed text-gray-400'>Track real-time market data across multiple assets.</p>
+                    <p className='text-[13px] leading-relaxed text-neutral-400'>Track real-time market data across multiple assets.</p>
                 </div>
                 <div className='space-y-2'>
                     <div className='group relative overflow-hidden rounded-xl transition-all duration-300'>
@@ -20,8 +20,8 @@ export function InstrumentsContent({ onComplete }: InstrumentsContentProps) {
                                 <LuZap className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
-                                <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Live Price Updates</div>
-                                <div className='text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-400'>
+                                <div className='text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white'>Live Price Updates</div>
+                                <div className='text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400'>
                                     Track real-time prices for FX, Crypto, Stocks & ETFs
                                 </div>
                             </div>
@@ -34,8 +34,8 @@ export function InstrumentsContent({ onComplete }: InstrumentsContentProps) {
                                 <LuLayoutGrid className='h-4 w-4 text-[#3FFFA2] transition-colors duration-300 group-hover:text-[#3FFFA2]/80' />
                             </div>
                             <div className='flex-1'>
-                                <div className='text-sm font-medium text-gray-200 transition-colors duration-300 group-hover:text-white'>Instrument Selection</div>
-                                <div className='text-xs text-gray-500 transition-colors duration-300 group-hover:text-gray-400'>
+                                <div className='text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white'>Instrument Selection</div>
+                                <div className='text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400'>
                                     Easily add or remove trading pairs from your watchlist
                                 </div>
                             </div>

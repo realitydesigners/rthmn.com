@@ -101,7 +101,7 @@ const InputField = memo(
                     {label}
                     {tooltip && (
                         <div className='group relative'>
-                            <FaInfoCircle className='h-4 w-4 cursor-help text-gray-400' />
+                            <FaInfoCircle className='h-4 w-4 cursor-help text-neutral-400' />
                             <div className='absolute bottom-full left-1/2 mb-2 hidden w-48 -translate-x-1/2 rounded-lg bg-black/90 p-2 text-xs text-white shadow-lg group-hover:block'>
                                 {tooltip}
                             </div>
@@ -117,7 +117,7 @@ const InputField = memo(
                     value={value || ''}
                     onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
                     placeholder={placeholder}
-                    className={`w-full rounded-xl border bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
+                    className={`w-full rounded-xl border bg-white/5 py-4 pl-12 pr-4 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
                         error
                             ? 'border-red-400/50 focus:border-red-400/50 focus:bg-red-400/5 focus:ring-2 focus:ring-red-400/20'
                             : 'border-white/10 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20'
@@ -158,14 +158,14 @@ const ResultCard = memo(
                 <div className='mb-2 flex items-center gap-3'>
                     <div
                         className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                            isInvalid ? 'bg-red-400/10 text-red-400' : positive ? 'bg-emerald-400/10 text-emerald-400' : 'bg-white/5 text-gray-400'
+                            isInvalid ? 'bg-red-400/10 text-red-400' : positive ? 'bg-emerald-400/10 text-emerald-400' : 'bg-white/5 text-neutral-400'
                         }`}>
                         {icon}
                     </div>
-                    <div className='font-kodemono text-sm text-gray-400'>{label}</div>
+                    <div className='font-kodemono text-sm text-neutral-400'>{label}</div>
                 </div>
                 <div className='font-outfit text-2xl font-bold text-white'>{isInvalid ? '—' : value}</div>
-                {subValue && !isInvalid && <div className='font-kodemono mt-1 text-sm text-gray-400'>{subValue}</div>}
+                {subValue && !isInvalid && <div className='font-kodemono mt-1 text-sm text-neutral-400'>{subValue}</div>}
             </div>
         </motion.div>
     )
@@ -214,7 +214,7 @@ const TakeProfitSuggestion = memo(({ entryPrice, stopLoss, onSelect }: { entryPr
                 <button
                     key={ratio}
                     onClick={() => onSelect(price)}
-                    className='group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-gray-400 transition-all duration-300 hover:border-emerald-400/50 hover:bg-emerald-400/5'>
+                    className='group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-emerald-400/50 hover:bg-emerald-400/5'>
                     <span>{ratio}:1</span>
                     <span className='text-emerald-400'>${price.toFixed(2)}</span>
                 </button>
@@ -309,7 +309,7 @@ export const SectionCalculator = () => {
             <div className='pointer-events-none absolute inset-0'>
                 <div className='absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]' />
                 <div className='absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl' />
-                <div className='absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl' />
+                <div className='absolute -bottom-1/2 right-0 h-96 w-96 translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl' />
             </div>
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
@@ -319,8 +319,8 @@ export const SectionCalculator = () => {
                     animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.8 }}
                     className='mb-16 text-center'>
-                    <h2 className='text-gray-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Position Size Calculator</h2>
-                    <p className='font-kodemono mx-auto max-w-2xl text-base text-gray-400 sm:text-lg'>
+                    <h2 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Position Size Calculator</h2>
+                    <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>
                         Calculate your optimal position size and risk management parameters with precision.
                     </p>
                 </motion.div>
@@ -348,7 +348,7 @@ export const SectionCalculator = () => {
                                         <div className='relative z-10'>
                                             <div className='font-outfit mb-1 text-lg font-semibold text-white'>{template.label}</div>
                                             <div className='font-kodemono mb-2 text-2xl text-emerald-400'>{template.value}%</div>
-                                            <p className='font-kodemono text-sm text-gray-400'>{template.description}</p>
+                                            <p className='font-kodemono text-sm text-neutral-400'>{template.description}</p>
                                         </div>
                                     </button>
                                 ))}
@@ -366,7 +366,7 @@ export const SectionCalculator = () => {
                                     label='Account Size'
                                     value={inputs.accountSize}
                                     onChange={(value) => handleInputChange('accountSize', value)}
-                                    icon={<FaDollarSign className='h-5 w-5 text-gray-400' />}
+                                    icon={<FaDollarSign className='h-5 w-5 text-neutral-400' />}
                                     tooltip='Your total account balance'
                                     error={getError('accountSize')}
                                     placeholder='Enter account size'
@@ -376,7 +376,7 @@ export const SectionCalculator = () => {
                                     label='Risk Percentage'
                                     value={inputs.riskPercentage}
                                     onChange={(value) => handleInputChange('riskPercentage', value)}
-                                    icon={<FaPercentage className='h-5 w-5 text-gray-400' />}
+                                    icon={<FaPercentage className='h-5 w-5 text-neutral-400' />}
                                     tooltip='Percentage of account to risk'
                                     error={getError('riskPercentage')}
                                     placeholder='Enter risk %'
@@ -406,7 +406,7 @@ export const SectionCalculator = () => {
                                     label='Entry Price'
                                     value={inputs.entryPrice}
                                     onChange={(value) => handleInputChange('entryPrice', value)}
-                                    icon={<FaExchangeAlt className='h-5 w-5 text-gray-400' />}
+                                    icon={<FaExchangeAlt className='h-5 w-5 text-neutral-400' />}
                                     error={getError('entryPrice')}
                                     placeholder='Enter entry price'
                                 />

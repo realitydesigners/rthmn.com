@@ -8,18 +8,18 @@ const themeClasses = {
         isInset: false,
     },
     'image-standard-dark': {
-        textColor: 'text-gray-200',
+        textColor: 'text-neutral-200',
         isInset: false,
     },
     'image-inset': {
-        textColor: 'text-gray-200',
+        textColor: 'text-neutral-200',
         isInset: true,
     },
 };
 
 const ImageDisplay = ({ image, alt, className }) => {
     const { isInset } = themeClasses[className] || themeClasses['image-standard'];
-    const insetStyles = isInset ? 'border border-t border-gray-600/50' : '';
+    const insetStyles = isInset ? 'border border-t border-neutral-600/50' : '';
 
     return (
         <div className={`relative flex h-auto w-full items-center justify-center overflow-hidden rounded-[1.2em] lg:w-3/4 ${insetStyles}`}>
@@ -33,7 +33,7 @@ const ArtistInfo = ({ artist, className }) => {
     const insetStyles = isInset ? 'rounded-b-[1.2em] pl-2 -mt-[60px] pb-3 pt-1 bg-linear-to-t from-black to-transparent' : '';
 
     return (
-        <div className={`relative -bottom-1 flex h-auto w-full pt-4 pl-4 lg:w-3/4 ${textColor} ${insetStyles}`}>
+        <div className={`relative -bottom-1 flex h-auto w-full pl-4 pt-4 lg:w-3/4 ${textColor} ${insetStyles}`}>
             <Image
                 src={artist.image}
                 alt={`Cover Image for ${artist.name}`}
@@ -42,7 +42,7 @@ const ArtistInfo = ({ artist, className }) => {
                 priority={false}
                 className='mr-2 max-h-[30px] max-w-[30px] rounded-full border'
             />
-            <div className='flex flex-col items-start justify-center text-xs leading-none uppercase'>
+            <div className='flex flex-col items-start justify-center text-xs uppercase leading-none'>
                 <Link href={`/team/${artist.slug.current}`} className={`text-md pl-1 font-bold`}>
                     {artist.name}
                 </Link>

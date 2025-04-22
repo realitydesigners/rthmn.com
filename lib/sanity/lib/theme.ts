@@ -5,14 +5,14 @@ const props = {
     '--my-black': '#060F12',
     '--my-brand': '#00cc7a',
     '--my-red': '#ff4444',
-    '--my-gray': '#888',
+    '--my-neutral': '#888',
 };
 
 export const Theme = buildLegacyTheme({
     '--black': props['--my-black'],
     '--white': props['--my-white'],
-    '--gray': props['--my-gray'],
-    '--gray-base': props['--my-gray'],
+    '--neutral': props['--my-neutral'],
+    '--neutral-base': props['--my-neutral'],
     '--component-bg': props['--my-white'],
     '--component-text-color': props['--my-black'],
     '--brand-primary': props['--my-brand'],

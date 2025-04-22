@@ -109,15 +109,15 @@ export default function Dashboard() {
 
     if (!selectedPairs.length && !isLoading) {
         return (
-            <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
+            <main className='lg:pt-18 w-full px-2 pt-16 sm:px-4 lg:px-6'>
                 <NoInstruments />
-                <div className='mt-4 text-center text-sm text-gray-400'>Please complete the onboarding process to select your trading pairs.</div>
+                <div className='mt-4 text-center text-sm text-neutral-400'>Please complete the onboarding process to select your trading pairs.</div>
             </main>
         );
     }
 
     return (
-        <main className='w-full px-2 py-18 sm:px-4'>
+        <main className='py-18 w-full px-2 sm:px-4'>
             <div className={cn(gridClass, 'transition-[grid-template-columns] duration-300 ease-in-out')}>
                 {orderedPairs.map((pair) => {
                     const data = pairData[pair];

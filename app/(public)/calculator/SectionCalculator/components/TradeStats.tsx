@@ -62,7 +62,7 @@ export const TradeStats = memo(({ entryPrice, stopLoss, takeProfit, positionSize
                         <div className={`mb-2 flex h-8 w-8 items-center justify-center rounded-lg ${stat.bgColor}`}>
                             <div className={`h-4 w-4 ${stat.color}`}>{stat.icon}</div>
                         </div>
-                        <div className='font-kodemono text-sm text-gray-400'>{stat.label}</div>
+                        <div className='font-kodemono text-sm text-neutral-400'>{stat.label}</div>
                         <div className={`font-outfit mt-1 text-xl font-bold ${stat.color}`}>{stat.value}</div>
                     </div>
                 </motion.div>
