@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useMemo } from 'react';
 import type { Box } from '@/types/types';
+import { motion } from 'framer-motion';
 
 interface NestedBoxesProps {
     boxes: Box[];
@@ -45,6 +46,7 @@ export const NestedBoxes = ({
     boxes,
     demoStep = 0,
     isPaused = false,
+    isPointOfChange = false,
     maxSize: providedMaxSize,
     baseSize = 400,
     showLabels = false,
@@ -113,12 +115,17 @@ export const NestedBoxes = ({
             transition: 'all 0.15s ease-out',
             position: 'absolute',
             boxShadow: colors.styles.showBorder ? `0 0px 0 ${boxStyles.shadowColor(0.12 * boxStyles.shadowIntensity)}` : 'none',
-            ...(mode === 'animated' && isPaused ? { transform: `translateX(${index * 3}px) translateY(${index * 2}px)`, transition: 'all 0.8s cubic-bezier(0.8, 0, 0.2, 1)' } : {}),
+            ...(mode === 'animated' && isPaused
+                ? {
+                      transform: `translateX(${index * 5}px) translateY(${index * -5}px) rotateX(0deg) rotateY(0deg) `,
+                      transition: 'all 1.2s cubic-bezier(0.8, 0, 0.2, 1)',
+                  }
+                : {}),
             opacity: 1,
         };
 
         return (
-            <div key={`box-${index}-${box.value}-${mode === 'animated' ? demoStep : ''}`} className='absolute' style={style}>
+            <div key={`box-${index}-${box.value}`} className='absolute' style={style}>
                 <div
                     className='absolute inset-0'
                     style={{
@@ -156,5 +163,39 @@ export const NestedBoxes = ({
         );
     };
 
-    return <div className={`relative min-h-[200px] w-full ${containerClassName}`}>{renderBox(boxes[0], 0)}</div>;
+    const containerStyle: React.CSSProperties = mode === 'animated' ? { perspective: '1500px', transformStyle: 'preserve-3d' } : {};
+
+    const animationVariants = {
+        paused: {
+            translateX: -90,
+            translateY: 90,
+            rotateX: 60,
+            rotateY: 0,
+            rotateZ: -45,
+        },
+        playing: {
+            translateX: 0,
+            translateY: 0,
+            rotateX: 0,
+            rotateY: 0,
+            rotateZ: 0,
+        },
+    };
+
+    const animationTransition = {
+        duration: 0.8,
+        ease: [0.8, 0, 0.2, 1],
+    };
+
+    return (
+        <div className={`relative min-h-[200px] w-full ${containerClassName}`} style={containerStyle}>
+            <motion.div
+                style={{ width: '100%', height: '100%', transformStyle: 'preserve-3d' }}
+                variants={animationVariants}
+                animate={isPaused ? 'paused' : 'playing'}
+                transition={animationTransition}>
+                {renderBox(boxes[0], 0)}
+            </motion.div>
+        </div>
+    );
 };

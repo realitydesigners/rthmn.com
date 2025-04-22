@@ -56,7 +56,7 @@ const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData:
 
     useEffect(() => {
         const handleResize = () => {
-            setBaseSize(window.innerWidth >= 1024 ? 250 : 150);
+            setBaseSize(window.innerWidth >= 1024 ? 225 : 160);
         };
 
         handleResize();
@@ -90,8 +90,8 @@ const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData:
                     <div className='flex w-full flex-col items-center gap-2'>
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
-                                <div className='font-outfit text-lg font-bold tracking-wider'>{pair.replace('_', '/')}</div>
-                                <div className='font-kodemono text-sm font-medium text-neutral-200'>{latestPrice ? formatPrice(latestPrice, pair) : '-'}</div>
+                                <div className='font-outfit text-sm font-bold tracking-wider lg:text-lg'>{pair.replace('_', '/')}</div>
+                                <div className='font-kodemono text-xs font-medium text-neutral-200 lg:text-sm'>{latestPrice ? formatPrice(latestPrice, pair) : '-'}</div>
                             </div>
                         </div>
                     </div>

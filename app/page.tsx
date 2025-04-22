@@ -66,7 +66,7 @@ export default async function Homepage() {
             <SectionMarketDisplay marketData={marketData} />
             <SectionRthmnDemo marketData={marketData} />
             {/* <SectionMarketTicker marketData={marketData} /> */}
-            {/* <SectionBoxes /> */}
+            <SectionBoxes />
             {/* <SectionHistogram />
             <SectionHero marketData={marketData} />
             */}

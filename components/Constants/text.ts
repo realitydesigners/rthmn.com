@@ -85,7 +85,6 @@ export const STATS_DATA = [
 export const FEATURE_TAGS = [
     { icon: FaChartLine, text: 'Self Similar Patterns', color: '#22c55e' },
     { icon: FaWaveSquare, text: 'Multi Trend Analysis', color: '#3b82f6' },
-    { icon: FaRobot, text: 'Smart Alerts', color: '#8b5cf6' },
     { icon: FaFingerprint, text: 'Real-time updates', color: '#ef4444' },
 ];
 
