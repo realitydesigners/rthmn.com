@@ -1,5 +1,6 @@
-import React, { memo, useCallback, useState, useEffect } from 'react';
 import type { BoxColors } from '@/types/types';
+import type React from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 
 interface CustomColorPickerProps {
     boxColors: BoxColors;
@@ -57,7 +58,9 @@ const ColorInput = memo(
             <div className='group flex flex-col gap-2'>
                 <div className='relative h-10 w-full overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C] transition-all duration-200 hover:border-[#333] hover:bg-[#111]'>
                     <div className='absolute inset-0 flex items-center px-3'>
-                        <span className='font-kodemono text-[10px] font-medium tracking-wider text-[#666] uppercase'>{label}</span>
+                        <span className='font-kodemono text-[10px] font-medium tracking-wider text-[#666] uppercase'>
+                            {label}
+                        </span>
                         <div
                             className='ml-auto h-6 w-6 rounded-full shadow-lg'
                             style={{
@@ -66,7 +69,12 @@ const ColorInput = memo(
                             }}
                         />
                     </div>
-                    <input type='color' value={localValue} onChange={handleChange} className='h-full w-full cursor-pointer opacity-0' />
+                    <input
+                        type='color'
+                        value={localValue}
+                        onChange={handleChange}
+                        className='h-full w-full cursor-pointer opacity-0'
+                    />
                 </div>
             </div>
         );
@@ -97,7 +105,9 @@ export const CustomColorPicker = memo(
         return (
             <div className='mt-4 flex flex-col gap-3'>
                 <div className='flex items-center justify-between'>
-                    <span className='font-kodemono text-[10px] font-medium tracking-wider text-[#666] uppercase'>Custom Colors</span>
+                    <span className='font-kodemono text-[10px] font-medium tracking-wider text-[#666] uppercase'>
+                        Custom Colors
+                    </span>
                 </div>
                 <div className='grid grid-cols-2 gap-3'>
                     <ColorInput label='Positive' value={boxColors.positive} onChange={handlePositiveChange} />
@@ -106,5 +116,7 @@ export const CustomColorPicker = memo(
             </div>
         );
     },
-    (prevProps, nextProps) => prevProps.boxColors.positive === nextProps.boxColors.positive && prevProps.boxColors.negative === nextProps.boxColors.negative
+    (prevProps, nextProps) =>
+        prevProps.boxColors.positive === nextProps.boxColors.positive &&
+        prevProps.boxColors.negative === nextProps.boxColors.negative
 );

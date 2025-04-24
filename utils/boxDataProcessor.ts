@@ -1,5 +1,5 @@
+import type { BoxSlice } from '@/types/types';
 import { createBoxCalculator } from './boxCalculator';
-import { BoxSlice } from '@/types/types';
 
 import { safeISOString } from './dateUtils';
 
@@ -54,9 +54,9 @@ export const processProgressiveBoxValues = (boxes: BoxSlice['boxes']): BoxSlice[
 export function processInitialBoxData(
     processedCandles: { timestamp: number; open: number; high: number; low: number; close: number }[],
     pair: string,
-    defaultVisibleBoxesCount: number = 7,
-    defaultHeight: number = 200,
-    initialBarWidth: number = 20
+    defaultVisibleBoxesCount = 7,
+    defaultHeight = 200,
+    initialBarWidth = 20
 ) {
     // Reset previous values at the start of processing
 
@@ -89,16 +89,18 @@ export function processInitialBoxData(
     });
 
     // First create base histogram boxes with initial deduplication
-    let histogramBoxes: ExtendedBoxSlice[] = [];
+    const histogramBoxes: ExtendedBoxSlice[] = [];
     let previousBoxes: any[] = [];
 
     boxTimeseriesData.forEach((timepoint, index) => {
         // Convert current timepoint boxes to array format
-        const currentBoxes = Object.entries(timepoint.boxes).map(([size, data]: [string, { high: number; low: number; value: number }]) => ({
-            high: Number(data.high),
-            low: Number(data.low),
-            value: data.value,
-        }));
+        const currentBoxes = Object.entries(timepoint.boxes).map(
+            ([size, data]: [string, { high: number; low: number; value: number }]) => ({
+                high: Number(data.high),
+                low: Number(data.low),
+                value: data.value,
+            })
+        );
 
         // Process boxes and get progressive values
         const progressiveBoxes = processProgressiveBoxValues(currentBoxes);
@@ -170,9 +172,12 @@ export function processInitialBoxData(
         const negativeBoxesCount = defaultVisibleBoxesCount - positiveBoxesCount;
 
         const totalNegativeHeight = negativeBoxesCount * boxHeight;
-        const meetingPointY = totalNegativeHeight + (defaultHeight - totalNegativeHeight - positiveBoxesCount * boxHeight) / 2;
+        const meetingPointY =
+            totalNegativeHeight + (defaultHeight - totalNegativeHeight - positiveBoxesCount * boxHeight) / 2;
 
-        const smallestBox = visibleBoxes.reduce((smallest, current) => (Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest));
+        const smallestBox = visibleBoxes.reduce((smallest, current) =>
+            Math.abs(current.value) < Math.abs(smallest.value) ? current : smallest
+        );
         const price = smallestBox.value >= 0 ? smallestBox.high : smallestBox.low;
         const high = Math.max(...visibleBoxes.map((box) => box.high));
         const low = Math.min(...visibleBoxes.map((box) => box.low));

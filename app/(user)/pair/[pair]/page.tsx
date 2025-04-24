@@ -1,9 +1,9 @@
-import { processInitialBoxData } from '@/utils/boxDataProcessor';
-import { processInitialChartData } from '@/utils/chartDataProcessor';
 import { getSubscription } from '@/lib/supabase/queries';
 import { createClient } from '@/lib/supabase/server';
-import PairClient from './client';
+import { processInitialBoxData } from '@/utils/boxDataProcessor';
+import { processInitialChartData } from '@/utils/chartDataProcessor';
 import { getUnixTimestamp } from '@/utils/dateUtils';
+import PairClient from './client';
 
 interface PageProps {
     params: Promise<{
@@ -14,11 +14,14 @@ interface PageProps {
 async function fetchApiData(pair: string, token: string) {
     const CANDLE_LIMIT = 200;
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+        const response = await fetch(
+            `${process.env.NEXT_PUBLIC_SERVER_URL}/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min`,
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            }
+        );
 
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const { data } = await response.json();
@@ -61,7 +64,10 @@ async function fetchApiData(pair: string, token: string) {
                     close: candleClose,
                 };
             })
-            .filter((candle): candle is { timestamp: number; open: number; high: number; low: number; close: number } => candle !== null); // Filter out nulls and type guard
+            .filter(
+                (candle): candle is { timestamp: number; open: number; high: number; low: number; close: number } =>
+                    candle !== null
+            ); // Filter out nulls and type guard
 
         // Early exit if no valid data remained after processing
         if (!processedData.length) {

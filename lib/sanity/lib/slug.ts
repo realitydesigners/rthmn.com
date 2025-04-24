@@ -1,4 +1,4 @@
-import { defineField, type FieldDefinition, type SlugifierFn, type SlugValidationContext } from 'sanity';
+import { type FieldDefinition, type SlugValidationContext, type SlugifierFn, defineField } from 'sanity';
 import slugify from 'slugify';
 
 export function defineSlug(schema: any = { name: 'slug' }): FieldDefinition<'slug'> {

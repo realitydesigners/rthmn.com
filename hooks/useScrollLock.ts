@@ -23,7 +23,7 @@ export const useScrollLock = (lock: boolean) => {
 
             // Restore scroll position
             if (scrollPosition) {
-                window.scrollTo(0, parseInt(scrollPosition.replace('px', '')) * -1);
+                window.scrollTo(0, Number.parseInt(scrollPosition.replace('px', '')) * -1);
             }
         }
     }, [lock]);

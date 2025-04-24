@@ -1,10 +1,10 @@
 'use server';
 
-import type Stripe from 'stripe';
-import { calculateTrialEndUnixTimestamp, getErrorRedirect, getURL } from '@/utils/helpers';
 import { stripe } from '@/lib/stripe/config';
 import { createOrRetrieveCustomer } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { calculateTrialEndUnixTimestamp, getErrorRedirect, getURL } from '@/utils/helpers';
+import type Stripe from 'stripe';
 
 type Price = any;
 
@@ -13,7 +13,12 @@ type CheckoutResponse = {
     sessionId?: string;
 };
 
-export async function checkoutWithStripe(price: Price, isSubscription: boolean, successPath: string, cancelPath: string): Promise<CheckoutResponse> {
+export async function checkoutWithStripe(
+    price: Price,
+    isSubscription: boolean,
+    successPath: string,
+    cancelPath: string
+): Promise<CheckoutResponse> {
     try {
         const supabase = await createClient();
 
@@ -144,9 +149,17 @@ export async function createStripePortal(currentPath: string) {
     } catch (error) {
         if (error instanceof Error) {
             console.error(error);
-            return getErrorRedirect(currentPath, error.message, 'Please try again later or contact a system administrator.');
+            return getErrorRedirect(
+                currentPath,
+                error.message,
+                'Please try again later or contact a system administrator.'
+            );
         } else {
-            return getErrorRedirect(currentPath, 'An unknown error occurred.', 'Please try again later or contact a system administrator.');
+            return getErrorRedirect(
+                currentPath,
+                'An unknown error occurred.',
+                'Please try again later or contact a system administrator.'
+            );
         }
     }
 }

@@ -22,7 +22,7 @@ export const createMockBoxData = (values: number[]): Box[] => {
 };
 
 export const getBoxPositionsFromPattern = (pattern: number[]): any[] => {
-    let boxes: any[] = pattern.map((_, index) => ({
+    const boxes: any[] = pattern.map((_, index) => ({
         boxNumber: index + 1,
         position: index,
         isUp: pattern[index] === 1,
@@ -78,7 +78,8 @@ export const getAnimationSequence = () => {
 };
 
 export const BASE_VALUES = [
-    2000, 1600, 1280, 1024, 819, 655, 524, 419, 335, 268, 214, 171, 137, 110, 88, 70, 56, 45, 36, 29, 23, 18, 14, 11, 9, 7, 6, 5, 4, 3, 2, 2, 2, 1, 1, 1, 1, 0,
+    2000, 1600, 1280, 1024, 819, 655, 524, 419, 335, 268, 214, 171, 137, 110, 88, 70, 56, 45, 36, 29, 23, 18, 14, 11, 9,
+    7, 6, 5, 4, 3, 2, 2, 2, 1, 1, 1, 1, 0,
 ];
 
 export const sequences = [

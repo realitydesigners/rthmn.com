@@ -1,4 +1,4 @@
-import { CandleData } from '@/types/types';
+import type { CandleData } from '@/types/types';
 import { BoxSizes, INSTRUMENTS } from '@/utils/instruments';
 
 export class BoxCalculator {
@@ -9,7 +9,10 @@ export class BoxCalculator {
     private calculationPoint: number;
 
     constructor(pair: string) {
-        const details = Object.values(INSTRUMENTS).find((category) => pair in category)?.[pair] || { point: 0.00001, digits: 5 };
+        const details = Object.values(INSTRUMENTS).find((category) => pair in category)?.[pair] || {
+            point: 0.00001,
+            digits: 5,
+        };
         this.calculationPoint = details.point;
 
         this.boxSizes = new Float64Array(BoxSizes);

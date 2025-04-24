@@ -1,8 +1,8 @@
-import { notFound } from 'next/navigation';
+import { PageBuilder } from '@/components/PageBuilder';
 import { client, sanityFetch } from '@/lib/sanity/lib/client';
 import { queryPortfolioItem, querySlugPageData, querySlugPagePaths } from '@/lib/sanity/lib/query';
 import { getMetaData } from '@/lib/sanity/lib/seo';
-import { PageBuilder } from '@/components/PageBuilder';
+import { notFound } from 'next/navigation';
 
 type PageTypeConfig = {
     query: string;

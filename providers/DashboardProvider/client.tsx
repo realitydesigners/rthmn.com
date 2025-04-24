@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, useEffect, useRef, use, useState, useCallback, useMemo } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
-import { Box, BoxSlice, PairData, OHLC } from '@/types/types';
+import type { Box, BoxSlice, OHLC, PairData } from '@/types/types';
+import type React from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface DashboardContextType {
     pairData: Record<string, PairData>;
@@ -83,7 +84,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
     // Memoized states
     const isAuthenticated = useMemo(() => !!session?.access_token, [session?.access_token]);
-    const isLoading = useMemo(() => !isAuthenticated || !isConnected || !isSidebarInitialized, [isAuthenticated, isConnected, isSidebarInitialized]);
+    const isLoading = useMemo(
+        () => !isAuthenticated || !isConnected || !isSidebarInitialized,
+        [isAuthenticated, isConnected, isSidebarInitialized]
+    );
 
     // WebSocket subscription effect
     useEffect(() => {

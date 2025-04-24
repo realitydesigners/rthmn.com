@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
-import { FaSearch, FaTimes } from 'react-icons/fa';
-import { useOnboardingStore } from '@/stores/onboardingStore';
 import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
+import { useGridStore } from '@/stores/gridStore';
+import { useOnboardingStore } from '@/stores/onboardingStore';
 import { cn } from '@/utils/cn';
 import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
+import { formatPrice } from '@/utils/instruments';
 import { Reorder, useDragControls } from 'framer-motion';
 import { motion } from 'framer-motion';
-import { useGridStore } from '@/stores/gridStore';
-import { formatPrice } from '@/utils/instruments';
+import React, { useEffect, useRef, useState, useMemo, memo, useCallback } from 'react';
+import { FaSearch, FaTimes } from 'react-icons/fa';
 
 interface LoadingSpinnerProps {
     color?: string;
@@ -61,21 +61,31 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
                 isSelected ? 'bg-[#141414] hover:bg-[#181818]' : 'bg-[#0C0C0C] hover:bg-[#111]'
             )}
             role='button'
-            tabIndex={0}>
+            tabIndex={0}
+        >
             <div className='relative flex w-full items-center px-3'>
                 {/* Status indicator */}
                 <div className='relative flex h-8 w-8 items-center justify-center'>
                     <div
-                        className={cn('h-1.5 w-1.5 rounded-full transition-all duration-300', isSelected ? 'opacity-100' : 'opacity-40')}
+                        className={cn(
+                            'h-1.5 w-1.5 rounded-full transition-all duration-300',
+                            isSelected ? 'opacity-100' : 'opacity-40'
+                        )}
                         style={{
-                            background: isSelected ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})` : '#333',
+                            background: isSelected
+                                ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})`
+                                : '#333',
                         }}
                     />
                 </div>
 
                 {/* Instrument name */}
                 <span
-                    className={cn('font-outfit flex-1 text-sm font-bold tracking-wide transition-colors', isSelected ? 'text-white' : 'text-[#666] group-hover/item:text-[#888]')}>
+                    className={cn(
+                        'font-outfit flex-1 text-sm font-bold tracking-wide transition-colors',
+                        isSelected ? 'text-white' : 'text-[#666] group-hover/item:text-[#888]'
+                    )}
+                >
                     {item}
                 </span>
 
@@ -85,8 +95,17 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
                         className={cn(
                             'font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors',
                             isSelected ? 'text-[#999]' : 'text-[#444] group-hover/item:text-[#666]'
-                        )}>
-                        {price ? formatPrice(price, item) : <LoadingSpinner key={`${item}-loading`} itemId={item} color={isSelected ? boxColors.positive : '#444'} />}
+                        )}
+                    >
+                        {price ? (
+                            formatPrice(price, item)
+                        ) : (
+                            <LoadingSpinner
+                                key={`${item}-loading`}
+                                itemId={item}
+                                color={isSelected ? boxColors.positive : '#444'}
+                            />
+                        )}
                     </span>
 
                     {/* Toggle button */}
@@ -100,9 +119,16 @@ const PairItem = memo(({ item, isSelected = false, onToggle }: Omit<PairItemProp
                                 'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
                                 'opacity-0 group-hover/item:opacity-100',
                                 isSelected
-                                    ? ['border-[#333] bg-[#1A1A1A] text-[#666]', 'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400']
-                                    : ['border-[#222] bg-[#141414] text-[#666]', 'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400']
-                            )}>
+                                    ? [
+                                          'border-[#333] bg-[#1A1A1A] text-[#666]',
+                                          'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400',
+                                      ]
+                                    : [
+                                          'border-[#222] bg-[#141414] text-[#666]',
+                                          'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400',
+                                      ]
+                            )}
+                        >
                             {isSelected ? <FaTimes size={8} /> : <span className='text-[9px] font-medium'>+</span>}
                         </button>
                     </div>
@@ -125,7 +151,9 @@ const PairGroup = memo(({ label, items, count, isSelected = false }: PairGroupPr
             <div className='font-kodemono mb-2 flex h-8 items-center text-xs font-medium tracking-wider text-[#818181]'>
                 <span className='uppercase'>{label}</span>
                 <div className='ml-auto flex items-center gap-1.5'>
-                    <div className={cn('h-1.5 w-1.5 rounded-full', isSelected ? 'bg-emerald-400/50' : 'bg-[#333]/50')}></div>
+                    <div
+                        className={cn('h-1.5 w-1.5 rounded-full', isSelected ? 'bg-emerald-400/50' : 'bg-[#333]/50')}
+                    ></div>
                     <span className='text-[#444]'>{count}</span>
                 </div>
             </div>
@@ -135,64 +163,93 @@ const PairGroup = memo(({ label, items, count, isSelected = false }: PairGroupPr
 });
 
 // Memoized search result item component
-const SearchResultItem = memo(({ pair, isSelected, onSelect }: { pair: string; isSelected: boolean; onSelect: () => void }) => {
-    const { boxColors } = useUser();
-    const { priceData } = useWebSocket();
-    const price = priceData[pair]?.price;
+const SearchResultItem = memo(
+    ({ pair, isSelected, onSelect }: { pair: string; isSelected: boolean; onSelect: () => void }) => {
+        const { boxColors } = useUser();
+        const { priceData } = useWebSocket();
+        const price = priceData[pair]?.price;
 
-    return (
-        <div
-            className={cn('group/result relative flex h-10 items-center justify-between px-3 transition-all duration-300', isSelected ? 'bg-[#141414]/90' : 'hover:bg-[#111]/90')}
-            onClick={onSelect}>
-            {/* Left side */}
-            <div className='flex items-center gap-3'>
-                <div className='relative flex h-8 w-8 items-center justify-center'>
-                    <div
-                        className={cn('absolute h-4 w-4 rounded-full transition-all duration-300', isSelected ? 'opacity-10' : 'opacity-0 group-hover/result:opacity-5')}
-                        style={{
-                            background: isSelected ? `radial-gradient(circle at center, ${boxColors.positive}, ${boxColors.negative})` : '#333',
-                        }}
-                    />
-                    <div
-                        className={cn('h-1.5 w-1.5 rounded-full transition-all duration-300', isSelected ? 'scale-100' : 'scale-90 opacity-40')}
-                        style={{
-                            background: isSelected ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})` : '#333',
-                        }}
-                    />
+        return (
+            <div
+                className={cn(
+                    'group/result relative flex h-10 items-center justify-between px-3 transition-all duration-300',
+                    isSelected ? 'bg-[#141414]/90' : 'hover:bg-[#111]/90'
+                )}
+                onClick={onSelect}
+            >
+                {/* Left side */}
+                <div className='flex items-center gap-3'>
+                    <div className='relative flex h-8 w-8 items-center justify-center'>
+                        <div
+                            className={cn(
+                                'absolute h-4 w-4 rounded-full transition-all duration-300',
+                                isSelected ? 'opacity-10' : 'opacity-0 group-hover/result:opacity-5'
+                            )}
+                            style={{
+                                background: isSelected
+                                    ? `radial-gradient(circle at center, ${boxColors.positive}, ${boxColors.negative})`
+                                    : '#333',
+                            }}
+                        />
+                        <div
+                            className={cn(
+                                'h-1.5 w-1.5 rounded-full transition-all duration-300',
+                                isSelected ? 'scale-100' : 'scale-90 opacity-40'
+                            )}
+                            style={{
+                                background: isSelected
+                                    ? `linear-gradient(135deg, ${boxColors.positive}, ${boxColors.negative})`
+                                    : '#333',
+                            }}
+                        />
+                    </div>
+                    <span
+                        className={cn(
+                            'font-outfit text-[13px] font-bold tracking-wide transition-colors',
+                            isSelected ? 'text-white' : 'text-[#666] group-hover/result:text-[#888]'
+                        )}
+                    >
+                        {pair}
+                    </span>
                 </div>
-                <span className={cn('font-outfit text-[13px] font-bold tracking-wide transition-colors', isSelected ? 'text-white' : 'text-[#666] group-hover/result:text-[#888]')}>
-                    {pair}
-                </span>
-            </div>
 
-            {/* Right side */}
-            <div className='flex items-center gap-3'>
-                <span
-                    className={cn(
-                        'font-kodemono text-[13px] tracking-wider transition-colors',
-                        isSelected ? 'text-[#999]' : 'text-[#444] group-hover/result:text-[#666]',
-                        'flex w-[70px] items-center justify-end'
-                    )}>
-                    {price ? formatPrice(price, pair) : 'N/A'}
-                </span>
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onSelect();
-                    }}
-                    className={cn(
-                        'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
-                        'opacity-0 group-hover/result:opacity-100',
-                        isSelected
-                            ? ['border-[#333] bg-[#1A1A1A] text-[#666]', 'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400']
-                            : ['border-[#222] bg-[#141414] text-[#666]', 'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400']
-                    )}>
-                    {isSelected ? <FaTimes size={8} /> : <span className='text-[9px] font-medium'>+</span>}
-                </button>
+                {/* Right side */}
+                <div className='flex items-center gap-3'>
+                    <span
+                        className={cn(
+                            'font-kodemono text-[13px] tracking-wider transition-colors',
+                            isSelected ? 'text-[#999]' : 'text-[#444] group-hover/result:text-[#666]',
+                            'flex w-[70px] items-center justify-end'
+                        )}
+                    >
+                        {price ? formatPrice(price, pair) : 'N/A'}
+                    </span>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onSelect();
+                        }}
+                        className={cn(
+                            'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
+                            'opacity-0 group-hover/result:opacity-100',
+                            isSelected
+                                ? [
+                                      'border-[#333] bg-[#1A1A1A] text-[#666]',
+                                      'hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400',
+                                  ]
+                                : [
+                                      'border-[#222] bg-[#141414] text-[#666]',
+                                      'hover:border-emerald-500/30 hover:bg-emerald-500/5 hover:text-emerald-400',
+                                  ]
+                        )}
+                    >
+                        {isSelected ? <FaTimes size={8} /> : <span className='text-[9px] font-medium'>+</span>}
+                    </button>
+                </div>
             </div>
-        </div>
-    );
-});
+        );
+    }
+);
 
 // Memoized filtered pairs calculation
 const useFilteredPairs = (searchQuery: string, selectedPairs: string[]) => {
@@ -277,7 +334,8 @@ const SearchBar = memo(({ onSearchStateChange }: { onSearchStateChange: (isSearc
                             setSearchQuery('');
                             setShowResults(false);
                         }}
-                        className='relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-[#222] bg-[#141414] text-[#666] transition-all hover:border-[#333] hover:bg-[#1A1A1A] hover:text-[#888]'>
+                        className='relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-[#222] bg-[#141414] text-[#666] transition-all hover:border-[#333] hover:bg-[#1A1A1A] hover:text-[#888]'
+                    >
                         <FaTimes size={8} />
                     </button>
                 )}
@@ -288,10 +346,17 @@ const SearchBar = memo(({ onSearchStateChange }: { onSearchStateChange: (isSearc
                 <div className='absolute top-full right-0 left-0 z-10 overflow-hidden bg-[#0C0C0C] pt-2 shadow-lg'>
                     <div className='max-h-[280px] overflow-y-auto rounded-lg border border-[#222]'>
                         {filteredPairs.map((pair) => (
-                            <SearchResultItem key={pair} pair={pair} isSelected={selectedPairs.includes(pair)} onSelect={() => handleToggle(pair)} />
+                            <SearchResultItem
+                                key={pair}
+                                pair={pair}
+                                isSelected={selectedPairs.includes(pair)}
+                                onSelect={() => handleToggle(pair)}
+                            />
                         ))}
                         {filteredPairs.length === 0 && (
-                            <div className='flex h-20 items-center justify-center text-center text-[13px] text-[#666]'>No instruments found matching "{searchQuery}"</div>
+                            <div className='flex h-20 items-center justify-center text-center text-[13px] text-[#666]'>
+                                No instruments found matching "{searchQuery}"
+                            </div>
                         )}
                     </div>
                 </div>
@@ -314,8 +379,14 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
             dragControls={dragControls}
             className='group/drag mb-1'
             whileDrag={{ zIndex: 50 }}
-            style={{ position: 'relative', zIndex: 0 }}>
-            <motion.div className='relative flex w-full items-center rounded-lg' layout='position' transition={{ duration: 0.15 }} whileDrag={{ zIndex: 50 }}>
+            style={{ position: 'relative', zIndex: 0 }}
+        >
+            <motion.div
+                className='relative flex w-full items-center rounded-lg'
+                layout='position'
+                transition={{ duration: 0.15 }}
+                whileDrag={{ zIndex: 50 }}
+            >
                 <div className='w-full'>
                     {/* Drag Handle */}
                     <motion.button
@@ -324,7 +395,8 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
                             e.preventDefault();
                             e.stopPropagation();
                             dragControls.start(e);
-                        }}>
+                        }}
+                    >
                         <div className='flex h-8 w-8 items-center justify-center opacity-0 transition-all duration-200 group-hover/drag:opacity-60'>
                             <svg width='14' height='14' viewBox='0 0 16 16' fill='none' className='pointer-events-none'>
                                 <path d='M7 3H5V5H7V3Z' fill='#666' />
@@ -351,7 +423,9 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
                             </div>
 
                             {/* Instrument name */}
-                            <span className='font-outfit flex-1 text-sm font-bold tracking-wide text-white transition-colors'>{item}</span>
+                            <span className='font-outfit flex-1 text-sm font-bold tracking-wide text-white transition-colors'>
+                                {item}
+                            </span>
 
                             {/* Price */}
                             <div className='flex items-center'>
@@ -359,7 +433,11 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
                                     {priceData[item]?.price ? (
                                         formatPrice(priceData[item].price, item)
                                     ) : (
-                                        <LoadingSpinner key={`${item}-loading`} itemId={item} color={boxColors.positive} />
+                                        <LoadingSpinner
+                                            key={`${item}-loading`}
+                                            itemId={item}
+                                            color={boxColors.positive}
+                                        />
                                     )}
                                 </span>
 
@@ -374,7 +452,8 @@ const DraggableItem = memo(({ item, onToggle }: { item: string; onToggle: () => 
                                             'relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200',
                                             'opacity-0 group-hover/item:opacity-100',
                                             'border-[#333] bg-[#1A1A1A] text-[#666] hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400'
-                                        )}>
+                                        )}
+                                    >
                                         <FaTimes size={8} />
                                     </button>
                                 </div>
@@ -396,7 +475,10 @@ export const InstrumentsPanel = () => {
     const reorderPairs = useGridStore((state) => state.reorderPairs);
 
     // Memoized selected pairs items
-    const selectedPairsItems = useMemo(() => selectedPairs.map((item) => <DraggableItem key={item} item={item} onToggle={() => togglePair(item)} />), [selectedPairs, togglePair]);
+    const selectedPairsItems = useMemo(
+        () => selectedPairs.map((item) => <DraggableItem key={item} item={item} onToggle={() => togglePair(item)} />),
+        [selectedPairs, togglePair]
+    );
 
     // Memoized available pairs groups
     const availablePairsGroups = useMemo(
@@ -411,9 +493,13 @@ export const InstrumentsPanel = () => {
                     const availablePairs = group.items.filter((item) => !selectedPairs.includes(item));
                     if (availablePairs.length === 0) return null;
 
-                    const items = availablePairs.map((item) => <PairItem key={item} item={item} isSelected={false} onToggle={() => togglePair(item)} />);
+                    const items = availablePairs.map((item) => (
+                        <PairItem key={item} item={item} isSelected={false} onToggle={() => togglePair(item)} />
+                    ));
 
-                    return <PairGroup key={group.label} label={group.label} items={items} count={availablePairs.length} />;
+                    return (
+                        <PairGroup key={group.label} label={group.label} items={items} count={availablePairs.length} />
+                    );
                 })
                 .filter(Boolean),
         [selectedPairs, togglePair]

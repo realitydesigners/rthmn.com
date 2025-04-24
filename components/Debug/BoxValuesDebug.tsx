@@ -1,6 +1,6 @@
-import React from 'react';
-import { Box } from '@/types/types';
-import { ExtendedBoxSlice } from '@/app/(user)/pair/[pair]/client';
+import type { ExtendedBoxSlice } from '@/app/(user)/pair/[pair]/client';
+import type { Box } from '@/types/types';
+import type React from 'react';
 
 interface BoxValuesDebugProps {
     resoBoxes?: Box[];
@@ -9,7 +9,12 @@ interface BoxValuesDebugProps {
     maxBoxCount: number;
 }
 
-export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histogramData, startIndex, maxBoxCount }) => {
+export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
+    resoBoxes,
+    histogramData,
+    startIndex,
+    maxBoxCount,
+}) => {
     const latestHistogramSlice = histogramData?.[histogramData.length - 1];
     const visibleHistogramBoxes = latestHistogramSlice?.progressiveValues.slice(startIndex, startIndex + maxBoxCount);
     const visibleResoBoxes = resoBoxes?.slice(startIndex, startIndex + maxBoxCount);
@@ -38,11 +43,15 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
             <div className='mb-4 grid grid-cols-2 gap-4 rounded border border-neutral-800 bg-black/40 p-2 text-neutral-400'>
                 <div>
                     <span className='text-emerald-500'>ResoBox Last Update: </span>
-                    <span>{latestHistogramSlice?.timestamp ? formatTimestamp(latestHistogramSlice.timestamp) : 'N/A'}</span>
+                    <span>
+                        {latestHistogramSlice?.timestamp ? formatTimestamp(latestHistogramSlice.timestamp) : 'N/A'}
+                    </span>
                 </div>
                 <div className='text-right'>
                     <span className='text-blue-500'>Histogram Last Update: </span>
-                    <span>{latestHistogramSlice?.timestamp ? formatTimestamp(latestHistogramSlice.timestamp) : 'N/A'}</span>
+                    <span>
+                        {latestHistogramSlice?.timestamp ? formatTimestamp(latestHistogramSlice.timestamp) : 'N/A'}
+                    </span>
                 </div>
             </div>
 
@@ -58,7 +67,9 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
                     <div className='mt-1 space-y-1'>
                         {visibleResoBoxes?.map((box, i) => (
                             <div key={i} className='grid grid-cols-[1fr_1fr_1fr] gap-2 text-right'>
-                                <span className={box.value >= 0 ? 'text-emerald-400' : 'text-red-400'}>{box.value}</span>
+                                <span className={box.value >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                                    {box.value}
+                                </span>
                                 <span className='text-neutral-300'>{box.high}</span>
                                 <span className='text-neutral-300'>{box.low}</span>
                             </div>
@@ -79,7 +90,9 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({ resoBoxes, histo
                     <div className='mt-1 space-y-1'>
                         {visibleHistogramBoxes?.map((box, i) => (
                             <div key={i} className='grid grid-cols-[1fr_1fr_1fr] gap-2 text-right'>
-                                <span className={box.value >= 0 ? 'text-emerald-400' : 'text-red-400'}>{box.value}</span>
+                                <span className={box.value >= 0 ? 'text-emerald-400' : 'text-red-400'}>
+                                    {box.value}
+                                </span>
                                 <span className='text-neutral-300'>{box.high}</span>
                                 <span className='text-neutral-300'>{box.low}</span>
                             </div>

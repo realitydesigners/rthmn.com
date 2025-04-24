@@ -1,10 +1,10 @@
 'use client';
 
-import React from 'react';
+import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplate';
+import { DarkTemplate, LightTemplate, VideoTemplate } from '@/components/PageBuilder/templates/Templates';
 import { PortableText } from '@portabletext/react';
 import type { PortableTextComponents } from '@portabletext/react';
-import { DarkTemplate, LightTemplate, VideoTemplate } from '@/components/PageBuilder/templates/Templates';
-import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplate';
+import React from 'react';
 
 const templateStyles = {
     dark: 'w-full bg-black',

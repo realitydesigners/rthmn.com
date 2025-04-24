@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { AnimatePresence, motion } from 'framer-motion';
 import { client } from '@/lib/sanity/lib/client';
+import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface Props {
     onComplete: () => void;
@@ -18,7 +18,7 @@ const AuroraBackground = ({ isExiting }: { isExiting: boolean }) => (
         transition={{
             backgroundPosition: {
                 duration: 60,
-                repeat: Infinity,
+                repeat: Number.POSITIVE_INFINITY,
                 ease: 'linear',
             },
         }}
@@ -39,7 +39,7 @@ const LightShadows = ({ isExiting }: { isExiting: boolean }) =>
             }}
             transition={{
                 duration: 10 + i * 5,
-                repeat: Infinity,
+                repeat: Number.POSITIVE_INFINITY,
                 ease: 'linear',
                 delay: i * 1,
             }}
@@ -74,22 +74,23 @@ const StarParticle = ({ isExiting, index }: { isExiting: boolean; index: number 
             }}
             transition={{
                 duration: duration,
-                repeat: Infinity,
+                repeat: Number.POSITIVE_INFINITY,
                 delay: startDelay,
                 opacity: {
                     duration: 2 + Math.random() * 2,
-                    repeat: Infinity,
+                    repeat: Number.POSITIVE_INFINITY,
                     repeatDelay: Math.random() * 3,
                     ease: 'easeInOut',
                 },
                 y: {
                     duration: duration,
-                    repeat: Infinity,
+                    repeat: Number.POSITIVE_INFINITY,
                     ease: 'linear',
                     delay: startDelay,
                 },
             }}
-            className='absolute'>
+            className='absolute'
+        >
             <div
                 style={{
                     width: `${size}px`,
@@ -153,23 +154,40 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
                 ...BASE_ANIMATIONS.transition,
                 delay,
             }}
-            className='flex flex-col items-center justify-center space-y-8'>
+            className='flex flex-col items-center justify-center space-y-8'
+        >
             {/* Logo */}
-            <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative mx-auto mb-6 flex h-24 w-24'>
+            <motion.div
+                {...BASE_ANIMATIONS.fade}
+                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
+                className='relative mx-auto mb-6 flex h-24 w-24'
+            >
                 {/* Holographic glow effect */}
                 <motion.div
                     animate={{
-                        boxShadow: ['0 0 20px rgba(255,255,255,0.1)', '0 0 60px rgba(255,255,255,0.2)', '0 0 20px rgba(255,255,255,0.1)'],
+                        boxShadow: [
+                            '0 0 20px rgba(255,255,255,0.1)',
+                            '0 0 60px rgba(255,255,255,0.2)',
+                            '0 0 20px rgba(255,255,255,0.1)',
+                        ],
                         filter: ['brightness(1) blur(8px)', 'brightness(1.2) blur(12px)', 'brightness(1) blur(8px)'],
                     }}
                     exit={{
                         boxShadow: '0 0 0px rgba(255,255,255,0)',
                         filter: 'brightness(0.5) blur(20px)',
                     }}
-                    transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+                    transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: 'linear' }}
                     className='absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5'
                 />
-                <svg className='relative' width='80' height='80' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg' aria-labelledby='logoTitle'>
+                <svg
+                    className='relative'
+                    width='80'
+                    height='80'
+                    viewBox='0 0 100 100'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                    aria-labelledby='logoTitle'
+                >
                     <title id='logoTitle'>Logo</title>
                     <g clipPath='url(#clip0_1208_27417)'>
                         <path
@@ -189,11 +207,16 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
             <motion.h1
                 {...BASE_ANIMATIONS.fade}
                 transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-                className='font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-7xl font-bold text-transparent'>
+                className='font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-7xl font-bold text-transparent'
+            >
                 Welcome to Rthmn
             </motion.h1>
             {/* Subtitle */}
-            <motion.p {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }} className='font-outfit text-lg text-white/60'>
+            <motion.p
+                {...BASE_ANIMATIONS.fade}
+                transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
+                className='font-outfit text-lg text-white/60'
+            >
                 The future of trading and first gamified trading platform.
             </motion.p>
         </motion.div>
@@ -211,29 +234,42 @@ const PatternRecognitionStep = ({ duration = 6000, delay, onComplete, team }: St
         onAnimationComplete={() => {
             setTimeout(onComplete, duration);
         }}
-        className='flex max-w-3xl flex-col items-center justify-center space-y-12'>
-        <motion.div {...BASE_ANIMATIONS.fade} transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }} className='relative space-y-6'>
+        className='flex max-w-3xl flex-col items-center justify-center space-y-12'
+    >
+        <motion.div
+            {...BASE_ANIMATIONS.fade}
+            transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
+            className='relative space-y-6'
+        >
             <div className='space-y-2'>
                 <motion.div
                     {...BASE_ANIMATIONS.fade}
                     transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.5 }}
-                    className='font-outfit text-center text-4xl leading-tight font-bold tracking-tight text-balance'>
+                    className='font-outfit text-center text-4xl leading-tight font-bold tracking-tight text-balance'
+                >
                     <span className='bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent'>
-                        Rthmn is a tool designed to compress time allowing you to see the market in a way that is not possible with traditional tools
+                        Rthmn is a tool designed to compress time allowing you to see the market in a way that is not
+                        possible with traditional tools
                     </span>
                 </motion.div>
             </div>
         </motion.div>
 
         {/* Team members */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 1 }} className='flex justify-center gap-6'>
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: delay + 1 }}
+            className='flex justify-center gap-6'
+        >
             {team.map((member, i) => (
                 <motion.div
                     key={member.slug}
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: delay + 1 + i * 0.1 }}
-                    className='group relative flex flex-col items-center'>
+                    className='group relative flex flex-col items-center'
+                >
                     <div className='relative h-14 w-14 overflow-hidden rounded-full border border-white/10 bg-white/5 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105'>
                         {member.image && (
                             <Image
@@ -252,19 +288,27 @@ const PatternRecognitionStep = ({ duration = 6000, delay, onComplete, team }: St
                             }}
                             transition={{
                                 duration: 2,
-                                repeat: Infinity,
+                                repeat: Number.POSITIVE_INFINITY,
                                 ease: 'easeInOut',
                             }}
                         />
                     </div>
-                    <motion.div initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: delay + 1.2 + i * 0.1 }} className='mt-3 text-center'>
-                        <span className='font-mono text-sm text-white/40 transition-colors duration-300 group-hover:text-white/90'>{member.name}</span>
+                    <motion.div
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: delay + 1.2 + i * 0.1 }}
+                        className='mt-3 text-center'
+                    >
+                        <span className='font-mono text-sm text-white/40 transition-colors duration-300 group-hover:text-white/90'>
+                            {member.name}
+                        </span>
                         {member.role && (
                             <motion.span
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: delay + 1.4 + i * 0.1 }}
-                                className='mt-0.5 block font-mono text-[10px] text-white/30'>
+                                className='mt-0.5 block font-mono text-[10px] text-white/30'
+                            >
                                 {member.role}
                             </motion.span>
                         )}
@@ -291,21 +335,37 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, 'duration'>) => {
                 ...BASE_ANIMATIONS.transition,
                 delay,
             }}
-            className='max-w-xl space-y-6'>
+            className='max-w-xl space-y-6'
+        >
             <motion.h1
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className='font-outfit mb-8 bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent'>
+                className='font-outfit mb-8 bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent'
+            >
                 Terms of Service
             </motion.h1>
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className='space-y-6 rounded-xl border border-white/10 bg-white/5 p-6'>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className='space-y-6 rounded-xl border border-white/10 bg-white/5 p-6'
+            >
                 <p className='font-mono text-sm leading-relaxed text-white/60'>
                     By checking this box, I acknowledge that I have read and agree to Rthmn's{' '}
-                    <a href='/terms-of-service' target='_blank' rel='noopener noreferrer' className='font-bold text-white underline'>
+                    <a
+                        href='/terms-of-service'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='font-bold text-white underline'
+                    >
                         Terms of Service
                     </a>{' '}
                     and{' '}
-                    <a href='/privacy' target='_blank' rel='noopener noreferrer' className='font-bold text-white underline'>
+                    <a
+                        href='/privacy'
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='font-bold text-white underline'
+                    >
                         Privacy Policy
                     </a>
                     . I understand that my use of the platform is subject to these agreements.
@@ -315,8 +375,11 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, 'duration'>) => {
                     <button
                         onClick={() => setAccepted(!accepted)}
                         className={`group relative h-6 w-6 overflow-hidden rounded-md border transition-all ${
-                            accepted ? 'border-white-500 bg-white-500/20' : 'border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/10'
-                        }`}>
+                            accepted
+                                ? 'border-white-500 bg-white-500/20'
+                                : 'border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/10'
+                        }`}
+                    >
                         <motion.div
                             initial={false}
                             animate={{
@@ -324,17 +387,37 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, 'duration'>) => {
                                 scale: accepted ? 1 : 0.8,
                             }}
                             transition={{ duration: 0.2 }}
-                            className='text-white-400 absolute inset-0 flex items-center justify-center'>
-                            <svg width='14' height='14' viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'>
-                                <path d='M20 6L9 17L4 12' stroke='currentColor' strokeWidth='3' strokeLinecap='round' strokeLinejoin='round' />
+                            className='text-white-400 absolute inset-0 flex items-center justify-center'
+                        >
+                            <svg
+                                width='14'
+                                height='14'
+                                viewBox='0 0 24 24'
+                                fill='none'
+                                xmlns='http://www.w3.org/2000/svg'
+                            >
+                                <path
+                                    d='M20 6L9 17L4 12'
+                                    stroke='currentColor'
+                                    strokeWidth='3'
+                                    strokeLinecap='round'
+                                    strokeLinejoin='round'
+                                />
                             </svg>
                         </motion.div>
                     </button>
-                    <label className='cursor-pointer font-mono text-sm text-white/70 select-none'>I agree to the terms and conditions</label>
+                    <label className='cursor-pointer font-mono text-sm text-white/70 select-none'>
+                        I agree to the terms and conditions
+                    </label>
                 </div>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: delay + 0.4 }} className='flex justify-center'>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: delay + 0.4 }}
+                className='flex justify-center'
+            >
                 <button
                     onClick={() => {
                         if (accepted) {
@@ -345,8 +428,11 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, 'duration'>) => {
                     disabled={!accepted}
                     className={`group relative overflow-hidden rounded-xl px-8 py-3 transition-all ${
                         accepted ? 'bg-white/10 hover:bg-white/20' : 'cursor-not-allowed bg-white/5 text-white/30'
-                    }`}>
-                    <div className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/0 opacity-0 transition-opacity ${accepted ? '' : ''}`} />
+                    }`}
+                >
+                    <div
+                        className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/0 opacity-0 transition-opacity ${accepted ? '' : ''}`}
+                    />
                     <span className='relative font-mono text-sm text-white/90'>Continue</span>
                 </button>
             </motion.div>
@@ -378,7 +464,14 @@ export default function IntroSequence({ onComplete }: Props) {
 
     // Image preloader component
     const ImagePreloader = () => (
-        <div className='hidden'>{team.map((member) => member.image && <Image key={member.slug} src={member.image.url} alt='' width={56} height={56} priority />)}</div>
+        <div className='hidden'>
+            {team.map(
+                (member) =>
+                    member.image && (
+                        <Image key={member.slug} src={member.image.url} alt='' width={56} height={56} priority />
+                    )
+            )}
+        </div>
     );
 
     const renderCurrentStep = () => {
@@ -386,7 +479,15 @@ export default function IntroSequence({ onComplete }: Props) {
             case 0:
                 return <WelcomeStep key='welcome' duration={5000} delay={1} onComplete={handleStepComplete} />;
             case 1:
-                return <PatternRecognitionStep key='pattern' duration={10000} delay={0} onComplete={handleStepComplete} team={team} />;
+                return (
+                    <PatternRecognitionStep
+                        key='pattern'
+                        duration={10000}
+                        delay={0}
+                        onComplete={handleStepComplete}
+                        team={team}
+                    />
+                );
             case 2:
                 return <LegalStep key='legal' delay={0} onComplete={handleStepComplete} />;
             default:
@@ -394,7 +495,9 @@ export default function IntroSequence({ onComplete }: Props) {
         }
     };
 
-    const totalSteps = Object.keys(Object.fromEntries(Object.entries(renderCurrentStep.toString().match(/case \d+:/g) || []))).length;
+    const totalSteps = Object.keys(
+        Object.fromEntries(Object.entries(renderCurrentStep.toString().match(/case \d+:/g) || []))
+    ).length;
 
     const handleStepComplete = useCallback(() => {
         // Start audio on first step completion
@@ -425,13 +528,16 @@ export default function IntroSequence({ onComplete }: Props) {
                     filter: isExiting ? 'blur(20px)' : 'blur(0px)',
                 }}
                 transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-                className='fixed inset-0 z-[1000] overflow-hidden bg-black'>
+                className='fixed inset-0 z-[1000] overflow-hidden bg-black'
+            >
                 <AuroraBackground isExiting={isExiting} />
                 <LightShadows isExiting={isExiting} />
                 <StarField isExiting={isExiting} />
 
                 <ImagePreloader />
-                <motion.div className='no-select relative z-10 flex h-full items-center justify-center'>{renderCurrentStep()}</motion.div>
+                <motion.div className='no-select relative z-10 flex h-full items-center justify-center'>
+                    {renderCurrentStep()}
+                </motion.div>
             </motion.div>
         </AnimatePresence>
     );

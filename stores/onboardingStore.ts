@@ -114,7 +114,7 @@ export const useOnboardingStore = create<OnboardingState>()(
                     const newCompletedSteps = [...state.completedSteps, stepId];
 
                     // Find next step based on current phase
-                    let nextIncompleteStep = null;
+                    const nextIncompleteStep = null;
 
                     const newState = {
                         completedSteps: newCompletedSteps,
@@ -133,12 +133,14 @@ export const useOnboardingStore = create<OnboardingState>()(
                 let nextIncompleteStep = null;
                 if (currentStep?.type === 'page' || !get().hasCompletedPageSteps()) {
                     // If in page steps, stay in page steps
-                    nextIncompleteStep = ONBOARDING_STEPS.filter((step) => step.type === 'page' && !state.completedSteps.includes(step.id)).sort((a, b) => a.order - b.order)[0];
+                    nextIncompleteStep = ONBOARDING_STEPS.filter(
+                        (step) => step.type === 'page' && !state.completedSteps.includes(step.id)
+                    ).sort((a, b) => a.order - b.order)[0];
                 } else {
                     // If in feature tours, find next by order
-                    nextIncompleteStep = ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour' && !state.completedSteps.includes(step.id)).sort(
-                        (a, b) => a.order - b.order
-                    )[0];
+                    nextIncompleteStep = ONBOARDING_STEPS.filter(
+                        (step) => step.type === 'feature-tour' && !state.completedSteps.includes(step.id)
+                    ).sort((a, b) => a.order - b.order)[0];
                 }
 
                 if (nextIncompleteStep) {
@@ -220,9 +222,9 @@ export const useOnboardingStore = create<OnboardingState>()(
                 }
 
                 // If page steps are done, find the first incomplete feature tour by order
-                const nextFeatureTour = ONBOARDING_STEPS.filter((step) => step.type === 'feature-tour' && !state.completedSteps.includes(step.id)).sort(
-                    (a, b) => a.order - b.order
-                )[0];
+                const nextFeatureTour = ONBOARDING_STEPS.filter(
+                    (step) => step.type === 'feature-tour' && !state.completedSteps.includes(step.id)
+                ).sort((a, b) => a.order - b.order)[0];
                 console.log('Next Feature Tour Step:', nextFeatureTour);
                 return nextFeatureTour || null;
             },

@@ -1,12 +1,15 @@
 import { DocumentIcon, ImageIcon, TagIcon } from '@sanity/icons';
-import { StructureBuilder } from 'sanity/structure';
+import type { StructureBuilder } from 'sanity/structure';
 
 export const StudioStructure = (S: StructureBuilder) =>
     S.list()
         .title('Content')
         .items([
             // Pages
-            S.listItem().title('Pages').icon(DocumentIcon).child(S.documentTypeList('page')),
+            S.listItem()
+                .title('Pages')
+                .icon(DocumentIcon)
+                .child(S.documentTypeList('page')),
 
             // Content
             S.listItem()
@@ -22,7 +25,10 @@ export const StudioStructure = (S: StructureBuilder) =>
                             S.listItem().title('Categories').icon(TagIcon).child(S.documentTypeList('category')),
                             S.listItem().title('Market Data').icon(TagIcon).child(S.documentTypeList('marketData')),
                             S.listItem().title('Changelog').icon(TagIcon).child(S.documentTypeList('changelog')),
-                            S.listItem().title('Pair Snapshots').icon(TagIcon).child(S.documentTypeList('pairSnapshot')),
+                            S.listItem()
+                                .title('Pair Snapshots')
+                                .icon(TagIcon)
+                                .child(S.documentTypeList('pairSnapshot')),
                         ])
                 ),
             S.listItem()

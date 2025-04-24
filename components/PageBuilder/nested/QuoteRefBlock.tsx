@@ -1,5 +1,5 @@
-import React from 'react';
 import Image from 'next/image';
+import React from 'react';
 
 const QuoteRefBlock = ({ quote, className, image }) => {
     if (!quote) {
@@ -27,7 +27,8 @@ const QuoteCard = ({ quote, image, className }) => {
                                 />
                                 <div className='absolute inset-0 z-10 flex items-center justify-center'>
                                     <h4
-                                        className={`font-russo flex items-center justify-center p-4 text-center text-2xl leading-none font-bold tracking-wide text-blue-100 uppercase sm:text-5xl lg:text-6xl`}>
+                                        className={`font-russo flex items-center justify-center p-4 text-center text-2xl leading-none font-bold tracking-wide text-blue-100 uppercase sm:text-5xl lg:text-6xl`}
+                                    >
                                         {quote}
                                     </h4>
                                 </div>
@@ -53,7 +54,11 @@ const QuoteCard = ({ quote, image, className }) => {
                                     />
                                 </div>
                                 <div className='z-10 h-full w-full items-center justify-center p-4'>
-                                    <h4 className={`font-russo text-center text-2xl leading-[1.2em] font-bold tracking-wide text-blue-100 uppercase lg:text-3xl`}>{quote}</h4>
+                                    <h4
+                                        className={`font-russo text-center text-2xl leading-[1.2em] font-bold tracking-wide text-blue-100 uppercase lg:text-3xl`}
+                                    >
+                                        {quote}
+                                    </h4>
                                 </div>
                             </div>
                         )}
@@ -76,7 +81,8 @@ const QuoteCard = ({ quote, image, className }) => {
                                 />
                                 <div className='absolute inset-0 z-10 flex items-center justify-center'>
                                     <h4
-                                        className={`font-russo flex items-center justify-center p-4 text-center text-2xl leading-none font-bold tracking-wide text-blue-100 uppercase sm:text-4xl lg:text-5xl`}>
+                                        className={`font-russo flex items-center justify-center p-4 text-center text-2xl leading-none font-bold tracking-wide text-blue-100 uppercase sm:text-4xl lg:text-5xl`}
+                                    >
                                         {quote}
                                     </h4>
                                 </div>

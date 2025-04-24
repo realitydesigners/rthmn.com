@@ -1,8 +1,8 @@
 'use client';
 
+import type { CandleData } from '@/types/types';
 import { useState } from 'react';
 import { FaBell, FaChevronRight, FaSearch, FaStar } from 'react-icons/fa';
-import type { CandleData } from '@/types/types';
 
 interface MarketData {
     pair: string;
@@ -44,7 +44,7 @@ export function MarketNavigator({ marketData, selectedPair, onPairSelect }: Mark
     const getLatestPrice = (candleData: string) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            return parseFloat(data[data.length - 1].mid.c);
+            return Number.parseFloat(data[data.length - 1].mid.c);
         } catch (e) {
             return null;
         }
@@ -92,19 +92,25 @@ export function MarketNavigator({ marketData, selectedPair, onPairSelect }: Mark
                                 onClick={() => onPairSelect(item.pair)}
                                 className={`group flex cursor-pointer items-center justify-between rounded-lg border border-transparent p-3 transition-all hover:border-white/10 hover:bg-white/5 ${
                                     selectedPair === item.pair ? 'border-white/10 bg-white/5' : ''
-                                }`}>
+                                }`}
+                            >
                                 <div className='flex items-center gap-3'>
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             toggleFavorite(item.pair);
                                         }}
-                                        className={`transition-colors ${isFavorite ? 'text-yellow-500' : 'text-neutral-400 hover:text-yellow-500'}`}>
+                                        className={`transition-colors ${isFavorite ? 'text-yellow-500' : 'text-neutral-400 hover:text-yellow-500'}`}
+                                    >
                                         <FaStar className='h-4 w-4' />
                                     </button>
                                     <div>
-                                        <div className='font-outfit text-sm font-medium text-white'>{item.pair.replace('_', '/')}</div>
-                                        <div className='text-xs text-neutral-400'>{price?.toFixed(item.pair.includes('JPY') ? 3 : 5)}</div>
+                                        <div className='font-outfit text-sm font-medium text-white'>
+                                            {item.pair.replace('_', '/')}
+                                        </div>
+                                        <div className='text-xs text-neutral-400'>
+                                            {price?.toFixed(item.pair.includes('JPY') ? 3 : 5)}
+                                        </div>
                                     </div>
                                 </div>
 

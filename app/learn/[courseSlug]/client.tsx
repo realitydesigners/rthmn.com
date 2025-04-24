@@ -1,9 +1,19 @@
 'use client';
 
+import { Background } from '@/components/Backgrounds/Background';
 import Link from 'next/link';
 import { useState } from 'react';
-import { FaArrowLeft, FaBook, FaChartLine, FaChevronDown, FaGraduationCap, FaLightbulb, FaPlay, FaRocket, FaTools } from 'react-icons/fa';
-import { Background } from '@/components/Backgrounds/Background';
+import {
+    FaArrowLeft,
+    FaBook,
+    FaChartLine,
+    FaChevronDown,
+    FaGraduationCap,
+    FaLightbulb,
+    FaPlay,
+    FaRocket,
+    FaTools,
+} from 'react-icons/fa';
 
 const CourseIcon = ({ icon }: { icon: string }) => {
     const icons = {
@@ -62,7 +72,9 @@ export default function CourseClient({ course }: { course: Course }) {
                             <p className='max-w-2xl text-lg text-neutral-400'>{course.description}</p>
                             <div className='flex flex-wrap items-center gap-6'>
                                 <div className='flex items-center gap-2'>
-                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>{course.chapters.length}</div>
+                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>
+                                        {course.chapters.length}
+                                    </div>
                                     <span className='text-sm text-neutral-400'>Chapters</span>
                                 </div>
                                 {course.difficulty && (
@@ -87,7 +99,8 @@ export default function CourseClient({ course }: { course: Course }) {
                             {course.chapters?.map((chapter, chapterIndex) => (
                                 <div
                                     key={chapter._id}
-                                    className='overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-emerald-500/20 hover:bg-emerald-500/5'>
+                                    className='overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-emerald-500/20 hover:bg-emerald-500/5'
+                                >
                                     <div className='p-6'>
                                         <div className='flex items-center gap-4'>
                                             <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 text-lg font-semibold text-emerald-400'>
@@ -95,7 +108,11 @@ export default function CourseClient({ course }: { course: Course }) {
                                             </div>
                                             <div className='flex-1'>
                                                 <h3 className='text-lg font-medium text-white'>{chapter.title}</h3>
-                                                {chapter.description && <p className='mt-1 text-sm text-neutral-400'>{chapter.description}</p>}
+                                                {chapter.description && (
+                                                    <p className='mt-1 text-sm text-neutral-400'>
+                                                        {chapter.description}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div className='flex items-center gap-2 text-sm text-neutral-400'>
                                                 <div className='flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-xs text-emerald-400'>
@@ -111,13 +128,18 @@ export default function CourseClient({ course }: { course: Course }) {
                                             <Link
                                                 key={lesson._id}
                                                 href={`/learn/${course.slug}/${lesson.slug}`}
-                                                className='flex items-center gap-4 border-b border-white/5 p-4 last:border-b-0 hover:bg-emerald-500/5'>
+                                                className='flex items-center gap-4 border-b border-white/5 p-4 last:border-b-0 hover:bg-emerald-500/5'
+                                            >
                                                 <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>
                                                     {lessonIndex + 1}
                                                 </div>
                                                 <div className='flex-1'>
                                                     <h4 className='text-white'>{lesson.title}</h4>
-                                                    {lesson.description && <p className='mt-1 text-sm text-neutral-400'>{lesson.description}</p>}
+                                                    {lesson.description && (
+                                                        <p className='mt-1 text-sm text-neutral-400'>
+                                                            {lesson.description}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <FaPlay className='h-4 w-4 text-emerald-400' />
                                             </Link>

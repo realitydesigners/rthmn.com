@@ -1,9 +1,9 @@
 'use client';
 
-import Link from 'next/link';
-import { FaBook, FaChartLine, FaGraduationCap, FaArrowRight } from 'react-icons/fa';
 import { Background } from '@/components/Backgrounds/Background';
-import { Course } from '@/types/types';
+import type { Course } from '@/types/types';
+import Link from 'next/link';
+import { FaArrowRight, FaBook, FaChartLine, FaGraduationCap } from 'react-icons/fa';
 
 export function LearnPageClient({ courses }: { courses: Course[] }) {
     return (
@@ -18,7 +18,8 @@ export function LearnPageClient({ courses }: { courses: Course[] }) {
                         <span className=''> confidence</span>
                     </h1>
                     <p className='font-outfit mx-auto mt-8 max-w-2xl text-xl text-white/90'>
-                        Master the art of trading through our comprehensive courses. From fundamentals to advanced strategies.
+                        Master the art of trading through our comprehensive courses. From fundamentals to advanced
+                        strategies.
                     </p>
                 </div>
 
@@ -32,7 +33,9 @@ export function LearnPageClient({ courses }: { courses: Course[] }) {
                                         {/* Left side with icon and info */}
                                         <div className='flex items-center gap-5'>
                                             <div>
-                                                <h2 className='font-outfit text-xl font-medium text-white'>{course.title}</h2>
+                                                <h2 className='font-outfit text-xl font-medium text-white'>
+                                                    {course.title}
+                                                </h2>
                                                 <p className='mt-1 text-sm text-white/60'>{course.description}</p>
                                             </div>
                                         </div>

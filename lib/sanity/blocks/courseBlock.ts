@@ -119,9 +119,16 @@ export default defineType({
                             publicationDate: 'posts.block.0.publicationDate',
                             media: 'posts.block.0.image',
                         },
-                        prepare(selection: { title?: string; excerpt?: string; publicationDate?: string; media?: any }) {
+                        prepare(selection: {
+                            title?: string;
+                            excerpt?: string;
+                            publicationDate?: string;
+                            media?: any;
+                        }) {
                             const { title, excerpt, publicationDate, media } = selection;
-                            const formattedDate = publicationDate ? new Date(publicationDate).toLocaleDateString() : 'No date';
+                            const formattedDate = publicationDate
+                                ? new Date(publicationDate).toLocaleDateString()
+                                : 'No date';
 
                             const subtitle = `${excerpt ? excerpt : 'No excerpt'} | ${formattedDate}`;
                             return {
@@ -475,13 +482,15 @@ export default defineType({
                             name: 'sequencesData',
                             title: 'Sequences Data',
                             type: 'text',
-                            description: 'JSON array of arrays, each inner array containing exactly 8 numbers (1 or -1). Example: [[1,1,1,1,-1,-1,-1,-1], [1,1,-1,-1,1,1,-1,-1]]',
+                            description:
+                                'JSON array of arrays, each inner array containing exactly 8 numbers (1 or -1). Example: [[1,1,1,1,-1,-1,-1,-1], [1,1,-1,-1,1,1,-1,-1]]',
                         },
                         {
                             name: 'baseValuesData',
                             title: 'Base Values Data',
                             type: 'text',
-                            description: 'JSON array of numbers (1-8 values). Example: [795.375, 565.6, 399.455, 282.8, 199.374, 141.4, 99.687, 70.7]',
+                            description:
+                                'JSON array of numbers (1-8 values). Example: [795.375, 565.6, 399.455, 282.8, 199.374, 141.4, 99.687, 70.7]',
                         },
                         {
                             name: 'colorScheme',

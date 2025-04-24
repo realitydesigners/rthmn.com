@@ -1,8 +1,13 @@
+import { manageDiscordAccess } from '@/lib/discord/server';
+import {
+    deleteProductRecord,
+    manageSubscriptionStatusChange,
+    upsertPriceRecord,
+    upsertProductRecord,
+} from '@/lib/supabase/admin';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
-import { manageDiscordAccess } from '@/lib/discord/server';
-import { deleteProductRecord, manageSubscriptionStatusChange, upsertPriceRecord, upsertProductRecord } from '@/lib/supabase/admin';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
     apiVersion: '2025-02-24.acacia',
@@ -60,7 +65,11 @@ export async function POST(request: Request) {
                     const subscription = event.data.object as Stripe.Subscription;
                     const isActive = event.type !== 'customer.subscription.deleted' && subscription.status === 'active';
 
-                    await manageSubscriptionStatusChange(subscription.id, subscription.customer as string, event.type === 'customer.subscription.created');
+                    await manageSubscriptionStatusChange(
+                        subscription.id,
+                        subscription.customer as string,
+                        event.type === 'customer.subscription.created'
+                    );
 
                     // Manage Discord access
                     await manageDiscordAccess(subscription.customer as string, isActive);
@@ -69,7 +78,11 @@ export async function POST(request: Request) {
                     const checkoutSession = event.data.object as Stripe.Checkout.Session;
                     if (checkoutSession.mode === 'subscription') {
                         const subscriptionId = checkoutSession.subscription;
-                        await manageSubscriptionStatusChange(subscriptionId as string, checkoutSession.customer as string, true);
+                        await manageSubscriptionStatusChange(
+                            subscriptionId as string,
+                            checkoutSession.customer as string,
+                            true
+                        );
 
                         // Add Discord access for new subscribers
                         await manageDiscordAccess(checkoutSession.customer as string, true);

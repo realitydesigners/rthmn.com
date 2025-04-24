@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
 import { BoxVisualizer } from '@/components/Panels/PanelComponents/BoxVisualizer';
+import { useUser } from '@/providers/UserProvider';
+import type { BoxColors } from '@/stores/colorStore';
+import { usePresetStore } from '@/stores/presetStore';
+import React, { useState, useCallback } from 'react';
 import { ColorPresets } from './ColorPresets';
 import { CustomColorPicker } from './CustomColorPicker';
-import { useUser } from '@/providers/UserProvider';
-import { usePresetStore } from '@/stores/presetStore';
-import type { BoxColors } from '@/stores/colorStore';
 
 // Memoized preset comparison function
 const useIsPresetSelected = (boxColors: BoxColors) => {
@@ -21,7 +21,14 @@ const useIsPresetSelected = (boxColors: BoxColors) => {
                 boxColors.styles?.showBorder === preset.styles.showBorder
             );
         },
-        [boxColors.positive, boxColors.negative, boxColors.styles?.borderRadius, boxColors.styles?.shadowIntensity, boxColors.styles?.opacity, boxColors.styles?.showBorder]
+        [
+            boxColors.positive,
+            boxColors.negative,
+            boxColors.styles?.borderRadius,
+            boxColors.styles?.shadowIntensity,
+            boxColors.styles?.opacity,
+            boxColors.styles?.showBorder,
+        ]
     );
 };
 
@@ -81,7 +88,12 @@ export const SettingsBar = () => {
                 <div className='flex flex-col gap-2'>
                     {showColors && (
                         <>
-                            <ColorPresets fullPresets={presets} boxColors={boxColors} onPresetClick={handleFullPresetClick} isPresetSelected={isFullPresetSelected} />
+                            <ColorPresets
+                                fullPresets={presets}
+                                boxColors={boxColors}
+                                onPresetClick={handleFullPresetClick}
+                                isPresetSelected={isFullPresetSelected}
+                            />
                             <CustomColorPicker boxColors={boxColors} onColorChange={updateBoxColors} />
                         </>
                     )}

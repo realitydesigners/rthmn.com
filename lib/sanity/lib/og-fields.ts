@@ -13,10 +13,14 @@ export const ogFields = [
     defineField({
         name: 'ogDescription',
         title: 'Open graph description override',
-        description: 'This will override the meta description. If left blank it will inherit the description from the page description.',
+        description:
+            'This will override the meta description. If left blank it will inherit the description from the page description.',
         type: 'text',
         rows: 2,
-        validation: (Rule) => [Rule.warning('A description is required'), Rule.max(160).warning('No more than 160 characters')],
+        validation: (Rule) => [
+            Rule.warning('A description is required'),
+            Rule.max(160).warning('No more than 160 characters'),
+        ],
         group: GROUP.OG,
     }),
 ];

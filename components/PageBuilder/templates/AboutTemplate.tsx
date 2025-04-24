@@ -1,9 +1,11 @@
-import React from 'react';
 import type { PortableTextComponents } from '@portabletext/react';
+import type React from 'react';
 
 const NormalText: React.FC<{ children: React.ReactNode }> = ({ children }) => (
     <div className='flex w-full justify-center p-3'>
-        <p className='font-outfit w-full text-lg leading-relaxed text-white/70 md:w-3/4 lg:w-3/4 2xl:w-1/2'>{children}</p>
+        <p className='font-outfit w-full text-lg leading-relaxed text-white/70 md:w-3/4 lg:w-3/4 2xl:w-1/2'>
+            {children}
+        </p>
     </div>
 );
 
@@ -18,7 +20,9 @@ const Heading: React.FC<{ children: React.ReactNode; level: number }> = ({ child
 
     return (
         <div className='flex w-full justify-center p-3'>
-            <div className={`w-full md:w-3/4 lg:w-1/2 ${baseStyle} ${sizes[level as keyof typeof sizes]}`}>{children}</div>
+            <div className={`w-full md:w-3/4 lg:w-1/2 ${baseStyle} ${sizes[level as keyof typeof sizes]}`}>
+                {children}
+            </div>
         </div>
     );
 };
@@ -34,18 +38,27 @@ export const AboutTemplate: PortableTextComponents = {
     list: {
         bullet: ({ children }) => (
             <div className='flex w-full justify-center p-3'>
-                <ul className='font-outfit w-full list-disc space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2'>{children}</ul>
+                <ul className='font-outfit w-full list-disc space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2'>
+                    {children}
+                </ul>
             </div>
         ),
         number: ({ children }) => (
             <div className='flex w-full justify-center p-3'>
-                <ol className='font-outfit w-full list-decimal space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2'>{children}</ol>
+                <ol className='font-outfit w-full list-decimal space-y-2 pl-4 text-white/70 md:w-3/4 lg:w-1/2'>
+                    {children}
+                </ol>
             </div>
         ),
     },
     marks: {
         link: ({ children, value }) => (
-            <a href={value?.href} className='font-outfit text-cyan-400 transition-colors duration-200 hover:text-cyan-300' target='_blank' rel='noopener noreferrer'>
+            <a
+                href={value?.href}
+                className='font-outfit text-cyan-400 transition-colors duration-200 hover:text-cyan-300'
+                target='_blank'
+                rel='noopener noreferrer'
+            >
                 {children}
             </a>
         ),

@@ -1,5 +1,5 @@
 import { BlockElementIcon, ComposeIcon, InlineElementIcon, InsertAboveIcon, SearchIcon } from '@sanity/icons';
-import { defineField, type FieldGroupDefinition } from 'sanity';
+import { type FieldGroupDefinition, defineField } from 'sanity';
 
 export const GROUP = {
     SEO: 'seo',

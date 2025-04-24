@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
 import Link from 'next/link';
+import type React from 'react';
 
 interface PostsCardLightProps {
     slug: string;
@@ -21,7 +21,8 @@ const PostsCardLight: React.FC<PostsCardLightProps> = ({ slug, heading, image })
 
                     <Link
                         className='bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-2xl leading-[1.2em] font-bold text-transparent transition-colors duration-3 group-hover:text-neutral-100 group-hover:underline'
-                        href={`/posts/${slug}`}>
+                        href={`/posts/${slug}`}
+                    >
                         {heading}
                     </Link>
                 </div>

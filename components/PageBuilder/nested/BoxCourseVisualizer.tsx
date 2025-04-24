@@ -1,12 +1,12 @@
 'use client';
 
-import type React from 'react';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/components/Constants/constants';
 import { FEATURE_TAGS } from '@/components/Constants/text';
-import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import type { BoxSlice } from '@/types/types';
+import { motion } from 'framer-motion';
+import type React from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 const POINT_OF_CHANGE_INDEX = 29;
 
@@ -21,11 +21,14 @@ const FeatureTags = memo(() => (
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
                 key={index}
-                className='group flex cursor-pointer items-center gap-2 sm:gap-3'>
+                className='group flex cursor-pointer items-center gap-2 sm:gap-3'
+            >
                 <div className='items-centergap-1.5 relative flex'>
                     <div className='absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100' />
                     <feature.icon className='relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4' />
-                    <span className='font-kodemono text-neutral-400 transition-colors duration-300 group-hover:text-white'>{feature.text}</span>
+                    <span className='font-kodemono text-neutral-400 transition-colors duration-300 group-hover:text-white'>
+                        {feature.text}
+                    </span>
                 </div>
             </motion.div>
         ))}
@@ -58,51 +61,53 @@ interface BoxVisualizationProps {
 }
 
 // Memoize BoxVisualization component
-const BoxVisualization = memo(({ currentSlice, demoStep, isPaused, colorScheme = 'green-red', showLabels }: BoxVisualizationProps) => {
-    const [baseSize, setBaseSize] = useState(250);
+const BoxVisualization = memo(
+    ({ currentSlice, demoStep, isPaused, colorScheme = 'green-red', showLabels }: BoxVisualizationProps) => {
+        const [baseSize, setBaseSize] = useState(250);
 
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerWidth >= 1024) {
-                setBaseSize(400);
-            } else if (window.innerWidth >= 640) {
-                setBaseSize(300);
-            } else {
-                setBaseSize(250);
-            }
-        };
-        handleResize();
+        useEffect(() => {
+            const handleResize = () => {
+                if (window.innerWidth >= 1024) {
+                    setBaseSize(400);
+                } else if (window.innerWidth >= 640) {
+                    setBaseSize(300);
+                } else {
+                    setBaseSize(250);
+                }
+            };
+            handleResize();
 
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+            window.addEventListener('resize', handleResize);
+            return () => window.removeEventListener('resize', handleResize);
+        }, []);
 
-    const sortedBoxes = useMemo(() => {
-        return currentSlice?.boxes?.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)) || [];
-    }, [currentSlice]);
+        const sortedBoxes = useMemo(() => {
+            return currentSlice?.boxes?.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)) || [];
+        }, [currentSlice]);
 
-    const isPointOfChange = useMemo(() => {
-        return Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX;
-    }, [demoStep]);
+        const isPointOfChange = useMemo(() => {
+            return Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX;
+        }, [demoStep]);
 
-    return (
-        <div className='w-full'>
-            {currentSlice && sortedBoxes.length > 0 && (
-                <div className='relative h-full w-full'>
-                    <NestedBoxes
-                        boxes={sortedBoxes}
-                        demoStep={demoStep}
-                        isPaused={isPaused}
-                        isPointOfChange={isPointOfChange}
-                        baseSize={baseSize}
-                        colorScheme={colorScheme}
-                        showLabels={showLabels}
-                    />
-                </div>
-            )}
-        </div>
-    );
-});
+        return (
+            <div className='w-full'>
+                {currentSlice && sortedBoxes.length > 0 && (
+                    <div className='relative h-full w-full'>
+                        <NestedBoxes
+                            boxes={sortedBoxes}
+                            demoStep={demoStep}
+                            isPaused={isPaused}
+                            isPointOfChange={isPointOfChange}
+                            baseSize={baseSize}
+                            colorScheme={colorScheme}
+                            showLabels={showLabels}
+                        />
+                    </div>
+                )}
+            </div>
+        );
+    }
+);
 
 BoxVisualization.displayName = 'BoxVisualization';
 
@@ -124,7 +129,7 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
                     // Extract the array part and parse it
                     const match = line.match(/\[(.*?)\]/);
                     if (!match) return null;
-                    return match[1].split(',').map((num) => parseInt(num.trim(), 10));
+                    return match[1].split(',').map((num) => Number.parseInt(num.trim(), 10));
                 })
                 .filter((arr) => arr && arr.length === 8); // Ensure valid arrays only
             return lines.length > 0 ? lines : sequences;
@@ -141,7 +146,7 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
             // Split by commas and parse each number
             const values = value.baseValuesData
                 .split(',')
-                .map((num) => parseFloat(num.trim()))
+                .map((num) => Number.parseFloat(num.trim()))
                 .filter((num) => !isNaN(num));
             return values.length === 8 ? values : BASE_VALUES;
         } catch (error) {
@@ -195,12 +200,22 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
         }, value.animationSpeed || 150);
 
         return () => clearInterval(interval);
-    }, [demoStep, isPaused, value.animationSpeed, value.pauseDuration, value.mode, activeSequences, value.pointOfChangeIndex]);
+    }, [
+        demoStep,
+        isPaused,
+        value.animationSpeed,
+        value.pauseDuration,
+        value.mode,
+        activeSequences,
+        value.pointOfChangeIndex,
+    ]);
 
     return (
         <div className='flex h-full w-full flex-col items-center justify-center space-y-6 py-8'>
             {value.title && <h3 className='font-outfit text-center text-xl font-semibold text-white'>{value.title}</h3>}
-            {value.description && <p className='font-outfit max-w-2xl text-center text-base text-neutral-400'>{value.description}</p>}
+            {value.description && (
+                <p className='font-outfit max-w-2xl text-center text-base text-neutral-400'>{value.description}</p>
+            )}
             <div className='relative flex h-[400px] w-[400px] items-center justify-center'>
                 <NestedBoxes
                     boxes={currentSlice.boxes}
@@ -211,7 +226,10 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
                     mode={value.mode || 'animated'}
                     baseSize={400}
                     containerClassName='flex items-center justify-center'
-                    isPointOfChange={Math.floor(demoStep / 1) % activeSequences.length === (value.pointOfChangeIndex || POINT_OF_CHANGE_INDEX)}
+                    isPointOfChange={
+                        Math.floor(demoStep / 1) % activeSequences.length ===
+                        (value.pointOfChangeIndex || POINT_OF_CHANGE_INDEX)
+                    }
                 />
             </div>
         </div>

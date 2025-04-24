@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { CHART_CONFIG, ChartDataPoint } from '.';
+import { CHART_CONFIG, type ChartDataPoint } from '.';
 
 export const XAxis: React.FC<{
     data: ChartDataPoint[];
@@ -25,7 +25,9 @@ export const XAxis: React.FC<{
         const result = [];
 
         for (let time = startTime; time <= endTime; time += hourMs) {
-            const closestPoint = data.reduce((prev, curr) => (Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time) ? curr : prev));
+            const closestPoint = data.reduce((prev, curr) =>
+                Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time) ? curr : prev
+            );
             result.push(closestPoint);
         }
 
@@ -52,11 +54,30 @@ export const XAxis: React.FC<{
             {/* Grid lines */}
             {intervals.map((point) => {
                 const adjustedX = (point.scaledX / chartWidth) * adjustedWidth;
-                return <line key={`grid-${point.timestamp}`} x1={adjustedX} y1={0} x2={adjustedX} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={GRID_OPACITY} />;
+                return (
+                    <line
+                        key={`grid-${point.timestamp}`}
+                        x1={adjustedX}
+                        y1={0}
+                        x2={adjustedX}
+                        y2={chartHeight}
+                        stroke='#ffffff'
+                        strokeWidth='1'
+                        strokeOpacity={GRID_OPACITY}
+                    />
+                );
             })}
 
             {/* Main axis line */}
-            <line x1={0} y1={chartHeight} x2={chartWidth} y2={chartHeight} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.1} />
+            <line
+                x1={0}
+                y1={chartHeight}
+                x2={chartWidth}
+                y2={chartHeight}
+                stroke='#ffffff'
+                strokeWidth='1'
+                strokeOpacity={0.1}
+            />
 
             {/* Time intervals */}
             {intervals.map((point, index) => {
@@ -68,7 +89,15 @@ export const XAxis: React.FC<{
                 return (
                     <g key={`time-${point.timestamp}-${index}`} transform={`translate(${adjustedX}, ${chartHeight})`}>
                         <line y2={TICK_HEIGHT} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.3} />
-                        <text y={labelY} textAnchor='middle' fill='#ffffff' fillOpacity={0.6} fontSize={FONT_SIZE} fontFamily='monospace' style={{ userSelect: 'none' }}>
+                        <text
+                            y={labelY}
+                            textAnchor='middle'
+                            fill='#ffffff'
+                            fillOpacity={0.6}
+                            fontSize={FONT_SIZE}
+                            fontFamily='monospace'
+                            style={{ userSelect: 'none' }}
+                        >
                             {timeLabel}
                         </text>
                         {isStartOfDay && (
@@ -79,7 +108,8 @@ export const XAxis: React.FC<{
                                 fillOpacity={0.4}
                                 fontSize={FONT_SIZE - 1}
                                 fontFamily='monospace'
-                                style={{ userSelect: 'none' }}>
+                                style={{ userSelect: 'none' }}
+                            >
                                 {date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                             </text>
                         )}
@@ -90,7 +120,16 @@ export const XAxis: React.FC<{
             {/* Hover time indicator */}
             {hoverInfo && (
                 <g transform={`translate(${hoverInfo.x}, ${chartHeight})`}>
-                    <rect x={-40} y={hoverY} width={80} height={HOVER_BG_HEIGHT} fill='#1a1a1a' stroke='rgba(255, 255, 255, 0.2)' strokeWidth={1} rx={4} />
+                    <rect
+                        x={-40}
+                        y={hoverY}
+                        width={80}
+                        height={HOVER_BG_HEIGHT}
+                        fill='#1a1a1a'
+                        stroke='rgba(255, 255, 255, 0.2)'
+                        strokeWidth={1}
+                        rx={4}
+                    />
                     <text
                         x={0}
                         y={hoverY + HOVER_BG_HEIGHT / 2 + FONT_SIZE / 3}
@@ -99,7 +138,8 @@ export const XAxis: React.FC<{
                         fontSize={FONT_SIZE}
                         fontFamily='monospace'
                         fontWeight='medium'
-                        style={{ userSelect: 'none' }}>
+                        style={{ userSelect: 'none' }}
+                    >
                         {hoverInfo.time}
                     </text>
                 </g>

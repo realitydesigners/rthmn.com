@@ -1,9 +1,9 @@
 'use client';
+import { useTimeframeStore } from '@/stores/timeframeStore';
 import React, { useCallback, useState } from 'react';
 import { LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuRuler } from 'react-icons/lu';
-import { useTimeframeStore } from '@/stores/timeframeStore';
-import { TimeFrameSlider } from '../PanelComponents/TimeFrameSlider';
 import { CHART_STYLES, ChartStyleOption } from '../../Charts/ChartStyleOptions';
+import { TimeFrameSlider } from '../PanelComponents/TimeFrameSlider';
 import { Toggle } from '../PanelComponents/Toggle/Toggle';
 
 const VISUALIZER_TABS = {
@@ -15,12 +15,15 @@ const VISUALIZER_TABS = {
             <>
                 <button
                     onClick={props.onToggle}
-                    className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                    className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
+                >
                     <div className='flex items-center gap-3'>
                         <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
                             <LuLineChart size={14} className='text-[#666] transition-colors group-hover:text-white' />
                         </div>
-                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>Chart Style</span>
+                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                            Chart Style
+                        </span>
                     </div>
                     {props.showChartStyle ? (
                         <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
@@ -53,12 +56,15 @@ const VISUALIZER_TABS = {
             <>
                 <button
                     onClick={props.onToggle}
-                    className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                    className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
+                >
                     <div className='flex items-center gap-3'>
                         <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
                             <LuLayoutGrid size={14} className='text-[#666] transition-colors group-hover:text-white' />
                         </div>
-                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>Timeframe</span>
+                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                            Timeframe
+                        </span>
                     </div>
                     {props.showTimeframe ? (
                         <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
@@ -85,16 +91,24 @@ const VISUALIZER_TABS = {
         id: 'priceLines',
         title: 'Price Lines',
         icon: LuRuler,
-        content: (props: { showPriceLines: boolean; onToggle: () => void; globalSettings: any; handleTimeframeChange: (property: string, value: number | boolean) => void }) => (
+        content: (props: {
+            showPriceLines: boolean;
+            onToggle: () => void;
+            globalSettings: any;
+            handleTimeframeChange: (property: string, value: number | boolean) => void;
+        }) => (
             <>
                 <button
                     onClick={props.onToggle}
-                    className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'>
+                    className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
+                >
                     <div className='flex items-center gap-3'>
                         <div className='flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#181818] to-[#0F0F0F] shadow-xl'>
                             <LuRuler size={14} className='text-[#666] transition-colors group-hover:text-white' />
                         </div>
-                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>Price Lines</span>
+                        <span className='font-kodemono text-[10px] font-medium tracking-widest text-[#818181] uppercase transition-colors group-hover:text-white'>
+                            Price Lines
+                        </span>
                     </div>
                     {props.showPriceLines ? (
                         <LuChevronUp size={14} className='text-[#666] transition-colors group-hover:text-white' />
@@ -106,7 +120,11 @@ const VISUALIZER_TABS = {
                     <div className='px-3 py-2'>
                         <Toggle
                             isEnabled={props.globalSettings.showPriceLines}
-                            onToggle={props.handleTimeframeChange.bind(null, 'showPriceLines', !props.globalSettings.showPriceLines)}
+                            onToggle={props.handleTimeframeChange.bind(
+                                null,
+                                'showPriceLines',
+                                !props.globalSettings.showPriceLines
+                            )}
                             size='sm'
                             title='Show Price Lines'
                         />

@@ -1,15 +1,21 @@
 'use client';
-import { useOptimistic } from '@sanity/visual-editing/react';
-import { createDataAttribute, type SanityDocument } from 'next-sanity';
 import { dataset, projectId, studioUrl } from '@/lib/sanity/lib/api';
-import { TeamGridBlock, type TeamGridBlockProps } from './blocks/teamGrid';
-import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';
-import { ContentBlock, type ContentBlockProps } from './blocks/contentBlock';
-import { LegalContentBlock, type LegalContentBlockProps } from './blocks/legalContentBlock';
+import { useOptimistic } from '@sanity/visual-editing/react';
+import { type SanityDocument, createDataAttribute } from 'next-sanity';
 import { ChangelogBlock, type ChangelogBlockProps } from './blocks/changelogBlock';
+import { ContentBlock, type ContentBlockProps } from './blocks/contentBlock';
+import { FAQBlock, type FAQBlockProps } from './blocks/faqBlock';
 import { GitHubBlock, type GitHubBlockProps } from './blocks/githubBlock';
+import { LegalContentBlock, type LegalContentBlockProps } from './blocks/legalContentBlock';
+import { TeamGridBlock, type TeamGridBlockProps } from './blocks/teamGrid';
 
-export type PageBuilderBlock = TeamGridBlockProps | FAQBlockProps | ContentBlockProps | LegalContentBlockProps | ChangelogBlockProps | GitHubBlockProps;
+export type PageBuilderBlock =
+    | TeamGridBlockProps
+    | FAQBlockProps
+    | ContentBlockProps
+    | LegalContentBlockProps
+    | ChangelogBlockProps
+    | GitHubBlockProps;
 
 export interface PageBuilderProps {
     blocks: PageBuilderBlock[];
@@ -35,12 +41,15 @@ const BLOCK_COMPONENTS = {
 type BlockType = keyof typeof BLOCK_COMPONENTS;
 
 export function PageBuilder({ blocks, id, type }: PageBuilderProps) {
-    const pageBuilder = useOptimistic<PageBuilderBlock[], SanityDocument<PageData>>(blocks, (currentPageBuilder, action) => {
-        if (action.id === id && action.document.pageBuilder) {
-            return action.document.pageBuilder;
+    const pageBuilder = useOptimistic<PageBuilderBlock[], SanityDocument<PageData>>(
+        blocks,
+        (currentPageBuilder, action) => {
+            if (action.id === id && action.document.pageBuilder) {
+                return action.document.pageBuilder;
+            }
+            return currentPageBuilder;
         }
-        return currentPageBuilder;
-    });
+    );
 
     return (
         <main
@@ -52,7 +61,8 @@ export function PageBuilder({ blocks, id, type }: PageBuilderProps) {
                 dataset: dataset,
                 type: type,
                 path: 'pageBuilder',
-            }).toString()}>
+            }).toString()}
+        >
             {pageBuilder.length === 0 && (
                 <div className='flex h-screen items-center justify-center'>
                     <p className='text-xl'>No content blocks found. Add some blocks in the Sanity Studio.</p>
@@ -64,7 +74,10 @@ export function PageBuilder({ blocks, id, type }: PageBuilderProps) {
 
                     if (!Component) {
                         return (
-                            <div key={`${block._type}-${block._key}`} className='text-muted-foreground bg-muted flex items-center justify-center rounded-lg p-8 text-center'>
+                            <div
+                                key={`${block._type}-${block._key}`}
+                                className='text-muted-foreground bg-muted flex items-center justify-center rounded-lg p-8 text-center'
+                            >
                                 Component not found for block type: <code>{block._type}</code>
                             </div>
                         );
@@ -80,7 +93,8 @@ export function PageBuilder({ blocks, id, type }: PageBuilderProps) {
                                 dataset: dataset,
                                 type: type,
                                 path: `pageBuilder[_key=="${block._key}"]`,
-                            }).toString()}>
+                            }).toString()}
+                        >
                             <Component {...(block as any)} />
                         </div>
                     );

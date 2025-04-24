@@ -1,13 +1,13 @@
 'use client';
 
-import type React from 'react';
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { NestedBoxes } from '@/components/Charts/NestedBoxes';
 import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/components/Constants/constants';
 import { FEATURE_TAGS } from '@/components/Constants/text';
-import { NestedBoxes } from '@/components/Charts/NestedBoxes';
-import { BoxSlice } from '@/types/types';
 import { StartButton } from '@/components/Sections/StartNowButton';
+import type { BoxSlice } from '@/types/types';
+import { motion } from 'framer-motion';
+import type React from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 const POINT_OF_CHANGE_INDEX = 29;
 const PAUSE_DURATION = 5000;
 
@@ -66,10 +66,11 @@ const StarField = () => {
                     }}
                     transition={{
                         duration: star.duration,
-                        repeat: Infinity,
+                        repeat: Number.POSITIVE_INFINITY,
                         delay: star.delay,
                     }}
-                    className='absolute'>
+                    className='absolute'
+                >
                     <div
                         style={{
                             width: `${star.size}px`,
@@ -116,7 +117,7 @@ const AuroraBackground = ({ dominantState }: { dominantState: string }) => {
             transition={{
                 backgroundPosition: {
                     duration: 60,
-                    repeat: Infinity,
+                    repeat: Number.POSITIVE_INFINITY,
                     ease: 'linear',
                 },
             }}
@@ -165,9 +166,12 @@ const FeatureTags = memo(() => (
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
                 key={index}
-                className='group flex cursor-pointer items-center gap-2'>
+                className='group flex cursor-pointer items-center gap-2'
+            >
                 <feature.icon className='h-3.5 w-3.5 text-neutral-500 transition-colors duration-300 group-hover:text-emerald-400 group-hover:drop-shadow-[0_0_3px_rgba(34,197,94,0.4)]' />
-                <span className='font-kodemono text-xs text-neutral-400 transition-colors duration-300 group-hover:text-neutral-200'>{feature.text}</span>
+                <span className='font-kodemono text-xs text-neutral-400 transition-colors duration-300 group-hover:text-neutral-200'>
+                    {feature.text}
+                </span>
             </motion.div>
         ))}
     </div>
@@ -193,8 +197,14 @@ const BoxVisualization = memo(({ currentSlice, demoStep, isPaused }: BoxVisualiz
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    const sortedBoxes = useMemo(() => currentSlice?.boxes?.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)) || [], [currentSlice]);
-    const isPointOfChange = useMemo(() => Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX, [demoStep]);
+    const sortedBoxes = useMemo(
+        () => currentSlice?.boxes?.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)) || [],
+        [currentSlice]
+    );
+    const isPointOfChange = useMemo(
+        () => Math.floor(demoStep / 1) % sequences.length === POINT_OF_CHANGE_INDEX,
+        [demoStep]
+    );
 
     return (
         <motion.div
@@ -202,13 +212,21 @@ const BoxVisualization = memo(({ currentSlice, demoStep, isPaused }: BoxVisualiz
             style={{ transformStyle: 'preserve-3d' }}
             initial={{ rotateX: 10, rotateY: -15, opacity: 0, scale: 0.8 }}
             whileInView={{ rotateX: 0, rotateY: 0, opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}>
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+        >
             {/* Decorative Corners */}
 
             {/* NestedBoxes container - Apply conditional rotation here */}
             <motion.div className='relative h-full w-full' style={{ transform: 'translateZ(20px)' }}>
                 {currentSlice && sortedBoxes.length > 0 && (
-                    <NestedBoxes boxes={sortedBoxes} demoStep={demoStep} isPaused={isPaused} isPointOfChange={isPointOfChange} baseSize={baseSize} colorScheme='green-red' />
+                    <NestedBoxes
+                        boxes={sortedBoxes}
+                        demoStep={demoStep}
+                        isPaused={isPaused}
+                        isPointOfChange={isPointOfChange}
+                        baseSize={baseSize}
+                        colorScheme='green-red'
+                    />
                 )}
             </motion.div>
         </motion.div>
@@ -223,7 +241,8 @@ const StaticContent = memo(() => (
         style={{ transformStyle: 'preserve-3d' }}
         initial={{ rotateX: -8, rotateY: 10, opacity: 0, y: 30 }}
         whileInView={{ rotateX: 0, rotateY: 0, opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}>
+        transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+    >
         <div className='relative p-4 lg:p-0'>
             {/* Decorative Corners */}
             <CornerElement position='top-left' />
@@ -232,20 +251,42 @@ const StaticContent = memo(() => (
             <CornerElement position='bottom-right' delay={0.3} />
 
             <div className='space-y-6'>
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className='space-y-3'>
-                    <h2 className='font-outfit text-neutral-gradient text-xl leading-none font-medium tracking-tight lg:text-2xl'>Multi-Dimensional</h2>
-                    <h2 className='font-outfit text-neutral-gradient -mt-4 text-5xl leading-none font-bold tracking-tight sm:text-6xl lg:text-7xl'>Trend Analysis</h2>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6 }}
+                    className='space-y-3'
+                >
+                    <h2 className='font-outfit text-neutral-gradient text-xl leading-none font-medium tracking-tight lg:text-2xl'>
+                        Multi-Dimensional
+                    </h2>
+                    <h2 className='font-outfit text-neutral-gradient -mt-4 text-5xl leading-none font-bold tracking-tight sm:text-6xl lg:text-7xl'>
+                        Trend Analysis
+                    </h2>
                 </motion.div>
 
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }} className='space-y-8'>
-                    <p className='font-outfit text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg' style={{ textShadow: '0 0 8px rgba(200, 200, 255, 0.1)' }}>
-                        Transform market data into clear visual insights. Rthmn analyzes price structure to reveal hidden patterns and key market levels.
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.1 }}
+                    className='space-y-8'
+                >
+                    <p
+                        className='font-outfit text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg'
+                        style={{ textShadow: '0 0 8px rgba(200, 200, 255, 0.1)' }}
+                    >
+                        Transform market data into clear visual insights. Rthmn analyzes price structure to reveal
+                        hidden patterns and key market levels.
                     </p>
                 </motion.div>
 
                 <StartButton href='/dashboard' />
 
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
                     <FeatureTags />
                 </motion.div>
             </div>
@@ -300,7 +341,8 @@ export const SectionBoxes = memo(() => {
                     linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
                 `,
                 backgroundSize: '40px 40px',
-            }}>
+            }}
+        >
             {/* Added Section-level Corners */}
             <CornerElement position='top-left' delay={0} />
             <CornerElement position='top-right' delay={0.1} />

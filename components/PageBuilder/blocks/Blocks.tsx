@@ -1,9 +1,9 @@
-import React from 'react';
-import type { PortableTextBlock } from '@portabletext/types';
 import ContentBlock from '@/components/PageBuilder/section/ContentBlock';
+import CourseBlock from '@/components/PageBuilder/section/CourseBlock';
 import HeadingBlock from '@/components/PageBuilder/section/HeadingBlock';
 import TeamBlock from '@/components/PageBuilder/section/TeamBlock';
-import CourseBlock from '@/components/PageBuilder/section/CourseBlock';
+import type { PortableTextBlock } from '@portabletext/types';
+import React from 'react';
 
 export interface BlockProps {
     _type: {
