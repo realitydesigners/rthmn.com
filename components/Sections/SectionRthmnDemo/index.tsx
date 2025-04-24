@@ -138,7 +138,7 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     // Process candles for LineChart
-    const processCandles = (candleDataString: string) => {
+    const processCandles = useCallback((candleDataString: string) => {
         try {
             const data = JSON.parse(candleDataString) as CandleData[];
             return data.map((candle) => ({
@@ -152,7 +152,7 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
         } catch (e) {
             return [];
         }
-    };
+    }, []);
 
     // 3D mouse effect
     useEffect(() => {
@@ -180,7 +180,7 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
     const processedCandles = useMemo(() => {
         const selectedMarketData = marketData.find((item) => item.pair === selectedPair);
         return selectedMarketData ? processCandles(selectedMarketData.candleData) : [];
-    }, [marketData, selectedPair]);
+    }, [marketData, selectedPair, processCandles]);
 
     const renderActiveTab = useMemo(() => {
         switch (activeTab) {

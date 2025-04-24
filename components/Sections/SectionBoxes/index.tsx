@@ -121,7 +121,7 @@ const AuroraBackground = ({ dominantState }: { dominantState: string }) => {
                     ease: 'linear',
                 },
             }}
-            className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform`}
+            className='pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform'
             style={
                 {
                     '--aurora': `repeating-linear-gradient(100deg,
@@ -165,7 +165,7 @@ const FeatureTags = memo(() => (
                 initial={{ opacity: 0, x: -15 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                key={index}
+                key={feature.text}
                 className='group flex cursor-pointer items-center gap-2'
             >
                 <feature.icon className='h-3.5 w-3.5 text-neutral-500 transition-colors duration-300 group-hover:text-emerald-400 group-hover:drop-shadow-[0_0_3px_rgba(34,197,94,0.4)]' />

@@ -92,7 +92,7 @@ const CARD_ANIMATION = {
 
 // Re-add helper function to add random jitter
 const addRandomJitter = (value: number, maxOffsetScale = 0.0001): number => {
-    if (typeof value !== 'number' || !isFinite(value)) return value;
+    if (typeof value !== 'number' || !Number.isFinite(value)) return value;
     const valueString = String(value);
     const decimalIndex = valueString.indexOf('.');
     const originalPrecision = decimalIndex === -1 ? 0 : valueString.length - decimalIndex - 1;
@@ -159,7 +159,10 @@ const SparklineChart = memo(({ data, change }: { data: number[]; change: number 
                 viewBox='0 0 200 60'
                 preserveAspectRatio='none'
                 className='overflow-visible'
+                aria-labelledby='sparkline-title'
+                role='img'
             >
+                <title id='sparkline-title'>Sparkline Chart</title>
                 <defs>
                     <linearGradient id={`gradient-${change}`} x1='0' y1='0' x2='0' y2='1'>
                         <stop offset='0%' stopColor={change >= 0 ? '#4ade80' : '#f87171'} stopOpacity='0.8' />
@@ -434,9 +437,15 @@ const useProcessedMarketData = (marketData: MarketData[], progress: number) => {
                     }
                 }
 
+                const cachedData = cache.get(cacheKey);
+                if (!cachedData) {
+                    console.error(`Cache miss for key: ${cacheKey}`);
+                    return null;
+                }
+
                 return {
                     item,
-                    data: cache.get(cacheKey)!,
+                    data: cachedData,
                 };
             })
             .filter((item): item is { item: MarketData; data: ProcessedMarketData } => item !== null);
