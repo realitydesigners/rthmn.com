@@ -280,7 +280,9 @@ const StaticContent = memo(() => (
                     </p>
                 </motion.div>
 
-                <StartButton href='/dashboard' />
+                <StartButton href='/dashboard' variant='shimmer'>
+                    Start now
+                </StartButton>
 
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}

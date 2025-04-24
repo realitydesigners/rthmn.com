@@ -2,12 +2,14 @@
 
 import { getStripe } from '@/lib/stripe/client';
 import { checkoutWithStripe } from '@/lib/stripe/server';
+import { StartButton } from '@/components/Sections/StartNowButton';
 import { getErrorRedirect } from '@/utils/helpers';
 import type { User } from '@supabase/supabase-js';
 import { motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { FaArrowRight, FaCheck } from 'react-icons/fa';
+import { useInView } from 'react-intersection-observer';
 
 type Subscription = any;
 type Product = any;
@@ -28,59 +30,187 @@ interface Props {
     subscription: SubscriptionWithProduct | null;
 }
 
+const StarField = () => {
+    const [mounted, setMounted] = useState(false);
+    const [stars, setStars] = useState<
+        Array<{ id: number; x: number; y: number; size: number; duration: number; delay: number }>
+    >([]);
+
+    useEffect(() => {
+        const generateStars = () => {
+            const newStars = Array.from({ length: 50 }, (_, i) => ({
+                id: i,
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                size: 1 + Math.random() * 2,
+                duration: 15 + Math.random() * 20,
+                delay: Math.random() * -15,
+            }));
+            setStars(newStars);
+        };
+
+        generateStars();
+        setMounted(true);
+
+        const handleResize = () => {
+            generateStars();
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    if (!mounted) return null;
+
+    return (
+        <div className='absolute inset-0 overflow-hidden'>
+            {stars.map((star) => (
+                <motion.div
+                    key={star.id}
+                    initial={{ opacity: 0.1, x: star.x, y: star.y }}
+                    animate={{ opacity: [0.1, 0.5, 0.1], y: [star.y, -100] }}
+                    transition={{ duration: star.duration, repeat: Number.POSITIVE_INFINITY, delay: star.delay }}
+                    className='absolute'
+                >
+                    <div
+                        style={{ width: `${star.size}px`, height: `${star.size}px` }}
+                        className='rounded-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)]'
+                    />
+                </motion.div>
+            ))}
+        </div>
+    );
+};
+
 const PricingBenefits = [
-    'Real-time Pattern Recognition',
-    'Advanced Pattern Detection',
-    'Real-time Market Analysis',
-    'Premium Discord Access',
-    'Trading Indicators',
-    'Early Access Features',
+    {
+        title: 'Real-time Pattern Recognition',
+        description: 'Instantly identify trading patterns as they form in the market',
+    },
+    {
+        title: 'Advanced Pattern Detection',
+        description: 'Leverage AI to spot complex trading opportunities',
+    },
+    {
+        title: 'Real-time Market Analysis',
+        description: 'Get deep insights into market movements and trends',
+    },
+    {
+        title: 'Premium Discord Access',
+        description: 'Join an exclusive community of professional traders',
+    },
+    {
+        title: 'Trading Indicators',
+        description: 'Access our suite of proprietary trading indicators',
+    },
+    {
+        title: 'Early Access Features',
+        description: 'Be the first to try new trading tools and features',
+    },
 ];
+
+// Decorative Corner Element Component
+const CornerElement = ({ position, delay = 0 }: { position: string; delay?: number }) => {
+    const baseClasses = 'absolute w-6 h-6 border-neutral-700/50';
+    const positionClasses = {
+        'top-left': '-top-4 -left-4 border-t border-l',
+        'top-right': '-top-4 -right-4 border-t border-r',
+        'bottom-left': '-bottom-4 -left-4 border-b border-l',
+        'bottom-right': '-bottom-4 -right-4 border-b border-r',
+    };
+    return (
+        <motion.div
+            className={`${baseClasses} ${positionClasses[position]}`}
+            initial={{ opacity: 0, scale: 0.5 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, delay: delay + 0.6, ease: 'easeOut' }}
+        />
+    );
+};
+
+const BenefitsList = memo(({ benefits }: { benefits: typeof PricingBenefits }) => (
+    <div className='grid gap-4 lg:grid-cols-2'>
+        {benefits.map((benefit, index) => (
+            <motion.div
+                key={benefit.title}
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+                className='group relative overflow-hidden rounded-xl bg-white/[0.02] p-4 transition-all duration-300 hover:bg-white/[0.04]'
+            >
+                <div className='pointer-events-none absolute inset-px rounded-xl bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+                <div className='relative flex gap-3'>
+                    <div className='flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 shadow-lg shadow-emerald-500/[0.15] ring-1 ring-emerald-500/[0.15]'>
+                        <FaCheck className='h-3.5 w-3.5 text-emerald-400' />
+                    </div>
+                    <div>
+                        <h3 className='font-outfit text-base font-semibold text-white'>{benefit.title}</h3>
+                        <p className='font-kodemono mt-1 text-sm text-neutral-400'>{benefit.description}</p>
+                    </div>
+                </div>
+            </motion.div>
+        ))}
+    </div>
+));
+
+BenefitsList.displayName = 'BenefitsList';
 
 export function SectionPricing({ user, products, subscription }: Props) {
     const router = useRouter();
     const [priceIdLoading, setPriceIdLoading] = useState<string>();
-    const [selectedPriceId, setSelectedPriceId] = useState<string>();
     const currentPath = usePathname();
+    const { ref, inView } = useInView({
+        threshold: 0.1,
+        triggerOnce: true,
+    });
 
     const product = products[0];
     const price = product?.prices?.[0];
 
-    const handleStripeCheckout = async (price: Price) => {
+    const handleStripeCheckout = async () => {
         setPriceIdLoading(price.id);
 
-        if (!user) {
-            setPriceIdLoading(undefined);
-            return router.push('/signin');
-        }
+        try {
+            if (!user) {
+                return router.push('/signin');
+            }
 
-        const { errorRedirect, sessionId } = await checkoutWithStripe(
-            price,
-            price.type === 'recurring', // isSubscription
-            '/account', // successPath
-            currentPath // cancelPath
-        );
+            const { errorRedirect, sessionId } = await checkoutWithStripe(
+                price,
+                price.type === 'recurring', // isSubscription
+                '/account', // successPath
+                currentPath // cancelPath
+            );
 
-        if (errorRedirect) {
-            setPriceIdLoading(undefined);
-            return router.push(errorRedirect);
-        }
+            if (errorRedirect) {
+                return router.push(errorRedirect);
+            }
 
-        if (!sessionId) {
-            setPriceIdLoading(undefined);
-            return router.push(
+            if (!sessionId) {
+                return router.push(
+                    getErrorRedirect(
+                        currentPath,
+                        'An unknown error occurred.',
+                        'Please try again later or contact a system administrator.'
+                    )
+                );
+            }
+
+            const stripe = await getStripe();
+            await stripe?.redirectToCheckout({ sessionId });
+        } catch (error) {
+            console.error('Stripe checkout error:', error);
+            router.push(
                 getErrorRedirect(
                     currentPath,
-                    'An unknown error occurred.',
-                    'Please try again later or contact a system administrator.'
+                    'Payment processing failed.',
+                    'Please try again or contact support if the problem persists.'
                 )
             );
+        } finally {
+            setPriceIdLoading(undefined);
         }
-
-        const stripe = await getStripe();
-        stripe?.redirectToCheckout({ sessionId });
-
-        setPriceIdLoading(undefined);
     };
 
     if (!product || !price) return null;
@@ -92,117 +222,96 @@ export function SectionPricing({ user, products, subscription }: Props) {
     }).format((price.unit_amount ?? 0) / 100);
 
     return (
-        <section className='relative min-h-screen overflow-hidden py-32'>
-            {/* Enhanced Background Effects */}
-            <div className='pointer-events-none absolute inset-0'>
-                <div className='absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]' />
-            </div>
+        <section
+            className='relative h-full w-full overflow-hidden bg-black px-4 py-24 sm:px-8 lg:px-[10vw] lg:py-40'
+            style={{
+                perspective: '1500px',
+                backgroundImage: `
+                    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px)
+                `,
+                backgroundSize: '40px 40px',
+            }}
+        >
+            <CornerElement position='top-left' delay={0} />
+            <CornerElement position='top-right' delay={0.1} />
+            <CornerElement position='bottom-left' delay={0.2} />
+            <CornerElement position='bottom-right' delay={0.3} />
 
-            <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
-                {/* Enhanced Header Section */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className='mx-auto mb-12 max-w-3xl text-center'
-                >
-                    <h1 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>
-                        Elevate Your Trading Strategy
-                    </h1>
-                    <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>
-                        Join an elite community of traders using trading tools from the future.
-                    </p>
-                </motion.div>
+            <StarField />
 
-                {/* Single Pricing Card */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    className='mx-auto max-w-2xl'
-                >
-                    <div className='relative overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-xl inset-shadow-sm shadow-black/20 inset-shadow-white/5 backdrop-blur-sm'>
-                        {/* Enhanced glow effects */}
-                        <div className='pointer-events-none absolute inset-0'>
-                            <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]' />
-                            <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
-                        </div>
-
-                        <div className='p-8'>
-                            {/* Price Header */}
-                            <div className='mb-8 text-center'>
-                                <h2 className='font-outfit mb-4 text-3xl font-bold text-white'>{product.name}</h2>
-                                <div className='mb-4'>
-                                    <div className='inline-flexrounded-full px-6 py-2 shadow-lg inset-shadow-xs'>
-                                        <span className='font-outfit text-6xl font-bold text-white'>{priceString}</span>
-                                        <span className='font-kodemono ml-2 text-lg text-neutral-400'>/month</span>
-                                    </div>
-                                </div>
-                                <p className='font-kodemono text-md text-neutral-400'>{product.description}</p>
-                            </div>
-
-                            {/* Benefits List */}
-                            <div className='mb-8'>
-                                <div className='flex w-full flex-col items-start justify-start'>
-                                    {PricingBenefits.map((benefit, index) => (
-                                        <div
-                                            key={index}
-                                            className='flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-neutral-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10'
-                                        >
-                                            <div className='flex h-6 w-6 items-center justify-center rounded-full bg-white/5 shadow-sm inset-shadow-xs inset-shadow-white/10'>
-                                                <FaCheck className='h-3 w-3 text-emerald-400' />
-                                            </div>
-                                            <span className='font-kodemono text-md'>{benefit}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Action Button */}
-                            <button
-                                onClick={() => handleStripeCheckout(price)}
-                                disabled={priceIdLoading === price.id}
-                                className='group relative flex w-full items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white shadow-lg ring-1 inset-shadow-sm inset-ring shadow-black/20 ring-white/10 inset-shadow-white/10 inset-ring-white/5 transition-all duration-300 hover:from-[#444444] hover:to-[#282828] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50'
+            <div className='relative z-10 mx-auto max-w-7xl'>
+                <div className='grid grid-cols-1 items-center gap-16 lg:grid-cols-2 lg:gap-32'>
+                    {/* Left Content */}
+                    <motion.div
+                        className='flex flex-col justify-center'
+                        style={{ transformStyle: 'preserve-3d' }}
+                        initial={{ rotateX: -8, rotateY: 10, opacity: 0, y: 30 }}
+                        whileInView={{ rotateX: 0, rotateY: 0, opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
+                    >
+                        <div className='relative space-y-8 p-4 lg:p-0'>
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6 }}
+                                className='space-y-3'
                             >
-                                <span className='font-outfit relative flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-lg font-medium transition-all duration-300 group-hover:inset-shadow-sm group-hover:inset-shadow-white/5'>
-                                    {priceIdLoading === price.id ? (
-                                        <span className='flex items-center gap-2'>
-                                            <svg className='h-4 w-4 animate-spin' viewBox='0 0 24 24'>
-                                                <circle
-                                                    className='opacity-25'
-                                                    cx='12'
-                                                    cy='12'
-                                                    r='10'
-                                                    stroke='currentColor'
-                                                    strokeWidth='4'
-                                                />
-                                                <path
-                                                    className='opacity-75'
-                                                    fill='currentColor'
-                                                    d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
-                                                />
-                                            </svg>
-                                            Processing...
-                                        </span>
-                                    ) : subscription ? (
-                                        'Manage Subscription'
-                                    ) : (
-                                        <>
-                                            Get Started Now
-                                            <FaArrowRight className='h-3 w-3 transition-transform duration-300 group-hover:translate-x-0.5' />
-                                        </>
-                                    )}
-                                </span>
-                            </button>
-                        </div>
-                    </div>
-                </motion.div>
-            </div>
+                                <h2 className='font-outfit text-neutral-gradient text-xl font-medium tracking-tight lg:text-2xl'>
+                                    Box Seat
+                                </h2>
+                                <div className='flex items-baseline gap-3'>
+                                    <h2 className='font-outfit text-neutral-gradient text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl'>
+                                        {priceString}
+                                    </h2>
+                                    <span className='font-kodemono text-lg text-neutral-400'>/month</span>
+                                </div>
+                            </motion.div>
 
-            {/* Add floating elements */}
-            <div className='pointer-events-none absolute inset-0 overflow-hidden'>
-                <div className='absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-white/5 blur-3xl' />
-                <div className='absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-white/5 blur-3xl' />
+                            <motion.p
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.1 }}
+                                className='font-outfit text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg'
+                                style={{ textShadow: '0 0 8px rgba(200, 200, 255, 0.1)' }}
+                            >
+                                {product.description}
+                            </motion.p>
+
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                transition={{ duration: 0.6, delay: 0.2 }}
+                                className='flex items-center gap-4'
+                            >
+                                <StartButton
+                                    onClick={handleStripeCheckout}
+                                    variant='shimmer'
+                                    disabled={priceIdLoading === price.id}
+                                    isLoading={priceIdLoading === price.id}
+                                >
+                                    <span className='flex items-center gap-3'>
+                                        {subscription ? 'Manage Subscription' : 'Get Started Now'}
+                                    </span>
+                                </StartButton>
+                            </motion.div>
+                        </div>
+                    </motion.div>
+
+                    {/* Right Content */}
+                    <motion.div
+                        className='order-first lg:order-none'
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <div className='relative overflow-hidden rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent p-8 shadow-2xl shadow-emerald-500/10 backdrop-blur-sm'>
+                            <div className='pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100' />
+                            <BenefitsList benefits={PricingBenefits} />
+                        </div>
+                    </motion.div>
+                </div>
             </div>
         </section>
     );
