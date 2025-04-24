@@ -1,19 +1,19 @@
 'use client';
 
-import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
-import { useWebSocket } from '@/providers/WebsocketProvider';
-import CandleChart, { ChartDataPoint } from '@/components/Charts/CandleChart';
-import { useUser } from '@/providers/UserProvider';
-import { formatPrice } from '@/utils/instruments';
-import { useDashboard } from '@/providers/DashboardProvider/client';
-import { ResoBox } from '@/components/Charts/ResoBox';
-import { useTimeframeStore } from '@/stores/timeframeStore';
-import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
-import Histogram from '@/components/Charts/Histogram';
+import CandleChart, { type ChartDataPoint } from '@/components/Charts/CandleChart';
 import ChartControls from '@/components/Charts/CandleChart/ChartControls';
-import { Box } from '@/types/types';
+import Histogram from '@/components/Charts/Histogram';
+import { ResoBox } from '@/components/Charts/ResoBox';
 import { BoxValuesDebug } from '@/components/Debug/BoxValuesDebug';
+import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
+import { useDashboard } from '@/providers/DashboardProvider/client';
+import { useUser } from '@/providers/UserProvider';
+import { useWebSocket } from '@/providers/WebsocketProvider';
+import { useTimeframeStore } from '@/stores/timeframeStore';
+import type { Box } from '@/types/types';
 import { processLiveCandleUpdate } from '@/utils/chartDataProcessor';
+import { formatPrice } from '@/utils/instruments';
+import React, { useEffect, useCallback, useState, useMemo, useRef } from 'react';
 
 export interface ExtendedBoxSlice {
     timestamp: string;
@@ -48,7 +48,9 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const lastPriceRef = useRef<number | null>(null);
     const currentCandleRef = useRef<ChartDataPoint | null>(null);
 
-    const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
+    const settings = useTimeframeStore(
+        useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair])
+    );
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
     const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
@@ -203,7 +205,13 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                         <div className='flex h-full flex-col border border-[#222] bg-black p-4'>
                             <div className='relative flex-1 p-2 pr-16'>
                                 {filteredBoxSlice && boxColors && (
-                                    <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                                    <ResoBox
+                                        slice={filteredBoxSlice}
+                                        className='h-full w-full'
+                                        boxColors={boxColors}
+                                        pair={pair}
+                                        showPriceLines={settings.showPriceLines}
+                                    />
                                 )}
                             </div>
                             {boxSlice?.boxes && (

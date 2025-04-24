@@ -1,10 +1,10 @@
 'use client';
 
-import { createContext, use, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Session, User } from '@supabase/supabase-js';
-import { Database } from '@/types/supabase';
 import { createClient } from '@/lib/supabase/client';
+import type { Database } from '@/types/supabase';
+import type { Session, User } from '@supabase/supabase-js';
+import { useRouter } from 'next/navigation';
+import { createContext, use, useEffect, useState } from 'react';
 
 type UserDetails = Database['public']['Tables']['users']['Row'];
 type DiscordConnection = Database['public']['Tables']['discord_connections']['Row'];
@@ -30,7 +30,10 @@ export const useAuth = () => {
     return context;
 };
 
-export default function SupabaseProvider({ children, initialUser }: { children: React.ReactNode; initialUser: User | null }) {
+export default function SupabaseProvider({
+    children,
+    initialUser,
+}: { children: React.ReactNode; initialUser: User | null }) {
     const [supabaseClient] = useState(() => createClient());
     const [session, setSession] = useState<Session | null>(null);
     const [user, setUser] = useState<User | null>(initialUser);
@@ -68,7 +71,11 @@ export default function SupabaseProvider({ children, initialUser }: { children: 
                 // console.log('User details fetched:', details);
 
                 // Fetch subscription using the same query as queries.ts
-                const { data: sub, error: subError } = await supabaseClient.from('subscriptions').select('*, prices(*)').in('status', ['trialing', 'active']).maybeSingle();
+                const { data: sub, error: subError } = await supabaseClient
+                    .from('subscriptions')
+                    .select('*, prices(*)')
+                    .in('status', ['trialing', 'active'])
+                    .maybeSingle();
 
                 // console.log('Subscription query:', {
                 //     userId: user.id,
@@ -79,7 +86,11 @@ export default function SupabaseProvider({ children, initialUser }: { children: 
                 setSubscription(sub);
 
                 // Fetch discord connection
-                const { data: discord } = await supabaseClient.from('discord_connections').select('*').eq('user_id', user.id).single();
+                const { data: discord } = await supabaseClient
+                    .from('discord_connections')
+                    .select('*')
+                    .eq('user_id', user.id)
+                    .single();
 
                 setUserDetails(details);
                 setDiscordConnection(discord);
@@ -135,7 +146,8 @@ export default function SupabaseProvider({ children, initialUser }: { children: 
                 discordConnection,
                 isLoading,
                 signOut,
-            }}>
+            }}
+        >
             {children}
         </AuthContext.Provider>
     );

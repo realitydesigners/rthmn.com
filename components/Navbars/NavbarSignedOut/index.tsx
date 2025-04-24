@@ -1,18 +1,18 @@
 'use client';
-import { useEffect, useRef, useState, type FC } from 'react';
+import { LogoIcon } from '@/components/Icons/icons';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/providers/SupabaseProvider';
+import type { User } from '@supabase/supabase-js';
+import { motion } from 'framer-motion';
+import { AnimatePresence } from 'motion/react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User } from '@supabase/supabase-js';
-import { motion } from 'framer-motion';
-import { AnimatePresence } from 'motion/react';
-import { LogoIcon } from '@/components/Icons/icons';
-import { useAuth } from '@/providers/SupabaseProvider';
-import { createClient } from '@/lib/supabase/client';
-import { allLinks, LinkItem } from './allLinks';
-import styles from './styles.module.css';
-import { HiChevronRight } from 'react-icons/hi';
+import { type FC, useEffect, useRef, useState } from 'react';
 import { FaGithub, FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
+import { HiChevronRight } from 'react-icons/hi';
+import { type LinkItem, allLinks } from './allLinks';
+import styles from './styles.module.css';
 
 interface NavbarSignedOutProps {
     user: User | null;
@@ -47,17 +47,37 @@ const Links = () => {
     return (
         <div className='group relative' onMouseLeave={handleMouseLeave}>
             <div className='font-outfit flex'>
-                <NavButton href='/pricing' onMouseEnter={() => handleMouseEnter('pricing')} onClick={handleLinkClick} custom={0}>
+                <NavButton
+                    href='/pricing'
+                    onMouseEnter={() => handleMouseEnter('pricing')}
+                    onClick={handleLinkClick}
+                    custom={0}
+                >
                     Pricing
                 </NavButton>
-                <NavButton href='/' onMouseEnter={() => handleMouseEnter('company')} onClick={handleLinkClick} custom={1}>
+                <NavButton
+                    href='/'
+                    onMouseEnter={() => handleMouseEnter('company')}
+                    onClick={handleLinkClick}
+                    custom={1}
+                >
                     Company
                 </NavButton>
-                <NavButton href='/' onMouseEnter={() => handleMouseEnter('resources')} onClick={handleLinkClick} custom={3}>
+                <NavButton
+                    href='/'
+                    onMouseEnter={() => handleMouseEnter('resources')}
+                    onClick={handleLinkClick}
+                    custom={3}
+                >
                     Resources
                 </NavButton>
             </div>
-            <DesktopMenuContent activeDropdown={activeDropdown} onMouseEnter={() => {}} onMouseLeave={handleMouseLeave} onLinkClick={handleLinkClick} />
+            <DesktopMenuContent
+                activeDropdown={activeDropdown}
+                onMouseEnter={() => {}}
+                onMouseLeave={handleMouseLeave}
+                onLinkClick={handleLinkClick}
+            />
         </div>
     );
 };
@@ -129,7 +149,11 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     // Check routes after all hooks are declared
     const protectedRoutes = ['/dashboard', '/onboarding', '/admin', '/account', '/studio', '/signals', '/support'];
     const isUserRoute =
-        pathname.startsWith('/(user)') || pathname.startsWith('/pair/') || pathname.startsWith('/studio/') || pathname.startsWith('/admin') || protectedRoutes.includes(pathname);
+        pathname.startsWith('/(user)') ||
+        pathname.startsWith('/pair/') ||
+        pathname.startsWith('/studio/') ||
+        pathname.startsWith('/admin') ||
+        protectedRoutes.includes(pathname);
     if (isUserRoute) {
         return null;
     }
@@ -182,7 +206,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 className={`fixed top-0 right-0 left-0 z-50 z-1001 h-16 bg-linear-to-b from-black via-black/50 to-transparent font-mono lg:h-20`}
                 initial='hidden'
                 animate='visible'
-                variants={navVariants}>
+                variants={navVariants}
+            >
                 <div className='relative mx-auto h-full w-full lg:w-11/12'>
                     <div className='grid h-full grid-cols-3 items-center'>
                         <Link href='/' className='z-50 flex items-center gap-2 justify-self-start pl-4 xl:pl-0'>
@@ -207,7 +232,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                         target='_blank'
                                         rel='noopener noreferrer'
                                         className='text-gray-400 transition-colors duration-200 hover:text-white'
-                                        aria-label={item.name}>
+                                        aria-label={item.name}
+                                    >
                                         <item.icon className='h-5 w-5' />
                                     </a>
                                 ))}
@@ -217,7 +243,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                     <div className='flex items-center gap-3'>
                                         <Link
                                             href='/dashboard'
-                                            className='font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                            className='font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'
+                                        >
                                             <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
                                                 Dashboard
                                             </span>
@@ -225,11 +252,18 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                         <div className='relative' ref={dropdownRef}>
                                             <button
                                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                                className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                                className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'
+                                            >
                                                 <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]'>
                                                     <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black'>
                                                         {avatarUrl ? (
-                                                            <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
+                                                            <Image
+                                                                src={avatarUrl}
+                                                                alt='Profile'
+                                                                className='object-cover'
+                                                                width={80}
+                                                                height={80}
+                                                            />
                                                         ) : (
                                                             <span className='text-xs font-bold'>{userInitial}</span>
                                                         )}
@@ -238,17 +272,24 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                             </button>
                                             {isDropdownOpen && (
                                                 <div className='animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl'>
-                                                    <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
+                                                    <div
+                                                        className='py-1'
+                                                        role='menu'
+                                                        aria-orientation='vertical'
+                                                        aria-labelledby='options-menu'
+                                                    >
                                                         <Link
                                                             href='/account'
                                                             className='flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5'
-                                                            role='menuitem'>
+                                                            role='menuitem'
+                                                        >
                                                             Account
                                                         </Link>
                                                         <button
                                                             onClick={handleSignOut}
                                                             className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-white/5'
-                                                            role='menuitem'>
+                                                            role='menuitem'
+                                                        >
                                                             Sign out
                                                         </button>
                                                     </div>
@@ -259,7 +300,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                 ) : pathname !== '/signin' ? (
                                     <Link
                                         href='/signin'
-                                        className='font-outfit group flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                        className='font-outfit group flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'
+                                    >
                                         <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium'>
                                             Start now
                                             <HiChevronRight className='ml-1 h-4 w-4 opacity-60 transition-all duration-300 group-hover:translate-x-0.5 group-hover:opacity-100' />
@@ -280,7 +322,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                             initial={{ opacity: 0, y: -100 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -100 }}
-                            transition={{ duration: 0.3 }}>
+                            transition={{ duration: 0.3 }}
+                        >
                             <div className='flex h-full flex-col overflow-y-auto px-6'>
                                 <MobileMenuContent />
                                 <div className='mt-8'>
@@ -288,7 +331,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                         <div className='flex items-center gap-3'>
                                             <Link
                                                 href='/dashboard'
-                                                className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                                className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'
+                                            >
                                                 <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-sm font-medium'>
                                                     Dashbaord
                                                 </span>
@@ -296,11 +340,18 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                             <div className='relative' ref={dropdownRef}>
                                                 <button
                                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                                    className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                                                    className='group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'
+                                                >
                                                     <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]'>
                                                         <div className='relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black'>
                                                             {avatarUrl ? (
-                                                                <Image src={avatarUrl} alt='Profile' className='object-cover' width={80} height={80} />
+                                                                <Image
+                                                                    src={avatarUrl}
+                                                                    alt='Profile'
+                                                                    className='object-cover'
+                                                                    width={80}
+                                                                    height={80}
+                                                                />
                                                             ) : (
                                                                 <span className='text-xs font-bold'>{userInitial}</span>
                                                             )}
@@ -309,17 +360,24 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                                 </button>
                                                 {isDropdownOpen && (
                                                     <div className='animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl'>
-                                                        <div className='py-1' role='menu' aria-orientation='vertical' aria-labelledby='options-menu'>
+                                                        <div
+                                                            className='py-1'
+                                                            role='menu'
+                                                            aria-orientation='vertical'
+                                                            aria-labelledby='options-menu'
+                                                        >
                                                             <Link
                                                                 href='/account'
                                                                 className='flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5'
-                                                                role='menuitem'>
+                                                                role='menuitem'
+                                                            >
                                                                 Account
                                                             </Link>
                                                             <button
                                                                 onClick={handleSignOut}
                                                                 className='flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-white/5'
-                                                                role='menuitem'>
+                                                                role='menuitem'
+                                                            >
                                                                 Sign out
                                                             </button>
                                                         </div>
@@ -330,7 +388,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                     ) : (
                                         <Link
                                             href='/signin'
-                                            className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'>
+                                            className='font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]'
+                                        >
                                             <span className='flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium'>
                                                 Start now
                                             </span>
@@ -344,7 +403,11 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
             )}
 
             {!isproduction && (
-                <button onClick={toggleNav} className='menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden' aria-label='Toggle navigation'>
+                <button
+                    onClick={toggleNav}
+                    className='menu-icon-button z-50 flex h-14 w-14 items-center justify-center lg:hidden'
+                    aria-label='Toggle navigation'
+                >
                     {/* ... burger icon ... */}
                 </button>
             )}
@@ -371,13 +434,19 @@ const buttonVariants = {
 
 export const NavButton: FC<NavButtonProps> = ({ href, children, onMouseEnter, onClick, custom = 0 }) => {
     return (
-        <div className='relative flex h-20 items-center px-2 transition-colors duration-200 hover:text-neutral-600' onMouseEnter={onMouseEnter}>
+        <div
+            className='relative flex h-20 items-center px-2 transition-colors duration-200 hover:text-neutral-600'
+            onMouseEnter={onMouseEnter}
+        >
             <motion.div variants={buttonVariants} initial='hidden' animate='visible' custom={custom}>
                 <Link
                     href={href}
                     className='flex items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'
-                    onClick={onClick}>
-                    <span className='flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm'>{children}</span>
+                    onClick={onClick}
+                >
+                    <span className='flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm'>
+                        {children}
+                    </span>
                 </Link>
             </motion.div>
         </div>
@@ -433,8 +502,18 @@ export const DesktopMenuContent = ({ activeDropdown, onMouseEnter, onMouseLeave,
         switch (activeDropdown) {
             case 'pricing':
                 return (
-                    <div className={`${styles.dropdownContent} font-outfit w-[750px]`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onLinkClick}>
-                        <motion.div className='flex w-1/2 flex-col gap-2' variants={contentVariants} initial='hidden' animate='visible'>
+                    <div
+                        className={`${styles.dropdownContent} font-outfit w-[750px]`}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        onClick={onLinkClick}
+                    >
+                        <motion.div
+                            className='flex w-1/2 flex-col gap-2'
+                            variants={contentVariants}
+                            initial='hidden'
+                            animate='visible'
+                        >
                             {group.links.map((item, index) => (
                                 <motion.div key={item.title} variants={itemVariants}>
                                     <DropdownLink {...item} />
@@ -449,9 +528,19 @@ export const DesktopMenuContent = ({ activeDropdown, onMouseEnter, onMouseLeave,
                 );
             case 'company':
                 return (
-                    <div className={`${styles.dropdownContent} font-outfit w-[600px]`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onLinkClick}>
+                    <div
+                        className={`${styles.dropdownContent} font-outfit w-[600px]`}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        onClick={onLinkClick}
+                    >
                         <div className='w-1/3 bg-[#181818]' />
-                        <motion.div className='flex w-2/3 flex-col gap-2' variants={contentVariants} initial='hidden' animate='visible'>
+                        <motion.div
+                            className='flex w-2/3 flex-col gap-2'
+                            variants={contentVariants}
+                            initial='hidden'
+                            animate='visible'
+                        >
                             {group.links.map((item, index) => (
                                 <motion.div key={item.title} variants={itemVariants}>
                                     <DropdownLink {...item} />
@@ -463,8 +552,18 @@ export const DesktopMenuContent = ({ activeDropdown, onMouseEnter, onMouseLeave,
 
             case 'resources':
                 return (
-                    <div className={`${styles.dropdownContent} font-outfit w-[700px]`} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} onClick={onLinkClick}>
-                        <motion.div className='flex w-1/2 flex-col gap-2' variants={contentVariants} initial='hidden' animate='visible'>
+                    <div
+                        className={`${styles.dropdownContent} font-outfit w-[700px]`}
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                        onClick={onLinkClick}
+                    >
+                        <motion.div
+                            className='flex w-1/2 flex-col gap-2'
+                            variants={contentVariants}
+                            initial='hidden'
+                            animate='visible'
+                        >
                             {group.links.map((item, index) => (
                                 <motion.div key={item.title} variants={itemVariants}>
                                     <DropdownLink {...item} />
@@ -492,7 +591,8 @@ export const DesktopMenuContent = ({ activeDropdown, onMouseEnter, onMouseLeave,
                     variants={dropdownVariants}
                     initial='hidden'
                     animate='visible'
-                    exit='exit'>
+                    exit='exit'
+                >
                     {renderDropdownContent()}
                 </motion.div>
             )}
@@ -526,7 +626,8 @@ export const MobileMenuContent = () => {
                         target='_blank'
                         rel='noopener noreferrer'
                         className='text-neutral-400 transition-colors duration-200 hover:text-white'
-                        aria-label={item.name}>
+                        aria-label={item.name}
+                    >
                         <item.icon className='h-6 w-6' />
                     </a>
                 ))}

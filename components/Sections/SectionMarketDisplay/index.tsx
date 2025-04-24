@@ -1,11 +1,11 @@
 'use client';
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { StartButton } from '@/components/Sections/StartNowButton';
+import type { CandleData } from '@/types/types';
 import { motion } from 'framer-motion';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { FaPlay } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
-import { StartButton } from '@/components/Sections/StartNowButton';
-import { CandleData } from '@/types/types';
 
 // Types
 interface MarketData {
@@ -91,7 +91,7 @@ const CARD_ANIMATION = {
 };
 
 // Re-add helper function to add random jitter
-const addRandomJitter = (value: number, maxOffsetScale: number = 0.0001): number => {
+const addRandomJitter = (value: number, maxOffsetScale = 0.0001): number => {
     if (typeof value !== 'number' || !isFinite(value)) return value;
     const valueString = String(value);
     const decimalIndex = valueString.indexOf('.');
@@ -100,7 +100,7 @@ const addRandomJitter = (value: number, maxOffsetScale: number = 0.0001): number
     const maxOffset = Math.abs(value * maxOffsetScale);
     const offset = (Math.random() - 0.5) * 2 * maxOffset;
     const newValue = value + offset;
-    return parseFloat(newValue.toFixed(precision));
+    return Number.parseFloat(newValue.toFixed(precision));
 };
 
 // Memoize the MarketHeading component
@@ -114,7 +114,8 @@ const MarketHeading = memo(() => (
                     Unlock Your Edge.
                 </h2>
                 <p className='font-outfit text-md text-neutral-gradient mx-auto max-w-2xl px-4 sm:text-lg lg:text-2xl'>
-                    Enter a new dimension to trading and discover the same patterns you already trade, visualized in a way never seen before.
+                    Enter a new dimension to trading and discover the same patterns you already trade, visualized in a
+                    way never seen before.
                 </p>
             </div>
 
@@ -152,7 +153,13 @@ const SparklineChart = memo(({ data, change }: { data: number[]; change: number 
 
     return (
         <div ref={ref} className='h-full w-full'>
-            <svg width='100%' height='100%' viewBox='0 0 200 60' preserveAspectRatio='none' className='overflow-visible'>
+            <svg
+                width='100%'
+                height='100%'
+                viewBox='0 0 200 60'
+                preserveAspectRatio='none'
+                className='overflow-visible'
+            >
                 <defs>
                     <linearGradient id={`gradient-${change}`} x1='0' y1='0' x2='0' y2='1'>
                         <stop offset='0%' stopColor={change >= 0 ? '#4ade80' : '#f87171'} stopOpacity='0.8' />
@@ -185,7 +192,10 @@ const SparklineChart = memo(({ data, change }: { data: number[]; change: number 
                 {data.length > 0 && (
                     <circle
                         cx={200}
-                        cy={60 - ((data[data.length - 1] - Math.min(...data)) / (Math.max(...data) - Math.min(...data))) * 60}
+                        cy={
+                            60 -
+                            ((data[data.length - 1] - Math.min(...data)) / (Math.max(...data) - Math.min(...data))) * 60
+                        }
                         r='3'
                         fill={change >= 0 ? '#4ade80' : '#f87171'}
                         className={inView ? 'animate-dotAppear' : 'opacity-0'}
@@ -223,11 +233,17 @@ const CardContent = memo(({ item, data }: { item: MarketData; data: ProcessedMar
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className={`rounded-full px-2 py-0.5 text-xs ${data.change >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}>
+                    className={`rounded-full px-2 py-0.5 text-xs ${data.change >= 0 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-red-500/20 text-red-400'}`}
+                >
                     {data.change.toFixed(2)}%
                 </motion.div>
             </div>
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className='mb-3 text-xl font-bold text-white tabular-nums'>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className='mb-3 text-xl font-bold text-white tabular-nums'
+            >
                 {data.price.toFixed(item.pair.includes('JPY') ? 3 : 5)}
             </motion.div>
             <div className='h-12 w-full'>
@@ -276,101 +292,109 @@ const useAnimationProgress = (duration: number) => {
 };
 
 // 2. Create a memoized transform component to handle card positioning
-const CardTransform = memo(({ children, position, index, change }: { children: React.ReactNode; position: CardPosition; index: number; change: number }) => {
-    const [isMobile, setIsMobile] = useState(false);
+const CardTransform = memo(
+    ({
+        children,
+        position,
+        index,
+        change,
+    }: { children: React.ReactNode; position: CardPosition; index: number; change: number }) => {
+        const [isMobile, setIsMobile] = useState(false);
 
-    useEffect(() => {
-        const checkMobile = () => {
-            setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
+        useEffect(() => {
+            const checkMobile = () => {
+                setIsMobile(window.innerWidth < 768); // Adjust breakpoint as needed
+            };
+
+            checkMobile();
+            window.addEventListener('resize', checkMobile);
+            return () => window.removeEventListener('resize', checkMobile);
+        }, []);
+
+        const floatAnimation: FloatAnimation = useMemo(
+            () => ({
+                y: {
+                    duration: FLOAT_ANIMATION.duration.min + (index % 3),
+                    delay: index * FLOAT_ANIMATION.delay.min,
+                },
+                x: {
+                    duration: FLOAT_ANIMATION.duration.max + (index % 2),
+                    delay: index * FLOAT_ANIMATION.delay.max,
+                },
+            }),
+            [index]
+        );
+
+        // Calculate final positions based on mobile state
+        const targetX = isMobile ? position.x : position.x * POSITION_SCALE.DESKTOP;
+        const targetY = isMobile ? position.y : position.y * POSITION_SCALE.DESKTOP;
+
+        // Define animation variants based on mobile state
+        const animateProps = {
+            y: isMobile ? targetY : targetY + Math.sin(index * 0.8) * CARD_ANIMATION.FLOAT_RANGE.y,
+            x: isMobile ? targetX : targetX + Math.cos(index * 0.5) * CARD_ANIMATION.FLOAT_RANGE.x,
+            opacity: 1,
+            transition: isMobile
+                ? {
+                      // Mobile: Simple fade-in
+                      opacity: {
+                          duration: 0.5,
+                          delay: index * 0.1,
+                      },
+                  }
+                : {
+                      // Desktop: Floating + fade-in
+                      y: {
+                          duration: floatAnimation.y.duration,
+                          repeat: Number.POSITIVE_INFINITY,
+                          repeatType: 'reverse',
+                          ease: 'easeInOut',
+                          delay: floatAnimation.y.delay,
+                      },
+                      x: {
+                          duration: floatAnimation.x.duration,
+                          repeat: Number.POSITIVE_INFINITY,
+                          repeatType: 'reverse',
+                          ease: 'easeInOut',
+                          delay: floatAnimation.x.delay,
+                      },
+                      opacity: {
+                          duration: 0.5,
+                          delay: index * 0.1,
+                      },
+                  },
         };
 
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
-
-    const floatAnimation: FloatAnimation = useMemo(
-        () => ({
-            y: {
-                duration: FLOAT_ANIMATION.duration.min + (index % 3),
-                delay: index * FLOAT_ANIMATION.delay.min,
-            },
-            x: {
-                duration: FLOAT_ANIMATION.duration.max + (index % 2),
-                delay: index * FLOAT_ANIMATION.delay.max,
-            },
-        }),
-        [index]
-    );
-
-    // Calculate final positions based on mobile state
-    const targetX = isMobile ? position.x : position.x * POSITION_SCALE.DESKTOP;
-    const targetY = isMobile ? position.y : position.y * POSITION_SCALE.DESKTOP;
-
-    // Define animation variants based on mobile state
-    const animateProps = {
-        y: isMobile ? targetY : targetY + Math.sin(index * 0.8) * CARD_ANIMATION.FLOAT_RANGE.y,
-        x: isMobile ? targetX : targetX + Math.cos(index * 0.5) * CARD_ANIMATION.FLOAT_RANGE.x,
-        opacity: 1,
-        transition: isMobile
-            ? {
-                  // Mobile: Simple fade-in
-                  opacity: {
-                      duration: 0.5,
-                      delay: index * 0.1,
-                  },
-              }
-            : {
-                  // Desktop: Floating + fade-in
-                  y: {
-                      duration: floatAnimation.y.duration,
-                      repeat: Infinity,
-                      repeatType: 'reverse',
-                      ease: 'easeInOut',
-                      delay: floatAnimation.y.delay,
-                  },
-                  x: {
-                      duration: floatAnimation.x.duration,
-                      repeat: Infinity,
-                      repeatType: 'reverse',
-                      ease: 'easeInOut',
-                      delay: floatAnimation.x.delay,
-                  },
-                  opacity: {
-                      duration: 0.5,
-                      delay: index * 0.1,
-                  },
-              },
-    };
-
-    return (
-        <motion.div
-            className='absolute top-1/2 left-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]'
-            initial={{
-                x: targetX,
-                y: targetY,
-                z: position.z, // Use z directly
-                scale: CARD_ANIMATION.INITIAL_SCALE,
-                rotateX: (index % 3) * CARD_ANIMATION.ROTATION.x,
-                rotateY: (index % 2) * CARD_ANIMATION.ROTATION.y,
-                opacity: 0,
-            }}
-            animate={animateProps} // Use the conditional animateProps
-            whileHover={{
-                scale: CARD_ANIMATION.HOVER_SCALE,
-                z: position.z + 100, // Use z directly
-                rotateX: 0,
-                rotateY: 0,
-                transition: HOVER_TRANSITION,
-            }}
-            style={{
-                transformStyle: 'preserve-3d',
-                backfaceVisibility: 'hidden',
-            }}>
-            {children}
-        </motion.div>
-    );
-});
+        return (
+            <motion.div
+                className='absolute top-1/2 left-1/2 h-[130px] w-[160px] -translate-x-1/2 -translate-y-1/2 cursor-pointer will-change-transform sm:h-[160px] sm:w-[180px]'
+                initial={{
+                    x: targetX,
+                    y: targetY,
+                    z: position.z, // Use z directly
+                    scale: CARD_ANIMATION.INITIAL_SCALE,
+                    rotateX: (index % 3) * CARD_ANIMATION.ROTATION.x,
+                    rotateY: (index % 2) * CARD_ANIMATION.ROTATION.y,
+                    opacity: 0,
+                }}
+                animate={animateProps} // Use the conditional animateProps
+                whileHover={{
+                    scale: CARD_ANIMATION.HOVER_SCALE,
+                    z: position.z + 100, // Use z directly
+                    rotateX: 0,
+                    rotateY: 0,
+                    transition: HOVER_TRANSITION,
+                }}
+                style={{
+                    transformStyle: 'preserve-3d',
+                    backfaceVisibility: 'hidden',
+                }}
+            >
+                {children}
+            </motion.div>
+        );
+    }
+);
 
 CardTransform.displayName = 'CardTransform';
 
@@ -392,13 +416,16 @@ const useProcessedMarketData = (marketData: MarketData[], progress: number) => {
 
                         const latest = animatedData[animatedData.length - 1];
                         const first = data[0];
-                        const change = ((parseFloat(latest.mid.c) - parseFloat(first.mid.o)) / parseFloat(first.mid.o)) * 100;
+                        const change =
+                            ((Number.parseFloat(latest.mid.c) - Number.parseFloat(first.mid.o)) /
+                                Number.parseFloat(first.mid.o)) *
+                            100;
 
                         const processed = {
-                            price: parseFloat(latest.mid.c),
+                            price: Number.parseFloat(latest.mid.c),
                             change,
                             volume: latest.volume,
-                            points: animatedData.map((d) => parseFloat(d.mid.c)),
+                            points: animatedData.map((d) => Number.parseFloat(d.mid.c)),
                         };
 
                         cache.set(cacheKey, processed);
@@ -516,7 +543,12 @@ export const SectionMarketDisplay = memo(({ marketData }: { marketData: MarketDa
                             displayData.map(({ item, data }, index) => {
                                 if (!data) return null;
                                 return (
-                                    <CardTransform key={item.pair} position={chosenPositions[index] || DEFAULT_POSITION} index={index} change={data.change}>
+                                    <CardTransform
+                                        key={item.pair}
+                                        position={chosenPositions[index] || DEFAULT_POSITION}
+                                        index={index}
+                                        change={data.change}
+                                    >
                                         <div className='relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80'>
                                             <CardContent item={item} data={data} />
                                         </div>

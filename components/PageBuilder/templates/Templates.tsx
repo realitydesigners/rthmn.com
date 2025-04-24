@@ -1,5 +1,5 @@
-import React from 'react';
 import { generateHeadingId } from '@/app/learn/_components/TOC';
+import React from 'react';
 import AudioRefBlock from '../nested/AudioRefBlock';
 import ImageRefBlock from '../nested/ImageRefBlock';
 import InternalLink from '../nested/InternalLink';
@@ -33,7 +33,7 @@ const NormalText: React.FC<{
     const className = normalTextStyles[theme];
 
     if (value?.style?.match(/^h[1-6]$/)) {
-        const level = parseInt(value.style[1]);
+        const level = Number.parseInt(value.style[1]);
         const textContent = React.Children.toArray(children)
             .map((child) => {
                 if (typeof child === 'string') return child;

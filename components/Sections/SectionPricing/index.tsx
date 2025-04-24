@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
-import type { User } from '@supabase/supabase-js';
-import { motion } from 'framer-motion';
-import { FaArrowRight, FaCheck } from 'react-icons/fa';
-import { getErrorRedirect } from '@/utils/helpers';
 import { getStripe } from '@/lib/stripe/client';
 import { checkoutWithStripe } from '@/lib/stripe/server';
+import { getErrorRedirect } from '@/utils/helpers';
+import type { User } from '@supabase/supabase-js';
+import { motion } from 'framer-motion';
+import { usePathname, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FaArrowRight, FaCheck } from 'react-icons/fa';
 
 type Subscription = any;
 type Product = any;
@@ -68,7 +68,13 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
         if (!sessionId) {
             setPriceIdLoading(undefined);
-            return router.push(getErrorRedirect(currentPath, 'An unknown error occurred.', 'Please try again later or contact a system administrator.'));
+            return router.push(
+                getErrorRedirect(
+                    currentPath,
+                    'An unknown error occurred.',
+                    'Please try again later or contact a system administrator.'
+                )
+            );
         }
 
         const stripe = await getStripe();
@@ -94,13 +100,27 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
             <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
                 {/* Enhanced Header Section */}
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className='mx-auto mb-12 max-w-3xl text-center'>
-                    <h1 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Elevate Your Trading Strategy</h1>
-                    <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>Join an elite community of traders using trading tools from the future.</p>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className='mx-auto mb-12 max-w-3xl text-center'
+                >
+                    <h1 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>
+                        Elevate Your Trading Strategy
+                    </h1>
+                    <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>
+                        Join an elite community of traders using trading tools from the future.
+                    </p>
                 </motion.div>
 
                 {/* Single Pricing Card */}
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className='mx-auto max-w-2xl'>
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className='mx-auto max-w-2xl'
+                >
                     <div className='relative overflow-hidden rounded-xl border border-white/10 bg-black/40 shadow-xl inset-shadow-sm shadow-black/20 inset-shadow-white/5 backdrop-blur-sm'>
                         {/* Enhanced glow effects */}
                         <div className='pointer-events-none absolute inset-0'>
@@ -127,7 +147,8 @@ export function SectionPricing({ user, products, subscription }: Props) {
                                     {PricingBenefits.map((benefit, index) => (
                                         <div
                                             key={index}
-                                            className='flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-neutral-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10'>
+                                            className='flex w-auto items-center gap-3 rounded-lg p-2 px-2 text-neutral-400 transition-all duration-300 hover:bg-white/5 hover:inset-shadow-2xs hover:inset-shadow-white/10'
+                                        >
                                             <div className='flex h-6 w-6 items-center justify-center rounded-full bg-white/5 shadow-sm inset-shadow-xs inset-shadow-white/10'>
                                                 <FaCheck className='h-3 w-3 text-emerald-400' />
                                             </div>
@@ -141,12 +162,20 @@ export function SectionPricing({ user, products, subscription }: Props) {
                             <button
                                 onClick={() => handleStripeCheckout(price)}
                                 disabled={priceIdLoading === price.id}
-                                className='group relative flex w-full items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white shadow-lg ring-1 inset-shadow-sm inset-ring shadow-black/20 ring-white/10 inset-shadow-white/10 inset-ring-white/5 transition-all duration-300 hover:from-[#444444] hover:to-[#282828] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50'>
+                                className='group relative flex w-full items-center justify-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white shadow-lg ring-1 inset-shadow-sm inset-ring shadow-black/20 ring-white/10 inset-shadow-white/10 inset-ring-white/5 transition-all duration-300 hover:from-[#444444] hover:to-[#282828] hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50'
+                            >
                                 <span className='font-outfit relative flex w-full items-center justify-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-lg font-medium transition-all duration-300 group-hover:inset-shadow-sm group-hover:inset-shadow-white/5'>
                                     {priceIdLoading === price.id ? (
                                         <span className='flex items-center gap-2'>
                                             <svg className='h-4 w-4 animate-spin' viewBox='0 0 24 24'>
-                                                <circle className='opacity-25' cx='12' cy='12' r='10' stroke='currentColor' strokeWidth='4' />
+                                                <circle
+                                                    className='opacity-25'
+                                                    cx='12'
+                                                    cy='12'
+                                                    r='10'
+                                                    stroke='currentColor'
+                                                    strokeWidth='4'
+                                                />
                                                 <path
                                                     className='opacity-75'
                                                     fill='currentColor'

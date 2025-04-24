@@ -195,7 +195,7 @@ export function MarketWall({ marketData }: { marketData: MarketData[] }) {
             // Label with smaller glow
             const labelText = cell.tradeType;
             const mainTextWidth = ctx.measureText(text).width;
-            const labelY = cell.y + parseInt(BASE_FONT_SIZE) + LABEL_SPACING;
+            const labelY = cell.y + Number.parseInt(BASE_FONT_SIZE) + LABEL_SPACING;
             const labelX = cell.x + (mainTextWidth - ctx.measureText(labelText).width) / 2;
 
             // Multiple glow layers for label
@@ -238,7 +238,11 @@ export function MarketWall({ marketData }: { marketData: MarketData[] }) {
         const currentTime = Date.now();
 
         // Only add new signals if we have processed data
-        if (processedDataRef.current.length > 0 && cellsRef.current.length < MAX_SIGNALS && Math.random() < HIGHLIGHT_CHANCE) {
+        if (
+            processedDataRef.current.length > 0 &&
+            cellsRef.current.length < MAX_SIGNALS &&
+            Math.random() < HIGHLIGHT_CHANCE
+        ) {
             let position;
             do {
                 position = getRandomPosition(ctx);

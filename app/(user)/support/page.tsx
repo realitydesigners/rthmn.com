@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { Database } from '@/types/supabase';
-import { LuHelpCircle, LuMessageSquare, LuPlus, LuUser } from 'react-icons/lu';
 import { FAQBlock } from '@/components/PageBuilder/blocks/faqBlock';
 import { sanityFetch } from '@/lib/sanity/lib/client';
+import { createClient } from '@/lib/supabase/client';
+import { useAuth } from '@/providers/SupabaseProvider';
+import type { Database } from '@/types/supabase';
 import { cn } from '@/utils/cn';
 import Image from 'next/image';
-import { useAuth } from '@/providers/SupabaseProvider';
+import { useEffect, useState } from 'react';
+import { LuHelpCircle, LuMessageSquare, LuPlus, LuUser } from 'react-icons/lu';
 
 type SupportThread = Database['public']['Tables']['support_threads']['Row'];
 type Message = Database['public']['Tables']['support_messages']['Row'];
@@ -28,15 +28,32 @@ const MessageBubble = ({ message, isUser }: { message: Message; isUser: boolean 
         <div className={cn('flex items-end gap-2', isUser ? 'flex-row-reverse' : 'flex-row')}>
             <div className='flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-[#111]'>
                 {userDetails?.avatar_url && isUser ? (
-                    <Image src={userDetails.avatar_url} alt={message.sender_name} width={32} height={32} className='h-full w-full object-cover' />
+                    <Image
+                        src={userDetails.avatar_url}
+                        alt={message.sender_name}
+                        width={32}
+                        height={32}
+                        className='h-full w-full object-cover'
+                    />
                 ) : (
                     <LuUser className='h-4 w-4 text-white/50' />
                 )}
             </div>
-            <div className={cn('group relative max-w-[80%] space-y-1 rounded-2xl px-4 py-3', isUser ? 'bg-emerald-500/10' : 'bg-white/5', 'transition-all duration-200')}>
+            <div
+                className={cn(
+                    'group relative max-w-[80%] space-y-1 rounded-2xl px-4 py-3',
+                    isUser ? 'bg-emerald-500/10' : 'bg-white/5',
+                    'transition-all duration-200'
+                )}
+            >
                 <div className='flex items-center gap-2'>
                     <div className='font-outfit text-sm font-medium text-white/90'>{message.sender_name}</div>
-                    <div className='font-outfit text-xs text-white/40'>{new Date(message.created_at || '').toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                    <div className='font-outfit text-xs text-white/40'>
+                        {new Date(message.created_at || '').toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                        })}
+                    </div>
                 </div>
                 <div className='font-outfit text-sm text-white/80'>{message.content}</div>
             </div>
@@ -84,7 +101,11 @@ export default function SupportPage() {
             } = await supabase.auth.getUser();
             if (!user) return;
 
-            const { data, error } = await supabase.from('support_threads').select('*').eq('user_id', user.id).order('last_message_time', { ascending: false });
+            const { data, error } = await supabase
+                .from('support_threads')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('last_message_time', { ascending: false });
 
             if (error) {
                 console.error('Error fetching threads:', error);
@@ -110,7 +131,11 @@ export default function SupportPage() {
                     if (payload.eventType === 'INSERT') {
                         setThreads((prev) => [payload.new as SupportThread, ...prev]);
                     } else if (payload.eventType === 'UPDATE') {
-                        setThreads((prev) => prev.map((thread) => (thread.id === payload.new.id ? (payload.new as SupportThread) : thread)));
+                        setThreads((prev) =>
+                            prev.map((thread) =>
+                                thread.id === payload.new.id ? (payload.new as SupportThread) : thread
+                            )
+                        );
                     }
                 }
             )
@@ -125,7 +150,11 @@ export default function SupportPage() {
         if (!selectedThread) return;
 
         const fetchMessages = async () => {
-            const { data, error } = await supabase.from('support_messages').select('*').eq('thread_id', selectedThread.id).order('created_at', { ascending: true });
+            const { data, error } = await supabase
+                .from('support_messages')
+                .select('*')
+                .eq('thread_id', selectedThread.id)
+                .order('created_at', { ascending: true });
 
             if (error) {
                 console.error('Error fetching messages:', error);
@@ -249,7 +278,8 @@ export default function SupportPage() {
                         <div>
                             <button
                                 onClick={() => setIsCreatingThread(true)}
-                                className='group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] lg:w-auto'>
+                                className='group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] lg:w-auto'
+                            >
                                 <LuPlus className='h-4 w-4 text-white' />
                                 <span className='font-outfit'>Create New Support Thread</span>
                             </button>
@@ -258,15 +288,24 @@ export default function SupportPage() {
                                     <div
                                         key={thread.id}
                                         onClick={() => setSelectedThread(thread)}
-                                        className='cursor-pointer rounded-lg border border-white/5 bg-[#111] p-4 transition-all duration-200 hover:bg-[#151515]'>
+                                        className='cursor-pointer rounded-lg border border-white/5 bg-[#111] p-4 transition-all duration-200 hover:bg-[#151515]'
+                                    >
                                         <div className='flex items-center justify-between'>
                                             <div className='flex items-center gap-3'>
                                                 <LuMessageSquare className='h-4 w-4 text-zinc-400' />
-                                                <h3 className='font-outfit text-white'>{thread.subject || 'No Subject'}</h3>
+                                                <h3 className='font-outfit text-white'>
+                                                    {thread.subject || 'No Subject'}
+                                                </h3>
                                             </div>
-                                            <span className='font-outfit text-sm text-zinc-400'>{new Date(thread.last_message_time || '').toLocaleDateString()}</span>
+                                            <span className='font-outfit text-sm text-zinc-400'>
+                                                {new Date(thread.last_message_time || '').toLocaleDateString()}
+                                            </span>
                                         </div>
-                                        {thread.last_message && <p className='font-outfit mt-2 text-sm text-zinc-400'>{thread.last_message}</p>}
+                                        {thread.last_message && (
+                                            <p className='font-outfit mt-2 text-sm text-zinc-400'>
+                                                {thread.last_message}
+                                            </p>
+                                        )}
                                         <div className='mt-2 flex items-center gap-2'>
                                             {thread.status === 'open' ? (
                                                 <span className='font-outfit text-xs text-emerald-400'>Open</span>
@@ -296,7 +335,8 @@ export default function SupportPage() {
                                     type='submit'
                                     onClick={handleCreateThread}
                                     disabled={isLoading}
-                                    className='font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] disabled:opacity-50'>
+                                    className='font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] disabled:opacity-50'
+                                >
                                     {isLoading ? 'Creating...' : 'Create Thread'}
                                 </button>
                                 <button
@@ -306,7 +346,8 @@ export default function SupportPage() {
                                         setError(null);
                                     }}
                                     disabled={isLoading}
-                                    className='font-outfit flex w-full items-center justify-center rounded-lg border border-white/10 px-6 py-3 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50'>
+                                    className='font-outfit flex w-full items-center justify-center rounded-lg border border-white/10 px-6 py-3 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50'
+                                >
                                     Cancel
                                 </button>
                             </div>
@@ -319,14 +360,21 @@ export default function SupportPage() {
                                         <LuMessageSquare className='h-4 w-4 text-zinc-400' />
                                         <h2 className='font-outfit text-white'>{selectedThread.subject}</h2>
                                     </div>
-                                    <button onClick={() => setSelectedThread(null)} className='font-outfit text-sm text-zinc-400 transition-colors hover:text-white'>
+                                    <button
+                                        onClick={() => setSelectedThread(null)}
+                                        className='font-outfit text-sm text-zinc-400 transition-colors hover:text-white'
+                                    >
                                         Back
                                     </button>
                                 </div>
                             </div>
                             <div className='scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 flex-1 space-y-4 overflow-y-auto p-4'>
                                 {messages.map((message) => (
-                                    <MessageBubble key={message.id} message={message} isUser={message.sender_type === 'user'} />
+                                    <MessageBubble
+                                        key={message.id}
+                                        message={message}
+                                        isUser={message.sender_type === 'user'}
+                                    />
                                 ))}
                             </div>
                             <form onSubmit={handleSendMessage} className='border-t border-white/5 p-4'>
@@ -340,7 +388,8 @@ export default function SupportPage() {
                                     />
                                     <button
                                         type='submit'
-                                        className='font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818]'>
+                                        className='font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818]'
+                                    >
                                         Send
                                     </button>
                                 </div>
@@ -351,7 +400,9 @@ export default function SupportPage() {
             </div>
 
             {/* FAQ Section */}
-            {!selectedThread && !isCreatingThread && <FAQBlock _type='faqBlock' _key='support-faq' title='Frequently Asked Questions' items={faqs} />}
+            {!selectedThread && !isCreatingThread && (
+                <FAQBlock _type='faqBlock' _key='support-faq' title='Frequently Asked Questions' items={faqs} />
+            )}
         </div>
     );
 }

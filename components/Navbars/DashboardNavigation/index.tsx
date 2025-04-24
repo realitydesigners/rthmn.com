@@ -1,17 +1,18 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
-import { usePathname, useRouter } from 'next/navigation';
-import { IconType } from 'react-icons';
-import { LuSearch, LuSettings, LuHelpCircle } from 'react-icons/lu';
 import { PairNavigator } from '@/components/Navbars/DashboardNavigation/PairNavigator';
 import { ProfilePanel } from '@/components/Navbars/DashboardNavigation/ProfilePanel';
 import { SettingsBar } from '@/components/Panels/BoxUXPanel';
+import SupportPanel from '@/components/Panels/SupportPanel';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useAuth } from '@/providers/SupabaseProvider';
-import { useScrollDirection } from '@/hooks/useScrollDirection';
-import SupportPanel from '@/components/Panels/SupportPanel';
+import Image from 'next/image';
+import { usePathname, useRouter } from 'next/navigation';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { IconType } from 'react-icons';
+import { LuHelpCircle, LuSearch, LuSettings } from 'react-icons/lu';
 
 type Panel = 'pairs' | 'settings' | 'alerts' | 'profile' | 'support' | null;
 
@@ -29,11 +30,18 @@ const ProfileIcon = ({ setActivePanel }: { setActivePanel: (panel: Panel) => voi
                     setIsDropdownOpen(!isDropdownOpen);
                     setActivePanel('profile');
                 }}
-                className='group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
+                className='group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'
+            >
                 <div className='flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]'>
                     <div className='relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-black'>
                         {userDetails?.avatar_url ? (
-                            <Image src={userDetails.avatar_url} alt='Profile' className='object-cover' width={80} height={80} />
+                            <Image
+                                src={userDetails.avatar_url}
+                                alt='Profile'
+                                className='object-cover'
+                                width={80}
+                                height={80}
+                            />
                         ) : (
                             <span className='text-lg font-bold'>{userInitial}</span>
                         )}
@@ -127,36 +135,58 @@ export const DashboardNavigation = () => {
     return (
         <>
             <div
-                className={`fixed inset-0 z-[2040] transition-all duration-500 ease-in-out ${activePanel ? 'pointer-events-auto bg-black/80' : 'pointer-events-none bg-transparent'}`}>
+                className={`fixed inset-0 z-[2040] transition-all duration-500 ease-in-out ${activePanel ? 'pointer-events-auto bg-black/80' : 'pointer-events-none bg-transparent'}`}
+            >
                 {renderPanel()}
             </div>
 
             <div
                 className={`fixed bottom-4 left-1/2 z-[2060] flex -translate-x-1/2 transform transition-all duration-500 ease-in-out lg:hidden ${
                     scrollDirection === 'down' ? 'translate-y-24' : 'translate-y-0'
-                }`}>
+                }`}
+            >
                 <div className='flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2'>
                     <ProfileIcon setActivePanel={setActivePanel} />
-                    <SidebarIconButton icon={LuSearch} isActive={activePanel === 'pairs'} onClick={() => handleButtonClick('pairs')} />
-                    <SidebarIconButton icon={LuHelpCircle} isActive={activePanel === 'support'} onClick={() => handleButtonClick('support')} />
-                    <SidebarIconButton icon={LuSettings} isActive={activePanel === 'settings'} onClick={() => handleButtonClick('settings')} />
+                    <SidebarIconButton
+                        icon={LuSearch}
+                        isActive={activePanel === 'pairs'}
+                        onClick={() => handleButtonClick('pairs')}
+                    />
+                    <SidebarIconButton
+                        icon={LuHelpCircle}
+                        isActive={activePanel === 'support'}
+                        onClick={() => handleButtonClick('support')}
+                    />
+                    <SidebarIconButton
+                        icon={LuSettings}
+                        isActive={activePanel === 'settings'}
+                        onClick={() => handleButtonClick('settings')}
+                    />
                 </div>
             </div>
         </>
     );
 };
 
-const SidebarIconButton = ({ icon: Icon, isActive, onClick }: { icon: IconType; isActive: boolean; onClick: () => void }) => {
+const SidebarIconButton = ({
+    icon: Icon,
+    isActive,
+    onClick,
+}: { icon: IconType; isActive: boolean; onClick: () => void }) => {
     return (
         <button onClick={onClick} className='group relative flex items-center'>
             <div
                 className={`group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
-                    isActive ? 'from-[#444444] to-[#282828]' : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
-                }`}>
+                    isActive
+                        ? 'from-[#444444] to-[#282828]'
+                        : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
+                }`}
+            >
                 <div
                     className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] ${
                         isActive ? 'text-white' : 'text-[#818181]'
-                    }`}>
+                    }`}
+                >
                     <Icon size={24} />
                 </div>
             </div>

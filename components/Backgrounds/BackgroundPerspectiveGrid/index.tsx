@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 
 export const BackgroundPerspectiveGrid = React.memo(() => {
     const pathname = usePathname();

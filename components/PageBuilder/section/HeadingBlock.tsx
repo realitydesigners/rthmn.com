@@ -1,15 +1,19 @@
 'use client';
 
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import type React from 'react';
 
 const RenderCategory = ({ category }) => {
     if (!category) return null;
 
     return (
         <div className='my-1 flex items-center justify-center bg-linear-to-r from-blue-100/100 to-blue-100/90 p-1 pr-2 pl-2'>
-            <span className={`flex h-auto items-center justify-center text-xs font-semibold tracking-widest whitespace-nowrap text-black uppercase`}>{category.title}</span>
+            <span
+                className={`flex h-auto items-center justify-center text-xs font-semibold tracking-widest whitespace-nowrap text-black uppercase`}
+            >
+                {category.title}
+            </span>
         </div>
     );
 };
@@ -95,7 +99,9 @@ const HeadingBlock = ({ block }) => {
                         <div className='flex w-full flex-wrap p-2 lg:w-1/2'>
                             <div className='h-full w-full object-contain object-cover'>
                                 <Image src={imageUrl} alt={'this'} width={1000} height={1000} className='h-50 w-50' />
-                                <p className='flex py-2 text-xs tracking-wide text-neutral-400 uppercase'>Image Of: {imageAlt}</p>
+                                <p className='flex py-2 text-xs tracking-wide text-neutral-400 uppercase'>
+                                    Image Of: {imageAlt}
+                                </p>
                             </div>
                         </div>
                         <div className='flex-cols flex w-full justify-center p-2 pt-2 pr-4 lg:w-1/2 lg:pt-4 lg:pr-20'>

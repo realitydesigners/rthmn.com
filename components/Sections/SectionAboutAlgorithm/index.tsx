@@ -15,7 +15,8 @@ const MARKETS = [
         title: 'Stock Markets',
         icon: FaChartBar,
         stats: 'Real-time alerts',
-        description: 'Know exactly when stocks are about to break out or reverse. Avoid false signals that trap most traders.',
+        description:
+            'Know exactly when stocks are about to break out or reverse. Avoid false signals that trap most traders.',
         highlight: 'US500 • NASDAQ • DOW30',
     },
     {
@@ -38,9 +39,12 @@ export function SectionAboutAlgorithm() {
                 </div>
 
                 <div className='mb-8 text-center'>
-                    <h2 className='font-outfit bg-linear-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 text-5xl font-bold text-transparent'>Multi-Market Analysis</h2>
+                    <h2 className='font-outfit bg-linear-to-r from-white via-white/90 to-white/80 bg-clip-text py-8 text-5xl font-bold text-transparent'>
+                        Multi-Market Analysis
+                    </h2>
                     <p className='mx-auto max-w-2xl text-lg text-white/60'>
-                        Our algorithm adapts to different market conditions, providing accurate signals across multiple assets.
+                        Our algorithm adapts to different market conditions, providing accurate signals across multiple
+                        assets.
                     </p>
                 </div>
 
@@ -50,7 +54,8 @@ export function SectionAboutAlgorithm() {
                             key={market.title}
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className='group relative overflow-hidden rounded-lg border border-white/5 bg-black/40 p-6 hover:border-white/10'>
+                            className='group relative overflow-hidden rounded-lg border border-white/5 bg-black/40 p-6 hover:border-white/10'
+                        >
                             <div className='mb-4 flex items-center justify-between'>
                                 <div className='flex items-center gap-3'>
                                     <div className='flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10'>
@@ -58,7 +63,9 @@ export function SectionAboutAlgorithm() {
                                     </div>
                                     <h3 className='font-outfit text-xl font-semibold text-white/90'>{market.title}</h3>
                                 </div>
-                                <span className='rounded-full bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-400'>{market.stats}</span>
+                                <span className='rounded-full bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-400'>
+                                    {market.stats}
+                                </span>
                             </div>
 
                             <p className='mb-4 text-base text-white/70'>{market.description}</p>

@@ -1,11 +1,11 @@
 'use client';
 
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { FaCalculator, FaChartLine, FaDollarSign, FaExchangeAlt, FaInfoCircle, FaPercentage } from 'react-icons/fa';
 import { useInView } from 'react-intersection-observer';
-import { Direction, TradeDirection, TradeStats } from './components';
-import { CurrencySelector, getCurrencySymbol, type Currency } from './components/CurrencySelector';
+import { type Direction, TradeDirection, TradeStats } from './components';
+import { type Currency, CurrencySelector, getCurrencySymbol } from './components/CurrencySelector';
 import { RiskRewardGrid } from './components/RiskRewardGrid';
 
 interface CalculatorInputs {
@@ -115,7 +115,7 @@ const InputField = memo(
                 <input
                     type='number'
                     value={value || ''}
-                    onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => onChange(Number.parseFloat(e.target.value) || 0)}
                     placeholder={placeholder}
                     className={`w-full rounded-xl border bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
                         error
@@ -149,7 +149,8 @@ const ResultCard = memo(
     }) => (
         <motion.div
             whileHover={{ scale: 1.02 }}
-            className='relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm transition-all duration-300'>
+            className='relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm transition-all duration-300'
+        >
             <div className='pointer-events-none absolute inset-0'>
                 <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]' />
                 <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
@@ -158,14 +159,21 @@ const ResultCard = memo(
                 <div className='mb-2 flex items-center gap-3'>
                     <div
                         className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                            isInvalid ? 'bg-red-400/10 text-red-400' : positive ? 'bg-emerald-400/10 text-emerald-400' : 'bg-white/5 text-neutral-400'
-                        }`}>
+                            isInvalid
+                                ? 'bg-red-400/10 text-red-400'
+                                : positive
+                                  ? 'bg-emerald-400/10 text-emerald-400'
+                                  : 'bg-white/5 text-neutral-400'
+                        }`}
+                    >
                         {icon}
                     </div>
                     <div className='font-kodemono text-sm text-neutral-400'>{label}</div>
                 </div>
                 <div className='font-outfit text-2xl font-bold text-white'>{isInvalid ? '—' : value}</div>
-                {subValue && !isInvalid && <div className='font-kodemono mt-1 text-sm text-neutral-400'>{subValue}</div>}
+                {subValue && !isInvalid && (
+                    <div className='font-kodemono mt-1 text-sm text-neutral-400'>{subValue}</div>
+                )}
             </div>
         </motion.div>
     )
@@ -199,29 +207,36 @@ const RISK_TEMPLATES: RiskTemplate[] = [
 ];
 
 // Add TakeProfit suggestion component
-const TakeProfitSuggestion = memo(({ entryPrice, stopLoss, onSelect }: { entryPrice: number; stopLoss: number; onSelect: (value: number) => void }) => {
-    if (!entryPrice || !stopLoss) return null;
+const TakeProfitSuggestion = memo(
+    ({
+        entryPrice,
+        stopLoss,
+        onSelect,
+    }: { entryPrice: number; stopLoss: number; onSelect: (value: number) => void }) => {
+        if (!entryPrice || !stopLoss) return null;
 
-    const riskDistance = Math.abs(entryPrice - stopLoss);
-    const suggestions = [1.5, 2, 3].map((multiplier) => ({
-        ratio: multiplier,
-        price: entryPrice + riskDistance * multiplier,
-    }));
+        const riskDistance = Math.abs(entryPrice - stopLoss);
+        const suggestions = [1.5, 2, 3].map((multiplier) => ({
+            ratio: multiplier,
+            price: entryPrice + riskDistance * multiplier,
+        }));
 
-    return (
-        <div className='mt-2 flex gap-2'>
-            {suggestions.map(({ ratio, price }) => (
-                <button
-                    key={ratio}
-                    onClick={() => onSelect(price)}
-                    className='group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-emerald-400/50 hover:bg-emerald-400/5'>
-                    <span>{ratio}:1</span>
-                    <span className='text-emerald-400'>${price.toFixed(2)}</span>
-                </button>
-            ))}
-        </div>
-    );
-});
+        return (
+            <div className='mt-2 flex gap-2'>
+                {suggestions.map(({ ratio, price }) => (
+                    <button
+                        key={ratio}
+                        onClick={() => onSelect(price)}
+                        className='group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-emerald-400/50 hover:bg-emerald-400/5'
+                    >
+                        <span>{ratio}:1</span>
+                        <span className='text-emerald-400'>${price.toFixed(2)}</span>
+                    </button>
+                ))}
+            </div>
+        );
+    }
+);
 
 export const SectionCalculator = () => {
     const [inputs, setInputs] = useState<CalculatorInputs>(initialState);
@@ -238,10 +253,10 @@ export const SectionCalculator = () => {
     const results = useMemo(() => {
         if (validationErrors.length > 0) {
             return {
-                riskAmount: NaN,
-                positionSize: NaN,
-                potentialProfit: NaN,
-                riskRewardRatio: NaN,
+                riskAmount: Number.NaN,
+                positionSize: Number.NaN,
+                potentialProfit: Number.NaN,
+                riskRewardRatio: Number.NaN,
             };
         }
 
@@ -265,7 +280,10 @@ export const SectionCalculator = () => {
     }, [validationErrors]);
 
     // Memoize error getter
-    const getError = useCallback((field: keyof CalculatorInputs) => errors.find((error) => error.field === field)?.message, [errors]);
+    const getError = useCallback(
+        (field: keyof CalculatorInputs) => errors.find((error) => error.field === field)?.message,
+        [errors]
+    );
 
     // Memoize value formatter
     const formatValue = useCallback(
@@ -318,8 +336,11 @@ export const SectionCalculator = () => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                     transition={{ duration: 0.8 }}
-                    className='mb-16 text-center'>
-                    <h2 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>Position Size Calculator</h2>
+                    className='mb-16 text-center'
+                >
+                    <h2 className='text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl'>
+                        Position Size Calculator
+                    </h2>
                     <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>
                         Calculate your optimal position size and risk management parameters with precision.
                     </p>
@@ -340,15 +361,22 @@ export const SectionCalculator = () => {
                                             inputs.riskPercentage === template.value
                                                 ? 'border-emerald-400/50 bg-emerald-400/5'
                                                 : 'border-white/10 bg-black/40 hover:border-white/20 hover:bg-black/60'
-                                        }`}>
+                                        }`}
+                                    >
                                         <div className='pointer-events-none absolute inset-0'>
                                             <div className='absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]' />
                                             <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
                                         </div>
                                         <div className='relative z-10'>
-                                            <div className='font-outfit mb-1 text-lg font-semibold text-white'>{template.label}</div>
-                                            <div className='font-kodemono mb-2 text-2xl text-emerald-400'>{template.value}%</div>
-                                            <p className='font-kodemono text-sm text-neutral-400'>{template.description}</p>
+                                            <div className='font-outfit mb-1 text-lg font-semibold text-white'>
+                                                {template.label}
+                                            </div>
+                                            <div className='font-kodemono mb-2 text-2xl text-emerald-400'>
+                                                {template.value}%
+                                            </div>
+                                            <p className='font-kodemono text-sm text-neutral-400'>
+                                                {template.description}
+                                            </p>
                                         </div>
                                     </button>
                                 ))}
@@ -396,7 +424,11 @@ export const SectionCalculator = () => {
                                 <h3 className='font-outfit text-lg font-semibold text-white'>Price Levels</h3>
                                 <div className='flex gap-2'>
                                     {inputs.entryPrice > 0 && inputs.stopLoss > 0 && (
-                                        <TakeProfitSuggestion entryPrice={inputs.entryPrice} stopLoss={inputs.stopLoss} onSelect={handleTakeProfitSelect} />
+                                        <TakeProfitSuggestion
+                                            entryPrice={inputs.entryPrice}
+                                            stopLoss={inputs.stopLoss}
+                                            onSelect={handleTakeProfitSelect}
+                                        />
                                     )}
                                 </div>
                             </div>
@@ -481,7 +513,13 @@ export const SectionCalculator = () => {
                             <ResultCard
                                 label='Risk/Reward Visualization'
                                 value={`${formatValue(results.riskAmount)} → ${formatValue(results.potentialProfit)}`}
-                                subValue={<RiskRewardGrid riskAmount={results.riskAmount} potentialProfit={results.potentialProfit} ratio={results.riskRewardRatio} />}
+                                subValue={
+                                    <RiskRewardGrid
+                                        riskAmount={results.riskAmount}
+                                        potentialProfit={results.potentialProfit}
+                                        ratio={results.riskRewardRatio}
+                                    />
+                                }
                                 icon={<FaCalculator className='h-5 w-5' />}
                                 positive={results.riskRewardRatio >= 2}
                                 isInvalid={isNaN(results.riskRewardRatio) || !isFinite(results.riskRewardRatio)}

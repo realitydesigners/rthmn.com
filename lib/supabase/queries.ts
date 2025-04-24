@@ -1,5 +1,5 @@
-import { cache } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { cache } from 'react';
 
 export const getUser = cache(async (supabase: SupabaseClient) => {
     try {
@@ -14,7 +14,11 @@ export const getUser = cache(async (supabase: SupabaseClient) => {
 });
 
 export const getSubscription = async (supabase: SupabaseClient) => {
-    const { data: subscription, error } = await supabase.from('subscriptions').select('*, prices(*)').in('status', ['trialing', 'active']).maybeSingle();
+    const { data: subscription, error } = await supabase
+        .from('subscriptions')
+        .select('*, prices(*)')
+        .in('status', ['trialing', 'active'])
+        .maybeSingle();
 
     if (error) {
         console.error('getSubscription: Error fetching subscription:', error);
@@ -26,7 +30,11 @@ export const getSubscription = async (supabase: SupabaseClient) => {
 export const getProducts = cache(async (supabase: SupabaseClient) => {
     try {
         // Fetch products
-        const { data: products, error: productsError } = await supabase.from('products').select('*').eq('active', true).order('metadata->index', { ascending: true });
+        const { data: products, error: productsError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('active', true)
+            .order('metadata->index', { ascending: true });
 
         if (productsError) throw productsError;
 
@@ -101,7 +109,10 @@ export const getUserDetails = cache(async (supabase: SupabaseClient) => {
 export const getSignals = cache(async (supabase: SupabaseClient) => {
     try {
         // Simple query - RLS will ensure user is authenticated
-        const { data: signals, error } = await supabase.from('signals').select('*').order('created_at', { ascending: false });
+        const { data: signals, error } = await supabase
+            .from('signals')
+            .select('*')
+            .order('created_at', { ascending: false });
 
         if (error) throw error;
         return signals;
@@ -133,7 +144,11 @@ export const getSupportThreads = cache(async (supabase: SupabaseClient) => {
         } = await supabase.auth.getUser();
         if (!user) return null;
 
-        const { data, error } = await supabase.from('support_threads').select('*').eq('user_id', user.id).order('last_message_time', { ascending: false });
+        const { data, error } = await supabase
+            .from('support_threads')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('last_message_time', { ascending: false });
 
         if (error) throw error;
         return data;
@@ -145,7 +160,11 @@ export const getSupportThreads = cache(async (supabase: SupabaseClient) => {
 
 export const getSupportMessages = cache(async (supabase: SupabaseClient, threadId: string) => {
     try {
-        const { data, error } = await supabase.from('support_messages').select('*').eq('thread_id', threadId).order('created_at', { ascending: true });
+        const { data, error } = await supabase
+            .from('support_messages')
+            .select('*')
+            .eq('thread_id', threadId)
+            .order('created_at', { ascending: true });
 
         if (error) throw error;
         return data;
@@ -172,7 +191,12 @@ export const createSupportThread = cache(async (supabase: SupabaseClient, subjec
         }
 
         // First, get a valid product_id
-        const { data: products, error: productsError } = await supabase.from('products').select('id').eq('active', true).limit(1).single();
+        const { data: products, error: productsError } = await supabase
+            .from('products')
+            .select('id')
+            .eq('active', true)
+            .limit(1)
+            .single();
 
         if (productsError) {
             console.error('Error fetching products:', productsError);

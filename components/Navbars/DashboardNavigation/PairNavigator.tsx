@@ -1,13 +1,24 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { LuArrowRight, LuBitcoin, LuBookmark, LuDollarSign, LuList, LuPlus, LuSearch, LuTrash2, LuLineChart, LuTrendingUp } from 'react-icons/lu';
 import { useLongPress } from '@/hooks/useLongPress';
 import { useDashboard } from '@/providers/DashboardProvider/client';
-import { CRYPTO_PAIRS, FOREX_PAIRS, EQUITY_PAIRS, ETF_PAIRS } from '@/utils/instruments';
 import { useUser } from '@/providers/UserProvider';
-import React from 'react';
+import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS } from '@/utils/instruments';
+import Link from 'next/link';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import {
+    LuArrowRight,
+    LuBitcoin,
+    LuBookmark,
+    LuDollarSign,
+    LuLineChart,
+    LuList,
+    LuPlus,
+    LuSearch,
+    LuTrash2,
+    LuTrendingUp,
+} from 'react-icons/lu';
 
 const useSound = () => {
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -43,7 +54,11 @@ const navigationButtons = [
     { mode: 'etf', label: 'ETF' },
 ];
 
-const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, currentPairs: string[], setActiveIndex: (index: number) => void) => {
+const useIntersectionObserver = (
+    scrollRef: React.RefObject<HTMLDivElement>,
+    currentPairs: string[],
+    setActiveIndex: (index: number) => void
+) => {
     const { play } = useSound();
 
     useEffect(() => {
@@ -53,7 +68,7 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
 
                 // Find the entry closest to the center of the viewport
                 let closestEntry = null;
-                let minDistance = Infinity;
+                let minDistance = Number.POSITIVE_INFINITY;
 
                 entries.forEach((entry) => {
                     const rect = entry.boundingClientRect;
@@ -70,7 +85,7 @@ const useIntersectionObserver = (scrollRef: React.RefObject<HTMLDivElement>, cur
 
                 if (closestEntry && minDistance < 10) {
                     // Only trigger if very close to center
-                    const index = parseInt(closestEntry.target.getAttribute('data-index') || '0');
+                    const index = Number.parseInt(closestEntry.target.getAttribute('data-index') || '0');
                     setActiveIndex(index);
                     play();
                 }
@@ -93,7 +108,12 @@ const PairFilters = ({ viewMode, setViewMode }: { viewMode: string; setViewMode:
     <div className='absolute right-0 bottom-22 left-0 z-[1000]'>
         <div className='scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto px-4 py-2'>
             {navigationButtons.map((button) => (
-                <PairFilterButtons key={button.mode} isActive={viewMode === button.mode} onClick={() => setViewMode(button.mode)} label={button.label} />
+                <PairFilterButtons
+                    key={button.mode}
+                    isActive={viewMode === button.mode}
+                    onClick={() => setViewMode(button.mode)}
+                    label={button.label}
+                />
             ))}
         </div>
     </div>
@@ -199,7 +219,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
         // Find the item closest to the center
         const items = container.getElementsByClassName('pair-item');
         let closestItem = null;
-        let minDistance = Infinity;
+        let minDistance = Number.POSITIVE_INFINITY;
 
         Array.from(items).forEach((item) => {
             const rect = item.getBoundingClientRect();
@@ -211,7 +231,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
         });
 
         if (closestItem) {
-            const index = parseInt(closestItem.getAttribute('data-index') || '0');
+            const index = Number.parseInt(closestItem.getAttribute('data-index') || '0');
             if (index !== activeIndex) {
                 handleIndexChange(index);
             }
@@ -230,7 +250,8 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
         <div
             className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
                 isModalOpen ? 'h-[175px] lg:hidden' : 'h-[50vh]'
-            }`}>
+            }`}
+        >
             <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
             {/* Main container */}
@@ -243,7 +264,8 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
                         scrollSnapType: 'y mandatory',
                         WebkitOverflowScrolling: 'touch',
                         scrollBehavior: 'smooth',
-                    }}>
+                    }}
+                >
                     {/* Top spacer */}
                     <div className='h-[calc(40vh-32px)]' />
 
@@ -257,7 +279,8 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
                                 style={{
                                     scrollSnapAlign: 'center',
                                     scrollSnapStop: 'always',
-                                }}>
+                                }}
+                            >
                                 <PairItem
                                     pair={pair}
                                     index={index}
@@ -300,17 +323,25 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
     );
 };
 
-export const PairFilterButtons = ({ isActive, onClick, label }: { isActive: boolean; onClick: () => void; label: string }) => {
+export const PairFilterButtons = ({
+    isActive,
+    onClick,
+    label,
+}: { isActive: boolean; onClick: () => void; label: string }) => {
     return (
         <button onClick={onClick} className='group relative flex items-center'>
             <div
                 className={`group flex h-9 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
-                    isActive ? 'from-[#444444] to-[#282828]' : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
-                }`}>
+                    isActive
+                        ? 'from-[#444444] to-[#282828]'
+                        : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]'
+                }`}
+            >
                 <div
                     className={`font-outfit flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium ${
                         isActive ? 'text-neutral-200' : 'text-[#818181]'
-                    }`}>
+                    }`}
+                >
                     {label}
                 </div>
             </div>
@@ -318,7 +349,10 @@ export const PairFilterButtons = ({ isActive, onClick, label }: { isActive: bool
     );
 };
 
-export const SearchBar = ({ searchQuery, setSearchQuery }: { searchQuery: string; setSearchQuery: (query: string) => void }) => {
+export const SearchBar = ({
+    searchQuery,
+    setSearchQuery,
+}: { searchQuery: string; setSearchQuery: (query: string) => void }) => {
     return (
         <div className='relative z-[99] flex justify-center px-4'>
             <div className='relative flex w-full items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#444444] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]'>
@@ -338,14 +372,20 @@ export const SearchBar = ({ searchQuery, setSearchQuery }: { searchQuery: string
 };
 
 // Extract action buttons into separate components
-const RemoveActions = ({ onCancel, onRemove }: { onCancel: (e: React.MouseEvent) => void; onRemove: (e: React.MouseEvent) => void }) => (
+const RemoveActions = ({
+    onCancel,
+    onRemove,
+}: { onCancel: (e: React.MouseEvent) => void; onRemove: (e: React.MouseEvent) => void }) => (
     <div className='-webkit-tap-highlight-color-transparent bg-red-500/05 flex h-11 w-11 items-center justify-center rounded-full text-red-400 transition-all hover:bg-red-500/20 hover:text-white'>
         {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
         <ActionButton onClick={onRemove} icon={<LuTrash2 size={24} />} variant='danger' />
     </div>
 );
 
-const AddActions = ({ onCancel, onAdd }: { onCancel: (e: React.MouseEvent) => void; onAdd: (e: React.MouseEvent) => void }) => (
+const AddActions = ({
+    onCancel,
+    onAdd,
+}: { onCancel: (e: React.MouseEvent) => void; onAdd: (e: React.MouseEvent) => void }) => (
     <div className='-webkit-tap-highlight-color-transparent bg-emerald-500/05 flex h-11 w-11 items-center justify-center rounded-full text-emerald-400 transition-all hover:bg-emerald-500/20 hover:text-white'>
         {/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
         <ActionButton onClick={onAdd} icon={<LuPlus size={24} />} variant='success' />
@@ -353,7 +393,9 @@ const AddActions = ({ onCancel, onAdd }: { onCancel: (e: React.MouseEvent) => vo
 );
 
 const PairPrice = ({ price, isJPY, isActive }: { price: number; isJPY: boolean; isActive: boolean }) => (
-    <div className={`font-kodemono ml-2 text-sm ${isActive ? 'text-white' : 'text-[#222]'}`}>{price.toFixed(isJPY ? 3 : 5)}</div>
+    <div className={`font-kodemono ml-2 text-sm ${isActive ? 'text-white' : 'text-[#222]'}`}>
+        {price.toFixed(isJPY ? 3 : 5)}
+    </div>
 );
 
 export const PairItem = ({
@@ -468,15 +510,19 @@ export const PairItem = ({
                 ...style,
             }}
             onClick={handleClick}
-            {...handlers}>
+            {...handlers}
+        >
             <div className='relative z-10 flex flex-col'>
                 <div className='group flex w-full items-center justify-between'>
                     <div className='flex items-baseline gap-2'>
                         <h3
-                            className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ease-in-out ${isActive ? 'scale-105 text-white' : 'scale-90 text-[#444]'}`}>
+                            className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ease-in-out ${isActive ? 'scale-105 text-white' : 'scale-90 text-[#444]'}`}
+                        >
                             {pair}
                         </h3>
-                        {currentPrice && <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} isActive={isActive} />}
+                        {currentPrice && (
+                            <PairPrice price={currentPrice} isJPY={pair.includes('JPY')} isActive={isActive} />
+                        )}
                         {isFavorite && <LuBookmark size={15} className='ml-1 inline-block text-blue-400/70' />}
                     </div>
 
@@ -491,7 +537,11 @@ export const PairItem = ({
     );
 };
 
-const ActionButton = ({ onClick, icon, variant = 'default' }: { onClick: (e: React.MouseEvent) => void; icon: React.ReactNode; variant?: 'default' | 'danger' | 'success' }) => {
+const ActionButton = ({
+    onClick,
+    icon,
+    variant = 'default',
+}: { onClick: (e: React.MouseEvent) => void; icon: React.ReactNode; variant?: 'default' | 'danger' | 'success' }) => {
     const variantStyles = {
         default: 'bg-white/10 hover:bg-white/20 text-neutral-300',
         danger: 'bg-red-500/10 text-red-400 hover:bg-red-500/20',
@@ -499,7 +549,10 @@ const ActionButton = ({ onClick, icon, variant = 'default' }: { onClick: (e: Rea
     };
 
     return (
-        <button onClick={onClick} className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${variantStyles[variant]}`}>
+        <button
+            onClick={onClick}
+            className={`flex h-10 w-10 items-center justify-center rounded-full transition-all ${variantStyles[variant]}`}
+        >
             {icon}
         </button>
     );

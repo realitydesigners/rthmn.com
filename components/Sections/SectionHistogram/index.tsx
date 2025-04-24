@@ -1,10 +1,10 @@
 'use client';
 
+import { sequences } from '@/components/Constants/constants';
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
-import { sequences } from '@/components/Constants/constants';
-import { Histogram } from './Histogram';
 import { FaCrosshairs, FaLayerGroup, FaSignal } from 'react-icons/fa';
+import { Histogram } from './Histogram';
 
 // Define histogramBenefits constant here
 const histogramBenefits = [
@@ -96,9 +96,12 @@ export const SectionHistogram = () => {
         <section className='relative overflow-hidden bg-black py-16 text-center sm:py-24'>
             {/* Text Content Container */}
             <div className='mx-auto mb-12 max-w-3xl px-4 sm:px-6 lg:px-8'>
-                <h2 className='font-outfit text-neutral-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl'>Visualize Market Dynamics</h2>
+                <h2 className='font-outfit text-neutral-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl'>
+                    Visualize Market Dynamics
+                </h2>
                 <p className='font-outfit text-md mx-auto mt-4 max-w-2xl text-neutral-400 sm:text-lg lg:text-xl'>
-                    Dive deep into order flow with our volume profile histogram. Identify key support/resistance levels and understand market conviction at a glance.
+                    Dive deep into order flow with our volume profile histogram. Identify key support/resistance levels
+                    and understand market conviction at a glance.
                 </p>
             </div>
 

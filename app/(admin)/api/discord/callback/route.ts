@@ -1,6 +1,6 @@
-import { NextResponse } from 'next/server';
 import { getDiscordClient } from '@/lib/discord/client';
 import { createClient } from '@/lib/supabase/server';
+import { NextResponse } from 'next/server';
 
 // Constants for Discord OAuth
 const DISCORD_CLIENT_ID = '1297321318030639114';
@@ -122,16 +122,19 @@ export async function GET(request: Request) {
             // Add user to guild using access token
             console.log('Adding user to guild...');
             try {
-                await fetch(`https://discord.com/api/v10/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUser.id}`, {
-                    method: 'PUT',
-                    headers: {
-                        Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        access_token,
-                    }),
-                });
+                await fetch(
+                    `https://discord.com/api/v10/guilds/${process.env.DISCORD_GUILD_ID}/members/${discordUser.id}`,
+                    {
+                        method: 'PUT',
+                        headers: {
+                            Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            access_token,
+                        }),
+                    }
+                );
                 console.log('Successfully added member to guild');
             } catch (addError) {
                 console.error('Failed to add member to guild:', addError);
@@ -140,7 +143,11 @@ export async function GET(request: Request) {
 
             // Check subscription status
             console.log('Checking subscription status...');
-            const { data: subscription, error: subError } = await supabase.from('subscriptions').select('*').in('status', ['trialing', 'active']).single();
+            const { data: subscription, error: subError } = await supabase
+                .from('subscriptions')
+                .select('*')
+                .in('status', ['trialing', 'active'])
+                .single();
 
             if (subError) {
                 console.error('Subscription check failed:', subError);
@@ -150,11 +157,19 @@ export async function GET(request: Request) {
             try {
                 if (subscription) {
                     console.log('Adding paid role...');
-                    await discord.addGuildMemberRole(process.env.DISCORD_GUILD_ID!, discordUser.id, process.env.DISCORD_PAID_ROLE_ID!);
+                    await discord.addGuildMemberRole(
+                        process.env.DISCORD_GUILD_ID!,
+                        discordUser.id,
+                        process.env.DISCORD_PAID_ROLE_ID!
+                    );
                     console.log('Added paid role for new connection');
                 } else {
                     console.log('Adding unpaid role...');
-                    await discord.addGuildMemberRole(process.env.DISCORD_GUILD_ID!, discordUser.id, process.env.DISCORD_UNPAID_ROLE_ID!);
+                    await discord.addGuildMemberRole(
+                        process.env.DISCORD_GUILD_ID!,
+                        discordUser.id,
+                        process.env.DISCORD_UNPAID_ROLE_ID!
+                    );
                     console.log('Added unpaid role for new connection');
                 }
             } catch (roleError) {

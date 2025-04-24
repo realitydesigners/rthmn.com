@@ -1,12 +1,12 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
 import { useAuth } from '@/providers/SupabaseProvider';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { LuLogOut } from 'react-icons/lu';
 import CustomerPortalForm from './CustomerPortalForm';
 import DiscordConnectionForm from './DiscordConnectionForm';
 import ProfilePhotoForm from './ProfilePhotoForm';
-import { LuLogOut } from 'react-icons/lu';
 
 const AccountPanel = () => {
     const { user, userDetails, subscription, discordConnection, isLoading, signOut } = useAuth();
@@ -60,7 +60,9 @@ const AccountPanel = () => {
                         <ProfilePhotoForm avatarUrl={userDetails?.avatar_url} userId={user.id} />
                     </div>
                     <div className='flex items-center'>
-                        <h1 className='font-outfit mb-1 text-center text-xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h1>
+                        <h1 className='font-outfit mb-1 text-center text-xl font-bold text-white'>
+                            {user.user_metadata?.full_name || 'Your Profile'}
+                        </h1>
                     </div>
                     <p className='font-outfit max-w-full text-center text-sm break-words text-zinc-400'>{user.email}</p>
                 </div>
@@ -96,9 +98,12 @@ const AccountPanel = () => {
                                 <button
                                     onClick={handleSignOut}
                                     disabled={isSigningOut}
-                                    className='flex w-auto items-center justify-center gap-2 rounded-full bg-red-500/10 px-4 py-2 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50'>
+                                    className='flex w-auto items-center justify-center gap-2 rounded-full bg-red-500/10 px-4 py-2 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50'
+                                >
                                     <LuLogOut className='h-4 w-4' />
-                                    <span className='font-outfit text-sm'>{isSigningOut ? 'Signing out...' : 'Sign out'}</span>
+                                    <span className='font-outfit text-sm'>
+                                        {isSigningOut ? 'Signing out...' : 'Sign out'}
+                                    </span>
                                 </button>
                             </div>
                         </div>

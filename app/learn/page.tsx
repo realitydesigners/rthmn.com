@@ -1,7 +1,7 @@
-import { getCourses } from '@/lib/sanity/lib/queries';
-import { LearnPageClient } from './client';
 import { sanityFetch } from '@/lib/sanity/lib/client';
-import { Course } from '@/types/types';
+import { getCourses } from '@/lib/sanity/lib/queries';
+import type { Course } from '@/types/types';
+import { LearnPageClient } from './client';
 
 export default async function LearnPage() {
     const courses = await sanityFetch<Course[]>({

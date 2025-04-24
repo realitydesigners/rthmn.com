@@ -1,7 +1,7 @@
 'use client';
 
+import type { CandleData } from '@/types/types';
 import { motion } from 'framer-motion';
-import { CandleData } from '@/types/types';
 
 interface MarketData {
     pair: string;
@@ -18,7 +18,7 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
     const getLatestPrice = (candleData: string) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            return parseFloat(data[data.length - 1].mid.c);
+            return Number.parseFloat(data[data.length - 1].mid.c);
         } catch (e) {
             return null;
         }
@@ -27,7 +27,7 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
     const getSparklinePoints = (candleData: string, width: number, height: number) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            const prices = data.map((d) => parseFloat(d.mid.c));
+            const prices = data.map((d) => Number.parseFloat(d.mid.c));
             const min = Math.min(...prices);
             const max = Math.max(...prices);
             const range = max - min;
@@ -49,8 +49,8 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
     const getPriceChange = (candleData: string) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            const firstPrice = parseFloat(data[0].mid.o);
-            const lastPrice = parseFloat(data[data.length - 1].mid.c);
+            const firstPrice = Number.parseFloat(data[0].mid.o);
+            const lastPrice = Number.parseFloat(data[data.length - 1].mid.c);
             const change = ((lastPrice - firstPrice) / firstPrice) * 100;
             return change;
         } catch (e) {
@@ -65,18 +65,29 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
         <motion.div
             key={`${prefix}-${item.pair}`}
             className='flex h-12 w-36 items-center justify-between rounded-[4px] border border-white/10 bg-black/40 px-1.5 shadow-lg backdrop-blur-sm transition-all hover:border-white/20 hover:bg-black/60'
-            whileHover={{ scale: 1.02 }}>
+            whileHover={{ scale: 1.02 }}
+        >
             <div className='flex flex-col gap-[2px]'>
                 <div className='flex items-center gap-1'>
                     <h4 className='text-[10px] font-medium text-white/70'>{item.pair.replace('_', '/')}</h4>
-                    <span className={`text-[8px] ${priceChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>{priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}</span>
+                    <span className={`text-[8px] ${priceChange >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                        {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}
+                    </span>
                 </div>
-                <div className='text-[11px] font-bold tracking-tight text-white'>{latestPrice ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5) : 'N/A'}</div>
+                <div className='text-[11px] font-bold tracking-tight text-white'>
+                    {latestPrice ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5) : 'N/A'}
+                </div>
             </div>
 
             <div className='h-7 w-12 pr-1'>
                 {getSparklinePoints(item.candleData, 48, 28) && (
-                    <svg width='100%' height='100%' viewBox='0 0 48 28' preserveAspectRatio='none' className='overflow-visible opacity-80'>
+                    <svg
+                        width='100%'
+                        height='100%'
+                        viewBox='0 0 48 28'
+                        preserveAspectRatio='none'
+                        className='overflow-visible opacity-80'
+                    >
                         <polyline
                             points={getSparklinePoints(item.candleData, 48, 28) || ''}
                             fill='none'

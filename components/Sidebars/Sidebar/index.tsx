@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { IconType } from 'react-icons';
-import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { FeatureTour } from '@/app/(user)/onboarding/_components/FeatureTour';
 import { SidebarWrapper } from '@/components/Panels/SidebarPanelWrapper';
-import { useOnboardingStore, ONBOARDING_STEPS } from '@/stores/onboardingStore';
+import { ONBOARDING_STEPS, useOnboardingStore } from '@/stores/onboardingStore';
 import { cn } from '@/utils/cn';
+import { getSidebarState, setSidebarState } from '@/utils/localStorage';
+import { usePathname } from 'next/navigation';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { IconType } from 'react-icons';
 
 interface SidebarButton {
     id: string;
@@ -30,7 +31,8 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isLocked, setIsLocked] = useState(false);
     const [activePanel, setActivePanel] = useState<string | undefined>();
-    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } = useOnboardingStore();
+    const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } =
+        useOnboardingStore();
 
     const isSidebarStep = (stepId: string) => buttons.some((button) => button.id === stepId);
 
@@ -71,7 +73,11 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
                 .sort((a, b) => a.order - b.order)
                 .find((step) => !isStepCompleted(step.id));
 
-            if (nextIncompleteStep && (!currentStepId || isStepCompleted(currentStepId)) && isSidebarStep(nextIncompleteStep.id)) {
+            if (
+                nextIncompleteStep &&
+                (!currentStepId || isStepCompleted(currentStepId)) &&
+                isSidebarStep(nextIncompleteStep.id)
+            ) {
                 setCurrentStep(nextIncompleteStep.id);
                 setIsOpen(true);
                 setActivePanel(nextIncompleteStep.id);
@@ -132,7 +138,8 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
                 className={cn(
                     'fixed top-14 bottom-0 z-[120] flex w-16 flex-col items-center justify-between border-l border-[#121212] bg-[#0a0a0a] py-4',
                     position === 'left' ? 'left-0 border-r' : 'right-0 border-l'
-                )}>
+                )}
+            >
                 {/* Top buttons */}
                 <div className='flex flex-col gap-2'>
                     {buttons
@@ -145,7 +152,8 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
                                 isActive={activePanel === button.id}
                                 isOpen={isOpen}
                                 tourId={button.id}
-                                position={position}>
+                                position={position}
+                            >
                                 {button.tourContent}
                             </FeatureTour>
                         ))}
@@ -163,7 +171,8 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
                                 isActive={activePanel === button.id}
                                 isOpen={isOpen}
                                 tourId={button.id}
-                                position={position}>
+                                position={position}
+                            >
                                 {button.tourContent}
                             </FeatureTour>
                         ))}
@@ -176,7 +185,8 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
                 onLockToggle={handleLockToggle}
                 position={position}
                 isCurrentTourStep={currentStepId === activePanel}
-                isCompleted={isStepCompleted(activePanel)}>
+                isCompleted={isStepCompleted(activePanel)}
+            >
                 {renderPanelContent()}
             </SidebarWrapper>
         </div>

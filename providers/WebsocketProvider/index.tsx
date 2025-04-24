@@ -1,10 +1,11 @@
 'use client';
 
-import React, { createContext, use, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { API_ROUTES } from '@/app/(admin)/api/config';
 import { useAuth } from '@/providers/SupabaseProvider';
 import { wsClient } from '@/providers/WebsocketProvider/websocketClient';
-import { BoxSlice, PriceData } from '@/types/types';
+import type { BoxSlice, PriceData } from '@/types/types';
+import type React from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface WebSocketContextType {
     subscribeToBoxSlices: (pair: string, handler: (data: BoxSlice) => void) => void;
@@ -101,7 +102,9 @@ export function WebSocketProvider({ children }: { children: React.ReactNode }) {
         if (!session?.access_token) return;
 
         try {
-            const response = await fetch(`${window.location.origin}${API_ROUTES.LATEST_CANDLES}?token=${session.access_token}`);
+            const response = await fetch(
+                `${window.location.origin}${API_ROUTES.LATEST_CANDLES}?token=${session.access_token}`
+            );
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
                 console.error('Candle data fetch failed:', {

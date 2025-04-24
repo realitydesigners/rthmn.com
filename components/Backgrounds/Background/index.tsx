@@ -14,7 +14,7 @@ export const AuroraBackground = () => (
         transition={{
             backgroundPosition: {
                 duration: 60,
-                repeat: Infinity,
+                repeat: Number.POSITIVE_INFINITY,
                 ease: 'linear',
             },
         }}
@@ -77,10 +77,11 @@ export const StarField = () => {
                     }}
                     transition={{
                         duration: star.duration,
-                        repeat: Infinity,
+                        repeat: Number.POSITIVE_INFINITY,
                         delay: star.delay,
                     }}
-                    className='absolute'>
+                    className='absolute'
+                >
                     <div
                         style={{
                             width: `${star.size}px`,

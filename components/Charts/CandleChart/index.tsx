@@ -1,9 +1,10 @@
 'use client';
 
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useColorStore } from '@/stores/colorStore';
 import { formatTime } from '@/utils/dateUtils';
 import { INSTRUMENTS } from '@/utils/instruments';
-import { useColorStore } from '@/stores/colorStore';
+import type React from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { XAxis } from './Xaxis';
 import { YAxis } from './YAxis';
 import BoxLevels from './indicators/BoxLevels';
@@ -23,7 +24,14 @@ export interface ChartDataPoint {
     scaledClose: number;
 }
 
-export const useChartData = (data: ChartDataPoint[], scrollLeft: number, chartWidth: number, chartHeight: number, yAxisScale: number, visiblePoints: number) => {
+export const useChartData = (
+    data: ChartDataPoint[],
+    scrollLeft: number,
+    chartWidth: number,
+    chartHeight: number,
+    yAxisScale: number,
+    visiblePoints: number
+) => {
     return useMemo(() => {
         if (!data.length || !chartWidth || !chartHeight) {
             return { visibleData: [], minY: 0, maxY: 0 };
@@ -49,8 +57,8 @@ export const useChartData = (data: ChartDataPoint[], scrollLeft: number, chartWi
         const contextEndIndex = Math.min(data.length, endIndex + Math.floor(visiblePoints * 0.1));
         const contextData = data.slice(contextStartIndex, contextEndIndex);
 
-        let minPrice = Infinity;
-        let maxPrice = -Infinity;
+        let minPrice = Number.POSITIVE_INFINITY;
+        let maxPrice = Number.NEGATIVE_INFINITY;
         contextData.forEach((point) => {
             minPrice = Math.min(minPrice, point.low);
             maxPrice = Math.max(maxPrice, point.high);
@@ -152,7 +160,10 @@ const CandleSticks = memo(({ data, width, height, rightMargin }: CandleSticksPro
     const adjustedWidth = width - rightMargin;
 
     // Calculate candle width to use 80% of available space (leaving 20% for gaps)
-    const candleWidth = Math.max(CHART_CONFIG.CANDLES.MIN_WIDTH, Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (adjustedWidth / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)));
+    const candleWidth = Math.max(
+        CHART_CONFIG.CANDLES.MIN_WIDTH,
+        Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, (adjustedWidth / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO))
+    );
     const halfCandleWidth = candleWidth / 2;
 
     // Adjust x positions to account for right margin
@@ -179,9 +190,31 @@ const CandleSticks = memo(({ data, width, height, rightMargin }: CandleSticksPro
 
                 return (
                     <g key={point.timestamp} transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}>
-                        <line x1={halfCandleWidth} y1={point.scaledHigh} x2={halfCandleWidth} y2={bodyTop} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
-                        <line x1={halfCandleWidth} y1={bodyBottom} x2={halfCandleWidth} y2={point.scaledLow} stroke={candleColor} strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH} />
-                        <rect x={0} y={bodyTop} width={candleWidth} height={bodyHeight} fill='none' stroke={candleColor} strokeWidth={1} />
+                        <line
+                            x1={halfCandleWidth}
+                            y1={point.scaledHigh}
+                            x2={halfCandleWidth}
+                            y2={bodyTop}
+                            stroke={candleColor}
+                            strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH}
+                        />
+                        <line
+                            x1={halfCandleWidth}
+                            y1={bodyBottom}
+                            x2={halfCandleWidth}
+                            y2={point.scaledLow}
+                            stroke={candleColor}
+                            strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH}
+                        />
+                        <rect
+                            x={0}
+                            y={bodyTop}
+                            width={candleWidth}
+                            height={bodyHeight}
+                            fill='none'
+                            stroke={candleColor}
+                            strokeWidth={1}
+                        />
                     </g>
                 );
             })}
@@ -226,7 +259,14 @@ const CandleChart = ({
     const chartHeight = dimensions.height - chartPadding.top - chartPadding.bottom;
 
     // Get chart data directly
-    const { visibleData, minY, maxY } = useChartData(candles, scrollLeft, chartWidth, chartHeight, yAxisScale, CHART_CONFIG.VISIBLE_POINTS);
+    const { visibleData, minY, maxY } = useChartData(
+        candles,
+        scrollLeft,
+        chartWidth,
+        chartHeight,
+        yAxisScale,
+        CHART_CONFIG.VISIBLE_POINTS
+    );
 
     // Update dimension effect to use parent's full dimensions
     useEffect(() => {
@@ -281,7 +321,10 @@ const CandleChart = ({
             if (now - lastScrollUpdate < THROTTLE_MS) return;
 
             const deltaX = clientX - dragStart;
-            const maxScroll = Math.max(0, candles.length * (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) - chartWidth);
+            const maxScroll = Math.max(
+                0,
+                candles.length * (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) - chartWidth
+            );
             const newScrollLeft = Math.max(0, Math.min(maxScroll, scrollStart - deltaX));
 
             setScrollLeft(newScrollLeft);
@@ -359,7 +402,7 @@ const CandleChart = ({
                 if (x >= 0 && x <= adjustedWidth) {
                     // Find the closest data point based on cursor position
                     let closestPoint: ChartDataPoint | null = null;
-                    let minDist = Infinity;
+                    let minDist = Number.POSITIVE_INFINITY;
 
                     visibleData.forEach((point) => {
                         // Scale the point's x position to match the adjusted width
@@ -389,7 +432,12 @@ const CandleChart = ({
         [isDragging, chartWidth, chartPadding.left, visibleData, onHoverChange]
     );
 
-    const HoverInfoComponent = ({ x, y, chartHeight, chartWidth }: { x: number; y: number; chartHeight: number; chartWidth: number }) => {
+    const HoverInfoComponent = ({
+        x,
+        y,
+        chartHeight,
+        chartWidth,
+    }: { x: number; y: number; chartHeight: number; chartWidth: number }) => {
         if (!isFinite(x) || !isFinite(y)) return null;
 
         return (
@@ -407,11 +455,17 @@ const CandleChart = ({
             onMouseDown={dragHandlers.onMouseDown}
             onMouseMove={dragHandlers.onMouseMove}
             onMouseUp={dragHandlers.onMouseUp}
-            onMouseLeave={dragHandlers.onMouseLeave}>
+            onMouseLeave={dragHandlers.onMouseLeave}
+        >
             {(!chartWidth || !chartHeight) && initialVisibleData ? (
                 <svg width='100%' height='100%' className='min-h-[500px]'>
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
-                        <CandleSticks data={initialVisibleData} width={1000} height={500} rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN} />
+                        <CandleSticks
+                            data={initialVisibleData}
+                            width={1000}
+                            height={500}
+                            rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                        />
                     </g>
                 </svg>
             ) : visibleData.length > 0 ? (
@@ -420,7 +474,8 @@ const CandleChart = ({
                     height='100%'
                     onMouseMove={hoverHandlers.onSvgMouseMove}
                     onMouseLeave={hoverHandlers.onMouseLeave}
-                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
+                    style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                >
                     <g transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}>
                         {showBoxLevels && (
                             <BoxLevels
@@ -435,7 +490,12 @@ const CandleChart = ({
                                 rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
                             />
                         )}
-                        <CandleSticks data={visibleData} width={chartWidth} height={chartHeight} rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN} />
+                        <CandleSticks
+                            data={visibleData}
+                            width={chartWidth}
+                            height={chartHeight}
+                            rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                        />
                         <XAxis
                             data={visibleData}
                             chartWidth={chartWidth}
@@ -457,7 +517,14 @@ const CandleChart = ({
                             lastPrice={visibleData[visibleData.length - 1].close}
                             lastPriceY={visibleData[visibleData.length - 1].scaledClose}
                         />
-                        {displayedHoverInfo && <HoverInfoComponent x={displayedHoverInfo.x} y={displayedHoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
+                        {displayedHoverInfo && (
+                            <HoverInfoComponent
+                                x={displayedHoverInfo.x}
+                                y={displayedHoverInfo.y}
+                                chartHeight={chartHeight}
+                                chartWidth={chartWidth}
+                            />
+                        )}
                     </g>
                 </svg>
             ) : (

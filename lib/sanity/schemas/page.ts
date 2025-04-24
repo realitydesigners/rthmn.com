@@ -1,8 +1,8 @@
-import { defineField, defineType } from 'sanity';
 import { GROUP, GROUPS, pageBuilderField } from '@/lib/sanity/lib/constant';
 import { ogFields } from '@/lib/sanity/lib/og-fields';
 import { seoFields } from '@/lib/sanity/lib/seo-fields';
 import { createSlug, isUnique } from '@/lib/sanity/lib/slug';
+import { defineField, defineType } from 'sanity';
 
 export default defineType({
     name: 'page',
@@ -23,8 +23,16 @@ export default defineType({
             rows: 3,
             group: GROUP.MAIN_CONTENT,
             validation: (rule) => [
-                rule.min(140).warning('The meta description should be at least 140 characters for optimal SEO visibility in search results'),
-                rule.max(160).warning('The meta description should not exceed 160 characters as it will be truncated in search results'),
+                rule
+                    .min(140)
+                    .warning(
+                        'The meta description should be at least 140 characters for optimal SEO visibility in search results'
+                    ),
+                rule
+                    .max(160)
+                    .warning(
+                        'The meta description should not exceed 160 characters as it will be truncated in search results'
+                    ),
             ],
         }),
         defineField({

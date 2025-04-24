@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { AnimatePresence, motion } from 'framer-motion';
+import { useRef, useState } from 'react';
 import { LuImagePlus, LuUpload } from 'react-icons/lu';
 
 interface Props {
@@ -89,21 +89,45 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                 <motion.h2
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
+                    className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'
+                >
                     Welcome to Rthmn
                 </motion.h2>
-                <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='text-base text-neutral-400'>
+                <motion.p
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 }}
+                    className='text-base text-neutral-400'
+                >
                     You can add a profile photo to personalize your experience, or skip this step.
                 </motion.p>
             </div>
 
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className='flex justify-center py-4'>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2 }}
+                className='flex justify-center py-4'
+            >
                 <div className='relative'>
                     {/* Hidden file input */}
-                    <input ref={fileInputRef} type='file' accept='image/*' className='hidden' onChange={handleFileUpload} disabled={isLoading} />
+                    <input
+                        ref={fileInputRef}
+                        type='file'
+                        accept='image/*'
+                        className='hidden'
+                        onChange={handleFileUpload}
+                        disabled={isLoading}
+                    />
 
                     {/* Upload Area */}
-                    <div onClick={handleClick} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop} className='relative'>
+                    <div
+                        onClick={handleClick}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className='relative'
+                    >
                         {/* Main upload button/area */}
                         <motion.div
                             animate={{
@@ -111,13 +135,29 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                                 borderColor: isDragging ? '#3FFFA2' : 'rgb(51, 51, 51)',
                             }}
                             className={`group relative flex h-64 w-64 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed bg-gradient-to-b from-[#1A1A1A] via-[#141414] to-[#0D0D0D] shadow-2xl transition-all duration-300 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-b before:from-white/[0.03] before:to-transparent before:transition-colors ${
-                                isDragging ? 'border-[#3FFFA2] before:from-[#3FFFA2]/[0.05]' : 'border-[#333] hover:border-[#3FFFA2]/50 hover:before:from-white/[0.05]'
-                            }`}>
+                                isDragging
+                                    ? 'border-[#3FFFA2] before:from-[#3FFFA2]/[0.05]'
+                                    : 'border-[#333] hover:border-[#3FFFA2]/50 hover:before:from-white/[0.05]'
+                            }`}
+                        >
                             <div className='absolute inset-0 rounded-2xl bg-gradient-to-b from-black/0 via-black/5 to-black/20' />
                             <AnimatePresence mode='wait'>
                                 {preview ? (
-                                    <motion.div key='preview' initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='relative z-10 h-full w-full'>
-                                        <Image src={preview} alt='Profile' fill className='object-cover' sizes='256px' priority />
+                                    <motion.div
+                                        key='preview'
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className='relative z-10 h-full w-full'
+                                    >
+                                        <Image
+                                            src={preview}
+                                            alt='Profile'
+                                            fill
+                                            className='object-cover'
+                                            sizes='256px'
+                                            priority
+                                        />
                                         {/* Hover overlay with glass effect */}
                                         <div className='absolute inset-0 flex items-center justify-center bg-gradient-to-b from-black/0 via-black/20 to-black/60 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100'>
                                             <div className='flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-md'>
@@ -132,7 +172,8 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                                         initial={{ opacity: 0 }}
                                         animate={{ opacity: 1 }}
                                         exit={{ opacity: 0 }}
-                                        className='relative z-10 flex flex-col items-center gap-4 p-6 text-center'>
+                                        className='relative z-10 flex flex-col items-center gap-4 p-6 text-center'
+                                    >
                                         <div className='rounded-full bg-gradient-to-b from-[#3FFFA2]/30 via-[#3FFFA2]/10 to-[#3FFFA2]/5 p-4 transition-colors duration-300 group-hover:from-[#3FFFA2]/40 group-hover:via-[#3FFFA2]/20 group-hover:to-[#3FFFA2]/10'>
                                             <LuImagePlus className='h-8 w-8 text-[#3FFFA2]' />
                                         </div>
@@ -152,7 +193,8 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    className='absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-gradient-to-b from-black/60 via-black/70 to-black/80 backdrop-blur-sm'>
+                                    className='absolute inset-0 z-20 flex items-center justify-center rounded-2xl bg-gradient-to-b from-black/60 via-black/70 to-black/80 backdrop-blur-sm'
+                                >
                                     <div className='h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-b-white'></div>
                                 </motion.div>
                             )}
@@ -160,7 +202,12 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
                     </div>
 
                     {/* File type info */}
-                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className='mt-4 text-center text-xs text-neutral-500'>
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className='mt-4 text-center text-xs text-neutral-500'
+                    >
                         PNG or JPG (max. 2MB)
                     </motion.div>
                 </div>

@@ -1,6 +1,6 @@
-import React from 'react';
-import { LuBox, LuBoxes, LuLineChart, LuLock } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
+import type React from 'react';
+import { LuBox, LuBoxes, LuLineChart, LuLock } from 'react-icons/lu';
 
 export const CHART_STYLES = {
     box: {
@@ -42,7 +42,16 @@ interface ChartStyleOptionProps {
     onClick?: () => void;
 }
 
-export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, icon: Icon, locked = false, isActive = false, description, comingSoon, onClick }) => {
+export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
+    id,
+    title,
+    icon: Icon,
+    locked = false,
+    isActive = false,
+    description,
+    comingSoon,
+    onClick,
+}) => {
     return (
         <button
             onClick={locked ? undefined : onClick}
@@ -52,9 +61,12 @@ export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, i
                     ? 'border-[#333] from-[#181818]/80 to-[#0F0F0F]/90 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#444] hover:from-[#1c1c1c]/80 hover:to-[#141414]/90'
                     : 'border-[#222] from-[#141414]/30 to-[#0A0A0A]/40 hover:border-[#333] hover:from-[#181818]/40 hover:to-[#0F0F0F]/50',
                 locked ? 'pointer-events-none opacity-90' : 'cursor-pointer'
-            )}>
+            )}
+        >
             {/* Background glow effect */}
-            {isActive && !locked && <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_50%)]' />}
+            {isActive && !locked && (
+                <div className='absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_50%)]' />
+            )}
 
             {/* Diagonal stripes for locked state */}
             {locked && (
@@ -123,9 +135,12 @@ export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, i
                         : isActive
                           ? 'from-[#222] to-[#111] shadow-[0_4px_16px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.1)] group-hover:shadow-[0_4px_20px_rgba(0,0,0,0.6)]'
                           : 'from-[#181818] to-[#0F0F0F] shadow-[0_4px_12px_rgba(0,0,0,0.3)] group-hover:shadow-[0_4px_16px_rgba(0,0,0,0.4)]'
-                )}>
+                )}
+            >
                 {/* Icon inner glow */}
-                {!locked && isActive && <div className='absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.1),transparent_70%)]' />}
+                {!locked && isActive && (
+                    <div className='absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.1),transparent_70%)]' />
+                )}
                 <Icon
                     size={20}
                     className={cn(
@@ -141,7 +156,8 @@ export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ id, title, i
                 className={cn(
                     'font-kodemono text-[8px] font-medium tracking-widest uppercase transition-all duration-300',
                     locked ? 'text-[#666]/40' : isActive ? 'text-[#999]' : 'text-[#666] group-hover:text-[#818181]'
-                )}>
+                )}
+            >
                 {title}
             </span>
         </button>

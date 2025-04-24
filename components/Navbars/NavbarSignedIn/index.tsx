@@ -1,13 +1,13 @@
 'use client';
 
+import { LogoIcon } from '@/components/Icons/icons';
+import { useWebSocket } from '@/providers/WebsocketProvider';
+import type { User } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { User } from '@supabase/supabase-js';
-import { LuChevronRight, LuLayoutDashboard, LuOrbit, LuHelpCircle } from 'react-icons/lu';
-import { LogoIcon } from '@/components/Icons/icons';
-import { GridControl } from '../../Panels/BoxDataPanel/GridControl';
-import { useWebSocket } from '@/providers/WebsocketProvider';
+import { LuChevronRight, LuHelpCircle, LuLayoutDashboard, LuOrbit } from 'react-icons/lu';
 import { ConnectionBadge } from '../../Badges/ConnectionBadge';
+import { GridControl } from '../../Panels/BoxDataPanel/GridControl';
 
 interface NavbarSignedInProps {
     user: User | null;
@@ -46,7 +46,10 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                     {/* Left section */}
                     <div className='relative z-[1] flex items-center gap-3'>
                         <div className='flex items-center'>
-                            <Link href='/dashboard' className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5'>
+                            <Link
+                                href='/dashboard'
+                                className='group relative z-[110] flex items-center gap-2 rounded-lg p-1.5'
+                            >
                                 <div className='flex h-7 w-7 items-center'>
                                     <LogoIcon />
                                 </div>
@@ -59,14 +62,22 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                 pathSegments.map((segment, index) => (
                                     <div key={index} className='flex items-center gap-1.5'>
                                         <div className='flex items-center gap-1.5 rounded-md px-1.5 py-1'>
-                                            {getSegmentIcon(segment) && <span className='text-[#666]'>{getSegmentIcon(segment)}</span>}
-                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-neutral-200/50 uppercase'>{segment}</span>
+                                            {getSegmentIcon(segment) && (
+                                                <span className='text-[#666]'>{getSegmentIcon(segment)}</span>
+                                            )}
+                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-neutral-200/50 uppercase'>
+                                                {segment}
+                                            </span>
                                         </div>
-                                        {index < pathSegments.length - 1 && <LuChevronRight size={14} className='text-[#444]' />}
+                                        {index < pathSegments.length - 1 && (
+                                            <LuChevronRight size={14} className='text-[#444]' />
+                                        )}
                                     </div>
                                 ))
                             ) : (
-                                <span className='font-mono text-[11px] font-medium tracking-wider text-neutral-200/50 uppercase'>{pathSegments}</span>
+                                <span className='font-mono text-[11px] font-medium tracking-wider text-neutral-200/50 uppercase'>
+                                    {pathSegments}
+                                </span>
                             )}
                         </div>
                     </div>

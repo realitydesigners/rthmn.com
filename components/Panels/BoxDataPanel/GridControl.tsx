@@ -1,6 +1,6 @@
 'use client';
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { useGridStore } from '@/stores/gridStore';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 
 // Pre-calculate grid cells to avoid recreation
 const GRID_CELLS = {
@@ -23,13 +23,16 @@ const GridIcon = React.memo(({ cols, isActive, onClick }: { cols: number; isActi
                 isActive
                     ? 'border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#141414]'
                     : 'border-[#222] bg-gradient-to-b from-[#111] to-[#0A0A0A] hover:border-[#333] hover:from-[#151515] hover:to-[#0F0F0F]'
-            }`}>
+            }`}
+        >
             <div className='grid h-4 w-4 gap-[1px]' style={gridStyle}>
                 {cells.map((i) => (
                     <div
                         key={i}
                         className={`rounded-[1px] border transition-all duration-200 ${
-                            isActive ? 'border-[#444] bg-[#222]' : 'border-[#222] bg-[#181818] group-hover:border-[#333] group-hover:bg-[#1A1A1A]'
+                            isActive
+                                ? 'border-[#444] bg-[#222]'
+                                : 'border-[#222] bg-[#181818] group-hover:border-[#333] group-hover:bg-[#1A1A1A]'
                         }`}
                     />
                 ))}
@@ -95,7 +98,7 @@ export const GridControl = () => {
         if (currentWidth > 0) {
             const gridClass = getGridClass(currentWidth);
             const match = gridClass.match(/grid-cols-(\d+)/);
-            return match ? parseInt(match[1], 10) : 1;
+            return match ? Number.parseInt(match[1], 10) : 1;
         }
         return 1; // Default before width is known
     }, [selectedCols, isClient, lastCols, currentWidth, getGridClass]);

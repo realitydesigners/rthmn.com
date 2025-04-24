@@ -1,6 +1,6 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
-import { FaCheck, FaTimes, FaQuestionCircle, FaLightbulb, FaChevronRight } from 'react-icons/fa';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FaCheck, FaChevronRight, FaLightbulb, FaQuestionCircle, FaTimes } from 'react-icons/fa';
 
 interface QuizProps {
     question: string;
@@ -42,7 +42,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="relative my-12 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-900/10 to-indigo-800/5 p-0.5 backdrop-blur-lg before:absolute before:inset-0 before:-z-10 before:translate-y-[60%] before:transform before:rounded-full before:bg-indigo-500/20 before:opacity-20 before:blur-3xl before:content-['']">
+            className="relative my-12 overflow-hidden rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-900/10 to-indigo-800/5 p-0.5 backdrop-blur-lg before:absolute before:inset-0 before:-z-10 before:translate-y-[60%] before:transform before:rounded-full before:bg-indigo-500/20 before:opacity-20 before:blur-3xl before:content-['']"
+        >
             {/* Success animation overlay */}
             <AnimatePresence>
                 {animateSuccess && (
@@ -52,13 +53,15 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.5 }}
                         className='absolute inset-0 z-20 flex items-center justify-center bg-black/50 backdrop-blur-sm'
-                        onAnimationComplete={() => setTimeout(() => setAnimateSuccess(false), 1000)}>
+                        onAnimationComplete={() => setTimeout(() => setAnimateSuccess(false), 1000)}
+                    >
                         <motion.div
                             initial={{ scale: 0.5, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
                             exit={{ scale: 1.5, opacity: 0 }}
                             transition={{ duration: 0.5, type: 'spring' }}
-                            className='flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/20 backdrop-blur-md'>
+                            className='flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/20 backdrop-blur-md'
+                        >
                             <FaCheck className='h-10 w-10 text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]' />
                         </motion.div>
                     </motion.div>
@@ -79,7 +82,9 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                 <FaQuestionCircle className='h-5 w-5 text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.5)]' />
                             </div>
                         </div>
-                        <h3 className='bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>{question}</h3>
+                        <h3 className='bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>
+                            {question}
+                        </h3>
                     </div>
                 </div>
 
@@ -102,7 +107,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                       ? 'border-indigo-500/50 bg-gradient-to-r from-indigo-500/20 to-indigo-400/10'
                                       : 'border-white/5 bg-black/20 hover:border-indigo-400/30 hover:bg-indigo-500/10'
                             }`}
-                            disabled={hasSubmitted}>
+                            disabled={hasSubmitted}
+                        >
                             {/* Option inner content */}
                             <div className='relative rounded-[10px] bg-black/40 p-4 backdrop-blur-sm'>
                                 <div className='flex items-center justify-between'>
@@ -117,7 +123,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                                 : selectedAnswer === index
                                                   ? 'text-white'
                                                   : 'text-neutral-300 group-hover:text-white'
-                                        }`}>
+                                        }`}
+                                    >
                                         {option}
                                     </span>
 
@@ -133,8 +140,11 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                                 : selectedAnswer === index
                                                   ? 'border border-indigo-500/30 bg-indigo-500/20'
                                                   : 'border border-white/10 bg-black/30 opacity-0 group-hover:opacity-100'
-                                        }`}>
-                                        {hasSubmitted && index === correctAnswer && <FaCheck className='h-3.5 w-3.5 text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]' />}
+                                        }`}
+                                    >
+                                        {hasSubmitted && index === correctAnswer && (
+                                            <FaCheck className='h-3.5 w-3.5 text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]' />
+                                        )}
                                         {hasSubmitted && index === selectedAnswer && index !== correctAnswer && (
                                             <FaTimes className='h-3.5 w-3.5 text-rose-400 drop-shadow-[0_0_5px_rgba(251,113,133,0.5)]' />
                                         )}
@@ -145,7 +155,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                 </div>
 
                                 {/* Highlight bar for correct/selected answers */}
-                                {(hasSubmitted && (index === correctAnswer || index === selectedAnswer)) || (!hasSubmitted && selectedAnswer === index) ? (
+                                {(hasSubmitted && (index === correctAnswer || index === selectedAnswer)) ||
+                                (!hasSubmitted && selectedAnswer === index) ? (
                                     <div
                                         className={`absolute bottom-0 left-0 h-[2px] w-full ${
                                             hasSubmitted
@@ -153,7 +164,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                                     ? 'bg-gradient-to-r from-emerald-500 to-emerald-400'
                                                     : 'bg-gradient-to-r from-rose-500 to-rose-400'
                                                 : 'bg-gradient-to-r from-indigo-500 to-indigo-400'
-                                        }`}></div>
+                                        }`}
+                                    ></div>
                                 ) : null}
                             </div>
                         </motion.button>
@@ -168,7 +180,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                             whileTap={{ scale: 0.97 }}
                             onClick={handleSubmit}
                             disabled={selectedAnswer === null}
-                            className='relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 p-0.5 font-medium text-white shadow-lg transition-all disabled:opacity-50'>
+                            className='relative overflow-hidden rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 p-0.5 font-medium text-white shadow-lg transition-all disabled:opacity-50'
+                        >
                             <div className='relative rounded-[10px] bg-black/20 px-6 py-3 backdrop-blur-sm'>
                                 <span className='relative z-10 flex items-center gap-2'>
                                     Check Answer
@@ -182,7 +195,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                             whileHover={{ scale: 1.03, y: -2 }}
                             whileTap={{ scale: 0.97 }}
                             onClick={handleReset}
-                            className='relative overflow-hidden rounded-xl border border-indigo-400/20 p-0.5 font-medium text-white transition-all'>
+                            className='relative overflow-hidden rounded-xl border border-indigo-400/20 p-0.5 font-medium text-white transition-all'
+                        >
                             <div className='relative rounded-[10px] bg-black/20 px-6 py-3 backdrop-blur-sm'>
                                 <span className='relative z-10'>Try Again</span>
                             </div>
@@ -203,13 +217,17 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                 isCorrect
                                     ? 'border-emerald-500/20 bg-gradient-to-r from-emerald-500/20 to-emerald-400/10'
                                     : 'border-rose-500/20 bg-gradient-to-r from-rose-500/20 to-rose-400/10'
-                            }`}>
+                            }`}
+                        >
                             <div className='rounded-[10px] bg-black/40 p-5 backdrop-blur-sm'>
                                 <div className='mb-3 flex items-center gap-3'>
                                     <div
                                         className={`flex h-10 w-10 items-center justify-center rounded-full ${
-                                            isCorrect ? 'border border-emerald-500/30 bg-emerald-500/20' : 'border border-rose-500/30 bg-rose-500/20'
-                                        }`}>
+                                            isCorrect
+                                                ? 'border border-emerald-500/30 bg-emerald-500/20'
+                                                : 'border border-rose-500/30 bg-rose-500/20'
+                                        }`}
+                                    >
                                         {isCorrect ? (
                                             <FaCheck className='h-4 w-4 text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.5)]' />
                                         ) : (
@@ -224,7 +242,8 @@ export default function Quiz({ question, options, correctAnswer, explanation }: 
                                         initial={{ opacity: 0, height: 0 }}
                                         animate={{ opacity: 1, height: 'auto' }}
                                         transition={{ duration: 0.3, delay: 0.2 }}
-                                        className='mt-4 flex items-start gap-3 rounded-lg border border-white/5 bg-black/30 p-4 backdrop-blur-sm'>
+                                        className='mt-4 flex items-start gap-3 rounded-lg border border-white/5 bg-black/30 p-4 backdrop-blur-sm'
+                                    >
                                         <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border border-amber-500/30 bg-amber-500/20'>
                                             <FaLightbulb className='h-3.5 w-3.5 text-amber-400 drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]' />
                                         </div>

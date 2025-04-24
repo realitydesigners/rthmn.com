@@ -1,4 +1,11 @@
-import type { ObjectDefinition, ObjectOptions, ObjectSchemaType, SanityDocument, SlugDefinition, SlugOptions } from 'sanity';
+import type {
+    ObjectDefinition,
+    ObjectOptions,
+    ObjectSchemaType,
+    SanityDocument,
+    SlugDefinition,
+    SlugOptions,
+} from 'sanity';
 import type { NavigatorOptions as PresentationNavigatorOptions, PresentationPluginOptions } from 'sanity/presentation';
 
 export type NormalizedCreatablePage = {

@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import { useEffect, useState, type JSX } from 'react';
+import { type JSX, useEffect, useState } from 'react';
 
 const Services = [
     {
@@ -89,8 +89,12 @@ export const ServiceSection = () => {
 
     return (
         <div className='flex w-full flex-row flex-wrap px-4 py-10 text-white md:px-40'>
-            <div className={`text-balance transition-all duration-300 ease-in-out ${isDetailVisible ? 'w-full lg:w-1/6 lg:grid-cols-1' : 'w-full lg:grid-cols-4'}`}>
-                <ul className={`grid ${isDetailVisible ? 'grid-cols-2 lg:grid-cols-1' : 'grid-cols-2 md:grid-cols-5'} gap-1`}>
+            <div
+                className={`text-balance transition-all duration-300 ease-in-out ${isDetailVisible ? 'w-full lg:w-1/6 lg:grid-cols-1' : 'w-full lg:grid-cols-4'}`}
+            >
+                <ul
+                    className={`grid ${isDetailVisible ? 'grid-cols-2 lg:grid-cols-1' : 'grid-cols-2 md:grid-cols-5'} gap-1`}
+                >
                     {Services.map(({ label, icon }) => (
                         <li
                             key={label}
@@ -98,9 +102,12 @@ export const ServiceSection = () => {
                                 activeService === label ? 'bg-neutral-600/25' : 'bg-black hover:bg-neutral-600/25'
                             } flex items-center transition duration-300 ease-in-out`}
                             onClick={() => handleServiceClick(label)}
-                            onKeyDown={(e) => handleKeyPress(e, label)}>
+                            onKeyDown={(e) => handleKeyPress(e, label)}
+                        >
                             {getIcon(icon)}
-                            <div className={`text-oxanium ml-2 text-lg leading-[1.2em] font-bold uppercase`}>{label}</div>
+                            <div className={`text-oxanium ml-2 text-lg leading-[1.2em] font-bold uppercase`}>
+                                {label}
+                            </div>
                         </li>
                     ))}
                 </ul>
@@ -111,9 +118,16 @@ export const ServiceSection = () => {
                     style={{
                         maxHeight: isDetailVisible ? '100%' : '0',
                         opacity: isDetailVisible ? 1 : 0,
-                    }}>
-                    <h2 className={`heading-text fade-in text-oxanium mb-4 text-4xl leading-none font-bold uppercase lg:text-5xl`}>{activeService}</h2>
-                    <p className={`primary-text fade-in text-oxanium text-xl text-neutral-400`}>{Services.find((service) => service.label === activeService)?.desc}</p>
+                    }}
+                >
+                    <h2
+                        className={`heading-text fade-in text-oxanium mb-4 text-4xl leading-none font-bold uppercase lg:text-5xl`}
+                    >
+                        {activeService}
+                    </h2>
+                    <p className={`primary-text fade-in text-oxanium text-xl text-neutral-400`}>
+                        {Services.find((service) => service.label === activeService)?.desc}
+                    </p>
                 </div>
             )}
         </div>
@@ -129,14 +143,26 @@ const getIcon = (name: string): JSX.Element => {
 
 const icons = {
     lock: (
-        <svg width='20' height='20' viewBox='0 0 18 20' fill='none' xmlns='http://www.w3.org/2000/svg' aria-labelledby='lockIconTitle'>
+        <svg
+            width='20'
+            height='20'
+            viewBox='0 0 18 20'
+            fill='none'
+            xmlns='http://www.w3.org/2000/svg'
+            aria-labelledby='lockIconTitle'
+        >
             <title id='lockIconTitle'>Lock Icon</title>
             <path
                 d='M1 11C1 9.11438 1 8.17157 1.58579 7.58579C2.17157 7 3.11438 7 5 7H13C14.8856 7 15.8284 7 16.4142 7.58579C17 8.17157 17 9.11438 17 11V13C17 15.8284 17 17.2426 16.1213 18.1213C15.2426 19 13.8284 19 11 19H7C4.17157 19 2.75736 19 1.87868 18.1213C1 17.2426 1 15.8284 1 13V11Z'
                 stroke='#444'
                 strokeWidth='2'
             />
-            <path d='M13 6V5C13 2.79086 11.2091 1 9 1V1C6.79086 1 5 2.79086 5 5V6' stroke='#444' strokeWidth='2' strokeLinecap='round' />
+            <path
+                d='M13 6V5C13 2.79086 11.2091 1 9 1V1C6.79086 1 5 2.79086 5 5V6'
+                stroke='#444'
+                strokeWidth='2'
+                strokeLinecap='round'
+            />
             <circle cx='9' cy='13' r='2' fill='#444' />
         </svg>
     ),

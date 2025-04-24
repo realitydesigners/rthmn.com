@@ -1,11 +1,11 @@
 'use client';
 
-import { defineConfig } from 'sanity';
-import { structureTool } from 'sanity/structure';
-import schemaTypes from './lib/sanity/lib/index';
 import { dataset, projectId, studioUrl } from '@/lib/sanity/lib/api';
 import { createPageTemplate } from '@/lib/sanity/lib/helper';
 import { CustomField, CustomItem, StudioStructure, myTheme } from '@/lib/sanity/ui';
+import { defineConfig } from 'sanity';
+import { structureTool } from 'sanity/structure';
+import schemaTypes from './lib/sanity/lib/index';
 
 const title = process.env.NEXT_PUBLIC_SANITY_PROJECT_TITLE || 'RTHMN';
 

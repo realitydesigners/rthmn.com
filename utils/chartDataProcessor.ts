@@ -1,4 +1,4 @@
-import { ChartDataPoint } from '@/components/Charts/CandleChart';
+import type { ChartDataPoint } from '@/components/Charts/CandleChart';
 
 export interface ProcessedChartData {
     processedCandles: ChartDataPoint[];
@@ -33,12 +33,22 @@ function createEmptyCandle(timestamp: number, price: number): ChartDataPoint {
     };
 }
 
-export function processLiveCandleUpdate(currentCandles: ChartDataPoint[], update: LiveCandleUpdate, currentCandleRef: { current: ChartDataPoint | null }): ChartDataPoint[] {
+export function processLiveCandleUpdate(
+    currentCandles: ChartDataPoint[],
+    update: LiveCandleUpdate,
+    currentCandleRef: { current: ChartDataPoint | null }
+): ChartDataPoint[] {
     if (!currentCandles.length) return currentCandles;
 
     const newCandles = [...currentCandles];
     const now = new Date(update.timestamp);
-    const currentMinute = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes()).getTime();
+    const currentMinute = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        now.getHours(),
+        now.getMinutes()
+    ).getTime();
     const lastHistoricalCandle = newCandles[newCandles.length - 1];
 
     // If we don't have a current candle, check the gap from historical data
@@ -157,9 +167,9 @@ export function processLiveCandleUpdate(currentCandles: ChartDataPoint[], update
 
 export function processInitialChartData(
     rawCandles: any[],
-    initialVisiblePoints: number = 1000,
-    chartWidth: number = 1000, // Default width for SSR
-    chartHeight: number = 500 // Default height for SSR
+    initialVisiblePoints = 1000,
+    chartWidth = 1000, // Default width for SSR
+    chartHeight = 500 // Default height for SSR
 ): ProcessedChartData {
     if (!rawCandles.length) {
         return {
@@ -189,8 +199,8 @@ export function processInitialChartData(
     const visibleCandles = processedCandles.slice(0, visibleCount);
 
     // 3. Calculate initial price range
-    let minPrice = Infinity;
-    let maxPrice = -Infinity;
+    let minPrice = Number.POSITIVE_INFINITY;
+    let maxPrice = Number.NEGATIVE_INFINITY;
 
     for (const candle of visibleCandles) {
         minPrice = Math.min(minPrice, candle.low);

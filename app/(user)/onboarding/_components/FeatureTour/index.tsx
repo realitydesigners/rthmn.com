@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
-import { IconType } from 'react-icons';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { cn } from '@/utils/cn';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import type { IconType } from 'react-icons';
 
 export function FeatureTour({
     icon: Icon,
@@ -49,7 +49,7 @@ export function FeatureTour({
         const updateTooltipPosition = () => {
             const sidebarElement = document.querySelector(`[data-position="${position}"]`);
             if (sidebarElement) {
-                const width = parseInt(sidebarElement.getAttribute('data-width') || '0');
+                const width = Number.parseInt(sidebarElement.getAttribute('data-width') || '0');
                 setSidebarWidth(width);
             }
         };
@@ -130,7 +130,8 @@ export function FeatureTour({
                         currentStepId !== tourId &&
                         'pointer-events-none cursor-not-allowed opacity-50 hover:border-transparent hover:bg-transparent hover:shadow-none',
                     className
-                )}>
+                )}
+            >
                 <Icon
                     size={20}
                     className={cn('transition-colors', {
@@ -154,7 +155,11 @@ export function FeatureTour({
                                 duration: 0.2,
                                 ease: [0.2, 1, 0.2, 1],
                             }}
-                            className={cn('fixed top-18 z-50', position === 'left' ? (isOpen ? 'left-4' : 'left-20') : isOpen ? 'right-4' : 'right-20')}>
+                            className={cn(
+                                'fixed top-18 z-50',
+                                position === 'left' ? (isOpen ? 'left-4' : 'left-20') : isOpen ? 'right-4' : 'right-20'
+                            )}
+                        >
                             {React.cloneElement(children, {
                                 onComplete: handleComplete,
                                 isCompleted: isCompleted,

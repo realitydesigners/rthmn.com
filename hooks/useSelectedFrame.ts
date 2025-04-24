@@ -1,5 +1,5 @@
+import type { BoxSlice } from '@/types/types';
 import { useCallback, useState } from 'react';
-import { BoxSlice } from '@/types/types';
 
 export const useSelectedFrame = () => {
     const [selectedFrame, setSelectedFrame] = useState<BoxSlice | null>(null);

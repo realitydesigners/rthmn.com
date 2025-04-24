@@ -14,7 +14,9 @@ export function LegalContentBlock({ title, content, layout = 'contained' }: Lega
     console.log('Legal content block with layout:', layout);
 
     return (
-        <div className={`legal-content-block ${layout === 'contained' ? 'container mx-auto px-4' : layout === 'wide' ? 'container-wide mx-auto px-4' : 'w-full px-6'}`}>
+        <div
+            className={`legal-content-block ${layout === 'contained' ? 'container mx-auto px-4' : layout === 'wide' ? 'container-wide mx-auto px-4' : 'w-full px-6'}`}
+        >
             <div className='py-16'>
                 {title && <h1 className='mb-8 text-center text-4xl font-bold'>{title}</h1>}
 

@@ -1,11 +1,12 @@
 'use client';
 
-import React, { createContext, use, useState, useCallback, useMemo, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { type BoxColors, useColorStore } from '@/stores/colorStore';
+import { useGridStore } from '@/stores/gridStore';
 import { useOnboardingStore } from '@/stores/onboardingStore';
 import { getSelectedPairs, setSelectedPairs } from '@/utils/localStorage';
-import { useColorStore, type BoxColors } from '@/stores/colorStore';
-import { useGridStore } from '@/stores/gridStore';
+import { usePathname, useRouter } from 'next/navigation';
+import type React from 'react';
+import { createContext, use, useCallback, useEffect, useMemo, useState } from 'react';
 
 interface UserContextType {
     selectedPairs: string[];
@@ -75,7 +76,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
     const handleSidebarClick = useCallback((e: React.MouseEvent) => {
         const target = e.target as HTMLElement;
-        if (target.closest('.sidebar-toggle') || target.closest('.sidebar-content') || target.closest('.fixed-sidebar')) {
+        if (
+            target.closest('.sidebar-toggle') ||
+            target.closest('.sidebar-content') ||
+            target.closest('.fixed-sidebar')
+        ) {
             return;
         }
         window.dispatchEvent(new Event('closeSidebars'));

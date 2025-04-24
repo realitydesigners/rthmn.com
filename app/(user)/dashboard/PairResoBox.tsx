@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo } from 'react';
 import { ResoBox } from '@/components/Charts/ResoBox';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
-import { BoxSlice } from '@/types/types';
-import type { BoxColors } from '@/stores/colorStore';
 import { useWebSocket } from '@/providers/WebsocketProvider';
+import type { BoxColors } from '@/stores/colorStore';
 import { useTimeframeStore } from '@/stores/timeframeStore';
+import type { BoxSlice } from '@/types/types';
 import { formatPrice } from '@/utils/instruments';
+import React, { useCallback, useEffect, useMemo } from 'react';
 
 interface PairResoBoxProps {
     pair?: string;
@@ -17,7 +17,9 @@ interface PairResoBoxProps {
 }
 
 // Simple inline skeleton components
-const TextSkeleton = ({ className }: { className?: string }) => <div className={`animate-pulse rounded bg-[#333] ${className}`}></div>;
+const TextSkeleton = ({ className }: { className?: string }) => (
+    <div className={`animate-pulse rounded bg-[#333] ${className}`}></div>
+);
 
 const ChartSkeleton = () => <div className='aspect-square h-full w-full animate-pulse rounded bg-[#222]'></div>;
 
@@ -27,7 +29,9 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
     const { priceData } = useWebSocket();
 
     // Get timeframe state and actions - memoize selectors
-    const settings = useTimeframeStore(useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair]));
+    const settings = useTimeframeStore(
+        useCallback((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings), [pair])
+    );
     const updatePairSettings = useTimeframeStore((state) => state.updatePairSettings);
     const initializePair = useTimeframeStore((state) => state.initializePair);
 
@@ -69,21 +73,33 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                     <div className='flex w-full flex-col items-center gap-2'>
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
-                                <div className='font-outfit text-lg font-bold tracking-wider'>{pair?.toUpperCase()}</div>
+                                <div className='font-outfit text-lg font-bold tracking-wider'>
+                                    {pair?.toUpperCase()}
+                                </div>
                                 {/* Conditional Skeleton for Price */}
                                 {isLoading || !currentPrice ? (
                                     <TextSkeleton className='h-4 w-16' />
                                 ) : (
-                                    <div className='font-kodemono text-sm font-medium text-neutral-200'>{formatPrice(currentPrice, pair)}</div>
+                                    <div className='font-kodemono text-sm font-medium text-neutral-200'>
+                                        {formatPrice(currentPrice, pair)}
+                                    </div>
                                 )}
                             </div>
                         </div>
                     </div>
 
                     {/* Chart Section - Conditionally render skeleton or ResoBox */}
-                    <div className={`relative flex h-full min-h-[100px] w-full flex-grow ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}>
+                    <div
+                        className={`relative flex h-full min-h-[100px] w-full flex-grow ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}
+                    >
                         {showChart ? (
-                            <ResoBox slice={filteredBoxSlice} className='h-full w-full' boxColors={boxColors} pair={pair} showPriceLines={settings.showPriceLines} />
+                            <ResoBox
+                                slice={filteredBoxSlice}
+                                className='h-full w-full'
+                                boxColors={boxColors}
+                                pair={pair}
+                                showPriceLines={settings.showPriceLines}
+                            />
                         ) : (
                             <ChartSkeleton />
                         )}
@@ -92,7 +108,12 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                     {/* Timeframe Control - Conditionally render skeleton or Slider */}
                     <div className='relative h-16 w-full flex-shrink-0'>
                         {showSlider ? (
-                            <TimeFrameSlider startIndex={settings.startIndex} maxBoxCount={settings.maxBoxCount} boxes={boxSlice.boxes} onStyleChange={handleTimeframeChange} />
+                            <TimeFrameSlider
+                                startIndex={settings.startIndex}
+                                maxBoxCount={settings.maxBoxCount}
+                                boxes={boxSlice.boxes}
+                                onStyleChange={handleTimeframeChange}
+                            />
                         ) : (
                             <SliderSkeleton />
                         )}

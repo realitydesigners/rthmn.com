@@ -133,9 +133,16 @@ export default defineType({
                             publicationDate: 'posts.block.0.publicationDate',
                             media: 'posts.block.0.image',
                         },
-                        prepare(selection: { title?: string; excerpt?: string; publicationDate?: string; media?: any }) {
+                        prepare(selection: {
+                            title?: string;
+                            excerpt?: string;
+                            publicationDate?: string;
+                            media?: any;
+                        }) {
                             const { title, excerpt, publicationDate, media } = selection;
-                            const formattedDate = publicationDate ? new Date(publicationDate).toLocaleDateString() : 'No date';
+                            const formattedDate = publicationDate
+                                ? new Date(publicationDate).toLocaleDateString()
+                                : 'No date';
 
                             const subtitle = `${excerpt ? excerpt : 'No excerpt'} | ${formattedDate}`;
                             return {

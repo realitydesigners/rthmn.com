@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Direction } from './TradeDirection';
+import type { Direction } from './TradeDirection';
 
 interface PriceLevelsProps {
     direction: Direction;
