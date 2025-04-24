@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Candle } from '@/types/types';
+import type { Candle } from '@/types/types';
 import { formatTime } from '@/utils/dateUtils';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 // Add these constants at the top with other constants
 const VISIBLE_POINTS = 100;
@@ -62,7 +62,9 @@ const PathGenerator = {
         let path = '';
         for (let i = 0; i < points.length; i += this.batchSize) {
             const batch = points.slice(i, i + this.batchSize);
-            path += batch.map((p, index) => `${index === 0 && i === 0 ? 'M' : 'L'} ${p.scaledX} ${p.scaledY}`).join(' ');
+            path += batch
+                .map((p, index) => `${index === 0 && i === 0 ? 'M' : 'L'} ${p.scaledX} ${p.scaledY}`)
+                .join(' ');
         }
         return path;
     },
@@ -324,7 +326,8 @@ export const LineChart: React.FC<{
             onMouseDown={handleMouseDown}
             onMouseMove={handleContainerMouseMove}
             onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}>
+            onMouseLeave={handleMouseUp}
+        >
             <svg
                 width='100%'
                 height='100%'
@@ -332,10 +335,17 @@ export const LineChart: React.FC<{
                 preserveAspectRatio='none'
                 onMouseMove={handleSvgMouseMove}
                 onMouseLeave={handleMouseLeave}
-                style={{ cursor: isDragging ? 'grabbing' : 'grab' }}>
+                style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+            >
                 <g transform={`translate(${chartPadding.left},${chartPadding.top})`}>
                     <ChartLine pathData={pathData} width={chartWidth} height={chartHeight} yAxisScale={animatedScale} />
-                    <XAxis data={scaledData} chartWidth={chartWidth} chartHeight={chartHeight} hoverInfo={hoverInfo} formatTime={formatTime} />
+                    <XAxis
+                        data={scaledData}
+                        chartWidth={chartWidth}
+                        chartHeight={chartHeight}
+                        hoverInfo={hoverInfo}
+                        formatTime={formatTime}
+                    />
                     <YAxis
                         minY={minY}
                         maxY={maxY}
@@ -346,7 +356,9 @@ export const LineChart: React.FC<{
                         yAxisScale={animatedScale}
                         hoverInfo={hoverInfo}
                     />
-                    {hoverInfo && <HoverInfo x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />}
+                    {hoverInfo && (
+                        <HoverInfo x={hoverInfo.x} y={hoverInfo.y} chartHeight={chartHeight} chartWidth={chartWidth} />
+                    )}
                 </g>
             </svg>
         </div>
@@ -386,7 +398,9 @@ const XAxis: React.FC<{
         const result = [];
 
         for (let time = startTime; time <= endTime; time += intervalMs) {
-            const closestPoint = data.reduce((prev, curr) => (Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time) ? curr : prev));
+            const closestPoint = data.reduce((prev, curr) =>
+                Math.abs(curr.timestamp - time) < Math.abs(prev.timestamp - time) ? curr : prev
+            );
             result.push(closestPoint);
         }
 
@@ -401,7 +415,9 @@ const XAxis: React.FC<{
         <g className='x-axis' transform={`translate(0, ${chartHeight})`}>
             <line x1={0} y1={0} x2={chartWidth} y2={0} stroke='#777' />
             {intervals.map((point, index) => {
-                const xPosition = ((point.timestamp - data[0].timestamp) / (data[data.length - 1].timestamp - data[0].timestamp)) * chartWidth;
+                const xPosition =
+                    ((point.timestamp - data[0].timestamp) / (data[data.length - 1].timestamp - data[0].timestamp)) *
+                    chartWidth;
 
                 // Create a unique key using both timestamp and index
                 const uniqueKey = `time-${point.timestamp}-${index}`;
@@ -483,7 +499,8 @@ const YAxis: React.FC<{
                 WebkitUserSelect: 'none', // For Safari
                 MozUserSelect: 'none', // For Firefox
                 msUserSelect: 'none', // For IE/Edge
-            }}>
+            }}
+        >
             <rect x={0} y={0} width={60} height={chartHeight} fill='transparent' cursor='ns-resize' />
             <line x1={0} y1={0} x2={0} y2={chartHeight} stroke='#777' />
             {Array.from({ length: steps + 1 }, (_, i) => {
@@ -495,12 +512,22 @@ const YAxis: React.FC<{
                         <text x={10} y={4} textAnchor='start' fill='#fff' fontSize='12'>
                             {value.toFixed(3)}
                         </text>
-                        <line x1={0} y1={0} x2={-chartWidth} y2={0} stroke='#777' strokeOpacity='0.2' strokeDasharray='4 4' />
+                        <line
+                            x1={0}
+                            y1={0}
+                            x2={-chartWidth}
+                            y2={0}
+                            stroke='#777'
+                            strokeOpacity='0.2'
+                            strokeDasharray='4 4'
+                        />
                     </g>
                 );
             })}
             {hoverInfo && (
-                <g transform={`translate(0, ${ensureNumber(chartHeight * (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange))})`}>
+                <g
+                    transform={`translate(0, ${ensureNumber(chartHeight * (1 - (hoverInfo.price - visibleMin) / scaledVisibleRange))})`}
+                >
                     <rect
                         x={3}
                         y={-10}

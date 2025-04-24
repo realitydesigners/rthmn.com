@@ -1,7 +1,7 @@
-import { PortableText as SanityPortableText } from '@portabletext/react';
-import type { PortableTextComponents } from '@portabletext/react';
 import { AboutTemplate } from '@/components/PageBuilder/templates/AboutTemplate';
 import { ChangelogTemplate } from '@/components/PageBuilder/templates/ChangelogTemplate';
+import { PortableText as SanityPortableText } from '@portabletext/react';
+import type { PortableTextComponents } from '@portabletext/react';
 
 interface PortableTextProps {
     value: any;

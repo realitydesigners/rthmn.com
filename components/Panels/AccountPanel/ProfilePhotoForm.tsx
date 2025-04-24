@@ -1,8 +1,8 @@
 'use client';
 
-import { useRef, useState, useEffect } from 'react';
-import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
     avatarUrl: string | null;
@@ -112,13 +112,21 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
     return (
         <div className='font-outfit relative h-full w-full'>
             {/* Hidden file input */}
-            <input ref={fileInputRef} type='file' accept='image/*' className='hidden' onChange={handleFileUpload} disabled={isLoading} />
+            <input
+                ref={fileInputRef}
+                type='file'
+                accept='image/*'
+                className='hidden'
+                onChange={handleFileUpload}
+                disabled={isLoading}
+            />
 
             {/* Profile Image */}
             <button
                 onClick={handleClick}
                 className='group relative h-full w-full overflow-hidden rounded-full border-2 border-[#222] bg-[#222] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl'
-                disabled={isLoading}>
+                disabled={isLoading}
+            >
                 {preview ? (
                     <>
                         <Image
@@ -139,13 +147,17 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
                     </>
                 ) : (
                     <div className='flex h-full w-full items-center justify-center bg-[#333] transition-colors duration-200 group-hover:bg-[#444]'>
-                        <span className='text-2xl font-bold text-zinc-500 sm:text-4xl'>{userId.charAt(0).toUpperCase()}</span>
+                        <span className='text-2xl font-bold text-zinc-500 sm:text-4xl'>
+                            {userId.charAt(0).toUpperCase()}
+                        </span>
                     </div>
                 )}
 
                 {/* Simple hover text */}
                 <div className='font-outfit absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-                    <span className='rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:py-2 sm:text-sm'>Change Photo</span>
+                    <span className='rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:py-2 sm:text-sm'>
+                        Change Photo
+                    </span>
                 </div>
             </button>
 
@@ -157,7 +169,9 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
             )}
 
             {/* Help Text - Hidden on very small screens */}
-            <div className='font-outfit mt-2 hidden text-center text-xs text-zinc-500 sm:block'>Click to change • Max 2MB</div>
+            <div className='font-outfit mt-2 hidden text-center text-xs text-zinc-500 sm:block'>
+                Click to change • Max 2MB
+            </div>
         </div>
     );
 }

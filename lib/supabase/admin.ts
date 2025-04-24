@@ -1,6 +1,6 @@
+import { toDateTime } from '@/utils/helpers';
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
-import { toDateTime } from '@/utils/helpers';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
     apiVersion: '2025-02-24.acacia',
@@ -9,7 +9,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
         version: '0.1.0',
     },
 });
-export const supabaseAdmin = createClient<any>(process.env.NEXT_PUBLIC_SUPABASE_URL || '', process.env.SUPABASE_SERVICE_ROLE_KEY || '');
+export const supabaseAdmin = createClient<any>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
+);
 
 const upsertProductRecord = async (product: Stripe.Product) => {
     const productData = {
@@ -64,7 +67,9 @@ const createOrRetrieveCustomer = async ({ email, uuid }: { email: string; uuid: 
         };
         if (email) customerData.email = email;
         const customer = await stripe.customers.create(customerData);
-        const { error: supabaseError } = await supabaseAdmin.from('customers').insert([{ id: uuid, stripe_customer_id: customer.id }]);
+        const { error: supabaseError } = await supabaseAdmin
+            .from('customers')
+            .insert([{ id: uuid, stripe_customer_id: customer.id }]);
         if (supabaseError) throw supabaseError;
         console.log(`New customer created and inserted for ${uuid}.`);
         return customer.id;
@@ -91,7 +96,11 @@ const copyBillingDetailsToCustomer = async (uuid: string, payment_method: Stripe
 
 const manageSubscriptionStatusChange = async (subscriptionId: string, customerId: string, createAction = false) => {
     // Get customer's UUID from mapping table.
-    const { data: customerData, error: noCustomerError } = await supabaseAdmin.from('customers').select('id').eq('stripe_customer_id', customerId).single();
+    const { data: customerData, error: noCustomerError } = await supabaseAdmin
+        .from('customers')
+        .select('id')
+        .eq('stripe_customer_id', customerId)
+        .single();
     if (noCustomerError) throw noCustomerError;
 
     const { id: uuid } = customerData!;

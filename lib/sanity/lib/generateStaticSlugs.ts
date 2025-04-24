@@ -1,7 +1,7 @@
-import { createClient } from '@sanity/client/stega';
-import { groq } from 'next-sanity';
 import { apiVersion, dataset, projectId, studioUrl } from '@/lib/sanity/lib/api';
 import { token } from '@/lib/sanity/lib/token';
+import { createClient } from '@sanity/client/stega';
+import { groq } from 'next-sanity';
 import 'server-only';
 
 export const client = createClient({

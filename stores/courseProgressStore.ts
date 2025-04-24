@@ -1,6 +1,6 @@
+import { produce } from 'immer';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { produce } from 'immer';
 
 interface Progress {
     completed: boolean;
@@ -94,7 +94,9 @@ export const useCourseProgressStore = create<CourseProgressState>()(
                     };
 
                     // Check if chapter is completed
-                    const allLessonsCompleted = Object.values(newCourse.chapters[chapterId].lessons).every((lesson) => lesson.completed);
+                    const allLessonsCompleted = Object.values(newCourse.chapters[chapterId].lessons).every(
+                        (lesson) => lesson.completed
+                    );
 
                     if (allLessonsCompleted) {
                         newCourse.chapters[chapterId] = {
@@ -105,7 +107,9 @@ export const useCourseProgressStore = create<CourseProgressState>()(
                     }
 
                     // Check if course is completed
-                    const allChaptersCompleted = Object.values(newCourse.chapters).every((chapter) => chapter.completed);
+                    const allChaptersCompleted = Object.values(newCourse.chapters).every(
+                        (chapter) => chapter.completed
+                    );
 
                     if (allChaptersCompleted) {
                         newCourse.progress = {

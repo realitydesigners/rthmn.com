@@ -1,16 +1,16 @@
 'use client';
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaChartArea, FaCube, FaTable } from 'react-icons/fa';
+import { ConnectionBadge } from '@/components/Badges/ConnectionBadge';
 import { LogoIcon } from '@/components/Icons/icons';
-import { CandleData } from '@/types/types';
+import type { CandleData } from '@/types/types';
+import { motion } from 'framer-motion';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FaChartArea, FaCube, FaTable } from 'react-icons/fa';
 import { LineChart } from './LineChart';
 import { MarketDisplay } from './MarketDisplay';
 import { MarketNavigator } from './MarketNavigator';
 import { PairSlider } from './PairSlider';
 import { PatternDisplay } from './PatternDisplay';
-import { ConnectionBadge } from '@/components/Badges/ConnectionBadge';
 
 interface MarketData {
     pair: string;
@@ -20,50 +20,59 @@ interface MarketData {
 
 type TabType = 'chart' | 'grid' | 'boxes' | 'navigation';
 
-const MarketCard = memo(({ item, isSelected, onClick }: { item: MarketData; isSelected: boolean; onClick: () => void }) => {
-    const getLatestPrice = (candleData: string) => {
-        try {
-            const data = JSON.parse(candleData) as CandleData[];
-            return parseFloat(data[data.length - 1].mid.c);
-        } catch (e) {
-            return null;
-        }
-    };
+const MarketCard = memo(
+    ({ item, isSelected, onClick }: { item: MarketData; isSelected: boolean; onClick: () => void }) => {
+        const getLatestPrice = (candleData: string) => {
+            try {
+                const data = JSON.parse(candleData) as CandleData[];
+                return Number.parseFloat(data[data.length - 1].mid.c);
+            } catch (e) {
+                return null;
+            }
+        };
 
-    const getPriceChange = (candleData: string) => {
-        try {
-            const data = JSON.parse(candleData) as CandleData[];
-            const firstPrice = parseFloat(data[0].mid.o);
-            const lastPrice = parseFloat(data[data.length - 1].mid.c);
-            const change = ((lastPrice - firstPrice) / firstPrice) * 100;
-            return change;
-        } catch (e) {
-            return null;
-        }
-    };
+        const getPriceChange = (candleData: string) => {
+            try {
+                const data = JSON.parse(candleData) as CandleData[];
+                const firstPrice = Number.parseFloat(data[0].mid.o);
+                const lastPrice = Number.parseFloat(data[data.length - 1].mid.c);
+                const change = ((lastPrice - firstPrice) / firstPrice) * 100;
+                return change;
+            } catch (e) {
+                return null;
+            }
+        };
 
-    const latestPrice = getLatestPrice(item.candleData);
-    const priceChange = getPriceChange(item.candleData);
+        const latestPrice = getLatestPrice(item.candleData);
+        const priceChange = getPriceChange(item.candleData);
 
-    return (
-        <motion.div
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            onClick={onClick}
-            className={`group relative flex h-[40px] cursor-pointer items-center justify-between rounded-md border px-3 backdrop-blur-sm transition-all duration-200 ${
-                isSelected ? 'border-[#22c55e]/50 bg-[#22c55e]/10' : 'border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60'
-            }`}>
-            {isSelected && <div className='absolute top-0 left-0 h-full w-[3px] rounded-l-md bg-[#22c55e]' />}
-            <div className='flex w-full items-center justify-between'>
-                <span className='text-xs font-medium text-white/90'>{item.pair.replace('_', '/')}</span>
-                <span className='text-xs font-medium text-white/90'>{latestPrice ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5) : 'N/A'}</span>
-                <span className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${priceChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}>
-                    {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}
-                </span>
-            </div>
-        </motion.div>
-    );
-});
+        return (
+            <motion.div
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.99 }}
+                onClick={onClick}
+                className={`group relative flex h-[40px] cursor-pointer items-center justify-between rounded-md border px-3 backdrop-blur-sm transition-all duration-200 ${
+                    isSelected
+                        ? 'border-[#22c55e]/50 bg-[#22c55e]/10'
+                        : 'border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60'
+                }`}
+            >
+                {isSelected && <div className='absolute top-0 left-0 h-full w-[3px] rounded-l-md bg-[#22c55e]' />}
+                <div className='flex w-full items-center justify-between'>
+                    <span className='text-xs font-medium text-white/90'>{item.pair.replace('_', '/')}</span>
+                    <span className='text-xs font-medium text-white/90'>
+                        {latestPrice ? latestPrice.toFixed(item.pair.includes('JPY') ? 3 : 5) : 'N/A'}
+                    </span>
+                    <span
+                        className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${priceChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'}`}
+                    >
+                        {priceChange ? `${priceChange.toFixed(1)}%` : 'N/A'}
+                    </span>
+                </div>
+            </motion.div>
+        );
+    }
+);
 
 MarketCard.displayName = 'MarketCard';
 
@@ -79,7 +88,9 @@ const DemoNavbar = memo(({ activeTab, setActiveTab }: { activeTab: TabType; setA
                                 <div className='flex h-7 w-7 items-center'>
                                     <LogoIcon />
                                 </div>
-                                <span className='font-russo tracking ml-2 hidden text-[16px] text-white lg:block'>RTHMN</span>
+                                <span className='font-russo tracking ml-2 hidden text-[16px] text-white lg:block'>
+                                    RTHMN
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -132,10 +143,10 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
             const data = JSON.parse(candleDataString) as CandleData[];
             return data.map((candle) => ({
                 time: candle.time,
-                open: parseFloat(candle.mid.o),
-                high: parseFloat(candle.mid.h),
-                low: parseFloat(candle.mid.l),
-                close: parseFloat(candle.mid.c),
+                open: Number.parseFloat(candle.mid.o),
+                high: Number.parseFloat(candle.mid.h),
+                low: Number.parseFloat(candle.mid.l),
+                close: Number.parseFloat(candle.mid.c),
                 volume: candle.volume,
             }));
         } catch (e) {
@@ -219,10 +230,18 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
                 return (
                     <div className='flex h-full gap-4'>
                         <div className='w-[300px]'>
-                            <MarketNavigator marketData={marketData} selectedPair={selectedPair} onPairSelect={handlePairSelect} />
+                            <MarketNavigator
+                                marketData={marketData}
+                                selectedPair={selectedPair}
+                                onPairSelect={handlePairSelect}
+                            />
                         </div>
                         <div className='flex-1'>
-                            <PairSlider marketData={marketData} selectedPair={selectedPair} onPairSelect={handlePairSelect} />
+                            <PairSlider
+                                marketData={marketData}
+                                selectedPair={selectedPair}
+                                onPairSelect={handlePairSelect}
+                            />
                         </div>
                     </div>
                 );
@@ -246,7 +265,8 @@ export const SectionRthmnDemo = memo(({ marketData }: { marketData: MarketData[]
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.3 }}
-                    className='relative z-10 h-[calc(100%-80px)] [transform:translateZ(20px)] overflow-y-auto pt-2'>
+                    className='relative z-10 h-[calc(100%-80px)] [transform:translateZ(20px)] overflow-y-auto pt-2'
+                >
                     {renderActiveTab}
                 </motion.div>
             </div>

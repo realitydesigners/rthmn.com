@@ -1,7 +1,7 @@
-import type { CSSProperties } from 'react';
-import { useMemo } from 'react';
 import type { Box } from '@/types/types';
 import { motion } from 'framer-motion';
+import type { CSSProperties } from 'react';
+import { useMemo } from 'react';
 
 interface NestedBoxesProps {
     boxes: Box[];
@@ -68,7 +68,8 @@ export const NestedBoxes = ({
     };
 
     const renderBox = (box: Box, index: number, prevBox: Box | null = null) => {
-        const isFirstDifferent = prevBox && ((prevBox.value > 0 && box.value < 0) || (prevBox.value < 0 && box.value > 0));
+        const isFirstDifferent =
+            prevBox && ((prevBox.value > 0 && box.value < 0) || (prevBox.value < 0 && box.value > 0));
 
         const boxStyles = useMemo(() => {
             const baseColor = box.value > 0 ? colors.positive : colors.negative;
@@ -76,9 +77,9 @@ export const NestedBoxes = ({
             const shadowIntensity = colors.styles.shadowIntensity;
             const hexToRgba = (hex: string, alpha: number) => {
                 if (!hex || hex.length < 7) return `rgba(100, 100, 100, ${alpha})`;
-                const r = parseInt(hex.slice(1, 3), 16);
-                const g = parseInt(hex.slice(3, 5), 16);
-                const b = parseInt(hex.slice(5, 7), 16);
+                const r = Number.parseInt(hex.slice(1, 3), 16);
+                const g = Number.parseInt(hex.slice(3, 5), 16);
+                const b = Number.parseInt(hex.slice(5, 7), 16);
                 return `rgba(${r}, ${g}, ${b}, ${alpha})`;
             };
             const shadowColor = (alpha: number) => hexToRgba(baseColor, alpha * opacity);
@@ -90,7 +91,14 @@ export const NestedBoxes = ({
                 borderRadius: `${colors.styles.borderRadius}px`,
                 shadowIntensity,
             };
-        }, [box.value, colors.positive, colors.negative, colors.styles.opacity, colors.styles.shadowIntensity, colors.styles.borderRadius]);
+        }, [
+            box.value,
+            colors.positive,
+            colors.negative,
+            colors.styles.opacity,
+            colors.styles.shadowIntensity,
+            colors.styles.borderRadius,
+        ]);
 
         const size = (Math.abs(box.value) / maxSize) * baseSize;
 
@@ -114,7 +122,9 @@ export const NestedBoxes = ({
             borderColor: colors.styles.showBorder ? boxStyles.shadowColor(0.25) : 'transparent',
             transition: 'all 0.15s ease-out',
             position: 'absolute',
-            boxShadow: colors.styles.showBorder ? `0 0px 0 ${boxStyles.shadowColor(0.12 * boxStyles.shadowIntensity)}` : 'none',
+            boxShadow: colors.styles.showBorder
+                ? `0 0px 0 ${boxStyles.shadowColor(0.12 * boxStyles.shadowIntensity)}`
+                : 'none',
             ...(mode === 'animated' && isPaused
                 ? {
                       transform: `translateX(${index * 5}px) translateY(${index * -5}px) rotateX(0deg) rotateY(0deg) `,
@@ -150,7 +160,9 @@ export const NestedBoxes = ({
                 )}
 
                 {showLabels && (
-                    <div className={`absolute -right-20 flex items-center ${box.value > 0 ? '-bottom-[5px]' : '-top-[5px]'}`}>
+                    <div
+                        className={`absolute -right-20 flex items-center ${box.value > 0 ? '-bottom-[5px]' : '-top-[5px]'}`}
+                    >
                         <div className='h-[1px] w-8' style={{ backgroundColor: boxStyles.baseColor }}></div>
                         <div className='ml-2 font-mono text-[12px]' style={{ color: boxStyles.baseColor }}>
                             {Math.abs(box.value)}
@@ -163,7 +175,8 @@ export const NestedBoxes = ({
         );
     };
 
-    const containerStyle: React.CSSProperties = mode === 'animated' ? { perspective: '1500px', transformStyle: 'preserve-3d' } : {};
+    const containerStyle: React.CSSProperties =
+        mode === 'animated' ? { perspective: '1500px', transformStyle: 'preserve-3d' } : {};
 
     const animationVariants = {
         paused: {
@@ -193,7 +206,8 @@ export const NestedBoxes = ({
                 style={{ width: '100%', height: '100%', transformStyle: 'preserve-3d' }}
                 variants={animationVariants}
                 animate={isPaused ? 'paused' : 'playing'}
-                transition={animationTransition}>
+                transition={animationTransition}
+            >
                 {renderBox(boxes[0], 0)}
             </motion.div>
         </div>

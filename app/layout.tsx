@@ -1,15 +1,15 @@
-import type { Metadata, Viewport } from 'next';
 import { NavbarSignedOut } from '@/components/Navbars/NavbarSignedOut';
-import SupabaseProvider from '@/providers/SupabaseProvider';
+import { SectionFooter } from '@/components/Sections/SectionFooter';
+import { kodeMono, outfit, oxanium, russo } from '@/lib/styles/fonts';
+import { createClient } from '@/lib/supabase/server';
 import { QueryProvider } from '@/providers/QueryProvider';
+import SupabaseProvider from '@/providers/SupabaseProvider';
 import ogImage from '@/public/opengraph-image.png';
 import { getURL } from '@/utils/helpers';
-import { createClient } from '@/lib/supabase/server';
 import { GoogleTagManager } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
-import { kodeMono, outfit, oxanium, russo } from '@/lib/styles/fonts';
-import { SectionFooter } from '@/components/Sections/SectionFooter';
-import { prefetchDNS, preconnect } from 'react-dom';
+import type { Metadata, Viewport } from 'next';
+import { preconnect, prefetchDNS } from 'react-dom';
 import '@/lib/styles/main.css';
 
 const title = 'RTHMN | Next Generation Forex / Stocks Toolkit';

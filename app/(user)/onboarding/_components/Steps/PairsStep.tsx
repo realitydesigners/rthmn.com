@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { FaSearch } from 'react-icons/fa';
 import { useUser } from '@/providers/UserProvider';
 import { useWebSocket } from '@/providers/WebsocketProvider';
 import { CRYPTO_PAIRS, EQUITY_PAIRS, ETF_PAIRS, FOREX_PAIRS, INSTRUMENTS } from '@/utils/instruments';
 import { setSelectedPairs as saveToLocalStorage } from '@/utils/localStorage';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import { FaSearch } from 'react-icons/fa';
 
 interface Props {
     selectedPairs: string[];
@@ -38,7 +38,9 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
     }, [selectedPairs, onValidationChange]);
 
     const handlePairClick = (pair: string) => {
-        const newSelectedPairs = selectedPairs.includes(pair) ? selectedPairs.filter((p) => p !== pair) : [...selectedPairs, pair];
+        const newSelectedPairs = selectedPairs.includes(pair)
+            ? selectedPairs.filter((p) => p !== pair)
+            : [...selectedPairs, pair];
 
         setSelectedPairs(newSelectedPairs);
         saveToLocalStorage(newSelectedPairs);
@@ -70,16 +72,26 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                     <motion.h2
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'>
+                        className='bg-gradient-to-r from-white to-white/60 bg-clip-text text-3xl font-bold text-transparent'
+                    >
                         Select Trading Instruments
                     </motion.h2>
                     <div className='flex items-center justify-between'>
-                        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className='pr-4 text-base text-neutral-400'>
+                        <motion.p
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className='pr-4 text-base text-neutral-400'
+                        >
                             Choose your favorite trading pairs, you can always add more later
                         </motion.p>
 
                         {/* Refined Selection Counter */}
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className='flex items-center gap-2'>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            className='flex items-center gap-2'
+                        >
                             <div className='flex gap-1'>
                                 {[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
                                     <motion.div
@@ -92,7 +104,9 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                     />
                                 ))}
                             </div>
-                            <span className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-[#3FFFA2]' : 'text-[#666]'}`}>
+                            <span
+                                className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? 'text-[#3FFFA2]' : 'text-[#666]'}`}
+                            >
                                 {selectedPairs.length}/{MIN_PAIRS_REQUIRED}
                             </span>
                         </motion.div>
@@ -100,7 +114,12 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                 </div>
 
                 {/* Search Bar */}
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className='relative'>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className='relative'
+                >
                     <div className='relative flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]'>
                         <div className='flex h-10 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#121212]'>
                             <FaSearch className='ml-4 text-[#666]' />
@@ -125,7 +144,8 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                 style={{
                     scrollbarWidth: 'thin',
                     scrollbarColor: '#333 transparent',
-                }}>
+                }}
+            >
                 {/* Scrollbar Styles */}
                 <style jsx global>{`
                     .overflow-y-auto::-webkit-scrollbar {
@@ -146,7 +166,9 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
 
                     return (
                         <div key={group.label}>
-                            <h3 className='font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#666] uppercase'>{group.label}</h3>
+                            <h3 className='font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#666] uppercase'>
+                                {group.label}
+                            </h3>
                             <div className='grid grid-cols-2 gap-2 xl:grid-cols-3'>
                                 {pairs.map((item, index) => {
                                     const isSelected = selectedPairs.includes(item);
@@ -165,7 +187,8 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
                                                 isSelected
                                                     ? 'border-[#3FFFA2]/50 from-[#3FFFA2]/20 to-[#3FFFA2]/0'
                                                     : 'border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-[#3FFFA2]/30 hover:from-[#1A1A1A] hover:to-[#111]'
-                                            }`}>
+                                            }`}
+                                        >
                                             <motion.div
                                                 initial={false}
                                                 animate={{
@@ -182,11 +205,15 @@ export default function PairsStep({ selectedPairs, setSelectedPairs, onValidatio
 
                                             <div className='relative flex items-center justify-between rounded-xl p-4'>
                                                 <div className='flex items-center'>
-                                                    <span className='font-outfit text-[13px] font-bold tracking-wider text-white'>{item}</span>
+                                                    <span className='font-outfit text-[13px] font-bold tracking-wider text-white'>
+                                                        {item}
+                                                    </span>
                                                 </div>
                                                 <div className='flex items-center'>
                                                     <span className='font-kodemono mr-3 text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-4'>
-                                                        {priceData[item]?.price ? formatPrice(priceData[item].price, item) : 'N/A'}
+                                                        {priceData[item]?.price
+                                                            ? formatPrice(priceData[item].price, item)
+                                                            : 'N/A'}
                                                     </span>
                                                     <motion.div
                                                         initial={false}

@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState, memo } from 'react';
-import { Box } from '@/types/types';
-import { BoxColors } from '@/stores/colorStore';
+import type { BoxColors } from '@/stores/colorStore';
+import type { Box } from '@/types/types';
 import { BoxSizes } from '@/utils/instruments';
 import { formatPrice } from '@/utils/instruments';
+import type React from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 
 interface BoxTimelineProps {
     data: {
@@ -28,7 +29,16 @@ interface BoxTimelineProps {
 
 const MAX_FRAMES = 1000;
 
-const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCount, boxVisibilityFilter, boxColors, className = '', hoveredTimestamp, showLine = true }) => {
+const Histogram: React.FC<BoxTimelineProps> = ({
+    data,
+    boxOffset,
+    visibleBoxesCount,
+    boxVisibilityFilter,
+    boxColors,
+    className = '',
+    hoveredTimestamp,
+    showLine = true,
+}) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const [isClient, setIsClient] = useState(false);
@@ -90,8 +100,12 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                 if (prevBoxesRaw.length === 0) {
                     addFrameDirectly = true;
                 } else {
-                    const prevLargestBox = prevBoxesRaw.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
-                    const currentLargestBox = boxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+                    const prevLargestBox = prevBoxesRaw.reduce((max, box) =>
+                        Math.abs(box.value) > Math.abs(max.value) ? box : max
+                    );
+                    const currentLargestBox = boxes.reduce((max, box) =>
+                        Math.abs(box.value) > Math.abs(max.value) ? box : max
+                    );
                     const trendChanged = prevLargestBox.value >= 0 !== currentLargestBox.value >= 0;
 
                     if (trendChanged) {
@@ -119,29 +133,43 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                                 const originalBox = prevFrame.progressiveValues[boxIndex];
 
                                 const sortedIndex = prevBoxesSorted.findIndex(
-                                    (b) => b.high === originalBox.high && b.low === originalBox.low && Math.abs(b.value - originalBox.value) < 0.00001
+                                    (b) =>
+                                        b.high === originalBox.high &&
+                                        b.low === originalBox.low &&
+                                        Math.abs(b.value - originalBox.value) < 0.00001
                                 );
 
                                 if (sortedIndex !== -1 && sortedIndex < boxesToFlipCount) {
-                                    if ((isNewTrendPositive && currentBoxValue < 0) || (!isNewTrendPositive && currentBoxValue > 0)) {
+                                    if (
+                                        (isNewTrendPositive && currentBoxValue < 0) ||
+                                        (!isNewTrendPositive && currentBoxValue > 0)
+                                    ) {
                                         intermediateValues[boxIndex] = {
                                             ...intermediateValues[boxIndex],
-                                            value: isNewTrendPositive ? Math.abs(originalBox.value) : -Math.abs(originalBox.value),
+                                            value: isNewTrendPositive
+                                                ? Math.abs(originalBox.value)
+                                                : -Math.abs(originalBox.value),
                                         };
                                         flippedCount++;
                                     }
-                                } else if ((isNewTrendPositive && currentBoxValue > 0) || (!isNewTrendPositive && currentBoxValue < 0)) {
+                                } else if (
+                                    (isNewTrendPositive && currentBoxValue > 0) ||
+                                    (!isNewTrendPositive && currentBoxValue < 0)
+                                ) {
                                     intermediateValues[boxIndex] = { ...intermediateValues[boxIndex] };
                                 } else {
                                     intermediateValues[boxIndex] = {
                                         ...intermediateValues[boxIndex],
-                                        value: isNewTrendPositive ? -Math.abs(originalBox.value) : Math.abs(originalBox.value),
+                                        value: isNewTrendPositive
+                                            ? -Math.abs(originalBox.value)
+                                            : Math.abs(originalBox.value),
                                     };
                                 }
                             }
 
                             const safeTimeDiff = Math.max(0, timeDiff);
-                            const interpolatedTimestampMillis = prevTimestamp + safeTimeDiff * (k / (numIntermediateSteps + 1));
+                            const interpolatedTimestampMillis =
+                                prevTimestamp + safeTimeDiff * (k / (numIntermediateSteps + 1));
                             const interpolatedTimestampISO = new Date(interpolatedTimestampMillis).toISOString();
 
                             const intermediateFrame = {
@@ -211,7 +239,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
         let highlightIndex = -1;
         if (hoveredTimestamp !== null && hoveredTimestamp !== undefined) {
             const targetTime = Number(hoveredTimestamp);
-            let minDiff = Infinity;
+            let minDiff = Number.POSITIVE_INFINITY;
 
             framesToDraw.forEach((frame, index) => {
                 const frameTime = new Date(frame.timestamp).getTime();
@@ -224,7 +252,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
 
             if (highlightIndex === -1) {
                 let closestMappedIndex = -1;
-                let minMappedDiff = Infinity;
+                let minMappedDiff = Number.POSITIVE_INFINITY;
                 frameToRealTimestampRef.current.forEach((realTimestamp, index) => {
                     if (index >= framesToDraw.length) return;
                     const diff = Math.abs(realTimestamp - targetTime);
@@ -273,7 +301,10 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             const positiveBoxes = slicedBoxes.filter((box) => box.value >= 0).sort((a, b) => a.value - b.value);
             const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
 
-            const largestBox = orderedBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max), orderedBoxes[0] || { value: 0 });
+            const largestBox = orderedBoxes.reduce(
+                (max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max),
+                orderedBoxes[0] || { value: 0 }
+            );
             const isLargestPositive = largestBox.value >= 0;
 
             // Draw boxes with proper spacing
@@ -283,12 +314,12 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
 
                 if (isLargestPositive) {
                     ctx.fillStyle = isPositiveBox
-                        ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
-                        : `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
+                        ? `rgba(${Number.parseInt(boxColors.positive.slice(1, 3), 16)}, ${Number.parseInt(boxColors.positive.slice(3, 5), 16)}, ${Number.parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
+                        : `rgba(${Number.parseInt(boxColors.positive.slice(1, 3), 16)}, ${Number.parseInt(boxColors.positive.slice(3, 5), 16)}, ${Number.parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
                 } else {
                     ctx.fillStyle = isPositiveBox
-                        ? `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
-                        : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+                        ? `rgba(${Number.parseInt(boxColors.negative.slice(1, 3), 16)}, ${Number.parseInt(boxColors.negative.slice(3, 5), 16)}, ${Number.parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
+                        : `rgba(${Number.parseInt(boxColors.negative.slice(1, 3), 16)}, ${Number.parseInt(boxColors.negative.slice(3, 5), 16)}, ${Number.parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
                 }
 
                 ctx.fillRect(x, y, boxSize, boxSize + (boxIndex === orderedBoxes.length - 1 ? 1 : 0));
@@ -302,7 +333,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                     }
                     return minData;
                 },
-                { minAbsValue: Infinity, box: null as Box | null }
+                { minAbsValue: Number.POSITIVE_INFINITY, box: null as Box | null }
             );
             const smallestBox = smallestBoxData.box;
 
@@ -342,9 +373,9 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                 const fillColor = currentPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
                 const gradient = ctx.createLinearGradient(currentPoint.x, 0, nextPoint.x, 0);
                 try {
-                    const r = parseInt(fillColor.slice(1, 3), 16) || 0;
-                    const g = parseInt(fillColor.slice(3, 5), 16) || 0;
-                    const b = parseInt(fillColor.slice(5, 7), 16) || 0;
+                    const r = Number.parseInt(fillColor.slice(1, 3), 16) || 0;
+                    const g = Number.parseInt(fillColor.slice(3, 5), 16) || 0;
+                    const b = Number.parseInt(fillColor.slice(5, 7), 16) || 0;
                     gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     ctx.fillStyle = gradient;
@@ -374,9 +405,9 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                 const fillColor = lastPoint.isLargestPositive ? boxColors.positive : boxColors.negative;
                 const gradient = ctx.createLinearGradient(lastPoint.x, 0, lastPoint.x + boxSize, 0);
                 try {
-                    const r = parseInt(fillColor.slice(1, 3), 16) || 0;
-                    const g = parseInt(fillColor.slice(3, 5), 16) || 0;
-                    const b = parseInt(fillColor.slice(5, 7), 16) || 0;
+                    const r = Number.parseInt(fillColor.slice(1, 3), 16) || 0;
+                    const g = Number.parseInt(fillColor.slice(3, 5), 16) || 0;
+                    const b = Number.parseInt(fillColor.slice(5, 7), 16) || 0;
                     gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
                     ctx.fillStyle = gradient;
@@ -449,14 +480,19 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                                     style={{
                                         left: `${change.x}px`,
                                         color: change.isPositive ? boxColors.positive : boxColors.negative,
-                                    }}>
+                                    }}
+                                >
                                     ▼
                                 </div>
                             ))}
                         </div>
 
                         <div className='relative mr-8 h-full'>
-                            <canvas ref={canvasRef} className='block h-full overflow-y-hidden' style={{ imageRendering: 'pixelated' }} />
+                            <canvas
+                                ref={canvasRef}
+                                className='block h-full overflow-y-hidden'
+                                style={{ imageRendering: 'pixelated' }}
+                            />
                         </div>
                     </div>
                 </div>
@@ -464,18 +500,27 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
             <div>
                 {data.length > 0 && (
                     <div className='pointer-events-none absolute top-3 right-0 -bottom-0 flex w-12 flex-col justify-between shadow-2xl'>
-                        {data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount).length > 0 && (
+                        {data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount)
+                            .length > 0 && (
                             <>
                                 {(() => {
-                                    const visibleBoxes = data[data.length - 1].progressiveValues.slice(boxOffset, boxOffset + visibleBoxesCount);
-                                    const largestBox = visibleBoxes.reduce((max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max));
+                                    const visibleBoxes = data[data.length - 1].progressiveValues.slice(
+                                        boxOffset,
+                                        boxOffset + visibleBoxesCount
+                                    );
+                                    const largestBox = visibleBoxes.reduce((max, box) =>
+                                        Math.abs(box.value) > Math.abs(max.value) ? box : max
+                                    );
                                     const color = largestBox.value > 0 ? boxColors.positive : boxColors.negative;
                                     return (
                                         <>
                                             <div className='flex items-center'>
                                                 <div className='h-[1px] flex-1' style={{ backgroundColor: color }} />
                                                 <div className='ml-1'>
-                                                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color }}>
+                                                    <span
+                                                        className='font-kodemono text-[8px] tracking-wider'
+                                                        style={{ color }}
+                                                    >
                                                         {formatPrice(largestBox.high, 'BTC/USD')}
                                                     </span>
                                                 </div>
@@ -483,7 +528,10 @@ const Histogram: React.FC<BoxTimelineProps> = ({ data, boxOffset, visibleBoxesCo
                                             <div className='flex items-center'>
                                                 <div className='h-[1px] flex-1' style={{ backgroundColor: color }} />
                                                 <div className='ml-1'>
-                                                    <span className='font-kodemono text-[8px] tracking-wider' style={{ color }}>
+                                                    <span
+                                                        className='font-kodemono text-[8px] tracking-wider'
+                                                        style={{ color }}
+                                                    >
                                                         {formatPrice(largestBox.low, 'BTC/USD')}
                                                     </span>
                                                 </div>

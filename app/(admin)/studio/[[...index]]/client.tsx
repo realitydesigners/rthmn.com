@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import dynamic from 'next/dynamic';
 import config from '@/sanity.config';
+import dynamic from 'next/dynamic';
+import React from 'react';
 
 const NextStudio = dynamic(() => import('next-sanity/studio').then((mod) => mod.NextStudio), {
     ssr: false,

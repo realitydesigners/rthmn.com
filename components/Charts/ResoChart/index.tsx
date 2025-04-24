@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useEffect, useMemo, useRef, useState, memo } from 'react';
-import type { Box, BoxSlice } from '@/types/types';
-import type { BoxColors } from '@/stores/colorStore';
 import { useUser } from '@/providers/UserProvider';
+import type { BoxColors } from '@/stores/colorStore';
 import { useTimeframeStore } from '@/stores/timeframeStore';
+import type { Box, BoxSlice } from '@/types/types';
+import React, { useEffect, useMemo, useRef, useState, memo } from 'react';
 
 interface ResoChartProps {
     slice: BoxSlice | null;
@@ -15,87 +15,91 @@ interface ResoChartProps {
     pair?: string;
 }
 
-export const ResoChart = memo(({ slice, boxColors: propBoxColors, pair = '', className = '', digits, showSidebar }: ResoChartProps) => {
-    const { boxColors: userBoxColors } = useUser();
-    const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
+export const ResoChart = memo(
+    ({ slice, boxColors: propBoxColors, pair = '', className = '', digits, showSidebar }: ResoChartProps) => {
+        const { boxColors: userBoxColors } = useUser();
+        const settings = useTimeframeStore((state) => (pair ? state.getSettingsForPair(pair) : state.global.settings));
 
-    // Merge boxColors from props with userBoxColors, preferring props
-    const mergedBoxColors = useMemo(() => {
-        if (!propBoxColors) return userBoxColors;
-        return {
-            ...userBoxColors,
-            ...propBoxColors,
-            styles: {
-                ...userBoxColors.styles,
-                ...propBoxColors.styles,
-            },
-        };
-    }, [propBoxColors, userBoxColors]);
+        // Merge boxColors from props with userBoxColors, preferring props
+        const mergedBoxColors = useMemo(() => {
+            if (!propBoxColors) return userBoxColors;
+            return {
+                ...userBoxColors,
+                ...propBoxColors,
+                styles: {
+                    ...userBoxColors.styles,
+                    ...propBoxColors.styles,
+                },
+            };
+        }, [propBoxColors, userBoxColors]);
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+        const containerRef = useRef<HTMLDivElement>(null);
+        const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-    useEffect(() => {
-        let rafId: number;
-        const updateSize = () => {
+        useEffect(() => {
+            let rafId: number;
+            const updateSize = () => {
+                if (containerRef.current) {
+                    const element = containerRef.current;
+                    const rect = element.getBoundingClientRect();
+                    setDimensions({
+                        width: rect.width - (showSidebar ? 80 : 0), // Adjust width based on sidebar visibility
+                        height: rect.height,
+                    });
+                }
+            };
+
+            const debouncedUpdateSize = () => {
+                cancelAnimationFrame(rafId);
+                rafId = requestAnimationFrame(updateSize);
+            };
+
+            const resizeObserver = new ResizeObserver(debouncedUpdateSize);
+
             if (containerRef.current) {
-                const element = containerRef.current;
-                const rect = element.getBoundingClientRect();
-                setDimensions({
-                    width: rect.width - (showSidebar ? 80 : 0), // Adjust width based on sidebar visibility
-                    height: rect.height,
-                });
+                resizeObserver.observe(containerRef.current);
             }
-        };
+            debouncedUpdateSize();
 
-        const debouncedUpdateSize = () => {
-            cancelAnimationFrame(rafId);
-            rafId = requestAnimationFrame(updateSize);
-        };
+            return () => {
+                resizeObserver.disconnect();
+                cancelAnimationFrame(rafId);
+            };
+        }, [showSidebar]);
 
-        const resizeObserver = new ResizeObserver(debouncedUpdateSize);
+        const selectedBoxes = useMemo(() => {
+            if (!slice?.boxes?.length) return [];
+            const boxes = slice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount);
+            console.log('Boxes in view:', {
+                total: slice.boxes.length,
+                startIndex: settings.startIndex,
+                maxBoxCount: settings.maxBoxCount,
+                selected: boxes.length,
+            });
+            return boxes;
+        }, [slice?.boxes, settings.startIndex, settings.maxBoxCount]);
 
-        if (containerRef.current) {
-            resizeObserver.observe(containerRef.current);
+        const { points, priceLines, prices } = useLinePoints(selectedBoxes, dimensions.height, dimensions.width);
+
+        if (!slice?.boxes || slice.boxes.length === 0) {
+            return null;
         }
-        debouncedUpdateSize();
 
-        return () => {
-            resizeObserver.disconnect();
-            cancelAnimationFrame(rafId);
-        };
-    }, [showSidebar]);
-
-    const selectedBoxes = useMemo(() => {
-        if (!slice?.boxes?.length) return [];
-        const boxes = slice.boxes.slice(settings.startIndex, settings.startIndex + settings.maxBoxCount);
-        console.log('Boxes in view:', {
-            total: slice.boxes.length,
-            startIndex: settings.startIndex,
-            maxBoxCount: settings.maxBoxCount,
-            selected: boxes.length,
-        });
-        return boxes;
-    }, [slice?.boxes, settings.startIndex, settings.maxBoxCount]);
-
-    const { points, priceLines, prices } = useLinePoints(selectedBoxes, dimensions.height, dimensions.width);
-
-    if (!slice?.boxes || slice.boxes.length === 0) {
-        return null;
-    }
-
-    return (
-        <div ref={containerRef} className={`relative flex h-full w-full ${className}`}>
-            <div className='relative h-full flex-1 overflow-visible'>
-                <svg className='h-full w-full overflow-visible' preserveAspectRatio='none'>
-                    <ChartSegments points={points} priceLines={priceLines} boxColors={mergedBoxColors} />
-                    <PriceLines priceLines={priceLines} boxColors={mergedBoxColors} />
-                </svg>
+        return (
+            <div ref={containerRef} className={`relative flex h-full w-full ${className}`}>
+                <div className='relative h-full flex-1 overflow-visible'>
+                    <svg className='h-full w-full overflow-visible' preserveAspectRatio='none'>
+                        <ChartSegments points={points} priceLines={priceLines} boxColors={mergedBoxColors} />
+                        <PriceLines priceLines={priceLines} boxColors={mergedBoxColors} />
+                    </svg>
+                </div>
+                {showSidebar && (
+                    <PriceSidebar priceLines={priceLines} boxColors={mergedBoxColors} digits={digits} prices={prices} />
+                )}
             </div>
-            {showSidebar && <PriceSidebar priceLines={priceLines} boxColors={mergedBoxColors} digits={digits} prices={prices} />}
-        </div>
-    );
-});
+        );
+    }
+);
 
 ResoChart.displayName = 'ResoChart';
 
@@ -169,7 +173,12 @@ export const usePriceScale = (priceMap: Map<number, { isPositive: boolean }>, co
     const priceRange = maxPrice - minPrice;
     const scaleFactor = containerHeight / priceRange;
 
-    return { minPrice, maxPrice, scaleFactor, priceToY: (price: number) => containerHeight - (price - minPrice) * scaleFactor };
+    return {
+        minPrice,
+        maxPrice,
+        scaleFactor,
+        priceToY: (price: number) => containerHeight - (price - minPrice) * scaleFactor,
+    };
 };
 
 interface ScalingResult {
@@ -324,7 +333,11 @@ export const PriceLines = ({ priceLines, boxColors }: { priceLines: PriceLine[];
     </>
 );
 
-export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point[]; priceLines: PriceLine[]; boxColors: BoxColors }) => {
+export const ChartSegments = ({
+    points,
+    priceLines,
+    boxColors,
+}: { points: Point[]; priceLines: PriceLine[]; boxColors: BoxColors }) => {
     const allPrices = priceLines.map((line) => line.price);
     const minPrice = Math.min(...allPrices);
     const maxPrice = Math.max(...allPrices);
@@ -355,14 +368,38 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
                     return (
                         <React.Fragment key={i}>
                             <linearGradient id={`positiveGradient-${i}`} x1='0' y1='1' x2='0' y2='0'>
-                                <stop offset='0%' stopColor={boxColors.positive} stopOpacity={Math.min(0.8 * intensity, 1)} />
-                                <stop offset='50%' stopColor={boxColors.positive} stopOpacity={Math.min(0.5 * intensity, 0.8)} />
-                                <stop offset='100%' stopColor={boxColors.positive} stopOpacity={Math.min(0.2 * intensity, 0.4)} />
+                                <stop
+                                    offset='0%'
+                                    stopColor={boxColors.positive}
+                                    stopOpacity={Math.min(0.8 * intensity, 1)}
+                                />
+                                <stop
+                                    offset='50%'
+                                    stopColor={boxColors.positive}
+                                    stopOpacity={Math.min(0.5 * intensity, 0.8)}
+                                />
+                                <stop
+                                    offset='100%'
+                                    stopColor={boxColors.positive}
+                                    stopOpacity={Math.min(0.2 * intensity, 0.4)}
+                                />
                             </linearGradient>
                             <linearGradient id={`negativeGradient-${i}`} x1='0' y1='0' x2='0' y2='1'>
-                                <stop offset='0%' stopColor={boxColors.negative} stopOpacity={Math.min(0.8 * intensity, 1)} />
-                                <stop offset='50%' stopColor={boxColors.negative} stopOpacity={Math.min(0.5 * intensity, 0.8)} />
-                                <stop offset='100%' stopColor={boxColors.negative} stopOpacity={Math.min(0.2 * intensity, 0.4)} />
+                                <stop
+                                    offset='0%'
+                                    stopColor={boxColors.negative}
+                                    stopOpacity={Math.min(0.8 * intensity, 1)}
+                                />
+                                <stop
+                                    offset='50%'
+                                    stopColor={boxColors.negative}
+                                    stopOpacity={Math.min(0.5 * intensity, 0.8)}
+                                />
+                                <stop
+                                    offset='100%'
+                                    stopColor={boxColors.negative}
+                                    stopOpacity={Math.min(0.2 * intensity, 0.4)}
+                                />
                             </linearGradient>
                         </React.Fragment>
                     );
@@ -388,7 +425,9 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
                 }
                 intensityIndex = Math.min(consecutiveCount, 9);
 
-                const gradientColor = isUp ? `url(#positiveGradient-${intensityIndex})` : `url(#negativeGradient-${intensityIndex})`;
+                const gradientColor = isUp
+                    ? `url(#positiveGradient-${intensityIndex})`
+                    : `url(#negativeGradient-${intensityIndex})`;
 
                 const lineColor = isUp ? boxColors.positive : boxColors.negative;
                 const currentPriceLine = priceLines.find((line) => Math.abs(line.y - y) < 1);
@@ -402,7 +441,13 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
                             fill={gradientColor}
                             className='transition-all duration-300'
                         />
-                        <path d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]}`} stroke={lineColor} strokeWidth='3' fill='none' className='relative z-[1000]' />
+                        <path
+                            d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]}`}
+                            stroke={lineColor}
+                            strokeWidth='3'
+                            fill='none'
+                            className='relative z-[1000]'
+                        />
                     </g>
                 );
             })}
@@ -410,7 +455,11 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
     );
 };
 
-export const PriceSidebar = ({ priceLines, digits = 5, prices = [] }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
+export const PriceSidebar = ({
+    priceLines,
+    digits = 5,
+    prices = [],
+}: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number; prices?: number[] }) => (
     <div className='relative w-18 border-l border-[#222] pl-2'>
         {priceLines.map((line, index) => {
             const isHighlightedPrice = prices.includes(line.price);
@@ -420,7 +469,8 @@ export const PriceSidebar = ({ priceLines, digits = 5, prices = [] }: { priceLin
                     className={`font-kodemono absolute left-0 w-full pl-2 transition-colors ${isHighlightedPrice ? 'z-10 p-1 text-[10px] font-bold text-white' : 'text-[8px] text-[#222]'}`}
                     style={{
                         top: !isNaN(line.y) ? line.y - 6 : 0,
-                    }}>
+                    }}
+                >
                     {line.price.toFixed(digits)}
                 </div>
             );

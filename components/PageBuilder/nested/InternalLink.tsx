@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import React, { useState } from 'react';
 import { TemplateTheme } from '../templates/Templates';
 
 const themeClasses = {
@@ -39,7 +39,16 @@ const TeamLink = ({ team, theme }) => {
     return (
         <Link href={`/team/${team.slug.current}`}>
             <div className={`flex w-auto items-center p-2 ${style.textColor}`}>
-                {team.image && <Image src={team.image} width={100} height={100} priority={true} alt='Team Image' className='h-[30px] max-w-[30px] rounded-[1em] object-cover' />}
+                {team.image && (
+                    <Image
+                        src={team.image}
+                        width={100}
+                        height={100}
+                        priority={true}
+                        alt='Team Image'
+                        className='h-[30px] max-w-[30px] rounded-[1em] object-cover'
+                    />
+                )}
                 <span className='ml-2 text-sm tracking-wide uppercase'>{team.name || 'no title'}</span>
             </div>
         </Link>
@@ -67,19 +76,32 @@ const PostPreviewDialog = ({
 
     return (
         <div id='popup' className='my-5 w-full items-center justify-center'>
-            <div className={`grid w-full grid-cols-1 justify-center rounded-[.7em] p-2 shadow-lg ${style.backgroundColor}`}>
+            <div
+                className={`grid w-full grid-cols-1 justify-center rounded-[.7em] p-2 shadow-lg ${style.backgroundColor}`}
+            >
                 {content && (
                     <>
-                        <div className={`flex h-auto w-full justify-between rounded-[.6em] p-2 ${style.topBackgroundColor} `}>
-                            <Image src={imageUrl} alt={'this'} width={100} height={100} className='h-[50px] max-w-[50px] rounded-[.5em] object-cover' />
+                        <div
+                            className={`flex h-auto w-full justify-between rounded-[.6em] p-2 ${style.topBackgroundColor} `}
+                        >
+                            <Image
+                                src={imageUrl}
+                                alt={'this'}
+                                width={100}
+                                height={100}
+                                className='h-[50px] max-w-[50px] rounded-[.5em] object-cover'
+                            />
 
                             <div className='flex w-full justify-between'>
                                 <Link
                                     href={`/posts/${postData.slug.current}`}
-                                    className={`${style.textColor} lg:text-md flex w-1/2 items-center pl-4 text-sm leading-[1.3em] font-bold`}>
+                                    className={`${style.textColor} lg:text-md flex w-1/2 items-center pl-4 text-sm leading-[1.3em] font-bold`}
+                                >
                                     {content.heading || 'no title'}
                                 </Link>
-                                <span className={`${style.textColor} mb-2 flex h-auto w-auto items-center pt-1 pr-2 text-[.6em] leading-[1em] tracking-widest uppercase`}>
+                                <span
+                                    className={`${style.textColor} mb-2 flex h-auto w-auto items-center pt-1 pr-2 text-[.6em] leading-[1em] tracking-widest uppercase`}
+                                >
                                     {formatDate(content.publicationDate)}
                                 </span>
                             </div>
@@ -87,14 +109,17 @@ const PostPreviewDialog = ({
                         </div>
 
                         <div className='relative flex h-auto w-full flex-col'>
-                            <h4 className={`${style.textColor} p-4 text-2xl leading-[1.3em]`}>{content.subheading || 'no title'}</h4>
+                            <h4 className={`${style.textColor} p-4 text-2xl leading-[1.3em]`}>
+                                {content.subheading || 'no title'}
+                            </h4>
 
                             <div className='relative flex items-center justify-between'>
                                 <TeamLink team={content?.team} theme={theme} />
                                 <Link
                                     href={`/posts/${postData.slug.current}`}
                                     className={`${style.buttonTextColor} ${style.buttonBackgroundColor} absolute right-2 bottom-1 flex items-center justify-center rounded-[.7em] px-4 py-2 text-sm font-bold uppercase hover:transition-colors`}
-                                    prefetch={true}>
+                                    prefetch={true}
+                                >
                                     Read More
                                 </Link>
                             </div>
@@ -131,9 +156,18 @@ const InternalLink: React.FC<{
         <>
             <Link href='#popup' onClick={openDialog}>
                 <span className='text-xl font-bold capitalize underline'>{children}</span>
-                <span className={`font-russo ml-2 rounded-full bg-[#c4b5fd] pt-[5px] pr-2 pb-[5px] pl-2 text-[16px] text-black`}>POST</span>
+                <span
+                    className={`font-russo ml-2 rounded-full bg-[#c4b5fd] pt-[5px] pr-2 pb-[5px] pl-2 text-[16px] text-black`}
+                >
+                    POST
+                </span>
             </Link>
-            <PostPreviewDialog isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} postData={previewPostData} theme={theme} />
+            <PostPreviewDialog
+                isOpen={isDialogOpen}
+                onClose={() => setDialogOpen(false)}
+                postData={previewPostData}
+                theme={theme}
+            />
             {isDialogOpen && isLoading && <LoadingIndicator />}
         </>
     );
@@ -146,8 +180,24 @@ const LoadingIndicator = () => (
         <div className='flex h-auto w-full animate-pulse items-center justify-center rounded-lg bg-linear-to-r from-blue-200/10 to-blue-200/5 p-4 shadow-lg'>
             {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
             <svg width='100' height='100' viewBox='0 0 50 50' xmlns='http://www.w3.org/2000/svg'>
-                <circle cx='25' cy='25' r='20' stroke='#333' strokeWidth='5' fill='none' strokeDasharray='31.415, 31.415' strokeDashoffset='0'>
-                    <animateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='1s' repeatCount='indefinite' />
+                <circle
+                    cx='25'
+                    cy='25'
+                    r='20'
+                    stroke='#333'
+                    strokeWidth='5'
+                    fill='none'
+                    strokeDasharray='31.415, 31.415'
+                    strokeDashoffset='0'
+                >
+                    <animateTransform
+                        attributeName='transform'
+                        type='rotate'
+                        from='0 25 25'
+                        to='360 25 25'
+                        dur='1s'
+                        repeatCount='indefinite'
+                    />
                 </circle>
             </svg>
         </div>

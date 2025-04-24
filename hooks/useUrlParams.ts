@@ -1,13 +1,13 @@
-import { useCallback, useMemo, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
 import debounce from 'lodash/debounce';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useCallback, useMemo, useState } from 'react';
 
 export const useUrlParams = (pair: string) => {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const [boxOffset, setBoxOffset] = useState(() => {
         const offsetParam = searchParams.get('offset');
-        return offsetParam ? parseInt(offsetParam, 10) : 0;
+        return offsetParam ? Number.parseInt(offsetParam, 10) : 0;
     });
 
     const updateURL = useCallback(

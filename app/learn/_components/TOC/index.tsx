@@ -1,14 +1,14 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
-import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import type { PortableTextBlock } from '@portabletext/types';
-import { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
-import { motion, AnimatePresence } from 'framer-motion';
+import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
 import { createClient } from '@/lib/supabase/client';
-import { FiBookOpen, FiArrowRight } from 'react-icons/fi';
+import type { PortableTextBlock } from '@portabletext/types';
+import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import { FiArrowRight, FiBookOpen } from 'react-icons/fi';
 
 interface TOCItem {
     id: string;
@@ -56,14 +56,21 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
                 }
 
                 // Also try to get from users table
-                const { data: userDetails } = await supabase.from('users').select('avatar_url').eq('id', session.user.id).single();
+                const { data: userDetails } = await supabase
+                    .from('users')
+                    .select('avatar_url')
+                    .eq('id', session.user.id)
+                    .single();
 
                 if (userDetails?.avatar_url) {
                     setAvatarUrl(userDetails.avatar_url);
                 }
 
                 // Set user initial as fallback
-                const initial = session.user.user_metadata?.full_name?.[0]?.toUpperCase() || session.user.email?.[0]?.toUpperCase() || '?';
+                const initial =
+                    session.user.user_metadata?.full_name?.[0]?.toUpperCase() ||
+                    session.user.email?.[0]?.toUpperCase() ||
+                    '?';
                 setUserInitial(initial);
             }
         };
@@ -83,7 +90,7 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
                     .trim();
 
                 if (text) {
-                    const level = parseInt(content.style[1]);
+                    const level = Number.parseInt(content.style[1]);
                     const id = generateHeadingId(text);
                     items.push({ id, text, level });
                 }
@@ -102,7 +109,9 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
 
                 const visibleEntries = entries.filter((entry) => entry.isIntersecting);
                 if (visibleEntries.length > 0) {
-                    const mostVisible = visibleEntries.reduce((prev, current) => (prev.intersectionRatio > current.intersectionRatio ? prev : current));
+                    const mostVisible = visibleEntries.reduce((prev, current) =>
+                        prev.intersectionRatio > current.intersectionRatio ? prev : current
+                    );
 
                     setActiveId(mostVisible.target.id);
 
@@ -172,7 +181,8 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className='fixed top-0 right-0 z-10 mt-20 mr-8 mb-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'>
+            className='fixed top-0 right-0 z-10 mt-20 mr-8 mb-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'
+        >
             <div className='mb-6'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2.5'>
@@ -226,12 +236,14 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
                                     className='relative'
                                     style={{ paddingLeft: `${(heading.level - 1) * 12}px` }}
                                     onMouseEnter={() => setIsHovered(heading.id)}
-                                    onMouseLeave={() => setIsHovered(null)}>
+                                    onMouseLeave={() => setIsHovered(null)}
+                                >
                                     {isActive && (
                                         <motion.div
                                             layoutId='activeIndicator'
                                             className='absolute top-1/2 left-[-24px] -translate-y-1/2'
-                                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}>
+                                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                                        >
                                             <div className='relative'>
                                                 {/* Subtle connecting line */}
 
@@ -258,20 +270,39 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
                                         </motion.div>
                                     )}
 
-                                    <Link href={`${pathname}#${heading.id}`} scroll={false} onClick={(e) => handleClick(e, heading.id)} className='group block py-[6px]'>
+                                    <Link
+                                        href={`${pathname}#${heading.id}`}
+                                        scroll={false}
+                                        onClick={(e) => handleClick(e, heading.id)}
+                                        className='group block py-[6px]'
+                                    >
                                         <motion.div
                                             className={`relative rounded-md transition-all duration-200 ${
-                                                isActive ? 'bg-white/[0.06]' : isHovered === heading.id ? 'bg-white/[0.03]' : ''
-                                            }`}>
+                                                isActive
+                                                    ? 'bg-white/[0.06]'
+                                                    : isHovered === heading.id
+                                                      ? 'bg-white/[0.03]'
+                                                      : ''
+                                            }`}
+                                        >
                                             <div className='relative flex items-center gap-2 px-3 py-1.5'>
                                                 <span
                                                     className={`block text-[13px] leading-[1.35] tracking-tight transition-colors duration-200 ${
-                                                        isActive ? 'text-white' : shouldRender ? 'text-[#888] group-hover:text-white/90' : 'text-[#666]'
-                                                    }`}>
+                                                        isActive
+                                                            ? 'text-white'
+                                                            : shouldRender
+                                                              ? 'text-[#888] group-hover:text-white/90'
+                                                              : 'text-[#666]'
+                                                    }`}
+                                                >
                                                     {heading.text}
                                                 </span>
                                                 {isActive && (
-                                                    <motion.div initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className='ml-auto text-white/40'>
+                                                    <motion.div
+                                                        initial={{ opacity: 0, x: -4 }}
+                                                        animate={{ opacity: 1, x: 0 }}
+                                                        className='ml-auto text-white/40'
+                                                    >
                                                         <FiArrowRight size={12} />
                                                     </motion.div>
                                                 )}

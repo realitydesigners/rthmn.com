@@ -12,15 +12,21 @@ export const TradeDirection = memo(({ direction, onDirectionChange }: TradeDirec
         <button
             onClick={() => onDirectionChange('long')}
             className={`group relative flex items-center gap-2 rounded-full border px-4 py-2 transition-all duration-300 ${
-                direction === 'long' ? 'border-emerald-400/50 bg-emerald-400/10 text-emerald-400' : 'border-white/10 bg-black/40 text-neutral-400 hover:border-white/20'
-            }`}>
+                direction === 'long'
+                    ? 'border-emerald-400/50 bg-emerald-400/10 text-emerald-400'
+                    : 'border-white/10 bg-black/40 text-neutral-400 hover:border-white/20'
+            }`}
+        >
             <span className='font-kodemono'>Long</span>
         </button>
         <button
             onClick={() => onDirectionChange('short')}
             className={`group relative flex items-center gap-2 rounded-full border px-4 py-2 transition-all duration-300 ${
-                direction === 'short' ? 'border-red-400/50 bg-red-400/10 text-red-400' : 'border-white/10 bg-black/40 text-neutral-400 hover:border-white/20'
-            }`}>
+                direction === 'short'
+                    ? 'border-red-400/50 bg-red-400/10 text-red-400'
+                    : 'border-white/10 bg-black/40 text-neutral-400 hover:border-white/20'
+            }`}
+        >
             <span className='font-kodemono'>Short</span>
         </button>
     </div>

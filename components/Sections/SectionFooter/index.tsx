@@ -61,7 +61,14 @@ export function SectionFooter() {
     const getIcon = (name: string) => {
         const icons: { [key: string]: any } = {
             logo: (
-                <svg width='40' height='40' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg' aria-labelledby='logoTitle'>
+                <svg
+                    width='40'
+                    height='40'
+                    viewBox='0 0 100 100'
+                    fill='none'
+                    xmlns='http://www.w3.org/2000/svg'
+                    aria-labelledby='logoTitle'
+                >
                     <title id='logoTitle'>Logo</title>
                     <g clipPath='url(#clip0_1208_27417)'>
                         <path
@@ -98,7 +105,11 @@ export function SectionFooter() {
                             {/* Social Links */}
                             <div className='mt-6 flex space-x-6'>
                                 {SOCIAL_LINKS.map((item) => (
-                                    <a key={item.name} href={item.href} className='group relative text-neutral-400 transition-colors duration-200 hover:text-white'>
+                                    <a
+                                        key={item.name}
+                                        href={item.href}
+                                        className='group relative text-neutral-400 transition-colors duration-200 hover:text-white'
+                                    >
                                         <span className='absolute -inset-2 -z-10 rounded-full bg-white/0 transition-all duration-300 group-hover:bg-white/5' />
                                         <item.icon className='h-5 w-5' />
                                     </a>
@@ -116,7 +127,10 @@ export function SectionFooter() {
                                 <ul className='mt-4 space-y-2'>
                                     {links.map((link) => (
                                         <li key={link.name}>
-                                            <a href={link.href} className='group flex items-center text-sm text-neutral-400 transition-colors duration-200 hover:text-white'>
+                                            <a
+                                                href={link.href}
+                                                className='group flex items-center text-sm text-neutral-400 transition-colors duration-200 hover:text-white'
+                                            >
                                                 <span className='relative'>
                                                     {link.name}
                                                     <span className='absolute -bottom-0.5 left-0 h-px w-0 bg-white transition-all duration-200 group-hover:w-full' />
@@ -132,29 +146,37 @@ export function SectionFooter() {
                 <div className='font-kodemono mt-8 border-t border-white/10 pt-8 text-[11px] leading-relaxed text-neutral-400'>
                     <h4 className='mb-2 text-xs font-semibold text-white uppercase'>Risk Disclosure & Disclaimer</h4>
                     <p className='text-neutral-400'>
-                        RTHMN is pattern recognition platform providing algorithmic trading indicators and analysis tools. Built by traders, for traders. Trading in financial
-                        instruments involves high risks including the risk of losing some, or all, of your investment amount, and may not be suitable for all investors. Before
-                        deciding to trade, you should carefully consider your investment objectives, level of experience, and risk appetite.
+                        RTHMN is pattern recognition platform providing algorithmic trading indicators and analysis
+                        tools. Built by traders, for traders. Trading in financial instruments involves high risks
+                        including the risk of losing some, or all, of your investment amount, and may not be suitable
+                        for all investors. Before deciding to trade, you should carefully consider your investment
+                        objectives, level of experience, and risk appetite.
                     </p>
                     <p className='mt-2 text-neutral-400'>
-                        The information and tools provided by RTHMN, including but not limited to our indicators, pattern recognition systems, and market analysis, do not
-                        constitute investment advice, financial advice, trading advice, or any other sort of advice. Any decision to place a trade or investment using our platform
-                        and tools is solely your decision. RTHMN will not accept liability for any loss or damage, including without limitation any loss of profit, which may arise
-                        directly or indirectly from use of or reliance on our platform or information.
+                        The information and tools provided by RTHMN, including but not limited to our indicators,
+                        pattern recognition systems, and market analysis, do not constitute investment advice, financial
+                        advice, trading advice, or any other sort of advice. Any decision to place a trade or investment
+                        using our platform and tools is solely your decision. RTHMN will not accept liability for any
+                        loss or damage, including without limitation any loss of profit, which may arise directly or
+                        indirectly from use of or reliance on our platform or information.
                     </p>
                     <p className='mt-2 text-neutral-400'>
-                        Past performance of any trading system, methodology, or pattern recognition tool is not necessarily indicative of future results. Market patterns and
-                        behaviors are inherently unpredictable. You should be aware of all the risks associated with trading and seek advice from an independent financial advisor
-                        if you have any doubts.
+                        Past performance of any trading system, methodology, or pattern recognition tool is not
+                        necessarily indicative of future results. Market patterns and behaviors are inherently
+                        unpredictable. You should be aware of all the risks associated with trading and seek advice from
+                        an independent financial advisor if you have any doubts.
                     </p>
                     <p className='mt-2 text-neutral-400'>
-                        Hypothetical or simulated performance results have certain inherent limitations. Unlike actual trading performance, simulated results do not represent
-                        actual trading and may not be impacted by real market factors. No representation is being made that any account will or is likely to achieve profits or
-                        losses similar to those shown through our platform.
+                        Hypothetical or simulated performance results have certain inherent limitations. Unlike actual
+                        trading performance, simulated results do not represent actual trading and may not be impacted
+                        by real market factors. No representation is being made that any account will or is likely to
+                        achieve profits or losses similar to those shown through our platform.
                     </p>
                 </div>
                 {/* Bottom Section */}
-                <div className={`font-kodemono mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 lg:flex-row`}>
+                <div
+                    className={`font-kodemono mt-12 flex flex-col items-center justify-between border-t border-white/10 pt-8 lg:flex-row`}
+                >
                     <p className='text-xs text-neutral-400'>© 2024 Rthmn. All rights reserved.</p>
                 </div>
             </div>

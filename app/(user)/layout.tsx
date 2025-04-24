@@ -1,14 +1,14 @@
-import { headers } from 'next/headers';
-import { redirect } from 'next/navigation';
 import { DashboardNavigation } from '@/components/Navbars/DashboardNavigation';
 import { NavbarSignedIn } from '@/components/Navbars/NavbarSignedIn';
 import { SidebarLeft } from '@/components/Sidebars/SidebarLeft';
 import { SidebarRight } from '@/components/Sidebars/SidebarRight';
+import { getSubscription, getUser } from '@/lib/supabase/queries';
+import { createClient } from '@/lib/supabase/server';
 import { DashboardProvider } from '@/providers/DashboardProvider/client';
 import { UserProvider } from '@/providers/UserProvider';
 import { WebSocketProvider } from '@/providers/WebsocketProvider';
-import { getSubscription, getUser } from '@/lib/supabase/queries';
-import { createClient } from '@/lib/supabase/server';
+import { headers } from 'next/headers';
+import { redirect } from 'next/navigation';
 
 interface UserLayoutProps {
     children: React.ReactNode;
@@ -32,7 +32,9 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
                 <UserProvider>
                     <DashboardProvider>
                         <div id='app-container' className='min-h-screen bg-black'>
-                            <main className='h-screen w-full bg-black transition-all duration-300 ease-in-out'>{children}</main>
+                            <main className='h-screen w-full bg-black transition-all duration-300 ease-in-out'>
+                                {children}
+                            </main>
                         </div>
                     </DashboardProvider>
                 </UserProvider>

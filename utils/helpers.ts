@@ -55,7 +55,14 @@ const toastKeyMap: { [key: string]: string[] } = {
     error: ['error', 'error_description'],
 };
 
-const getToastRedirect = (path: string, toastType: string, toastName: string, toastDescription = '', disableButton = false, arbitraryParams = ''): string => {
+const getToastRedirect = (
+    path: string,
+    toastType: string,
+    toastName: string,
+    toastDescription = '',
+    disableButton = false,
+    arbitraryParams = ''
+): string => {
     const [nameKey, descriptionKey] = toastKeyMap[toastType];
 
     let redirectPath = `${path}?${nameKey}=${encodeURIComponent(toastName)}`;
@@ -75,8 +82,18 @@ const getToastRedirect = (path: string, toastType: string, toastName: string, to
     return redirectPath;
 };
 
-export const getStatusRedirect = (path: string, statusName: string, statusDescription = '', disableButton = false, arbitraryParams = '') =>
-    getToastRedirect(path, 'status', statusName, statusDescription, disableButton, arbitraryParams);
+export const getStatusRedirect = (
+    path: string,
+    statusName: string,
+    statusDescription = '',
+    disableButton = false,
+    arbitraryParams = ''
+) => getToastRedirect(path, 'status', statusName, statusDescription, disableButton, arbitraryParams);
 
-export const getErrorRedirect = (path: string, errorName: string, errorDescription = '', disableButton = false, arbitraryParams = '') =>
-    getToastRedirect(path, 'error', errorName, errorDescription, disableButton, arbitraryParams);
+export const getErrorRedirect = (
+    path: string,
+    errorName: string,
+    errorDescription = '',
+    disableButton = false,
+    arbitraryParams = ''
+) => getToastRedirect(path, 'error', errorName, errorDescription, disableButton, arbitraryParams);

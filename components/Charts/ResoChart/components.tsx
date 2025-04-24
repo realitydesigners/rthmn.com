@@ -1,5 +1,5 @@
-import React, { memo } from 'react';
 import type { BoxColors } from '@/stores/colorStore';
+import React, { memo } from 'react';
 import type { PriceLine } from './types';
 
 type Point = [number, number];
@@ -48,7 +48,11 @@ export const PriceLines = ({ priceLines, boxColors }: { priceLines: PriceLine[];
 );
 
 // Chart segments component
-export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point[]; priceLines: PriceLine[]; boxColors: BoxColors }) => (
+export const ChartSegments = ({
+    points,
+    priceLines,
+    boxColors,
+}: { points: Point[]; priceLines: PriceLine[]; boxColors: BoxColors }) => (
     <>
         {points.map(([x, y], index, arr) => {
             if (index === arr.length - 1) return null;
@@ -61,25 +65,49 @@ export const ChartSegments = ({ points, priceLines, boxColors }: { points: Point
             const endX = Math.max(currentPriceLine?.x2 ?? x, nextPriceLine?.x2 ?? nextPoint[0]);
 
             return (
-                <path key={`segment-${index}`} d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`} fill={gradientColor} opacity='1.5' />
+                <path
+                    key={`segment-${index}`}
+                    d={`M ${x},${y} L ${nextPoint[0]},${nextPoint[1]} L ${endX},${nextPoint[1]} L ${endX},${y} Z`}
+                    fill={gradientColor}
+                    opacity='1.5'
+                />
             );
         })}
     </>
 );
 
 // Chart points component
-export const ChartPoints = ({ points, boxColors, prices, digits = 5 }: { points: Point[]; boxColors: BoxColors; prices: number[]; digits?: number }) => {
+export const ChartPoints = ({
+    points,
+    boxColors,
+    prices,
+    digits = 5,
+}: { points: Point[]; boxColors: BoxColors; prices: number[]; digits?: number }) => {
     const pathData = points.reduce((acc, [x, y], index) => {
         return index === 0 ? `M ${x},${y}` : `${acc} L ${x},${y}`;
     }, '');
 
     return (
         <>
-            <path d={pathData} fill='none' stroke='white' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round' />
+            <path
+                d={pathData}
+                fill='none'
+                stroke='white'
+                strokeWidth='2'
+                strokeLinecap='round'
+                strokeLinejoin='round'
+            />
             {points.map(([x, y], index) => (
                 <g key={`point-${index}`}>
                     <circle cx={!isNaN(x) ? x : 0} cy={!isNaN(y) ? y : 0} r='4' fill='white' />
-                    <text x={!isNaN(x) ? x + 8 : 0} y={!isNaN(y) ? y + 4 : 0} fill='white' fontSize='11' fontFamily='monospace' textAnchor='start'>
+                    <text
+                        x={!isNaN(x) ? x + 8 : 0}
+                        y={!isNaN(y) ? y + 4 : 0}
+                        fill='white'
+                        fontSize='11'
+                        fontFamily='monospace'
+                        textAnchor='start'
+                    >
                         {prices[index].toFixed(digits)}
                     </text>
                 </g>
@@ -89,7 +117,11 @@ export const ChartPoints = ({ points, boxColors, prices, digits = 5 }: { points:
 };
 
 // Price sidebar component
-export const PriceSidebar = ({ priceLines, boxColors, digits = 5 }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number }) => (
+export const PriceSidebar = ({
+    priceLines,
+    boxColors,
+    digits = 5,
+}: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number }) => (
     <div className='relative w-18 border-l border-[#222] pl-2'>
         {priceLines.map((line, index) => (
             <div
@@ -97,7 +129,8 @@ export const PriceSidebar = ({ priceLines, boxColors, digits = 5 }: { priceLines
                 className='absolute left-0 w-full pl-2 font-mono text-[10px] text-white'
                 style={{
                     top: !isNaN(line.y) ? line.y - 6 : 0,
-                }}>
+                }}
+            >
                 {line.price.toFixed(digits)}
             </div>
         ))}

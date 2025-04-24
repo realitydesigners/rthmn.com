@@ -1,11 +1,11 @@
 'use client';
 
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/components/Constants/constants';
 import { NestedBoxes } from '@/components/Charts/NestedBoxes';
+import { BASE_VALUES, createDemoStep, createMockBoxData, sequences } from '@/components/Constants/constants';
 import type { CandleData } from '@/types/types';
 import { formatPrice } from '@/utils/instruments';
+import { motion } from 'framer-motion';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 
 interface MarketData {
     pair: string;
@@ -38,7 +38,7 @@ const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData:
     const latestPrice = useMemo(() => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            return parseFloat(data[data.length - 1].mid.c);
+            return Number.parseFloat(data[data.length - 1].mid.c);
         } catch (e) {
             return null;
         }
@@ -90,14 +90,21 @@ const BoxVisualization = memo(({ pair, candleData }: { pair: string; candleData:
                     <div className='flex w-full flex-col items-center gap-2'>
                         <div className='flex w-full items-center justify-between'>
                             <div className='flex items-center gap-4'>
-                                <div className='font-outfit text-sm font-bold tracking-wider lg:text-lg'>{pair.replace('_', '/')}</div>
-                                <div className='font-kodemono text-xs font-medium text-neutral-200 lg:text-sm'>{latestPrice ? formatPrice(latestPrice, pair) : '-'}</div>
+                                <div className='font-outfit text-sm font-bold tracking-wider lg:text-lg'>
+                                    {pair.replace('_', '/')}
+                                </div>
+                                <div className='font-kodemono text-xs font-medium text-neutral-200 lg:text-sm'>
+                                    {latestPrice ? formatPrice(latestPrice, pair) : '-'}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Box Visualization */}
-                    <div className='relative flex items-center justify-center' style={{ height: `${baseSize}px`, width: `${baseSize}px` }}>
+                    <div
+                        className='relative flex items-center justify-center'
+                        style={{ height: `${baseSize}px`, width: `${baseSize}px` }}
+                    >
                         {currentSlice && currentSlice.boxes.length > 0 && (
                             <div className='absolute inset-0 flex items-center justify-center'>
                                 <div className='relative' style={{ width: baseSize, height: baseSize }}>

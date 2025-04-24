@@ -1,8 +1,8 @@
 'use client';
 
+import type { CandleData } from '@/types/types';
 import { useEffect, useRef, useState } from 'react';
 import { useSwipeable } from 'react-swipeable';
-import type { CandleData } from '@/types/types';
 
 interface MarketData {
     pair: string;
@@ -61,8 +61,8 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
     const getPriceChange = (candleData: string) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            const firstPrice = parseFloat(data[0].mid.o);
-            const lastPrice = parseFloat(data[data.length - 1].mid.c);
+            const firstPrice = Number.parseFloat(data[0].mid.o);
+            const lastPrice = Number.parseFloat(data[data.length - 1].mid.c);
             const change = ((lastPrice - firstPrice) / firstPrice) * 100;
             return change;
         } catch (e) {
@@ -73,7 +73,7 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
     const getLatestPrice = (candleData: string) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            return parseFloat(data[data.length - 1].mid.c);
+            return Number.parseFloat(data[data.length - 1].mid.c);
         } catch (e) {
             return null;
         }
@@ -84,7 +84,7 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
             (entries) => {
                 entries.forEach((entry) => {
                     if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
-                        const index = parseInt(entry.target.getAttribute('data-index') || '0');
+                        const index = Number.parseInt(entry.target.getAttribute('data-index') || '0');
                         setActiveIndex(index);
                         onPairSelect(marketData[index].pair);
                     }
@@ -106,7 +106,7 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
     const getSparklinePoints = (candleData: string, width: number, height: number) => {
         try {
             const data = JSON.parse(candleData) as CandleData[];
-            const prices = data.map((d) => parseFloat(d.mid.c));
+            const prices = data.map((d) => Number.parseFloat(d.mid.c));
             const min = Math.min(...prices);
             const max = Math.max(...prices);
             const range = max - min;
@@ -134,7 +134,8 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
                     scrollSnapType: 'y mandatory',
                     scrollPaddingTop: '50%',
                     scrollPaddingBottom: '50%',
-                }}>
+                }}
+            >
                 {marketData.map((item, index) => {
                     const priceChange = getPriceChange(item.candleData);
                     const latestPrice = getLatestPrice(item.candleData);
@@ -149,14 +150,18 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
                             onClick={() => {
                                 onPairSelect(item.pair);
                                 setActiveIndex(index);
-                            }}>
+                            }}
+                        >
                             {isActive && <div className='absolute inset-0 z-0'></div>}
                             <div className='relative z-10 flex flex-col items-center'>
                                 <div className='flex items-center gap-8'>
                                     <h3
                                         className={`font-outfit text-5xl font-bold tracking-tight transition-all duration-300 ${
-                                            isActive ? 'text-neutral-gradient scale-110' : 'scale-90 text-neutral-500/40'
-                                        }`}>
+                                            isActive
+                                                ? 'text-neutral-gradient scale-110'
+                                                : 'scale-90 text-neutral-500/40'
+                                        }`}
+                                    >
                                         {item.pair.replace('_', '/')}
                                     </h3>
 
@@ -164,11 +169,31 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
                                     {isActive && (
                                         <div className='h-10 w-20 opacity-80'>
                                             {getSparklinePoints(item.candleData, 128, 64) && (
-                                                <svg width='100%' height='100%' viewBox='0 0 128 64' preserveAspectRatio='none' className='overflow-visible'>
+                                                <svg
+                                                    width='100%'
+                                                    height='100%'
+                                                    viewBox='0 0 128 64'
+                                                    preserveAspectRatio='none'
+                                                    className='overflow-visible'
+                                                >
                                                     <defs>
-                                                        <linearGradient id={`gradient-${index}`} x1='0' y1='0' x2='0' y2='1'>
-                                                            <stop offset='0%' stopColor={priceChange >= 0 ? '#4ade80' : '#f87171'} stopOpacity='0.2' />
-                                                            <stop offset='100%' stopColor={priceChange >= 0 ? '#4ade80' : '#f87171'} stopOpacity='0' />
+                                                        <linearGradient
+                                                            id={`gradient-${index}`}
+                                                            x1='0'
+                                                            y1='0'
+                                                            x2='0'
+                                                            y2='1'
+                                                        >
+                                                            <stop
+                                                                offset='0%'
+                                                                stopColor={priceChange >= 0 ? '#4ade80' : '#f87171'}
+                                                                stopOpacity='0.2'
+                                                            />
+                                                            <stop
+                                                                offset='100%'
+                                                                stopColor={priceChange >= 0 ? '#4ade80' : '#f87171'}
+                                                                stopOpacity='0'
+                                                            />
                                                         </linearGradient>
                                                     </defs>
                                                     <path
@@ -194,13 +219,18 @@ export function PairSlider({ marketData, selectedPair, onPairSelect }: PairSlide
 
                                 {isActive && (
                                     <div className='mt-4 flex items-center gap-2'>
-                                        <div className='font-kodemono text-lg text-neutral-400'>{latestPrice?.toFixed(item.pair.includes('JPY') ? 3 : 5)}</div>
+                                        <div className='font-kodemono text-lg text-neutral-400'>
+                                            {latestPrice?.toFixed(item.pair.includes('JPY') ? 3 : 5)}
+                                        </div>
                                         <div className='flex items-center gap-3'>
                                             {priceChange !== null && (
                                                 <span
                                                     className={`rounded-full px-2 py-1 text-xs font-medium ${
-                                                        priceChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-                                                    }`}>
+                                                        priceChange >= 0
+                                                            ? 'bg-emerald-500/10 text-emerald-400'
+                                                            : 'bg-red-500/10 text-red-400'
+                                                    }`}
+                                                >
                                                     {priceChange >= 0 ? '+' : ''}
                                                     {priceChange.toFixed(2)}%
                                                 </span>

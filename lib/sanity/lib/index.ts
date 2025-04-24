@@ -1,36 +1,46 @@
-import { defineArrayMember, defineType } from 'sanity';
 import { richText } from '@/lib/sanity/lib/rich-text';
+import { defineArrayMember, defineType } from 'sanity';
 
+import audio from '@/lib/sanity/schemas/audio';
+import category from '@/lib/sanity/schemas/category';
+import changelog from '@/lib/sanity/schemas/changelog';
+import chapter from '@/lib/sanity/schemas/chapter';
+import course from '@/lib/sanity/schemas/course';
+import faq from '@/lib/sanity/schemas/faq';
+import glossary from '@/lib/sanity/schemas/glossary';
+import img from '@/lib/sanity/schemas/img';
+import lesson from '@/lib/sanity/schemas/lesson';
+import marketData from '@/lib/sanity/schemas/marketData';
 // Documents
 import page from '@/lib/sanity/schemas/page';
-import team from '@/lib/sanity/schemas/team';
-import category from '@/lib/sanity/schemas/category';
-import video from '@/lib/sanity/schemas/video';
-import glossary from '@/lib/sanity/schemas/glossary';
-import lesson from '@/lib/sanity/schemas/lesson';
-import course from '@/lib/sanity/schemas/course';
-import marketData from '@/lib/sanity/schemas/marketData';
 import posts from '@/lib/sanity/schemas/posts';
-import changelog from '@/lib/sanity/schemas/changelog';
-import faq from '@/lib/sanity/schemas/faq';
-import img from '@/lib/sanity/schemas/img';
-import audio from '@/lib/sanity/schemas/audio';
-import chapter from '@/lib/sanity/schemas/chapter';
+import team from '@/lib/sanity/schemas/team';
+import video from '@/lib/sanity/schemas/video';
 
 // Page Builder Blocks
 
-import headingBlock from '@/lib/sanity/blocks/headingBlock';
+import changelogBlock from '@/lib/sanity/blocks/changelogBlock';
 import contentBlock from '@/lib/sanity/blocks/contentBlock';
-import teamBlock from '@/lib/sanity/blocks/teamBlock';
-import teamGrid from '@/lib/sanity/blocks/teamGrid';
 import courseBlock from '@/lib/sanity/blocks/courseBlock';
 import faqBlock from '@/lib/sanity/blocks/faqBlock';
-import legalContentBlock from '@/lib/sanity/blocks/legalContentBlock';
-import changelogBlock from '@/lib/sanity/blocks/changelogBlock';
 import githubBlock from '@/lib/sanity/blocks/githubBlock';
+import headingBlock from '@/lib/sanity/blocks/headingBlock';
+import legalContentBlock from '@/lib/sanity/blocks/legalContentBlock';
+import teamBlock from '@/lib/sanity/blocks/teamBlock';
+import teamGrid from '@/lib/sanity/blocks/teamGrid';
 
 // All page builder blocks in one array
-const PageBuilderBlocks = [headingBlock, contentBlock, teamBlock, teamGrid, courseBlock, faqBlock, legalContentBlock, changelogBlock, githubBlock];
+const PageBuilderBlocks = [
+    headingBlock,
+    contentBlock,
+    teamBlock,
+    teamGrid,
+    courseBlock,
+    faqBlock,
+    legalContentBlock,
+    changelogBlock,
+    githubBlock,
+];
 
 // Page builder block types
 export const pagebuilderBlockTypes = PageBuilderBlocks.map(({ name }) => ({

@@ -31,7 +31,8 @@ export function GitHubBlock({
                         </div>
                         <Link
                             href={githubUrl}
-                            className='group flex items-center gap-2 rounded-full bg-white/5 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-white/10'>
+                            className='group flex items-center gap-2 rounded-full bg-white/5 px-6 py-3 text-sm text-white transition-all duration-300 hover:bg-white/10'
+                        >
                             <FaGithub className='h-5 w-5' />
                             <span>{buttonText}</span>
                             <FaArrowRight className='h-3 w-3 transition-transform duration-300 group-hover:translate-x-1' />

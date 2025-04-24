@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import { LuUnlock, LuLock } from 'react-icons/lu';
 import { cn } from '@/utils/cn';
 import { getSidebarLocks, getSidebarState, setSidebarLocks, setSidebarState } from '@/utils/localStorage';
+import { motion } from 'framer-motion';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { LuLock, LuUnlock } from 'react-icons/lu';
 
 const LockButton = ({ isLocked, onClick }: { isLocked: boolean; onClick: () => void }) => (
     <button
@@ -14,7 +15,8 @@ const LockButton = ({ isLocked, onClick }: { isLocked: boolean; onClick: () => v
             isLocked
                 ? 'border-[#333] bg-gradient-to-b from-[#181818] to-[#0F0F0F] text-white shadow-lg shadow-black/20'
                 : 'border-transparent bg-transparent text-[#666] hover:border-[#333] hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20'
-        )}>
+        )}
+    >
         <div className='relative flex items-center justify-center'>
             {isLocked ? (
                 <LuLock size={11} className='transition-transform duration-200 group-hover:scale-110' />
@@ -102,8 +104,14 @@ export const SidebarWrapper = ({
         const leftSidebar = document.querySelector('.sidebar-content [data-position="left"]');
         const rightSidebar = document.querySelector('.sidebar-content [data-position="right"]');
 
-        const leftWidth = leftSidebar?.getAttribute('data-locked') === 'true' ? parseInt(leftSidebar?.getAttribute('data-width') || '0') : 0;
-        const rightWidth = rightSidebar?.getAttribute('data-locked') === 'true' ? parseInt(rightSidebar?.getAttribute('data-width') || '0') : 0;
+        const leftWidth =
+            leftSidebar?.getAttribute('data-locked') === 'true'
+                ? Number.parseInt(leftSidebar?.getAttribute('data-width') || '0')
+                : 0;
+        const rightWidth =
+            rightSidebar?.getAttribute('data-locked') === 'true'
+                ? Number.parseInt(rightSidebar?.getAttribute('data-width') || '0')
+                : 0;
 
         if (isOpen && isLocked) {
             if (position === 'left') {
@@ -150,14 +158,28 @@ export const SidebarWrapper = ({
             data-position={position}
             data-locked={isLocked}
             data-width={width}
-            style={{ width: `${width}px` }}>
+            style={{ width: `${width}px` }}
+        >
             <div className={cn('relative flex h-full w-full', position === 'left' ? 'ml-16' : 'mr-16')}>
-                <div className={cn('relative flex h-full w-full flex-col bg-[#0a0a0a] p-1', position === 'left' ? 'border-r' : 'border-l', 'border-[#121212]')}>
+                <div
+                    className={cn(
+                        'relative flex h-full w-full flex-col bg-[#0a0a0a] p-1',
+                        position === 'left' ? 'border-r' : 'border-l',
+                        'border-[#121212]'
+                    )}
+                >
                     {/* Header */}
                     <div className='relative z-10 flex h-12 items-center justify-between px-3'>
                         {position === 'right' && <LockButton isLocked={isLocked} onClick={handleLockToggle} />}
-                        <div className={cn('flex items-center justify-center', position === 'right' && 'flex-1 justify-end')}>
-                            <h2 className='font-kodemono text-[10px] font-medium tracking-widest text-[#666] uppercase'>{title}</h2>
+                        <div
+                            className={cn(
+                                'flex items-center justify-center',
+                                position === 'right' && 'flex-1 justify-end'
+                            )}
+                        >
+                            <h2 className='font-kodemono text-[10px] font-medium tracking-widest text-[#666] uppercase'>
+                                {title}
+                            </h2>
                         </div>
                         {position === 'left' && <LockButton isLocked={isLocked} onClick={handleLockToggle} />}
                     </div>
@@ -193,7 +215,10 @@ export const SidebarWrapper = ({
 
                 {/* Resize handle */}
                 <div
-                    className={cn('absolute top-0 bottom-0 w-4 cursor-ew-resize opacity-0 hover:opacity-100', position === 'left' ? '-right-4' : '-left-4')}
+                    className={cn(
+                        'absolute top-0 bottom-0 w-4 cursor-ew-resize opacity-0 hover:opacity-100',
+                        position === 'left' ? '-right-4' : '-left-4'
+                    )}
                     onMouseDown={(e) => {
                         e.preventDefault();
                         const startX = e.clientX;

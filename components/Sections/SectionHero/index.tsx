@@ -1,9 +1,9 @@
 'use client';
 
-import type React from 'react';
-import { motion } from 'framer-motion';
-import { MarketWall } from './MarketWall';
 import { StartButton } from '@/components/Sections/StartNowButton';
+import { motion } from 'framer-motion';
+import type React from 'react';
+import { MarketWall } from './MarketWall';
 
 interface MarketData {
     pair: string;
@@ -31,16 +31,20 @@ export const SectionHero: React.FC<BoxComponentProps> = ({ marketData }) => {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8, delay: 0.2 }}
-                    className='relative flex flex-col items-center text-center'>
+                    className='relative flex flex-col items-center text-center'
+                >
                     <div className='absolute inset-x-0 top-[-10%] -z-10 mx-auto h-[200px] w-[70%] scale-125 rounded-full bg-[radial-gradient(circle_at_center,rgba(0,204,122,0.1),transparent_60%)] opacity-60 blur-3xl' />
 
-                    <h1 className={`text-neutral-gradient font-outfit relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[8em] lg:leading-[1em]`}>
+                    <h1
+                        className={`text-neutral-gradient font-outfit relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[8em] lg:leading-[1em]`}
+                    >
                         Unlock Market
                         <br />
                         Patterns, Instantly.
                     </h1>
                     <p className={`text-dark-neutral font-kodemono mb-6 w-11/12 pt-6 text-lg lg:text-xl`}>
-                        Experience the future of market analysis. RTHMN's AI identifies predictive patterns, giving you a unique edge.
+                        Experience the future of market analysis. RTHMN's AI identifies predictive patterns, giving you
+                        a unique edge.
                     </p>
                     <div className='mt-6 flex gap-6'>
                         <StartButton href='#pricing' custom={0} />

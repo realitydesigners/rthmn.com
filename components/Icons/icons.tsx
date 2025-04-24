@@ -1,7 +1,14 @@
 import React from 'react';
 
 export const LogoIcon = () => (
-    <svg width='40' height='40' viewBox='0 0 100 100' fill='none' xmlns='http://www.w3.org/2000/svg' aria-labelledby='logoTitle'>
+    <svg
+        width='40'
+        height='40'
+        viewBox='0 0 100 100'
+        fill='none'
+        xmlns='http://www.w3.org/2000/svg'
+        aria-labelledby='logoTitle'
+    >
         <title id='logoTitle'>Logo</title>
         <g clipPath='url(#clip0_1208_27417)'>
             <path

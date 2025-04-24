@@ -13,10 +13,14 @@ export const seoFields = [
     defineField({
         name: 'seoDescription',
         title: 'SEO meta description override',
-        description: 'This will override the meta description. If left blank it will inherit the description from the page description.',
+        description:
+            'This will override the meta description. If left blank it will inherit the description from the page description.',
         type: 'text',
         rows: 2,
-        validation: (rule) => [rule.warning('A description is required'), rule.max(160).warning('No more than 160 characters')],
+        validation: (rule) => [
+            rule.warning('A description is required'),
+            rule.max(160).warning('No more than 160 characters'),
+        ],
         group: GROUP.SEO,
     }),
     defineField({

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export const useLongPress = (callback: () => void, ms: number = 500) => {
+export const useLongPress = (callback: () => void, ms = 500) => {
     const [isPressed, setIsPressed] = useState<boolean>(false);
     const timerRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const isLongPressed = useRef<boolean>(false);
@@ -48,7 +48,8 @@ export const useLongPress = (callback: () => void, ms: number = 500) => {
     const move = useCallback((e: React.MouseEvent | React.TouchEvent) => {
         if (!startPosition.current) return;
 
-        const currentPosition = 'touches' in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
+        const currentPosition =
+            'touches' in e ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY };
 
         const moveThreshold = 2;
         const deltaY = Math.abs(currentPosition.y - startPosition.current.y);

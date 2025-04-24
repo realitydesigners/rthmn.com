@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useAuth } from '@/providers/SupabaseProvider';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import { LuCreditCard, LuLogOut, LuSettings, LuUser } from 'react-icons/lu';
-import { useAuth } from '@/providers/SupabaseProvider';
 
 const menuItems = [
     {
@@ -33,9 +33,12 @@ interface MenuButtonProps {
 }
 
 const MenuButton = ({ icon: Icon, label, href, onClick, variant = 'default' }: MenuButtonProps) => {
-    const baseStyles = 'flex items-center justify-between rounded-md my-4 bg-gradient-to-b p-[1px]  transition-all duration-200';
+    const baseStyles =
+        'flex items-center justify-between rounded-md my-4 bg-gradient-to-b p-[1px]  transition-all duration-200';
     const variantStyles =
-        variant === 'danger' ? 'from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30' : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]';
+        variant === 'danger'
+            ? 'from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30'
+            : 'from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]';
 
     const textColor = variant === 'danger' ? 'text-red-500' : 'text-white';
 
@@ -87,13 +90,21 @@ export const ProfilePanel = () => {
                     <div className='flex flex-col items-center'>
                         <div className='relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-full bg-black'>
                             {userDetails?.avatar_url ? (
-                                <Image src={userDetails.avatar_url} alt='Profile' className='object-cover' width={80} height={80} />
+                                <Image
+                                    src={userDetails.avatar_url}
+                                    alt='Profile'
+                                    className='object-cover'
+                                    width={80}
+                                    height={80}
+                                />
                             ) : (
                                 <span className='text-lg font-bold'>{userInitial}</span>
                             )}
                         </div>
                         <div className='mt-4 text-center'>
-                            <h2 className='font-outfit text-xl font-bold text-white'>{user.user_metadata?.full_name || 'Your Profile'}</h2>
+                            <h2 className='font-outfit text-xl font-bold text-white'>
+                                {user.user_metadata?.full_name || 'Your Profile'}
+                            </h2>
                             <p className='font-outfit mt-1 text-sm text-zinc-400'>{user.email}</p>
                         </div>
                     </div>
@@ -111,7 +122,12 @@ export const ProfilePanel = () => {
                         </div>
                     </div>
 
-                    <MenuButton icon={LuLogOut} label={isSigningOut ? 'Signing out...' : 'Sign out'} onClick={handleSignOut} variant='danger' />
+                    <MenuButton
+                        icon={LuLogOut}
+                        label={isSigningOut ? 'Signing out...' : 'Sign out'}
+                        onClick={handleSignOut}
+                        variant='danger'
+                    />
                 </div>
             </div>
         </div>

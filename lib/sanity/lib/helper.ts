@@ -1,4 +1,4 @@
-import { isPortableTextTextBlock, type StringOptions } from 'sanity';
+import { type StringOptions, isPortableTextTextBlock } from 'sanity';
 import type { DocumentWithLocale, Page, Tree, TreeNode } from './types';
 
 export const isRelativeUrl = (url: string) => url.startsWith('/') || url.startsWith('#') || url.startsWith('?');
@@ -22,7 +22,10 @@ export const getTitleCase = (name: string) => {
     return titleTemp.charAt(0).toUpperCase() + titleTemp.slice(1);
 };
 
-export const createRadioListLayout = (items: Array<string | { title: string; value: string }>, options?: StringOptions): StringOptions => {
+export const createRadioListLayout = (
+    items: Array<string | { title: string; value: string }>,
+    options?: StringOptions
+): StringOptions => {
     const list = items.map((item) => {
         if (typeof item === 'string') {
             return {

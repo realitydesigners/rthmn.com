@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Database } from '@/types/supabase';
+import { createSupportThread, getSupportMessages, getSupportThreads, sendSupportMessage } from '@/lib/supabase/queries';
+import type { Database } from '@/types/supabase';
+import { useEffect, useState } from 'react';
 import { LuHelpCircle, LuMessageSquare, LuX } from 'react-icons/lu';
-import { getSupportThreads, getSupportMessages, createSupportThread, sendSupportMessage } from '@/lib/supabase/queries';
 
 type SupportThread = Database['public']['Tables']['support_threads']['Row'];
 type Message = Database['public']['Tables']['support_messages']['Row'];
@@ -61,7 +61,11 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                     if (payload.eventType === 'INSERT') {
                         setThreads((prev) => [payload.new as SupportThread, ...prev]);
                     } else if (payload.eventType === 'UPDATE') {
-                        setThreads((prev) => prev.map((thread) => (thread.id === payload.new.id ? (payload.new as SupportThread) : thread)));
+                        setThreads((prev) =>
+                            prev.map((thread) =>
+                                thread.id === payload.new.id ? (payload.new as SupportThread) : thread
+                            )
+                        );
                     }
                 }
             )
@@ -164,7 +168,10 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                         </div>
                         <h2 className='font-outfit text-xl font-bold text-white'>Support</h2>
                     </div>
-                    <button onClick={onClose} className='rounded-md p-2 text-zinc-400 hover:bg-white/5 hover:text-white'>
+                    <button
+                        onClick={onClose}
+                        className='rounded-md p-2 text-zinc-400 hover:bg-white/5 hover:text-white'
+                    >
                         <LuX className='h-5 w-5' />
                     </button>
                 </div>
@@ -183,7 +190,8 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                             <button
                                 onClick={() => setIsCreatingThread(true)}
                                 disabled={isLoading}
-                                className='mb-4 w-full rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50'>
+                                className='mb-4 w-full rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50'
+                            >
                                 {isLoading ? 'Creating...' : 'Create New Support Thread'}
                             </button>
                             <div className='space-y-4'>
@@ -191,10 +199,15 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                                     <div
                                         key={thread.id}
                                         onClick={() => setSelectedThread(thread)}
-                                        className='cursor-pointer rounded-lg border border-white/5 p-4 transition-all duration-200 hover:bg-white/5'>
+                                        className='cursor-pointer rounded-lg border border-white/5 p-4 transition-all duration-200 hover:bg-white/5'
+                                    >
                                         <div className='flex items-center justify-between'>
-                                            <h3 className='font-outfit font-medium text-white'>{thread.subject || 'No Subject'}</h3>
-                                            <span className='font-outfit text-sm text-zinc-400'>{new Date(thread.last_message_time || '').toLocaleDateString()}</span>
+                                            <h3 className='font-outfit font-medium text-white'>
+                                                {thread.subject || 'No Subject'}
+                                            </h3>
+                                            <span className='font-outfit text-sm text-zinc-400'>
+                                                {new Date(thread.last_message_time || '').toLocaleDateString()}
+                                            </span>
                                         </div>
                                         <p className='font-outfit mt-2 text-sm text-zinc-400'>{thread.last_message}</p>
                                         <div className='mt-2 flex items-center gap-2'>
@@ -225,14 +238,16 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                                 <button
                                     type='submit'
                                     disabled={isLoading}
-                                    className='font-outfit flex-1 rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50'>
+                                    className='font-outfit flex-1 rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50'
+                                >
                                     {isLoading ? 'Creating...' : 'Create Thread'}
                                 </button>
                                 <button
                                     type='button'
                                     onClick={() => setIsCreatingThread(false)}
                                     disabled={isLoading}
-                                    className='font-outfit rounded-full border border-white/5 px-4 py-2 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50'>
+                                    className='font-outfit rounded-full border border-white/5 px-4 py-2 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50'
+                                >
                                     Cancel
                                 </button>
                             </div>
@@ -242,21 +257,32 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                             <div className='border-b border-white/5 p-4'>
                                 <div className='flex items-center justify-between'>
                                     <h3 className='font-outfit font-medium text-white'>{selectedThread.subject}</h3>
-                                    <button onClick={() => setSelectedThread(null)} className='font-outfit text-sm text-zinc-400 hover:text-white'>
+                                    <button
+                                        onClick={() => setSelectedThread(null)}
+                                        className='font-outfit text-sm text-zinc-400 hover:text-white'
+                                    >
                                         Back
                                     </button>
                                 </div>
                             </div>
                             <div className='flex-1 space-y-4 overflow-y-auto p-4'>
                                 {messages.map((message) => (
-                                    <div key={message.id} className={`flex ${message.sender_type === 'support_team' ? 'justify-start' : 'justify-end'}`}>
+                                    <div
+                                        key={message.id}
+                                        className={`flex ${message.sender_type === 'support_team' ? 'justify-start' : 'justify-end'}`}
+                                    >
                                         <div
                                             className={`font-outfit max-w-[80%] rounded-lg p-3 ${
-                                                message.sender_type === 'support_team' ? 'bg-white/5 text-white' : 'bg-blue-600 text-white'
-                                            }`}>
+                                                message.sender_type === 'support_team'
+                                                    ? 'bg-white/5 text-white'
+                                                    : 'bg-blue-600 text-white'
+                                            }`}
+                                        >
                                             <div className='mb-1 text-sm font-medium'>{message.sender_name}</div>
                                             <div className='text-sm'>{message.content}</div>
-                                            <div className='mt-1 text-xs opacity-70'>{new Date(message.created_at || '').toLocaleTimeString()}</div>
+                                            <div className='mt-1 text-xs opacity-70'>
+                                                {new Date(message.created_at || '').toLocaleTimeString()}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -274,7 +300,8 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                                     <button
                                         type='submit'
                                         disabled={isLoading}
-                                        className='font-outfit rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50'>
+                                        className='font-outfit rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50'
+                                    >
                                         {isLoading ? 'Sending...' : 'Send'}
                                     </button>
                                 </div>

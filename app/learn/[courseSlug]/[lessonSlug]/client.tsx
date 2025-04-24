@@ -1,15 +1,23 @@
 'use client';
 
-import Link from 'next/link';
-import { useEffect, useCallback } from 'react';
-import { FaArrowLeft, FaArrowRight, FaBookmark, FaClock, FaCheckCircle, FaLightbulb, FaNotesMedical } from 'react-icons/fa';
-import { PortableText } from '@portabletext/react';
-import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
 import { TableOfContents } from '@/app/learn/_components/TOC';
+import type { BlockProps } from '@/components/PageBuilder/blocks/Blocks';
+import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplate';
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
+import { PortableText } from '@portabletext/react';
+import Link from 'next/link';
+import { useCallback, useEffect } from 'react';
+import {
+    FaArrowLeft,
+    FaArrowRight,
+    FaBookmark,
+    FaCheckCircle,
+    FaClock,
+    FaLightbulb,
+    FaNotesMedical,
+} from 'react-icons/fa';
 import { CourseNav } from '../../_components/CourseNavigation';
 import { MobileNavigation } from '../../_components/MobileNavigation';
-import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplate';
 
 interface LessonClientProps {
     course: any; // Add proper type
@@ -63,14 +71,17 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         </div>
                     </div>
 
-                    {lesson.courseContent?.content && <PortableText value={lesson.courseContent?.content} components={CourseTemplate} />}
+                    {lesson.courseContent?.content && (
+                        <PortableText value={lesson.courseContent?.content} components={CourseTemplate} />
+                    )}
 
                     {/* Navigation */}
                     <div className='mt-12 flex items-center justify-between border-t border-white/10 pt-8'>
                         {prevLesson && (
                             <Link
                                 href={`/learn/${course.slug.current}/${prevLesson.slug.current}`}
-                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
+                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'
+                            >
                                 <FaArrowLeft className='h-4 w-4 transition-transform group-hover:-translate-x-1' />
                                 Previous Lesson
                             </Link>
@@ -78,7 +89,8 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         {nextLesson && (
                             <Link
                                 href={`/learn/${course.slug.current}/${nextLesson.slug}`}
-                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'>
+                                className='group flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-400 transition-all hover:border-emerald-500/50 hover:bg-emerald-500/5 hover:text-white'
+                            >
                                 Next Lesson
                                 <FaArrowRight className='h-4 w-4 transition-transform group-hover:translate-x-1' />
                             </Link>
@@ -90,8 +102,11 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         <button
                             onClick={handleComplete}
                             className={`flex items-center gap-2 rounded-lg px-4 py-2 transition-all ${
-                                completed ? 'bg-emerald-400/20 text-emerald-400' : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                            }`}>
+                                completed
+                                    ? 'bg-emerald-400/20 text-emerald-400'
+                                    : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                            }`}
+                        >
                             {completed ? (
                                 <>
                                     <FaCheckCircle className='h-4 w-4' />
@@ -109,7 +124,8 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
                         {process.env.NODE_ENV === 'development' && (
                             <button
                                 onClick={handleUncomplete}
-                                className='flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-red-400 transition-all hover:bg-red-500/20'>
+                                className='flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-2 text-red-400 transition-all hover:bg-red-500/20'
+                            >
                                 <FaCheckCircle className='h-4 w-4' />
                                 Mark Incomplete
                             </button>

@@ -12,7 +12,19 @@ export const YAxis: React.FC<{
     pair: string;
     lastPrice: number;
     lastPriceY: number;
-}> = ({ minY, maxY, chartHeight, chartWidth, onDrag, hoverInfo, onYAxisDragStart, onYAxisDragEnd, pair, lastPrice, lastPriceY }) => {
+}> = ({
+    minY,
+    maxY,
+    chartHeight,
+    chartWidth,
+    onDrag,
+    hoverInfo,
+    onYAxisDragStart,
+    onYAxisDragEnd,
+    pair,
+    lastPrice,
+    lastPriceY,
+}) => {
     const handleMouseDown = (event: React.MouseEvent) => {
         event.stopPropagation();
         onYAxisDragStart();
@@ -85,7 +97,16 @@ export const YAxis: React.FC<{
 
             {/* Grid lines */}
             {levels.map(({ y }) => (
-                <line key={`grid-${y}`} x1={-chartWidth} y1={y} x2={0} y2={y} stroke='#ffffff' strokeWidth='1' strokeOpacity={GRID_OPACITY} />
+                <line
+                    key={`grid-${y}`}
+                    x1={-chartWidth}
+                    y1={y}
+                    x2={0}
+                    y2={y}
+                    stroke='#ffffff'
+                    strokeWidth='1'
+                    strokeOpacity={GRID_OPACITY}
+                />
             ))}
 
             {/* Vertical axis line */}
@@ -93,9 +114,35 @@ export const YAxis: React.FC<{
 
             {/* Last price line and label */}
             <g>
-                <line x1={-chartWidth} y1={lastPriceY} x2={0} y2={lastPriceY} stroke='#ffffff' strokeWidth='1' strokeOpacity={0.3} strokeDasharray='2 2' />
-                <rect x={3} y={lastPriceY - 9} width={LABEL_WIDTH - 4} height={18} fill='#1a1a1a' stroke='rgba(255, 255, 255, 0.2)' strokeWidth={1} rx={4} />
-                <text x={LABEL_WIDTH / 2 + 1} y={lastPriceY + 3} textAnchor='middle' fill='#ffffff' fontSize={FONT_SIZE} fontFamily='monospace' fontWeight='medium'>
+                <line
+                    x1={-chartWidth}
+                    y1={lastPriceY}
+                    x2={0}
+                    y2={lastPriceY}
+                    stroke='#ffffff'
+                    strokeWidth='1'
+                    strokeOpacity={0.3}
+                    strokeDasharray='2 2'
+                />
+                <rect
+                    x={3}
+                    y={lastPriceY - 9}
+                    width={LABEL_WIDTH - 4}
+                    height={18}
+                    fill='#1a1a1a'
+                    stroke='rgba(255, 255, 255, 0.2)'
+                    strokeWidth={1}
+                    rx={4}
+                />
+                <text
+                    x={LABEL_WIDTH / 2 + 1}
+                    y={lastPriceY + 3}
+                    textAnchor='middle'
+                    fill='#ffffff'
+                    fontSize={FONT_SIZE}
+                    fontFamily='monospace'
+                    fontWeight='medium'
+                >
                     {lastPrice.toFixed(instrumentConfig.digits)}
                 </text>
             </g>
@@ -104,7 +151,15 @@ export const YAxis: React.FC<{
             {levels.map(({ price, y, digits }) => (
                 <g key={price}>
                     <line x1={0} x2={4} y1={y} y2={y} stroke='#ffffff' strokeOpacity={0.3} />
-                    <text x={8} y={y + 3} fill='#ffffff' fillOpacity={0.6} fontSize={FONT_SIZE} fontFamily='monospace' textAnchor='start'>
+                    <text
+                        x={8}
+                        y={y + 3}
+                        fill='#ffffff'
+                        fillOpacity={0.6}
+                        fontSize={FONT_SIZE}
+                        fontFamily='monospace'
+                        textAnchor='start'
+                    >
                         {price.toFixed(digits)}
                     </text>
                 </g>
@@ -113,8 +168,25 @@ export const YAxis: React.FC<{
             {/* Hover price indicator */}
             {hoverInfo && (
                 <g transform={`translate(0, ${hoverInfo.y})`}>
-                    <rect x={3} y={-9} width={LABEL_WIDTH - 4} height={18} fill='#1a1a1a' stroke='rgba(255, 255, 255, 0.2)' strokeWidth={1} rx={4} />
-                    <text x={LABEL_WIDTH / 2 + 1} y={3} textAnchor='middle' fill='#ffffff' fontSize={FONT_SIZE} fontFamily='monospace' fontWeight='medium'>
+                    <rect
+                        x={3}
+                        y={-9}
+                        width={LABEL_WIDTH - 4}
+                        height={18}
+                        fill='#1a1a1a'
+                        stroke='rgba(255, 255, 255, 0.2)'
+                        strokeWidth={1}
+                        rx={4}
+                    />
+                    <text
+                        x={LABEL_WIDTH / 2 + 1}
+                        y={3}
+                        textAnchor='middle'
+                        fill='#ffffff'
+                        fontSize={FONT_SIZE}
+                        fontFamily='monospace'
+                        fontWeight='medium'
+                    >
                         {hoverInfo.price.toFixed(instrumentConfig.digits)}
                     </text>
                 </g>

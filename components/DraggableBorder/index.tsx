@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface DraggableBorderProps {
     isDragging?: boolean;
@@ -8,7 +9,13 @@ interface DraggableBorderProps {
     className?: string;
 }
 
-export const DraggableBorder: React.FC<DraggableBorderProps> = ({ isDragging: externalIsDragging, onDragStart, onResize, direction = 'left', className }) => {
+export const DraggableBorder: React.FC<DraggableBorderProps> = ({
+    isDragging: externalIsDragging,
+    onDragStart,
+    onResize,
+    direction = 'left',
+    className,
+}) => {
     const [internalIsDragging, setInternalIsDragging] = useState(false);
     const [startPosition, setStartPosition] = useState(0);
 

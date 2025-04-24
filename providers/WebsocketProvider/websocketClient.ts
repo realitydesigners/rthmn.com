@@ -1,5 +1,5 @@
+import { type BoxSlice, PriceData } from '@/types/types';
 import { decode } from '@msgpack/msgpack';
-import { BoxSlice, PriceData } from '@/types/types';
 
 type MessageType = 'auth' | 'subscribe' | 'unsubscribe' | 'price' | 'boxSlice' | 'error' | 'ack';
 
@@ -13,10 +13,10 @@ interface WebSocketMessage {
 class WebSocketClient {
     private socket: WebSocket | null = null;
     private accessToken: string | null = null;
-    private isAuthenticated: boolean = false;
-    private reconnectAttempts: number = 0;
-    private maxReconnectAttempts: number = 5;
-    private reconnectDelay: number = 1000; // Base delay of 1 second
+    private isAuthenticated = false;
+    private reconnectAttempts = 0;
+    private maxReconnectAttempts = 5;
+    private reconnectDelay = 1000; // Base delay of 1 second
 
     private handlers = {
         message: new Set<(event: MessageEvent) => void>(),
@@ -37,7 +37,10 @@ class WebSocketClient {
             return;
         }
 
-        if (this.socket && (this.socket.readyState === WebSocket.CONNECTING || this.socket.readyState === WebSocket.OPEN)) {
+        if (
+            this.socket &&
+            (this.socket.readyState === WebSocket.CONNECTING || this.socket.readyState === WebSocket.OPEN)
+        ) {
             console.log('WebSocket already connected or connecting');
             return;
         }
@@ -114,7 +117,9 @@ class WebSocketClient {
                 break;
 
             case 'price':
-                this.handlers.message.forEach((handler) => handler(new MessageEvent('message', { data: JSON.stringify(message) })));
+                this.handlers.message.forEach((handler) =>
+                    handler(new MessageEvent('message', { data: JSON.stringify(message) }))
+                );
                 break;
 
             case 'error':

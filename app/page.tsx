@@ -1,16 +1,16 @@
+import { FAQBlock } from '@/components/PageBuilder/blocks/faqBlock';
 import { SectionBoxes } from '@/components/Sections/SectionBoxes';
+import { SectionCTA } from '@/components/Sections/SectionCTA';
 import { SectionHero } from '@/components/Sections/SectionHero';
 import { SectionHistogram } from '@/components/Sections/SectionHistogram';
 import { SectionMarketDisplay } from '@/components/Sections/SectionMarketDisplay';
-import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
-import { FAQBlock } from '@/components/PageBuilder/blocks/faqBlock';
-import { sanityFetch } from '@/lib/sanity/lib/client';
-import { groq } from 'next-sanity';
-import { SectionCTA } from '@/components/Sections/SectionCTA';
-import { SectionPricing } from '@/components/Sections/SectionPricing';
-import { createClient } from '@/lib/supabase/server';
-import { getProducts } from '@/lib/supabase/queries';
 import { SectionMarketTicker } from '@/components/Sections/SectionMarketTicker';
+import { SectionPricing } from '@/components/Sections/SectionPricing';
+import { SectionRthmnDemo } from '@/components/Sections/SectionRthmnDemo';
+import { sanityFetch } from '@/lib/sanity/lib/client';
+import { getProducts } from '@/lib/supabase/queries';
+import { createClient } from '@/lib/supabase/server';
+import { groq } from 'next-sanity';
 
 // Fetch all required datasets
 async function getPageData(): Promise<any> {

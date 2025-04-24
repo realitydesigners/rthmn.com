@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { getDiscordClient } from '@/lib/discord/client';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
     try {
@@ -12,8 +12,16 @@ export async function POST(request: Request) {
 
         // Remove both roles when disconnecting
         await Promise.all([
-            discord.removeGuildMemberRole(process.env.DISCORD_GUILD_ID!, discord_user_id, process.env.DISCORD_PAID_ROLE_ID!),
-            discord.removeGuildMemberRole(process.env.DISCORD_GUILD_ID!, discord_user_id, process.env.DISCORD_UNPAID_ROLE_ID!),
+            discord.removeGuildMemberRole(
+                process.env.DISCORD_GUILD_ID!,
+                discord_user_id,
+                process.env.DISCORD_PAID_ROLE_ID!
+            ),
+            discord.removeGuildMemberRole(
+                process.env.DISCORD_GUILD_ID!,
+                discord_user_id,
+                process.env.DISCORD_UNPAID_ROLE_ID!
+            ),
         ]);
 
         console.log('Removed Discord roles for user:', discord_user_id);

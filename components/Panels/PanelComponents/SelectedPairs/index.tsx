@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { FaChevronDown, FaTimes } from 'react-icons/fa';
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useUser } from '@/providers/UserProvider';
+import { useEffect, useRef, useState } from 'react';
+import { FaChevronDown, FaTimes } from 'react-icons/fa';
 
 export const SelectedPairs = () => {
     const { pairData } = useDashboard();
@@ -59,12 +59,17 @@ export const SelectedPairs = () => {
                         <div
                             key={pair}
                             onContextMenu={(e) => handleContextMenu(e, pair)}
-                            className='group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-[#333]'>
+                            className='group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-[#333]'
+                        >
                             <div className='flex items-center overflow-hidden'>
-                                <span className='font-outfit truncate text-[13px] font-bold tracking-wider text-white'>{pair}</span>
+                                <span className='font-outfit truncate text-[13px] font-bold tracking-wider text-white'>
+                                    {pair}
+                                </span>
                             </div>
                             <div className='flex shrink-0 items-center gap-3'>
-                                <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666]'>{currentPrice ? formatPrice(currentPrice) : '0'}</span>
+                                <span className='font-kodemono text-[13px] font-medium tracking-wider text-[#666]'>
+                                    {currentPrice ? formatPrice(currentPrice) : '0'}
+                                </span>
                                 {isActive && (
                                     <button
                                         onClick={(e) => {
@@ -72,7 +77,8 @@ export const SelectedPairs = () => {
                                             togglePair(pair);
                                             setActiveRow(null);
                                         }}
-                                        className='flex h-5 w-5 items-center justify-center rounded border border-red-400 bg-red-400/80 opacity-0 transition-all group-hover:opacity-100 hover:text-white'>
+                                        className='flex h-5 w-5 items-center justify-center rounded border border-red-400 bg-red-400/80 opacity-0 transition-all group-hover:opacity-100 hover:text-white'
+                                    >
                                         <FaTimes size={10} className='text-black' />
                                     </button>
                                 )}

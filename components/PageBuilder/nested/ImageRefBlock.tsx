@@ -1,6 +1,6 @@
-import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import React from 'react';
 
 const themeClasses = {
     'image-standard': {
@@ -22,15 +22,26 @@ const ImageDisplay = ({ image, alt, className }) => {
     const insetStyles = isInset ? 'border border-t border-neutral-600/50' : '';
 
     return (
-        <div className={`relative flex h-auto w-full items-center justify-center overflow-hidden rounded-[1.2em] lg:w-3/4 ${insetStyles}`}>
-            <Image src={image} width={2000} height={2000} priority={false} alt={alt} className='h-[325px] w-full object-cover md:h-[600px] lg:h-[800px]' />
+        <div
+            className={`relative flex h-auto w-full items-center justify-center overflow-hidden rounded-[1.2em] lg:w-3/4 ${insetStyles}`}
+        >
+            <Image
+                src={image}
+                width={2000}
+                height={2000}
+                priority={false}
+                alt={alt}
+                className='h-[325px] w-full object-cover md:h-[600px] lg:h-[800px]'
+            />
         </div>
     );
 };
 
 const ArtistInfo = ({ artist, className }) => {
     const { isInset, textColor } = themeClasses[className] || themeClasses['image-standard'];
-    const insetStyles = isInset ? 'rounded-b-[1.2em] pl-2 -mt-[60px] pb-3 pt-1 bg-linear-to-t from-black to-transparent' : '';
+    const insetStyles = isInset
+        ? 'rounded-b-[1.2em] pl-2 -mt-[60px] pb-3 pt-1 bg-linear-to-t from-black to-transparent'
+        : '';
 
     return (
         <div className={`relative -bottom-1 flex h-auto w-full pt-4 pl-4 lg:w-3/4 ${textColor} ${insetStyles}`}>

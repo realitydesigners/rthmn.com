@@ -7,7 +7,11 @@ export async function manageDiscordAccess(stripeCustomerId: string, isActive: bo
 
     try {
         // 1. Get user from stripe customer ID
-        const { data: customer } = await supabase.from('customers').select('id').eq('stripe_customer_id', stripeCustomerId).single();
+        const { data: customer } = await supabase
+            .from('customers')
+            .select('id')
+            .eq('stripe_customer_id', stripeCustomerId)
+            .single();
 
         if (!customer) {
             console.error('No customer found for stripe ID:', stripeCustomerId);
@@ -34,18 +38,36 @@ export async function manageDiscordAccess(stripeCustomerId: string, isActive: bo
         if (isActive) {
             // Add paid role and remove unpaid role
             await Promise.all([
-                discord.addGuildMemberRole(process.env.DISCORD_GUILD_ID!, discordConnection.discord_user_id, process.env.DISCORD_PAID_ROLE_ID!),
-                discord.removeGuildMemberRole(process.env.DISCORD_GUILD_ID!, discordConnection.discord_user_id, process.env.DISCORD_UNPAID_ROLE_ID!),
+                discord.addGuildMemberRole(
+                    process.env.DISCORD_GUILD_ID!,
+                    discordConnection.discord_user_id,
+                    process.env.DISCORD_PAID_ROLE_ID!
+                ),
+                discord.removeGuildMemberRole(
+                    process.env.DISCORD_GUILD_ID!,
+                    discordConnection.discord_user_id,
+                    process.env.DISCORD_UNPAID_ROLE_ID!
+                ),
             ]);
         } else {
             // Remove paid role and add unpaid role
             await Promise.all([
-                discord.removeGuildMemberRole(process.env.DISCORD_GUILD_ID!, discordConnection.discord_user_id, process.env.DISCORD_PAID_ROLE_ID!),
-                discord.addGuildMemberRole(process.env.DISCORD_GUILD_ID!, discordConnection.discord_user_id, process.env.DISCORD_UNPAID_ROLE_ID!),
+                discord.removeGuildMemberRole(
+                    process.env.DISCORD_GUILD_ID!,
+                    discordConnection.discord_user_id,
+                    process.env.DISCORD_PAID_ROLE_ID!
+                ),
+                discord.addGuildMemberRole(
+                    process.env.DISCORD_GUILD_ID!,
+                    discordConnection.discord_user_id,
+                    process.env.DISCORD_UNPAID_ROLE_ID!
+                ),
             ]);
         }
 
-        console.log(`Successfully updated roles for Discord user ${discordConnection.discord_user_id} to ${isActive ? 'paid' : 'unpaid'}`);
+        console.log(
+            `Successfully updated roles for Discord user ${discordConnection.discord_user_id} to ${isActive ? 'paid' : 'unpaid'}`
+        );
     } catch (error) {
         console.error('Error managing Discord access:', error);
         if (error instanceof Error) {

@@ -1,5 +1,5 @@
-import React from 'react';
 import { getAnimationSequence } from '@/components/Constants/constants';
+import type React from 'react';
 
 interface HistoricalPatternViewProps {
     tableRef: React.RefObject<HTMLDivElement>;
@@ -29,14 +29,16 @@ export const Histogram: React.FC<HistoricalPatternViewProps> = ({ tableRef, demo
             style={{
                 height: `${availableHeight + 25}px`,
                 padding: '0px',
-            }}>
+            }}
+        >
             <div className='relative z-10 h-full items-center justify-center overflow-x-auto'>
                 <div
                     ref={tableRef}
                     className='relative flex h-full'
                     style={{
                         width: `${patternWidth * animationSequence.length}px`,
-                    }}>
+                    }}
+                >
                     {animationSequence.slice(0, currentSequenceIndex + 1).map((sequence, patternIndex) => {
                         const isCurrentPattern = patternIndex === currentSequenceIndex;
 
@@ -49,13 +51,16 @@ export const Histogram: React.FC<HistoricalPatternViewProps> = ({ tableRef, demo
                                 style={{
                                     width: `${patternWidth}px`,
                                     height: 'calc(100% - 12px)',
-                                }}>
+                                }}
+                            >
                                 <div className='relative h-full'>
                                     {sequence.positions.map(({ boxNumber, position, isUp }) => (
                                         <div
                                             key={boxNumber}
                                             className={`group absolute left-0 cursor-pointer transition-all duration-300 ${
-                                                isUp ? 'border-emerald-500/50 bg-emerald-500/40 shadow-emerald-500/30' : 'border-red-500/40 bg-red-500/30 shadow-red-500/30'
+                                                isUp
+                                                    ? 'border-emerald-500/50 bg-emerald-500/40 shadow-emerald-500/30'
+                                                    : 'border-red-500/40 bg-red-500/30 shadow-red-500/30'
                                             } border shadow-[0_0_4px]`}
                                             style={{
                                                 width: `${boxSize}px`,
@@ -66,7 +71,8 @@ export const Histogram: React.FC<HistoricalPatternViewProps> = ({ tableRef, demo
                                                 transform: `scale(${isUp ? 1.02 : 1})`,
                                                 opacity: isUp ? 1 : 0.9,
                                                 willChange: 'transform, opacity',
-                                            }}>
+                                            }}
+                                        >
                                             <div className='h-full w-full transition-opacity hover:opacity-80' />
                                         </div>
                                     ))}

@@ -1,5 +1,5 @@
-import { PortableText } from '@portabletext/react';
 import { CourseTemplate } from '@/components/PageBuilder/templates/CourseTemplate';
+import { PortableText } from '@portabletext/react';
 
 const ContentBlock = ({ block }) => {
     const { content } = block;

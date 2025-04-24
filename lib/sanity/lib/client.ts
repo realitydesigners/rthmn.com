@@ -21,7 +21,11 @@ export const writeClient = createClient({
     useCdn: false,
 });
 
-export async function sanityFetch<QueryResponse>({ query, qParams = {}, tags = [] }: { query: string; qParams?: QueryParams; tags?: string[] }): Promise<QueryResponse> {
+export async function sanityFetch<QueryResponse>({
+    query,
+    qParams = {},
+    tags = [],
+}: { query: string; qParams?: QueryParams; tags?: string[] }): Promise<QueryResponse> {
     return client.fetch<QueryResponse>(query, qParams, {
         next: { revalidate: 60, tags },
     });

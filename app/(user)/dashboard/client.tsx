@@ -3,10 +3,10 @@
 import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useUser } from '@/providers/UserProvider';
 import { useGridStore } from '@/stores/gridStore';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { NoInstruments } from './LoadingSkeleton';
 import { PairResoBox } from './PairResoBox';
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 
 export default function Dashboard() {
     const { pairData, isLoading } = useDashboard();
@@ -41,7 +41,7 @@ export default function Dashboard() {
 
         const elements = document.querySelectorAll('[data-pair]');
         let closestEl = null;
-        let minDistance = Infinity;
+        let minDistance = Number.POSITIVE_INFINITY;
 
         elements.forEach((el) => {
             if (el === container) return;
@@ -93,7 +93,9 @@ export default function Dashboard() {
         return (
             <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
                 <NoInstruments />
-                <div className='mt-4 text-center text-sm text-neutral-400'>Please complete the onboarding process to select your trading pairs.</div>
+                <div className='mt-4 text-center text-sm text-neutral-400'>
+                    Please complete the onboarding process to select your trading pairs.
+                </div>
             </main>
         );
     }
@@ -111,7 +113,8 @@ export default function Dashboard() {
                 style={{
                     gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
                     gap: '1rem',
-                }}>
+                }}
+            >
                 {/* Only render the list content after client-side mounting */}
                 {isClient &&
                     pairsToRender.map((pair) => {
@@ -141,7 +144,8 @@ export default function Dashboard() {
                                         damping: 20,
                                     },
                                 }}
-                                className='relative cursor-grab active:cursor-grabbing'>
+                                className='relative cursor-grab active:cursor-grabbing'
+                            >
                                 <div data-pair={pair}>
                                     <PairResoBox
                                         pair={pair}
