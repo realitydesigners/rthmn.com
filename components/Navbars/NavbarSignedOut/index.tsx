@@ -300,7 +300,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                     </div>
                                 ) : pathname !== '/signin' ? (
                                     <StartButton href='/signin' variant='shimmer-sm'>
-                                        Start now
+                                        Login
                                     </StartButton>
                                 ) : null}
                             </motion.div>

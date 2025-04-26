@@ -45,14 +45,14 @@ export const StartButton: FC<StartButtonProps> = ({
         shimmer: {
             wrapper:
                 'relative bg-gradient-to-r from-white/95 via-white to-white/95 text-zinc-800 backdrop-blur-sm hover:from-white hover:via-white hover:to-white before:absolute before:inset-0 before:bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_10%,rgba(255,255,255,0.4)_45%,rgba(255,255,255,0.2)_55%,rgba(255,255,255,0.4)_80%,rgba(255,255,255,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_4s_linear_infinite] before:backdrop-blur-sm shadow-[inset_0_1px_0px_rgba(255,255,255,1),inset_0_-1px_0px_rgba(0,0,0,0.1)] after:absolute after:inset-0 after:rounded-full after:shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_2px_rgba(0,0,0,0.1)]',
-            inner: 'bg-gradient-to-b from-transparent via-black/10 to-black/40',
+            inner: 'bg-gradient-to-b from-transparent via-black/10 to-black/30',
             shimmer: '',
             size: 'px-8 py-4 text-[15px]',
         },
         'shimmer-sm': {
             wrapper:
                 'relative bg-gradient-to-r from-white/95 via-white to-white/95 text-zinc-800 backdrop-blur-sm hover:from-white hover:via-white hover:to-white before:absolute before:inset-0 before:bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_10%,rgba(255,255,255,0.4)_45%,rgba(255,255,255,0.2)_55%,rgba(255,255,255,0.4)_80%,rgba(255,255,255,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_4s_linear_infinite] before:backdrop-blur-sm shadow-[inset_0_1px_0px_rgba(255,255,255,1),inset_0_-1px_0px_rgba(0,0,0,0.1)] after:absolute after:inset-0 after:rounded-full after:shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_2px_rgba(0,0,0,0.1)]',
-            inner: 'bg-gradient-to-b from-transparent via-black/10 to-black/40',
+            inner: 'bg-gradient-to-b from-transparent via-black/10 to-black/20',
             shimmer: '',
             size: 'px-4 py-2 text-sm',
         },
