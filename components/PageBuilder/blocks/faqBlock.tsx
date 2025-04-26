@@ -53,7 +53,11 @@ const FAQItem = memo(
                         <div className='absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent' />
                     </div>
 
-                    <button onClick={onClick} className='flex w-full cursor-pointer items-center justify-between p-6'>
+                    <button
+                        type='button'
+                        onClick={onClick}
+                        className='flex w-full cursor-pointer items-center justify-between p-6'
+                    >
                         <div className='flex items-center gap-4'>
                             <FaQuestionCircle
                                 className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? 'text-emerald-400' : 'text-neutral-400 group-hover:text-neutral-400'}`}
@@ -130,6 +134,7 @@ const CategoryFilter = memo(
     }: { categories: string[]; selected: string; onSelect: (category: string) => void }) => (
         <div className='mb-8 flex flex-wrap gap-2'>
             <button
+                type='button'
                 onClick={() => onSelect('all')}
                 className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
                     selected === 'all'
@@ -137,11 +142,12 @@ const CategoryFilter = memo(
                         : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:bg-white/10 hover:text-neutral-400'
                 }`}
             >
-                <FaTags className={`h-4 w-4 transition-transform duration-300 group-hover:rotate-12`} />
+                <FaTags className='h-4 w-4 transition-transform duration-300 group-hover:rotate-12' />
                 All
             </button>
             {categories.map((category) => (
                 <button
+                    type='button'
                     key={category}
                     onClick={() => onSelect(category)}
                     className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition-all duration-300 ${
@@ -150,7 +156,7 @@ const CategoryFilter = memo(
                             : 'border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:bg-white/10 hover:text-neutral-400'
                     }`}
                 >
-                    <FaTags className={`h-4 w-4 transition-transform duration-300 group-hover:rotate-12`} />
+                    <FaTags className='h-4 w-4 transition-transform duration-300 group-hover:rotate-12' />
                     {category}
                 </button>
             ))}
@@ -162,6 +168,7 @@ CategoryFilter.displayName = 'CategoryFilter';
 
 const LoadMoreButton = memo(({ onClick }: { onClick: () => void }) => (
     <button
+        type='button'
         onClick={onClick}
         className='group relative mt-8 flex w-full items-center justify-center rounded-full border border-white/10 bg-black/40 p-4 text-white transition-all duration-300 hover:border-white/20 hover:bg-black/60'
     >
@@ -221,7 +228,9 @@ export function FAQBlock({ title = 'Frequently Asked Questions', items = [] }: F
                     </h2>
                     <p className='font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg'>
                         Everything you need to know about rthmn. Can't find the answer you're looking for? Contact us at{' '}
-                        <button className='text-emerald-400'>hello@rthmn.com</button>
+                        <button type='button' className='text-emerald-400'>
+                            hello@rthmn.com
+                        </button>
                     </p>
                 </motion.div>
                 <div className='mx-auto max-w-4xl'>
