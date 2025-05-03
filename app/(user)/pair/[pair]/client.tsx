@@ -4,6 +4,7 @@ import CandleChart, { type ChartDataPoint } from '@/components/Charts/CandleChar
 import ChartControls from '@/components/Charts/CandleChart/ChartControls';
 import Histogram from '@/components/Charts/Histogram';
 import { ResoBox } from '@/components/Charts/ResoBox';
+import { ResoBox3D } from '@/components/Charts/ResoBox/ResoBox3D';
 import { BoxValuesDebug } from '@/components/Debug/BoxValuesDebug';
 import { TimeFrameSlider } from '@/components/Panels/PanelComponents/TimeFrameSlider';
 import { useDashboard } from '@/providers/DashboardProvider/client';
@@ -56,6 +57,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
     const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<'all' | 'positive' | 'negative'>('all');
     const [showBoxLevels, setShowBoxLevels] = useState(false);
     const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
+    const [is3DMode, setIs3DMode] = useState(false);
 
     const handleHoverChange = useCallback((timestamp: number | null) => {
         setHoveredTimestamp(timestamp);
@@ -151,7 +153,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
         <div className='flex h-auto w-full flex-col pt-14'>
             <div className='relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col'>
                 <div className='flex h-full w-full flex-1'>
-                    <div className='h-full w-3/4 p-4'>
+                    <div className='h-full w-1/2 p-4'>
                         <div className='relative flex h-full flex-col overflow-hidden border border-[#222] bg-black'>
                             <ChartControls
                                 showBoxLevels={showBoxLevels}
@@ -201,18 +203,40 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                             </div>
                         </div>
                     </div>
-                    <div className='h-full w-1/4 border-r border-[#222] p-4'>
+                    <div className='h-full w-1/2 border-r border-[#222] p-4'>
                         <div className='flex h-full flex-col border border-[#222] bg-black p-4'>
-                            <div className='relative flex-1 p-2 pr-16'>
-                                {filteredBoxSlice && boxColors && (
-                                    <ResoBox
-                                        slice={filteredBoxSlice}
-                                        className='h-full w-full'
-                                        boxColors={boxColors}
-                                        pair={pair}
-                                        showPriceLines={settings.showPriceLines}
-                                    />
-                                )}
+                            <div className='mb-4 flex items-center justify-end'>
+                                <button
+                                    type='button'
+                                    onClick={() => setIs3DMode(!is3DMode)}
+                                    className={`rounded-lg px-3 py-1.5 text-sm transition-all ${
+                                        is3DMode
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-neutral-800 text-neutral-400 hover:bg-neutral-700'
+                                    }`}
+                                >
+                                    3D View
+                                </button>
+                            </div>
+                            <div className='relative flex-1 p-2 '>
+                                {filteredBoxSlice &&
+                                    boxColors &&
+                                    (is3DMode ? (
+                                        <ResoBox3D
+                                            slice={filteredBoxSlice}
+                                            className='h-full w-full'
+                                            boxColors={boxColors}
+                                            pair={pair}
+                                        />
+                                    ) : (
+                                        <ResoBox
+                                            slice={filteredBoxSlice}
+                                            className='h-full w-full'
+                                            boxColors={boxColors}
+                                            pair={pair}
+                                            showPriceLines={settings.showPriceLines}
+                                        />
+                                    ))}
                             </div>
                             {boxSlice?.boxes && (
                                 <div className='mt-4 h-16 w-full'>
