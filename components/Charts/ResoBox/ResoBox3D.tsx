@@ -5,7 +5,7 @@ import type { BoxColors } from '@/stores/colorStore';
 import type { Box, BoxSlice } from '@/types/types';
 import { INSTRUMENTS, formatPrice } from '@/utils/instruments';
 import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Text, Line } from '@react-three/drei';
+import { OrbitControls, Text, Line, Edges } from '@react-three/drei';
 import * as THREE from 'three';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -17,7 +17,7 @@ interface BoxDimensions {
 }
 
 const calculateBoxDimensions = (index: number, baseSize: number): BoxDimensions => {
-    const scale = (1 / Math.sqrt(2)) ** index;
+    const scale = (1 / Math.sqrt(1.5)) ** index;
     return {
         size: baseSize * scale,
         scale,
@@ -42,7 +42,7 @@ const calculateCornerPosition = (
 
 // Reference lines component
 const OriginLines = () => {
-    const lineLength = 10;
+    const lineLength = 30;
     return (
         <group>
             {/* X axis - red */}
@@ -51,7 +51,7 @@ const OriginLines = () => {
                     [0, 0, 0],
                     [lineLength, 0, 0],
                 ]}
-                color='#FF0000'
+                color='#333333'
                 lineWidth={1}
             />
             {/* Y axis - green */}
@@ -60,7 +60,7 @@ const OriginLines = () => {
                     [0, 0, 0],
                     [0, lineLength, 0],
                 ]}
-                color='#00FF00'
+                color='#333333'
                 lineWidth={1}
             />
             {/* Z axis - blue */}
@@ -69,7 +69,7 @@ const OriginLines = () => {
                     [0, 0, 0],
                     [0, 0, lineLength],
                 ]}
-                color='#0000FF'
+                color='#333333'
                 lineWidth={1}
             />
         </group>
@@ -87,7 +87,9 @@ interface Box3DProps {
 
 const Box3D = memo(({ box, boxColors, pair, absolutePosition, dimensions }: Box3DProps) => {
     const meshRef = useRef<THREE.Mesh>(null);
-    const colors = useBoxColors(box, boxColors);
+
+    const baseColor = new THREE.Color(box.value > 0 ? boxColors.positive : boxColors.negative);
+    const opacity = 0.75; // Consistent opacity for all boxes
 
     // Use passed props directly
     return (
@@ -95,54 +97,26 @@ const Box3D = memo(({ box, boxColors, pair, absolutePosition, dimensions }: Box3
             <mesh ref={meshRef} scale={[dimensions.size, dimensions.size, dimensions.size]} castShadow receiveShadow>
                 <boxGeometry />
                 <meshPhysicalMaterial
-                    color={box.value > 0 ? boxColors.positive : boxColors.negative}
+                    color={baseColor}
                     transparent={true}
-                    opacity={0.6}
-                    metalness={0.1}
-                    roughness={0.2}
+                    opacity={0.8}
+                    metalness={0.0}
+                    roughness={0.8}
+                    side={THREE.FrontSide}
                     depthWrite={false}
-                    side={THREE.DoubleSide}
-                    transmission={0.6}
-                    thickness={1}
                 />
+                {/* Add edges for definition, slightly brighter than base color */}
+                {/* <Edges
+                    scale={1.001} // Avoid z-fighting
+                    threshold={15} // Default angle threshold
+                    color={baseColor.clone().multiplyScalar(0.7)} // Make edges slightly darker than base
+                /> */}
             </mesh>
-
-            {/* Box outline */}
-            <mesh scale={[dimensions.size, dimensions.size, dimensions.size]}>
-                <boxGeometry />
-                <meshBasicMaterial wireframe={false} transparent={true} opacity={0.2} depthWrite={false} />
-            </mesh>
-
-            {/* Price Labels */}
-            <Text
-                position={[dimensions.size / 2 + 0.1, dimensions.size / 2, 0]}
-                fontSize={0.1 * dimensions.scale}
-                color={box.value > 0 ? boxColors.positive : boxColors.negative}
-            >
-                {formatPrice(box.high, pair)}
-            </Text>
-
-            <Text
-                position={[dimensions.size / 2 + 0.1, -dimensions.size / 2, 0]}
-                fontSize={0.1 * dimensions.scale}
-                color={box.value > 0 ? boxColors.positive : boxColors.negative}
-            >
-                {formatPrice(box.low, pair)}
-            </Text>
         </group>
     );
 });
 
 // Helper hook for box colors
-const useBoxColors = (box: Box, boxColors: BoxColors) => {
-    return useMemo(() => {
-        return {
-            baseColor: box.value > 0 ? boxColors.positive : boxColors.negative,
-            opacity: boxColors.styles?.opacity ?? 0.2,
-        };
-    }, [box.value, boxColors]);
-};
-
 interface ResoBox3DProps {
     slice: BoxSlice;
     className?: string;
@@ -250,16 +224,23 @@ export const ResoBox3D = memo(({ slice, className = '', pair = '', boxColors: pr
 
     return (
         <div ref={containerRef} className={`relative aspect-square h-full w-full ${className}`}>
-            <Canvas camera={{ position: [10, 5, 10], fov: 50 }} shadows>
+            <Canvas
+                camera={{ position: [30, 20, 30], fov: 20 }}
+                shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
+            >
                 <color attach='background' args={['#000000']} />
-                <ambientLight intensity={0.8} />
-                <directionalLight position={[5, 5, 5]} intensity={1} castShadow shadow-mapSize={[1024, 1024]} />
-                <directionalLight position={[-5, -5, -5]} intensity={0.2} />
+                <ambientLight intensity={0.5} />
+                <directionalLight
+                    position={[10, 60, 10]}
+                    intensity={1}
+                    castShadow
+                    shadow-mapSize={[2048, 2048]}
+                    shadow-bias={-0.0001}
+                />
 
-                <OrbitControls enableZoom={true} enablePan={true} maxDistance={30} minDistance={5} />
-
-                <group>
-                    <OriginLines />
+                <OrbitControls enableZoom={true} enablePan={true} maxDistance={100} minDistance={5} />
+                <OriginLines />
+                <group position={[6, 6, 6]}>
                     {/* Render based on sorted order but use calculated pos/dims */}
                     {sortedBoxes.map((box) => {
                         const data = calculatedPositionsAndDimensions.get(box.originalIndex);
