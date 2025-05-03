@@ -83,13 +83,13 @@ interface Box3DProps {
     pair: string;
     absolutePosition: [number, number, number];
     dimensions: BoxDimensions; // Pass calculated dimensions
+    isOuterMost: boolean;
 }
 
-const Box3D = memo(({ box, boxColors, pair, absolutePosition, dimensions }: Box3DProps) => {
+const Box3D = memo(({ box, boxColors, pair, absolutePosition, dimensions, isOuterMost }: Box3DProps) => {
     const meshRef = useRef<THREE.Mesh>(null);
 
     const baseColor = new THREE.Color(box.value > 0 ? boxColors.positive : boxColors.negative);
-    const opacity = 0.75; // Consistent opacity for all boxes
 
     // Use passed props directly
     return (
@@ -100,8 +100,7 @@ const Box3D = memo(({ box, boxColors, pair, absolutePosition, dimensions }: Box3
                     color={baseColor}
                     transparent={true}
                     opacity={0.8}
-                    metalness={0.0}
-                    roughness={0.8}
+                    metalness={0.3}
                     side={THREE.FrontSide}
                     depthWrite={false}
                 />
@@ -225,22 +224,18 @@ export const ResoBox3D = memo(({ slice, className = '', pair = '', boxColors: pr
     return (
         <div ref={containerRef} className={`relative aspect-square h-full w-full ${className}`}>
             <Canvas
-                camera={{ position: [30, 20, 30], fov: 20 }}
+                camera={{ position: [30, 15, 30], fov: 25 }}
+                gl={{ antialias: true }}
                 shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
             >
-                <color attach='background' args={['#000000']} />
                 <ambientLight intensity={0.5} />
-                <directionalLight
-                    position={[10, 60, 10]}
-                    intensity={1}
-                    castShadow
-                    shadow-mapSize={[2048, 2048]}
-                    shadow-bias={-0.0001}
-                />
+                <directionalLight position={[10, 60, 10]} intensity={1} shadow-mapSize={[1024, 1024]} />
 
-                <OrbitControls enableZoom={true} enablePan={true} maxDistance={100} minDistance={5} />
-                <OriginLines />
-                <group position={[6, 6, 6]}>
+                <OrbitControls enableZoom={true} enablePan={true} maxDistance={80} minDistance={40} />
+                {/* <OriginLines /> */}
+                <group
+                // position={[6, 6, 6]}
+                >
                     {/* Render based on sorted order but use calculated pos/dims */}
                     {sortedBoxes.map((box) => {
                         const data = calculatedPositionsAndDimensions.get(box.originalIndex);
@@ -255,6 +250,7 @@ export const ResoBox3D = memo(({ slice, className = '', pair = '', boxColors: pr
                                 pair={pair}
                                 absolutePosition={absolutePosition}
                                 dimensions={dimensions}
+                                isOuterMost={false}
                             />
                         );
                     })}

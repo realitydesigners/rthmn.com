@@ -1,13 +1,10 @@
 'use client';
-
 import { generateHeadingId } from '@/app/learn/_components/TOC';
-import React from 'react';
 import AudioRefBlock from '../nested/AudioRefBlock';
 import ImageRefBlock from '../nested/ImageRefBlock';
 import InternalLink from '../nested/InternalLink';
 import PostsRefBlock from '../nested/PostsRefBlock';
 import QuoteRefBlock from '../nested/QuoteRefBlock';
-
 import BoxCourseVisualizer from '../nested/BoxCourseVisualizer';
 import Callout from '../nested/Callout';
 import Quiz from '../nested/Quiz';
@@ -18,69 +15,81 @@ import type { PortableTextComponents } from '@portabletext/react';
 export const CourseTemplate: PortableTextComponents = {
     block: {
         normal: ({ children }) => (
-            <div className='mb-4'>
-                <p className={`font-outfit text-xl leading-relaxed text-neutral-400`}>{children}</p>
+            <div className='mb-4 w-full flex justify-center'>
+                <p className='font-outfit text-xl leading-relaxed text-neutral-400 max-w-2xl w-full'>{children}</p>
             </div>
         ),
         h1: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h1
-                    id={id}
-                    className={`font-outfit mb-6 text-3xl leading-[1.25em] font-bold text-neutral-300 lg:text-6xl`}
-                >
-                    {children}
-                </h1>
+                <div className='w-full flex justify-center'>
+                    <h1
+                        id={id}
+                        className='font-outfit text-3xl w-full max-w-2xl leading-[1.25em] font-bold text-neutral-300 lg:text-6xl'
+                    >
+                        {children}
+                    </h1>
+                </div>
             );
         },
         h2: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h2
-                    id={id}
-                    className={`font-outfit mb-4 scroll-mt-24 text-2xl leading-[1.25em] font-bold text-neutral-300`}
-                >
-                    {children}
-                </h2>
+                <div className='w-full flex justify-center'>
+                    <h2
+                        id={id}
+                        className='font-outfit mb-4 w-full max-w-2xl scroll-mt-24 text-2xl leading-[1.25em] font-bold text-neutral-300'
+                    >
+                        {children}
+                    </h2>
+                </div>
             );
         },
         h3: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h3
-                    id={id}
-                    className={`font-outfit mb-3 scroll-mt-24 text-xl leading-[1.25em] font-bold text-neutral-300`}
-                >
-                    {children}
-                </h3>
+                <div className='w-full flex justify-center'>
+                    <h3
+                        id={id}
+                        className='font-outfit mb-3 w-full max-w-2xl scroll-mt-24 text-xl leading-[1.25em] font-bold text-neutral-300'
+                    >
+                        {children}
+                    </h3>
+                </div>
             );
         },
         h4: ({ children }) => {
             const id = generateHeadingId(children?.toString() || '');
             return (
-                <h4
-                    id={id}
-                    className={`font-outfit mb-2 scroll-mt-24 text-lg leading-relaxed font-bold text-neutral-300`}
-                >
-                    {children}
-                </h4>
+                <div className='mb-6 w-full flex justify-center'>
+                    <h4
+                        id={id}
+                        className='font-outfit mb-2 scroll-mt-24 text-lg leading-relaxed font-bold text-neutral-300'
+                    >
+                        {children}
+                    </h4>
+                </div>
             );
         },
         bullet: ({ children }) => (
-            <li className='font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white'>{children}</li>
+            <div className='mb-4 w-full flex justify-center'>
+                <li className='font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white'>{children}</li>
+            </div>
         ),
         number: ({ children }) => (
-            <li className='font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white'>{children}</li>
+            <div className='mb-4 w-full flex justify-center'>
+                <li className='font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white'>{children}</li>
+            </div>
         ),
     },
     list: {
         bullet: ({ children }) => (
-            <div className='my-4 w-full'>
+            <div className='mb-4 w-full flex justify-center'>
                 <ul className='font-outfit w-full list-disc space-y-1 pr-4 pl-8 text-neutral-400'>{children}</ul>
             </div>
         ),
         number: ({ children }) => (
-            <div className='my-4 w-full'>
+            <div className='mb-4 w-full flex justify-center'>
                 <ol className='font-outfit w-full list-decimal space-y-1 pr-4 pl-8 text-neutral-400'>{children}</ol>
             </div>
         ),

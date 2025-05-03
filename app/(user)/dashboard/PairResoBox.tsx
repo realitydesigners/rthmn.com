@@ -8,6 +8,7 @@ import { useTimeframeStore } from '@/stores/timeframeStore';
 import type { BoxSlice } from '@/types/types';
 import { formatPrice } from '@/utils/instruments';
 import React, { useCallback, useEffect, useMemo } from 'react';
+import { ResoBox3D } from '@/components/Charts/ResoBox/ResoBox3D';
 
 interface PairResoBoxProps {
     pair?: string;
@@ -18,12 +19,12 @@ interface PairResoBoxProps {
 
 // Simple inline skeleton components
 const TextSkeleton = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse rounded bg-[#333] ${className}`}></div>
+    <div className={`animate-pulse rounded bg-[#333] ${className}`} />
 );
 
-const ChartSkeleton = () => <div className='aspect-square h-full w-full animate-pulse rounded bg-[#222]'></div>;
+const ChartSkeleton = () => <div className='aspect-square h-full w-full animate-pulse rounded bg-[#222]' />;
 
-const SliderSkeleton = () => <div className='h-16 w-full animate-pulse rounded bg-[#282828]'></div>;
+const SliderSkeleton = () => <div className='h-16 w-full animate-pulse rounded bg-[#282828]' />;
 
 export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBoxProps) => {
     const { priceData } = useWebSocket();
@@ -103,6 +104,15 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                         ) : (
                             <ChartSkeleton />
                         )}
+                        {showChart && (
+                            <div className='relative h-full aspect-square w-full flex-shrink-0 mt-2'>
+                                <ResoBox3D
+                                    slice={filteredBoxSlice} // Already filtered
+                                    pair={pair}
+                                    boxColors={boxColors}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {/* Timeframe Control - Conditionally render skeleton or Slider */}
@@ -118,6 +128,8 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                             <SliderSkeleton />
                         )}
                     </div>
+
+                    {/* 3D ResoBox Section - Conditionally render based on filtered slice */}
                 </div>
             </div>
         </div>

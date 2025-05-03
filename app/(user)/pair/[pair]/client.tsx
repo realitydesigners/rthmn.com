@@ -218,7 +218,7 @@ const PairClient = ({ pair, chartData }: { pair: string; chartData: ChartData })
                                     3D View
                                 </button>
                             </div>
-                            <div className='relative flex-1 p-2 '>
+                            <div className='relative flex-1 p-2 h-[300px] '>
                                 {filteredBoxSlice &&
                                     boxColors &&
                                     (is3DMode ? (

@@ -16,104 +16,45 @@ const icons = {
     important: FaExclamationCircle,
 };
 
-const styles = {
-    info: {
-        border: 'border-blue-400/20',
-        bg: 'from-blue-900/10 to-blue-800/5',
-        text: 'text-blue-400',
-        shadow: 'drop-shadow-[0_0_8px_rgba(96,165,250,0.3)]',
-        glow: 'before:bg-blue-500/20',
-        accent: 'bg-gradient-to-r from-blue-500 to-blue-400',
-    },
-    warning: {
-        border: 'border-amber-400/20',
-        bg: 'from-amber-900/10 to-amber-800/5',
-        text: 'text-amber-400',
-        shadow: 'drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]',
-        glow: 'before:bg-amber-500/20',
-        accent: 'bg-gradient-to-r from-amber-500 to-amber-400',
-    },
-    tip: {
-        border: 'border-emerald-400/20',
-        bg: 'from-emerald-900/10 to-emerald-800/5',
-        text: 'text-emerald-400',
-        shadow: 'drop-shadow-[0_0_8px_rgba(52,211,153,0.3)]',
-        glow: 'before:bg-emerald-500/20',
-        accent: 'bg-gradient-to-r from-emerald-500 to-emerald-400',
-    },
-    learning: {
-        border: 'border-violet-400/20',
-        bg: 'from-violet-900/10 to-violet-800/5',
-        text: 'text-violet-400',
-        shadow: 'drop-shadow-[0_0_8px_rgba(167,139,250,0.3)]',
-        glow: 'before:bg-violet-500/20',
-        accent: 'bg-gradient-to-r from-violet-500 to-violet-400',
-    },
-    important: {
-        border: 'border-rose-400/20',
-        bg: 'from-rose-900/10 to-rose-800/5',
-        text: 'text-rose-400',
-        shadow: 'drop-shadow-[0_0_8px_rgba(251,113,133,0.3)]',
-        glow: 'before:bg-rose-500/20',
-        accent: 'bg-gradient-to-r from-rose-500 to-rose-400',
-    },
-};
-
 export default function Callout({ type = 'info', title, points }: CalloutProps) {
     const Icon = icons[type];
-    const style = styles[type];
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className={`relative my-10 overflow-hidden rounded-2xl border ${style.border} bg-gradient-to-br ${style.bg} p-0.5 backdrop-blur-lg before:absolute before:inset-0 before:-z-10 before:translate-y-[60%] before:transform before:rounded-full before:opacity-20 before:blur-3xl before:content-[''] ${style.glow}`}
-        >
-            <div className='relative rounded-[14px] bg-black/30 p-6 backdrop-blur-sm'>
-                {/* Decorative elements */}
-                <div className='absolute -top-12 -right-12 h-24 w-24 rounded-full bg-gradient-to-br from-white/5 to-transparent opacity-20 blur-2xl'></div>
-                <div
-                    className={`absolute -bottom-4 -left-4 h-20 w-20 rounded-full ${style.accent} opacity-10 blur-2xl`}
-                ></div>
-
+        <div className='w-full flex justify-center'>
+            <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className='group relative my-8 max-w-2xl flex-col flex w-full items-end gap-4 rounded-2xl bg-black p-4 transition-all duration-300 before:absolute before:inset-0 before:rounded-2xl before:bg-[linear-gradient(120deg,transparent_0%,rgba(0,115,230,0)_10%,rgba(0,115,230,0.1)_45%,rgba(0,115,230,0.05)_55%,rgba(0,115,230,0.1)_80%,rgba(0,115,230,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_30s_linear_infinite] shadow-[0_0_30px_rgba(0,115,230,0.1)] ring-1 ring-white/5'
+            >
                 {/* Header */}
-                <div className='mb-6 flex items-center gap-4'>
-                    <div
-                        className={`relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-xl ${style.accent} p-0.5`}
-                    >
-                        <div className='absolute inset-0 bg-black/30 backdrop-blur-sm'></div>
-                        <div className='relative z-10 flex h-full w-full items-center justify-center rounded-[10px] bg-black/60'>
-                            <Icon className={`h-5 w-5 ${style.text} ${style.shadow}`} />
-                        </div>
+                <div className='flex w-full items-center gap-4'>
+                    <div className='flex h-12 w-12 items-center justify-center rounded-xl bg-[#0073E6]/20 text-[#0073E6] shadow-[inset_0_1px_0px_rgba(255,255,255,0.1)]  transition-all duration-300'>
+                        <Icon className='h-5 w-5 drop-shadow-[0_0_8px_rgba(0,115,230,0.5)]' />
                     </div>
-                    <h2 className='bg-gradient-to-r from-white to-neutral-300 bg-clip-text text-xl font-bold tracking-tight text-transparent'>
-                        {title}
-                    </h2>
+                    <div className='flex-1 min-w-0'>
+                        <h2 className='text-xl font-medium text-white transition-all duration-300'>{title}</h2>
+                    </div>
                 </div>
 
                 {/* Content */}
-                <ul className='space-y-4 pl-2'>
+                <ul className='mt-4 w-full space-y-4'>
                     {points.map((point, index) => (
                         <motion.li
-                            key={index}
+                            key={`point-${point.substring(0, 20)}`}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.3, delay: 0.1 + index * 0.1 }}
-                            className='flex items-start gap-3'
+                            className='flex items-start gap-4'
                         >
-                            <div
-                                className={`relative mt-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-black/40 p-0.5 backdrop-blur-sm`}
-                            >
-                                <div
-                                    className={`h-1.5 w-1.5 rounded-full ${style.text} ${style.shadow} bg-current`}
-                                ></div>
+                            <div className='flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#0073E6]/10 text-[#0073E6]  transition-all duration-300'>
+                                <div className='h-1.5 w-1.5 rounded-full bg-current drop-shadow-[0_0_8px_rgba(0,115,230,0.5)]' />
                             </div>
-                            <span className='flex-1 text-neutral-300'>{point}</span>
+                            <span className='text-sm text-neutral-300'>{point}</span>
                         </motion.li>
                     ))}
                 </ul>
-            </div>
-        </motion.div>
+            </motion.div>
+        </div>
     );
 }

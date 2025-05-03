@@ -92,7 +92,7 @@ const LessonFooter = ({
                     }
                 }
                 .grid-bg {
-                    background-size: 80px 80px;
+                    background-size: 60px 60px;
                     background-image: 
                         linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
                         linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
@@ -202,7 +202,7 @@ export default function LessonClient({ course, lesson, chapter }: LessonClientPr
     const prevLesson = chapter.lessons[currentLessonIndex - 1];
 
     return (
-        <div className='w-full px-4 py-28 lg:px-8'>
+        <div className='w-full px-4 pt-20 pb-6'>
             <LessonHeader
                 lesson={lesson}
                 currentLessonIndex={currentLessonIndex}

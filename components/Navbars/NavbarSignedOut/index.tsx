@@ -209,7 +209,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                 animate='visible'
                 variants={navVariants}
             >
-                <div className='relative mx-auto h-full w-full lg:w-11/12'>
+                <div className='relative mx-auto h-full w-full px-8'>
                     <div className='grid h-full grid-cols-3 items-center'>
                         <Link href='/' className='z-50 flex items-center gap-2 justify-self-start pl-4 xl:pl-0'>
                             <div className='flex h-8 w-8 items-center'>
@@ -239,7 +239,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
                                     </a>
                                 ))}
                             </div>
-                            <motion.div className='mr-2 flex' variants={linkVariants} custom={3}>
+                            <motion.div className='mr-4 flex' variants={linkVariants} custom={3}>
                                 {user ? (
                                     <div className='flex items-center gap-3'>
                                         <Link
