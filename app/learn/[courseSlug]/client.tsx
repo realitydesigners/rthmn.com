@@ -24,7 +24,7 @@ const CourseIcon = ({ icon }: { icon: string }) => {
         FaRocket,
     };
     const IconComponent = icons[icon as keyof typeof icons] || FaBook;
-    return <IconComponent className='h-8 w-8 text-emerald-400' />;
+    return <IconComponent className='h-8 w-8 text-blue-400' />;
 };
 
 interface Lesson {
@@ -62,7 +62,7 @@ export default function CourseClient({ course }: { course: Course }) {
                 {/* Hero Section */}
                 <div className='mx-auto mt-32 max-w-5xl px-6 sm:px-8 lg:px-12'>
                     <div className='mb-16 flex items-start gap-6'>
-                        <div className='rounded-2xl bg-emerald-400/10 p-4'>
+                        <div className='rounded-2xl bg-blue-400/10 p-4'>
                             <CourseIcon icon={course.icon} />
                         </div>
                         <div className='flex-1 space-y-4'>
@@ -72,14 +72,14 @@ export default function CourseClient({ course }: { course: Course }) {
                             <p className='max-w-2xl text-lg text-neutral-400'>{course.description}</p>
                             <div className='flex flex-wrap items-center gap-6'>
                                 <div className='flex items-center gap-2'>
-                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>
+                                    <div className='flex h-6 w-6 items-center justify-center rounded-full bg-blue-400/10 text-sm text-blue-400'>
                                         {course.chapters.length}
                                     </div>
                                     <span className='text-sm text-neutral-400'>Chapters</span>
                                 </div>
                                 {course.difficulty && (
                                     <div className='flex items-center gap-2'>
-                                        <FaLightbulb className='h-5 w-5 text-emerald-400' />
+                                        <FaLightbulb className='h-5 w-5 text-blue-400' />
                                         <span className='text-sm text-neutral-400 capitalize'>{course.difficulty}</span>
                                     </div>
                                 )}
@@ -99,11 +99,11 @@ export default function CourseClient({ course }: { course: Course }) {
                             {course.chapters?.map((chapter, chapterIndex) => (
                                 <div
                                     key={chapter._id}
-                                    className='overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-emerald-500/20 hover:bg-emerald-500/5'
+                                    className='overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-blue-500/20 hover:bg-blue-500/5'
                                 >
                                     <div className='p-6'>
                                         <div className='flex items-center gap-4'>
-                                            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-400/10 text-lg font-semibold text-emerald-400'>
+                                            <div className='flex h-10 w-10 items-center justify-center rounded-xl bg-blue-400/10 text-lg font-semibold text-blue-400'>
                                                 {chapterIndex + 1}
                                             </div>
                                             <div className='flex-1'>
@@ -115,7 +115,7 @@ export default function CourseClient({ course }: { course: Course }) {
                                                 )}
                                             </div>
                                             <div className='flex items-center gap-2 text-sm text-neutral-400'>
-                                                <div className='flex h-5 w-5 items-center justify-center rounded-full bg-emerald-400/10 text-xs text-emerald-400'>
+                                                <div className='flex h-5 w-5 items-center justify-center rounded-full bg-blue-400/10 text-xs text-blue-400'>
                                                     {chapter.lessons.length}
                                                 </div>
                                                 <span>Lessons</span>
@@ -128,9 +128,9 @@ export default function CourseClient({ course }: { course: Course }) {
                                             <Link
                                                 key={lesson._id}
                                                 href={`/learn/${course.slug}/${lesson.slug}`}
-                                                className='flex items-center gap-4 border-b border-white/5 p-4 last:border-b-0 hover:bg-emerald-500/5'
+                                                className='flex items-center gap-4 border-b border-white/5 p-4 last:border-b-0 hover:bg-blue-500/5'
                                             >
-                                                <div className='flex h-6 w-6 items-center justify-center rounded-full bg-emerald-400/10 text-sm text-emerald-400'>
+                                                <div className='flex h-6 w-6 items-center justify-center rounded-full bg-blue-400/10 text-sm text-blue-400'>
                                                     {lessonIndex + 1}
                                                 </div>
                                                 <div className='flex-1'>
@@ -141,7 +141,7 @@ export default function CourseClient({ course }: { course: Course }) {
                                                         </p>
                                                     )}
                                                 </div>
-                                                <FaPlay className='h-4 w-4 text-emerald-400' />
+                                                <FaPlay className='h-4 w-4 text-blue-400' />
                                             </Link>
                                         ))}
                                     </div>

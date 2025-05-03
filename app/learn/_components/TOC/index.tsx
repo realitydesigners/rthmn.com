@@ -177,12 +177,7 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
     };
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className='fixed top-0 right-0 z-10 mt-20 mr-8 mb-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'
-        >
+        <div className='fixed top-0 right-0 z-10 mt-20 mr-8 mb-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'>
             <div className='mb-6'>
                 <div className='flex items-center justify-between'>
                     <div className='flex items-center gap-2.5'>
@@ -322,6 +317,6 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
                     </AnimatePresence>
                 </ul>
             </div>
-        </motion.div>
+        </div>
     );
 }

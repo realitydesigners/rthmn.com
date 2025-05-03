@@ -17,7 +17,8 @@ export function SectionFooter() {
         pathname?.startsWith('/account') ||
         pathname?.startsWith('/studio') ||
         pathname?.startsWith('/signals') ||
-        pathname?.startsWith('/support')
+        pathname?.startsWith('/support') ||
+        pathname?.startsWith('/learn')
     ) {
         return null;
     }

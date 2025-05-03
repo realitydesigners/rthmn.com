@@ -7,7 +7,6 @@ import { FaArrowLeft, FaBook, FaCheckCircle } from 'react-icons/fa';
 
 import { useCourseProgressStore } from '@/stores/courseProgressStore';
 import type { Course } from '@/types/types';
-import { motion } from 'framer-motion';
 
 interface CourseNavProps {
     course: Course;
@@ -23,15 +22,10 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
         if (!store.courses[course._id]) {
             store.initializeCourse(course._id, course.chapters);
         }
-    }, [course, store.courses]);
+    }, [course, store.courses, store.initializeCourse]);
 
     return (
-        <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className='fixed top-0 left-0 z-10 mt-20 mb-8 ml-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'
-        >
+        <div className='fixed top-0 left-0 z-10 mt-20 mb-8 ml-8 flex hidden h-[calc(100vh-100px)] w-[280px] flex-col overflow-y-auto rounded-lg border border-white/[0.08] bg-[#0c0c0c]/95 p-5 shadow-[0_0_1px_1px_rgba(0,0,0,0.2)] backdrop-blur-xl backdrop-saturate-150 lg:block'>
             {/* Course Header */}
             <div className='mb-8'>
                 <Link
@@ -64,11 +58,9 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                         <span className='text-[13px] font-medium text-white'>{Math.round(progress)}%</span>
                     </div>
                     <div className='h-1 overflow-hidden rounded-full bg-white/[0.08]'>
-                        <motion.div
+                        <div
                             className='h-full rounded-full bg-gradient-to-r from-white/25 to-white/20'
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.3, ease: 'easeInOut' }}
+                            style={{ width: `${progress}%` }}
                         />
                     </div>
                 </div>
@@ -111,6 +103,6 @@ export function CourseNav({ course, view: propView = 'course' }: CourseNavProps)
                     </div>
                 );
             })}
-        </motion.div>
+        </div>
     );
 }
