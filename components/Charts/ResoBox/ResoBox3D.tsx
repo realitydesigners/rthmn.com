@@ -3,7 +3,6 @@
 import { useUser } from '@/providers/UserProvider';
 import type { BoxColors } from '@/stores/colorStore';
 import type { Box, BoxSlice } from '@/types/types';
-import { INSTRUMENTS, formatPrice } from '@/utils/instruments';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, Text, Line, Edges } from '@react-three/drei';
 import * as THREE from 'three';
@@ -98,18 +97,18 @@ const Box3D = memo(({ box, boxColors, pair, absolutePosition, dimensions, isOute
                 <boxGeometry />
                 <meshPhysicalMaterial
                     color={baseColor}
-                    transparent={true}
-                    opacity={0.8}
+                    transparent={false}
+                    opacity={1}
                     metalness={0.3}
                     side={THREE.FrontSide}
-                    depthWrite={false}
+                    depthWrite={true}
                 />
-                {/* Add edges for definition, slightly brighter than base color */}
-                {/* <Edges
-                    scale={1.001} // Avoid z-fighting
+                {/* Add subtle darker edges for definition */}
+                <Edges
+                    scale={1.001} // Avoid z-fighting with the box face
                     threshold={15} // Default angle threshold
-                    color={baseColor.clone().multiplyScalar(0.7)} // Make edges slightly darker than base
-                /> */}
+                    color={baseColor.clone().multiplyScalar(0.1)} // Slightly darker than base
+                />
             </mesh>
         </group>
     );
@@ -198,11 +197,34 @@ export const ResoBox3D = memo(({ slice, className = '', pair = '', boxColors: pr
                         positionSignPositive // Use the determined sign for positioning
                     );
 
-                    calculatedPosition = [
+                    // Initial position calculation (corner inside parent)
+                    const initialPosition: [number, number, number] = [
                         parentPosition[0] + offsetX,
                         parentPosition[1] + offsetY,
                         parentPosition[2] + offsetZ,
                     ];
+
+                    // Calculate outwards offset to prevent Z-fighting
+                    const epsilon = 0.005;
+                    const offsetVector: [number, number, number] = [offsetX, offsetY, offsetZ];
+                    const magnitude = Math.sqrt(offsetVector[0] ** 2 + offsetVector[1] ** 2 + offsetVector[2] ** 2);
+
+                    if (magnitude > 0) {
+                        const normalizedOffset: [number, number, number] = [
+                            (offsetVector[0] / magnitude) * epsilon,
+                            (offsetVector[1] / magnitude) * epsilon,
+                            (offsetVector[2] / magnitude) * epsilon,
+                        ];
+                        // Add the small outward offset to the initial position
+                        calculatedPosition = [
+                            initialPosition[0] + normalizedOffset[0],
+                            initialPosition[1] + normalizedOffset[1],
+                            initialPosition[2] + normalizedOffset[2],
+                        ];
+                    } else {
+                        // If magnitude is 0 (shouldn't happen with different sized boxes), use initial position
+                        calculatedPosition = initialPosition;
+                    }
                 } else {
                     // Fallback: Should ideally not happen if logic is correct
                     console.warn('Could not find previous box data for positioning:', prevSortedBox.originalIndex);
@@ -224,14 +246,14 @@ export const ResoBox3D = memo(({ slice, className = '', pair = '', boxColors: pr
     return (
         <div ref={containerRef} className={`relative aspect-square h-full w-full ${className}`}>
             <Canvas
-                camera={{ position: [30, 15, 30], fov: 25 }}
+                camera={{ position: [25, 5, 25], fov: 30 }}
                 gl={{ antialias: true }}
                 shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
             >
-                <ambientLight intensity={0.5} />
-                <directionalLight position={[10, 60, 10]} intensity={1} shadow-mapSize={[1024, 1024]} />
+                <ambientLight intensity={1} />
+                <directionalLight position={[0, 0, 60]} intensity={1} shadow-mapSize={[1024, 1024]} />
 
-                <OrbitControls enableZoom={true} enablePan={true} maxDistance={80} minDistance={40} />
+                <OrbitControls enableZoom={true} enablePan={true} maxDistance={70} minDistance={40} />
                 {/* <OriginLines /> */}
                 <group
                 // position={[6, 6, 6]}
