@@ -483,7 +483,7 @@ export async function getCourse(slug: string) {
                             }
                         }
                     }
-                },
+                } | order(order asc)
             } | order(order asc)
         }`,
         { slug }
