@@ -67,7 +67,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                             {getSegmentIcon(segment) && (
                                                 <span className='text-[#666]'>{getSegmentIcon(segment)}</span>
                                             )}
-                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-neutral-200/50 uppercase'>
+                                            <span className='font-outfit text-[10px] font-medium tracking-wide text-[#666] uppercase'>
                                                 {segment}
                                             </span>
                                         </div>

@@ -136,7 +136,7 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
         <div className='sidebar-content' ref={sidebarRef}>
             <div
                 className={cn(
-                    'fixed top-14 bottom-0 z-[120] flex w-16 flex-col items-center justify-between border-l bg-gradient-to-b from-[#0A0B0D] to-[#070809]/50 py-4',
+                    'fixed top-14 bottom-0 z-[120] flex w-16 flex-col items-center justify-between border-l bg-gradient-to-b from-[#0A0B0D] to-[#070809] py-4',
                     position === 'left' ? 'left-0 border-r border-white/[0.05]' : 'right-0 border-l border-white/[0.05]'
                 )}
             >

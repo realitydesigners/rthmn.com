@@ -67,11 +67,11 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
     const showSlider = true;
 
     return (
-        <div className='no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]'>
+        <div className='no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D] border border-white/[0.02]'>
             {/* Grid Pattern Background */}
 
             <div className='relative flex min-h-[250px] flex-col border-[0.5px] border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#040505]'>
-                <div className='absolute inset-0'>
+                {/* <div className='absolute inset-0'>
                     <svg className='h-full w-full opacity-[0.07]' xmlns='http://www.w3.org/2000/svg'>
                         <title>Background Grid Pattern</title>
                         <defs>
@@ -99,7 +99,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                         <rect width='100%' height='100%' fill='url(#gridFade)' />
                         <rect width='100%' height='100%' fill='url(#gridVignette)' opacity='0.1' />
                     </svg>
-                </div>
+                </div> */}
                 {/* Enhanced depth effects */}
                 <div className='absolute inset-0 bg-[radial-gradient(100%_100%_at_50%_0%,rgba(255,255,255,0.02)_0%,transparent_50%)]' />
 
