@@ -67,7 +67,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
     const showSlider = true;
 
     return (
-        <div className='no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D] border border-white/[0.02]'>
+        <div className='no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]'>
             {/* Grid Pattern Background */}
 
             <div className='relative flex min-h-[250px] flex-col border-[0.5px] border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#040505]'>

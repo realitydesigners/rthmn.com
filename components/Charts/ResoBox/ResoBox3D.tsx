@@ -260,9 +260,9 @@ export const ResoBox3D = memo(({ slice, className = '', pair = '', boxColors: pr
                 shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
             >
                 <ambientLight intensity={1} />
-                <directionalLight position={[0, 0, 60]} intensity={2} shadow-mapSize={[1024, 1024]} />
+                <directionalLight position={[10, 20, 60]} intensity={2} shadow-mapSize={[1024, 1024]} />
 
-                <OrbitControls enableZoom={true} enablePan={true} maxDistance={70} minDistance={40} />
+                <OrbitControls enableZoom={false} enablePan={false} maxDistance={70} minDistance={40} />
                 {/* <OriginLines /> */}
                 <group>
                     {/* Render based on sorted order but use calculated pos/dims */}

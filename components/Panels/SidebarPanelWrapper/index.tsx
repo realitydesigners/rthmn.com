@@ -4,7 +4,7 @@ import { cn } from '@/utils/cn';
 import { getSidebarLocks, getSidebarState, setSidebarLocks, setSidebarState } from '@/utils/localStorage';
 import { motion } from 'framer-motion';
 import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { LuLock, LuUnlock } from 'react-icons/lu';
 
 const LockButton = ({ isLocked, onClick }: { isLocked: boolean; onClick: () => void }) => (
@@ -51,24 +51,30 @@ export const SidebarWrapper = ({
 }) => {
     const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
+    const initialLoadRef = useRef(true);
 
     useEffect(() => {
         setMounted(true);
-        const state = getSidebarState();
-        const locks = getSidebarLocks();
 
-        if (locks[position] && !state[position].isOpen) {
-            setSidebarState({
-                ...state,
-                [position]: {
-                    ...state[position],
-                    isOpen: true,
-                    locked: true,
-                },
-            });
-            onLockToggle();
+        // Only run this effect once on initial mount
+        if (initialLoadRef.current) {
+            initialLoadRef.current = false;
+            const state = getSidebarState();
+            const locks = getSidebarLocks();
+
+            if (locks[position] && !state[position].isOpen) {
+                setSidebarState({
+                    ...state,
+                    [position]: {
+                        ...state[position],
+                        isOpen: true,
+                        locked: true,
+                    },
+                });
+                onLockToggle();
+            }
         }
-    }, [onLockToggle, position]);
+    }, [position, onLockToggle]);
 
     const handleResize = useCallback((newWidth: number) => {
         setWidth(Math.max(350, Math.min(600, newWidth)));
@@ -87,7 +93,7 @@ export const SidebarWrapper = ({
             ...state,
             [position]: {
                 ...state[position],
-                isOpen: isOpen,
+                isOpen,
                 locked: !isLocked,
             },
         });

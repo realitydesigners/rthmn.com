@@ -7,7 +7,7 @@ import { cn } from '@/utils/cn';
 import { getSidebarState, setSidebarState } from '@/utils/localStorage';
 import { usePathname } from 'next/navigation';
 import type React from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type { IconType } from 'react-icons';
 
 interface SidebarButton {
@@ -34,7 +34,55 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
     const { currentStepId, setCurrentStep, hasCompletedInitialOnboarding, hasCompletedAllSteps, isStepCompleted } =
         useOnboardingStore();
 
-    const isSidebarStep = (stepId: string) => buttons.some((button) => button.id === stepId);
+    const isSidebarStep = useCallback((stepId: string) => buttons.some((button) => button.id === stepId), [buttons]);
+
+    const updateSidebarState = useCallback(
+        (isOpen: boolean, panel: string | undefined, locked: boolean) => {
+            const state = getSidebarState();
+            setSidebarState({
+                ...state,
+                [position]: {
+                    isOpen,
+                    activePanel: panel,
+                    locked,
+                },
+            });
+        },
+        [position]
+    );
+
+    const handleLockToggle = useCallback(() => {
+        setIsLocked((prevLocked) => {
+            const newLockedState = !prevLocked;
+
+            if (!newLockedState) {
+                setIsOpen(false);
+                setActivePanel(undefined);
+                updateSidebarState(false, undefined, false);
+            } else {
+                updateSidebarState(isOpen, activePanel, true);
+            }
+
+            return newLockedState;
+        });
+    }, [isOpen, activePanel, updateSidebarState]);
+
+    const handlePanelToggle = useCallback(
+        (panel: string) => {
+            if (isMobile) return;
+
+            if (activePanel === panel) {
+                setIsOpen(false);
+                setActivePanel(undefined);
+                updateSidebarState(false, undefined, isLocked);
+            } else {
+                setIsOpen(true);
+                setActivePanel(panel);
+                updateSidebarState(true, panel, isLocked);
+            }
+        },
+        [isMobile, activePanel, isLocked, updateSidebarState]
+    );
 
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth < 1024);
@@ -83,49 +131,16 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
                 setActivePanel(nextIncompleteStep.id);
             }
         }
-    }, [hasCompletedInitialOnboarding, hasCompletedAllSteps, currentStepId, setCurrentStep, isStepCompleted]);
+    }, [
+        hasCompletedInitialOnboarding,
+        hasCompletedAllSteps,
+        currentStepId,
+        setCurrentStep,
+        isStepCompleted,
+        isSidebarStep,
+    ]);
 
     if (!mounted || isMobile || pathname === '/account') return null;
-
-    const handlePanelToggle = (panel: string) => {
-        if (isMobile) return;
-
-        if (activePanel === panel) {
-            setIsOpen(false);
-            setActivePanel(undefined);
-            updateSidebarState(false, undefined, isLocked);
-        } else {
-            setIsOpen(true);
-            setActivePanel(panel);
-            updateSidebarState(true, panel, isLocked);
-        }
-    };
-
-    const updateSidebarState = (isOpen: boolean, panel: string | undefined, locked: boolean) => {
-        const state = getSidebarState();
-        setSidebarState({
-            ...state,
-            [position]: {
-                isOpen,
-                activePanel: panel,
-                locked,
-            },
-        });
-    };
-
-    const handleLockToggle = () => {
-        const newLockedState = !isLocked;
-        setIsLocked(newLockedState);
-
-        // When unlocking, also close the panel
-        if (!newLockedState) {
-            setIsOpen(false);
-            setActivePanel(undefined);
-            updateSidebarState(false, undefined, false);
-        } else {
-            updateSidebarState(isOpen, activePanel, true);
-        }
-    };
 
     const renderPanelContent = () => {
         const activeButton = buttons.find((button) => button.id === activePanel);

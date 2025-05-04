@@ -152,10 +152,15 @@ const SearchResultItem = memo(
         const price = priceData[pair]?.price;
 
         return (
-            <button
-                type='button'
+            <div
+                onClick={onSelect}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        onSelect();
+                    }
+                }}
                 className={cn(
-                    'group/result relative flex h-10 w-full items-center justify-between px-3 transition-all duration-300',
+                    'group/result relative flex h-10 w-full items-center justify-between px-3 transition-all duration-300 cursor-pointer',
                     isSelected
                         ? [
                               'bg-gradient-to-b from-[#0A0B0D] to-[#070809]',
@@ -166,7 +171,6 @@ const SearchResultItem = memo(
                           ]
                         : 'hover:bg-white/[0.02]'
                 )}
-                onClick={onSelect}
             >
                 {/* Left side */}
                 <div className='flex w-full items-center'>
@@ -220,7 +224,7 @@ const SearchResultItem = memo(
                         </div>
                     </div>
                 </div>
-            </button>
+            </div>
         );
     }
 );
