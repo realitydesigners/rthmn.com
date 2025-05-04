@@ -70,7 +70,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
         <div className='no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]'>
             {/* Grid Pattern Background */}
 
-            <div className='relative flex min-h-[250px] flex-col border-[0.5px] border-white/[0.02] bg-gradient-to-b from-[#0A0B0D]/90 to-[#070809]/90'>
+            <div className='relative flex min-h-[250px] flex-col border-[0.5px] border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#040505]'>
                 <div className='absolute inset-0'>
                     <svg className='h-full w-full opacity-[0.07]' xmlns='http://www.w3.org/2000/svg'>
                         <title>Background Grid Pattern</title>
@@ -101,9 +101,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                     </svg>
                 </div>
                 {/* Enhanced depth effects */}
-                <div className='absolute inset-0 bg-[radial-gradient(100%_100%_at_50%_0%,rgba(255,255,255,0.03)_0%,transparent_50%)]' />
-                <div className='absolute inset-0 bg-[radial-gradient(100%_100%_at_0%_0%,rgba(0,0,0,0.2)_0%,transparent_50%)]' />
-                <div className='absolute inset-0 bg-[radial-gradient(100%_100%_at_100%_0%,rgba(0,0,0,0.2)_0%,transparent_50%)]' />
+                <div className='absolute inset-0 bg-[radial-gradient(100%_100%_at_50%_0%,rgba(255,255,255,0.02)_0%,transparent_50%)]' />
 
                 {/* Main content container */}
                 <div className='relative flex flex-grow flex-col items-center justify-start gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6'>
