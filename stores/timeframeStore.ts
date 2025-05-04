@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface TimeframeSettings {
     startIndex: number;
@@ -30,15 +30,29 @@ const DEFAULT_SETTINGS: TimeframeSettings = {
     showPriceLines: true,
 };
 
+// Get initial state from localStorage synchronously
+const getInitialState = () => {
+    if (typeof window === 'undefined') return null;
+    try {
+        const saved = localStorage.getItem('timeframe-storage');
+        if (!saved) return null;
+        return JSON.parse(saved);
+    } catch (e) {
+        return null;
+    }
+};
+
+const initialState = getInitialState();
+
 export const useTimeframeStore = create<TimeframeState>()(
     persist(
         (set, get) => ({
             global: {
-                settings: DEFAULT_SETTINGS,
+                settings: initialState?.state?.global?.settings || DEFAULT_SETTINGS,
                 isDragging: false,
                 dragType: null,
             },
-            pairs: {},
+            pairs: initialState?.state?.pairs || {},
             pairsBackup: {},
 
             updateGlobalSettings: (settings) =>
@@ -99,28 +113,28 @@ export const useTimeframeStore = create<TimeframeState>()(
                                 },
                             },
                         };
-                    } else {
-                        // Toggle global setting and update all pairs
-                        const newShowPriceLines = !state.global.settings.showPriceLines;
-                        const updatedPairs = { ...state.pairs };
-                        Object.keys(state.pairs).forEach((pair) => {
-                            updatedPairs[pair] = {
-                                ...state.pairs[pair],
-                                showPriceLines: newShowPriceLines,
-                            };
-                        });
-
-                        return {
-                            global: {
-                                ...state.global,
-                                settings: {
-                                    ...state.global.settings,
-                                    showPriceLines: newShowPriceLines,
-                                },
-                            },
-                            pairs: updatedPairs,
-                        };
                     }
+
+                    // Toggle global setting and update all pairs
+                    const newShowPriceLines = !state.global.settings.showPriceLines;
+                    const updatedPairs = { ...state.pairs };
+                    Object.keys(state.pairs).forEach((pair) => {
+                        updatedPairs[pair] = {
+                            ...state.pairs[pair],
+                            showPriceLines: newShowPriceLines,
+                        };
+                    });
+
+                    return {
+                        global: {
+                            ...state.global,
+                            settings: {
+                                ...state.global.settings,
+                                showPriceLines: newShowPriceLines,
+                            },
+                        },
+                        pairs: updatedPairs,
+                    };
                 }),
 
             startGlobalDrag: (dragType) =>
@@ -179,6 +193,7 @@ export const useTimeframeStore = create<TimeframeState>()(
         }),
         {
             name: 'timeframe-storage',
+            storage: createJSONStorage(() => localStorage),
             partialize: (state) => ({
                 global: { settings: state.global.settings },
                 pairs: state.pairs,

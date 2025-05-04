@@ -64,7 +64,7 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
     }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
     const showChart = !isLoading && filteredBoxSlice;
-    const showSlider = !isLoading && boxSlice?.boxes;
+    const showSlider = true;
 
     return (
         <div className='no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#333]/30 via-[#222]/25 to-[#111]/30 p-[1px]'>
@@ -89,44 +89,40 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                         </div>
                     </div>
 
-                    {/* Chart Section - Conditionally render skeleton or ResoBox */}
+                    {/* Chart Section */}
                     <div
-                        className={`relative flex h-full min-h-[100px] w-full flex-grow ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}
+                        className={`relative flex h-full min-h-[100px] w-full flex-grow ${boxColors?.styles?.viewMode !== '3d' && settings.showPriceLines ? 'pr-16' : 'p-0'}`}
                     >
                         {showChart ? (
                             boxColors?.styles?.viewMode === '3d' ? (
-                                <div className='relative h-full aspect-square w-full'>
+                                <div className='relative h-full w-full aspect-square'>
                                     <ResoBox3D slice={filteredBoxSlice} pair={pair} boxColors={boxColors} />
                                 </div>
                             ) : (
-                                <ResoBox
-                                    slice={filteredBoxSlice}
-                                    className='h-full w-full'
-                                    boxColors={boxColors}
-                                    pair={pair}
-                                    showPriceLines={settings.showPriceLines}
-                                />
+                                <div className='relative h-full w-full aspect-square'>
+                                    <ResoBox
+                                        slice={filteredBoxSlice}
+                                        className='h-full w-full'
+                                        boxColors={boxColors}
+                                        pair={pair}
+                                        showPriceLines={settings.showPriceLines}
+                                    />
+                                </div>
                             )
                         ) : (
                             <ChartSkeleton />
                         )}
                     </div>
 
-                    {/* Timeframe Control - Conditionally render skeleton or Slider */}
-                    <div className='relative h-16 w-full flex-shrink-0'>
-                        {showSlider ? (
-                            <TimeFrameSlider
-                                startIndex={settings.startIndex}
-                                maxBoxCount={settings.maxBoxCount}
-                                boxes={boxSlice.boxes}
-                                onStyleChange={handleTimeframeChange}
-                            />
-                        ) : (
-                            <SliderSkeleton />
-                        )}
+                    {/* Timeframe Control */}
+                    <div className='relative h-14 w-full flex-shrink-0'>
+                        <TimeFrameSlider
+                            startIndex={settings.startIndex}
+                            maxBoxCount={settings.maxBoxCount}
+                            boxes={boxSlice?.boxes || []}
+                            onStyleChange={handleTimeframeChange}
+                        />
                     </div>
-
-                    {/* 3D ResoBox Section - Conditionally render based on filtered slice */}
                 </div>
             </div>
         </div>

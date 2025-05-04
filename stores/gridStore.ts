@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface GridBreakpoint {
     width: number;
@@ -27,19 +27,35 @@ const DEFAULT_BREAKPOINTS: GridBreakpoint[] = [
     { width: 1600, cols: 5 }, // Add a breakpoint for 5 columns
 ];
 
-// Helper to save order to localStorage
-const saveOrderToLocalStorage = (pairs: string[]) => {
+// Create a safe storage object that works in both browser and server environments
+const createSafeStorage = () => {
+    if (typeof window !== 'undefined') {
+        return window.localStorage;
+    }
+    return {
+        getItem: () => null,
+        setItem: () => undefined,
+        removeItem: () => undefined,
+    };
+};
+
+// Helper to safely interact with storage
+const safeStorage = createSafeStorage();
+
+// Helper to save order to storage
+const saveOrderToStorage = (pairs: string[]) => {
     try {
-        localStorage.setItem('rthmn-pairs-order', JSON.stringify(pairs));
+        safeStorage.setItem('rthmn-pairs-order', JSON.stringify(pairs));
     } catch (e) {
         console.error('Failed to save pairs order:', e);
     }
 };
 
-// Helper to get order from localStorage
-const getOrderFromLocalStorage = (): string[] => {
+// Helper to get order from storage
+const getOrderFromStorage = (): string[] => {
     try {
-        const saved = localStorage.getItem('rthmn-pairs-order');
+        if (typeof window === 'undefined') return [];
+        const saved = safeStorage.getItem('rthmn-pairs-order');
         return saved ? JSON.parse(saved) : [];
     } catch (e) {
         console.error('Failed to get pairs order:', e);
@@ -47,109 +63,109 @@ const getOrderFromLocalStorage = (): string[] => {
     }
 };
 
-// Helper to save grid preferences to localStorage
+// Helper to save grid preferences to storage
 const saveGridPreferences = (breakpoints: GridBreakpoint[], cols: number) => {
     try {
-        localStorage.setItem('rthmn-grid-preferences', JSON.stringify({ breakpoints, lastCols: cols }));
-        // console.log('Grid preferences saved:', { breakpoints, cols });
+        safeStorage.setItem('rthmn-grid-preferences', JSON.stringify({ breakpoints, lastCols: cols }));
     } catch (e) {
         console.error('Failed to save grid preferences:', e);
     }
 };
 
-// Helper to get grid preferences from localStorage
+// Helper to get grid preferences from storage
 const getGridPreferences = (): { breakpoints: GridBreakpoint[]; lastCols: number } | null => {
     try {
-        if (typeof window === 'undefined') return null; // Don't run on server
-        const saved = localStorage.getItem('rthmn-grid-preferences');
-        const prefs = saved ? JSON.parse(saved) : null;
-        // console.log('Grid preferences loaded:', prefs);
-        return prefs;
+        if (typeof window === 'undefined') return null;
+        const saved = safeStorage.getItem('rthmn-grid-preferences');
+        return saved ? JSON.parse(saved) : null;
     } catch (e) {
         console.error('Failed to get grid preferences:', e);
         return null;
     }
 };
 
-// Get saved preferences or use defaults
-let savedPreferences: { breakpoints: GridBreakpoint[]; lastCols: number } | null = null;
-if (typeof window !== 'undefined') {
-    savedPreferences = getGridPreferences();
-}
-const INITIAL_BREAKPOINTS = savedPreferences?.breakpoints || DEFAULT_BREAKPOINTS;
-const INITIAL_COLS = savedPreferences?.lastCols || DEFAULT_BREAKPOINTS[0].cols;
+let store: ReturnType<typeof createStore> | null = null;
 
-export const useGridStore = create<GridState>()(
-    persist(
-        (set, get) => ({
-            breakpoints: INITIAL_BREAKPOINTS,
-            orderedPairs: getOrderFromLocalStorage(),
-            lastWidth: typeof window !== 'undefined' ? window.innerWidth : 0,
-            lastCols: INITIAL_COLS,
-            initialized: false,
+const createStore = () => {
+    const savedPrefs = getGridPreferences();
+    return create<GridState>()(
+        persist(
+            (set, get) => ({
+                breakpoints: savedPrefs?.breakpoints || DEFAULT_BREAKPOINTS,
+                orderedPairs: getOrderFromStorage(),
+                lastWidth: typeof window !== 'undefined' ? window.innerWidth : 0,
+                lastCols: savedPrefs?.lastCols || DEFAULT_BREAKPOINTS[0].cols,
+                initialized: false,
 
-            setInitialPairs: (pairs: string[]) => {
-                const state = get();
-                if (!state.initialized && pairs.length > 0) {
-                    const initialOrder = getOrderFromLocalStorage();
-                    const finalOrder = initialOrder.length === pairs.length ? initialOrder : pairs;
-                    set({
-                        orderedPairs: finalOrder,
-                        initialized: true,
+                setInitialPairs: (pairs: string[]) => {
+                    const state = get();
+                    if (!state.initialized && pairs.length > 0) {
+                        const initialOrder = getOrderFromStorage();
+                        const finalOrder = initialOrder.length === pairs.length ? initialOrder : pairs;
+                        set({
+                            orderedPairs: finalOrder,
+                            initialized: true,
+                        });
+                        if (initialOrder.length !== pairs.length) {
+                            saveOrderToStorage(finalOrder);
+                        }
+                    }
+                },
+
+                reorderPairs: (newOrder: string[]) => {
+                    set({ orderedPairs: newOrder });
+                    saveOrderToStorage(newOrder);
+                },
+
+                updateBreakpoint: (width: number, cols: number) => {
+                    set((state) => {
+                        if (width <= 0) return state;
+                        const newState = {
+                            ...state,
+                            lastWidth: width,
+                            lastCols: cols,
+                        };
+                        saveGridPreferences(state.breakpoints, cols);
+                        return newState;
                     });
-                    if (initialOrder.length !== pairs.length) {
-                        saveOrderToLocalStorage(finalOrder);
+                },
+
+                getGridClass: (width: number) => {
+                    const state = get();
+                    let calculatedCols = 1;
+                    for (let i = state.breakpoints.length - 1; i >= 0; i--) {
+                        if (width >= state.breakpoints[i].width) {
+                            calculatedCols = state.breakpoints[i].cols;
+                            break;
+                        }
                     }
-                }
-            },
-
-            reorderPairs: (newOrder: string[]) => {
-                set({ orderedPairs: newOrder });
-                saveOrderToLocalStorage(newOrder);
-            },
-
-            updateBreakpoint: (width: number, cols: number) => {
-                set((state) => {
-                    if (width <= 0) return state;
-
-                    // console.log(`Grid store - Updating cols to ${cols} for width ${width}`);
-                    const newState = {
-                        ...state,
-                        lastWidth: width,
-                        lastCols: cols,
+                    const colsToUse = state.lastCols > 0 ? state.lastCols : calculatedCols;
+                    return `grid w-full gap-4 grid-cols-${colsToUse}`;
+                },
+            }),
+            {
+                name: 'grid-storage',
+                storage: createJSONStorage(() => createSafeStorage()),
+                skipHydration: true,
+                merge: (persistedState: any, currentState: GridState) => {
+                    const mergedState = {
+                        ...currentState,
+                        ...(persistedState as Partial<GridState>),
+                        initialized: currentState.initialized,
                     };
-                    saveGridPreferences(state.breakpoints, cols);
-                    return newState;
-                });
-            },
+                    mergedState.lastCols = (persistedState as Partial<GridState>)?.lastCols || 1;
+                    return mergedState;
+                },
+            }
+        )
+    );
+};
 
-            getGridClass: (width: number) => {
-                const state = get();
-                let calculatedCols = 1;
-                for (let i = state.breakpoints.length - 1; i >= 0; i--) {
-                    if (width >= state.breakpoints[i].width) {
-                        calculatedCols = state.breakpoints[i].cols;
-                        break;
-                    }
-                }
-                const colsToUse = state.lastCols > 0 ? state.lastCols : calculatedCols;
-                // console.log(`Grid store - getGridClass: width=${width}, lastCols=${state.lastCols}, calculatedCols=${calculatedCols}, using=${colsToUse}`);
-                return `grid w-full gap-4 grid-cols-${colsToUse}`;
-            },
-        }),
-        {
-            name: 'grid-storage',
-            merge: (persistedState: any, currentState: GridState) => {
-                // console.log('Merging persisted state:', { persistedState, currentState });
-                const mergedState = {
-                    ...currentState,
-                    ...(persistedState as Partial<GridState>),
-                    initialized: currentState.initialized,
-                };
-                mergedState.lastCols = (persistedState as Partial<GridState>)?.lastCols || 1;
+// Initialize store only on client side
+const initializeStore = () => {
+    if (typeof window === 'undefined') return createStore();
+    if (store === null) store = createStore();
+    return store;
+};
 
-                return mergedState;
-            },
-        }
-    )
-);
+export const useGridStore = initializeStore();

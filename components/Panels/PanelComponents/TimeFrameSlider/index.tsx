@@ -118,7 +118,6 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(
                 const startX = e.clientX;
                 const previousIndex =
                     type === 'left' ? reversedStartIndex : type === 'right' ? reversedMaxBoxCount : reversedStartIndex;
-                const lastValidIndex = previousIndex;
 
                 const handleDragMouseMove = (e: MouseEvent) => {
                     if (!barContainerRef.current) return;
@@ -284,29 +283,32 @@ export const TimeFrameSlider: React.FC<PatternVisualizerProps> = memo(
 
                     {/* Invisible click handlers */}
                     <div className='relative flex h-full w-full'>
-                        {Array.from({ length: 38 }).map((_, i) => (
-                            <div
-                                key={i}
-                                className='flex h-full flex-1 items-center'
-                                onMouseDown={(e) => {
-                                    const reversedI = i;
-                                    const isSelected =
-                                        reversedI >= reversedStartIndex &&
-                                        reversedI < reversedStartIndex + reversedMaxBoxCount;
-                                    const isNearLeftEdge = Math.abs(reversedI - reversedStartIndex) <= 1;
-                                    const isNearRightEdge =
-                                        Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
+                        {Array.from({ length: 38 }).map((_, i) => {
+                            const timeInfo = getTimeLabel(i);
+                            return (
+                                <div
+                                    key={`slider-element-${i}-${timeInfo.minutes}min`}
+                                    className='flex h-full flex-1 items-center'
+                                    onMouseDown={(e) => {
+                                        const reversedI = i;
+                                        const isSelected =
+                                            reversedI >= reversedStartIndex &&
+                                            reversedI < reversedStartIndex + reversedMaxBoxCount;
+                                        const isNearLeftEdge = Math.abs(reversedI - reversedStartIndex) <= 1;
+                                        const isNearRightEdge =
+                                            Math.abs(reversedI - (reversedStartIndex + reversedMaxBoxCount - 1)) <= 1;
 
-                                    if (isSelected) {
-                                        handleMouseDown(e, 'position');
-                                    } else if (isNearLeftEdge) {
-                                        handleMouseDown(e, 'left');
-                                    } else if (isNearRightEdge) {
-                                        handleMouseDown(e, 'right');
-                                    }
-                                }}
-                            />
-                        ))}
+                                        if (isSelected) {
+                                            handleMouseDown(e, 'position');
+                                        } else if (isNearLeftEdge) {
+                                            handleMouseDown(e, 'left');
+                                        } else if (isNearRightEdge) {
+                                            handleMouseDown(e, 'right');
+                                        }
+                                    }}
+                                />
+                            );
+                        })}
                     </div>
 
                     {/* Edge handles */}
@@ -344,7 +346,7 @@ const DynamicTimeScale = memo(({ reversedStartIndex, reversedMaxBoxCount, getTim
             const timeInfo = getTimeLabel(position);
 
             return (
-                <div key={i} className='relative flex flex-col items-center'>
+                <div key={`scale-mark-${i}-${timeInfo.minutes}min`} className='relative flex flex-col items-center'>
                     <div
                         className={cn(
                             'mb-1 h-2 w-[1px] will-change-transform',

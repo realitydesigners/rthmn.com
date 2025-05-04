@@ -9,9 +9,10 @@ export default async function LessonLayout({
     params,
 }: {
     children: React.ReactNode;
-    params: { courseSlug: string; lessonSlug: string };
+    params: Promise<{ courseSlug: string; lessonSlug: string }>;
 }) {
-    const { courseSlug, lessonSlug } = params;
+    const resolvedParams = await params;
+    const { courseSlug, lessonSlug } = resolvedParams;
 
     if (!courseSlug || !lessonSlug) {
         notFound();
