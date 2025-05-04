@@ -1,4 +1,4 @@
-import { defineQuery } from 'next-sanity';
+import { defineQuery } from "next-sanity";
 
 // Base fragments for reusable query parts
 const imageFragment = /* groq */ `
@@ -293,7 +293,8 @@ const pageBuilderFragment = /* groq */ `
   }
 `;
 
-export const queryHomePageData = defineQuery(/* groq */ `*[_type == "page" && slug.current == "/"][0]{
+export const queryHomePageData =
+	defineQuery(/* groq */ `*[_type == "page" && slug.current == "/"][0]{
     ...,
     _id,
     _type,

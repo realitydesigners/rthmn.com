@@ -1,165 +1,168 @@
-'use client';
+"use client";
 
-import { useDashboard } from '@/providers/DashboardProvider/client';
-import { useUser } from '@/providers/UserProvider';
-import { useGridStore } from '@/stores/gridStore';
-import { motion } from 'framer-motion';
-import { useEffect, useMemo, useState } from 'react';
-import { NoInstruments } from './LoadingSkeleton';
-import { PairResoBox } from './PairResoBox';
+import { useDashboard } from "@/providers/DashboardProvider/client";
+import { useUser } from "@/providers/UserProvider";
+import { useGridStore } from "@/stores/gridStore";
+import { motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { NoInstruments } from "./LoadingSkeleton";
+import { PairResoBox } from "./PairResoBox";
 
 export default function Dashboard() {
-    const { pairData, isLoading } = useDashboard();
-    const { selectedPairs, boxColors } = useUser();
-    const lastCols = useGridStore((state) => state.lastCols);
-    const orderedPairs = useGridStore((state) => state.orderedPairs);
-    const reorderPairs = useGridStore((state) => state.reorderPairs);
-    const setInitialPairs = useGridStore((state) => state.setInitialPairs);
-    const [isClient, setIsClient] = useState(false);
-    const [draggedItem, setDraggedItem] = useState<string | null>(null);
+	const { pairData, isLoading } = useDashboard();
+	const { selectedPairs, boxColors } = useUser();
+	const lastCols = useGridStore((state) => state.lastCols);
+	const orderedPairs = useGridStore((state) => state.orderedPairs);
+	const reorderPairs = useGridStore((state) => state.reorderPairs);
+	const setInitialPairs = useGridStore((state) => state.setInitialPairs);
+	const [isClient, setIsClient] = useState(false);
+	const [draggedItem, setDraggedItem] = useState<string | null>(null);
 
-    // Mark as client-side rendered
-    useEffect(() => {
-        setIsClient(true);
-    }, []);
+	// Mark as client-side rendered
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
 
-    // Initialize ordered pairs from selected pairs
-    useEffect(() => {
-        setInitialPairs(selectedPairs);
-    }, [selectedPairs, setInitialPairs]);
+	// Initialize ordered pairs from selected pairs
+	useEffect(() => {
+		setInitialPairs(selectedPairs);
+	}, [selectedPairs, setInitialPairs]);
 
-    const handleDragStart = (pair: string) => {
-        setDraggedItem(pair);
-    };
+	const handleDragStart = (pair: string) => {
+		setDraggedItem(pair);
+	};
 
-    const handleDrag = (e: MouseEvent | TouchEvent | PointerEvent, pair: string) => {
-        if (!draggedItem) return;
+	const handleDrag = (
+		e: MouseEvent | TouchEvent | PointerEvent,
+		pair: string,
+	) => {
+		if (!draggedItem) return;
 
-        const element = e.target as HTMLElement;
-        const container = element.closest('[data-pair]');
-        if (!container) return;
+		const element = e.target as HTMLElement;
+		const container = element.closest("[data-pair]");
+		if (!container) return;
 
-        const elements = document.querySelectorAll('[data-pair]');
-        let closestEl = null;
-        let minDistance = Number.POSITIVE_INFINITY;
+		const elements = document.querySelectorAll("[data-pair]");
+		let closestEl = null;
+		let minDistance = Number.POSITIVE_INFINITY;
 
-        elements.forEach((el) => {
-            if (el === container) return;
+		elements.forEach((el) => {
+			if (el === container) return;
 
-            const rect = el.getBoundingClientRect();
-            const containerRect = container.getBoundingClientRect();
+			const rect = el.getBoundingClientRect();
+			const containerRect = container.getBoundingClientRect();
 
-            // Calculate center points
-            const elCenter = {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2,
-            };
-            const containerCenter = {
-                x: containerRect.left + containerRect.width / 2,
-                y: containerRect.top + containerRect.height / 2,
-            };
+			// Calculate center points
+			const elCenter = {
+				x: rect.left + rect.width / 2,
+				y: rect.top + rect.height / 2,
+			};
+			const containerCenter = {
+				x: containerRect.left + containerRect.width / 2,
+				y: containerRect.top + containerRect.height / 2,
+			};
 
-            // Calculate distance with more weight on vertical position
-            const dx = elCenter.x - containerCenter.x;
-            const dy = elCenter.y - containerCenter.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+			// Calculate distance with more weight on vertical position
+			const dx = elCenter.x - containerCenter.x;
+			const dy = elCenter.y - containerCenter.y;
+			const distance = Math.sqrt(dx * dx + dy * dy);
 
-            // Update closest element if this one is closer
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestEl = el;
-            }
-        });
+			// Update closest element if this one is closer
+			if (distance < minDistance) {
+				minDistance = distance;
+				closestEl = el;
+			}
+		});
 
-        // If we found a close element and it's within a reasonable distance, swap
-        if (closestEl && minDistance < 150) {
-            const targetPair = closestEl.getAttribute('data-pair');
-            if (targetPair && targetPair !== draggedItem) {
-                const newOrder = [...orderedPairs];
-                const fromIndex = newOrder.indexOf(draggedItem);
-                const toIndex = newOrder.indexOf(targetPair);
+		// If we found a close element and it's within a reasonable distance, swap
+		if (closestEl && minDistance < 150) {
+			const targetPair = closestEl.getAttribute("data-pair");
+			if (targetPair && targetPair !== draggedItem) {
+				const newOrder = [...orderedPairs];
+				const fromIndex = newOrder.indexOf(draggedItem);
+				const toIndex = newOrder.indexOf(targetPair);
 
-                // Only reorder if positions are different
-                if (fromIndex !== toIndex) {
-                    newOrder.splice(fromIndex, 1);
-                    newOrder.splice(toIndex, 0, draggedItem);
-                    reorderPairs(newOrder);
-                }
-            }
-        }
-    };
+				// Only reorder if positions are different
+				if (fromIndex !== toIndex) {
+					newOrder.splice(fromIndex, 1);
+					newOrder.splice(toIndex, 0, draggedItem);
+					reorderPairs(newOrder);
+				}
+			}
+		}
+	};
 
-    if (!selectedPairs.length && !isLoading) {
-        return (
-            <main className='w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18'>
-                <NoInstruments />
-                <div className='mt-4 text-center text-sm text-neutral-400'>
-                    Please complete the onboarding process to select your trading pairs.
-                </div>
-            </main>
-        );
-    }
+	if (!selectedPairs.length && !isLoading) {
+		return (
+			<main className="w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18">
+				<NoInstruments />
+				<div className="mt-4 text-center text-sm text-neutral-400">
+					Please complete the onboarding process to select your trading pairs.
+				</div>
+			</main>
+		);
+	}
 
-    // Determine columns for style, ensuring client-side check for hydration
-    const gridColsStyle = isClient ? lastCols || 1 : 1;
+	// Determine columns for style, ensuring client-side check for hydration
+	const gridColsStyle = isClient ? lastCols || 1 : 1;
 
-    // Render based on orderedPairs once available, or selectedPairs initially
-    const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
+	// Render based on orderedPairs once available, or selectedPairs initially
+	const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
 
-    return (
-        <main className='w-full px-2 py-18 sm:px-4'>
-            <div
-                className='grid w-full gap-4'
-                style={{
-                    gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
-                    gap: '1rem',
-                }}
-            >
-                {/* Only render the list content after client-side mounting */}
-                {isClient &&
-                    pairsToRender.map((pair) => {
-                        const data = pairData[pair]; // Get data regardless of loading state
+	return (
+		<main className="w-full px-2 py-18 sm:px-4">
+			<div
+				className="grid w-full gap-4"
+				style={{
+					gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
+					gap: "1rem",
+				}}
+			>
+				{/* Only render the list content after client-side mounting */}
+				{isClient &&
+					pairsToRender.map((pair) => {
+						const data = pairData[pair]; // Get data regardless of loading state
 
-                        return (
-                            <motion.div
-                                key={pair}
-                                initial={false}
-                                layout='position'
-                                dragSnapToOrigin
-                                dragElastic={0.1}
-                                dragTransition={{
-                                    bounceStiffness: 300,
-                                    bounceDamping: 20,
-                                }}
-                                onDragStart={() => handleDragStart(pair)}
-                                onDrag={(e) => handleDrag(e, pair)}
-                                onDragEnd={() => setDraggedItem(null)}
-                                whileDrag={{
-                                    zIndex: 1,
-                                }}
-                                transition={{
-                                    layout: {
-                                        type: 'spring',
-                                        stiffness: 250,
-                                        damping: 20,
-                                    },
-                                }}
-                                className='relative cursor-grab active:cursor-grabbing'
-                            >
-                                <div data-pair={pair}>
-                                    <PairResoBox
-                                        pair={pair}
-                                        // Pass the raw slice now, filtering happens inside PairResoBox
-                                        boxSlice={data?.boxes?.[0]}
-                                        boxColors={boxColors}
-                                        // Pass the isLoading state down
-                                        isLoading={isLoading}
-                                    />
-                                </div>
-                            </motion.div>
-                        );
-                    })}
-            </div>
-        </main>
-    );
+						return (
+							<motion.div
+								key={pair}
+								initial={false}
+								layout="position"
+								dragSnapToOrigin
+								dragElastic={0.1}
+								dragTransition={{
+									bounceStiffness: 300,
+									bounceDamping: 20,
+								}}
+								onDragStart={() => handleDragStart(pair)}
+								onDrag={(e) => handleDrag(e, pair)}
+								onDragEnd={() => setDraggedItem(null)}
+								whileDrag={{
+									zIndex: 1,
+								}}
+								transition={{
+									layout: {
+										type: "spring",
+										stiffness: 250,
+										damping: 20,
+									},
+								}}
+								className="relative cursor-grab active:cursor-grabbing"
+							>
+								<div data-pair={pair}>
+									<PairResoBox
+										pair={pair}
+										// Pass the raw slice now, filtering happens inside PairResoBox
+										boxSlice={data?.boxes?.[0]}
+										boxColors={boxColors}
+										// Pass the isLoading state down
+										isLoading={isLoading}
+									/>
+								</div>
+							</motion.div>
+						);
+					})}
+			</div>
+		</main>
+	);
 }
