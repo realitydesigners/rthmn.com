@@ -2,7 +2,7 @@
 import { useTimeframeStore } from '@/stores/timeframeStore';
 import React, { useCallback, useState } from 'react';
 import { LuChevronDown, LuChevronUp, LuLayoutGrid, LuLineChart, LuRuler } from 'react-icons/lu';
-import { CHART_STYLES, ChartStyleOption } from '../../Charts/ChartStyleOptions';
+import { CHART_STYLES, ChartStyleOptions } from '../../Charts/ChartStyleOptions';
 import { TimeFrameSlider } from '../PanelComponents/TimeFrameSlider';
 import { Toggle } from '../PanelComponents/Toggle/Toggle';
 
@@ -14,6 +14,7 @@ const VISUALIZER_TABS = {
         content: (props: { showChartStyle: boolean; onToggle: () => void }) => (
             <>
                 <button
+                    type='button'
                     onClick={props.onToggle}
                     className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
                 >
@@ -32,10 +33,8 @@ const VISUALIZER_TABS = {
                     )}
                 </button>
                 {props.showChartStyle && (
-                    <div className='grid grid-cols-3 gap-2'>
-                        {Object.values(CHART_STYLES).map((style) => (
-                            <ChartStyleOption key={style.id} {...style} onClick={null} />
-                        ))}
+                    <div className='mt-2'>
+                        <ChartStyleOptions noContainer className='w-full' />
                     </div>
                 )}
             </>
@@ -55,6 +54,7 @@ const VISUALIZER_TABS = {
         }) => (
             <>
                 <button
+                    type='button'
                     onClick={props.onToggle}
                     className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
                 >
@@ -99,6 +99,7 @@ const VISUALIZER_TABS = {
         }) => (
             <>
                 <button
+                    type='button'
                     onClick={props.onToggle}
                     className='group flex h-10 items-center justify-between rounded-lg border border-[#222] bg-gradient-to-b from-[#141414] to-[#0A0A0A] px-3 transition-all hover:border-[#333] hover:from-[#181818] hover:to-[#0F0F0F]'
                 >

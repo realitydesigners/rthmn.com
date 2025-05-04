@@ -1,6 +1,7 @@
 import { cn } from '@/utils/cn';
 import type React from 'react';
 import { LuBox, LuBoxes, LuLineChart, LuLock } from 'react-icons/lu';
+import { useColorStore } from '@/stores/colorStore';
 
 export const CHART_STYLES = {
     box: {
@@ -24,36 +25,31 @@ export const CHART_STYLES = {
         id: '3d',
         title: '3D',
         icon: LuBoxes,
-        locked: true,
+        locked: false,
         isActive: false,
         description: '3D visualization of boxes',
-        comingSoon: true,
     },
 } as const;
+
+interface IconProps {
+    size: number;
+    className?: string;
+}
 
 interface ChartStyleOptionProps {
     id: string;
     title: string;
-    icon: React.ElementType;
-    locked?: boolean;
-    isActive?: boolean;
-    description?: string;
-    comingSoon?: boolean;
+    icon: React.ComponentType<IconProps>;
+    locked: boolean;
+    isActive: boolean;
+    description: string;
     onClick?: () => void;
 }
 
-export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
-    id,
-    title,
-    icon: Icon,
-    locked = false,
-    isActive = false,
-    description,
-    comingSoon,
-    onClick,
-}) => {
+const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({ title, icon: Icon, locked, isActive, onClick }) => {
     return (
         <button
+            type='button'
             onClick={locked ? undefined : onClick}
             className={cn(
                 'group relative flex h-[72px] flex-col items-center justify-center gap-2 rounded-lg border bg-gradient-to-b p-2 transition-all duration-200',
@@ -161,5 +157,48 @@ export const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
                 {title}
             </span>
         </button>
+    );
+};
+
+interface ChartStyleOptionsContainerProps {
+    className?: string;
+    noContainer?: boolean;
+}
+
+export const ChartStyleOptions: React.FC<ChartStyleOptionsContainerProps> = ({
+    className = '',
+    noContainer = false,
+}) => {
+    const { boxColors, updateStyles } = useColorStore();
+    const currentViewMode = boxColors.styles?.viewMode || 'default';
+
+    const content = (
+        <>
+            <ChartStyleOption
+                {...CHART_STYLES.box}
+                isActive={currentViewMode === 'default'}
+                onClick={() => updateStyles({ viewMode: 'default' })}
+            />
+            <ChartStyleOption
+                {...CHART_STYLES.threeD}
+                isActive={currentViewMode === '3d'}
+                onClick={() => updateStyles({ viewMode: '3d' })}
+            />
+            <ChartStyleOption
+                {...CHART_STYLES.line}
+                isActive={currentViewMode === 'line'}
+                onClick={() => updateStyles({ viewMode: 'line' })}
+            />
+        </>
+    );
+
+    if (noContainer) {
+        return <div className={cn('grid grid-cols-3 gap-2', className)}>{content}</div>;
+    }
+
+    return (
+        <div className={cn('flex gap-4 rounded-lg border border-neutral-700/50 bg-neutral-800/40 p-4', className)}>
+            {content}
+        </div>
     );
 };

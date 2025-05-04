@@ -94,24 +94,21 @@ export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBo
                         className={`relative flex h-full min-h-[100px] w-full flex-grow ${settings.showPriceLines ? 'pr-16' : 'p-0'} transition-all duration-300`}
                     >
                         {showChart ? (
-                            <ResoBox
-                                slice={filteredBoxSlice}
-                                className='h-full w-full'
-                                boxColors={boxColors}
-                                pair={pair}
-                                showPriceLines={settings.showPriceLines}
-                            />
+                            boxColors?.styles?.viewMode === '3d' ? (
+                                <div className='relative h-full aspect-square w-full'>
+                                    <ResoBox3D slice={filteredBoxSlice} pair={pair} boxColors={boxColors} />
+                                </div>
+                            ) : (
+                                <ResoBox
+                                    slice={filteredBoxSlice}
+                                    className='h-full w-full'
+                                    boxColors={boxColors}
+                                    pair={pair}
+                                    showPriceLines={settings.showPriceLines}
+                                />
+                            )
                         ) : (
                             <ChartSkeleton />
-                        )}
-                        {showChart && (
-                            <div className='relative h-full aspect-square w-full flex-shrink-0 mt-2'>
-                                <ResoBox3D
-                                    slice={filteredBoxSlice} // Already filtered
-                                    pair={pair}
-                                    boxColors={boxColors}
-                                />
-                            </div>
                         )}
                     </div>
 

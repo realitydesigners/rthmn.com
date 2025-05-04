@@ -12,7 +12,7 @@ export interface BoxColors {
         globalTimeframeControl: boolean;
         showLineChart: boolean;
         perspective?: boolean;
-        viewMode?: 'default' | 'perspective' | 'centered';
+        viewMode?: 'default' | '3d' | 'line';
     };
 }
 
