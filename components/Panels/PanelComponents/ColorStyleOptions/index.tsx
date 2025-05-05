@@ -4,7 +4,7 @@ import { LuPalette } from 'react-icons/lu';
 import { PanelSection } from '../PanelSection';
 import { cn } from '@/utils/cn';
 import type { BoxColors } from '@/types/types';
-import type { Preset } from '@/stores/presetStore';
+import type { Preset } from '@/stores/colorStore';
 
 interface ColorStyleOptionsProps {
     boxColors: BoxColors;

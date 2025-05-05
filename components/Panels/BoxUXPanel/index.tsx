@@ -1,8 +1,7 @@
 'use client';
 
 import { useUser } from '@/providers/UserProvider';
-import type { BoxColors } from '@/stores/colorStore';
-import { usePresetStore } from '@/stores/presetStore';
+import { usePresetStore, type BoxColors } from '@/stores/colorStore';
 import React, { useCallback } from 'react';
 import { ColorStyleOptions } from '../PanelComponents/ColorStyleOptions';
 import { BoxVisualizer } from '../PanelComponents/BoxVisualizer';

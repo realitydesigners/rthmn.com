@@ -1,4 +1,4 @@
-import type { Preset } from '@/stores/presetStore';
+import type { Preset } from '@/stores/colorStore';
 import type { BoxColors } from '@/types/types';
 import { cn } from '@/utils/cn';
 import React, { memo } from 'react';
