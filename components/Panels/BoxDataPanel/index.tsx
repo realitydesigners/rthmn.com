@@ -6,7 +6,7 @@ import { ChartStyleOptions } from '../../Charts/ChartStyleOptions';
 import { TimeFrameSlider } from '../PanelComponents/TimeFrameSlider';
 import { PanelSection } from '../PanelComponents/PanelSection';
 
-export const VisualizersView = () => {
+export const BoxDataPanel = () => {
     const [showTimeframe, setShowTimeframe] = useState(true);
     const [showChartStyle, setShowChartStyle] = useState(true);
 

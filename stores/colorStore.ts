@@ -11,14 +11,14 @@ export interface Preset {
 interface PresetState {
     presets: Preset[];
     selectedPreset: string | null;
-    selectPreset: (name: string) => void;
+    selectPreset: (name: string | null) => void;
 }
 
 const DEFAULT_PRESETS: Preset[] = [
     {
-        name: 'CYBER.01',
-        positive: '#00ffd5', // Cyan
-        negative: '#ff2975', // Hot pink
+        name: 'FLUX.01',
+        positive: '#FF4B6B', // Warm red glow
+        negative: '#303238',
         styles: {
             borderRadius: 4,
             shadowIntensity: 0.1,
@@ -31,11 +31,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'HOLO.02',
-        positive: '#39ff14', // Matrix green
-        negative: '#b91dff', // Electric purple
+        name: 'NOVA.02',
+        positive: '#FFA264', // Warm orange pulse
+        negative: '#303238',
         styles: {
-            borderRadius: 6,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -46,11 +46,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'VOID.03',
-        positive: '#e6e6ff', // Soft white
-        negative: '#6600cc', // Deep purple
+        name: 'SYNC.03',
+        positive: '#FFE64D', // Electric yellow
+        negative: '#303238',
         styles: {
-            borderRadius: 8,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -61,11 +61,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'PLSM.04',
-        positive: '#ff9933', // Orange
-        negative: '#6600ff', // Royal purple
+        name: 'GRID.04',
+        positive: '#4DFF7C', // Matrix green
+        negative: '#303238',
         styles: {
-            borderRadius: 5,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -76,11 +76,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'CRYO.05',
-        positive: '#ffffff', // Pure white
-        negative: '#0066ff', // Bright blue
+        name: 'WAVE.05',
+        positive: '#4DB4FF', // Data stream blue
+        negative: '#303238',
         styles: {
-            borderRadius: 6,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -91,11 +91,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'PRPL.06',
-        positive: '#b3b3ff', // Light purple
-        negative: '#4d0099', // Deep purple
+        name: 'NEON.06',
+        positive: '#7C7CFF', // Electric purple
+        negative: '#303238',
         styles: {
-            borderRadius: 7,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -106,11 +106,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'FLUX.07',
-        positive: '#1aff1a', // Bright green
-        negative: '#ff1a1a', // Bright red
+        name: 'PULSE.07',
+        positive: '#FF4BC2', // Hot pink
+        negative: '#303238',
         styles: {
-            borderRadius: 6,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -121,11 +121,11 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'FRST.08',
-        positive: '#e6ffff', // Ice white
-        negative: '#0099ff', // Sky blue
+        name: 'ZERO.08',
+        positive: '#DB6BFF', // Bio-electric magenta
+        negative: '#303238',
         styles: {
-            borderRadius: 5,
+            borderRadius: 4,
             shadowIntensity: 0.1,
             opacity: 0.2,
             showBorder: true,
@@ -136,9 +136,9 @@ const DEFAULT_PRESETS: Preset[] = [
         },
     },
     {
-        name: 'ZERO.09',
-        positive: '#ffffff', // Pure white
-        negative: '#ff0000', // Pure red
+        name: 'VOID.09',
+        positive: '#FFFFFF', // Pure white
+        negative: '#303238',
         styles: {
             borderRadius: 4,
             shadowIntensity: 0.1,
@@ -155,7 +155,10 @@ const DEFAULT_PRESETS: Preset[] = [
 export const usePresetStore = create<PresetState>()((set) => ({
     presets: DEFAULT_PRESETS,
     selectedPreset: null,
-    selectPreset: (name) => set({ selectedPreset: name }),
+    selectPreset: (name) => {
+        console.log('Selecting preset:', name);
+        set({ selectedPreset: name });
+    },
 }));
 
 export interface BoxColors {
@@ -177,11 +180,12 @@ export interface ColorState {
     boxColors: BoxColors;
     updateBoxColors: (colors: Partial<BoxColors>) => void;
     updateStyles: (styles: Partial<BoxColors['styles']>) => void;
+    setPresetColors: (preset: Preset) => void;
 }
 
 const DEFAULT_BOX_COLORS: BoxColors = {
-    positive: '#3FFFA2', // Green
-    negative: '#212422', // Darker Green
+    positive: '#3FFFA2',
+    negative: '#212422',
     styles: {
         borderRadius: 4,
         shadowIntensity: 0.1,
@@ -196,22 +200,27 @@ const DEFAULT_BOX_COLORS: BoxColors = {
 
 export const useColorStore = create<ColorState>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             boxColors: DEFAULT_BOX_COLORS,
 
-            updateBoxColors: (colors) =>
+            updateBoxColors: (colors) => {
+                console.log('Updating box colors:', colors);
                 set((state) => ({
                     boxColors: {
                         ...state.boxColors,
                         ...colors,
-                        styles: {
-                            ...state.boxColors.styles,
-                            ...colors.styles,
-                        },
+                        styles: colors.styles
+                            ? {
+                                  ...state.boxColors.styles,
+                                  ...colors.styles,
+                              }
+                            : state.boxColors.styles,
                     },
-                })),
+                }));
+            },
 
-            updateStyles: (styles) =>
+            updateStyles: (styles) => {
+                console.log('Updating styles:', styles);
                 set((state) => ({
                     boxColors: {
                         ...state.boxColors,
@@ -220,7 +229,20 @@ export const useColorStore = create<ColorState>()(
                             ...styles,
                         },
                     },
-                })),
+                }));
+            },
+
+            setPresetColors: (preset) => {
+                console.log('Setting preset colors:', preset.name);
+                const currentState = get();
+                set({
+                    boxColors: {
+                        ...currentState.boxColors,
+                        positive: preset.positive,
+                        negative: preset.negative,
+                    },
+                });
+            },
         }),
         {
             name: 'color-storage',

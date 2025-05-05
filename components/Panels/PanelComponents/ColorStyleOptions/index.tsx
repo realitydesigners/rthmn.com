@@ -1,16 +1,13 @@
 import type React from 'react';
-import { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState, useRef } from 'react';
 import { LuPalette } from 'react-icons/lu';
 import { PanelSection } from '../PanelSection';
 import { cn } from '@/utils/cn';
 import type { BoxColors } from '@/types/types';
 import type { Preset } from '@/stores/colorStore';
+import { usePresetStore, useColorStore } from '@/stores/colorStore';
 
 interface ColorStyleOptionsProps {
-    boxColors: BoxColors;
-    presets: Preset[];
-    onColorChange: (colors: BoxColors) => void;
-    isPresetSelected: (preset: Preset) => boolean;
     noContainer?: boolean;
     className?: string;
 }
@@ -36,21 +33,29 @@ const useDebounce = (value: any, delay: number) => {
 const ColorInput = memo(
     ({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) => {
         const [localValue, setLocalValue] = useState(value);
+        const isInternalChange = useRef(false);
 
         useEffect(() => {
-            setLocalValue(value);
-        }, [value]);
+            if (value !== localValue && !isInternalChange.current) {
+                setLocalValue(value);
+            }
+        }, [value, localValue]);
 
         const debouncedValue = useDebounce(localValue, 50);
 
         useEffect(() => {
-            if (debouncedValue !== value) {
+            if (debouncedValue !== value && isInternalChange.current) {
                 onChange(debouncedValue);
             }
         }, [debouncedValue, onChange, value]);
 
         const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+            isInternalChange.current = true;
             setLocalValue(e.target.value);
+        }, []);
+
+        const handleBlur = useCallback(() => {
+            isInternalChange.current = false;
         }, []);
 
         return (
@@ -72,6 +77,7 @@ const ColorInput = memo(
                         type='color'
                         value={localValue}
                         onChange={handleChange}
+                        onBlur={handleBlur}
                         className='h-full w-full cursor-pointer opacity-0'
                     />
                 </div>
@@ -127,78 +133,99 @@ const PresetButton = memo(
     )
 );
 
-export const ColorStyleOptions = memo(
-    ({
-        boxColors,
-        presets,
-        onColorChange,
-        isPresetSelected,
-        noContainer = false,
-        className,
-    }: ColorStyleOptionsProps) => {
-        const [isExpanded, setIsExpanded] = useState(true);
+export const ColorStyleOptions = memo(({ noContainer = false, className }: ColorStyleOptionsProps) => {
+    const [isExpanded, setIsExpanded] = useState(true);
 
-        const handlePositiveChange = useCallback(
-            (value: string) =>
-                onColorChange({
-                    ...boxColors,
-                    positive: value,
-                }),
-            [boxColors, onColorChange]
-        );
+    // Get all necessary state and actions from stores
+    const boxColors = useColorStore((state) => state.boxColors);
+    const updateBoxColors = useColorStore((state) => state.updateBoxColors);
+    const setPresetColors = useColorStore((state) => state.setPresetColors);
+    const presets = usePresetStore((state) => state.presets);
+    const selectedPreset = usePresetStore((state) => state.selectedPreset);
+    const selectPreset = usePresetStore((state) => state.selectPreset);
 
-        const handleNegativeChange = useCallback(
-            (value: string) =>
-                onColorChange({
-                    ...boxColors,
-                    negative: value,
-                }),
-            [boxColors, onColorChange]
-        );
+    // Debug current state
+    useEffect(() => {
+        console.log('Current state:', {
+            selectedPreset,
+            positive: boxColors.positive,
+            negative: boxColors.negative,
+        });
+    }, [selectedPreset, boxColors]);
 
-        const content = (
-            <div className='flex flex-col gap-4 p-2'>
-                {/* Presets Grid */}
-                <div className='grid grid-cols-3 gap-2'>
-                    {presets.map((preset) => (
-                        <PresetButton
-                            key={preset.name}
-                            preset={preset}
-                            isSelected={isPresetSelected(preset)}
-                            onClick={() => onColorChange(preset)}
-                        />
-                    ))}
+    // Handle individual color changes
+    const handlePositiveChange = useCallback(
+        (value: string) => {
+            console.log('Changing positive color to:', value);
+            selectPreset(null);
+            updateBoxColors({ positive: value });
+        },
+        [updateBoxColors, selectPreset]
+    );
+
+    const handleNegativeChange = useCallback(
+        (value: string) => {
+            console.log('Changing negative color to:', value);
+            selectPreset(null);
+            updateBoxColors({ negative: value });
+        },
+        [updateBoxColors, selectPreset]
+    );
+
+    // Handle preset selection
+    const handlePresetSelect = useCallback(
+        (preset: Preset) => {
+            console.log('Selecting preset:', preset.name);
+            // First update the colors
+            setPresetColors(preset);
+            // Then update the selected preset
+            selectPreset(preset.name);
+        },
+        [setPresetColors, selectPreset]
+    );
+
+    const content = (
+        <div className='flex flex-col gap-4 p-2'>
+            {/* Presets Grid */}
+            <div className='grid grid-cols-3 gap-2'>
+                {presets.map((preset) => (
+                    <PresetButton
+                        key={preset.name}
+                        preset={preset}
+                        isSelected={selectedPreset === preset.name}
+                        onClick={() => handlePresetSelect(preset)}
+                    />
+                ))}
+            </div>
+
+            {/* Custom Color Inputs */}
+            <div className='flex flex-col gap-3'>
+                <div className='flex items-center justify-between'>
+                    <span className='font-kodemono text-[10px] font-medium tracking-wider text-[#666] uppercase'>
+                        Custom Colors
+                    </span>
                 </div>
-
-                {/* Custom Color Inputs */}
-                <div className='flex flex-col gap-3'>
-                    <div className='flex items-center justify-between'>
-                        <span className='font-kodemono text-[10px] font-medium tracking-wider text-[#666] uppercase'>
-                            Custom Colors
-                        </span>
-                    </div>
-                    <div className='grid grid-cols-2 gap-3'>
-                        <ColorInput label='Up Trend' value={boxColors.positive} onChange={handlePositiveChange} />
-                        <ColorInput label='Dn Trend' value={boxColors.negative} onChange={handleNegativeChange} />
-                    </div>
+                <div className='grid grid-cols-2 gap-3'>
+                    <ColorInput label='Up Trend' value={boxColors.positive} onChange={handlePositiveChange} />
+                    <ColorInput label='Dn Trend' value={boxColors.negative} onChange={handleNegativeChange} />
                 </div>
             </div>
-        );
+        </div>
+    );
 
-        if (noContainer) {
-            return content;
-        }
-
-        return (
-            <PanelSection
-                title='Color Style'
-                icon={LuPalette}
-                isExpanded={isExpanded}
-                onToggle={() => setIsExpanded(!isExpanded)}
-                className={className}
-            >
-                {content}
-            </PanelSection>
-        );
+    if (noContainer) {
+        return content;
     }
-);
+
+    return (
+        <PanelSection
+            title='Color Style'
+            icon={LuPalette}
+            isExpanded={isExpanded}
+            onToggle={() => setIsExpanded(!isExpanded)}
+            className={className}
+        >
+            {content}
+        </PanelSection>
+    );
+});
