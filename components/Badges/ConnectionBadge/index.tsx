@@ -16,7 +16,7 @@ export const ConnectionBadge: React.FC<ConnectionStatusProps> = ({ isConnected }
                 />
             </div>
             <span
-                className={`font-kodemono pr-1 text-[10px] font-medium tracking-wide transition-colors duration-300 ${isConnected ? 'text-white/70' : 'text-white/40'} `}
+                className={`font-outfit pr-1 text-[10px] font-medium tracking-wide transition-colors duration-300 ${isConnected ? 'text-white/70' : 'text-white/40'} `}
             >
                 {isConnected ? 'Connected' : 'Disconnected'}
             </span>

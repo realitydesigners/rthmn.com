@@ -1,11 +1,11 @@
-import { sanityFetch } from '@/lib/sanity/lib/client';
-import { getCourses } from '@/lib/sanity/lib/queries';
-import type { Course } from '@/types/types';
-import { LearnPageClient } from './client';
+import { sanityFetch } from "@/lib/sanity/lib/client";
+import { getCourses } from "@/lib/sanity/lib/queries";
+import type { Course } from "@/types/types";
+import { LearnPageClient } from "./client";
 
 export default async function LearnPage() {
-    const courses = await sanityFetch<Course[]>({
-        query: `*[_type == "course"] | order(order asc) {
+	const courses = await sanityFetch<Course[]>({
+		query: `*[_type == "course"] | order(order asc) {
             _id,
             title,
             description,
@@ -28,9 +28,9 @@ export default async function LearnPage() {
                 } | order(order asc)
             } | order(order asc)
         }`,
-        tags: ['course'],
-        qParams: {},
-    });
+		tags: ["course"],
+		qParams: {},
+	});
 
-    return <LearnPageClient courses={courses} />;
+	return <LearnPageClient courses={courses} />;
 }

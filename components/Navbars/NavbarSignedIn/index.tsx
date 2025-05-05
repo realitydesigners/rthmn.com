@@ -40,7 +40,9 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
     const pathSegments = formatPathname(pathname);
 
     return (
-        <nav className='fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#121212] bg-[#0a0a0a] p-1 lg:flex lg:h-14'>
+        <nav className='fixed top-0 right-0 left-0 z-[100] h-16 border-b border-white/[0.05] bg-[#0A0B0D] p-1 lg:flex lg:h-14'>
+            {/* Enhanced depth effects */}
+
             <div className='group relative z-[110] h-full w-full'>
                 <div className='relative flex h-full w-full items-center justify-between rounded-lg px-2'>
                     {/* Left section */}
@@ -65,7 +67,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                                             {getSegmentIcon(segment) && (
                                                 <span className='text-[#666]'>{getSegmentIcon(segment)}</span>
                                             )}
-                                            <span className='font-kodemono text-[10px] font-bold font-medium tracking-widest text-neutral-200/50 uppercase'>
+                                            <span className='font-outfit text-[10px] font-medium tracking-wide text-[#666] uppercase'>
                                                 {segment}
                                             </span>
                                         </div>

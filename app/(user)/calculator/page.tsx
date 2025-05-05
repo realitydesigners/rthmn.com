@@ -1,5 +1,5 @@
-import { SectionCalculator } from '@/app/(user)/calculator/SectionCalculator';
+import { SectionCalculator } from "@/app/(user)/calculator/SectionCalculator";
 
 export default function CalculatorPage() {
-    return <SectionCalculator />;
+	return <SectionCalculator />;
 }

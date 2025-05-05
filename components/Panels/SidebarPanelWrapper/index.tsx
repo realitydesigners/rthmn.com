@@ -4,11 +4,12 @@ import { cn } from '@/utils/cn';
 import { getSidebarLocks, getSidebarState, setSidebarLocks, setSidebarState } from '@/utils/localStorage';
 import { motion } from 'framer-motion';
 import type React from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { LuLock, LuUnlock } from 'react-icons/lu';
 
 const LockButton = ({ isLocked, onClick }: { isLocked: boolean; onClick: () => void }) => (
     <button
+        type='button'
         onClick={onClick}
         className={cn(
             'group relative z-[120] flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-200',
@@ -50,24 +51,30 @@ export const SidebarWrapper = ({
 }) => {
     const [width, setWidth] = useState(initialWidth);
     const [mounted, setMounted] = useState(false);
+    const initialLoadRef = useRef(true);
 
     useEffect(() => {
         setMounted(true);
-        const state = getSidebarState();
-        const locks = getSidebarLocks();
 
-        if (locks[position] && !state[position].isOpen) {
-            setSidebarState({
-                ...state,
-                [position]: {
-                    ...state[position],
-                    isOpen: true,
-                    locked: true,
-                },
-            });
-            onLockToggle();
+        // Only run this effect once on initial mount
+        if (initialLoadRef.current) {
+            initialLoadRef.current = false;
+            const state = getSidebarState();
+            const locks = getSidebarLocks();
+
+            if (locks[position] && !state[position].isOpen) {
+                setSidebarState({
+                    ...state,
+                    [position]: {
+                        ...state[position],
+                        isOpen: true,
+                        locked: true,
+                    },
+                });
+                onLockToggle();
+            }
         }
-    }, []);
+    }, [position, onLockToggle]);
 
     const handleResize = useCallback((newWidth: number) => {
         setWidth(Math.max(350, Math.min(600, newWidth)));
@@ -86,7 +93,7 @@ export const SidebarWrapper = ({
             ...state,
             [position]: {
                 ...state[position],
-                isOpen: isOpen,
+                isOpen,
                 locked: !isLocked,
             },
         });
@@ -150,7 +157,7 @@ export const SidebarWrapper = ({
                 ease: 'easeInOut',
             }}
             className={cn(
-                'sidebar-content fixed top-14 bottom-0 hidden transform lg:flex',
+                'sidebar-content fixed top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]',
                 position === 'left' ? 'left-0' : 'right-0',
                 isOpen ? 'pointer-events-auto' : 'pointer-events-none',
                 isLocked ? 'z-[90]' : 'z-[110]'
@@ -163,9 +170,9 @@ export const SidebarWrapper = ({
             <div className={cn('relative flex h-full w-full', position === 'left' ? 'ml-16' : 'mr-16')}>
                 <div
                     className={cn(
-                        'relative flex h-full w-full flex-col bg-[#0a0a0a] p-1',
+                        'relative flex h-full w-full flex-col  p-1',
                         position === 'left' ? 'border-r' : 'border-l',
-                        'border-[#121212]'
+                        'border-white/[0.02]'
                     )}
                 >
                     {/* Header */}
@@ -177,7 +184,7 @@ export const SidebarWrapper = ({
                                 position === 'right' && 'flex-1 justify-end'
                             )}
                         >
-                            <h2 className='font-kodemono text-[10px] font-medium tracking-widest text-[#666] uppercase'>
+                            <h2 className='font-outfit text-[10px] font-medium tracking-wide text-[#666] uppercase'>
                                 {title}
                             </h2>
                         </div>

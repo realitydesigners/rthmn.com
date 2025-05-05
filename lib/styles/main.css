@@ -194,11 +194,14 @@
 
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
 }
 
 .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+    display: none;
 }
 
 /* Technical Overlay Frame */

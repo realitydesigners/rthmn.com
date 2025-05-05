@@ -1,5 +1,5 @@
-import { groq } from 'next-sanity';
-import { client } from './client';
+import { groq } from "next-sanity";
+import { client } from "./client";
 
 export const settingsQuery = groq`
   *[_type == "settings"][0] {
@@ -327,8 +327,8 @@ export const pairSnapshotQuery = groq`
 `;
 
 export async function getModules() {
-    return client.fetch(
-        groq`*[_type == "module"] | order(order asc) {
+	return client.fetch(
+		groq`*[_type == "module"] | order(order asc) {
       _id,
       title,
       description,
@@ -340,13 +340,13 @@ export async function getModules() {
         slug,
         order
       } | order(order asc)
-    }`
-    );
+    }`,
+	);
 }
 
 export async function getModule(moduleSlug: string) {
-    return client.fetch(
-        groq`*[_type == "module" && slug.current == $moduleSlug][0] {
+	return client.fetch(
+		groq`*[_type == "module" && slug.current == $moduleSlug][0] {
       _id,
       title,
       description,
@@ -360,13 +360,13 @@ export async function getModule(moduleSlug: string) {
         order
       } | order(order asc)
     }`,
-        { moduleSlug }
-    );
+		{ moduleSlug },
+	);
 }
 
 export async function getChangeLog() {
-    return client.fetch(
-        groq`*[_type == "changelog"] | order(releaseDate desc) {
+	return client.fetch(
+		groq`*[_type == "changelog"] | order(releaseDate desc) {
       _id,
       title,
       description,
@@ -392,8 +392,8 @@ export async function getChangeLog() {
           }
         }
       }
-    }`
-    );
+    }`,
+	);
 }
 
 export const marketDataQuery = groq`
@@ -419,8 +419,8 @@ export const allMarketDataQuery = groq`
 `;
 
 export async function getCourses() {
-    return client.fetch(
-        groq`*[_type == "course"] | order(order asc) {
+	return client.fetch(
+		groq`*[_type == "course"] | order(order asc) {
             _id,
             title,
             description,
@@ -440,13 +440,13 @@ export async function getCourses() {
                     slug
                 }
             }
-        }`
-    );
+        }`,
+	);
 }
 
 export async function getCourse(slug: string) {
-    const course = await client.fetch(
-        `*[_type == "course" && slug.current == $slug][0]{
+	const course = await client.fetch(
+		`*[_type == "course" && slug.current == $slug][0]{
             _id,
             title,
             description,
@@ -483,18 +483,18 @@ export async function getCourse(slug: string) {
                             }
                         }
                     }
-                },
+                } | order(order asc)
             } | order(order asc)
         }`,
-        { slug }
-    );
+		{ slug },
+	);
 
-    console.log('Fetched course data:', JSON.stringify(course, null, 2));
-    return course;
+	console.log("Fetched course data:", JSON.stringify(course, null, 2));
+	return course;
 }
 
 export async function getLesson(slug: string) {
-    return client.fetch(`*[_type == "lesson" && slug.current == $slug][0]`, {
-        slug,
-    });
+	return client.fetch(`*[_type == "lesson" && slug.current == $slug][0]`, {
+		slug,
+	});
 }

@@ -14,7 +14,7 @@ interface SupportPanelProps {
     onClose: () => void;
 }
 
-export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
+export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
     const [threads, setThreads] = useState<SupportThread[]>([]);
     const [selectedThread, setSelectedThread] = useState<SupportThread | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
@@ -169,6 +169,7 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
                         <h2 className='font-outfit text-xl font-bold text-white'>Support</h2>
                     </div>
                     <button
+                        type='button'
                         onClick={onClose}
                         className='rounded-md p-2 text-zinc-400 hover:bg-white/5 hover:text-white'
                     >
@@ -317,4 +318,4 @@ export default function SupportPanel({ isOpen, onClose }: SupportPanelProps) {
             </div>
         </div>
     );
-}
+};

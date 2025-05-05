@@ -1,8 +1,8 @@
-import React from 'react';
-import StudioClient from './client';
+import React from "react";
+import StudioClient from "./client";
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 export default function StudioPage() {
-    return <StudioClient />;
+	return <StudioClient />;
 }

@@ -4,7 +4,7 @@ import { useDashboard } from '@/providers/DashboardProvider/client';
 import { useUser } from '@/providers/UserProvider';
 import { useGridStore } from '@/stores/gridStore';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { NoInstruments } from './LoadingSkeleton';
 import { PairResoBox } from './PairResoBox';
 
@@ -21,7 +21,7 @@ export default function Dashboard() {
     // Mark as client-side rendered
     useEffect(() => {
         setIsClient(true);
-    }, [lastCols]);
+    }, []);
 
     // Initialize ordered pairs from selected pairs
     useEffect(() => {
@@ -112,7 +112,6 @@ export default function Dashboard() {
                 className='grid w-full gap-4'
                 style={{
                     gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
-                    gap: '1rem',
                 }}
             >
                 {/* Only render the list content after client-side mounting */}
@@ -149,7 +148,7 @@ export default function Dashboard() {
                                 <div data-pair={pair}>
                                     <PairResoBox
                                         pair={pair}
-                                        // Pass data slice even if potentially undefined initially
+                                        // Pass the raw slice now, filtering happens inside PairResoBox
                                         boxSlice={data?.boxes?.[0]}
                                         boxColors={boxColors}
                                         // Pass the isLoading state down
