@@ -28,8 +28,8 @@ export const PriceLevels = memo(
 						style={{ top: `${getYPosition(takeProfit)}px` }}
 					>
 						<div className="flex items-center gap-2">
-							<div className="h-[1px] w-full bg-emerald-400" />
-							<span className="text-xs text-emerald-400">
+							<div className="h-[1px] w-full bg-blue-400" />
+							<span className="text-xs text-blue-400">
 								${takeProfit.toFixed(2)}
 							</span>
 						</div>
@@ -65,7 +65,7 @@ export const PriceLevels = memo(
 						style={{ top: `${getYPosition(entryPrice)}px` }}
 					>
 						<div
-							className={`h-20 w-1 ${direction === "long" ? "bg-emerald-400/20" : "bg-red-400/20"}`}
+							className={`h-20 w-1 ${direction === "long" ? "bg-blue-400/20" : "bg-red-400/20"}`}
 						/>
 					</div>
 				</div>

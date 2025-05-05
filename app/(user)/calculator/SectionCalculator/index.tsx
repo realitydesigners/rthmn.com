@@ -141,7 +141,7 @@ const InputField = memo(
 					className={`w-full rounded-xl border bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
 						error
 							? "border-red-400/50 focus:border-red-400/50 focus:bg-red-400/5 focus:ring-2 focus:ring-red-400/20"
-							: "border-white/10 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20"
+							: "border-white/10 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20"
 					}`}
 				/>
 			</div>
@@ -183,7 +183,7 @@ const ResultCard = memo(
 							isInvalid
 								? "bg-red-400/10 text-red-400"
 								: positive
-									? "bg-emerald-400/10 text-emerald-400"
+									? "bg-blue-400/10 text-blue-400"
 									: "bg-white/5 text-neutral-400"
 						}`}
 					>
@@ -256,10 +256,10 @@ const TakeProfitSuggestion = memo(
 					<button
 						key={ratio}
 						onClick={() => onSelect(price)}
-						className="group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-emerald-400/50 hover:bg-emerald-400/5"
+						className="group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
 					>
 						<span>{ratio}:1</span>
-						<span className="text-emerald-400">${price.toFixed(2)}</span>
+						<span className="text-blue-400">${price.toFixed(2)}</span>
 					</button>
 				))}
 			</div>
@@ -364,8 +364,8 @@ export const SectionCalculator = () => {
 		<section className="relative min-h-screen overflow-hidden py-32">
 			<div className="pointer-events-none absolute inset-0">
 				<div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_70%)]" />
-				<div className="absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl" />
-				<div className="absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-emerald-500/5 blur-3xl" />
+				<div className="absolute -top-1/2 left-0 h-96 w-96 -translate-x-1/2 rounded-full bg-blue-500/5 blur-3xl" />
+				<div className="absolute right-0 -bottom-1/2 h-96 w-96 translate-x-1/2 rounded-full bg-blue-500/5 blur-3xl" />
 			</div>
 
 			<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -400,7 +400,7 @@ export const SectionCalculator = () => {
 										onClick={() => handleRiskTemplateSelect(template.value)}
 										className={`group relative w-full overflow-hidden rounded-xl border p-4 text-left transition-all duration-300 ${
 											inputs.riskPercentage === template.value
-												? "border-emerald-400/50 bg-emerald-400/5"
+												? "border-blue-400/50 bg-blue-400/5"
 												: "border-white/10 bg-black/40 hover:border-white/20 hover:bg-black/60"
 										}`}
 									>
@@ -412,7 +412,7 @@ export const SectionCalculator = () => {
 											<div className="font-outfit mb-1 text-lg font-semibold text-white">
 												{template.label}
 											</div>
-											<div className="font-kodemono mb-2 text-2xl text-emerald-400">
+											<div className="font-kodemono mb-2 text-2xl text-blue-400">
 												{template.value}%
 											</div>
 											<p className="font-kodemono text-sm text-neutral-400">
@@ -512,7 +512,7 @@ export const SectionCalculator = () => {
 										label="Take Profit"
 										value={inputs.takeProfit}
 										onChange={(value) => handleInputChange("takeProfit", value)}
-										icon={<FaChartLine className="h-5 w-5 text-emerald-400" />}
+										icon={<FaChartLine className="h-5 w-5 text-blue-400" />}
 										error={getError("takeProfit")}
 										placeholder="Enter take profit"
 									/>

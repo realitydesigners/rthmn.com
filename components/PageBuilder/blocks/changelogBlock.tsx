@@ -20,7 +20,7 @@ export interface ChangelogBlockProps {
 function getTypeColor(type: string) {
 	switch (type) {
 		case "feature":
-			return "bg-emerald-500/10 text-emerald-400 border-emerald-500/20";
+			return "bg-blue-500/10 text-blue-400 border-blue-500/20";
 		case "bugfix":
 			return "bg-amber-500/10 text-amber-400 border-amber-500/20";
 		case "improvement":
@@ -99,7 +99,7 @@ export function ChangelogBlock({
 									{/* Timeline dot and connector */}
 									<div className="absolute -left-[40px] flex h-full w-12 flex-col items-center lg:-left-[60px]">
 										<div className="relative top-0 z-10 flex h-4 w-4 items-center justify-center">
-											<div className="absolute h-4 w-4 rounded-full border border-[#333] bg-black" />
+											<div className="absolute h-4 w-4 rounded-full border border-white/[0.05]  bg-black" />
 										</div>
 										<div className="absolute top-[8px] left-1/2 h-[1px] w-[16px] bg-[#333] lg:w-[36px]" />
 									</div>

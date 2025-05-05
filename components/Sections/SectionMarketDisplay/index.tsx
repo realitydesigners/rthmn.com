@@ -252,7 +252,7 @@ const CardContent = memo(
 		if (isLoading) {
 			return (
 				<div className="flex h-full items-center justify-center">
-					<div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+					<div className="h-8 w-8 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
 				</div>
 			);
 		}
@@ -267,7 +267,7 @@ const CardContent = memo(
 						initial={{ opacity: 0, y: -10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.2 }}
-						className={`rounded-full px-2 py-0.5 text-xs ${data.change >= 0 ? "bg-emerald-500/20 text-emerald-400" : "bg-red-500/20 text-red-400"}`}
+						className={`rounded-full px-2 py-0.5 text-xs ${data.change >= 0 ? "bg-blue-500/20 text-blue-400" : "bg-red-500/20 text-red-400"}`}
 					>
 						{data.change.toFixed(2)}%
 					</motion.div>

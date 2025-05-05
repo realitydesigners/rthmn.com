@@ -14,7 +14,7 @@ export const TradeDirection = memo(
 				onClick={() => onDirectionChange("long")}
 				className={`group relative flex items-center gap-2 rounded-full border px-4 py-2 transition-all duration-300 ${
 					direction === "long"
-						? "border-emerald-400/50 bg-emerald-400/10 text-emerald-400"
+						? "border-blue-400/50 bg-blue-400/10 text-blue-400"
 						: "border-white/10 bg-black/40 text-neutral-400 hover:border-white/20"
 				}`}
 			>

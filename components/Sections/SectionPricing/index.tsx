@@ -157,8 +157,8 @@ const BenefitsList = memo(
 				>
 					<div className="pointer-events-none absolute inset-px rounded-xl bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 					<div className="relative flex gap-3">
-						<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 shadow-lg shadow-emerald-500/[0.15] ring-1 ring-emerald-500/[0.15]">
-							<FaCheck className="h-3.5 w-3.5 text-emerald-400" />
+						<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 shadow-lg shadow-blue-500/[0.15] ring-1 ring-blue-500/[0.15]">
+							<FaCheck className="h-3.5 w-3.5 text-blue-400" />
 						</div>
 						<div>
 							<h3 className="font-outfit text-base font-semibold text-white">
@@ -329,7 +329,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 						viewport={{ once: true }}
 						transition={{ duration: 0.5 }}
 					>
-						<div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent p-8 shadow-2xl shadow-emerald-500/10 backdrop-blur-sm">
+						<div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent p-8 shadow-2xl shadow-blue-500/10 backdrop-blur-sm">
 							<div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.08] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 							<BenefitsList benefits={PricingBenefits} />
 						</div>

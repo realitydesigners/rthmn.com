@@ -18,14 +18,14 @@ export const RiskRewardGrid = memo(
 			<div className="relative mt-4 flex flex-col items-center">
 				{/* Grid Container */}
 				<div className={`grid grid-cols-${gridSize} gap-1`}>
-					{/* Reward Squares (Green) */}
+					{/* Reward Squares (blue) */}
 					{Array.from({ length: rewardSquares }).map((_, i) => (
 						<motion.div
 							key={`reward-${i}`}
 							initial={{ scale: 0, opacity: 0 }}
 							animate={{ scale: 1, opacity: 1 }}
 							transition={{ duration: 0.3, delay: i * 0.02 }}
-							className="h-4 w-4 rounded-sm border border-emerald-400/40 bg-emerald-400/20"
+							className="h-4 w-4 rounded-sm border border-blue-400/40 bg-blue-400/20"
 						/>
 					))}
 					{/* Risk Squares (Red) */}
@@ -47,8 +47,8 @@ export const RiskRewardGrid = memo(
 						<span className="font-bold text-red-400">{riskSquares} units</span>
 					</div>
 					<div className="flex flex-col items-center">
-						<span className="text-emerald-400">Reward</span>
-						<span className="font-bold text-emerald-400">
+						<span className="text-blue-400">Reward</span>
+						<span className="font-bold text-blue-400">
 							{rewardSquares} units
 						</span>
 					</div>

@@ -5,7 +5,7 @@ const props = {
 	"--my-black": "#000000",
 	"--my-brand": "#00cc7a",
 	"--my-red": "#ff4444",
-	"--my-green": "#00cc7a",
+	"--my-blue": "#00cc7a",
 	"--my-gray": "#333333",
 	"--my-darker-gray": "#1e1e1e",
 };
@@ -22,19 +22,19 @@ export const myTheme = buildLegacyTheme({
 	"--component-text-color": props["--my-white"],
 
 	/* Brand */
-	"--brand-primary": props["--my-green"],
+	"--brand-primary": props["--my-blue"],
 
 	// Default button
-	"--default-button-color": props["--my-green"],
-	"--default-button-primary-color": props["--my-green"],
-	"--default-button-success-color": props["--my-green"],
-	"--default-button-warning-color": props["--my-green"],
+	"--default-button-color": props["--my-blue"],
+	"--default-button-primary-color": props["--my-blue"],
+	"--default-button-success-color": props["--my-blue"],
+	"--default-button-warning-color": props["--my-blue"],
 	"--default-button-danger-color": props["--my-red"],
 
 	/* State */
-	"--state-info-color": props["--my-green"],
-	"--state-success-color": props["--my-green"],
-	"--state-warning-color": props["--my-green"],
+	"--state-info-color": props["--my-blue"],
+	"--state-success-color": props["--my-blue"],
+	"--state-warning-color": props["--my-blue"],
 	"--state-danger-color": props["--my-red"],
 
 	/* Navbar */
@@ -42,5 +42,5 @@ export const myTheme = buildLegacyTheme({
 	"--main-navigation-color--inverted": props["--my-white"],
 
 	/* Focus */
-	"--focus-color": props["--my-green"],
+	"--focus-color": props["--my-blue"],
 });

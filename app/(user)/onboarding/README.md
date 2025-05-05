@@ -118,7 +118,7 @@ const handleNext = () => {
 
 The right sidebar displays:
 
-- Completed steps (green)
+- Completed steps (blue)
 - Current step (blue)
 - Pending steps (neutral)
 - Clear progress option

@@ -127,7 +127,7 @@ export function MarketNavigator({
 								</div>
 
 								<div className="flex items-center gap-2">
-									{hasAlerts && <FaBell className="h-3 w-3 text-emerald-500" />}
+									{hasAlerts && <FaBell className="h-3 w-3 text-blue-500" />}
 									<FaChevronRight className="h-3 w-3 text-neutral-400 transition-transform group-hover:translate-x-0.5" />
 								</div>
 							</div>

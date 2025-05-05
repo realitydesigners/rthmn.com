@@ -108,7 +108,7 @@ export default function PairsStep({
 								{[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
 									<motion.div
 										key={i}
-										className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-[#3FFFA2]/80" : "bg-[#333]"}`}
+										className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-blue-400/80" : "bg-[#333]"}`}
 										initial={false}
 										animate={{
 											scale: i < selectedPairs.length ? 1 : 0.95,
@@ -117,7 +117,7 @@ export default function PairsStep({
 								))}
 							</div>
 							<span
-								className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-[#3FFFA2]" : "text-[#666]"}`}
+								className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-blue-400" : "text-[#666]"}`}
 							>
 								{selectedPairs.length}/{MIN_PAIRS_REQUIRED}
 							</span>
@@ -199,10 +199,10 @@ export default function PairsStep({
 												delay: (groupIndex * pairs.length + index) * 0.05,
 											}}
 											onClick={() => handlePairClick(item)}
-											className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b transition-all duration-300 ${
+											className={`group relative w-full overflow-hidden rounded-xl border  bg-gradient-to-b  transition-all duration-300 ${
 												isSelected
-													? "border-[#3FFFA2]/50 from-[#3FFFA2]/20 to-[#3FFFA2]/0"
-													: "border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-[#3FFFA2]/30 hover:from-[#1A1A1A] hover:to-[#111]"
+													? "border-blue-400/50 from-blue-400/20 to-blue-400/0"
+													: "border-white/[0.05]  from-[#0A0B0D] to-[#070809] hover:border-blue-400/30 "
 											}`}
 										>
 											<motion.div
@@ -216,7 +216,7 @@ export default function PairsStep({
 													stiffness: 200,
 													damping: 20,
 												}}
-												className={`absolute inset-0 bg-gradient-to-b from-[#3FFFA2]/10 to-transparent`}
+												className={`absolute inset-0 bg-gradient-to-b from-blue-400/10 to-transparent`}
 											/>
 
 											<div className="relative flex items-center justify-between rounded-xl p-4">
@@ -231,21 +231,6 @@ export default function PairsStep({
 															? formatPrice(priceData[item].price, item)
 															: "N/A"}
 													</span>
-													<motion.div
-														initial={false}
-														animate={{
-															scale: isSelected ? 1.2 : 1,
-															backgroundColor: isSelected
-																? "#3FFFA2"
-																: "rgb(51, 51, 51)",
-														}}
-														transition={{
-															type: "spring",
-															stiffness: 200,
-															damping: 20,
-														}}
-														className={`h-2 w-2 rounded-full`}
-													/>
 												</div>
 											</div>
 										</motion.button>

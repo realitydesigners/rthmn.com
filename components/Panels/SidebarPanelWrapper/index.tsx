@@ -226,6 +226,7 @@ export const SidebarWrapper = ({
 					</div>
 
 					{/* Onboarding Overlay */}
+					{/* Onboarding Overlay */}
 					{isCurrentTourStep && !isCompleted && (
 						<div className="pointer-events-none absolute inset-0 z-[1000]">
 							{/* Inner edge glows */}
@@ -237,16 +238,16 @@ export const SidebarWrapper = ({
 
 							{/* Additional corner radials for depth */}
 							<div className="absolute inset-0 overflow-hidden">
-								<div className="absolute -bottom-32 -left-16 h-32 w-32 bg-[#3FFFA2]/[0.35] blur-[24px]" />
-								<div className="absolute -right-16 -bottom-32 h-32 w-32 bg-[#3FFFA2]/[0.35] blur-[24px]" />
+								<div className="absolute -bottom-32 -left-16 h-32 w-32 bg-[#447DFC]/[0.35] blur-[24px]" />
+								<div className="absolute -right-16 -bottom-32 h-32 w-32 bg-[#447DFC]/[0.35] blur-[24px]" />
 
-								<div className="absolute -top-16 -left-16 h-64 w-64 bg-[radial-gradient(circle_at_0%_0%,rgba(63,255,162,0.4),transparent_70%)]" />
-								<div className="absolute -top-16 -right-16 h-64 w-64 bg-[radial-gradient(circle_at_100%_0%,rgba(63,255,162,0.4),transparent_70%)]" />
+								<div className="absolute -top-16 -left-16 h-64 w-64 bg-[radial-gradient(circle_at_0%_0%,rgba(68,125,252,0.2),transparent_70%)]" />
+								<div className="absolute -top-16 -right-16 h-64 w-64 bg-[radial-gradient(circle_at_100%_0%,rgba(68,125,252,0.2),transparent_70%)]" />
 							</div>
 
 							{/* Soft edge gradients */}
-							<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(63,255,162,0.15),transparent_20%,transparent_80%,rgba(63,255,162,0.15))]" />
-							<div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(63,255,162,0.15),transparent_20%,transparent_80%,rgba(63,255,162,0.15))]" />
+							<div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(68,125,252,0.15),transparent_20%,transparent_90%,rgba(68,125,252,0.15))]" />
+							<div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(68,125,252,0.15),transparent_20%,transparent_90%,rgba(68,125,252,0.15))]" />
 						</div>
 					)}
 				</div>

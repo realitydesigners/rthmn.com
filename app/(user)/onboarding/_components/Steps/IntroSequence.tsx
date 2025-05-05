@@ -7,25 +7,6 @@ interface Props {
 	onComplete: () => void;
 }
 
-const AuroraBackground = ({ isExiting }: { isExiting: boolean }) => (
-	<motion.div
-		initial={{ opacity: 0 }}
-		animate={{
-			opacity: isExiting ? 0 : 0.3,
-			backgroundPosition: ["0% 50%, 0% 50%", "100% 50%, 100% 50%"],
-			filter: isExiting ? "blur(50px)" : "blur(30px)",
-		}}
-		transition={{
-			backgroundPosition: {
-				duration: 60,
-				repeat: Number.POSITIVE_INFINITY,
-				ease: "linear",
-			},
-		}}
-		className={`after:animate-aurora pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_100%_0%,black_10%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(63,255,162,0.5)_10%,rgba(63,255,162,0.5)_15%,rgba(63,255,162,0.5)_20%,rgba(63,255,162,0.5)_25%,rgba(63,255,162,0.5)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.1)_0%,rgba(255,255,255,0.1)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.1)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed] after:mix-blend-plus-lighter after:content-[""]`}
-	/>
-);
-
 const LightShadows = ({ isExiting }: { isExiting: boolean }) =>
 	[...Array(1)].map((_, i) => (
 		<motion.div
@@ -43,68 +24,101 @@ const LightShadows = ({ isExiting }: { isExiting: boolean }) =>
 				ease: "linear",
 				delay: i * 1,
 			}}
-			className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-[#3FFFA2]/20 via-[#3FFFA2]/10 to-transparent blur-3xl`}
+			className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-blue-400/20 via-blue-400/10 to-transparent blur-3xl`}
 		/>
 	));
 
-const StarField = ({ isExiting }: { isExiting: boolean }) => (
-	<div className="absolute inset-0 overflow-hidden">
-		{[...Array(100)].map((_, i) => (
-			<StarParticle key={i} isExiting={isExiting} index={i} />
-		))}
-	</div>
+const AuroraBackground = () => (
+	<motion.div
+		initial={{ opacity: 0 }}
+		animate={{
+			opacity: 0.3,
+			backgroundPosition: ["0% 50%, 0% 50%", "100% 50%, 100% 50%"],
+			filter: "blur(30px)",
+		}}
+		transition={{
+			backgroundPosition: {
+				duration: 60,
+				repeat: Number.POSITIVE_INFINITY,
+				ease: "linear",
+			},
+		}}
+		className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed]`}
+	/>
 );
 
-const StarParticle = ({
-	isExiting,
-	index,
-}: { isExiting: boolean; index: number }) => {
-	const size = 1 + Math.random() * 2;
-	const startY = Math.random() * window.innerHeight;
-	const duration = 15 + Math.random() * 20; // Much longer duration
-	const startDelay = Math.random() * -15; // Negative delay for immediate start at random positions
+const StarField = () => {
+	const [mounted, setMounted] = useState(false);
+	const [stars, setStars] = useState<
+		Array<{
+			id: number;
+			x: number;
+			y: number;
+			size: number;
+			duration: number;
+			delay: number;
+		}>
+	>([]);
+
+	useEffect(() => {
+		const generateStars = () => {
+			const newStars = Array.from({ length: 50 }, (_, i) => ({
+				id: i,
+				x: Math.random() * window.innerWidth,
+				y: Math.random() * window.innerHeight,
+				size: 1 + Math.random() * 2,
+				duration: 15 + Math.random() * 20,
+				delay: Math.random() * -15,
+			}));
+			setStars(newStars);
+		};
+
+		generateStars();
+		setMounted(true);
+
+		const handleResize = () => {
+			generateStars();
+		};
+
+		window.addEventListener("resize", handleResize);
+		return () => window.removeEventListener("resize", handleResize);
+	}, []);
+
+	if (!mounted) return null;
 
 	return (
-		<motion.div
-			initial={{
-				opacity: 0.1,
-				x: Math.random() * window.innerWidth,
-				y: startY,
-			}}
-			animate={{
-				opacity: isExiting ? 0 : [0.1, 0.5, 0.1],
-				y: [startY, startY - window.innerHeight],
-			}}
-			transition={{
-				duration: duration,
-				repeat: Number.POSITIVE_INFINITY,
-				delay: startDelay,
-				opacity: {
-					duration: 2 + Math.random() * 2,
-					repeat: Number.POSITIVE_INFINITY,
-					repeatDelay: Math.random() * 3,
-					ease: "easeInOut",
-				},
-				y: {
-					duration: duration,
-					repeat: Number.POSITIVE_INFINITY,
-					ease: "linear",
-					delay: startDelay,
-				},
-			}}
-			className="absolute"
-		>
-			<div
-				style={{
-					width: `${size}px`,
-					height: `${size}px`,
-				}}
-				className="rounded-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)]"
-			/>
-		</motion.div>
+		<div className="absolute inset-0 overflow-hidden">
+			{stars.map((star) => (
+				<motion.div
+					key={star.id}
+					initial={{
+						opacity: 0.1,
+						x: star.x,
+						y: star.y,
+					}}
+					animate={{
+						opacity: [0.1, 0.5, 0.1],
+						y: [star.y, -100],
+					}}
+					transition={{
+						duration: star.duration,
+						repeat: Number.POSITIVE_INFINITY,
+						delay: star.delay,
+					}}
+					className="absolute"
+				>
+					<div
+						style={{
+							width: `${star.size}px`,
+							height: `${star.size}px`,
+						}}
+						className="rounded-full bg-white/80 shadow-[0_0_10px_rgba(255,255,255,0.8)]"
+					/>
+				</motion.div>
+			))}
+		</div>
 	);
 };
-
 const BASE_ANIMATIONS = {
 	transition: {
 		duration: 1.2,
@@ -570,9 +584,9 @@ export default function IntroSequence({ onComplete }: Props) {
 				transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
 				className="fixed inset-0 z-[1000] overflow-hidden bg-black"
 			>
-				<AuroraBackground isExiting={isExiting} />
+				<AuroraBackground />
 				<LightShadows isExiting={isExiting} />
-				<StarField isExiting={isExiting} />
+				<StarField />
 
 				<ImagePreloader />
 				<motion.div className="no-select relative z-10 flex h-full items-center justify-center">

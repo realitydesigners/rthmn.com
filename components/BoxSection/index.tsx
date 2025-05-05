@@ -60,7 +60,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 	// Constants
 	const ANIMATION_DURATION = 500;
 	const ANIMATION_STEPS = 30;
-	const GREEN_BOXES = ["1g", "2g", "3g", "4g", "5g", "6g", "7g", "8g"];
+	const blue_BOXES = ["1g", "2g", "3g", "4g", "5g", "6g", "7g", "8g"];
 
 	// Helper functions
 	const calculateBoxDimensions = (
@@ -105,8 +105,8 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 
 			let currentParentY = 0;
 			for (let i = 1; i <= 7; i++) {
-				const box = spline.findObjectByName(GREEN_BOXES[i]);
-				const parentBox = spline.findObjectByName(GREEN_BOXES[i - 1]);
+				const box = spline.findObjectByName(blue_BOXES[i]);
+				const parentBox = spline.findObjectByName(blue_BOXES[i - 1]);
 
 				if (box && parentBox) {
 					const currentDimensions = calculateBoxDimensions(
@@ -185,7 +185,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 						currentBox.scale.z = currentDimensions.scale;
 
 						if (index > 0) {
-							const parentName = GREEN_BOXES[index - 1];
+							const parentName = blue_BOXES[index - 1];
 							const parentBox = spline.findObjectByName(parentName);
 
 							if (parentBox) {
@@ -218,7 +218,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 		};
 
 		// Position the boxes and start auto-play
-		positionNestedBoxes(GREEN_BOXES);
+		positionNestedBoxes(blue_BOXES);
 		setIsInitialized(true);
 	}, [splineRef.current]);
 

@@ -48,7 +48,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 			{/* Timestamps */}
 			<div className="mb-4 grid grid-cols-2 gap-4 rounded border border-neutral-800 bg-black/40 p-2 text-neutral-400">
 				<div>
-					<span className="text-emerald-500">ResoBox Last Update: </span>
+					<span className="text-blue-500">ResoBox Last Update: </span>
 					<span>
 						{latestHistogramSlice?.timestamp
 							? formatTimestamp(latestHistogramSlice.timestamp)
@@ -67,9 +67,9 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 
 			{/* ResoBox Values */}
 			<div className="mb-4">
-				<h3 className="mb-2 font-bold text-emerald-500">ResoBox Values</h3>
-				<div className="rounded border border-emerald-900/50 bg-emerald-900/10 p-2">
-					<div className="grid grid-cols-[1fr_1fr_1fr] gap-2 border-b border-emerald-900/30 pb-1 text-emerald-400">
+				<h3 className="mb-2 font-bold text-blue-500">ResoBox Values</h3>
+				<div className="rounded border border-blue-900/50 bg-blue-900/10 p-2">
+					<div className="grid grid-cols-[1fr_1fr_1fr] gap-2 border-b border-blue-900/30 pb-1 text-blue-400">
 						<span>Value</span>
 						<span>High</span>
 						<span>Low</span>
@@ -81,9 +81,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 								className="grid grid-cols-[1fr_1fr_1fr] gap-2 text-right"
 							>
 								<span
-									className={
-										box.value >= 0 ? "text-emerald-400" : "text-red-400"
-									}
+									className={box.value >= 0 ? "text-blue-400" : "text-red-400"}
 								>
 									{box.value}
 								</span>
@@ -111,9 +109,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 								className="grid grid-cols-[1fr_1fr_1fr] gap-2 text-right"
 							>
 								<span
-									className={
-										box.value >= 0 ? "text-emerald-400" : "text-red-400"
-									}
+									className={box.value >= 0 ? "text-blue-400" : "text-red-400"}
 								>
 									{box.value}
 								</span>

@@ -419,7 +419,7 @@ const AddActions = ({
 	onCancel: (e: React.MouseEvent) => void;
 	onAdd: (e: React.MouseEvent) => void;
 }) => (
-	<div className="-webkit-tap-highlight-color-transparent bg-emerald-500/05 flex h-11 w-11 items-center justify-center rounded-full text-emerald-400 transition-all hover:bg-emerald-500/20 hover:text-white">
+	<div className="-webkit-tap-highlight-color-transparent bg-blue-500/05 flex h-11 w-11 items-center justify-center rounded-full text-blue-400 transition-all hover:bg-blue-500/20 hover:text-white">
 		{/* <ActionButton onClick={onCancel} icon={<LuX size={22} />} /> */}
 		<ActionButton
 			onClick={onAdd}
@@ -601,7 +601,7 @@ const ActionButton = ({
 	const variantStyles = {
 		default: "bg-white/10 hover:bg-white/20 text-neutral-300",
 		danger: "bg-red-500/10 text-red-400 hover:bg-red-500/20",
-		success: "bg-green-500/10 text-green-400 hover:bg-green-500/20",
+		success: "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20",
 	};
 
 	return (
@@ -618,7 +618,7 @@ const PairIndicator = ({ type }: { type: "active" | "remove" | "add" }) => {
 	const styles = {
 		active: "bg-gradient-to-r from-white/20 to-transparent",
 		remove: "animate-pulse bg-gradient-to-r from-red-400/20 to-transparent",
-		add: "animate-pulse bg-gradient-to-r from-green-400/20 to-transparent",
+		add: "animate-pulse bg-gradient-to-r from-blue-400/20 to-transparent",
 	};
 
 	return (

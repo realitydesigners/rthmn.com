@@ -10,7 +10,7 @@ interface NestedBoxesProps {
 	isPointOfChange?: boolean;
 	maxSize?: number;
 	baseSize?: number;
-	colorScheme?: "green-red" | "white-gradient";
+	colorScheme?: "blue-red" | "white-gradient";
 	showLabels?: boolean;
 	mode?: "animated" | "static";
 	containerClassName?: string;
@@ -28,7 +28,7 @@ interface NestedBoxesProps {
 }
 
 const defaultColors = {
-	positive: "#3FFFA2", // Green
+	positive: "#3FFFA2", // blue
 	negative: "#FF5959", // Red
 	styles: {
 		borderRadius: 4,

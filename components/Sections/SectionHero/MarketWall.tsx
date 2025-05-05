@@ -20,10 +20,10 @@ const LABEL_FONT_SIZE = "6px";
 const LABEL_SPACING = 2;
 
 const COLORS = {
-	emerald: {
+	blue: {
 		glow: [
-			"rgba(52, 211, 153, 1)", // text-emerald-400 full opacity
-			"rgba(52, 211, 153, 0.8)", // text-emerald-400 80%
+			"rgba(52, 211, 153, 1)", // text-blue-400 full opacity
+			"rgba(52, 211, 153, 0.8)", // text-blue-400 80%
 		],
 		text: "#4ade80",
 	},
@@ -173,7 +173,7 @@ export function MarketWall({ marketData }: { marketData: MarketData[] }) {
 			ctx.scale(cell.scale, cell.scale);
 			ctx.translate(-cell.x, -cell.y);
 
-			const colors = cell.isPositive ? COLORS.emerald : COLORS.red;
+			const colors = cell.isPositive ? COLORS.blue : COLORS.red;
 
 			if (cell.pair) {
 				const text = `${cell.pair.replace("_", "/")} ${cell.value}`;

@@ -62,7 +62,7 @@ const DEFAULT_PRESETS: Preset[] = [
 	},
 	{
 		name: "GRID.04",
-		positive: "#24FF66", // Matrix green
+		positive: "#24FF66", // Matrix blue
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
@@ -184,7 +184,7 @@ export interface ColorState {
 }
 
 const DEFAULT_BOX_COLORS: BoxColors = {
-	positive: "#24FF66", // Matrix green
+	positive: "#4DB4FF", // Data stream blue
 	negative: "#303238",
 	styles: {
 		borderRadius: 4,
