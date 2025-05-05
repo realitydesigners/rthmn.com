@@ -273,12 +273,7 @@ const PairClient = ({
 							</div>
 							{boxSlice?.boxes && (
 								<div className="mt-4 h-16 w-full">
-									<TimeFrameSlider
-										startIndex={settings.startIndex}
-										maxBoxCount={settings.maxBoxCount}
-										boxes={boxSlice.boxes}
-										onStyleChange={handleTimeframeChange}
-									/>
+									<TimeFrameSlider showPanel={false} pair={pair} />
 								</div>
 							)}
 						</div>
