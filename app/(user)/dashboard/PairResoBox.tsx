@@ -19,12 +19,10 @@ interface PairResoBoxProps {
 
 // Simple inline skeleton components
 const TextSkeleton = ({ className }: { className?: string }) => (
-    <div className={`animate-pulse rounded bg-[#333] ${className}`} />
+    <div className={`animate-pulse rounded bg-[#0F1012] ${className}`} />
 );
 
-const ChartSkeleton = () => <div className='aspect-square h-full w-full animate-pulse rounded bg-[#222]' />;
-
-const SliderSkeleton = () => <div className='h-16 w-full animate-pulse rounded bg-[#282828]' />;
+const ChartSkeleton = () => <div className='aspect-square h-full w-full animate-pulse rounded bg-[#0F1012]' />;
 
 export const PairResoBox = ({ pair, boxSlice, boxColors, isLoading }: PairResoBoxProps) => {
     const { priceData } = useWebSocket();

@@ -13,6 +13,7 @@ interface ColorPresetsProps {
 const PresetButton = memo(
     ({ preset, isSelected, onClick }: { preset: Preset; isSelected: boolean; onClick: () => void }) => (
         <button
+            type='button'
             onClick={onClick}
             className={cn(
                 'group relative flex h-[72px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border bg-gradient-to-b p-2 transition-all duration-200',
