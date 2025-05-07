@@ -74,7 +74,7 @@ const MarketCard = memo(
 							: "N/A"}
 					</span>
 					<span
-						className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${priceChange >= 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}
+						className={`rounded-sm px-1.5 py-0.5 text-[9px] font-semibold ${priceChange >= 0 ? "bg-blue-500/10 text-blue-400" : "bg-red-500/10 text-red-400"}`}
 					>
 						{priceChange ? `${priceChange.toFixed(1)}%` : "N/A"}
 					</span>
@@ -122,7 +122,7 @@ const DemoNavbar = memo(
                                 className={`flex h-auto items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]`}>
                                 <span
                                     className={`font-outfit flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-xs font-semibold ${
-                                        activeTab === tab.id ? 'text-emerald-400' : 'text-white hover:text-white'
+                                        activeTab === tab.id ? 'text-blue-400' : 'text-white hover:text-white'
                                     }`}>
                                     <tab.icon className='h-3 w-3' />
                                     {tab.label}

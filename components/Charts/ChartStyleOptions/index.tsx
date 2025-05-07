@@ -154,7 +154,7 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
 			{locked && (
 				<div className="pointer-events-none absolute -top-1 -right-1 flex items-center">
 					<div className="flex h-5 items-center gap-1">
-						<div className="flex h-5 w-5 items-center justify-center rounded-full border border-[#333] bg-gradient-to-b from-black/90 to-black/95 shadow-[0_2px_4px_rgba(0,0,0,0.4)] backdrop-blur-[1px]">
+						<div className="flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.05]  bg-gradient-to-b from-black/90 to-black/95 shadow-[0_2px_4px_rgba(0,0,0,0.4)] backdrop-blur-[1px]">
 							<LuLock className="h-2.5 w-2.5 text-white/80" />
 						</div>
 					</div>

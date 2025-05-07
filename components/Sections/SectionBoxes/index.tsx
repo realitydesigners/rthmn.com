@@ -92,7 +92,7 @@ const StarField = () => {
 const AuroraBackground = ({ dominantState }: { dominantState: string }) => {
 	// Define the colors to match NestedBoxes
 	const colors = {
-		green: {
+		blue: {
 			primary: "rgba(63, 255, 162, 0.3)", // #3FFFA2
 			secondary: "rgba(63, 255, 162, 0.2)",
 			tertiary: "rgba(63, 255, 162, 0.3)",
@@ -177,7 +177,7 @@ const FeatureTags = memo(() => (
 				key={feature.text}
 				className="group flex cursor-pointer items-center gap-2"
 			>
-				<feature.icon className="h-3.5 w-3.5 text-neutral-500 transition-colors duration-300 group-hover:text-emerald-400 group-hover:drop-shadow-[0_0_3px_rgba(34,197,94,0.4)]" />
+				<feature.icon className="h-3.5 w-3.5 text-neutral-500 transition-colors duration-300 group-hover:text-blue-400 group-hover:drop-shadow-[0_0_3px_rgba(34,197,94,0.4)]" />
 				<span className="font-kodemono text-xs text-neutral-400 transition-colors duration-300 group-hover:text-neutral-200">
 					{feature.text}
 				</span>
@@ -242,7 +242,7 @@ const BoxVisualization = memo(
 							isPaused={isPaused}
 							isPointOfChange={isPointOfChange}
 							baseSize={baseSize}
-							colorScheme="green-red"
+							colorScheme="blue-red"
 						/>
 					)}
 				</motion.div>
@@ -330,7 +330,7 @@ export const SectionBoxes = memo(() => {
 	const dominantState = useMemo(() => {
 		if (!currentSlice?.boxes || currentSlice.boxes.length === 0)
 			return "neutral";
-		return currentSlice.boxes[0].value > 0 ? "green" : "red";
+		return currentSlice.boxes[0].value > 0 ? "blue" : "red";
 	}, [currentSlice]);
 
 	useEffect(() => {

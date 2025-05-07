@@ -245,7 +245,7 @@ export function PairSlider({
 												<span
 													className={`rounded-full px-2 py-1 text-xs font-medium ${
 														priceChange >= 0
-															? "bg-emerald-500/10 text-emerald-400"
+															? "bg-blue-500/10 text-blue-400"
 															: "bg-red-500/10 text-red-400"
 													}`}
 												>

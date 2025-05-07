@@ -29,7 +29,7 @@ export const RISK_TEMPLATES: RiskTemplate[] = [
 export const getRiskLevelColor = (level: RiskTemplate["riskLevel"]) => {
 	switch (level) {
 		case "low":
-			return "text-emerald-400 bg-emerald-400/10";
+			return "text-blue-400 bg-blue-400/10";
 		case "medium":
 			return "text-blue-400 bg-blue-400/10";
 		case "high":

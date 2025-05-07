@@ -15,7 +15,7 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 
 const POINT_OF_CHANGE_INDEX = 29;
 
-type ColorScheme = "green-red" | "white-gradient";
+type ColorScheme = "blue-red" | "white-gradient";
 
 // Memoize FeatureTags component
 const FeatureTags = memo(() => (
@@ -44,7 +44,7 @@ FeatureTags.displayName = "FeatureTags";
 
 interface BoxVisualizerProps {
 	value: {
-		colorScheme?: "green-red" | "white-gradient";
+		colorScheme?: "blue-red" | "white-gradient";
 		animationSpeed?: number;
 		pauseDuration?: number;
 		title?: string;
@@ -71,7 +71,7 @@ const BoxVisualization = memo(
 		currentSlice,
 		demoStep,
 		isPaused,
-		colorScheme = "green-red",
+		colorScheme = "blue-red",
 		showLabels,
 	}: BoxVisualizationProps) => {
 		const [baseSize, setBaseSize] = useState(250);

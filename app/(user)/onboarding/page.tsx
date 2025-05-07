@@ -152,14 +152,14 @@ export default function OnboardingPage() {
 						maxWidth: currentStep?.id === "pairs" ? "48rem" : "28rem",
 					}}
 					transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-					className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#141414] via-[#111] to-[#0A0A0A] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}
+					className={`relative w-full rounded-2xl border border-[#222] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}
 				>
 					{/* Progress indicator */}
 					<div className="no-select absolute -top-3 left-1/2 -translate-x-1/2">
-						<div className="flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 text-xs font-medium shadow-xl">
+						<div className="flex items-center gap-2 rounded-full border border-white/[0.05]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 text-xs font-medium shadow-xl">
 							<div className="flex h-1.5 w-12 items-center rounded-full bg-[#222]">
 								<motion.div
-									className="h-full rounded-full bg-gradient-to-r from-[#3FFFA2] to-[#3FFFA2]/80"
+									className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80"
 									initial={false}
 									animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
 									transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -189,28 +189,24 @@ export default function OnboardingPage() {
 					<div className="font-outfit flex justify-end space-x-3">
 						{stepNumber > 1 && (
 							<button
+								type="button"
 								onClick={handleBack}
-								className="group relative rounded-lg border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#0F0F0F] px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
+								className="group relative rounded-lg border border-white/[0.05]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
 							>
 								<div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 								Back
 							</button>
 						)}
 						<button
+							type="button"
 							onClick={handleNext}
 							disabled={
 								(currentStep.id === "experience" && !userData.experience) ||
 								(currentStep.id === "pairs" &&
 									userData.selectedPairs.length < 4)
 							}
-							className="group relative flex items-center justify-center overflow-hidden rounded-xl border border-[#3FFFA2]/20 bg-gradient-to-b from-[#3FFFA2]/10 via-[#3FFFA2]/5 to-transparent px-6 py-2.5 text-sm font-medium text-[#3FFFA2] shadow-[0_0_15px_rgba(63,255,162,0.15)] transition-all duration-300 hover:border-[#3FFFA2]/30 hover:text-[#3FFFA2] hover:shadow-[0_0_25px_rgba(63,255,162,0.25)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+							className="group relative flex items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-gradient-to-b from-blue-400/10 via-blue-400/5 to-transparent px-6 py-2.5 text-sm font-medium text-blue-400  transition-all duration-300 hover:border-blue-400/30 hover:text-blue-400  active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
 						>
-							{/* Glow overlay */}
-							<div className="absolute inset-0 rounded-xl bg-[#3FFFA2]/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-							{/* Top highlight */}
-							<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#3FFFA2]/20 to-transparent" />
-							{/* Bottom highlight */}
-							<div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#3FFFA2]/10 to-transparent" />
 							<span className="relative">
 								{ONBOARDING_STEPS[
 									ONBOARDING_STEPS.findIndex(
@@ -230,9 +226,9 @@ export default function OnboardingPage() {
 
 			{/* Step title with enhanced styling */}
 			<div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4">
-				<div className="no-select group relative flex items-center gap-2 rounded-full border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#111] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-[#3FFFA2]/20 hover:shadow-[#3FFFA2]/10">
-					<div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-[#3FFFA2]/20 to-[#3FFFA2]/10">
-						<div className="h-1.5 w-1.5 rounded-full bg-[#3FFFA2]" />
+				<div className="no-select group relative flex items-center gap-2 rounded-full border border-white/[0.05]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-400/20 hover:shadow-blue-400/10">
+					<div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-400/20 to-blue-400/10">
+						<div className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 					</div>
 					<span className="no-select text-sm font-medium text-white/70 transition-colors group-hover:text-white">
 						{currentStep?.id === "profile"
@@ -243,7 +239,7 @@ export default function OnboardingPage() {
 									? "Select Trading Pairs"
 									: ""}
 					</span>
-					<div className="absolute inset-0 -z-10 rounded-full bg-[#3FFFA2] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10" />
+					<div className="absolute inset-0 -z-10 rounded-full bg-blue-400 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10" />
 				</div>
 			</div>
 			{showIntro && <IntroSequence onComplete={() => setShowIntro(false)} />}

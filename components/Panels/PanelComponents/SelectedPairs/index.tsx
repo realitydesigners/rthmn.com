@@ -62,7 +62,7 @@ export const SelectedPairs = () => {
 						<div
 							key={pair}
 							onContextMenu={(e) => handleContextMenu(e, pair)}
-							className="group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-[#333]"
+							className="group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-white/[0.05] "
 						>
 							<div className="flex items-center overflow-hidden">
 								<span className="font-outfit truncate text-[13px] font-bold tracking-wider text-white">

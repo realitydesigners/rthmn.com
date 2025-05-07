@@ -66,7 +66,7 @@ const ColorInput = memo(
 
 		return (
 			<div className="group flex flex-col gap-2">
-				<div className="relative h-10 w-full overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C] transition-all duration-200 hover:border-[#333] hover:bg-[#111]">
+				<div className="relative h-10 w-full overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C] transition-all duration-200 hover:border-white/[0.05]  hover:bg-[#111]">
 					<div className="absolute inset-0 flex items-center px-3">
 						<span className="font-outfit text-[8px] font-medium tracking-wider text-[#666] uppercase">
 							{label}
@@ -105,8 +105,8 @@ const PresetButton = memo(
 			className={cn(
 				"group relative flex h-[72px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border bg-gradient-to-b p-2 transition-all duration-200",
 				isSelected
-					? "border-[#333] from-[#181818]/80 to-[#0F0F0F]/90 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#444] hover:from-[#1c1c1c]/80 hover:to-[#141414]/90"
-					: "border-[#222] from-[#141414]/30 to-[#0A0A0A]/40 hover:border-[#333] hover:from-[#181818]/40 hover:to-[#0F0F0F]/50",
+					? "border-white/[0.05]  from-[#181818]/80 to-[#0F0F0F]/90 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#444] hover:from-[#1c1c1c]/80 hover:to-[#141414]/90"
+					: "border-[#222] from-[#141414]/30 to-[#0A0A0A]/40 hover:border-white/[0.05]  hover:from-[#181818]/40 hover:to-[#0F0F0F]/50",
 			)}
 			style={{
 				backgroundImage: `radial-gradient(circle at 30% 30%, ${preset.positive}${isSelected ? "11" : "05"}, ${preset.negative}${isSelected ? "22" : "08"})`,

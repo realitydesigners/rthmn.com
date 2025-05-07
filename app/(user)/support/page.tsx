@@ -50,7 +50,7 @@ const MessageBubble = ({
 			<div
 				className={cn(
 					"group relative max-w-[80%] space-y-1 rounded-2xl px-4 py-3",
-					isUser ? "bg-emerald-500/10" : "bg-white/5",
+					isUser ? "bg-blue-500/10" : "bg-white/5",
 					"transition-all duration-200",
 				)}
 			>
@@ -332,7 +332,7 @@ export default function SupportPage() {
 										)}
 										<div className="mt-2 flex items-center gap-2">
 											{thread.status === "open" ? (
-												<span className="font-outfit text-xs text-emerald-400">
+												<span className="font-outfit text-xs text-blue-400">
 													Open
 												</span>
 											) : (
@@ -355,7 +355,7 @@ export default function SupportPage() {
 									type="text"
 									value={newThreadSubject}
 									onChange={(e) => setNewThreadSubject(e.target.value)}
-									className="font-outfit mt-2 block w-full rounded-lg border border-emerald-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-none"
+									className="font-outfit mt-2 block w-full rounded-lg border border-blue-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 focus:outline-none"
 									placeholder="Enter subject"
 									disabled={isLoading}
 								/>
@@ -419,7 +419,7 @@ export default function SupportPage() {
 										value={newMessage}
 										onChange={(e) => setNewMessage(e.target.value)}
 										placeholder="Type your message..."
-										className="font-outfit flex-1 rounded-lg border border-emerald-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 focus:outline-none"
+										className="font-outfit flex-1 rounded-lg border border-blue-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 focus:outline-none"
 									/>
 									<button
 										type="submit"

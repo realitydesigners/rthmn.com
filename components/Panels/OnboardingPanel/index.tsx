@@ -21,7 +21,7 @@ const OnboardingCard = ({
 	return (
 		<div
 			className={cn(
-				"group relative w-full overflow-hidden rounded-xl border border-[#333] bg-gradient-to-b from-[#1A1A1A] to-[#0D0D0D] transition-all duration-300 hover:scale-[1.01]",
+				"group relative w-full overflow-hidden rounded-xl border border-white/[0.05]  bg-gradient-to-b from-[#1A1A1A] to-[#0D0D0D] transition-all duration-300 hover:scale-[1.01]",
 			)}
 		>
 			{/* Highlight Effect */}
@@ -33,13 +33,6 @@ const OnboardingCard = ({
 
 			{/* Content */}
 			<div className="relative flex items-center gap-4 rounded-xl bg-black/40 p-3">
-				{isCompleted && (
-					<div className="absolute top-2 right-2">
-						<div className="flex h-4 w-4 items-center justify-center rounded-full bg-[#3FFFA2]/20">
-							<LuCheck className="h-3 w-3 text-[#3FFFA2]" />
-						</div>
-					</div>
-				)}
 				<div className="flex min-w-0 flex-1 flex-col">
 					<div className="flex items-center justify-between">
 						<h3
@@ -70,11 +63,11 @@ const OnboardingCard = ({
 
 					<div className="mt-1">
 						{isCompleted ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-[#3FFFA2]/20 bg-[#3FFFA2]/10 px-2 py-0.5 text-[10px] font-medium text-[#3FFFA2]">
+							<span className="inline-flex items-center gap-1 rounded-full border border-blue-400/20 bg-blue-400/10 px-2 py-0.5 text-[10px] font-medium text-blue-400">
 								Completed
 							</span>
 						) : isCurrent ? (
-							<span className="inline-flex items-center gap-1 rounded-full border border-[#3FFFA2]/10 bg-[#3FFFA2]/5 px-2 py-0.5 text-[10px] font-medium text-[#3FFFA2]/80">
+							<span className="inline-flex items-center gap-1 rounded-full border border-blue-400/10 bg-blue-400/5 px-2 py-0.5 text-[10px] font-medium text-blue-400/80">
 								In Progress
 							</span>
 						) : (
@@ -100,15 +93,15 @@ export const Onboarding = () => {
 		<div className="no-select space-y-6 p-4 pb-16">
 			{/* Header */}
 			<div className="mb-6 flex flex-col">
-				<div className="flex flex-col">
+				{/* <div className="flex flex-col">
 					<h2 className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-xl font-bold text-transparent">
 						Onboarding Progress
 					</h2>
-				</div>
-				<div className="mt-2 flex items-center gap-2">
+				</div> */}
+				<div className="flex items-center gap-2">
 					<div className="h-1.5 flex-1 rounded-full bg-[#222]">
 						<div
-							className="h-full rounded-full bg-gradient-to-r from-[#3FFFA2] to-[#3FFFA2]/80 transition-all duration-300"
+							className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80 transition-all duration-300"
 							style={{
 								width: `${(completedSteps.length / ONBOARDING_STEPS.length) * 100}%`,
 							}}
@@ -136,7 +129,7 @@ export const Onboarding = () => {
 			{process.env.NODE_ENV === "development" && (
 				<button
 					onClick={handleClearOnboarding}
-					className="group relative mt-2 w-full rounded-lg bg-gradient-to-b from-[#3FFFA2]/20 to-[#3FFFA2]/10 px-3 py-1.5 text-xs font-medium text-[#3FFFA2] transition-all duration-200 hover:from-[#3FFFA2]/30 hover:to-[#3FFFA2]/20 hover:shadow-lg hover:shadow-[#3FFFA2]/20"
+					className="group relative mt-2 w-full rounded-lg bg-gradient-to-b from-blue-400/20 to-blue-400/10 px-3 py-1.5 text-xs font-medium text-blue-400 transition-all duration-200 hover:from-blue-400/30 hover:to-blue-400/20 hover:shadow-lg hover:shadow-blue-400/20"
 				>
 					<div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 					Clear Progress

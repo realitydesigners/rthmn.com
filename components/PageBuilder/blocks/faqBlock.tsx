@@ -59,7 +59,7 @@ const FAQItem = memo(
 				<div
 					className={`relative overflow-hidden rounded-xl border transition-all duration-300 ${
 						isActive
-							? "border-emerald-400/50 bg-emerald-400/5 shadow-lg shadow-emerald-400/10"
+							? "border-blue-400/50 bg-blue-400/5 shadow-lg shadow-blue-400/10"
 							: "border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60"
 					}`}
 				>
@@ -76,7 +76,7 @@ const FAQItem = memo(
 					>
 						<div className="flex items-center gap-4">
 							<FaQuestionCircle
-								className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? "text-emerald-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
+								className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? "text-blue-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
 							/>
 							<h3 className="text-left text-lg font-medium text-white">
 								{item.question}
@@ -85,7 +85,7 @@ const FAQItem = memo(
 						<motion.div
 							animate={{ rotate: isActive ? 180 : 0 }}
 							transition={{ duration: 0.3 }}
-							className={`transition-colors duration-300 ${isActive ? "text-emerald-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
+							className={`transition-colors duration-300 ${isActive ? "text-blue-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
 						>
 							<FaChevronDown className="h-5 w-5" />
 						</motion.div>
@@ -136,14 +136,14 @@ const SearchInput = memo(
 	}: { value: string; onChange: (value: string) => void }) => (
 		<div className="group relative mb-8">
 			<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-				<FaSearch className="h-5 w-5 text-neutral-400 transition-colors duration-300 group-focus-within:text-emerald-400" />
+				<FaSearch className="h-5 w-5 text-neutral-400 transition-colors duration-300 group-focus-within:text-blue-400" />
 			</div>
 			<input
 				type="text"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				placeholder="Search questions..."
-				className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-emerald-400/50 focus:bg-emerald-400/5 focus:ring-2 focus:ring-emerald-400/20 focus:outline-none"
+				className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20 focus:outline-none"
 			/>
 			<div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
 		</div>
@@ -168,7 +168,7 @@ const CategoryFilter = memo(
 				onClick={() => onSelect("all")}
 				className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
 					selected === "all"
-						? "border-emerald-400/50 bg-emerald-400/10 text-emerald-400"
+						? "border-blue-400/50 bg-blue-400/10 text-blue-400"
 						: "border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:bg-white/10 hover:text-neutral-400"
 				}`}
 			>
@@ -182,7 +182,7 @@ const CategoryFilter = memo(
 					onClick={() => onSelect(category)}
 					className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition-all duration-300 ${
 						selected === category
-							? "border-emerald-400/50 bg-emerald-400/10 text-emerald-400"
+							? "border-blue-400/50 bg-blue-400/10 text-blue-400"
 							: "border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:bg-white/10 hover:text-neutral-400"
 					}`}
 				>
@@ -269,7 +269,7 @@ export function FAQBlock({
 					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
 						Everything you need to know about rthmn. Can't find the answer
 						you're looking for? Contact us at{" "}
-						<button type="button" className="text-emerald-400">
+						<button type="button" className="text-blue-400">
 							hello@rthmn.com
 						</button>
 					</p>

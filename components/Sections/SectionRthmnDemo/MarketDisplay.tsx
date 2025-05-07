@@ -112,7 +112,7 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
 									</h4>
 								</div>
 								<span
-									className={`font-kodemono text-xs ${priceChange && priceChange >= 0 ? "text-green-400" : "text-red-400"}`}
+									className={`font-kodemono text-xs ${priceChange && priceChange >= 0 ? "text-blue-400" : "text-red-400"}`}
 								>
 									{priceChange ? `${priceChange.toFixed(2)}%` : "N/A"}
 								</span>

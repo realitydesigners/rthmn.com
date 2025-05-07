@@ -68,7 +68,7 @@ export const Histogram: React.FC<HistoricalPatternViewProps> = ({
 												key={boxNumber}
 												className={`group absolute left-0 cursor-pointer transition-all duration-300 ${
 													isUp
-														? "border-emerald-500/50 bg-emerald-500/40 shadow-emerald-500/30"
+														? "border-blue-500/50 bg-blue-500/40 shadow-blue-500/30"
 														: "border-red-500/40 bg-red-500/30 shadow-red-500/30"
 												} border shadow-[0_0_4px]`}
 												style={{

@@ -60,14 +60,14 @@ export function SectionAboutAlgorithm() {
 						>
 							<div className="mb-4 flex items-center justify-between">
 								<div className="flex items-center gap-3">
-									<div className="flex h-10 w-10 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/10">
-										<market.icon className="h-5 w-5 text-emerald-400" />
+									<div className="flex h-10 w-10 items-center justify-center rounded-full border border-blue-400/20 bg-blue-400/10">
+										<market.icon className="h-5 w-5 text-blue-400" />
 									</div>
 									<h3 className="font-outfit text-xl font-semibold text-white/90">
 										{market.title}
 									</h3>
 								</div>
-								<span className="rounded-full bg-emerald-400/10 px-3 py-1 text-sm font-medium text-emerald-400">
+								<span className="rounded-full bg-blue-400/10 px-3 py-1 text-sm font-medium text-blue-400">
 									{market.stats}
 								</span>
 							</div>

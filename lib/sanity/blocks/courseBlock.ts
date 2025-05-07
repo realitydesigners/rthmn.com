@@ -532,11 +532,11 @@ export default defineType({
 							type: "string",
 							options: {
 								list: [
-									{ title: "Green & Red", value: "green-red" },
+									{ title: "blue & Red", value: "blue-red" },
 									{ title: "Blue & Orange", value: "blue-orange" },
 								],
 							},
-							initialValue: "green-red",
+							initialValue: "blue-red",
 						},
 						{
 							name: "animationSpeed",

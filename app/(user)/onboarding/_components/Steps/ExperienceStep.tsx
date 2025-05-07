@@ -70,15 +70,15 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 							onClick={() => setExperience(level.id)}
 							className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b p-0.5 transition-all duration-300 ${
 								isSelected
-									? "border-[#3FFFA2]/50 from-[#3FFFA2]/20 to-[#3FFFA2]/0"
-									: "border-[#333] from-[#1A1A1A] to-[#0D0D0D] hover:border-[#3FFFA2]/30 hover:from-[#1A1A1A] hover:to-[#111]"
+									? "border-blue-400/50 from-blue-400/20 to-blue-400/0"
+									: "border-white/[0.05] from-[#0A0B0D] to-[#070809] hover:border-blue-400/30 hover:from-[#1A1A1A] hover:to-[#111]"
 							}`}
 						>
 							{/* Highlight Effect */}
 							<div
 								className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-300 ${
 									isSelected
-										? "from-[#3FFFA2]/10 to-transparent opacity-100"
+										? "from-blue-400/10 to-transparent opacity-100"
 										: "from-white/5 to-transparent opacity-0 group-hover:opacity-100"
 								}`}
 							/>
@@ -89,7 +89,7 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 								<div
 									className={`rounded-lg bg-gradient-to-b p-3 transition-colors duration-300 ${
 										isSelected
-											? "from-[#3FFFA2]/30 via-[#3FFFA2]/10 to-[#3FFFA2]/5 text-[#3FFFA2]"
+											? "from-blue-400/30 via-blue-400/10 to-blue-400/5 text-blue-400"
 											: "from-white/10 via-white/5 to-transparent text-neutral-400 group-hover:text-neutral-300"
 									}`}
 								>
@@ -112,7 +112,7 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 
 								{/* Selection Indicator */}
 								<div
-									className={`h-2 w-2 rounded-full transition-colors duration-300 ${isSelected ? "bg-[#3FFFA2]" : "bg-[#333] group-hover:bg-[#444]"}`}
+									className={`h-2 w-2 rounded-full transition-colors duration-300 ${isSelected ? "bg-blue-400" : "bg-[#333] group-hover:bg-[#444]"}`}
 								/>
 							</div>
 						</motion.button>

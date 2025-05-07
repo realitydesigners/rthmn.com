@@ -38,8 +38,8 @@ export const TradeStats = memo(
 						label: "Target Distance",
 						value: `${profitPips.toFixed(1)} pips`,
 						icon: <FaChartLine />,
-						color: "text-emerald-400",
-						bgColor: "bg-emerald-400/10",
+						color: "text-blue-400",
+						bgColor: "bg-blue-400/10",
 					},
 					{
 						label: "Win Rate Needed",
