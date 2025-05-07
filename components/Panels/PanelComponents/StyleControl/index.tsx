@@ -16,16 +16,16 @@ export const StyleControl: React.FC<{
             {!hideLabel && (
                 <div className='flex items-center justify-between px-0.5'>
                     <div className='flex items-center gap-2'>
-                        <span className='font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase'>
+                        <span className='font-outfit text-[8px] font-medium tracking-wider text-white/50 uppercase'>
                             {label}
                         </span>
                     </div>
                     <div className='flex items-center gap-1'>
-                        <span className='font-kodemono text-xs text-white/70'>
+                        <span className='font-outfit text-[8px] text-white/70'>
                             {step < 1 ? value.toFixed(2) : value}
                         </span>
                         {unit && (
-                            <span className='font-kodemono text-[9px] tracking-wider text-white/30 uppercase'>
+                            <span className='font-outfit text-[8px] tracking-wider text-white/30 uppercase'>
                                 {unit}
                             </span>
                         )}

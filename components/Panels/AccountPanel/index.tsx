@@ -8,7 +8,7 @@ import CustomerPortalForm from './CustomerPortalForm';
 import DiscordConnectionForm from './DiscordConnectionForm';
 import ProfilePhotoForm from './ProfilePhotoForm';
 
-const AccountPanel = () => {
+export const AccountPanel = () => {
     const { user, userDetails, subscription, discordConnection, isLoading, signOut } = useAuth();
     const router = useRouter();
     const [isSigningOut, setIsSigningOut] = useState(false);
@@ -118,5 +118,3 @@ const AccountPanel = () => {
         </div>
     );
 };
-
-export default AccountPanel;
