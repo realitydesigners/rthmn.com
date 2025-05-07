@@ -126,7 +126,7 @@ const MarketHeading = memo(() => (
 
 			{/* Updated CTA buttons */}
 			<div className="mt-12 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
-				<StartButton href="#pricing" variant="shimmer">
+				<StartButton href="/pricing" variant="shimmer">
 					Get Started
 				</StartButton>
 			</div>

@@ -49,7 +49,7 @@ export const SectionHero: React.FC<BoxComponentProps> = ({ marketData }) => {
 						predictive patterns, giving you a unique edge.
 					</p>
 					<div className="mt-6 flex gap-6">
-						<StartButton href="#pricing" custom={0} />
+						<StartButton href="/pricing" custom={0} />
 					</div>
 				</motion.div>
 			</div>
