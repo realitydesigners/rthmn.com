@@ -33,11 +33,11 @@ const MARKETS = [
 export function SectionAboutAlgorithm() {
 	return (
 		<section className="relative z-100 px-8 px-[5vw] py-12 xl:px-[15vw] 2xl:px-[15vw]">
-			<div className="relative rounded-xl border border-white/10 bg-black/90 p-6 backdrop-blur-md">
+			<div className="relative rounded-xl border border-[#1C1E23] bg-black/90 p-6 backdrop-blur-md">
 				{/* Effects */}
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#BFC2CA] to-transparent" />
 				</div>
 
 				<div className="mb-8 text-center">
@@ -56,7 +56,7 @@ export function SectionAboutAlgorithm() {
 							key={market.title}
 							whileHover={{ scale: 1.02 }}
 							whileTap={{ scale: 0.98 }}
-							className="group relative overflow-hidden rounded-lg border border-white/5 bg-black/40 p-6 hover:border-white/10"
+							className="group relative overflow-hidden rounded-lg border border-[#1C1E23] bg-black/40 p-6 hover:border-[#1C1E23]"
 						>
 							<div className="mb-4 flex items-center justify-between">
 								<div className="flex items-center gap-3">
@@ -76,7 +76,7 @@ export function SectionAboutAlgorithm() {
 								{market.description}
 							</p>
 
-							<div className="font-kodemono text-sm text-neutral-400">
+							<div className="font-dmmono  text-sm primary-text">
 								{market.highlight}
 							</div>
 						</motion.div>

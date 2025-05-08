@@ -87,13 +87,13 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
 				"group relative flex h-[72px] flex-col items-center justify-center gap-2 rounded-lg border transition-all duration-300",
 				isActive
 					? [
-							"border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+							"border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
 							"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
-							"hover:border-white/[0.05] hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
+							"hover:border-[#1C1E23] hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
 						]
 					: [
-							"border-white/[0.02] bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/80",
-							"hover:border-white/[0.05] hover:shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+							"border-[#111215] bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/80",
+							"hover:border-[#1C1E23] hover:shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
 						],
 				locked ? "pointer-events-none opacity-90" : "cursor-pointer",
 			)}
@@ -154,7 +154,7 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
 			{locked && (
 				<div className="pointer-events-none absolute -top-1 -right-1 flex items-center">
 					<div className="flex h-5 items-center gap-1">
-						<div className="flex h-5 w-5 items-center justify-center rounded-full border border-white/[0.05]  bg-gradient-to-b from-black/90 to-black/95 shadow-[0_2px_4px_rgba(0,0,0,0.4)] backdrop-blur-[1px]">
+						<div className="flex h-5 w-5 items-center justify-center rounded-full border border-[#1C1E23]  bg-gradient-to-b from-black/90 to-black/95 shadow-[0_2px_4px_rgba(0,0,0,0.4)] backdrop-blur-[1px]">
 							<LuLock className="h-2.5 w-2.5 text-white/80" />
 						</div>
 					</div>
@@ -189,9 +189,9 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
 					className={cn(
 						"relative transition-all duration-300",
 						isActive
-							? "text-[#888] group-hover:text-white"
-							: "text-[#666] group-hover:text-[#888]",
-						locked ? "text-[#666] opacity-40" : "group-hover:scale-105",
+							? "text-[#545963] group-hover:text-white"
+							: "text-[#32353C] group-hover:text-[#545963]",
+						locked ? "text-[#32353C] opacity-40" : "group-hover:scale-105",
 					)}
 				/>
 			</div>
@@ -201,10 +201,10 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
 				className={cn(
 					"font-outfit text-[13px] font-medium tracking-wide transition-all duration-300",
 					locked
-						? "text-[#666]/40"
+						? "text-[#32353C]/40"
 						: isActive
-							? "text-[#888]"
-							: "text-[#666] group-hover:text-[#888]",
+							? "text-[#545963]"
+							: "text-[#32353C] group-hover:text-[#545963]",
 				)}
 			>
 				{title}

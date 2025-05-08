@@ -30,16 +30,16 @@ export const StyleControl: React.FC<StyleControlProps> = ({
 			{!hideLabel && (
 				<div className="flex items-center justify-between px-0.5">
 					<div className="flex items-center gap-2">
-						<span className="font-kodemono text-[10px] font-medium tracking-wider text-white/50 uppercase">
+						<span className="font-dmmono  text-[10px] font-medium tracking-wider text-[#BFC2CA] uppercase">
 							{label}
 						</span>
 					</div>
 					<div className="flex items-center gap-1">
-						<span className="font-kodemono text-xs text-white/70">
+						<span className="font-dmmono  text-xs text-white/70">
 							{step < 1 ? value.toFixed(2) : value}
 						</span>
 						{unit && (
-							<span className="font-kodemono text-[9px] tracking-wider text-white/30 uppercase">
+							<span className="font-dmmono  text-[9px] tracking-wider text-white/30 uppercase">
 								{unit}
 							</span>
 						)}
@@ -48,14 +48,14 @@ export const StyleControl: React.FC<StyleControlProps> = ({
 			)}
 			<div className="relative">
 				{preview && (
-					<div className="mb-2 h-10 rounded-md border border-white/[0.08] bg-white/[0.02]">
+					<div className="mb-2 h-10 rounded-md border border-white/[0.08] bg-[#111215]">
 						{preview}
 					</div>
 				)}
 				<div className="absolute inset-y-0 left-0 flex w-full items-center px-2">
 					<div className="relative h-[1px] w-full bg-white/[0.06]">
 						<div
-							className="absolute h-full bg-gradient-to-r from-white/20 to-white/10"
+							className="absolute h-full bg-gradient-to-r from-[#32353C] to-[#1C1E23]"
 							style={{ width: `${percentage}%` }}
 						/>
 					</div>

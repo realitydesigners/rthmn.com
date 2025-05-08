@@ -102,7 +102,7 @@ export const SectionHistogram = () => {
 				<h2 className="font-outfit text-neutral-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
 					Visualize Market Dynamics
 				</h2>
-				<p className="font-outfit text-md mx-auto mt-4 max-w-2xl text-neutral-400 sm:text-lg lg:text-xl">
+				<p className="font-outfit text-md mx-auto mt-4 max-w-2xl primary-text sm:text-lg lg:text-xl">
 					Dive deep into order flow with our volume profile histogram. Identify
 					key support/resistance levels and understand market conviction at a
 					glance.
@@ -110,7 +110,7 @@ export const SectionHistogram = () => {
 			</div>
 
 			{/* Histogram Container - Add relative positioning for overlay */}
-			<div className="relative mx-auto w-full max-w-7xl rounded-xl border border-white/10 bg-white/5 p-4 shadow-lg lg:px-[5vw]">
+			<div className="relative mx-auto w-full max-w-7xl rounded-xl border border-[#1C1E23] bg-[#1C1E23] p-4 shadow-lg lg:px-[5vw]">
 				<Histogram
 					tableRef={tableRef}
 					demoStep={demoStep}
@@ -139,16 +139,14 @@ export const SectionHistogram = () => {
 					<div key={benefit.title} className="text-center">
 						<div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-neutral-800">
 							<benefit.icon
-								className="h-6 w-6 text-neutral-400"
+								className="h-6 w-6 primary-text"
 								aria-hidden="true"
 							/>
 						</div>
 						<h3 className="font-outfit mt-6 text-lg font-semibold text-white">
 							{benefit.title}
 						</h3>
-						<p className="mt-2 text-base text-neutral-400">
-							{benefit.description}
-						</p>
+						<p className="mt-2 text-base primary-text">{benefit.description}</p>
 					</div>
 				))}
 			</div>

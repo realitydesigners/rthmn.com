@@ -33,7 +33,7 @@ export function LearnPageClient({ courses }: { courses: Course[] }) {
 					{courses.map((course) => (
 						<Link key={course._id} href={`/learn/${course.slug.current}`}>
 							<div className="group relative">
-								<div className="relative overflow-hidden rounded-xl border border-white/[0.05] bg-gradient-to-r from-[#0c0c0c] to-black/40 p-6 transition-all duration-300 hover:border-white/[0.1]">
+								<div className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-gradient-to-r from-[#0c0c0c] to-black/40 p-6 transition-all duration-300 hover:border-white/[0.1]">
 									<div className="flex items-center justify-between">
 										{/* Left side with icon and info */}
 										<div className="flex items-center gap-5">

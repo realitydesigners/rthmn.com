@@ -627,7 +627,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 												/>
 												<div className="ml-1">
 													<span
-														className="font-kodemono text-[8px] tracking-wider"
+														className="font-dmmono  text-[8px] tracking-wider"
 														style={{ color }}
 													>
 														{formatPrice(largestBox.high, "BTC/USD")}
@@ -641,7 +641,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 												/>
 												<div className="ml-1">
 													<span
-														className="font-kodemono text-[8px] tracking-wider"
+														className="font-dmmono  text-[8px] tracking-wider"
 														style={{ color }}
 													>
 														{formatPrice(largestBox.low, "BTC/USD")}

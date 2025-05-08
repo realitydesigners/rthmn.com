@@ -30,7 +30,7 @@ export const Histogram: React.FC<HistoricalPatternViewProps> = ({
 
 	return (
 		<div
-			className="font-kodemonoborder-neutral flex w-full items-center justify-center overflow-hidden rounded-lg"
+			className="font-dmmono border-neutral flex w-full items-center justify-center overflow-hidden rounded-lg"
 			style={{
 				height: `${availableHeight + 25}px`,
 				padding: "0px",

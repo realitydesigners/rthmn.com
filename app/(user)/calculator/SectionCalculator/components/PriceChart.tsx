@@ -16,10 +16,10 @@ export const PriceChart = memo(
 		const ratio = profitDistance / riskDistance;
 
 		return (
-			<div className="relative h-[300px] w-full rounded-xl border border-white/10 bg-black/40 p-6">
+			<div className="relative h-[300px] w-full rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 				</div>
 
 				<div className="relative h-full">
@@ -33,7 +33,7 @@ export const PriceChart = memo(
 					>
 						<div className="absolute -top-3 right-0 flex items-center gap-2">
 							<div className="rounded bg-blue-400/10 px-2 py-1">
-								<span className="font-kodemono text-xs text-blue-400">
+								<span className="font-dmmono  text-xs text-blue-400">
 									Take Profit: ${takeProfit.toFixed(2)}
 								</span>
 							</div>
@@ -49,8 +49,8 @@ export const PriceChart = memo(
 						style={{ top: "50%" }}
 					>
 						<div className="absolute -top-3 right-0 flex items-center gap-2">
-							<div className="rounded bg-white/10 px-2 py-1">
-								<span className="font-kodemono text-xs text-white">
+							<div className="rounded bg-[#1C1E23] px-2 py-1">
+								<span className="font-dmmono  text-xs text-white">
 									Entry: ${entryPrice.toFixed(2)}
 								</span>
 							</div>
@@ -67,7 +67,7 @@ export const PriceChart = memo(
 					>
 						<div className="absolute -top-3 right-0 flex items-center gap-2">
 							<div className="rounded bg-red-400/10 px-2 py-1">
-								<span className="font-kodemono text-xs text-red-400">
+								<span className="font-dmmono  text-xs text-red-400">
 									Stop Loss: ${stopLoss.toFixed(2)}
 								</span>
 							</div>
@@ -96,8 +96,8 @@ export const PriceChart = memo(
 
 					{/* Risk/Reward Label */}
 					<div className="absolute bottom-4 left-4">
-						<div className="rounded-full bg-white/5 px-3 py-1">
-							<span className="font-kodemono text-sm text-white/60">
+						<div className="rounded-full bg-[#1C1E23] px-3 py-1">
+							<span className="font-dmmono  text-sm text-white/60">
 								Risk/Reward: 1:{ratio.toFixed(2)}
 							</span>
 						</div>

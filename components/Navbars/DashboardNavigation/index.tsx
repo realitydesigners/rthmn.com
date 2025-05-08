@@ -36,9 +36,9 @@ const ProfileIcon = ({
 					setIsDropdownOpen(!isDropdownOpen);
 					setActivePanel("profile");
 				}}
-				className="group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+				className="group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 			>
-				<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+				<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23]">
 					<div className="relative flex h-11 w-11 items-center justify-center overflow-hidden rounded-full bg-black">
 						{userDetails?.avatar_url ? (
 							<Image
@@ -162,7 +162,7 @@ export const DashboardNavigation = () => {
 					scrollDirection === "down" ? "translate-y-24" : "translate-y-0"
 				}`}
 			>
-				<div className="flex h-full gap-2 rounded-full border border-[#222] bg-black px-2 py-2">
+				<div className="flex h-full gap-2 rounded-full border border-[#0A0B0D] bg-black px-2 py-2">
 					<ProfileIcon setActivePanel={setActivePanel} />
 					<SidebarIconButton
 						icon={LuSearch}
@@ -195,12 +195,12 @@ const SidebarIconButton = ({
 			<div
 				className={`group flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
 					isActive
-						? "from-[#444444] to-[#282828]"
-						: "from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]"
+						? "from-[#32353C] to-[#282828]"
+						: "from-[#32353C] to-[#1C1E23] hover:from-[#32353C] hover:to-[#282828]"
 				}`}
 			>
 				<div
-					className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] ${
+					className={`flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23] ${
 						isActive ? "text-white" : "text-[#818181]"
 					}`}
 				>

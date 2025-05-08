@@ -35,6 +35,6 @@ export const getRiskLevelColor = (level: RiskTemplate["riskLevel"]) => {
 		case "high":
 			return "text-amber-400 bg-amber-400/10";
 		default:
-			return "text-neutral-400 bg-neutral-400/10";
+			return "primary-text bg-neutral-400/10";
 	}
 };

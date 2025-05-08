@@ -112,18 +112,18 @@ export function MarketDisplay({ marketData }: SectionMarketDisplayProps) {
 									</h4>
 								</div>
 								<span
-									className={`font-kodemono text-xs ${priceChange && priceChange >= 0 ? "text-blue-400" : "text-red-400"}`}
+									className={`font-dmmono  text-xs ${priceChange && priceChange >= 0 ? "text-blue-400" : "text-red-400"}`}
 								>
 									{priceChange ? `${priceChange.toFixed(2)}%` : "N/A"}
 								</span>
 							</div>
-							<div className="font-kodemono mb-2 text-2xl font-bold text-white">
+							<div className="font-dmmono  mb-2 text-2xl font-bold text-white">
 								{latestPrice
 									? latestPrice.toFixed(item.pair.includes("JPY") ? 3 : 5)
 									: "N/A"}
 							</div>
 							{getDayHighLow(item.candleData) && (
-								<div className="font-kodemono mb-6 flex justify-between text-xs text-white/60">
+								<div className="font-dmmono  mb-6 flex justify-between text-xs text-white/60">
 									<span>
 										High:{" "}
 										{getDayHighLow(item.candleData)?.high.toFixed(

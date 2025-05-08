@@ -200,7 +200,7 @@ export function MobileNavigation({
 				animate={{ y: isScrolled ? 0 : 100 }}
 				transition={{ duration: 0.3 }}
 			>
-				<div className="flex h-14 items-center gap-2 rounded-full border border-white/[0.05]  bg-[#111] px-3 py-2 shadow-lg backdrop-blur-md">
+				<div className="flex h-14 items-center gap-2 rounded-full border border-[#1C1E23]  bg-[#111] px-3 py-2 shadow-lg backdrop-blur-md">
 					<div className="flex items-center">
 						<FaBook className="mr-2 h-5 w-5 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
 						<div className="max-w-[150px] truncate text-sm font-medium text-white">
@@ -209,9 +209,9 @@ export function MobileNavigation({
 					</div>
 					<button
 						onClick={() => setIsOpen(true)}
-						className="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#333] via-[#222] to-[#111] p-[1px] shadow-md transition-all duration-200 hover:from-indigo-900 hover:via-indigo-800 hover:to-indigo-900"
+						className="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#32353C] via-[#0A0B0D] to-[#111] p-[1px] shadow-md transition-all duration-200 hover:from-indigo-900 hover:via-indigo-800 hover:to-indigo-900"
 					>
-						<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-[#222] to-[#111]">
+						<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-[#0A0B0D] to-[#111]">
 							<FaChevronUp className="h-4 w-4 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
 						</div>
 					</button>
@@ -223,7 +223,7 @@ export function MobileNavigation({
 				{isOpen && (
 					<motion.div
 						ref={panelRef}
-						className="fixed right-0 bottom-0 left-0 z-[120] flex flex-col rounded-t-xl border-t border-white/[0.05]  bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden"
+						className="fixed right-0 bottom-0 left-0 z-[120] flex flex-col rounded-t-xl border-t border-[#1C1E23]  bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden"
 						style={{ height: "60vh", maxHeight: "calc(100vh - 80px)" }}
 						initial={{ opacity: 0, y: 300 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -231,8 +231,8 @@ export function MobileNavigation({
 						transition={{ duration: 0.3 }}
 					>
 						{/* Panel Header with handle for dragging */}
-						<div className="flex flex-col border-b border-white/[0.05] ">
-							<div className="mx-auto my-2 h-1 w-16 rounded-full bg-[#444]"></div>
+						<div className="flex flex-col border-b border-[#1C1E23] ">
+							<div className="mx-auto my-2 h-1 w-16 rounded-full bg-[#32353C]"></div>
 							<div className="flex items-center justify-between p-4">
 								<div className="flex items-center gap-2">
 									<FaBook className="h-5 w-5 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
@@ -242,7 +242,7 @@ export function MobileNavigation({
 								</div>
 								<button
 									onClick={() => setIsOpen(false)}
-									className="flex h-8 w-8 items-center justify-center rounded-full bg-[#222] text-neutral-400 shadow-inner hover:text-white"
+									className="flex h-8 w-8 items-center justify-center rounded-full bg-[#0A0B0D] primary-text shadow-inner hover:text-white"
 								>
 									<FaTimes className="h-4 w-4" />
 								</button>
@@ -250,12 +250,12 @@ export function MobileNavigation({
 						</div>
 
 						{/* Tabs */}
-						<div className="flex border-b border-white/[0.05] ">
+						<div className="flex border-b border-[#1C1E23] ">
 							<button
 								className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
 									activeTab === "course"
 										? "border-b-2 border-indigo-500 text-indigo-300"
-										: "text-neutral-400 hover:text-white"
+										: "primary-text hover:text-white"
 								}`}
 								onClick={() => setActiveTab("course")}
 							>
@@ -266,7 +266,7 @@ export function MobileNavigation({
 									className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
 										activeTab === "toc"
 											? "border-b-2 border-indigo-500 text-indigo-300"
-											: "text-neutral-400 hover:text-white"
+											: "primary-text hover:text-white"
 									}`}
 									onClick={() => setActiveTab("toc")}
 								>
@@ -283,7 +283,7 @@ export function MobileNavigation({
 									{/* Back to Learning Center */}
 									<Link
 										href="/learn"
-										className="mb-6 flex items-center gap-2 text-sm text-neutral-400 transition-colors hover:text-white"
+										className="mb-6 flex items-center gap-2 text-sm primary-text transition-colors hover:text-white"
 									>
 										<FaArrowLeft className="h-3 w-3" />
 										Back to Learning Center
@@ -292,14 +292,14 @@ export function MobileNavigation({
 									{/* Progress Bar */}
 									<div>
 										<div className="mb-2 flex items-center justify-between">
-											<span className="text-sm text-neutral-400">
+											<span className="text-sm primary-text">
 												Course Progress
 											</span>
 											<span className="text-sm font-medium text-indigo-300">
 												{Math.round(progress)}%
 											</span>
 										</div>
-										<div className="h-2 rounded-full bg-[#222]">
+										<div className="h-2 rounded-full bg-[#0A0B0D]">
 											<div
 												className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 transition-all duration-300"
 												style={{ width: `${progress}%` }}
@@ -311,7 +311,7 @@ export function MobileNavigation({
 									<div className="space-y-6">
 										{course.chapters.map((chapter) => (
 											<div key={chapter._id} className="space-y-2">
-												<h3 className="text-sm font-semibold tracking-wider text-neutral-400 uppercase">
+												<h3 className="text-sm font-semibold tracking-wider primary-text uppercase">
 													{chapter.title}
 												</h3>
 												<div className="space-y-1">
@@ -331,11 +331,11 @@ export function MobileNavigation({
 																className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
 																	isActive
 																		? "bg-gradient-to-r from-[#111] to-[#161633] text-indigo-300"
-																		: "text-neutral-400 hover:bg-[#111] hover:text-white"
+																		: "primary-text hover:bg-[#111] hover:text-white"
 																}`}
 																onClick={() => setIsOpen(false)}
 															>
-																<div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#222] text-sm shadow-inner">
+																<div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#0A0B0D] text-sm shadow-inner">
 																	{index + 1}
 																</div>
 																<span className="flex-1 text-sm">
@@ -357,7 +357,7 @@ export function MobileNavigation({
 							{/* Table of Contents Tab */}
 							{activeTab === "toc" && lesson && (
 								<div className="p-4">
-									<h4 className="mb-4 text-sm font-semibold text-neutral-400">
+									<h4 className="mb-4 text-sm font-semibold primary-text">
 										On this page
 									</h4>
 									<ul className="space-y-2 text-sm">
@@ -373,7 +373,7 @@ export function MobileNavigation({
 													className={`inline-block w-full text-left transition-all duration-200 ${
 														activeId === heading.id
 															? "rounded-lg bg-gradient-to-r from-[#111] to-[#161633] p-2 font-medium text-indigo-300"
-															: "text-neutral-400 hover:text-white"
+															: "primary-text hover:text-white"
 													}`}
 												>
 													{heading.text}

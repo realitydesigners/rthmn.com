@@ -34,7 +34,7 @@ export const SectionCTA = () => {
 					>
 						Ready to Elevate Your Trading?
 					</h2>
-					<p className="font-outfit mx-auto mt-6 max-w-xl text-lg text-neutral-400">
+					<p className="font-outfit mx-auto mt-6 max-w-xl text-lg primary-text">
 						Join RTHMN today and start identifying high-probability patterns
 						with confidence. Gain your edge.
 					</p>

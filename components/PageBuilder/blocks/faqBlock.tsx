@@ -60,13 +60,13 @@ const FAQItem = memo(
 					className={`relative overflow-hidden rounded-xl border transition-all duration-300 ${
 						isActive
 							? "border-blue-400/50 bg-blue-400/5 shadow-lg shadow-blue-400/10"
-							: "border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60"
+							: "border-[#1C1E23] bg-black/40 hover:border-[#1C1E23] hover:bg-black/60"
 					}`}
 				>
 					{/* Glow effects */}
 					<div className="pointer-events-none absolute inset-0">
 						<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 					</div>
 
 					<button
@@ -76,7 +76,7 @@ const FAQItem = memo(
 					>
 						<div className="flex items-center gap-4">
 							<FaQuestionCircle
-								className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? "text-blue-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
+								className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? "text-blue-400" : "primary-text group-hover:primary-text"}`}
 							/>
 							<h3 className="text-left text-lg font-medium text-white">
 								{item.question}
@@ -85,7 +85,7 @@ const FAQItem = memo(
 						<motion.div
 							animate={{ rotate: isActive ? 180 : 0 }}
 							transition={{ duration: 0.3 }}
-							className={`transition-colors duration-300 ${isActive ? "text-blue-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
+							className={`transition-colors duration-300 ${isActive ? "text-blue-400" : "primary-text group-hover:primary-text"}`}
 						>
 							<FaChevronDown className="h-5 w-5" />
 						</motion.div>
@@ -100,10 +100,10 @@ const FAQItem = memo(
 						transition={{ duration: 0.3 }}
 						className="overflow-hidden"
 					>
-						<div className="border-t border-white/5 px-6 py-6">
+						<div className="border-t border-[#1C1E23] px-6 py-6">
 							<div className="flex gap-4">
 								<div className="mt-2 flex h-5 w-5 shrink-0 items-center justify-center">
-									<FaCommentAlt className="min-h-5 min-w-5 text-neutral-400" />
+									<FaCommentAlt className="min-h-5 min-w-5 primary-text" />
 								</div>
 								<div className="prose prose-invert max-w-none text-base leading-relaxed text-white/70">
 									<PortableText
@@ -114,7 +114,7 @@ const FAQItem = memo(
 							</div>
 							{item.category && (
 								<div className="mt-4 flex items-center gap-2">
-									<span className="rounded-full bg-white/5 px-3 py-1 text-xs text-neutral-400">
+									<span className="rounded-full  px-3 py-1 text-xs primary-text">
 										{item.category}
 									</span>
 								</div>
@@ -136,16 +136,16 @@ const SearchInput = memo(
 	}: { value: string; onChange: (value: string) => void }) => (
 		<div className="group relative mb-8">
 			<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-				<FaSearch className="h-5 w-5 text-neutral-400 transition-colors duration-300 group-focus-within:text-blue-400" />
+				<FaSearch className="h-5 w-5 primary-text transition-colors duration-300 group-focus-within:text-blue-400" />
 			</div>
 			<input
 				type="text"
 				value={value}
 				onChange={(e) => onChange(e.target.value)}
 				placeholder="Search questions..."
-				className="w-full rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20 focus:outline-none"
+				className="w-full rounded-xl border border-[#1C1E23]  py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20 focus:outline-none"
 			/>
-			<div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
+			<div className="absolute inset-0 -z-10 rounded-xl bg-gradient-to-b from-[#1C1E23] to-transparent opacity-0 transition-opacity duration-300 group-focus-within:opacity-100" />
 		</div>
 	),
 );
@@ -169,7 +169,7 @@ const CategoryFilter = memo(
 				className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
 					selected === "all"
 						? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-						: "border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:bg-white/10 hover:text-neutral-400"
+						: "border-[#1C1E23]  primary-text hover:border-[#32353C] hover: hover:primary-text"
 				}`}
 			>
 				<FaTags className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
@@ -183,7 +183,7 @@ const CategoryFilter = memo(
 					className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition-all duration-300 ${
 						selected === category
 							? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-							: "border-white/10 bg-white/5 text-neutral-400 hover:border-white/20 hover:bg-white/10 hover:text-neutral-400"
+							: "border-[#1C1E23]  primary-text hover:border-[#32353C] hover: hover:primary-text"
 					}`}
 				>
 					<FaTags className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
@@ -200,13 +200,13 @@ const LoadMoreButton = memo(({ onClick }: { onClick: () => void }) => (
 	<button
 		type="button"
 		onClick={onClick}
-		className="group relative mt-8 flex w-full items-center justify-center rounded-full border border-white/10 bg-black/40 p-4 text-white transition-all duration-300 hover:border-white/20 hover:bg-black/60"
+		className="group relative mt-8 flex w-full items-center justify-center rounded-full border border-[#1C1E23] bg-black/40 p-4 text-white transition-all duration-300 hover:border-[#32353C] hover:bg-black/60"
 	>
 		<div className="pointer-events-none absolute inset-0">
 			<div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 		</div>
-		<span className="font-kodemono text-sm">Show More</span>
+		<span className="font-dmmono  text-sm">Show More</span>
 	</button>
 ));
 
@@ -266,7 +266,7 @@ export function FAQBlock({
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						{title}
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
+					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Everything you need to know about rthmn. Can't find the answer
 						you're looking for? Contact us at{" "}
 						<button type="button" className="text-blue-400">
@@ -314,7 +314,7 @@ export function FAQBlock({
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="text-center text-neutral-400"
+								className="text-center primary-text"
 							>
 								No questions found matching your criteria
 							</motion.div>

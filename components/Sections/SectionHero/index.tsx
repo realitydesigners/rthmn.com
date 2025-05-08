@@ -43,7 +43,7 @@ export const SectionHero: React.FC<BoxComponentProps> = ({ marketData }) => {
 						Patterns, Instantly.
 					</h1>
 					<p
-						className={`text-dark-neutral font-kodemono mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
+						className={`text-dark-neutral font-dmmono  mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
 					>
 						Experience the future of market analysis. RTHMN's AI identifies
 						predictive patterns, giving you a unique edge.

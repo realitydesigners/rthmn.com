@@ -144,7 +144,7 @@ export const PriceSidebar = ({
 	boxColors,
 	digits = 5,
 }: { priceLines: PriceLine[]; boxColors: BoxColors; digits?: number }) => (
-	<div className="relative w-18 border-l border-[#222] pl-2">
+	<div className="relative w-18 border-l border-[#0A0B0D] pl-2">
 		{priceLines.map((line, index) => (
 			<div
 				key={`price-${index}`}

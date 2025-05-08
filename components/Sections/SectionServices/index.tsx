@@ -98,7 +98,7 @@ export const ServiceSection = () => {
 					{Services.map(({ label, icon }) => (
 						<li
 							key={label}
-							className={`heading-text w-full cursor-pointer border border-neutral-600/50 p-4 ${
+							className={`text-neutral-gradient w-full cursor-pointer border border-neutral-600/50 p-4 ${
 								activeService === label
 									? "bg-neutral-600/25"
 									: "bg-black hover:bg-neutral-600/25"
@@ -125,12 +125,12 @@ export const ServiceSection = () => {
 					}}
 				>
 					<h2
-						className={`heading-text fade-in text-oxanium mb-4 text-4xl leading-none font-bold uppercase lg:text-5xl`}
+						className={`text-neutral-gradient fade-in text-oxanium mb-4 text-4xl leading-none font-bold uppercase lg:text-5xl`}
 					>
 						{activeService}
 					</h2>
 					<p
-						className={`primary-text fade-in text-oxanium text-xl text-neutral-400`}
+						className={`primary-text fade-in text-oxanium text-xl primary-text`}
 					>
 						{Services.find((service) => service.label === activeService)?.desc}
 					</p>

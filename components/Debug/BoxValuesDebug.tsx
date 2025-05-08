@@ -34,7 +34,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 	return (
 		<div className="h-full overflow-auto rounded-lg bg-black/50 p-4 font-mono text-xs">
 			{/* Settings Info */}
-			<div className="mb-4 flex justify-between rounded border border-neutral-800 bg-black/40 p-2 text-neutral-400">
+			<div className="mb-4 flex justify-between rounded border border-neutral-800 bg-black/40 p-2 primary-text">
 				<div className="space-y-1">
 					<div>Start Index: {startIndex}</div>
 					<div>Max Box Count: {maxBoxCount}</div>
@@ -46,7 +46,7 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 			</div>
 
 			{/* Timestamps */}
-			<div className="mb-4 grid grid-cols-2 gap-4 rounded border border-neutral-800 bg-black/40 p-2 text-neutral-400">
+			<div className="mb-4 grid grid-cols-2 gap-4 rounded border border-neutral-800 bg-black/40 p-2 primary-text">
 				<div>
 					<span className="text-blue-500">ResoBox Last Update: </span>
 					<span>
@@ -85,8 +85,8 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 								>
 									{box.value}
 								</span>
-								<span className="text-neutral-300">{box.high}</span>
-								<span className="text-neutral-300">{box.low}</span>
+								<span className="primary-text">{box.high}</span>
+								<span className="primary-text">{box.low}</span>
 							</div>
 						))}
 					</div>
@@ -113,8 +113,8 @@ export const BoxValuesDebug: React.FC<BoxValuesDebugProps> = ({
 								>
 									{box.value}
 								</span>
-								<span className="text-neutral-300">{box.high}</span>
-								<span className="text-neutral-300">{box.low}</span>
+								<span className="primary-text">{box.high}</span>
+								<span className="primary-text">{box.low}</span>
 							</div>
 						))}
 					</div>

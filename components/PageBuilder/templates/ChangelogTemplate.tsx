@@ -5,14 +5,12 @@ export const ChangelogTemplate: PortableTextComponents = {
 	block: {
 		normal: ({ children }) => (
 			<div className="mb-4">
-				<p className={`font-outfit leading-relaxed text-neutral-400`}>
-					{children}
-				</p>
+				<p className={`font-outfit leading-relaxed primary-text`}>{children}</p>
 			</div>
 		),
 		h1: ({ children }) => (
 			<h1
-				className={`font-outfit mb-6 text-3xl leading-relaxed font-bold text-neutral-400`}
+				className={`font-outfit mb-6 text-3xl leading-relaxed font-bold primary-text`}
 			>
 				{children}
 			</h1>
@@ -41,35 +39,29 @@ export const ChangelogTemplate: PortableTextComponents = {
 	},
 	list: {
 		bullet: ({ children }) => (
-			<ul
-				className={`mb-6 list-disc space-y-2 pl-4 font-mono text-neutral-400`}
-			>
+			<ul className={`mb-6 list-disc space-y-2 pl-4 font-mono primary-text`}>
 				{children}
 			</ul>
 		),
 		number: ({ children }) => (
-			<ol
-				className={`mb-6 list-decimal space-y-2 pl-4 font-mono text-neutral-400`}
-			>
+			<ol className={`mb-6 list-decimal space-y-2 pl-4 font-mono primary-text`}>
 				{children}
 			</ol>
 		),
 	},
 	listItem: {
 		bullet: ({ children }) => (
-			<li className="leading-relaxed text-neutral-400">{children}</li>
+			<li className="leading-relaxed primary-text">{children}</li>
 		),
 		number: ({ children }) => (
-			<li className="leading-relaxed text-neutral-400">{children}</li>
+			<li className="leading-relaxed primary-text">{children}</li>
 		),
 	},
 	marks: {
 		strong: ({ children }) => (
 			<strong className="font-bold text-white">{children}</strong>
 		),
-		em: ({ children }) => (
-			<em className="text-neutral-300 italic">{children}</em>
-		),
+		em: ({ children }) => <em className="primary-text italic">{children}</em>,
 		code: ({ children }) => (
 			<code className="rounded-sm bg-neutral-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400">
 				{children}

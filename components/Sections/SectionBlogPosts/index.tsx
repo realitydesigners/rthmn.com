@@ -31,12 +31,12 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 		>
 			<motion.div
 				whileHover={{ y: -5 }}
-				className="group relative h-full overflow-hidden rounded-xl border border-white/10 bg-black/40 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-black/60"
+				className="group relative h-full overflow-hidden rounded-xl border border-[#1C1E23] bg-black/40 backdrop-blur-md transition-colors duration-300 hover:border-[#32353C] hover:bg-black/60"
 			>
 				{/* Subtle Glow Effect */}
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 				</div>
 
 				{block?.imageRef && (
@@ -50,16 +50,16 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 						<div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60" />
 
 						{/* Hover Overlay - More subtle */}
-						<div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+						<div className="absolute inset-0 bg-[#1C1E23] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 					</div>
 				)}
 
 				<div className="relative z-10 p-6">
 					{/* Meta Information */}
-					<div className="mb-4 flex items-center gap-4 text-xs text-neutral-400">
+					<div className="mb-4 flex items-center gap-4 text-xs primary-text">
 						<div className="flex items-center gap-2">
-							<FaCalendar className="h-3 w-3 text-neutral-400" />
-							<span className="font-kodemono">
+							<FaCalendar className="h-3 w-3 primary-text" />
+							<span className="font-dmmono ">
 								{new Date(block?.publicationDate).toLocaleDateString("en-US", {
 									year: "numeric",
 									month: "short",
@@ -68,8 +68,8 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
-							<FaClock className="h-3 w-3 text-neutral-400" />
-							<span className="font-kodemono">5 min read</span>
+							<FaClock className="h-3 w-3 primary-text" />
+							<span className="font-dmmono ">5 min read</span>
 						</div>
 					</div>
 
@@ -81,7 +81,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 					</Link>
 
 					{/* Description */}
-					<p className="font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-neutral-400">
+					<p className="font-dmmono  mb-6 line-clamp-2 text-sm leading-relaxed primary-text">
 						{block?.subheading || "No subheading"}
 					</p>
 
@@ -89,9 +89,9 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 					<Link href={`/posts/${post.slug.current}`}>
 						<motion.div
 							whileHover={{ x: 5 }}
-							className="flex w-fit items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+							className="flex w-fit items-center rounded-full bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 						>
-							<span className="flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
+							<span className="flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-sm">
 								<span>Read Article</span>
 								<FaArrowRight className="h-3 w-3" />
 							</span>
@@ -128,7 +128,7 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Latest Insights
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
+					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Explore our latest thoughts on market analysis, trading strategies,
 						and technological innovations.
 					</p>

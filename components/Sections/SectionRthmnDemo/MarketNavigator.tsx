@@ -68,30 +68,30 @@ export function MarketNavigator({
 		<div className="flex h-full flex-col gap-4">
 			{/* Search Bar */}
 			<div className="relative">
-				<FaSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+				<FaSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 primary-text" />
 				<input
 					type="text"
 					placeholder="Search pairs..."
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className="font-outfit w-full rounded-lg border border-white/5 bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-white/10"
+					className="font-outfit w-full rounded-lg border border-[#1C1E23] bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-[#1C1E23]"
 				/>
 			</div>
 
 			{/* Market Categories */}
 			<div className="grid grid-cols-2 gap-2">
-				<button className="rounded-lg border border-white/5 bg-black/40 p-3 text-left hover:border-white/10">
+				<button className="rounded-lg border border-[#1C1E23] bg-black/40 p-3 text-left hover:border-[#1C1E23]">
 					<span className="font-outfit text-sm font-medium text-white">
 						Favorites
 					</span>
-					<div className="mt-1 text-xs text-neutral-400">
+					<div className="mt-1 text-xs primary-text">
 						{favorites.length} pairs
 					</div>
 				</button>
 			</div>
 
 			{/* Market List */}
-			<div className="scrollbar-thin scrollbar-track-white/5 flex-1 overflow-y-auto rounded-lg border border-white/5 bg-black/40 p-2">
+			<div className="scrollbar-thin scrollbar-track-[#1C1E23] flex-1 overflow-y-auto rounded-lg border border-[#1C1E23] bg-black/40 p-2">
 				<div className="space-y-1">
 					{filteredPairs.map((item) => {
 						const price = getLatestPrice(item.candleData);
@@ -102,8 +102,10 @@ export function MarketNavigator({
 							<div
 								key={item.pair}
 								onClick={() => onPairSelect(item.pair)}
-								className={`group flex cursor-pointer items-center justify-between rounded-lg border border-transparent p-3 transition-all hover:border-white/10 hover:bg-white/5 ${
-									selectedPair === item.pair ? "border-white/10 bg-white/5" : ""
+								className={`group flex cursor-pointer items-center justify-between rounded-lg border border-transparent p-3 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] ${
+									selectedPair === item.pair
+										? "border-[#1C1E23] bg-[#1C1E23]"
+										: ""
 								}`}
 							>
 								<div className="flex items-center gap-3">
@@ -112,7 +114,7 @@ export function MarketNavigator({
 											e.stopPropagation();
 											toggleFavorite(item.pair);
 										}}
-										className={`transition-colors ${isFavorite ? "text-yellow-500" : "text-neutral-400 hover:text-yellow-500"}`}
+										className={`transition-colors ${isFavorite ? "text-yellow-500" : "primary-text hover:text-yellow-500"}`}
 									>
 										<FaStar className="h-4 w-4" />
 									</button>
@@ -120,7 +122,7 @@ export function MarketNavigator({
 										<div className="font-outfit text-sm font-medium text-white">
 											{item.pair.replace("_", "/")}
 										</div>
-										<div className="text-xs text-neutral-400">
+										<div className="text-xs primary-text">
 											{price?.toFixed(item.pair.includes("JPY") ? 3 : 5)}
 										</div>
 									</div>
@@ -128,7 +130,7 @@ export function MarketNavigator({
 
 								<div className="flex items-center gap-2">
 									{hasAlerts && <FaBell className="h-3 w-3 text-blue-500" />}
-									<FaChevronRight className="h-3 w-3 text-neutral-400 transition-transform group-hover:translate-x-0.5" />
+									<FaChevronRight className="h-3 w-3 primary-text transition-transform group-hover:translate-x-0.5" />
 								</div>
 							</div>
 						);

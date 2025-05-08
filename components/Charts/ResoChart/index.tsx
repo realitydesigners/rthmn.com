@@ -553,13 +553,13 @@ export const PriceSidebar = ({
 	digits?: number;
 	prices?: number[];
 }) => (
-	<div className="relative w-18 border-l border-[#222] pl-2">
+	<div className="relative w-18 border-l border-[#0A0B0D] pl-2">
 		{priceLines.map((line, index) => {
 			const isHighlightedPrice = prices.includes(line.price);
 			return (
 				<div
 					key={`price-${index}`}
-					className={`font-kodemono absolute left-0 w-full pl-2 transition-colors ${isHighlightedPrice ? "z-10 p-1 text-[10px] font-bold text-white" : "text-[8px] text-[#222]"}`}
+					className={`font-dmmono  absolute left-0 w-full pl-2 transition-colors ${isHighlightedPrice ? "z-10 p-1 text-[10px] font-bold text-white" : "text-[8px] text-[#0A0B0D]"}`}
 					style={{
 						top: !isNaN(line.y) ? line.y - 6 : 0,
 					}}

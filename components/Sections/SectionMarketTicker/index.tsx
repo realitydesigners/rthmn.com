@@ -68,7 +68,7 @@ const MarketCard = ({ item, prefix }: MarketCardProps) => {
 	return (
 		<motion.div
 			key={`${prefix}-${item.pair}`}
-			className="flex h-12 w-36 items-center justify-between rounded-[4px] border border-white/10 bg-black/40 px-1.5 shadow-lg backdrop-blur-sm transition-all hover:border-white/20 hover:bg-black/60"
+			className="flex h-12 w-36 items-center justify-between rounded-[4px] border border-[#1C1E23] bg-black/40 px-1.5 shadow-lg backdrop-blur-sm transition-all hover:border-[#32353C] hover:bg-black/60"
 			whileHover={{ scale: 1.02 }}
 		>
 			<div className="flex flex-col gap-[2px]">

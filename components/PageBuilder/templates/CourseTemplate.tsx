@@ -16,7 +16,7 @@ export const CourseTemplate: PortableTextComponents = {
 	block: {
 		normal: ({ children }) => (
 			<div className="mb-4 w-full flex justify-center">
-				<p className="font-outfit text-xl leading-relaxed text-neutral-400 max-w-2xl w-full">
+				<p className="font-outfit text-xl leading-relaxed primary-text max-w-2xl w-full">
 					{children}
 				</p>
 			</div>
@@ -27,7 +27,7 @@ export const CourseTemplate: PortableTextComponents = {
 				<div className="w-full flex justify-center">
 					<h1
 						id={id}
-						className="font-outfit text-3xl w-full max-w-2xl leading-[1.25em] font-bold text-neutral-300 lg:text-6xl"
+						className="font-outfit text-3xl w-full max-w-2xl leading-[1.25em] font-bold primary-text lg:text-6xl"
 					>
 						{children}
 					</h1>
@@ -40,7 +40,7 @@ export const CourseTemplate: PortableTextComponents = {
 				<div className="w-full flex justify-center">
 					<h2
 						id={id}
-						className="font-outfit mb-4 w-full max-w-2xl scroll-mt-24 text-2xl leading-[1.25em] font-bold text-neutral-300"
+						className="font-outfit mb-4 w-full max-w-2xl scroll-mt-24 text-2xl leading-[1.25em] font-bold primary-text"
 					>
 						{children}
 					</h2>
@@ -53,7 +53,7 @@ export const CourseTemplate: PortableTextComponents = {
 				<div className="w-full flex justify-center">
 					<h3
 						id={id}
-						className="font-outfit mb-3 w-full max-w-2xl scroll-mt-24 text-xl leading-[1.25em] font-bold text-neutral-300"
+						className="font-outfit mb-3 w-full max-w-2xl scroll-mt-24 text-xl leading-[1.25em] font-bold primary-text"
 					>
 						{children}
 					</h3>
@@ -66,7 +66,7 @@ export const CourseTemplate: PortableTextComponents = {
 				<div className="mb-6 w-full flex justify-center">
 					<h4
 						id={id}
-						className="font-outfit mb-2 scroll-mt-24 text-lg leading-relaxed font-bold text-neutral-300"
+						className="font-outfit mb-2 scroll-mt-24 text-lg leading-relaxed font-bold primary-text"
 					>
 						{children}
 					</h4>
@@ -75,14 +75,14 @@ export const CourseTemplate: PortableTextComponents = {
 		},
 		bullet: ({ children }) => (
 			<div className="mb-4 w-full flex justify-center">
-				<li className="font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white">
+				<li className="font-outfit py-1 leading-relaxed primary-text marker:text-white">
 					{children}
 				</li>
 			</div>
 		),
 		number: ({ children }) => (
 			<div className="mb-4 w-full flex justify-center">
-				<li className="font-outfit py-1 leading-relaxed text-neutral-400 marker:text-white">
+				<li className="font-outfit py-1 leading-relaxed primary-text marker:text-white">
 					{children}
 				</li>
 			</div>
@@ -91,14 +91,14 @@ export const CourseTemplate: PortableTextComponents = {
 	list: {
 		bullet: ({ children }) => (
 			<div className="mb-4 w-full flex justify-center">
-				<ul className="font-outfit w-full list-disc space-y-1 pr-4 pl-8 text-neutral-400">
+				<ul className="font-outfit w-full list-disc space-y-1 pr-4 pl-8 primary-text">
 					{children}
 				</ul>
 			</div>
 		),
 		number: ({ children }) => (
 			<div className="mb-4 w-full flex justify-center">
-				<ol className="font-outfit w-full list-decimal space-y-1 pr-4 pl-8 text-neutral-400">
+				<ol className="font-outfit w-full list-decimal space-y-1 pr-4 pl-8 primary-text">
 					{children}
 				</ol>
 			</div>
@@ -106,11 +106,9 @@ export const CourseTemplate: PortableTextComponents = {
 	},
 	marks: {
 		strong: ({ children }) => (
-			<strong className="font-bold text-neutral-400">{children}</strong>
+			<strong className="font-bold primary-text">{children}</strong>
 		),
-		em: ({ children }) => (
-			<em className="text-neutral-400 italic">{children}</em>
-		),
+		em: ({ children }) => <em className="primary-text italic">{children}</em>,
 		code: ({ children }) => (
 			<code className="rounded-sm bg-neutral-800/50 px-1.5 py-0.5 font-mono text-sm text-pink-400">
 				{children}

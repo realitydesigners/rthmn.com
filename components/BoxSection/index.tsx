@@ -239,7 +239,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 
 	return (
 		<div className="fixed right-8 bottom-8 w-[320px]">
-			<div className="relative overflow-hidden rounded-xl border border-white/10 bg-black/90 shadow-2xl backdrop-blur-lg">
+			<div className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-black/90 shadow-2xl backdrop-blur-lg">
 				{/* Enhanced Glow Effects */}
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_50%)]" />
@@ -255,7 +255,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 							<div className="h-1 w-1 rounded-full bg-blue-400/50" />
 							<div className="h-1 w-1 rounded-full bg-blue-400/20" />
 						</div>
-						<span className="font-kodemono text-[10px] tracking-wider text-white/40">
+						<span className="font-dmmono  text-[10px] tracking-wider text-white/40">
 							{currentConfigIndex + 1}/{CONFIGS.length}
 						</span>
 					</div>
@@ -304,7 +304,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 				{/* Sleek Progress Bar */}
 				<div className="px-3 pb-2">
 					<div className="relative h-[2px] w-full overflow-hidden">
-						<div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+						<div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#1C1E23] to-transparent" />
 						<div
 							className="absolute h-full bg-gradient-to-r from-blue-400/40 to-blue-400/60 transition-all duration-500"
 							style={{

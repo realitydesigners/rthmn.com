@@ -96,7 +96,7 @@ export default function Dashboard() {
 		return (
 			<main className="w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18">
 				<NoInstruments />
-				<div className="mt-4 text-center text-sm text-neutral-400">
+				<div className="mt-4 text-center text-sm primary-text">
 					Please complete the onboarding process to select your trading pairs.
 				</div>
 			</main>

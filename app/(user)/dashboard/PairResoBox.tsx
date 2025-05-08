@@ -62,7 +62,7 @@ export const PairResoBox = ({
 		<div className="no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]">
 			{/* Grid Pattern Background */}
 
-			<div className="relative flex min-h-[250px] flex-col border-[0.5px] border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#040505]">
+			<div className="relative flex min-h-[250px] flex-col border-[0.5px] border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#040505]">
 				{/* <div className='absolute inset-0'>
                     <svg className='h-full w-full opacity-[0.07]' xmlns='http://www.w3.org/2000/svg'>
                         <title>Background Grid Pattern</title>
@@ -107,7 +107,7 @@ export const PairResoBox = ({
 								{isLoading || !currentPrice ? (
 									<TextSkeleton className="h-4 w-16" />
 								) : (
-									<div className="font-kodemono text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+									<div className="font-dmmono  text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
 										{formatPrice(currentPrice, pair)}
 									</div>
 								)}
@@ -153,7 +153,7 @@ export const PairResoBox = ({
 
 					{/* Timeframe Control with enhanced separator */}
 					<div className="relative h-14 w-full flex-shrink-0">
-						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1C1E23] to-transparent" />
 						<TimeFrameSlider showPanel={false} pair={pair} />
 					</div>
 				</div>

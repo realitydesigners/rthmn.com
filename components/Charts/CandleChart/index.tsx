@@ -588,7 +588,7 @@ const CandleChart = ({
 					</g>
 				</svg>
 			) : (
-				<div className="flex h-full items-center justify-center text-neutral-400">
+				<div className="flex h-full items-center justify-center primary-text">
 					No data to display
 				</div>
 			)}

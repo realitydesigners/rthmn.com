@@ -128,7 +128,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 			{/* Profile Image */}
 			<button
 				onClick={handleClick}
-				className="group relative h-full w-full overflow-hidden rounded-full border-2 border-[#222] bg-[#222] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl"
+				className="group relative h-full w-full overflow-hidden rounded-full border-2 border-[#0A0B0D] bg-[#0A0B0D] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl"
 				disabled={isLoading}
 			>
 				{preview ? (
@@ -144,13 +144,13 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 							onError={handleImageError}
 						/>
 						{imageLoading && (
-							<div className="flex h-full w-full items-center justify-center bg-[#333]">
+							<div className="flex h-full w-full items-center justify-center bg-[#32353C]">
 								<div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-b-transparent"></div>
 							</div>
 						)}
 					</>
 				) : (
-					<div className="flex h-full w-full items-center justify-center bg-[#333] transition-colors duration-200 group-hover:bg-[#444]">
+					<div className="flex h-full w-full items-center justify-center bg-[#32353C] transition-colors duration-200 group-hover:bg-[#32353C]">
 						<span className="text-2xl font-bold text-zinc-500 sm:text-4xl">
 							{userId.charAt(0).toUpperCase()}
 						</span>

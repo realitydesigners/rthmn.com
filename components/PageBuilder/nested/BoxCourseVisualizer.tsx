@@ -31,7 +31,7 @@ const FeatureTags = memo(() => (
 				<div className="items-centergap-1.5 relative flex">
 					<div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
 					<feature.icon className="relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4" />
-					<span className="font-kodemono text-neutral-400 transition-colors duration-300 group-hover:text-white">
+					<span className="font-dmmono  primary-text transition-colors duration-300 group-hover:text-white">
 						{feature.text}
 					</span>
 				</div>
@@ -249,7 +249,7 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
 				</h3>
 			)}
 			{value.description && (
-				<p className="font-outfit max-w-2xl text-center text-base text-neutral-400">
+				<p className="font-outfit max-w-2xl text-center text-base primary-text">
 					{value.description}
 				</p>
 			)}

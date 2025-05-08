@@ -34,7 +34,7 @@ const MessageBubble = ({
 				isUser ? "flex-row-reverse" : "flex-row",
 			)}
 		>
-			<div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-[#111]">
+			<div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-[#1C1E23] bg-[#111]">
 				{userDetails?.avatar_url && isUser ? (
 					<Image
 						src={userDetails.avatar_url}
@@ -44,13 +44,13 @@ const MessageBubble = ({
 						className="h-full w-full object-cover"
 					/>
 				) : (
-					<LuUser className="h-4 w-4 text-white/50" />
+					<LuUser className="h-4 w-4 text-[#BFC2CA]" />
 				)}
 			</div>
 			<div
 				className={cn(
 					"group relative max-w-[80%] space-y-1 rounded-2xl px-4 py-3",
-					isUser ? "bg-blue-500/10" : "bg-white/5",
+					isUser ? "bg-blue-500/10" : "bg-[#1C1E23]",
 					"transition-all duration-200",
 				)}
 			>
@@ -282,7 +282,7 @@ export default function SupportPage() {
 			<div className="p-4 lg:p-8">
 				<div className="mx-auto max-w-4xl">
 					<div className="mb-8 flex items-center gap-3">
-						<div className="rounded-md bg-white/5 p-2">
+						<div className="rounded-md bg-[#1C1E23] p-2">
 							<LuHelpCircle className="h-6 w-6 text-white" />
 						</div>
 						<h1 className="font-outfit text-2xl font-bold text-white">
@@ -300,7 +300,7 @@ export default function SupportPage() {
 						<div>
 							<button
 								onClick={() => setIsCreatingThread(true)}
-								className="group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] lg:w-auto"
+								className="group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] lg:w-auto"
 							>
 								<LuPlus className="h-4 w-4 text-white" />
 								<span className="font-outfit">Create New Support Thread</span>
@@ -310,7 +310,7 @@ export default function SupportPage() {
 									<div
 										key={thread.id}
 										onClick={() => setSelectedThread(thread)}
-										className="cursor-pointer rounded-lg border border-white/5 bg-[#111] p-4 transition-all duration-200 hover:bg-[#151515]"
+										className="cursor-pointer rounded-lg border border-[#1C1E23] bg-[#111] p-4 transition-all duration-200 hover:bg-[#151515]"
 									>
 										<div className="flex items-center justify-between">
 											<div className="flex items-center gap-3">
@@ -365,7 +365,7 @@ export default function SupportPage() {
 									type="submit"
 									onClick={handleCreateThread}
 									disabled={isLoading}
-									className="font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] disabled:opacity-50"
+									className="font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									{isLoading ? "Creating..." : "Create Thread"}
 								</button>
@@ -376,15 +376,15 @@ export default function SupportPage() {
 										setError(null);
 									}}
 									disabled={isLoading}
-									className="font-outfit flex w-full items-center justify-center rounded-lg border border-white/10 px-6 py-3 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50"
+									className="font-outfit flex w-full items-center justify-center rounded-lg border border-[#1C1E23] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									Cancel
 								</button>
 							</div>
 						</div>
 					) : (
-						<div className="flex h-[calc(100vh-200px)] flex-col overflow-hidden rounded-lg border border-white/5 bg-[#111]">
-							<div className="border-b border-white/5 p-4">
+						<div className="flex h-[calc(100vh-200px)] flex-col overflow-hidden rounded-lg border border-[#1C1E23] bg-[#111]">
+							<div className="border-b border-[#1C1E23] p-4">
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
 										<LuMessageSquare className="h-4 w-4 text-zinc-400" />
@@ -400,7 +400,7 @@ export default function SupportPage() {
 									</button>
 								</div>
 							</div>
-							<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 flex-1 space-y-4 overflow-y-auto p-4">
+							<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#1C1E23] flex-1 space-y-4 overflow-y-auto p-4">
 								{messages.map((message) => (
 									<MessageBubble
 										key={message.id}
@@ -411,7 +411,7 @@ export default function SupportPage() {
 							</div>
 							<form
 								onSubmit={handleSendMessage}
-								className="border-t border-white/5 p-4"
+								className="border-t border-[#1C1E23] p-4"
 							>
 								<div className="flex gap-3">
 									<input
@@ -423,7 +423,7 @@ export default function SupportPage() {
 									/>
 									<button
 										type="submit"
-										className="font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818]"
+										className="font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23]"
 									>
 										Send
 									</button>

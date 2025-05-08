@@ -181,7 +181,7 @@ const PairClient = ({
 			<div className="relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col">
 				<div className="flex h-full w-full flex-1">
 					<div className="h-full w-1/2 p-4">
-						<div className="relative flex h-full flex-col overflow-hidden border border-[#222] bg-black">
+						<div className="relative flex h-full flex-col overflow-hidden border border-[#0A0B0D] bg-black">
 							<ChartControls
 								showBoxLevels={showBoxLevels}
 								setShowBoxLevels={setShowBoxLevels}
@@ -221,7 +221,7 @@ const PairClient = ({
 							</div>
 						</div>
 						<div className="mt-8 h-[200px] w-full">
-							<div className="flex h-full flex-col border border-[#222] bg-black p-2">
+							<div className="flex h-full flex-col border border-[#0A0B0D] bg-black p-2">
 								{boxColors && histogramData && (
 									<Histogram
 										data={histogramData}
@@ -236,8 +236,8 @@ const PairClient = ({
 							</div>
 						</div>
 					</div>
-					<div className="h-full w-1/2 border-r border-[#222] p-4">
-						<div className="flex h-full flex-col border border-[#222] bg-black p-4">
+					<div className="h-full w-1/2 border-r border-[#0A0B0D] p-4">
+						<div className="flex h-full flex-col border border-[#0A0B0D] bg-black p-4">
 							<div className="mb-4 flex items-center justify-end">
 								<button
 									type="button"
@@ -245,7 +245,7 @@ const PairClient = ({
 									className={`rounded-lg px-3 py-1.5 text-sm transition-all ${
 										is3DMode
 											? "bg-blue-500 text-white"
-											: "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+											: "bg-neutral-800 primary-text hover:bg-neutral-700"
 									}`}
 								>
 									3D View

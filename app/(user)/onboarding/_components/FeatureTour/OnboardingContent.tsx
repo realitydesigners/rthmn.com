@@ -7,13 +7,13 @@ interface OnboardingContentProps {
 
 export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 	return (
-		<div className="no-select w-[350px] overflow-hidden rounded-xl border border-[#222] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 shadow-2xl before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]">
+		<div className="no-select w-[350px] overflow-hidden rounded-xl border border-[#0A0B0D] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 shadow-2xl before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]">
 			<div className="relative flex h-full flex-col items-end justify-end space-y-2">
 				<div className="w-full p-2">
 					<h3 className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl font-bold text-transparent">
 						Learn
 					</h3>
-					<p className="text-[13px] leading-relaxed text-neutral-400">
+					<p className="text-[13px] leading-relaxed primary-text">
 						Your personal trading education and onboarding center.
 					</p>
 				</div>
@@ -27,7 +27,7 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 								<div className="text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white">
 									Onboarding Progress
 								</div>
-								<div className="text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+								<div className="text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 									Complete your setup and learn platform basics
 								</div>
 							</div>
@@ -43,7 +43,7 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 								<div className="text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white">
 									Trading Courses
 								</div>
-								<div className="text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+								<div className="text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 									Access interactive lessons and trading guides
 								</div>
 							</div>
@@ -59,7 +59,7 @@ export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 								<div className="text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white">
 									Skill Assessment
 								</div>
-								<div className="text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+								<div className="text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 									Test your knowledge with trading quizzes
 								</div>
 							</div>

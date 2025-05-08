@@ -25,7 +25,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 				<h1 className="font-outfit text-xl font-bold tracking-wider text-white">
 					{pair}
 				</h1>
-				<div className="font-kodemono text-sm font-medium text-neutral-200">
+				<div className="font-dmmono  text-sm font-medium text-neutral-200">
 					{currentPrice || "-"}
 				</div>
 			</div>
@@ -47,7 +47,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 							className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-[0.98] ${
 								boxVisibilityFilter === "all"
 									? "border border-blue-500/20 bg-gradient-to-b from-blue-500/10 via-blue-500/5 to-transparent text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:border-blue-500/30 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]"
-									: "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent text-neutral-400 hover:border-neutral-500/30"
+									: "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent primary-text hover:border-neutral-500/30"
 							}`}
 						>
 							<div className="absolute inset-0 rounded-xl bg-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -59,7 +59,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 							className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-[0.98] ${
 								boxVisibilityFilter === "positive"
 									? "border border-blue-500/20 bg-gradient-to-b from-blue-500/10 via-blue-500/5 to-transparent text-blue-400 shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:border-blue-500/30 hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]"
-									: "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent text-neutral-400 hover:border-neutral-500/30"
+									: "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent primary-text hover:border-neutral-500/30"
 							}`}
 						>
 							<div className="absolute inset-0 rounded-xl bg-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
@@ -71,7 +71,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 							className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-[0.98] ${
 								boxVisibilityFilter === "negative"
 									? "border border-red-500/20 bg-gradient-to-b from-red-500/10 via-red-500/5 to-transparent text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:border-red-500/30 hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]"
-									: "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent text-neutral-400 hover:border-neutral-500/30"
+									: "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent primary-text hover:border-neutral-500/30"
 							}`}
 						>
 							<div className="absolute inset-0 rounded-xl bg-red-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />

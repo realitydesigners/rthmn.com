@@ -38,7 +38,7 @@ export const StartButton: FC<StartButtonProps> = ({
 		default: {
 			wrapper:
 				"relative bg-gradient-to-r from-white/90 via-white/95 to-white/90 text-zinc-800 hover:from-white hover:via-white hover:to-white before:absolute before:inset-0 before:bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_20%,rgba(255,255,255,0.2)_35%,rgba(255,255,255,0.1)_45%,rgba(255,255,255,0.2)_55%,rgba(255,255,255,0)_80%,transparent_100%)] before:bg-[length:300%_100%] before:animate-[shimmer_6s_linear_infinite]",
-			inner: "bg-gradient-to-b from-white/5 to-black/5",
+			inner: "bg-gradient-to-b from-[#1C1E23] to-black/5",
 			shimmer: "",
 			size: "px-8 py-4 text-[15px]",
 		},

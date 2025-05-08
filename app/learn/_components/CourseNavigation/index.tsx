@@ -33,7 +33,7 @@ export function CourseNav({
 			<div className="mb-8">
 				<Link
 					href="/learn"
-					className="mb-6 flex items-center gap-2 text-[13px] text-[#888] transition-all duration-200 hover:text-white"
+					className="mb-6 flex items-center gap-2 text-[13px] text-[#545963] transition-all duration-200 hover:text-white"
 				>
 					<FaArrowLeft className="h-3 w-3" />
 					Back to Learning Center
@@ -43,7 +43,7 @@ export function CourseNav({
 						<FaBook className="h-5 w-5 text-white/70" />
 					</div>
 					<div className="space-y-1.5">
-						<div className="text-[11px] font-medium tracking-wide text-[#888]">
+						<div className="text-[11px] font-medium tracking-wide text-[#545963]">
 							CURRENT COURSE
 						</div>
 						<Link
@@ -52,21 +52,21 @@ export function CourseNav({
 						>
 							{course.title}
 						</Link>
-						{/* <p className='text-[13px] leading-relaxed text-[#888]'>{course.description}</p> */}
+						{/* <p className='text-[13px] leading-relaxed text-[#545963]'>{course.description}</p> */}
 					</div>
 				</div>
 
 				{/* Progress Bar */}
 				<div className="mt-6">
 					<div className="mb-2 flex items-center justify-between">
-						<span className="text-[13px] text-[#888]">Course Progress</span>
+						<span className="text-[13px] text-[#545963]">Course Progress</span>
 						<span className="text-[13px] font-medium text-white">
 							{Math.round(progress)}%
 						</span>
 					</div>
 					<div className="h-1 overflow-hidden rounded-full bg-white/[0.08]">
 						<div
-							className="h-full rounded-full bg-gradient-to-r from-white/25 to-white/20"
+							className="h-full rounded-full bg-gradient-to-r from-white/25 to-[#32353C]"
 							style={{ width: `${progress}%` }}
 						/>
 					</div>
@@ -77,7 +77,7 @@ export function CourseNav({
 				return (
 					<div key={chapter._id} className="space-y-3">
 						<div>
-							<h3 className="text-[11px] font-medium tracking-wide text-[#888]">
+							<h3 className="text-[11px] font-medium tracking-wide text-[#545963]">
 								{chapter.title.toUpperCase()}
 							</h3>
 						</div>
@@ -96,10 +96,10 @@ export function CourseNav({
 										href={`/learn/${course.slug}/${lessonItem.slug}`}
 										className="group flex items-center gap-3 rounded-md p-2 transition-all duration-200 hover:bg-white/[0.03]"
 									>
-										<div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.08] text-[11px] font-medium text-[#888] ring-1 ring-white/[0.08] transition-colors duration-200 ring-inset group-hover:text-white">
+										<div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/[0.08] text-[11px] font-medium text-[#545963] ring-1 ring-white/[0.08] transition-colors duration-200 ring-inset group-hover:text-white">
 											{index + 1}
 										</div>
-										<span className="flex-1 text-[13px] text-[#888] transition-colors duration-200 group-hover:text-white/90">
+										<span className="flex-1 text-[13px] text-[#545963] transition-colors duration-200 group-hover:text-white/90">
 											{lessonItem.title}
 										</span>
 										{isCompleted && (

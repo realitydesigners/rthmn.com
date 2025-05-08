@@ -41,7 +41,7 @@ export function TeamCard({ members = [] }: { members: TeamMember[] }) {
 			{members.map((member) => (
 				<div
 					key={member._id}
-					className="group relative aspect-square w-[400px] overflow-hidden rounded-xl bg-black/20 ring-1 ring-white/[0.05] transition-all duration-500 hover:shadow-lg hover:shadow-black/20 hover:ring-white/[0.1]"
+					className="group relative aspect-square w-[400px] overflow-hidden rounded-xl bg-black/20 ring-1 ring-[#1C1E23] transition-all duration-500 hover:shadow-lg hover:shadow-black/20 hover:ring-white/[0.1]"
 				>
 					<div className="absolute -inset-1 -z-10 animate-pulse bg-linear-to-r from-purple-500/10 via-transparent to-cyan-500/10 opacity-0 transition-all duration-700 ease-in-out group-hover:opacity-100" />
 
@@ -91,10 +91,10 @@ export function TeamCard({ members = [] }: { members: TeamMember[] }) {
 									)}
 								</div>
 							</div>
-							<p className="font-kodemono font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
+							<p className="font-dmmono  font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
 								{member.role}
 							</p>
-							<p className="font-outfit text-sm leading-relaxed text-white/50 transition-colors duration-300 group-hover:text-white/70">
+							<p className="font-outfit text-sm leading-relaxed text-[#BFC2CA] transition-colors duration-300 group-hover:text-white/70">
 								{member.shortBio}
 							</p>
 						</div>

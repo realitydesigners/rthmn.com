@@ -58,7 +58,7 @@ const MarketCard = memo(
 				className={`group relative flex h-[40px] cursor-pointer items-center justify-between rounded-md border px-3 backdrop-blur-sm transition-all duration-200 ${
 					isSelected
 						? "border-[#22c55e]/50 bg-[#22c55e]/10"
-						: "border-white/5 bg-black/40 hover:border-white/10 hover:bg-black/60"
+						: "border-[#1C1E23] bg-black/40 hover:border-[#1C1E23] hover:bg-black/60"
 				}`}
 			>
 				{isSelected && (
@@ -119,9 +119,9 @@ const DemoNavbar = memo(
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as TabType)}
-                                className={`flex h-auto items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]`}>
+                                className={`flex h-auto items-center rounded-full bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]`}>
                                 <span
-                                    className={`font-outfit flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-xs font-semibold ${
+                                    className={`font-outfit flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-xs font-semibold ${
                                         activeTab === tab.id ? 'text-blue-400' : 'text-white hover:text-white'
                                     }`}>
                                     <tab.icon className='h-3 w-3' />
@@ -211,15 +211,15 @@ export const SectionRthmnDemo = memo(
 						<div className="flex flex-col gap-4 lg:flex-row">
 							{/* Main Chart Area */}
 							<div className="relative z-100 flex-1 space-y-3">
-								<div className="relative h-[400px] overflow-hidden rounded-lg border border-white/5 bg-black/20 backdrop-blur-sm lg:h-[500px]">
+								<div className="relative h-[400px] overflow-hidden rounded-lg border border-[#1C1E23] bg-black/20 backdrop-blur-sm lg:h-[500px]">
 									<LineChart pair={selectedPair} candles={processedCandles} />
 								</div>
 							</div>
 
 							{/* Market Cards - Side on desktop, bottom on mobile */}
 							<div className="w-full shrink-0 space-y-3 lg:w-[250px]">
-								<div className="rounded-lg border border-white/5 bg-black/20 p-2 backdrop-blur-sm">
-									<div className="scrollbar-thin scrollbar-track-white/5 grid-cols- grid max-h-[200px] gap-1.5 overflow-y-auto pr-1 sm:max-h-[500px]">
+								<div className="rounded-lg border border-[#1C1E23] bg-black/20 p-2 backdrop-blur-sm">
+									<div className="scrollbar-thin scrollbar-track-[#1C1E23] grid-cols- grid max-h-[200px] gap-1.5 overflow-y-auto pr-1 sm:max-h-[500px]">
 										{marketData.map((marketItem) => (
 											<MarketCard
 												key={marketItem.pair}
@@ -281,10 +281,10 @@ export const SectionRthmnDemo = memo(
 
 		return (
 			<section className="pt-12no relative z-100 -mt-48 flex h-full flex-col items-center justify-center lg:-mt-[12.5vw] lg:py-12">
-				<div className="relative h-[820px] w-full overflow-hidden border-white/10 bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:h-auto lg:w-[80vw] 2xl:w-[75vw]">
+				<div className="relative h-[820px] w-full overflow-hidden border-[#1C1E23] bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:h-auto lg:w-[80vw] 2xl:w-[75vw]">
 					<div className="pointer-events-none absolute inset-0">
 						<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
-						<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
+						<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#BFC2CA] to-transparent" />
 					</div>
 					<DemoNavbar activeTab={activeTab} setActiveTab={handleTabChange} />
 					<motion.div

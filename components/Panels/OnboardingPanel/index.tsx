@@ -21,13 +21,13 @@ const OnboardingCard = ({
 	return (
 		<div
 			className={cn(
-				"group relative w-full overflow-hidden rounded-xl border border-white/[0.05]  bg-gradient-to-b from-[#1A1A1A] to-[#0D0D0D] transition-all duration-300 hover:scale-[1.01]",
+				"group relative w-full overflow-hidden rounded-xl border border-[#1C1E23]  bg-gradient-to-b from-[#1A1A1A] to-[#0D0D0D] transition-all duration-300 hover:scale-[1.01]",
 			)}
 		>
 			{/* Highlight Effect */}
 			<div
 				className={cn(
-					"absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+					"absolute inset-0 bg-gradient-to-b from-[#1C1E23] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100",
 				)}
 			/>
 
@@ -38,14 +38,14 @@ const OnboardingCard = ({
 						<h3
 							className={cn(
 								"truncate text-sm font-medium transition-colors duration-300",
-								isCompleted || isCurrent ? "text-white" : "text-neutral-400",
+								isCompleted || isCurrent ? "text-white" : "primary-text",
 							)}
 						>
 							{step.title}
 						</h3>
 						<button
 							onClick={() => setIsExpanded(!isExpanded)}
-							className="ml-2 rounded-md p-0.5 text-neutral-500 hover:bg-white/5 hover:text-neutral-300"
+							className="ml-2 rounded-md p-0.5 primary-text hover:bg-[#1C1E23] hover:primary-text"
 						>
 							{isExpanded ? (
 								<LuChevronUp size={14} />
@@ -56,7 +56,7 @@ const OnboardingCard = ({
 					</div>
 
 					{isExpanded && (
-						<p className="mt-1 text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+						<p className="mt-1 text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 							{step.description}
 						</p>
 					)}
@@ -71,7 +71,7 @@ const OnboardingCard = ({
 								In Progress
 							</span>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-full border border-[#222] bg-[#111] px-2 py-0.5 text-[10px] font-medium text-neutral-500">
+							<span className="inline-flex items-center gap-1 rounded-full border border-[#0A0B0D] bg-[#111] px-2 py-0.5 text-[10px] font-medium primary-text">
 								Not Started
 							</span>
 						)}
@@ -99,7 +99,7 @@ export const Onboarding = () => {
 					</h2>
 				</div> */}
 				<div className="flex items-center gap-2">
-					<div className="h-1.5 flex-1 rounded-full bg-[#222]">
+					<div className="h-1.5 flex-1 rounded-full bg-[#0A0B0D]">
 						<div
 							className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80 transition-all duration-300"
 							style={{
@@ -107,7 +107,7 @@ export const Onboarding = () => {
 							}}
 						/>
 					</div>
-					<span className="text-xs font-medium text-neutral-400">
+					<span className="text-xs font-medium primary-text">
 						{completedSteps.length}/{ONBOARDING_STEPS.length}
 					</span>
 				</div>

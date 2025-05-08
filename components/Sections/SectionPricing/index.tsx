@@ -153,7 +153,7 @@ const BenefitsList = memo(
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
 					transition={{ duration: 0.3, delay: index * 0.1 }}
-					className="group relative overflow-hidden rounded-xl bg-white/[0.02] p-4 transition-all duration-300 hover:bg-white/[0.04]"
+					className="group relative overflow-hidden rounded-xl bg-[#111215] p-4 transition-all duration-300 hover:bg-white/[0.04]"
 				>
 					<div className="pointer-events-none absolute inset-px rounded-xl bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 					<div className="relative flex gap-3">
@@ -164,7 +164,7 @@ const BenefitsList = memo(
 							<h3 className="font-outfit text-base font-semibold text-white">
 								{benefit.title}
 							</h3>
-							<p className="font-kodemono mt-1 text-sm text-neutral-400">
+							<p className="font-dmmono  mt-1 text-sm primary-text">
 								{benefit.description}
 							</p>
 						</div>
@@ -285,7 +285,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 									<h2 className="font-outfit text-neutral-gradient text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
 										{priceString}
 									</h2>
-									<span className="font-kodemono text-lg text-neutral-400">
+									<span className="font-dmmono  text-lg primary-text">
 										/month
 									</span>
 								</div>

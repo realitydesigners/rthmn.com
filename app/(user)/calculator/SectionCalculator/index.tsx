@@ -111,12 +111,12 @@ const InputField = memo(
 		placeholder?: string;
 	}) => (
 		<div className="relative">
-			<label className="font-kodemono mb-2 flex items-center justify-between text-sm">
+			<label className="font-dmmono  mb-2 flex items-center justify-between text-sm">
 				<div className="flex items-center gap-2">
 					{label}
 					{tooltip && (
 						<div className="group relative">
-							<FaInfoCircle className="h-4 w-4 cursor-help text-neutral-400" />
+							<FaInfoCircle className="h-4 w-4 cursor-help primary-text" />
 							<div className="absolute bottom-full left-1/2 mb-2 hidden w-48 -translate-x-1/2 rounded-lg bg-black/90 p-2 text-xs text-white shadow-lg group-hover:block">
 								{tooltip}
 							</div>
@@ -138,10 +138,10 @@ const InputField = memo(
 					value={value || ""}
 					onChange={(e) => onChange(Number.parseFloat(e.target.value) || 0)}
 					placeholder={placeholder}
-					className={`w-full rounded-xl border bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
+					className={`w-full rounded-xl border bg-[#1C1E23] py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
 						error
 							? "border-red-400/50 focus:border-red-400/50 focus:bg-red-400/5 focus:ring-2 focus:ring-red-400/20"
-							: "border-white/10 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20"
+							: "border-[#1C1E23] focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20"
 					}`}
 				/>
 			</div>
@@ -170,11 +170,11 @@ const ResultCard = memo(
 	}) => (
 		<motion.div
 			whileHover={{ scale: 1.02 }}
-			className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm transition-all duration-300"
+			className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-black/40 p-6 backdrop-blur-sm transition-all duration-300"
 		>
 			<div className="pointer-events-none absolute inset-0">
 				<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 			</div>
 			<div className="relative z-10">
 				<div className="mb-2 flex items-center gap-3">
@@ -184,18 +184,18 @@ const ResultCard = memo(
 								? "bg-red-400/10 text-red-400"
 								: positive
 									? "bg-blue-400/10 text-blue-400"
-									: "bg-white/5 text-neutral-400"
+									: "bg-[#1C1E23] primary-text"
 						}`}
 					>
 						{icon}
 					</div>
-					<div className="font-kodemono text-sm text-neutral-400">{label}</div>
+					<div className="font-dmmono  text-sm primary-text">{label}</div>
 				</div>
 				<div className="font-outfit text-2xl font-bold text-white">
 					{isInvalid ? "—" : value}
 				</div>
 				{subValue && !isInvalid && (
-					<div className="font-kodemono mt-1 text-sm text-neutral-400">
+					<div className="font-dmmono  mt-1 text-sm primary-text">
 						{subValue}
 					</div>
 				)}
@@ -256,7 +256,7 @@ const TakeProfitSuggestion = memo(
 					<button
 						key={ratio}
 						onClick={() => onSelect(price)}
-						className="group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
+						className="group flex items-center gap-2 rounded-lg border border-[#1C1E23] bg-black/40 px-3 py-1 text-xs primary-text transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
 					>
 						<span>{ratio}:1</span>
 						<span className="text-blue-400">${price.toFixed(2)}</span>
@@ -379,7 +379,7 @@ export const SectionCalculator = () => {
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Position Size Calculator
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
+					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Calculate your optimal position size and risk management parameters
 						with precision.
 					</p>
@@ -389,7 +389,7 @@ export const SectionCalculator = () => {
 				<div className="mx-auto flex gap-8">
 					{/* Quick Risk Templates - Left Sidebar */}
 					<div className="hidden w-1/4 shrink-0 lg:block">
-						<div className="sticky top-8 rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="sticky top-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
 								Quick Risk Templates
 							</h3>
@@ -401,21 +401,21 @@ export const SectionCalculator = () => {
 										className={`group relative w-full overflow-hidden rounded-xl border p-4 text-left transition-all duration-300 ${
 											inputs.riskPercentage === template.value
 												? "border-blue-400/50 bg-blue-400/5"
-												: "border-white/10 bg-black/40 hover:border-white/20 hover:bg-black/60"
+												: "border-[#1C1E23] bg-black/40 hover:border-[#32353C] hover:bg-black/60"
 										}`}
 									>
 										<div className="pointer-events-none absolute inset-0">
 											<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-											<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+											<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 										</div>
 										<div className="relative z-10">
 											<div className="font-outfit mb-1 text-lg font-semibold text-white">
 												{template.label}
 											</div>
-											<div className="font-kodemono mb-2 text-2xl text-blue-400">
+											<div className="font-dmmono  mb-2 text-2xl text-blue-400">
 												{template.value}%
 											</div>
-											<p className="font-kodemono text-sm text-neutral-400">
+											<p className="font-dmmono  text-sm primary-text">
 												{template.description}
 											</p>
 										</div>
@@ -428,7 +428,7 @@ export const SectionCalculator = () => {
 					{/* Main Calculator Content - Center */}
 					<div className="w-full lg:w-1/2">
 						{/* Account & Risk Section */}
-						<div className="mb-8 rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="mb-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
 								Account Details
 							</h3>
@@ -437,7 +437,7 @@ export const SectionCalculator = () => {
 									label="Account Size"
 									value={inputs.accountSize}
 									onChange={(value) => handleInputChange("accountSize", value)}
-									icon={<FaDollarSign className="h-5 w-5 text-neutral-400" />}
+									icon={<FaDollarSign className="h-5 w-5 primary-text" />}
 									tooltip="Your total account balance"
 									error={getError("accountSize")}
 									placeholder="Enter account size"
@@ -452,7 +452,7 @@ export const SectionCalculator = () => {
 									onChange={(value) =>
 										handleInputChange("riskPercentage", value)
 									}
-									icon={<FaPercentage className="h-5 w-5 text-neutral-400" />}
+									icon={<FaPercentage className="h-5 w-5 primary-text" />}
 									tooltip="Percentage of account to risk"
 									error={getError("riskPercentage")}
 									placeholder="Enter risk %"
@@ -461,7 +461,7 @@ export const SectionCalculator = () => {
 						</div>
 
 						{/* Trade Direction Section */}
-						<div className="mb-8 rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="mb-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
 								Trade Direction
 							</h3>
@@ -472,7 +472,7 @@ export const SectionCalculator = () => {
 						</div>
 
 						{/* Price Levels Section */}
-						<div className="rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<div className="mb-6 flex items-center justify-between">
 								<h3 className="font-outfit text-lg font-semibold text-white">
 									Price Levels
@@ -493,7 +493,7 @@ export const SectionCalculator = () => {
 									label="Entry Price"
 									value={inputs.entryPrice}
 									onChange={(value) => handleInputChange("entryPrice", value)}
-									icon={<FaExchangeAlt className="h-5 w-5 text-neutral-400" />}
+									icon={<FaExchangeAlt className="h-5 w-5 primary-text" />}
 									error={getError("entryPrice")}
 									placeholder="Enter entry price"
 								/>

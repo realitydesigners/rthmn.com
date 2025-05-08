@@ -20,17 +20,17 @@ const CURRENCIES: { value: Currency; symbol: string; label: string }[] = [
 export const CurrencySelector = memo(
 	({ currency, onCurrencyChange }: CurrencySelectorProps) => (
 		<div className="relative">
-			<label className="font-kodemono mb-2 block text-sm text-neutral-400">
+			<label className="font-dmmono  mb-2 block text-sm primary-text">
 				Currency
 			</label>
 			<div className="relative">
 				<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-					<FaGlobe className="h-5 w-5 text-neutral-400" />
+					<FaGlobe className="h-5 w-5 primary-text" />
 				</div>
 				<select
 					value={currency}
 					onChange={(e) => onCurrencyChange(e.target.value as Currency)}
-					className="w-full appearance-none rounded-xl border border-white/10 bg-white/5 py-4 pr-4 pl-12 text-white shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20 focus:outline-none"
+					className="w-full appearance-none rounded-xl border border-[#1C1E23] bg-[#1C1E23] py-4 pr-4 pl-12 text-white shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20 focus:outline-none"
 				>
 					{CURRENCIES.map((curr) => (
 						<option key={curr.value} value={curr.value} className="bg-black">

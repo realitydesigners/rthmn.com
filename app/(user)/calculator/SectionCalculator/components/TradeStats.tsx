@@ -61,11 +61,11 @@ export const TradeStats = memo(
 						initial={{ opacity: 0, y: 20 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ duration: 0.5, delay: index * 0.1 }}
-						className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-4"
+						className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-black/40 p-4"
 					>
 						<div className="pointer-events-none absolute inset-0">
 							<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-							<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+							<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 						</div>
 						<div className="relative">
 							<div
@@ -73,7 +73,7 @@ export const TradeStats = memo(
 							>
 								<div className={`h-4 w-4 ${stat.color}`}>{stat.icon}</div>
 							</div>
-							<div className="font-kodemono text-sm text-neutral-400">
+							<div className="font-dmmono  text-sm primary-text">
 								{stat.label}
 							</div>
 							<div

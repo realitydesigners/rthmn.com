@@ -186,9 +186,9 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 		<div className="fixed top-0 right-0 z-[200] h-full w-96 transform transition-transform duration-300 ease-in-out">
 			<div className="flex h-full flex-col bg-[#0a0a0a]">
 				{/* Header */}
-				<div className="flex items-center justify-between border-b border-white/5 p-4">
+				<div className="flex items-center justify-between border-b border-[#1C1E23] p-4">
 					<div className="flex items-center gap-3">
-						<div className="rounded-md bg-white/5 p-2">
+						<div className="rounded-md bg-[#1C1E23] p-2">
 							<LuHelpCircle className="h-4 w-4 text-white" />
 						</div>
 						<h2 className="font-outfit text-xl font-bold text-white">
@@ -198,7 +198,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 					<button
 						type="button"
 						onClick={onClose}
-						className="rounded-md p-2 text-zinc-400 hover:bg-white/5 hover:text-white"
+						className="rounded-md p-2 text-zinc-400 hover:bg-[#1C1E23] hover:text-white"
 					>
 						<LuX className="h-5 w-5" />
 					</button>
@@ -212,7 +212,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 				)}
 
 				{/* Content */}
-				<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-white/10 flex-1 overflow-y-auto">
+				<div className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-[#1C1E23] flex-1 overflow-y-auto">
 					{!selectedThread && !isCreatingThread ? (
 						<div className="p-4">
 							<button
@@ -227,7 +227,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 									<div
 										key={thread.id}
 										onClick={() => setSelectedThread(thread)}
-										className="cursor-pointer rounded-lg border border-white/5 p-4 transition-all duration-200 hover:bg-white/5"
+										className="cursor-pointer rounded-lg border border-[#1C1E23] p-4 transition-all duration-200 hover:bg-[#1C1E23]"
 									>
 										<div className="flex items-center justify-between">
 											<h3 className="font-outfit font-medium text-white">
@@ -268,7 +268,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 									value={newThreadSubject}
 									onChange={(e) => setNewThreadSubject(e.target.value)}
 									disabled={isLoading}
-									className="font-outfit mt-1 block w-full rounded-md border border-white/5 bg-white/5 px-3 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
+									className="font-outfit mt-1 block w-full rounded-md border border-[#1C1E23] bg-[#1C1E23] px-3 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
 									placeholder="Enter subject"
 								/>
 							</div>
@@ -284,7 +284,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 									type="button"
 									onClick={() => setIsCreatingThread(false)}
 									disabled={isLoading}
-									className="font-outfit rounded-full border border-white/5 px-4 py-2 text-white transition-all duration-200 hover:bg-white/5 disabled:opacity-50"
+									className="font-outfit rounded-full border border-[#1C1E23] px-4 py-2 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									Cancel
 								</button>
@@ -292,7 +292,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 						</form>
 					) : (
 						<div className="flex h-full flex-col">
-							<div className="border-b border-white/5 p-4">
+							<div className="border-b border-[#1C1E23] p-4">
 								<div className="flex items-center justify-between">
 									<h3 className="font-outfit font-medium text-white">
 										{selectedThread.subject}
@@ -314,7 +314,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 										<div
 											className={`font-outfit max-w-[80%] rounded-lg p-3 ${
 												message.sender_type === "support_team"
-													? "bg-white/5 text-white"
+													? "bg-[#1C1E23] text-white"
 													: "bg-blue-600 text-white"
 											}`}
 										>
@@ -333,7 +333,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 							</div>
 							<form
 								onSubmit={handleSendMessage}
-								className="border-t border-white/5 p-4"
+								className="border-t border-[#1C1E23] p-4"
 							>
 								<div className="flex gap-2">
 									<input
@@ -342,7 +342,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 										onChange={(e) => setNewMessage(e.target.value)}
 										disabled={isLoading}
 										placeholder="Type your message..."
-										className="font-outfit flex-1 rounded-md border border-white/5 bg-white/5 px-4 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
+										className="font-outfit flex-1 rounded-md border border-[#1C1E23] bg-[#1C1E23] px-4 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
 									/>
 									<button
 										type="submit"
@@ -358,7 +358,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 				</div>
 
 				{/* Footer */}
-				<div className="mt-4 border-t border-white/5 pb-4 text-center">
+				<div className="mt-4 border-t border-[#1C1E23] pb-4 text-center">
 					<p className="font-outfit text-xs text-zinc-500">
 						© {new Date().getFullYear()} Rthmn
 					</p>

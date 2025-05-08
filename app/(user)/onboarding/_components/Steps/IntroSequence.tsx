@@ -202,7 +202,7 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 						repeat: Number.POSITIVE_INFINITY,
 						ease: "linear",
 					}}
-					className="absolute inset-0 rounded-2xl bg-gradient-to-br from-white/10 to-white/5"
+					className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#1C1E23] to-[#1C1E23]"
 				/>
 				<svg
 					className="relative"
@@ -300,7 +300,7 @@ const PatternRecognitionStep = ({
 					transition={{ delay: delay + 1 + i * 0.1 }}
 					className="group relative flex flex-col items-center"
 				>
-					<div className="relative h-14 w-14 overflow-hidden rounded-full border border-white/10 bg-white/5 backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
+					<div className="relative h-14 w-14 overflow-hidden rounded-full border border-[#1C1E23] bg-[#1C1E23] backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
 						{member.image && (
 							<Image
 								src={member.image.url}
@@ -312,7 +312,7 @@ const PatternRecognitionStep = ({
 						)}
 						{/* Glow effect */}
 						<motion.div
-							className="absolute inset-0 rounded-full bg-gradient-to-b from-white/10 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+							className="absolute inset-0 rounded-full bg-gradient-to-b from-[#1C1E23] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 							animate={{
 								opacity: [0, 0.2, 0],
 							}}
@@ -377,7 +377,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="space-y-6 rounded-xl border border-white/10 bg-white/5 p-6"
+				className="space-y-6 rounded-xl border border-[#1C1E23] bg-[#1C1E23] p-6"
 			>
 				<p className="font-mono text-sm leading-relaxed text-white/60">
 					By checking this box, I acknowledge that I have read and agree to
@@ -409,7 +409,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 						className={`group relative h-6 w-6 overflow-hidden rounded-md border transition-all ${
 							accepted
 								? "border-white-500 bg-white-500/20"
-								: "border-white/20 bg-white/5 hover:border-white/30 hover:bg-white/10"
+								: "border-[#32353C] bg-[#1C1E23] hover:border-white/30 hover:bg-[#1C1E23]"
 						}`}
 					>
 						<motion.div
@@ -460,12 +460,12 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 					disabled={!accepted}
 					className={`group relative overflow-hidden rounded-xl px-8 py-3 transition-all ${
 						accepted
-							? "bg-white/10 hover:bg-white/20"
-							: "cursor-not-allowed bg-white/5 text-white/30"
+							? "bg-[#1C1E23] hover:bg-[#32353C]"
+							: "cursor-not-allowed bg-[#1C1E23] text-white/30"
 					}`}
 				>
 					<div
-						className={`absolute inset-0 bg-gradient-to-r from-white/10 to-white/0 opacity-0 transition-opacity ${accepted ? "" : ""}`}
+						className={`absolute inset-0 bg-gradient-to-r from-[#1C1E23] to-white/0 opacity-0 transition-opacity ${accepted ? "" : ""}`}
 					/>
 					<span className="relative font-mono text-sm text-white/90">
 						Continue
