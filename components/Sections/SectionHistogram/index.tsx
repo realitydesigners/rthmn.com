@@ -110,7 +110,7 @@ export const SectionHistogram = () => {
 			</div>
 
 			{/* Histogram Container - Add relative positioning for overlay */}
-			<div className="relative mx-auto w-full max-w-7xl rounded-xl border border-white/10 bg-white/5 p-4 shadow-lg lg:px-[5vw]">
+			<div className="relative mx-auto w-full max-w-7xl rounded-xl border border-[#1C1E23] bg-[#1C1E23] p-4 shadow-lg lg:px-[5vw]">
 				<Histogram
 					tableRef={tableRef}
 					demoStep={demoStep}

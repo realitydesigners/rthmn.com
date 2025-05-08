@@ -156,7 +156,7 @@ export default function OnboardingPage() {
 				>
 					{/* Progress indicator */}
 					<div className="no-select absolute -top-3 left-1/2 -translate-x-1/2">
-						<div className="flex items-center gap-2 rounded-full border border-white/[0.05]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 text-xs font-medium shadow-xl">
+						<div className="flex items-center gap-2 rounded-full border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 text-xs font-medium shadow-xl">
 							<div className="flex h-1.5 w-12 items-center rounded-full bg-[#222]">
 								<motion.div
 									className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80"
@@ -191,7 +191,7 @@ export default function OnboardingPage() {
 							<button
 								type="button"
 								onClick={handleBack}
-								className="group relative rounded-lg border border-white/[0.05]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-200 hover:border-[#444] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
+								className="group relative rounded-lg border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-200 hover:border-[#32353C] hover:from-[#222] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
 							>
 								<div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 								Back
@@ -220,13 +220,13 @@ export default function OnboardingPage() {
 					</div>
 
 					{/* Bottom pattern */}
-					<div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#333] to-transparent opacity-50" />
+					<div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent opacity-50" />
 				</motion.div>
 			</motion.div>
 
 			{/* Step title with enhanced styling */}
 			<div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4">
-				<div className="no-select group relative flex items-center gap-2 rounded-full border border-white/[0.05]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-400/20 hover:shadow-blue-400/10">
+				<div className="no-select group relative flex items-center gap-2 rounded-full border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-400/20 hover:shadow-blue-400/10">
 					<div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-400/20 to-blue-400/10">
 						<div className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 					</div>

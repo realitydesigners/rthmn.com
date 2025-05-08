@@ -107,7 +107,7 @@ export default function CourseClient({ course }: { course: Course }) {
 							{course.chapters?.map((chapter, chapterIndex) => (
 								<div
 									key={chapter._id}
-									className="overflow-hidden rounded-xl border border-white/10 bg-white/5 transition-all duration-300 hover:border-blue-500/20 hover:bg-blue-500/5"
+									className="overflow-hidden rounded-xl border border-[#1C1E23] bg-[#1C1E23] transition-all duration-300 hover:border-blue-500/20 hover:bg-blue-500/5"
 								>
 									<div className="p-6">
 										<div className="flex items-center gap-4">
@@ -133,12 +133,12 @@ export default function CourseClient({ course }: { course: Course }) {
 										</div>
 									</div>
 
-									<div className="border-t border-white/5">
+									<div className="border-t border-[#1C1E23]">
 										{chapter.lessons.map((lesson, lessonIndex) => (
 											<Link
 												key={lesson._id}
 												href={`/learn/${course.slug}/${lesson.slug}`}
-												className="flex items-center gap-4 border-b border-white/5 p-4 last:border-b-0 hover:bg-blue-500/5"
+												className="flex items-center gap-4 border-b border-[#1C1E23] p-4 last:border-b-0 hover:bg-blue-500/5"
 											>
 												<div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-400/10 text-sm text-blue-400">
 													{lessonIndex + 1}

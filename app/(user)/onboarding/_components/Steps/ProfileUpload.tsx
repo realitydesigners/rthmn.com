@@ -138,7 +138,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
 							className={`group relative flex h-64 w-64 cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-2xl transition-all duration-300 before:absolute before:inset-0 before:rounded-2xl before:bg-gradient-to-b before:from-white/[0.03] before:to-transparent before:transition-colors ${
 								isDragging
 									? "border-blue-400 before:from-blue-400/[0.05]"
-									: "border-white/[0.05]  hover:border-blue-400/50 hover:before:from-white/[0.05]"
+									: "border-[#1C1E23]  hover:border-blue-400/50 hover:before:from-[#1C1E23]"
 							}`}
 						>
 							<div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-black/0 via-black/5 to-black/20" />
@@ -161,7 +161,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
 										/>
 										{/* Hover overlay with glass effect */}
 										<div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-black/0 via-black/20 to-black/60 opacity-0 backdrop-blur-[2px] transition-all duration-300 group-hover:opacity-100">
-											<div className="flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
+											<div className="flex items-center gap-2 rounded-full bg-[#1C1E23] px-4 py-2 text-sm font-medium text-white backdrop-blur-md">
 												<LuUpload className="h-4 w-4" />
 												Change Photo
 											</div>

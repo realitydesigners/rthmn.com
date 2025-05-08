@@ -44,14 +44,14 @@ const MenuButton = ({
 	const variantStyles =
 		variant === "danger"
 			? "from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30"
-			: "from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]";
+			: "from-[#32353C] to-[#181818] hover:from-[#32353C] hover:to-[#282828]";
 
 	const textColor = variant === "danger" ? "text-red-500" : "text-white";
 
 	const Button = (
 		<div className={`${baseStyles} ${variantStyles} w-full`}>
 			<div className="flex w-full items-center gap-3 rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-3">
-				<div className="rounded-md bg-white/5 p-2">
+				<div className="rounded-md bg-[#1C1E23] p-2">
 					<Icon className={`h-4 w-4 ${textColor}`} />
 				</div>
 				<span className={`font-outfit text-sm ${textColor}`}>{label}</span>

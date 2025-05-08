@@ -31,12 +31,12 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 		>
 			<motion.div
 				whileHover={{ y: -5 }}
-				className="group relative h-full overflow-hidden rounded-xl border border-white/10 bg-black/40 backdrop-blur-md transition-colors duration-300 hover:border-white/20 hover:bg-black/60"
+				className="group relative h-full overflow-hidden rounded-xl border border-[#1C1E23] bg-black/40 backdrop-blur-md transition-colors duration-300 hover:border-[#32353C] hover:bg-black/60"
 			>
 				{/* Subtle Glow Effect */}
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 				</div>
 
 				{block?.imageRef && (
@@ -50,7 +50,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 						<div className="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent opacity-60" />
 
 						{/* Hover Overlay - More subtle */}
-						<div className="absolute inset-0 bg-white/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+						<div className="absolute inset-0 bg-[#1C1E23] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 					</div>
 				)}
 
@@ -89,7 +89,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 					<Link href={`/posts/${post.slug.current}`}>
 						<motion.div
 							whileHover={{ x: 5 }}
-							className="flex w-fit items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+							className="flex w-fit items-center rounded-full bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 						>
 							<span className="flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
 								<span>Read Article</span>

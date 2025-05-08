@@ -35,7 +35,7 @@ export default function Callout({
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5, ease: "easeOut" }}
-				className="group relative my-8 max-w-2xl flex-col flex w-full items-end gap-4 rounded-2xl bg-black p-4 transition-all duration-300 before:absolute before:inset-0 before:rounded-2xl before:bg-[linear-gradient(120deg,transparent_0%,rgba(0,115,230,0)_10%,rgba(0,115,230,0.1)_45%,rgba(0,115,230,0.05)_55%,rgba(0,115,230,0.1)_80%,rgba(0,115,230,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_30s_linear_infinite] shadow-[0_0_30px_rgba(0,115,230,0.1)] ring-1 ring-white/5"
+				className="group relative my-8 max-w-2xl flex-col flex w-full items-end gap-4 rounded-2xl bg-black p-4 transition-all duration-300 before:absolute before:inset-0 before:rounded-2xl before:bg-[linear-gradient(120deg,transparent_0%,rgba(0,115,230,0)_10%,rgba(0,115,230,0.1)_45%,rgba(0,115,230,0.05)_55%,rgba(0,115,230,0.1)_80%,rgba(0,115,230,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_30s_linear_infinite] shadow-[0_0_30px_rgba(0,115,230,0.1)] ring-1 ring-[#1C1E23]"
 			>
 				{/* Header */}
 				<div className="flex w-full items-center gap-4">

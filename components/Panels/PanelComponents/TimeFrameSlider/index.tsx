@@ -293,7 +293,7 @@ const TimeFrameSliderContent = memo(
 						onMouseDown={(e) => handleMouseDown(e, "left")}
 					>
 						<div className="absolute inset-y-3 right-[8px] w-[2px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/left:from-white/95 group-hover/left:via-white/80 group-hover/left:to-white/95 group-hover/left:shadow-[0_0_25px_rgba(255,255,255,0.7)]" />
-						<div className="absolute inset-y-3 right-[7px] w-[3px] bg-gradient-to-r from-white/0 to-white/20 opacity-0 transition-opacity duration-200 group-hover/left:opacity-100" />
+						<div className="absolute inset-y-3 right-[7px] w-[3px] bg-gradient-to-r from-white/0 to-[#32353C] opacity-0 transition-opacity duration-200 group-hover/left:opacity-100" />
 					</div>
 
 					<div
@@ -301,7 +301,7 @@ const TimeFrameSliderContent = memo(
 						onMouseDown={(e) => handleMouseDown(e, "right")}
 					>
 						<div className="absolute inset-y-3 left-[8px] w-[2px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/right:from-white/95 group-hover/right:via-white/80 group-hover/right:to-white/95 group-hover/right:shadow-[0_0_25px_rgba(255,255,255,0.7)]" />
-						<div className="absolute inset-y-3 left-[7px] w-[3px] bg-gradient-to-l from-white/0 to-white/20 opacity-0 transition-opacity duration-200 group-hover/right:opacity-100" />
+						<div className="absolute inset-y-3 left-[7px] w-[3px] bg-gradient-to-l from-white/0 to-[#32353C] opacity-0 transition-opacity duration-200 group-hover/right:opacity-100" />
 					</div>
 				</>
 			);
@@ -358,9 +358,9 @@ const TimeFrameSliderContent = memo(
 
 						{/* Refined edges */}
 						<div className="absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-						<div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-						<div className="absolute inset-y-0 left-0 w-[1.5px] bg-gradient-to-b from-white/30 via-white/20 to-white/10" />
-						<div className="absolute inset-y-0 right-0 w-[1.5px] bg-gradient-to-b from-white/30 via-white/20 to-white/10" />
+						<div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#1C1E23] to-transparent" />
+						<div className="absolute inset-y-0 left-0 w-[1.5px] bg-gradient-to-b from-white/30 via-[#32353C] to-[#1C1E23]" />
+						<div className="absolute inset-y-0 right-0 w-[1.5px] bg-gradient-to-b from-white/30 via-[#32353C] to-[#1C1E23]" />
 
 						{/* Additional subtle inner shadow */}
 						<div className="absolute inset-0 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.2)]" />
@@ -410,7 +410,7 @@ const TimeFrameSliderContent = memo(
 				</div>
 
 				{/* Dynamic Timeframe Scale */}
-				<div className="mt-2 flex items-center justify-between  font-kodemono text-[10px] tracking-wider text-[#666]">
+				<div className="mt-2 flex items-center justify-between  font-kodemono text-[10px] tracking-wider text-[#32353C]">
 					<span>{getTimeLabel(reversedStartIndex).label}</span>
 					<span>
 						{getTimeLabel(reversedStartIndex + reversedMaxBoxCount).label}
@@ -430,7 +430,7 @@ const TimeFrameSliderContent = memo(
 									opacity: i % 2 === 0 ? 1 : 0.5,
 								}}
 							>
-								<div className="h-2 w-[1px] bg-gradient-to-b from-white/20 to-transparent" />
+								<div className="h-2 w-[1px] bg-gradient-to-b from-[#32353C] to-transparent" />
 							</div>
 						))}
 					</div>

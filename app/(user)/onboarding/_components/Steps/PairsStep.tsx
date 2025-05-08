@@ -108,7 +108,7 @@ export default function PairsStep({
 								{[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
 									<motion.div
 										key={i}
-										className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-blue-400/80" : "bg-[#333]"}`}
+										className={`h-1 w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-blue-400/80" : "bg-[#32353C]"}`}
 										initial={false}
 										animate={{
 											scale: i < selectedPairs.length ? 1 : 0.95,
@@ -117,7 +117,7 @@ export default function PairsStep({
 								))}
 							</div>
 							<span
-								className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-blue-400" : "text-[#666]"}`}
+								className={`text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-blue-400" : "text-[#32353C]"}`}
 							>
 								{selectedPairs.length}/{MIN_PAIRS_REQUIRED}
 							</span>
@@ -132,9 +132,9 @@ export default function PairsStep({
 					transition={{ delay: 0.2 }}
 					className="relative"
 				>
-					<div className="relative flex items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]">
+					<div className="relative flex items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]">
 						<div className="flex h-10 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#121212]">
-							<FaSearch className="ml-4 text-[#666]" />
+							<FaSearch className="ml-4 text-[#32353C]" />
 							<input
 								type="text"
 								placeholder="Search instruments..."
@@ -144,7 +144,7 @@ export default function PairsStep({
 										e.target.value.replace(/\s/g, "").toUpperCase(),
 									)
 								}
-								className="font-outfit w-full bg-transparent px-3 py-2 text-sm text-white placeholder-[#666] focus:outline-none"
+								className="font-outfit w-full bg-transparent px-3 py-2 text-sm text-white placeholder-[#32353C] focus:outline-none"
 							/>
 						</div>
 					</div>
@@ -182,7 +182,7 @@ export default function PairsStep({
 
 					return (
 						<div key={group.label}>
-							<h3 className="font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#666] uppercase">
+							<h3 className="font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#32353C] uppercase">
 								{group.label}
 							</h3>
 							<div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
@@ -202,7 +202,7 @@ export default function PairsStep({
 											className={`group relative w-full overflow-hidden rounded-xl border  bg-gradient-to-b  transition-all duration-300 ${
 												isSelected
 													? "border-blue-400/50 from-blue-400/20 to-blue-400/0"
-													: "border-white/[0.05]  from-[#0A0B0D] to-[#070809] hover:border-blue-400/30 "
+													: "border-[#1C1E23]  from-[#0A0B0D] to-[#070809] hover:border-blue-400/30 "
 											}`}
 										>
 											<motion.div
@@ -226,7 +226,7 @@ export default function PairsStep({
 													</span>
 												</div>
 												<div className="flex items-center">
-													<span className="font-kodemono mr-3 text-[13px] font-medium tracking-wider text-[#666] transition-all group-hover:mr-4">
+													<span className="font-kodemono mr-3 text-[13px] font-medium tracking-wider text-[#32353C] transition-all group-hover:mr-4">
 														{priceData[item]?.price
 															? formatPrice(priceData[item].price, item)
 															: "N/A"}

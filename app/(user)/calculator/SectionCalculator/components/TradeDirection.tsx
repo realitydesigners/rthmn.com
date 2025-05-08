@@ -15,7 +15,7 @@ export const TradeDirection = memo(
 				className={`group relative flex items-center gap-2 rounded-full border px-4 py-2 transition-all duration-300 ${
 					direction === "long"
 						? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-						: "border-white/10 bg-black/40 text-neutral-400 hover:border-white/20"
+						: "border-[#1C1E23] bg-black/40 text-neutral-400 hover:border-[#32353C]"
 				}`}
 			>
 				<span className="font-kodemono">Long</span>
@@ -25,7 +25,7 @@ export const TradeDirection = memo(
 				className={`group relative flex items-center gap-2 rounded-full border px-4 py-2 transition-all duration-300 ${
 					direction === "short"
 						? "border-red-400/50 bg-red-400/10 text-red-400"
-						: "border-white/10 bg-black/40 text-neutral-400 hover:border-white/20"
+						: "border-[#1C1E23] bg-black/40 text-neutral-400 hover:border-[#32353C]"
 				}`}
 			>
 				<span className="font-kodemono">Short</span>

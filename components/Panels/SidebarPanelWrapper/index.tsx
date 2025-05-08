@@ -22,8 +22,8 @@ const LockButton = ({
 		className={cn(
 			"group relative z-[120] flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-200",
 			isLocked
-				? "border-[#333] bg-gradient-to-b from-[#181818] to-[#0F0F0F] text-white shadow-lg shadow-black/20"
-				: "border-transparent bg-transparent text-[#666] hover:border-[#333] hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20",
+				? "border-[#32353C] bg-gradient-to-b from-[#181818] to-[#0F0F0F] text-white shadow-lg shadow-black/20"
+				: "border-transparent bg-transparent text-[#32353C] hover:border-[#32353C] hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20",
 		)}
 	>
 		<div className="relative flex items-center justify-center">
@@ -211,7 +211,7 @@ export const SidebarWrapper = ({
 								position === "right" && "flex-1 justify-end",
 							)}
 						>
-							<h2 className="font-outfit text-[10px] font-medium tracking-wide text-[#666] uppercase">
+							<h2 className="font-outfit text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
 								{title}
 							</h2>
 						</div>

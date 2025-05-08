@@ -55,7 +55,7 @@ export const StyleControl: React.FC<StyleControlProps> = ({
 				<div className="absolute inset-y-0 left-0 flex w-full items-center px-2">
 					<div className="relative h-[1px] w-full bg-white/[0.06]">
 						<div
-							className="absolute h-full bg-gradient-to-r from-white/20 to-white/10"
+							className="absolute h-full bg-gradient-to-r from-[#32353C] to-[#1C1E23]"
 							style={{ width: `${percentage}%` }}
 						/>
 					</div>

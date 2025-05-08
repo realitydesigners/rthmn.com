@@ -186,20 +186,20 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
 						<div className="relative flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-white/[0.08] to-transparent p-1 ring-1 ring-white/[0.08] ring-inset">
 							<FiBookOpen className="h-[14px] w-[14px] text-white/70" />
 						</div>
-						<h4 className="text-[13px] font-medium tracking-tight text-[#888]">
+						<h4 className="text-[13px] font-medium tracking-tight text-[#545963]">
 							On this page
 						</h4>
 					</div>
 					<div className="flex items-center gap-3">
 						<div className="h-1 w-16 overflow-hidden rounded-full bg-white/[0.08]">
 							<motion.div
-								className="h-full rounded-full bg-gradient-to-r from-white/25 to-white/20"
+								className="h-full rounded-full bg-gradient-to-r from-white/25 to-[#32353C]"
 								initial={{ width: 0 }}
 								animate={{ width: `${progress}%` }}
 								transition={{ duration: 0.3, ease: "easeInOut" }}
 							/>
 						</div>
-						<span className="text-[11px] font-medium text-[#888]">
+						<span className="text-[11px] font-medium text-[#545963]">
 							{Math.round(progress)}%
 						</span>
 					</div>
@@ -210,7 +210,7 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
 				{/* Vertical progress line */}
 				<div className="absolute top-0 bottom-0 left-4 w-[1px] bg-white/[0.08]">
 					<motion.div
-						className="absolute top-0 w-[1px] bg-white/20"
+						className="absolute top-0 w-[1px] bg-[#32353C]"
 						initial={{ height: 0 }}
 						animate={{ height: `${progress}%` }}
 						transition={{ duration: 0.3, ease: "easeInOut" }}
@@ -297,8 +297,8 @@ export function TableOfContents({ blocks }: { blocks: PortableTextBlock[] }) {
 														isActive
 															? "text-white"
 															: shouldRender
-																? "text-[#888] group-hover:text-white/90"
-																: "text-[#666]"
+																? "text-[#545963] group-hover:text-white/90"
+																: "text-[#32353C]"
 													}`}
 												>
 													{heading.text}

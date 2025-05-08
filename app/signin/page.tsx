@@ -214,13 +214,13 @@ export default function SignIn() {
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
 									placeholder="Enter your email"
-									className="w-full rounded-lg bg-white/10 px-4 py-2 font-mono text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-neutral-500/20 focus:outline-none"
+									className="w-full rounded-lg bg-[#1C1E23] px-4 py-2 font-mono text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-neutral-500/20 focus:outline-none"
 									required
 								/>
 								<button
 									type="submit"
 									disabled={isLoading}
-									className="group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-neutral-500/20 focus:outline-none active:scale-[0.99]"
+									className="group relative w-full overflow-hidden rounded-lg bg-[#1C1E23] p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-neutral-500/20 focus:outline-none active:scale-[0.99]"
 								>
 									<span className="relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-neutral-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-neutral-100 lg:py-2.5">
 										<div className="absolute inset-0 -translate-x-full animate-[shine-loop_5s_ease-in-out_infinite] bg-[linear-gradient(-60deg,transparent_0%,transparent_25%,rgba(229,231,235,0.9)_35%,rgba(229,231,235,0.9)_45%,transparent_75%,transparent_100%)] group-hover:animate-[shine-loop_5s_ease-in-out_infinite]" />
@@ -245,7 +245,7 @@ export default function SignIn() {
 
 						<form onSubmit={handleSignIn}>
 							<button
-								className="group relative w-full overflow-hidden rounded-lg bg-white/10 p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-neutral-500/20 focus:outline-none active:scale-[0.99]"
+								className="group relative w-full overflow-hidden rounded-lg bg-[#1C1E23] p-[1px] transition-all duration-300 hover:scale-[1.01] focus:ring-2 focus:ring-neutral-500/20 focus:outline-none active:scale-[0.99]"
 								type="submit"
 							>
 								<span className="relative flex w-full items-center justify-center rounded-lg bg-white px-6 py-3 font-mono text-base font-medium text-neutral-900 shadow-[inset_0_1px_1px_rgba(0,0,0,0.075),inset_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-300 group-hover:bg-neutral-100 lg:py-2.5">

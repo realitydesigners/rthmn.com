@@ -80,7 +80,7 @@ export function ChangelogBlock({
 					{/* Changelog Entries */}
 					<div className="mx-auto mt-12 max-w-4xl">
 						<div className="relative space-y-8">
-							<div className="absolute top-0 left-0 h-full w-[1px] bg-[#333] lg:left-[29px]" />
+							<div className="absolute top-0 left-0 h-full w-[1px] bg-[#32353C] lg:left-[29px]" />
 
 							{entries.map((entry: ChangelogEntry, index: number) => (
 								<motion.div
@@ -88,7 +88,7 @@ export function ChangelogBlock({
 									initial={{ opacity: 0, y: 20 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.5, delay: index * 0.1 }}
-									className="group relative ml-4 rounded-xl border border-white/10 bg-black/90 p-8 backdrop-blur-md transition-all duration-200 hover:bg-black/95 lg:ml-16"
+									className="group relative ml-4 rounded-xl border border-[#1C1E23] bg-black/90 p-8 backdrop-blur-md transition-all duration-200 hover:bg-black/95 lg:ml-16"
 								>
 									{/* Card gradient effects */}
 									<div className="pointer-events-none absolute inset-0 rounded-xl">
@@ -99,9 +99,9 @@ export function ChangelogBlock({
 									{/* Timeline dot and connector */}
 									<div className="absolute -left-[40px] flex h-full w-12 flex-col items-center lg:-left-[60px]">
 										<div className="relative top-0 z-10 flex h-4 w-4 items-center justify-center">
-											<div className="absolute h-4 w-4 rounded-full border border-white/[0.05]  bg-black" />
+											<div className="absolute h-4 w-4 rounded-full border border-[#1C1E23]  bg-black" />
 										</div>
-										<div className="absolute top-[8px] left-1/2 h-[1px] w-[16px] bg-[#333] lg:w-[36px]" />
+										<div className="absolute top-[8px] left-1/2 h-[1px] w-[16px] bg-[#32353C] lg:w-[36px]" />
 									</div>
 
 									<div className="space-y-6">
@@ -174,7 +174,7 @@ export function ChangelogBlock({
 										{/* Read More Button */}
 										<button
 											onClick={() => toggleEntry(entry._id)}
-											className="group relative ml-auto flex items-center overflow-hidden rounded-lg border border-white/10 bg-white/[0.02] px-6 py-2 transition-all duration-200 hover:bg-white/[0.05]"
+											className="group relative ml-auto flex items-center overflow-hidden rounded-lg border border-[#1C1E23] bg-white/[0.02] px-6 py-2 transition-all duration-200 hover:bg-[#1C1E23]"
 										>
 											<div className="pointer-events-none absolute inset-0">
 												<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />

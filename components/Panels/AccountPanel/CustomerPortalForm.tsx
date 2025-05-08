@@ -42,7 +42,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
 	return (
 		<div>
 			<div className="flex items-center gap-3">
-				<div className="flex-shrink-0 rounded-md bg-white/5 p-2">
+				<div className="flex-shrink-0 rounded-md bg-[#1C1E23] p-2">
 					<LuCreditCard className="h-4 w-4 text-white" />
 				</div>
 				<div className="min-w-0">
@@ -71,7 +71,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
 					<button
 						onClick={handleStripePortalRequest}
 						disabled={isSubmitting}
-						className="flex w-auto items-center justify-center gap-2 rounded-full bg-white/5 px-4 py-2 text-white transition-all duration-200 hover:bg-white/10 disabled:opacity-50"
+						className="flex w-auto items-center justify-center gap-2 rounded-full bg-[#1C1E23] px-4 py-2 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 					>
 						<LuCreditCard className="h-4 w-4 text-white" />
 						<span className="font-outfit text-sm">

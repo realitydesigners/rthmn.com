@@ -87,7 +87,7 @@ const PairItem = memo(
 								"border border-white/[0.02]",
 								"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
 								"hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
-								"hover:border-white/[0.05]",
+								"hover:border-[#1C1E23]",
 							]
 						: "hover:bg-white/[0.02]",
 				)}
@@ -99,7 +99,7 @@ const PairItem = memo(
 							"font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
 							isSelected
 								? "text-white"
-								: "text-[#666] group-hover/item:text-[#888]",
+								: "text-[#32353C] group-hover/item:text-[#545963]",
 						)}
 					>
 						{item}
@@ -111,8 +111,8 @@ const PairItem = memo(
 							className={cn(
 								"font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
 								isSelected
-									? "text-[#999]"
-									: "text-[#444] group-hover/item:text-[#666]",
+									? "text-[#545963]"
+									: "text-[#32353C] group-hover/item:text-[#32353C]",
 							)}
 						>
 							{price ? (
@@ -140,11 +140,11 @@ const PairItem = memo(
 									isSelected
 										? [
 												"border-white/[0.02] bg-white/[0.02] text-white/40",
-												"hover:border-white/[0.05] hover:bg-white/[0.05] hover:text-white/60",
+												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											]
 										: [
 												"border-white/[0.02] bg-white/[0.02] text-white/40",
-												"hover:border-white/[0.05] hover:bg-white/[0.05] hover:text-white/60",
+												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											],
 								)}
 							>
@@ -205,7 +205,7 @@ const SearchResultItem = memo(
 								"border border-white/[0.02]",
 								"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
 								"hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
-								"hover:border-white/[0.05]",
+								"hover:border-[#1C1E23]",
 							]
 						: "hover:bg-white/[0.02]",
 				)}
@@ -218,7 +218,7 @@ const SearchResultItem = memo(
 							"font-outfit ml-4 flex-1 text-sm font-bold tracking-wide transition-colors",
 							isSelected
 								? "text-white/90 group-hover/result:text-white"
-								: "text-[#666] group-hover/result:text-[#888]",
+								: "text-[#32353C] group-hover/result:text-[#545963]",
 						)}
 					>
 						{pair}
@@ -230,8 +230,8 @@ const SearchResultItem = memo(
 							className={cn(
 								"font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
 								isSelected
-									? "text-[#999]"
-									: "text-[#444] group-hover/result:text-[#666]",
+									? "text-[#545963]"
+									: "text-[#32353C] group-hover/result:text-[#32353C]",
 							)}
 						>
 							{price ? formatPrice(price, pair) : "N/A"}
@@ -251,11 +251,11 @@ const SearchResultItem = memo(
 									isSelected
 										? [
 												"border-white/[0.02] bg-white/[0.02] text-white/40",
-												"hover:border-white/[0.05] hover:bg-white/[0.05] hover:text-white/60",
+												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											]
 										: [
 												"border-white/[0.02] bg-white/[0.02] text-white/40",
-												"hover:border-white/[0.05] hover:bg-white/[0.05] hover:text-white/60",
+												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											],
 								)}
 							>
@@ -340,10 +340,10 @@ const SearchBar = memo(
 			<div className="relative" ref={searchRef}>
 				{/* Search Input */}
 				<div className="group/search relative flex h-10 items-center overflow-hidden rounded-lg transition-all duration-300">
-					<div className="absolute inset-0 rounded-lg border border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#070809] transition-all duration-300 group-focus-within/search:border-white/[0.05]" />
+					<div className="absolute inset-0 rounded-lg border border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#070809] transition-all duration-300 group-focus-within/search:border-[#1C1E23]" />
 
 					{/* Search Icon */}
-					<div className="relative ml-3 text-[#666] transition-colors duration-300 group-focus-within/search:text-[#888]">
+					<div className="relative ml-3 text-[#32353C] transition-colors duration-300 group-focus-within/search:text-[#545963]">
 						<FaSearch size={12} />
 					</div>
 
@@ -358,7 +358,7 @@ const SearchBar = memo(
 							setSearchQuery(value);
 						}}
 						onFocus={() => setShowResults(true)}
-						className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-[#888] placeholder-[#666] transition-colors outline-none"
+						className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-[#545963] placeholder-[#32353C] transition-colors outline-none"
 					/>
 
 					{/* Clear Button */}
@@ -369,7 +369,7 @@ const SearchBar = memo(
 								setSearchQuery("");
 								setShowResults(false);
 							}}
-							className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-white/[0.02] bg-white/[0.02] text-white/40 transition-all hover:border-white/[0.05] hover:bg-white/[0.05] hover:text-white/60"
+							className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-white/[0.02] bg-white/[0.02] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
 						>
 							<FaTimes size={8} />
 						</button>
@@ -389,7 +389,7 @@ const SearchBar = memo(
 								/>
 							))}
 							{filteredPairs.length === 0 && (
-								<div className="flex h-20 items-center justify-center text-center text-[13px] text-[#666]">
+								<div className="flex h-20 items-center justify-center text-center text-[13px] text-[#32353C]">
 									No instruments found matching "{searchQuery}"
 								</div>
 							)}
@@ -464,7 +464,7 @@ const DraggableItem = memo(
 								"border border-white/[0.02]",
 								"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
 								"hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
-								"hover:border-white/[0.05]",
+								"hover:border-[#1C1E23]",
 							)}
 						>
 							<div className="relative flex w-full items-center px-3">
@@ -478,7 +478,7 @@ const DraggableItem = memo(
 
 								{/* Price */}
 								<div className="flex items-center">
-									<span className="font-kodemono w-[70px] text-right text-sm tracking-wider text-[#999] transition-colors">
+									<span className="font-kodemono w-[70px] text-right text-sm tracking-wider text-[#545963] transition-colors">
 										{priceData[item]?.price ? (
 											formatPrice(priceData[item].price, item)
 										) : (
@@ -501,7 +501,7 @@ const DraggableItem = memo(
 											className={cn(
 												"relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
 												"opacity-0 group-hover/item:opacity-100",
-												"border-white/[0.02] bg-white/[0.02] text-white/40 hover:border-white/[0.05] hover:bg-white/[0.05] hover:text-white/60",
+												"border-white/[0.02] bg-white/[0.02] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											)}
 										>
 											<FaTimes size={8} />
@@ -555,7 +555,7 @@ const FilterButton = ({
 				className={cn(
 					"relative z-10 font-outfit text-[12px] font-medium tracking-wide whitespace-nowrap flex items-center justify-center",
 					"transition-colors duration-300 ease-in-out",
-					isActive ? "text-white" : "text-[#666] group-hover:text-[#888]",
+					isActive ? "text-white" : "text-[#32353C] group-hover:text-[#545963]",
 				)}
 			>
 				{label}

@@ -200,7 +200,7 @@ export function MobileNavigation({
 				animate={{ y: isScrolled ? 0 : 100 }}
 				transition={{ duration: 0.3 }}
 			>
-				<div className="flex h-14 items-center gap-2 rounded-full border border-white/[0.05]  bg-[#111] px-3 py-2 shadow-lg backdrop-blur-md">
+				<div className="flex h-14 items-center gap-2 rounded-full border border-[#1C1E23]  bg-[#111] px-3 py-2 shadow-lg backdrop-blur-md">
 					<div className="flex items-center">
 						<FaBook className="mr-2 h-5 w-5 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
 						<div className="max-w-[150px] truncate text-sm font-medium text-white">
@@ -209,7 +209,7 @@ export function MobileNavigation({
 					</div>
 					<button
 						onClick={() => setIsOpen(true)}
-						className="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#333] via-[#222] to-[#111] p-[1px] shadow-md transition-all duration-200 hover:from-indigo-900 hover:via-indigo-800 hover:to-indigo-900"
+						className="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#32353C] via-[#222] to-[#111] p-[1px] shadow-md transition-all duration-200 hover:from-indigo-900 hover:via-indigo-800 hover:to-indigo-900"
 					>
 						<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-[#222] to-[#111]">
 							<FaChevronUp className="h-4 w-4 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
@@ -223,7 +223,7 @@ export function MobileNavigation({
 				{isOpen && (
 					<motion.div
 						ref={panelRef}
-						className="fixed right-0 bottom-0 left-0 z-[120] flex flex-col rounded-t-xl border-t border-white/[0.05]  bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden"
+						className="fixed right-0 bottom-0 left-0 z-[120] flex flex-col rounded-t-xl border-t border-[#1C1E23]  bg-gradient-to-b from-[#111] to-[#080808] shadow-2xl lg:hidden"
 						style={{ height: "60vh", maxHeight: "calc(100vh - 80px)" }}
 						initial={{ opacity: 0, y: 300 }}
 						animate={{ opacity: 1, y: 0 }}
@@ -231,8 +231,8 @@ export function MobileNavigation({
 						transition={{ duration: 0.3 }}
 					>
 						{/* Panel Header with handle for dragging */}
-						<div className="flex flex-col border-b border-white/[0.05] ">
-							<div className="mx-auto my-2 h-1 w-16 rounded-full bg-[#444]"></div>
+						<div className="flex flex-col border-b border-[#1C1E23] ">
+							<div className="mx-auto my-2 h-1 w-16 rounded-full bg-[#32353C]"></div>
 							<div className="flex items-center justify-between p-4">
 								<div className="flex items-center gap-2">
 									<FaBook className="h-5 w-5 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
@@ -250,7 +250,7 @@ export function MobileNavigation({
 						</div>
 
 						{/* Tabs */}
-						<div className="flex border-b border-white/[0.05] ">
+						<div className="flex border-b border-[#1C1E23] ">
 							<button
 								className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
 									activeTab === "course"

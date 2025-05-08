@@ -356,8 +356,8 @@ export const PairFilterButtons = ({
 			<div
 				className={`group flex h-9 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
 					isActive
-						? "from-[#444444] to-[#282828]"
-						: "from-[#333333] to-[#181818] hover:from-[#444444] hover:to-[#282828]"
+						? "from-[#32353C] to-[#282828]"
+						: "from-[#32353C] to-[#181818] hover:from-[#32353C] hover:to-[#282828]"
 				}`}
 			>
 				<div
@@ -378,15 +378,15 @@ export const SearchBar = ({
 }: { searchQuery: string; setSearchQuery: (query: string) => void }) => {
 	return (
 		<div className="relative z-[99] flex justify-center px-4">
-			<div className="relative flex w-full items-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#444444] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]">
+			<div className="relative flex w-full items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#32353C] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]">
 				<div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
-					<LuSearch className="ml-4 h-5 w-5 text-[#666]" />
+					<LuSearch className="ml-4 h-5 w-5 text-[#32353C]" />
 					<input
 						type="text"
 						value={searchQuery}
 						onChange={(e) => setSearchQuery(e.target.value)}
 						placeholder="Search instruments..."
-						className="font-outfit text-md ml-2 w-full bg-transparent pr-3 text-white placeholder-[#666] focus:outline-none"
+						className="font-outfit text-md ml-2 w-full bg-transparent pr-3 text-white placeholder-[#32353C] focus:outline-none"
 					/>
 				</div>
 			</div>
@@ -559,7 +559,7 @@ export const PairItem = ({
 				<div className="group flex w-full items-center justify-between">
 					<div className="flex items-baseline gap-2">
 						<h3
-							className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ease-in-out ${isActive ? "scale-105 text-white" : "scale-90 text-[#444]"}`}
+							className={`font-outfit text-2xl font-bold tracking-tight transition-all duration-300 ease-in-out ${isActive ? "scale-105 text-white" : "scale-90 text-[#32353C]"}`}
 						>
 							{pair}
 						</h3>
@@ -599,7 +599,7 @@ const ActionButton = ({
 	variant?: "default" | "danger" | "success";
 }) => {
 	const variantStyles = {
-		default: "bg-white/10 hover:bg-white/20 text-neutral-300",
+		default: "bg-[#1C1E23] hover:bg-[#32353C] text-neutral-300",
 		danger: "bg-red-500/10 text-red-400 hover:bg-red-500/20",
 		success: "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20",
 	};
@@ -616,7 +616,7 @@ const ActionButton = ({
 
 const PairIndicator = ({ type }: { type: "active" | "remove" | "add" }) => {
 	const styles = {
-		active: "bg-gradient-to-r from-white/20 to-transparent",
+		active: "bg-gradient-to-r from-[#32353C] to-transparent",
 		remove: "animate-pulse bg-gradient-to-r from-red-400/20 to-transparent",
 		add: "animate-pulse bg-gradient-to-r from-blue-400/20 to-transparent",
 	};

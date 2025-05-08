@@ -282,7 +282,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 									<div className="flex items-center gap-3">
 										<Link
 											href="/dashboard"
-											className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+											className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
 										>
 											<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
 												Dashboard
@@ -291,7 +291,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 										<div className="relative" ref={dropdownRef}>
 											<button
 												onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-												className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+												className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 											>
 												<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]">
 													<div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black">
@@ -321,14 +321,14 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 													>
 														<Link
 															href="/account"
-															className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5"
+															className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
 															role="menuitem"
 														>
 															Account
 														</Link>
 														<button
 															onClick={handleSignOut}
-															className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-white/5"
+															className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
 															role="menuitem"
 														>
 															Sign out
@@ -366,7 +366,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 										<div className="flex items-center gap-3">
 											<Link
 												href="/dashboard"
-												className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#444444] hover:to-[#282828]"
+												className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
 											>
 												<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-sm font-medium">
 													Dashbaord
@@ -375,7 +375,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 											<div className="relative" ref={dropdownRef}>
 												<button
 													onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-													className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#333333] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+													className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 												>
 													<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]">
 														<div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black">
@@ -405,14 +405,14 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 														>
 															<Link
 																href="/account"
-																className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-white/5"
+																className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
 																role="menuitem"
 															>
 																Account
 															</Link>
 															<button
 																onClick={handleSignOut}
-																className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-white/5"
+																className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
 																role="menuitem"
 															>
 																Sign out
@@ -486,7 +486,7 @@ export const NavButton: FC<NavButtonProps> = ({
 			>
 				<Link
 					href={href}
-					className="flex items-center rounded-full bg-linear-to-b from-[#333333] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#444444] hover:to-[#282828]"
+					className="flex items-center rounded-full bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 					onClick={onClick}
 				>
 					<span className="flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">

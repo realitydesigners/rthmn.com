@@ -21,13 +21,13 @@ const OnboardingCard = ({
 	return (
 		<div
 			className={cn(
-				"group relative w-full overflow-hidden rounded-xl border border-white/[0.05]  bg-gradient-to-b from-[#1A1A1A] to-[#0D0D0D] transition-all duration-300 hover:scale-[1.01]",
+				"group relative w-full overflow-hidden rounded-xl border border-[#1C1E23]  bg-gradient-to-b from-[#1A1A1A] to-[#0D0D0D] transition-all duration-300 hover:scale-[1.01]",
 			)}
 		>
 			{/* Highlight Effect */}
 			<div
 				className={cn(
-					"absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100",
+					"absolute inset-0 bg-gradient-to-b from-[#1C1E23] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100",
 				)}
 			/>
 
@@ -45,7 +45,7 @@ const OnboardingCard = ({
 						</h3>
 						<button
 							onClick={() => setIsExpanded(!isExpanded)}
-							className="ml-2 rounded-md p-0.5 text-neutral-500 hover:bg-white/5 hover:text-neutral-300"
+							className="ml-2 rounded-md p-0.5 text-neutral-500 hover:bg-[#1C1E23] hover:text-neutral-300"
 						>
 							{isExpanded ? (
 								<LuChevronUp size={14} />

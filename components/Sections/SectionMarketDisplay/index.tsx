@@ -605,7 +605,7 @@ export const SectionMarketDisplay = memo(
 											index={index}
 											change={data.change}
 										>
-											<div className="relative h-full w-full rounded-xl border border-white/10 bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80">
+											<div className="relative h-full w-full rounded-xl border border-[#1C1E23] bg-black/60 p-4 backdrop-blur-md transition-all duration-300 group-hover:bg-black/80">
 												<CardContent item={item} data={data} />
 											</div>
 										</CardTransform>

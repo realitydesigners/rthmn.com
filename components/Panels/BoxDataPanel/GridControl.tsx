@@ -29,8 +29,8 @@ const GridIcon = React.memo(
 				onClick={onClick}
 				className={`group relative flex h-7 w-7 items-center justify-center rounded-md transition-all duration-200 ${
 					isActive
-						? "border-white/[0.05]  bg-gradient-to-b from-[#1A1A1A] to-[#141414]"
-						: "border-[#222] bg-gradient-to-b from-[#111] to-[#0A0A0A] hover:border-white/[0.05]  hover:from-[#151515] hover:to-[#0F0F0F]"
+						? "border-[#1C1E23]  bg-gradient-to-b from-[#1A1A1A] to-[#141414]"
+						: "border-[#222] bg-gradient-to-b from-[#111] to-[#0A0A0A] hover:border-[#1C1E23]  hover:from-[#151515] hover:to-[#0F0F0F]"
 				}`}
 			>
 				<div className="grid h-4 w-4 gap-[1px]" style={gridStyle}>
@@ -39,8 +39,8 @@ const GridIcon = React.memo(
 							key={i}
 							className={`rounded-[1px] border transition-all duration-200 ${
 								isActive
-									? "border-[#444] bg-[#222]"
-									: "border-[#222] bg-[#181818] group-hover:border-white/[0.05]  group-hover:bg-[#1A1A1A]"
+									? "border-[#32353C] bg-[#222]"
+									: "border-[#222] bg-[#181818] group-hover:border-[#1C1E23]  group-hover:bg-[#1A1A1A]"
 							}`}
 						/>
 					))}

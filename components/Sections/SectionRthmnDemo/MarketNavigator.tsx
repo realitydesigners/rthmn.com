@@ -74,13 +74,13 @@ export function MarketNavigator({
 					placeholder="Search pairs..."
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className="font-outfit w-full rounded-lg border border-white/5 bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-white/10"
+					className="font-outfit w-full rounded-lg border border-[#1C1E23] bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-[#1C1E23]"
 				/>
 			</div>
 
 			{/* Market Categories */}
 			<div className="grid grid-cols-2 gap-2">
-				<button className="rounded-lg border border-white/5 bg-black/40 p-3 text-left hover:border-white/10">
+				<button className="rounded-lg border border-[#1C1E23] bg-black/40 p-3 text-left hover:border-[#1C1E23]">
 					<span className="font-outfit text-sm font-medium text-white">
 						Favorites
 					</span>
@@ -91,7 +91,7 @@ export function MarketNavigator({
 			</div>
 
 			{/* Market List */}
-			<div className="scrollbar-thin scrollbar-track-white/5 flex-1 overflow-y-auto rounded-lg border border-white/5 bg-black/40 p-2">
+			<div className="scrollbar-thin scrollbar-track-[#1C1E23] flex-1 overflow-y-auto rounded-lg border border-[#1C1E23] bg-black/40 p-2">
 				<div className="space-y-1">
 					{filteredPairs.map((item) => {
 						const price = getLatestPrice(item.candleData);
@@ -102,8 +102,10 @@ export function MarketNavigator({
 							<div
 								key={item.pair}
 								onClick={() => onPairSelect(item.pair)}
-								className={`group flex cursor-pointer items-center justify-between rounded-lg border border-transparent p-3 transition-all hover:border-white/10 hover:bg-white/5 ${
-									selectedPair === item.pair ? "border-white/10 bg-white/5" : ""
+								className={`group flex cursor-pointer items-center justify-between rounded-lg border border-transparent p-3 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] ${
+									selectedPair === item.pair
+										? "border-[#1C1E23] bg-[#1C1E23]"
+										: ""
 								}`}
 							>
 								<div className="flex items-center gap-3">

@@ -144,13 +144,13 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 							onError={handleImageError}
 						/>
 						{imageLoading && (
-							<div className="flex h-full w-full items-center justify-center bg-[#333]">
+							<div className="flex h-full w-full items-center justify-center bg-[#32353C]">
 								<div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-b-transparent"></div>
 							</div>
 						)}
 					</>
 				) : (
-					<div className="flex h-full w-full items-center justify-center bg-[#333] transition-colors duration-200 group-hover:bg-[#444]">
+					<div className="flex h-full w-full items-center justify-center bg-[#32353C] transition-colors duration-200 group-hover:bg-[#32353C]">
 						<span className="text-2xl font-bold text-zinc-500 sm:text-4xl">
 							{userId.charAt(0).toUpperCase()}
 						</span>

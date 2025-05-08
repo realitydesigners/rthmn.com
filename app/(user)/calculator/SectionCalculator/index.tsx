@@ -138,10 +138,10 @@ const InputField = memo(
 					value={value || ""}
 					onChange={(e) => onChange(Number.parseFloat(e.target.value) || 0)}
 					placeholder={placeholder}
-					className={`w-full rounded-xl border bg-white/5 py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
+					className={`w-full rounded-xl border bg-[#1C1E23] py-4 pr-4 pl-12 text-white placeholder-white/40 shadow-lg shadow-black/20 backdrop-blur-sm transition-all duration-300 focus:outline-none ${
 						error
 							? "border-red-400/50 focus:border-red-400/50 focus:bg-red-400/5 focus:ring-2 focus:ring-red-400/20"
-							: "border-white/10 focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20"
+							: "border-[#1C1E23] focus:border-blue-400/50 focus:bg-blue-400/5 focus:ring-2 focus:ring-blue-400/20"
 					}`}
 				/>
 			</div>
@@ -170,11 +170,11 @@ const ResultCard = memo(
 	}) => (
 		<motion.div
 			whileHover={{ scale: 1.02 }}
-			className="relative overflow-hidden rounded-xl border border-white/10 bg-black/40 p-6 backdrop-blur-sm transition-all duration-300"
+			className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-black/40 p-6 backdrop-blur-sm transition-all duration-300"
 		>
 			<div className="pointer-events-none absolute inset-0">
 				<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 			</div>
 			<div className="relative z-10">
 				<div className="mb-2 flex items-center gap-3">
@@ -184,7 +184,7 @@ const ResultCard = memo(
 								? "bg-red-400/10 text-red-400"
 								: positive
 									? "bg-blue-400/10 text-blue-400"
-									: "bg-white/5 text-neutral-400"
+									: "bg-[#1C1E23] text-neutral-400"
 						}`}
 					>
 						{icon}
@@ -256,7 +256,7 @@ const TakeProfitSuggestion = memo(
 					<button
 						key={ratio}
 						onClick={() => onSelect(price)}
-						className="group flex items-center gap-2 rounded-lg border border-white/10 bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
+						className="group flex items-center gap-2 rounded-lg border border-[#1C1E23] bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
 					>
 						<span>{ratio}:1</span>
 						<span className="text-blue-400">${price.toFixed(2)}</span>
@@ -389,7 +389,7 @@ export const SectionCalculator = () => {
 				<div className="mx-auto flex gap-8">
 					{/* Quick Risk Templates - Left Sidebar */}
 					<div className="hidden w-1/4 shrink-0 lg:block">
-						<div className="sticky top-8 rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="sticky top-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
 								Quick Risk Templates
 							</h3>
@@ -401,12 +401,12 @@ export const SectionCalculator = () => {
 										className={`group relative w-full overflow-hidden rounded-xl border p-4 text-left transition-all duration-300 ${
 											inputs.riskPercentage === template.value
 												? "border-blue-400/50 bg-blue-400/5"
-												: "border-white/10 bg-black/40 hover:border-white/20 hover:bg-black/60"
+												: "border-[#1C1E23] bg-black/40 hover:border-[#32353C] hover:bg-black/60"
 										}`}
 									>
 										<div className="pointer-events-none absolute inset-0">
 											<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
-											<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+											<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 										</div>
 										<div className="relative z-10">
 											<div className="font-outfit mb-1 text-lg font-semibold text-white">
@@ -428,7 +428,7 @@ export const SectionCalculator = () => {
 					{/* Main Calculator Content - Center */}
 					<div className="w-full lg:w-1/2">
 						{/* Account & Risk Section */}
-						<div className="mb-8 rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="mb-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
 								Account Details
 							</h3>
@@ -461,7 +461,7 @@ export const SectionCalculator = () => {
 						</div>
 
 						{/* Trade Direction Section */}
-						<div className="mb-8 rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="mb-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
 								Trade Direction
 							</h3>
@@ -472,7 +472,7 @@ export const SectionCalculator = () => {
 						</div>
 
 						{/* Price Levels Section */}
-						<div className="rounded-xl border border-white/10 bg-black/40 p-6">
+						<div className="rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<div className="mb-6 flex items-center justify-between">
 								<h3 className="font-outfit text-lg font-semibold text-white">
 									Price Levels

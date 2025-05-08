@@ -152,14 +152,14 @@ const LessonFooter = ({
 					{nextLesson && (
 						<Link
 							href={`/learn/${course.slug}/${nextLesson.slug}`}
-							className="group relative flex-col flex w-[400px] items-end gap-4 rounded-2xl bg-black p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,rgba(0,115,230,0.03)_0%,rgba(0,115,230,0.01)_100%)] before:absolute before:inset-0 before:rounded-2xl before:bg-[linear-gradient(120deg,transparent_0%,rgba(0,115,230,0)_10%,rgba(0,115,230,0.1)_45%,rgba(0,115,230,0.05)_55%,rgba(0,115,230,0.1)_80%,rgba(0,115,230,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_12s_linear_infinite] shadow-[0_0_30px_rgba(0,115,230,0.1)] hover:shadow-[0_0_30px_rgba(0,115,230,0.2)] ring-1 ring-white/5"
+							className="group relative flex-col flex w-[400px] items-end gap-4 rounded-2xl bg-black p-4 transition-all duration-300 hover:bg-[linear-gradient(180deg,rgba(0,115,230,0.03)_0%,rgba(0,115,230,0.01)_100%)] before:absolute before:inset-0 before:rounded-2xl before:bg-[linear-gradient(120deg,transparent_0%,rgba(0,115,230,0)_10%,rgba(0,115,230,0.1)_45%,rgba(0,115,230,0.05)_55%,rgba(0,115,230,0.1)_80%,rgba(0,115,230,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_12s_linear_infinite] shadow-[0_0_30px_rgba(0,115,230,0.1)] hover:shadow-[0_0_30px_rgba(0,115,230,0.2)] ring-1 ring-[#1C1E23]"
 						>
 							<div className="flex items-center gap-4">
 								<div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0073E6]/20 text-[#0073E6] shadow-[inset_0_1px_0px_rgba(255,255,255,0.1)] group-hover:bg-[#0073E6]/30 group-hover:text-[#0073E6] transition-all duration-300">
 									<FaPlay className="h-4 w-4 translate-x-0.5" />
 								</div>
 								<div className="flex-1 min-w-0">
-									<div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-[#666666] group-hover:text-[#0073E6]/70 transition-all duration-300">
+									<div className="flex items-center gap-3 text-[11px] font-medium uppercase tracking-wider text-[#32353C] group-hover:text-[#0073E6]/70 transition-all duration-300">
 										<span>Next up</span>
 										<div className="flex items-center gap-1.5">
 											<FaClock className="h-3 w-3" />
