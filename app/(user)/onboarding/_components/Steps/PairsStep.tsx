@@ -182,7 +182,7 @@ export default function PairsStep({
 
 					return (
 						<div key={group.label}>
-							<h3 className="font-kodemono sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#32353C] uppercase">
+							<h3 className="font-dmmono  sticky top-0 z-90 py-2 text-xs font-medium tracking-wider text-[#32353C] uppercase">
 								{group.label}
 							</h3>
 							<div className="grid grid-cols-2 gap-2 xl:grid-cols-3">
@@ -226,7 +226,7 @@ export default function PairsStep({
 													</span>
 												</div>
 												<div className="flex items-center">
-													<span className="font-kodemono mr-3 text-[13px] font-medium tracking-wider text-[#32353C] transition-all group-hover:mr-4">
+													<span className="font-dmmono  mr-3 text-[13px] font-medium tracking-wider text-[#32353C] transition-all group-hover:mr-4">
 														{priceData[item]?.price
 															? formatPrice(priceData[item].price, item)
 															: "N/A"}

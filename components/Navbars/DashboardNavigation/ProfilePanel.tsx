@@ -92,7 +92,7 @@ export const ProfilePanel = () => {
 	if (!user) return null;
 
 	return (
-		<div className="fixed bottom-0 left-1/2 z-[90] h-[px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#111215] bg-black pb-20">
+		<div className="fixed bottom-0 left-1/2 z-[90] h-[px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#0A0B0D] bg-black pb-20">
 			<div className="scrollbar-hide h-full overflow-y-auto px-4 pt-8">
 				{/* Profile Header */}
 				<div className="mb-6">
@@ -134,7 +134,7 @@ export const ProfilePanel = () => {
 
 					<div className="relative">
 						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-[#111215]"></div>
+							<div className="w-full border-t border-[#0A0B0D]"></div>
 						</div>
 					</div>
 

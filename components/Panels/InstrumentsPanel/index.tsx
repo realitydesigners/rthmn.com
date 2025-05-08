@@ -109,7 +109,7 @@ const PairItem = memo(
 					<div className="flex items-center">
 						<span
 							className={cn(
-								"font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+								"font-dmmono  w-[70px] text-right text-sm tracking-wider transition-colors",
 								isSelected
 									? "text-[#545963]"
 									: "text-[#32353C] group-hover/item:text-[#32353C]",
@@ -228,7 +228,7 @@ const SearchResultItem = memo(
 					<div className="flex items-center">
 						<span
 							className={cn(
-								"font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+								"font-dmmono  w-[70px] text-right text-sm tracking-wider transition-colors",
 								isSelected
 									? "text-[#545963]"
 									: "text-[#32353C] group-hover/result:text-[#32353C]",
@@ -478,7 +478,7 @@ const DraggableItem = memo(
 
 								{/* Price */}
 								<div className="flex items-center">
-									<span className="font-kodemono w-[70px] text-right text-sm tracking-wider text-[#545963] transition-colors">
+									<span className="font-dmmono  w-[70px] text-right text-sm tracking-wider text-[#545963] transition-colors">
 										{priceData[item]?.price ? (
 											formatPrice(priceData[item].price, item)
 										) : (

@@ -33,7 +33,7 @@ export const PriceChart = memo(
 					>
 						<div className="absolute -top-3 right-0 flex items-center gap-2">
 							<div className="rounded bg-blue-400/10 px-2 py-1">
-								<span className="font-kodemono text-xs text-blue-400">
+								<span className="font-dmmono  text-xs text-blue-400">
 									Take Profit: ${takeProfit.toFixed(2)}
 								</span>
 							</div>
@@ -50,7 +50,7 @@ export const PriceChart = memo(
 					>
 						<div className="absolute -top-3 right-0 flex items-center gap-2">
 							<div className="rounded bg-[#1C1E23] px-2 py-1">
-								<span className="font-kodemono text-xs text-white">
+								<span className="font-dmmono  text-xs text-white">
 									Entry: ${entryPrice.toFixed(2)}
 								</span>
 							</div>
@@ -67,7 +67,7 @@ export const PriceChart = memo(
 					>
 						<div className="absolute -top-3 right-0 flex items-center gap-2">
 							<div className="rounded bg-red-400/10 px-2 py-1">
-								<span className="font-kodemono text-xs text-red-400">
+								<span className="font-dmmono  text-xs text-red-400">
 									Stop Loss: ${stopLoss.toFixed(2)}
 								</span>
 							</div>
@@ -97,7 +97,7 @@ export const PriceChart = memo(
 					{/* Risk/Reward Label */}
 					<div className="absolute bottom-4 left-4">
 						<div className="rounded-full bg-[#1C1E23] px-3 py-1">
-							<span className="font-kodemono text-sm text-white/60">
+							<span className="font-dmmono  text-sm text-white/60">
 								Risk/Reward: 1:{ratio.toFixed(2)}
 							</span>
 						</div>

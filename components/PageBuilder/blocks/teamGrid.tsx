@@ -91,7 +91,7 @@ export function TeamCard({ members = [] }: { members: TeamMember[] }) {
 									)}
 								</div>
 							</div>
-							<p className="font-kodemono font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
+							<p className="font-dmmono  font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
 								{member.role}
 							</p>
 							<p className="font-outfit text-sm leading-relaxed text-[#BFC2CA] transition-colors duration-300 group-hover:text-white/70">

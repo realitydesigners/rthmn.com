@@ -410,7 +410,7 @@ const TimeFrameSliderContent = memo(
 				</div>
 
 				{/* Dynamic Timeframe Scale */}
-				<div className="mt-2 flex items-center justify-between  font-kodemono text-[10px] tracking-wider text-[#32353C]">
+				<div className="mt-2 flex items-center justify-between  font-dmmono  text-[10px] tracking-wider text-[#32353C]">
 					<span>{getTimeLabel(reversedStartIndex).label}</span>
 					<span>
 						{getTimeLabel(reversedStartIndex + reversedMaxBoxCount).label}

@@ -107,7 +107,7 @@ export const PairResoBox = ({
 								{isLoading || !currentPrice ? (
 									<TextSkeleton className="h-4 w-16" />
 								) : (
-									<div className="font-kodemono text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+									<div className="font-dmmono  text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
 										{formatPrice(currentPrice, pair)}
 									</div>
 								)}

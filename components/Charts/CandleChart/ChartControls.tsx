@@ -25,7 +25,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 				<h1 className="font-outfit text-xl font-bold tracking-wider text-white">
 					{pair}
 				</h1>
-				<div className="font-kodemono text-sm font-medium text-neutral-200">
+				<div className="font-dmmono  text-sm font-medium text-neutral-200">
 					{currentPrice || "-"}
 				</div>
 			</div>

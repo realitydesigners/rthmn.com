@@ -20,7 +20,7 @@ const CURRENCIES: { value: Currency; symbol: string; label: string }[] = [
 export const CurrencySelector = memo(
 	({ currency, onCurrencyChange }: CurrencySelectorProps) => (
 		<div className="relative">
-			<label className="font-kodemono mb-2 block text-sm primary-text">
+			<label className="font-dmmono  mb-2 block text-sm primary-text">
 				Currency
 			</label>
 			<div className="relative">

@@ -162,7 +162,7 @@ export const DashboardNavigation = () => {
 					scrollDirection === "down" ? "translate-y-24" : "translate-y-0"
 				}`}
 			>
-				<div className="flex h-full gap-2 rounded-full border border-[#111215] bg-black px-2 py-2">
+				<div className="flex h-full gap-2 rounded-full border border-[#0A0B0D] bg-black px-2 py-2">
 					<ProfileIcon setActivePanel={setActivePanel} />
 					<SidebarIconButton
 						icon={LuSearch}

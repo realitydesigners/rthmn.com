@@ -30,22 +30,22 @@ export const PanelSection = ({
 					<div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-xl">
 						<Icon
 							size={14}
-							className="text-[#32353C] transition-colors group-hover:text-[#545963]"
+							className="text-[#666] transition-colors group-hover:text-[#888]"
 						/>
 					</div>
-					<span className="font-outfit text-[13px] font-medium tracking-wide text-[#32353C] transition-colors group-hover:text-[#545963]">
+					<span className="font-outfit text-[13px] font-medium tracking-wide text-[#666] transition-colors group-hover:text-[#888]">
 						{title}
 					</span>
 				</div>
 				{isExpanded ? (
 					<LuChevronUp
 						size={14}
-						className="text-[#32353C] transition-colors group-hover:text-[#545963]"
+						className="text-[#666] transition-colors group-hover:text-[#888]"
 					/>
 				) : (
 					<LuChevronDown
 						size={14}
-						className="text-[#32353C] transition-colors group-hover:text-[#545963]"
+						className="text-[#666] transition-colors group-hover:text-[#888]"
 					/>
 				)}
 			</button>

@@ -178,7 +178,7 @@ const FeatureTags = memo(() => (
 				className="group flex cursor-pointer items-center gap-2"
 			>
 				<feature.icon className="h-3.5 w-3.5 primary-text transition-colors duration-300 group-hover:text-blue-400 group-hover:drop-shadow-[0_0_3px_rgba(34,197,94,0.4)]" />
-				<span className="font-kodemono text-xs primary-text transition-colors duration-300 group-hover:text-neutral-200">
+				<span className="font-dmmono  text-xs primary-text transition-colors duration-300 group-hover:text-neutral-200">
 					{feature.text}
 				</span>
 			</motion.div>

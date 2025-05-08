@@ -181,7 +181,7 @@ const PairClient = ({
 			<div className="relative flex h-[calc(100vh-250px-56px)] w-full flex-1 flex-col">
 				<div className="flex h-full w-full flex-1">
 					<div className="h-full w-1/2 p-4">
-						<div className="relative flex h-full flex-col overflow-hidden border border-[#111215] bg-black">
+						<div className="relative flex h-full flex-col overflow-hidden border border-[#0A0B0D] bg-black">
 							<ChartControls
 								showBoxLevels={showBoxLevels}
 								setShowBoxLevels={setShowBoxLevels}
@@ -221,7 +221,7 @@ const PairClient = ({
 							</div>
 						</div>
 						<div className="mt-8 h-[200px] w-full">
-							<div className="flex h-full flex-col border border-[#111215] bg-black p-2">
+							<div className="flex h-full flex-col border border-[#0A0B0D] bg-black p-2">
 								{boxColors && histogramData && (
 									<Histogram
 										data={histogramData}
@@ -236,8 +236,8 @@ const PairClient = ({
 							</div>
 						</div>
 					</div>
-					<div className="h-full w-1/2 border-r border-[#111215] p-4">
-						<div className="flex h-full flex-col border border-[#111215] bg-black p-4">
+					<div className="h-full w-1/2 border-r border-[#0A0B0D] p-4">
+						<div className="flex h-full flex-col border border-[#0A0B0D] bg-black p-4">
 							<div className="mb-4 flex items-center justify-end">
 								<button
 									type="button"

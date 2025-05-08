@@ -29,7 +29,7 @@ export function GitHubBlock({
 							<h2 className="font-outfit mb-2 text-2xl font-bold text-white">
 								{title}
 							</h2>
-							<p className="font-kodemono mb-8 primary-text md:mb-0">
+							<p className="font-dmmono  mb-8 primary-text md:mb-0">
 								{description}
 							</p>
 						</div>

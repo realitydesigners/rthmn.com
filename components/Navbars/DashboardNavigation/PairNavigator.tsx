@@ -267,7 +267,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
 
 	return (
 		<div
-			className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#111215] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
+			className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#0A0B0D] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
 				isModalOpen ? "h-[175px] lg:hidden" : "h-[50vh]"
 			}`}
 		>
@@ -435,7 +435,7 @@ const PairPrice = ({
 	isActive,
 }: { price: number; isJPY: boolean; isActive: boolean }) => (
 	<div
-		className={`font-kodemono ml-2 text-sm ${isActive ? "text-white" : "text-[#111215]"}`}
+		className={`font-dmmono  ml-2 text-sm ${isActive ? "text-white" : "text-[#0A0B0D]"}`}
 	>
 		{price.toFixed(isJPY ? 3 : 5)}
 	</div>

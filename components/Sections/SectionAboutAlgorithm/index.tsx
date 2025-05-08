@@ -76,7 +76,7 @@ export function SectionAboutAlgorithm() {
 								{market.description}
 							</p>
 
-							<div className="font-kodemono text-sm primary-text">
+							<div className="font-dmmono  text-sm primary-text">
 								{market.highlight}
 							</div>
 						</motion.div>

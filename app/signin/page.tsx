@@ -199,7 +199,7 @@ export default function SignIn() {
 							<h1 className="font-outfit bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl lg:text-5xl">
 								Trading from another dimension
 							</h1>
-							<p className="font-kodemono max-w-[90%] text-base primary-text/90 sm:text-lg">
+							<p className="font-dmmono  max-w-[90%] text-base primary-text/90 sm:text-lg">
 								Take your trading to a new level.
 							</p>
 						</div>

@@ -312,7 +312,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 												</div>
 											</button>
 											{isDropdownOpen && (
-												<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#111215] bg-black/95 shadow-xl backdrop-blur-xl">
+												<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#0A0B0D] bg-black/95 shadow-xl backdrop-blur-xl">
 													<div
 														className="py-1"
 														role="menu"
@@ -396,7 +396,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 													</div>
 												</button>
 												{isDropdownOpen && (
-													<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#111215] bg-black/95 shadow-xl backdrop-blur-xl">
+													<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#0A0B0D] bg-black/95 shadow-xl backdrop-blur-xl">
 														<div
 															className="py-1"
 															role="menu"

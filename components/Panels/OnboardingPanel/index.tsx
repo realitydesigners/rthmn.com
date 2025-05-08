@@ -71,7 +71,7 @@ const OnboardingCard = ({
 								In Progress
 							</span>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-full border border-[#111215] bg-[#111] px-2 py-0.5 text-[10px] font-medium primary-text">
+							<span className="inline-flex items-center gap-1 rounded-full border border-[#0A0B0D] bg-[#111] px-2 py-0.5 text-[10px] font-medium primary-text">
 								Not Started
 							</span>
 						)}
@@ -99,7 +99,7 @@ export const Onboarding = () => {
 					</h2>
 				</div> */}
 				<div className="flex items-center gap-2">
-					<div className="h-1.5 flex-1 rounded-full bg-[#111215]">
+					<div className="h-1.5 flex-1 rounded-full bg-[#0A0B0D]">
 						<div
 							className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80 transition-all duration-300"
 							style={{

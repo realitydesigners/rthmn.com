@@ -237,7 +237,7 @@ export function PairSlider({
 
 								{isActive && (
 									<div className="mt-4 flex items-center gap-2">
-										<div className="font-kodemono text-lg primary-text">
+										<div className="font-dmmono  text-lg primary-text">
 											{latestPrice?.toFixed(item.pair.includes("JPY") ? 3 : 5)}
 										</div>
 										<div className="flex items-center gap-3">

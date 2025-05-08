@@ -206,7 +206,7 @@ const LoadMoreButton = memo(({ onClick }: { onClick: () => void }) => (
 			<div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
 			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 		</div>
-		<span className="font-kodemono text-sm">Show More</span>
+		<span className="font-dmmono  text-sm">Show More</span>
 	</button>
 ));
 
@@ -266,7 +266,7 @@ export function FAQBlock({
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						{title}
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base primary-text sm:text-lg">
+					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Everything you need to know about rthmn. Can't find the answer
 						you're looking for? Contact us at{" "}
 						<button type="button" className="text-blue-400">

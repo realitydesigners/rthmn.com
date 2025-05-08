@@ -111,7 +111,7 @@ const InputField = memo(
 		placeholder?: string;
 	}) => (
 		<div className="relative">
-			<label className="font-kodemono mb-2 flex items-center justify-between text-sm">
+			<label className="font-dmmono  mb-2 flex items-center justify-between text-sm">
 				<div className="flex items-center gap-2">
 					{label}
 					{tooltip && (
@@ -189,13 +189,13 @@ const ResultCard = memo(
 					>
 						{icon}
 					</div>
-					<div className="font-kodemono text-sm primary-text">{label}</div>
+					<div className="font-dmmono  text-sm primary-text">{label}</div>
 				</div>
 				<div className="font-outfit text-2xl font-bold text-white">
 					{isInvalid ? "—" : value}
 				</div>
 				{subValue && !isInvalid && (
-					<div className="font-kodemono mt-1 text-sm primary-text">
+					<div className="font-dmmono  mt-1 text-sm primary-text">
 						{subValue}
 					</div>
 				)}
@@ -379,7 +379,7 @@ export const SectionCalculator = () => {
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Position Size Calculator
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base primary-text sm:text-lg">
+					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Calculate your optimal position size and risk management parameters
 						with precision.
 					</p>
@@ -412,10 +412,10 @@ export const SectionCalculator = () => {
 											<div className="font-outfit mb-1 text-lg font-semibold text-white">
 												{template.label}
 											</div>
-											<div className="font-kodemono mb-2 text-2xl text-blue-400">
+											<div className="font-dmmono  mb-2 text-2xl text-blue-400">
 												{template.value}%
 											</div>
-											<p className="font-kodemono text-sm primary-text">
+											<p className="font-dmmono  text-sm primary-text">
 												{template.description}
 											</p>
 										</div>
