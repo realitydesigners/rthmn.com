@@ -353,7 +353,7 @@ const TimeFrameSliderContent = memo(
 						{/* Enhanced inner glow effect */}
 						<div className="absolute inset-0 overflow-hidden">
 							<div className="absolute inset-0 bg-[radial-gradient(70%_70%_at_50%_50%,rgba(255,255,255,0.08),transparent_100%)]" />
-							<div className="absolute inset-0 bg-gradient-to-b from-white/[0.08] via-transparent to-white/[0.02]" />
+							<div className="absolute inset-0 bg-gradient-to-b from-white/[0.08] via-transparent to-[#111215]" />
 						</div>
 
 						{/* Refined edges */}

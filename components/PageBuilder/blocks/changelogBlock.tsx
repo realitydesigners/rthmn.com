@@ -174,7 +174,7 @@ export function ChangelogBlock({
 										{/* Read More Button */}
 										<button
 											onClick={() => toggleEntry(entry._id)}
-											className="group relative ml-auto flex items-center overflow-hidden rounded-lg border border-[#1C1E23] bg-white/[0.02] px-6 py-2 transition-all duration-200 hover:bg-[#1C1E23]"
+											className="group relative ml-auto flex items-center overflow-hidden rounded-lg border border-[#1C1E23] bg-[#111215] px-6 py-2 transition-all duration-200 hover:bg-[#1C1E23]"
 										>
 											<div className="pointer-events-none absolute inset-0">
 												<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />

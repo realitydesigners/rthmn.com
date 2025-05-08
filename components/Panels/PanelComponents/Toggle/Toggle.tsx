@@ -51,7 +51,7 @@ export const Toggle: React.FC<ToggleProps> = ({
 								"hover:border-white/[0.08] hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
 							]
 						: [
-								"border-white/[0.02]",
+								"border-[#111215]",
 								"hover:border-[#1C1E23] hover:shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
 							],
 				)}
@@ -60,7 +60,7 @@ export const Toggle: React.FC<ToggleProps> = ({
 				<div
 					className={cn(
 						"absolute inset-0 rounded-full transition-opacity duration-300",
-						isEnabled ? "bg-[#1C1E23]" : "bg-white/[0.02]",
+						isEnabled ? "bg-[#1C1E23]" : "bg-[#111215]",
 					)}
 				/>
 				{/* Thumb (circle) */}

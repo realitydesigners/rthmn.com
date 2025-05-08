@@ -44,7 +44,7 @@ export const StyleControl: React.FC<{
 			)}
 			<div className="relative">
 				{preview && (
-					<div className="mb-2 h-10 rounded-md border border-white/[0.08] bg-white/[0.02]">
+					<div className="mb-2 h-10 rounded-md border border-white/[0.08] bg-[#111215]">
 						{preview}
 					</div>
 				)}

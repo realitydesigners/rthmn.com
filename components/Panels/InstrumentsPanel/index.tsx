@@ -81,15 +81,6 @@ const PairItem = memo(
 			<div
 				className={cn(
 					"group/item relative flex h-10 w-full items-center rounded-lg transition-all duration-300 select-none",
-					isSelected
-						? [
-								"bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
-								"border border-white/[0.02]",
-								"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
-								"hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
-								"hover:border-[#1C1E23]",
-							]
-						: "hover:bg-white/[0.02]",
 				)}
 			>
 				<div className="relative flex w-full items-center px-3">
@@ -139,11 +130,11 @@ const PairItem = memo(
 									"opacity-0 group-hover/item:opacity-100",
 									isSelected
 										? [
-												"border-white/[0.02] bg-white/[0.02] text-white/40",
+												"border-[#111215] bg-[#111215] text-white/40",
 												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											]
 										: [
-												"border-white/[0.02] bg-white/[0.02] text-white/40",
+												"border-[#111215] bg-[#111215] text-white/40",
 												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											],
 								)}
@@ -199,15 +190,6 @@ const SearchResultItem = memo(
 				}}
 				className={cn(
 					"group/result relative flex h-10 w-full items-center justify-between px-3 transition-all duration-300 cursor-pointer",
-					isSelected
-						? [
-								"bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
-								"border border-white/[0.02]",
-								"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
-								"hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
-								"hover:border-[#1C1E23]",
-							]
-						: "hover:bg-white/[0.02]",
 				)}
 			>
 				{/* Left side */}
@@ -215,7 +197,7 @@ const SearchResultItem = memo(
 					{/* Instrument name */}
 					<span
 						className={cn(
-							"font-outfit ml-4 flex-1 text-sm font-bold tracking-wide transition-colors",
+							"font-outfit  flex-1 text-sm font-bold tracking-wide transition-colors",
 							isSelected
 								? "text-white/90 group-hover/result:text-white"
 								: "text-[#32353C] group-hover/result:text-[#545963]",
@@ -250,11 +232,11 @@ const SearchResultItem = memo(
 									"opacity-0 group-hover/result:opacity-100",
 									isSelected
 										? [
-												"border-white/[0.02] bg-white/[0.02] text-white/40",
+												"border-[#111215] bg-[#111215] text-white/40",
 												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											]
 										: [
-												"border-white/[0.02] bg-white/[0.02] text-white/40",
+												"border-[#111215] bg-[#111215] text-white/40",
 												"hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											],
 								)}
@@ -340,7 +322,7 @@ const SearchBar = memo(
 			<div className="relative" ref={searchRef}>
 				{/* Search Input */}
 				<div className="group/search relative flex h-10 items-center overflow-hidden rounded-lg transition-all duration-300">
-					<div className="absolute inset-0 rounded-lg border border-white/[0.02] bg-gradient-to-b from-[#0A0B0D] to-[#070809] transition-all duration-300 group-focus-within/search:border-[#1C1E23]" />
+					<div className="absolute inset-0 rounded-lg border border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809] transition-all duration-300 group-focus-within/search:border-[#1C1E23]" />
 
 					{/* Search Icon */}
 					<div className="relative ml-3 text-[#32353C] transition-colors duration-300 group-focus-within/search:text-[#545963]">
@@ -369,7 +351,7 @@ const SearchBar = memo(
 								setSearchQuery("");
 								setShowResults(false);
 							}}
-							className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-white/[0.02] bg-white/[0.02] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
+							className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
 						>
 							<FaTimes size={8} />
 						</button>
@@ -378,8 +360,8 @@ const SearchBar = memo(
 
 				{/* Results Dropdown */}
 				{showResults && searchQuery && (
-					<div className="absolute top-full z-100 right-0 left-0 z-10 overflow-hidden bg-gradient-to-b from-[#0A0B0D] to-[#070809] pt-2 shadow-lg">
-						<div className="max-h-[280px] overflow-y-auto rounded-lg border border-white/[0.02]">
+					<div className=" top-full z-[1000] right-0 left-0 z-10 overflow-hidden bg-gradient-to-b from-[#0A0B0D] to-[#070809] pt-2 shadow-lg">
+						<div className="max-h-[280px] overflow-y-auto rounded-lg border border-[#111215]">
 							{filteredPairs.map((pair) => (
 								<SearchResultItem
 									key={pair}
@@ -460,8 +442,7 @@ const DraggableItem = memo(
 						<div
 							className={cn(
 								"group/item relative flex h-10 w-full items-center rounded-lg transition-all duration-300 select-none",
-								"bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
-								"border border-white/[0.02]",
+								"border-[#111215] bg-gradient-to-b from-[#131518] to-[#0E0F11]",
 								"shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
 								"hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
 								"hover:border-[#1C1E23]",
@@ -501,7 +482,7 @@ const DraggableItem = memo(
 											className={cn(
 												"relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
 												"opacity-0 group-hover/item:opacity-100",
-												"border-white/[0.02] bg-white/[0.02] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+												"border-[#111215] bg-[#111215] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
 											)}
 										>
 											<FaTimes size={8} />
@@ -530,21 +511,21 @@ const FilterButton = ({
 			type="button"
 			onClick={onClick}
 			className={cn(
-				"group relative w-auto flex flex h-8 items-center px-2",
+				"group relative w-auto flex flex h-7 min-w-7 justify-center items-center px-2",
 				"transition-all duration-300 ease-in-out",
 			)}
 		>
 			{/* Active indicator */}
 			{isActive && (
-				<div className="absolute inset-0 rounded-lg bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]">
-					<div className="absolute inset-0 rounded-lg border border-white/[0.02]" />
+				<div className="absolute inset-0 rounded-lg border-[#111215] bg-gradient-to-b from-[#131518] to-[#0E0F11] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]">
+					<div className="absolute inset-0 rounded-lg border border-[#111215]" />
 				</div>
 			)}
 
 			{/* Hover background */}
 			<div
 				className={cn(
-					"absolute inset-0 rounded-lg bg-white/[0.02] opacity-0 transition-opacity duration-300",
+					"absolute inset-0 rounded-lg bg-[#111215] opacity-0 transition-opacity duration-300",
 					"group-hover:opacity-100",
 					isActive && "group-hover:opacity-0",
 				)}

@@ -153,7 +153,7 @@ const BenefitsList = memo(
 					whileInView={{ opacity: 1, y: 0 }}
 					viewport={{ once: true }}
 					transition={{ duration: 0.3, delay: index * 0.1 }}
-					className="group relative overflow-hidden rounded-xl bg-white/[0.02] p-4 transition-all duration-300 hover:bg-white/[0.04]"
+					className="group relative overflow-hidden rounded-xl bg-[#111215] p-4 transition-all duration-300 hover:bg-white/[0.04]"
 				>
 					<div className="pointer-events-none absolute inset-px rounded-xl bg-gradient-to-b from-white/[0.07] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 					<div className="relative flex gap-3">

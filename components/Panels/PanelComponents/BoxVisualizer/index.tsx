@@ -79,7 +79,7 @@ export const BoxVisualizer = memo(() => {
 							<div
 								className={cn(
 									"relative h-24 w-24 transition-all duration-300",
-									showBorder && "border border-white/[0.02]",
+									showBorder && "border border-[#111215]",
 								)}
 								style={{
 									borderRadius: `${borderRadius}px`,
