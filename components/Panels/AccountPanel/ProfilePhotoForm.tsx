@@ -128,7 +128,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 			{/* Profile Image */}
 			<button
 				onClick={handleClick}
-				className="group relative h-full w-full overflow-hidden rounded-full border-2 border-[#222] bg-[#222] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl"
+				className="group relative h-full w-full overflow-hidden rounded-full border-2 border-[#111215] bg-[#111215] shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98] sm:shadow-xl"
 				disabled={isLoading}
 			>
 				{preview ? (

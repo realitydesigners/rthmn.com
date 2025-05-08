@@ -59,7 +59,7 @@ const ColorInput = memo(
 
 		return (
 			<div className="group flex flex-col gap-2">
-				<div className="relative h-10 w-full overflow-hidden rounded-lg border border-[#222] bg-[#0C0C0C] transition-all duration-200 hover:border-[#1C1E23]  hover:bg-[#111]">
+				<div className="relative h-10 w-full overflow-hidden rounded-lg border border-[#111215] bg-[#0C0C0C] transition-all duration-200 hover:border-[#1C1E23]  hover:bg-[#111]">
 					<div className="absolute inset-0 flex items-center px-3">
 						<span className="font-kodemono text-[10px] font-medium tracking-wider text-[#32353C] uppercase">
 							{label}

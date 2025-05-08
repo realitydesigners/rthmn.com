@@ -89,9 +89,9 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 					<Link href={`/posts/${post.slug.current}`}>
 						<motion.div
 							whileHover={{ x: 5 }}
-							className="flex w-fit items-center rounded-full bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
+							className="flex w-fit items-center rounded-full bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 						>
-							<span className="flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
+							<span className="flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-sm">
 								<span>Read Article</span>
 								<FaArrowRight className="h-3 w-3" />
 							</span>

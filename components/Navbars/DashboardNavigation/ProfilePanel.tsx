@@ -44,13 +44,13 @@ const MenuButton = ({
 	const variantStyles =
 		variant === "danger"
 			? "from-red-500/20 to-red-600/20 hover:from-red-500/30 hover:to-red-600/30"
-			: "from-[#32353C] to-[#181818] hover:from-[#32353C] hover:to-[#282828]";
+			: "from-[#32353C] to-[#1C1E23] hover:from-[#32353C] hover:to-[#282828]";
 
 	const textColor = variant === "danger" ? "text-red-500" : "text-white";
 
 	const Button = (
 		<div className={`${baseStyles} ${variantStyles} w-full`}>
-			<div className="flex w-full items-center gap-3 rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-3">
+			<div className="flex w-full items-center gap-3 rounded-md bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-3">
 				<div className="rounded-md bg-[#1C1E23] p-2">
 					<Icon className={`h-4 w-4 ${textColor}`} />
 				</div>
@@ -92,7 +92,7 @@ export const ProfilePanel = () => {
 	if (!user) return null;
 
 	return (
-		<div className="fixed bottom-0 left-1/2 z-[90] h-[px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#222] bg-black pb-20">
+		<div className="fixed bottom-0 left-1/2 z-[90] h-[px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#111215] bg-black pb-20">
 			<div className="scrollbar-hide h-full overflow-y-auto px-4 pt-8">
 				{/* Profile Header */}
 				<div className="mb-6">
@@ -134,7 +134,7 @@ export const ProfilePanel = () => {
 
 					<div className="relative">
 						<div className="absolute inset-0 flex items-center">
-							<div className="w-full border-t border-[#222]"></div>
+							<div className="w-full border-t border-[#111215]"></div>
 						</div>
 					</div>
 

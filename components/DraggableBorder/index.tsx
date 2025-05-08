@@ -81,7 +81,7 @@ export const DraggableBorder: React.FC<DraggableBorderProps> = ({
 
 	return (
 		<div
-			className={`absolute ${cursorClass} ${dimensionClass} ${positionClass} z-[91] rounded-full bg-gradient-to-b from-[#32353C]/20 via-[#222]/20 to-[#111]/20 transition-all duration-200 hover:bg-gradient-to-b hover:from-blue-500/30 hover:via-blue-400/20 hover:to-blue-300/10 ${
+			className={`absolute ${cursorClass} ${dimensionClass} ${positionClass} z-[91] rounded-full bg-gradient-to-b from-[#32353C]/20 via-[#111215]/20 to-[#111]/20 transition-all duration-200 hover:bg-gradient-to-b hover:from-blue-500/30 hover:via-blue-400/20 hover:to-blue-300/10 ${
 				isDragging
 					? "shadow-2xl shadow-blue-500/30"
 					: "hover:shadow-2xl hover:shadow-blue-500/20"

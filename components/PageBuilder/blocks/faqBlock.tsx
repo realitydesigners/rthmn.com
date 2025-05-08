@@ -114,7 +114,7 @@ const FAQItem = memo(
 							</div>
 							{item.category && (
 								<div className="mt-4 flex items-center gap-2">
-									<span className="rounded-full bg-[#1C1E23] px-3 py-1 text-xs text-neutral-400">
+									<span className="rounded-full  px-3 py-1 text-xs text-neutral-400">
 										{item.category}
 									</span>
 								</div>
@@ -169,7 +169,7 @@ const CategoryFilter = memo(
 				className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
 					selected === "all"
 						? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-						: "border-[#1C1E23] bg-[#1C1E23] text-neutral-400 hover:border-[#32353C] hover:bg-[#1C1E23] hover:text-neutral-400"
+						: "border-[#1C1E23]  text-neutral-400 hover:border-[#32353C] hover: hover:text-neutral-400"
 				}`}
 			>
 				<FaTags className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
@@ -183,7 +183,7 @@ const CategoryFilter = memo(
 					className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition-all duration-300 ${
 						selected === category
 							? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-							: "border-[#1C1E23] bg-[#1C1E23] text-neutral-400 hover:border-[#32353C] hover:bg-[#1C1E23] hover:text-neutral-400"
+							: "border-[#1C1E23]  text-neutral-400 hover:border-[#32353C] hover: hover:text-neutral-400"
 					}`}
 				>
 					<FaTags className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />

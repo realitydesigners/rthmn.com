@@ -113,7 +113,7 @@ export function FeatureTour({
 					"group relative z-[120] flex h-10 w-10 items-center justify-center transition-all duration-200",
 					tourId === "account" ? "rounded-full" : "rounded-lg",
 					"border border-transparent bg-transparent",
-					"hover:border-[#1C1E23]  hover:bg-gradient-to-b hover:from-[#181818] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20",
+					"hover:border-[#1C1E23]  hover:bg-gradient-to-b hover:from-[#1C1E23] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20",
 					isActive &&
 						"text-white hover:border-[#32353C] hover:from-[#1c1c1c] hover:to-[#141414]",
 					isCurrentTour &&

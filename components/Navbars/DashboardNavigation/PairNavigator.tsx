@@ -267,7 +267,7 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
 
 	return (
 		<div
-			className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#222] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
+			className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#111215] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
 				isModalOpen ? "h-[175px] lg:hidden" : "h-[50vh]"
 			}`}
 		>
@@ -357,11 +357,11 @@ export const PairFilterButtons = ({
 				className={`group flex h-9 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
 					isActive
 						? "from-[#32353C] to-[#282828]"
-						: "from-[#32353C] to-[#181818] hover:from-[#32353C] hover:to-[#282828]"
+						: "from-[#32353C] to-[#1C1E23] hover:from-[#32353C] hover:to-[#282828]"
 				}`}
 			>
 				<div
-					className={`font-outfit flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm font-medium ${
+					className={`font-outfit flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-sm font-medium ${
 						isActive ? "text-neutral-200" : "text-[#818181]"
 					}`}
 				>
@@ -378,8 +378,8 @@ export const SearchBar = ({
 }: { searchQuery: string; setSearchQuery: (query: string) => void }) => {
 	return (
 		<div className="relative z-[99] flex justify-center px-4">
-			<div className="relative flex w-full items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] shadow-xl transition-all duration-200 hover:from-[#32353C] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]">
-				<div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818]">
+			<div className="relative flex w-full items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] shadow-xl transition-all duration-200 hover:from-[#32353C] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]">
+				<div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23]">
 					<LuSearch className="ml-4 h-5 w-5 text-[#32353C]" />
 					<input
 						type="text"
@@ -435,7 +435,7 @@ const PairPrice = ({
 	isActive,
 }: { price: number; isJPY: boolean; isActive: boolean }) => (
 	<div
-		className={`font-kodemono ml-2 text-sm ${isActive ? "text-white" : "text-[#222]"}`}
+		className={`font-kodemono ml-2 text-sm ${isActive ? "text-white" : "text-[#111215]"}`}
 	>
 		{price.toFixed(isJPY ? 3 : 5)}
 	</div>

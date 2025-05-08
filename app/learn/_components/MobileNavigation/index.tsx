@@ -209,9 +209,9 @@ export function MobileNavigation({
 					</div>
 					<button
 						onClick={() => setIsOpen(true)}
-						className="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#32353C] via-[#222] to-[#111] p-[1px] shadow-md transition-all duration-200 hover:from-indigo-900 hover:via-indigo-800 hover:to-indigo-900"
+						className="group flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#32353C] via-[#111215] to-[#111] p-[1px] shadow-md transition-all duration-200 hover:from-indigo-900 hover:via-indigo-800 hover:to-indigo-900"
 					>
-						<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-[#222] to-[#111]">
+						<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-[#111215] to-[#111]">
 							<FaChevronUp className="h-4 w-4 text-indigo-300 drop-shadow-[0_0_3px_rgba(129,140,248,0.5)]" />
 						</div>
 					</button>
@@ -242,7 +242,7 @@ export function MobileNavigation({
 								</div>
 								<button
 									onClick={() => setIsOpen(false)}
-									className="flex h-8 w-8 items-center justify-center rounded-full bg-[#222] text-neutral-400 shadow-inner hover:text-white"
+									className="flex h-8 w-8 items-center justify-center rounded-full bg-[#111215] text-neutral-400 shadow-inner hover:text-white"
 								>
 									<FaTimes className="h-4 w-4" />
 								</button>
@@ -299,7 +299,7 @@ export function MobileNavigation({
 												{Math.round(progress)}%
 											</span>
 										</div>
-										<div className="h-2 rounded-full bg-[#222]">
+										<div className="h-2 rounded-full bg-[#111215]">
 											<div
 												className="h-full rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 transition-all duration-300"
 												style={{ width: `${progress}%` }}
@@ -335,7 +335,7 @@ export function MobileNavigation({
 																}`}
 																onClick={() => setIsOpen(false)}
 															>
-																<div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#222] text-sm shadow-inner">
+																<div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#111215] text-sm shadow-inner">
 																	{index + 1}
 																</div>
 																<span className="flex-1 text-sm">

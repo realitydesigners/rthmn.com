@@ -132,7 +132,7 @@ export default function PairsStep({
 					transition={{ delay: 0.2 }}
 					className="relative"
 				>
-					<div className="relative flex items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]">
+					<div className="relative flex items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]">
 						<div className="flex h-10 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#121212]">
 							<FaSearch className="ml-4 text-[#32353C]" />
 							<input

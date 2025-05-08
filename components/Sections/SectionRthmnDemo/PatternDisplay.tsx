@@ -92,7 +92,7 @@ const BoxVisualization = memo(
 		}, [baseInterval]);
 
 		return (
-			<div className="no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#32353C]/30 via-[#222]/25 to-[#111]/30 p-[1px]">
+			<div className="no-select group relative flex w-full flex-col overflow-hidden rounded-lg bg-gradient-to-b from-[#32353C]/30 via-[#111215]/25 to-[#111]/30 p-[1px]">
 				<div className="relative flex h-full flex-col rounded-lg border border-[#111] bg-gradient-to-b from-[#0e0e0e] to-[#0a0a0a]">
 					<div className="relative flex flex-col items-center justify-center gap-2 p-3">
 						{/* Price Display */}

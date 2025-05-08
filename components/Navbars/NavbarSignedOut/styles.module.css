@@ -17,7 +17,7 @@
 	transition: all 0.3s ease;
 	position: relative;
 	overflow: hidden;
-	background: rgba(25, 25, 25, 0.5);
+	background: #111215;
 	transform-style: preserve-3d;
 }
 
@@ -36,7 +36,7 @@
 
 .dropdownLink:hover {
 	transform: translateY(-2px);
-	background: rgba(40, 40, 40, 0.8);
+	background: #1c1e23;
 }
 
 .dropdownLinkIcon {

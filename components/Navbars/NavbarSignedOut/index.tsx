@@ -282,18 +282,18 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 									<div className="flex items-center gap-3">
 										<Link
 											href="/dashboard"
-											className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
+											className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
 										>
-											<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-6 py-3 text-sm font-medium">
+											<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-6 py-3 text-sm font-medium">
 												Dashboard
 											</span>
 										</Link>
 										<div className="relative" ref={dropdownRef}>
 											<button
 												onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-												className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
+												className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 											>
-												<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]">
+												<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]">
 													<div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black">
 														{avatarUrl ? (
 															<Image
@@ -312,7 +312,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 												</div>
 											</button>
 											{isDropdownOpen && (
-												<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl">
+												<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#111215] bg-black/95 shadow-xl backdrop-blur-xl">
 													<div
 														className="py-1"
 														role="menu"
@@ -366,18 +366,18 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 										<div className="flex items-center gap-3">
 											<Link
 												href="/dashboard"
-												className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
+												className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
 											>
-												<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-3 text-sm font-medium">
-													Dashbaord
+												<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-3 text-sm font-medium">
+													Dashboard
 												</span>
 											</Link>
 											<div className="relative" ref={dropdownRef}>
 												<button
 													onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-													className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#181818] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
+													className="group flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 												>
-													<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#181818] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]">
+													<div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23] transition-all group-hover:from-[#141414] group-hover:to-[#1c1c1c]">
 														<div className="relative flex h-7 w-7 items-center justify-center overflow-hidden rounded-full bg-black">
 															{avatarUrl ? (
 																<Image
@@ -396,7 +396,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 													</div>
 												</button>
 												{isDropdownOpen && (
-													<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#222] bg-black/95 shadow-xl backdrop-blur-xl">
+													<div className="animate-in fade-in slide-in-from-top-1 absolute right-0 mt-2 w-64 rounded-lg border border-[#111215] bg-black/95 shadow-xl backdrop-blur-xl">
 														<div
 															className="py-1"
 															role="menu"
@@ -486,10 +486,10 @@ export const NavButton: FC<NavButtonProps> = ({
 			>
 				<Link
 					href={href}
-					className="flex items-center rounded-full bg-linear-to-b from-[#32353C] to-[#181818] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
+					className="flex items-center rounded-full bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]"
 					onClick={onClick}
 				>
-					<span className="flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#181818] px-4 py-2 text-sm">
+					<span className="flex w-full items-center space-x-3 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-sm">
 						{children}
 					</span>
 				</Link>
@@ -573,8 +573,8 @@ export const DesktopMenuContent = ({
 							))}
 						</motion.div>
 						<div className="flex w-1/2 flex-row gap-2">
-							<div className="h-full w-1/2 bg-[#181818]" />
-							<div className="h-full w-1/2 bg-[#181818]" />
+							<div className="h-full w-1/2 bg-[#1C1E23]" />
+							<div className="h-full w-1/2 bg-[#1C1E23]" />
 						</div>
 					</div>
 				);
@@ -586,7 +586,7 @@ export const DesktopMenuContent = ({
 						onMouseLeave={onMouseLeave}
 						onClick={onLinkClick}
 					>
-						<div className="w-1/3 bg-[#181818]" />
+						<div className="w-1/3 bg-[#1C1E23]" />
 						<motion.div
 							className="flex w-2/3 flex-col gap-2"
 							variants={contentVariants}
@@ -623,8 +623,8 @@ export const DesktopMenuContent = ({
 							))}
 						</motion.div>
 						<div className="flex w-1/2 flex-col gap-2">
-							<div className="h-full w-full bg-[#181818]" />
-							<div className="h-full w-full bg-[#181818]" />
+							<div className="h-full w-full bg-[#1C1E23]" />
+							<div className="h-full w-full bg-[#1C1E23]" />
 						</div>
 					</div>
 				);

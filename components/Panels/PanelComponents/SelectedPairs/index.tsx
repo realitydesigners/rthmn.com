@@ -45,7 +45,7 @@ export const SelectedPairs = () => {
 
 	return (
 		<div ref={containerRef} className="flex h-full flex-col">
-			<div className="font-kodemono flex h-8 items-center justify-between border-b border-[#222] px-4 text-xs font-medium tracking-wider text-[#818181]">
+			<div className="font-kodemono flex h-8 items-center justify-between border-b border-[#111215] px-4 text-xs font-medium tracking-wider text-[#818181]">
 				<div className="flex w-[140px] items-center gap-2">
 					<span className="uppercase">Symbol</span>
 					<FaChevronDown size={8} className="opacity-50" />

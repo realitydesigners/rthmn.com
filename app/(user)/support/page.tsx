@@ -300,7 +300,7 @@ export default function SupportPage() {
 						<div>
 							<button
 								onClick={() => setIsCreatingThread(true)}
-								className="group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] lg:w-auto"
+								className="group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] lg:w-auto"
 							>
 								<LuPlus className="h-4 w-4 text-white" />
 								<span className="font-outfit">Create New Support Thread</span>
@@ -365,7 +365,7 @@ export default function SupportPage() {
 									type="submit"
 									onClick={handleCreateThread}
 									disabled={isLoading}
-									className="font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818] disabled:opacity-50"
+									className="font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									{isLoading ? "Creating..." : "Create Thread"}
 								</button>
@@ -423,7 +423,7 @@ export default function SupportPage() {
 									/>
 									<button
 										type="submit"
-										className="font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#181818]"
+										className="font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23]"
 									>
 										Send
 									</button>

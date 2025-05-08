@@ -7,7 +7,7 @@ interface OnboardingContentProps {
 
 export function OnboardingContent({ onComplete }: OnboardingContentProps) {
 	return (
-		<div className="no-select w-[350px] overflow-hidden rounded-xl border border-[#222] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 shadow-2xl before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]">
+		<div className="no-select w-[350px] overflow-hidden rounded-xl border border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 shadow-2xl before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]">
 			<div className="relative flex h-full flex-col items-end justify-end space-y-2">
 				<div className="w-full p-2">
 					<h3 className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl font-bold text-transparent">
