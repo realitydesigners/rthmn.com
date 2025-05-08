@@ -44,7 +44,7 @@ const MessageBubble = ({
 						className="h-full w-full object-cover"
 					/>
 				) : (
-					<LuUser className="h-4 w-4 text-white/50" />
+					<LuUser className="h-4 w-4 text-[#BFC2CA]" />
 				)}
 			</div>
 			<div

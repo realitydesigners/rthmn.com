@@ -666,7 +666,7 @@ export const MobileMenuContent = () => {
 						<Link
 							key={link.title}
 							href="/"
-							className={`heading-text py-2 font-mono text-xl font-bold`}
+							className={`text-neutral-gradient py-2 font-mono text-xl font-bold`}
 						>
 							{link.title}
 						</Link>

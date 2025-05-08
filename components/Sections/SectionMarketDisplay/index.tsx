@@ -118,7 +118,7 @@ const MarketHeading = memo(() => (
 					<br />
 					Unlock Your Edge.
 				</h2>
-				<p className="font-outfit text-md text-neutral-gradient mx-auto max-w-2xl px-4 sm:text-lg lg:text-2xl">
+				<p className="font-outfit text-md primary-text mx-auto max-w-2xl px-4 sm:text-lg lg:text-2xl">
 					Enter a new dimension to trading and discover the same patterns you
 					already trade, visualized in a way never seen before.
 				</p>

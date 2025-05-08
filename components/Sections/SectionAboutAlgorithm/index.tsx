@@ -37,7 +37,7 @@ export function SectionAboutAlgorithm() {
 				{/* Effects */}
 				<div className="pointer-events-none absolute inset-0">
 					<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
-					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
+					<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#BFC2CA] to-transparent" />
 				</div>
 
 				<div className="mb-8 text-center">

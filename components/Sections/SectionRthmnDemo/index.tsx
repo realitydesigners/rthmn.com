@@ -284,7 +284,7 @@ export const SectionRthmnDemo = memo(
 				<div className="relative h-[820px] w-full overflow-hidden border-[#1C1E23] bg-black/90 p-2 backdrop-blur-md sm:w-[90vw] md:rounded-xl md:border lg:h-auto lg:w-[80vw] 2xl:w-[75vw]">
 					<div className="pointer-events-none absolute inset-0">
 						<div className="absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.05),transparent_30%)]" />
-						<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/50 to-transparent" />
+						<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-[#BFC2CA] to-transparent" />
 					</div>
 					<DemoNavbar activeTab={activeTab} setActiveTab={handleTabChange} />
 					<motion.div

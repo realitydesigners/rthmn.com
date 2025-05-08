@@ -31,7 +31,11 @@
 }
 
 @utility text-neutral-gradient {
-	@apply bg-linear-to-b from-white via-white to-white/50 bg-clip-text py-2 text-transparent;
+	@apply bg-linear-to-b from-white via-white to-[#BFC2CA] bg-clip-text py-2 text-transparent;
+}
+
+@utility primary-text {
+	@apply bg-linear-to-b from-[#82868F] to-[#32353C] bg-clip-text py-2 text-transparent;
 }
 
 @utility no-select {
@@ -115,20 +119,6 @@
 
 	.height-screen-helper {
 		min-height: calc(100vh - 80px);
-	}
-
-	.heading-text {
-		background: linear-gradient(to bottom, #ffffff, #a6a6aa);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
-	}
-
-	.primary-text {
-		background: linear-gradient(to bottom, #ffffffa0, #787c80);
-		-webkit-background-clip: text;
-		background-clip: text;
-		-webkit-text-fill-color: transparent;
 	}
 
 	@keyframes gradient-animation {

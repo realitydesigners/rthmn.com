@@ -26,7 +26,7 @@ export const StyleControl: React.FC<{
 			{!hideLabel && (
 				<div className="flex items-center justify-between px-0.5">
 					<div className="flex items-center gap-2">
-						<span className="font-outfit text-[8px] font-medium tracking-wider text-white/50 uppercase">
+						<span className="font-outfit text-[8px] font-medium tracking-wider text-[#BFC2CA] uppercase">
 							{label}
 						</span>
 					</div>
