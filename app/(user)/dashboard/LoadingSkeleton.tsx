@@ -7,7 +7,7 @@ export const NoInstruments = () => {
 				<h3 className="font-outfit text-lg font-medium text-neutral-200">
 					No Instruments Selected
 				</h3>
-				<p className="mt-2 text-sm text-neutral-500">
+				<p className="mt-2 text-sm primary-text">
 					Click the chart icon in the left sidebar to browse and select trading
 					pairs
 				</p>

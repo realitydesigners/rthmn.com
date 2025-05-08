@@ -191,7 +191,7 @@ export default function OnboardingPage() {
 							<button
 								type="button"
 								onClick={handleBack}
-								className="group relative rounded-lg border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-2 text-sm font-medium text-neutral-400 transition-all duration-200 hover:border-[#32353C] hover:from-[#111215] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
+								className="group relative rounded-lg border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-2 text-sm font-medium primary-text transition-all duration-200 hover:border-[#32353C] hover:from-[#111215] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
 							>
 								<div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 								Back

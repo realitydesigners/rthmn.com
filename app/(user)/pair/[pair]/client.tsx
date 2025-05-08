@@ -245,7 +245,7 @@ const PairClient = ({
 									className={`rounded-lg px-3 py-1.5 text-sm transition-all ${
 										is3DMode
 											? "bg-blue-500 text-white"
-											: "bg-neutral-800 text-neutral-400 hover:bg-neutral-700"
+											: "bg-neutral-800 primary-text hover:bg-neutral-700"
 									}`}
 								>
 									3D View

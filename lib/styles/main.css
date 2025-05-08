@@ -35,7 +35,7 @@
 }
 
 @utility primary-text {
-	@apply bg-linear-to-b from-[#82868F] to-[#32353C] bg-clip-text py-2 text-transparent;
+	@apply bg-linear-to-b from-[#545963] to-[#82868F]  bg-clip-text py-2 text-transparent;
 }
 
 @utility no-select {

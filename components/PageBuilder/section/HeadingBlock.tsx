@@ -109,7 +109,7 @@ const HeadingBlock = ({ block }) => {
 									height={1000}
 									className="h-50 w-50"
 								/>
-								<p className="flex py-2 text-xs tracking-wide text-neutral-400 uppercase">
+								<p className="flex py-2 text-xs tracking-wide primary-text uppercase">
 									Image Of: {imageAlt}
 								</p>
 							</div>

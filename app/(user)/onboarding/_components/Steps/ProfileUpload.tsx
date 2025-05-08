@@ -97,7 +97,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.1 }}
-					className="text-base text-neutral-400"
+					className="text-base primary-text"
 				>
 					You can add a profile photo to personalize your experience, or skip
 					this step.
@@ -182,7 +182,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
 											<div className="text-sm font-medium text-white">
 												Drop your photo here
 											</div>
-											<div className="text-xs text-neutral-500">
+											<div className="text-xs primary-text">
 												or click to browse
 											</div>
 										</div>
@@ -211,7 +211,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
 						transition={{ delay: 0.3 }}
-						className="mt-4 text-center text-xs text-neutral-500"
+						className="mt-4 text-center text-xs primary-text"
 					>
 						PNG or JPG (max. 2MB)
 					</motion.div>

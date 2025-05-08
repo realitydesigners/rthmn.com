@@ -106,9 +106,7 @@ export function SectionFooter() {
 									RTHMN
 								</div>
 							</Link>
-							<p
-								className={`font-kodemono mt-4 max-w-md text-sm text-neutral-400`}
-							>
+							<p className={`font-kodemono mt-4 max-w-md text-sm primary-text`}>
 								Advanced pattern recognition for algorithmic trading. Built by
 								traders, for traders.
 							</p>
@@ -118,7 +116,7 @@ export function SectionFooter() {
 									<a
 										key={item.name}
 										href={item.href}
-										className="group relative text-neutral-400 transition-colors duration-200 hover:text-white"
+										className="group relative primary-text transition-colors duration-200 hover:text-white"
 									>
 										<span className="absolute -inset-2 -z-10 rounded-full bg-white/0 transition-all duration-300 group-hover:bg-[#1C1E23]" />
 										<item.icon className="h-5 w-5" />
@@ -141,7 +139,7 @@ export function SectionFooter() {
 										<li key={link.name}>
 											<a
 												href={link.href}
-												className="group flex items-center text-sm text-neutral-400 transition-colors duration-200 hover:text-white"
+												className="group flex items-center text-sm text-[#BFC2CA] transition-colors duration-200 hover:text-white"
 											>
 												<span className="relative">
 													{link.name}
@@ -155,11 +153,11 @@ export function SectionFooter() {
 						))}
 					</div>
 				</div>
-				<div className="font-kodemono mt-8 border-t border-[#1C1E23] pt-8 text-[11px] leading-relaxed text-neutral-400">
-					<h4 className="mb-2 text-xs font-semibold text-white uppercase">
+				<div className="font-kodemono mt-8 border-t border-[#1C1E23] pt-8 text-[11px] leading-relaxed primary-text">
+					<h4 className="mb-2 text-xs font-semibold text-[#BFC2CA] uppercase">
 						Risk Disclosure & Disclaimer
 					</h4>
-					<p className="text-neutral-400">
+					<p className="primary-text">
 						RTHMN is pattern recognition platform providing algorithmic trading
 						indicators and analysis tools. Built by traders, for traders.
 						Trading in financial instruments involves high risks including the
@@ -168,7 +166,7 @@ export function SectionFooter() {
 						carefully consider your investment objectives, level of experience,
 						and risk appetite.
 					</p>
-					<p className="mt-2 text-neutral-400">
+					<p className="mt-2 primary-text">
 						The information and tools provided by RTHMN, including but not
 						limited to our indicators, pattern recognition systems, and market
 						analysis, do not constitute investment advice, financial advice,
@@ -179,14 +177,14 @@ export function SectionFooter() {
 						directly or indirectly from use of or reliance on our platform or
 						information.
 					</p>
-					<p className="mt-2 text-neutral-400">
+					<p className="mt-2 primary-text">
 						Past performance of any trading system, methodology, or pattern
 						recognition tool is not necessarily indicative of future results.
 						Market patterns and behaviors are inherently unpredictable. You
 						should be aware of all the risks associated with trading and seek
 						advice from an independent financial advisor if you have any doubts.
 					</p>
-					<p className="mt-2 text-neutral-400">
+					<p className="mt-2 primary-text">
 						Hypothetical or simulated performance results have certain inherent
 						limitations. Unlike actual trading performance, simulated results do
 						not represent actual trading and may not be impacted by real market
@@ -199,7 +197,7 @@ export function SectionFooter() {
 				<div
 					className={`font-kodemono mt-12 flex flex-col items-center justify-between border-t border-[#1C1E23] pt-8 lg:flex-row`}
 				>
-					<p className="text-xs text-neutral-400">
+					<p className="text-xs primary-text">
 						© 2024 Rthmn. All rights reserved.
 					</p>
 				</div>

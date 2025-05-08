@@ -69,7 +69,7 @@ export default function CourseClient({ course }: { course: Course }) {
 							<h1 className="font-outfit bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
 								{course.title}
 							</h1>
-							<p className="max-w-2xl text-lg text-neutral-400">
+							<p className="max-w-2xl text-lg primary-text">
 								{course.description}
 							</p>
 							<div className="flex flex-wrap items-center gap-6">
@@ -77,19 +77,19 @@ export default function CourseClient({ course }: { course: Course }) {
 									<div className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-400/10 text-sm text-blue-400">
 										{course.chapters.length}
 									</div>
-									<span className="text-sm text-neutral-400">Chapters</span>
+									<span className="text-sm primary-text">Chapters</span>
 								</div>
 								{course.difficulty && (
 									<div className="flex items-center gap-2">
 										<FaLightbulb className="h-5 w-5 text-blue-400" />
-										<span className="text-sm text-neutral-400 capitalize">
+										<span className="text-sm primary-text capitalize">
 											{course.difficulty}
 										</span>
 									</div>
 								)}
 								{course.estimatedTime && (
 									<div className="flex items-center gap-2">
-										<span className="text-sm text-neutral-400">
+										<span className="text-sm primary-text">
 											{course.estimatedTime}
 										</span>
 									</div>
@@ -119,12 +119,12 @@ export default function CourseClient({ course }: { course: Course }) {
 													{chapter.title}
 												</h3>
 												{chapter.description && (
-													<p className="mt-1 text-sm text-neutral-400">
+													<p className="mt-1 text-sm primary-text">
 														{chapter.description}
 													</p>
 												)}
 											</div>
-											<div className="flex items-center gap-2 text-sm text-neutral-400">
+											<div className="flex items-center gap-2 text-sm primary-text">
 												<div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-400/10 text-xs text-blue-400">
 													{chapter.lessons.length}
 												</div>
@@ -146,7 +146,7 @@ export default function CourseClient({ course }: { course: Course }) {
 												<div className="flex-1">
 													<h4 className="text-white">{lesson.title}</h4>
 													{lesson.description && (
-														<p className="mt-1 text-sm text-neutral-400">
+														<p className="mt-1 text-sm primary-text">
 															{lesson.description}
 														</p>
 													)}

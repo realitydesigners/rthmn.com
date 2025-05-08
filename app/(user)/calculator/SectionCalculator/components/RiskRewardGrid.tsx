@@ -56,7 +56,7 @@ export const RiskRewardGrid = memo(
 
 				{/* Ratio Display */}
 				<div className="mt-2 text-center">
-					<span className="font-kodemono text-sm text-neutral-400">
+					<span className="font-kodemono text-sm primary-text">
 						{ratio.toFixed(2)}:1 Ratio
 					</span>
 				</div>

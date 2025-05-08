@@ -73,7 +73,7 @@ export const TradeStats = memo(
 							>
 								<div className={`h-4 w-4 ${stat.color}`}>{stat.icon}</div>
 							</div>
-							<div className="font-kodemono text-sm text-neutral-400">
+							<div className="font-kodemono text-sm primary-text">
 								{stat.label}
 							</div>
 							<div

@@ -33,7 +33,7 @@ const LessonHeader = ({
 }) => {
 	return (
 		<div className="mb-12">
-			<div className="flex items-center gap-6 text-sm text-neutral-400">
+			<div className="flex items-center gap-6 text-sm primary-text">
 				<div className="flex items-center gap-2.5">
 					<div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/[0.08] ring-1 ring-white/[0.08] ring-inset">
 						<FaClock className="h-3.5 w-3.5 text-white/70" />

@@ -13,7 +13,7 @@ export function InstrumentsContent({ onComplete }: InstrumentsContentProps) {
 					<h3 className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl font-bold text-transparent">
 						Instruments
 					</h3>
-					<p className="text-[13px] leading-relaxed text-neutral-400">
+					<p className="text-[13px] leading-relaxed primary-text">
 						Track real-time market data across multiple assets.
 					</p>
 				</div>
@@ -27,7 +27,7 @@ export function InstrumentsContent({ onComplete }: InstrumentsContentProps) {
 								<div className="text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white">
 									Live Price Updates
 								</div>
-								<div className="text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+								<div className="text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 									Track real-time prices for FX, Crypto, Stocks & ETFs
 								</div>
 							</div>
@@ -43,7 +43,7 @@ export function InstrumentsContent({ onComplete }: InstrumentsContentProps) {
 								<div className="text-sm font-medium text-neutral-200 transition-colors duration-300 group-hover:text-white">
 									Instrument Selection
 								</div>
-								<div className="text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+								<div className="text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 									Easily add or remove trading pairs from your watchlist
 								</div>
 							</div>

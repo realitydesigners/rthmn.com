@@ -62,7 +62,7 @@ export default function Callout({
 							<div className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#0073E6]/10 text-[#0073E6]  transition-all duration-300">
 								<div className="h-1.5 w-1.5 rounded-full bg-current drop-shadow-[0_0_8px_rgba(0,115,230,0.5)]" />
 							</div>
-							<span className="text-sm text-neutral-300">{point}</span>
+							<span className="text-sm primary-text">{point}</span>
 						</motion.li>
 					))}
 				</ul>

@@ -242,7 +242,7 @@ export function MobileNavigation({
 								</div>
 								<button
 									onClick={() => setIsOpen(false)}
-									className="flex h-8 w-8 items-center justify-center rounded-full bg-[#111215] text-neutral-400 shadow-inner hover:text-white"
+									className="flex h-8 w-8 items-center justify-center rounded-full bg-[#111215] primary-text shadow-inner hover:text-white"
 								>
 									<FaTimes className="h-4 w-4" />
 								</button>
@@ -255,7 +255,7 @@ export function MobileNavigation({
 								className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
 									activeTab === "course"
 										? "border-b-2 border-indigo-500 text-indigo-300"
-										: "text-neutral-400 hover:text-white"
+										: "primary-text hover:text-white"
 								}`}
 								onClick={() => setActiveTab("course")}
 							>
@@ -266,7 +266,7 @@ export function MobileNavigation({
 									className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
 										activeTab === "toc"
 											? "border-b-2 border-indigo-500 text-indigo-300"
-											: "text-neutral-400 hover:text-white"
+											: "primary-text hover:text-white"
 									}`}
 									onClick={() => setActiveTab("toc")}
 								>
@@ -283,7 +283,7 @@ export function MobileNavigation({
 									{/* Back to Learning Center */}
 									<Link
 										href="/learn"
-										className="mb-6 flex items-center gap-2 text-sm text-neutral-400 transition-colors hover:text-white"
+										className="mb-6 flex items-center gap-2 text-sm primary-text transition-colors hover:text-white"
 									>
 										<FaArrowLeft className="h-3 w-3" />
 										Back to Learning Center
@@ -292,7 +292,7 @@ export function MobileNavigation({
 									{/* Progress Bar */}
 									<div>
 										<div className="mb-2 flex items-center justify-between">
-											<span className="text-sm text-neutral-400">
+											<span className="text-sm primary-text">
 												Course Progress
 											</span>
 											<span className="text-sm font-medium text-indigo-300">
@@ -311,7 +311,7 @@ export function MobileNavigation({
 									<div className="space-y-6">
 										{course.chapters.map((chapter) => (
 											<div key={chapter._id} className="space-y-2">
-												<h3 className="text-sm font-semibold tracking-wider text-neutral-400 uppercase">
+												<h3 className="text-sm font-semibold tracking-wider primary-text uppercase">
 													{chapter.title}
 												</h3>
 												<div className="space-y-1">
@@ -331,7 +331,7 @@ export function MobileNavigation({
 																className={`flex items-center gap-3 rounded-lg p-3 transition-all ${
 																	isActive
 																		? "bg-gradient-to-r from-[#111] to-[#161633] text-indigo-300"
-																		: "text-neutral-400 hover:bg-[#111] hover:text-white"
+																		: "primary-text hover:bg-[#111] hover:text-white"
 																}`}
 																onClick={() => setIsOpen(false)}
 															>
@@ -357,7 +357,7 @@ export function MobileNavigation({
 							{/* Table of Contents Tab */}
 							{activeTab === "toc" && lesson && (
 								<div className="p-4">
-									<h4 className="mb-4 text-sm font-semibold text-neutral-400">
+									<h4 className="mb-4 text-sm font-semibold primary-text">
 										On this page
 									</h4>
 									<ul className="space-y-2 text-sm">
@@ -373,7 +373,7 @@ export function MobileNavigation({
 													className={`inline-block w-full text-left transition-all duration-200 ${
 														activeId === heading.id
 															? "rounded-lg bg-gradient-to-r from-[#111] to-[#161633] p-2 font-medium text-indigo-300"
-															: "text-neutral-400 hover:text-white"
+															: "primary-text hover:text-white"
 													}`}
 												>
 													{heading.text}

@@ -169,7 +169,7 @@ export function PairSlider({
 										className={`font-outfit text-5xl font-bold tracking-tight transition-all duration-300 ${
 											isActive
 												? "text-neutral-gradient scale-110"
-												: "scale-90 text-neutral-500/40"
+												: "scale-90 primary-text/40"
 										}`}
 									>
 										{item.pair.replace("_", "/")}
@@ -237,7 +237,7 @@ export function PairSlider({
 
 								{isActive && (
 									<div className="mt-4 flex items-center gap-2">
-										<div className="font-kodemono text-lg text-neutral-400">
+										<div className="font-kodemono text-lg primary-text">
 											{latestPrice?.toFixed(item.pair.includes("JPY") ? 3 : 5)}
 										</div>
 										<div className="flex items-center gap-3">

@@ -130,7 +130,7 @@ export const ServiceSection = () => {
 						{activeService}
 					</h2>
 					<p
-						className={`primary-text fade-in text-oxanium text-xl text-neutral-400`}
+						className={`primary-text fade-in text-oxanium text-xl primary-text`}
 					>
 						{Services.find((service) => service.label === activeService)?.desc}
 					</p>

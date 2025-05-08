@@ -164,7 +164,7 @@ const BenefitsList = memo(
 							<h3 className="font-outfit text-base font-semibold text-white">
 								{benefit.title}
 							</h3>
-							<p className="font-kodemono mt-1 text-sm text-neutral-400">
+							<p className="font-kodemono mt-1 text-sm primary-text">
 								{benefit.description}
 							</p>
 						</div>
@@ -285,7 +285,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 									<h2 className="font-outfit text-neutral-gradient text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
 										{priceString}
 									</h2>
-									<span className="font-kodemono text-lg text-neutral-400">
+									<span className="font-kodemono text-lg primary-text">
 										/month
 									</span>
 								</div>

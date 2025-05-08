@@ -68,7 +68,7 @@ export function MarketNavigator({
 		<div className="flex h-full flex-col gap-4">
 			{/* Search Bar */}
 			<div className="relative">
-				<FaSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+				<FaSearch className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 primary-text" />
 				<input
 					type="text"
 					placeholder="Search pairs..."
@@ -84,7 +84,7 @@ export function MarketNavigator({
 					<span className="font-outfit text-sm font-medium text-white">
 						Favorites
 					</span>
-					<div className="mt-1 text-xs text-neutral-400">
+					<div className="mt-1 text-xs primary-text">
 						{favorites.length} pairs
 					</div>
 				</button>
@@ -114,7 +114,7 @@ export function MarketNavigator({
 											e.stopPropagation();
 											toggleFavorite(item.pair);
 										}}
-										className={`transition-colors ${isFavorite ? "text-yellow-500" : "text-neutral-400 hover:text-yellow-500"}`}
+										className={`transition-colors ${isFavorite ? "text-yellow-500" : "primary-text hover:text-yellow-500"}`}
 									>
 										<FaStar className="h-4 w-4" />
 									</button>
@@ -122,7 +122,7 @@ export function MarketNavigator({
 										<div className="font-outfit text-sm font-medium text-white">
 											{item.pair.replace("_", "/")}
 										</div>
-										<div className="text-xs text-neutral-400">
+										<div className="text-xs primary-text">
 											{price?.toFixed(item.pair.includes("JPY") ? 3 : 5)}
 										</div>
 									</div>
@@ -130,7 +130,7 @@ export function MarketNavigator({
 
 								<div className="flex items-center gap-2">
 									{hasAlerts && <FaBell className="h-3 w-3 text-blue-500" />}
-									<FaChevronRight className="h-3 w-3 text-neutral-400 transition-transform group-hover:translate-x-0.5" />
+									<FaChevronRight className="h-3 w-3 primary-text transition-transform group-hover:translate-x-0.5" />
 								</div>
 							</div>
 						);

@@ -28,7 +28,7 @@ function getTypeColor(type: string) {
 		case "breaking":
 			return "bg-red-500/10 text-red-400 border-red-500/20";
 		default:
-			return "bg-neutral-500/10 text-neutral-400 border-neutral-500/20";
+			return "bg-neutral-500/10 primary-text border-neutral-500/20";
 	}
 }
 
@@ -71,7 +71,7 @@ export function ChangelogBlock({
 							<h1 className="text-neutral-gradient font-outfit text-6xl font-bold tracking-tight text-transparent lg:text-7xl">
 								{title}
 							</h1>
-							<p className="font-kodemono mt-6 text-lg text-neutral-400">
+							<p className="font-kodemono mt-6 text-lg primary-text">
 								{subtitle}
 							</p>
 						</motion.div>
@@ -117,10 +117,10 @@ export function ChangelogBlock({
 													{entry.title}
 												</h2>
 												<div className="mt-2 flex items-center gap-4">
-													<span className="font-kodemono text-sm text-neutral-400">
+													<span className="font-kodemono text-sm primary-text">
 														v{entry.version}
 													</span>
-													<span className="font-kodemono text-sm text-neutral-400">
+													<span className="font-kodemono text-sm primary-text">
 														{new Date(entry.releaseDate).toLocaleDateString()}
 													</span>
 												</div>
@@ -128,14 +128,14 @@ export function ChangelogBlock({
 										</div>
 
 										{/* Description */}
-										<p className="font-kodemono text-lg text-neutral-400">
+										<p className="font-kodemono text-lg primary-text">
 											{entry.description}
 										</p>
 
 										{/* Contributors */}
 										{entry.contributors && entry.contributors.length > 0 && (
 											<div className="mt-6 flex items-center gap-2">
-												<span className="font-kodemono text-sm text-neutral-400/50">
+												<span className="font-kodemono text-sm primary-text/50">
 													Contributors:
 												</span>
 												<div className="flex -space-x-2">
@@ -180,7 +180,7 @@ export function ChangelogBlock({
 												<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_30%)]" />
 												<div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-white/30 to-transparent" />
 											</div>
-											<span className="font-kodemono text-sm text-neutral-400">
+											<span className="font-kodemono text-sm primary-text">
 												{expandedEntries.has(entry._id)
 													? "Show Less"
 													: "Read More"}

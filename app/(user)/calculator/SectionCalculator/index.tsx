@@ -116,7 +116,7 @@ const InputField = memo(
 					{label}
 					{tooltip && (
 						<div className="group relative">
-							<FaInfoCircle className="h-4 w-4 cursor-help text-neutral-400" />
+							<FaInfoCircle className="h-4 w-4 cursor-help primary-text" />
 							<div className="absolute bottom-full left-1/2 mb-2 hidden w-48 -translate-x-1/2 rounded-lg bg-black/90 p-2 text-xs text-white shadow-lg group-hover:block">
 								{tooltip}
 							</div>
@@ -184,18 +184,18 @@ const ResultCard = memo(
 								? "bg-red-400/10 text-red-400"
 								: positive
 									? "bg-blue-400/10 text-blue-400"
-									: "bg-[#1C1E23] text-neutral-400"
+									: "bg-[#1C1E23] primary-text"
 						}`}
 					>
 						{icon}
 					</div>
-					<div className="font-kodemono text-sm text-neutral-400">{label}</div>
+					<div className="font-kodemono text-sm primary-text">{label}</div>
 				</div>
 				<div className="font-outfit text-2xl font-bold text-white">
 					{isInvalid ? "—" : value}
 				</div>
 				{subValue && !isInvalid && (
-					<div className="font-kodemono mt-1 text-sm text-neutral-400">
+					<div className="font-kodemono mt-1 text-sm primary-text">
 						{subValue}
 					</div>
 				)}
@@ -256,7 +256,7 @@ const TakeProfitSuggestion = memo(
 					<button
 						key={ratio}
 						onClick={() => onSelect(price)}
-						className="group flex items-center gap-2 rounded-lg border border-[#1C1E23] bg-black/40 px-3 py-1 text-xs text-neutral-400 transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
+						className="group flex items-center gap-2 rounded-lg border border-[#1C1E23] bg-black/40 px-3 py-1 text-xs primary-text transition-all duration-300 hover:border-blue-400/50 hover:bg-blue-400/5"
 					>
 						<span>{ratio}:1</span>
 						<span className="text-blue-400">${price.toFixed(2)}</span>
@@ -379,7 +379,7 @@ export const SectionCalculator = () => {
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Position Size Calculator
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
+					<p className="font-kodemono mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Calculate your optimal position size and risk management parameters
 						with precision.
 					</p>
@@ -415,7 +415,7 @@ export const SectionCalculator = () => {
 											<div className="font-kodemono mb-2 text-2xl text-blue-400">
 												{template.value}%
 											</div>
-											<p className="font-kodemono text-sm text-neutral-400">
+											<p className="font-kodemono text-sm primary-text">
 												{template.description}
 											</p>
 										</div>
@@ -437,7 +437,7 @@ export const SectionCalculator = () => {
 									label="Account Size"
 									value={inputs.accountSize}
 									onChange={(value) => handleInputChange("accountSize", value)}
-									icon={<FaDollarSign className="h-5 w-5 text-neutral-400" />}
+									icon={<FaDollarSign className="h-5 w-5 primary-text" />}
 									tooltip="Your total account balance"
 									error={getError("accountSize")}
 									placeholder="Enter account size"
@@ -452,7 +452,7 @@ export const SectionCalculator = () => {
 									onChange={(value) =>
 										handleInputChange("riskPercentage", value)
 									}
-									icon={<FaPercentage className="h-5 w-5 text-neutral-400" />}
+									icon={<FaPercentage className="h-5 w-5 primary-text" />}
 									tooltip="Percentage of account to risk"
 									error={getError("riskPercentage")}
 									placeholder="Enter risk %"
@@ -493,7 +493,7 @@ export const SectionCalculator = () => {
 									label="Entry Price"
 									value={inputs.entryPrice}
 									onChange={(value) => handleInputChange("entryPrice", value)}
-									icon={<FaExchangeAlt className="h-5 w-5 text-neutral-400" />}
+									icon={<FaExchangeAlt className="h-5 w-5 primary-text" />}
 									error={getError("entryPrice")}
 									placeholder="Enter entry price"
 								/>

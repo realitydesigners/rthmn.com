@@ -321,14 +321,14 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 													>
 														<Link
 															href="/account"
-															className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
+															className="flex items-center gap-2 px-4 py-2 text-sm primary-text transition-colors hover:bg-[#1C1E23]"
 															role="menuitem"
 														>
 															Account
 														</Link>
 														<button
 															onClick={handleSignOut}
-															className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
+															className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm primary-text transition-colors hover:bg-[#1C1E23]"
 															role="menuitem"
 														>
 															Sign out
@@ -405,14 +405,14 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 														>
 															<Link
 																href="/account"
-																className="flex items-center gap-2 px-4 py-2 text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
+																className="flex items-center gap-2 px-4 py-2 text-sm primary-text transition-colors hover:bg-[#1C1E23]"
 																role="menuitem"
 															>
 																Account
 															</Link>
 															<button
 																onClick={handleSignOut}
-																className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-neutral-300 transition-colors hover:bg-[#1C1E23]"
+																className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm primary-text transition-colors hover:bg-[#1C1E23]"
 																role="menuitem"
 															>
 																Sign out
@@ -681,7 +681,7 @@ export const MobileMenuContent = () => {
 						href={item.href}
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-neutral-400 transition-colors duration-200 hover:text-white"
+						className="primary-text transition-colors duration-200 hover:text-white"
 						aria-label={item.name}
 					>
 						<item.icon className="h-6 w-6" />

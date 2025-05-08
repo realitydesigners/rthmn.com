@@ -76,7 +76,7 @@ const FAQItem = memo(
 					>
 						<div className="flex items-center gap-4">
 							<FaQuestionCircle
-								className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? "text-blue-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
+								className={`min-h-5 min-w-5 transition-all duration-300 ${isActive ? "text-blue-400" : "primary-text group-hover:primary-text"}`}
 							/>
 							<h3 className="text-left text-lg font-medium text-white">
 								{item.question}
@@ -85,7 +85,7 @@ const FAQItem = memo(
 						<motion.div
 							animate={{ rotate: isActive ? 180 : 0 }}
 							transition={{ duration: 0.3 }}
-							className={`transition-colors duration-300 ${isActive ? "text-blue-400" : "text-neutral-400 group-hover:text-neutral-400"}`}
+							className={`transition-colors duration-300 ${isActive ? "text-blue-400" : "primary-text group-hover:primary-text"}`}
 						>
 							<FaChevronDown className="h-5 w-5" />
 						</motion.div>
@@ -103,7 +103,7 @@ const FAQItem = memo(
 						<div className="border-t border-[#1C1E23] px-6 py-6">
 							<div className="flex gap-4">
 								<div className="mt-2 flex h-5 w-5 shrink-0 items-center justify-center">
-									<FaCommentAlt className="min-h-5 min-w-5 text-neutral-400" />
+									<FaCommentAlt className="min-h-5 min-w-5 primary-text" />
 								</div>
 								<div className="prose prose-invert max-w-none text-base leading-relaxed text-white/70">
 									<PortableText
@@ -114,7 +114,7 @@ const FAQItem = memo(
 							</div>
 							{item.category && (
 								<div className="mt-4 flex items-center gap-2">
-									<span className="rounded-full  px-3 py-1 text-xs text-neutral-400">
+									<span className="rounded-full  px-3 py-1 text-xs primary-text">
 										{item.category}
 									</span>
 								</div>
@@ -136,7 +136,7 @@ const SearchInput = memo(
 	}: { value: string; onChange: (value: string) => void }) => (
 		<div className="group relative mb-8">
 			<div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4">
-				<FaSearch className="h-5 w-5 text-neutral-400 transition-colors duration-300 group-focus-within:text-blue-400" />
+				<FaSearch className="h-5 w-5 primary-text transition-colors duration-300 group-focus-within:text-blue-400" />
 			</div>
 			<input
 				type="text"
@@ -169,7 +169,7 @@ const CategoryFilter = memo(
 				className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all duration-300 ${
 					selected === "all"
 						? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-						: "border-[#1C1E23]  text-neutral-400 hover:border-[#32353C] hover: hover:text-neutral-400"
+						: "border-[#1C1E23]  primary-text hover:border-[#32353C] hover: hover:primary-text"
 				}`}
 			>
 				<FaTags className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
@@ -183,7 +183,7 @@ const CategoryFilter = memo(
 					className={`group flex items-center gap-2 rounded-full border px-4 py-2 text-sm capitalize transition-all duration-300 ${
 						selected === category
 							? "border-blue-400/50 bg-blue-400/10 text-blue-400"
-							: "border-[#1C1E23]  text-neutral-400 hover:border-[#32353C] hover: hover:text-neutral-400"
+							: "border-[#1C1E23]  primary-text hover:border-[#32353C] hover: hover:primary-text"
 					}`}
 				>
 					<FaTags className="h-4 w-4 transition-transform duration-300 group-hover:rotate-12" />
@@ -266,7 +266,7 @@ export function FAQBlock({
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						{title}
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
+					<p className="font-kodemono mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Everything you need to know about rthmn. Can't find the answer
 						you're looking for? Contact us at{" "}
 						<button type="button" className="text-blue-400">
@@ -314,7 +314,7 @@ export function FAQBlock({
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								exit={{ opacity: 0 }}
-								className="text-center text-neutral-400"
+								className="text-center primary-text"
 							>
 								No questions found matching your criteria
 							</motion.div>

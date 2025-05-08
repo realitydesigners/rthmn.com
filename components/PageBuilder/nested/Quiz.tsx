@@ -160,11 +160,11 @@ export default function Quiz({
 													? options.indexOf(option) === correctAnswer
 														? "text-[#0073E6]"
 														: options.indexOf(option) === selectedAnswer
-															? "text-neutral-400"
-															: "text-neutral-400"
+															? "primary-text"
+															: "primary-text"
 													: selectedAnswer === options.indexOf(option)
 														? "text-white"
-														: "text-neutral-300 group-hover:text-white"
+														: "primary-text group-hover:text-white"
 											}`}
 										>
 											{option}
@@ -191,7 +191,7 @@ export default function Quiz({
 											{hasSubmitted &&
 												options.indexOf(option) === selectedAnswer &&
 												options.indexOf(option) !== correctAnswer && (
-													<FaTimes className="h-3.5 w-3.5 text-neutral-400" />
+													<FaTimes className="h-3.5 w-3.5 primary-text" />
 												)}
 											{selectedAnswer === options.indexOf(option) &&
 												!hasSubmitted && (
@@ -257,7 +257,7 @@ export default function Quiz({
 											{isCorrect ? (
 												<FaCheck className="h-4 w-4 text-[#0073E6] drop-shadow-[0_0_5px_rgba(0,115,230,0.5)]" />
 											) : (
-												<FaTimes className="h-4 w-4 text-neutral-400" />
+												<FaTimes className="h-4 w-4 primary-text" />
 											)}
 										</div>
 										<div>
@@ -286,9 +286,7 @@ export default function Quiz({
 												<p className="mb-1 font-medium text-white">
 													Explanation
 												</p>
-												<p className="text-sm text-neutral-300">
-													{explanation}
-												</p>
+												<p className="text-sm primary-text">{explanation}</p>
 											</div>
 										</motion.div>
 									)}

@@ -227,7 +227,7 @@ const AlgorithmPage = () => {
 										{item.metric}
 									</div>
 									<div
-										className={`font-outfit text-lg font-semibold text-neutral-400`}
+										className={`font-outfit text-lg font-semibold primary-text`}
 									>
 										{item.label}
 									</div>
@@ -303,7 +303,7 @@ const AlgorithmPage = () => {
 						>
 							<div className="absolute inset-0 -z-10 bg-linear-to-br from-white/[0.03] to-transparent" />
 							<div className="flex h-full items-center justify-center">
-								<div className={`font-kodemonotext-center text-neutral-400`}>
+								<div className={`font-kodemonotext-center primary-text`}>
 									[Wave Visualization Placeholder]
 								</div>
 							</div>
@@ -383,7 +383,7 @@ const AlgorithmPage = () => {
 								<div className="mb-4 flex items-center gap-4">
 									<div className="rounded-full bg-[#1C1E23] p-3">
 										<div
-											className={`font-kodemonotext-lg font-bold text-neutral-400`}
+											className={`font-kodemonotext-lg font-bold primary-text`}
 										>
 											{item.state}
 										</div>
@@ -436,7 +436,7 @@ const AlgorithmPage = () => {
 								</p>
 								<div className="mt-12 flex items-center gap-8">
 									<div className="h-[2px] w-12 bg-linear-to-r from-white/40 to-transparent" />
-									<span className={`font-kodemonotext-neutral-400`}>
+									<span className={`font-kodemonoprimary-text`}>
 										Position State Theory
 									</span>
 								</div>
@@ -524,12 +524,10 @@ const AlgorithmPage = () => {
 								<div className="grid gap-12 lg:grid-cols-2">
 									<div className="space-y-6">
 										<div className="rounded-lg border border-[#1C1E23] bg-[#1C1E23] p-6">
-											<div
-												className={`font-kodemonomb-2 text-sm text-neutral-400`}
-											>
+											<div className={`font-kodemonomb-2 text-sm primary-text`}>
 												Position State Evolution
 											</div>
-											<div className={`font-kodemonotext-lg text-neutral-400`}>
+											<div className={`font-kodemonotext-lg primary-text`}>
 												P(t+1) = ∑[P(t) × W(s)] + ε
 											</div>
 											<div className="mt-4 text-sm text-white/60">
@@ -543,12 +541,10 @@ const AlgorithmPage = () => {
 										</div>
 
 										<div className="rounded-lg border border-[#1C1E23] bg-[#1C1E23] p-6">
-											<div
-												className={`font-kodemonomb-2 text-sm text-neutral-400`}
-											>
+											<div className={`font-kodemonomb-2 text-sm primary-text`}>
 												Wave Propagation Function
 											</div>
-											<div className={`font-kodemonotext-lg text-neutral-400`}>
+											<div className={`font-kodemonotext-lg primary-text`}>
 												ψ(p,t) = A·sin(kp - ωt + φ)
 											</div>
 											<div className="mt-4 text-sm text-white/60">
@@ -565,12 +561,10 @@ const AlgorithmPage = () => {
 
 									<div className="space-y-6">
 										<div className="rounded-lg border border-[#1C1E23] bg-[#1C1E23] p-6">
-											<div
-												className={`font-kodemonomb-2 text-sm text-neutral-400`}
-											>
+											<div className={`font-kodemonomb-2 text-sm primary-text`}>
 												Energy Conservation Law
 											</div>
-											<div className={`font-kodemonotext-lg text-neutral-400`}>
+											<div className={`font-kodemonotext-lg primary-text`}>
 												E = ∑[Pi²] = constant
 											</div>
 											<div className="mt-4 text-sm text-white/60">
@@ -580,12 +574,10 @@ const AlgorithmPage = () => {
 										</div>
 
 										<div className="rounded-lg border border-[#1C1E23] bg-[#1C1E23] p-6">
-											<div
-												className={`font-kodemonomb-2 text-sm text-neutral-400`}
-											>
+											<div className={`font-kodemonomb-2 text-sm primary-text`}>
 												State Transition Probability
 											</div>
-											<div className={`font-kodemonotext-lg text-neutral-400`}>
+											<div className={`font-kodemonotext-lg primary-text`}>
 												T(i→j) = |⟨ψj|H|ψi⟩|²
 											</div>
 											<div className="mt-4 text-sm text-white/60">
@@ -779,7 +771,7 @@ const AlgorithmPage = () => {
 									>
 										<div className="flex items-start gap-8">
 											<div
-												className={`font-kodemonotext-3xl font-bold text-neutral-400`}
+												className={`font-kodemonotext-3xl font-bold primary-text`}
 											>
 												{item.step}
 											</div>

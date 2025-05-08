@@ -56,9 +56,9 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 
 				<div className="relative z-10 p-6">
 					{/* Meta Information */}
-					<div className="mb-4 flex items-center gap-4 text-xs text-neutral-400">
+					<div className="mb-4 flex items-center gap-4 text-xs primary-text">
 						<div className="flex items-center gap-2">
-							<FaCalendar className="h-3 w-3 text-neutral-400" />
+							<FaCalendar className="h-3 w-3 primary-text" />
 							<span className="font-kodemono">
 								{new Date(block?.publicationDate).toLocaleDateString("en-US", {
 									year: "numeric",
@@ -68,7 +68,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 							</span>
 						</div>
 						<div className="flex items-center gap-2">
-							<FaClock className="h-3 w-3 text-neutral-400" />
+							<FaClock className="h-3 w-3 primary-text" />
 							<span className="font-kodemono">5 min read</span>
 						</div>
 					</div>
@@ -81,7 +81,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 					</Link>
 
 					{/* Description */}
-					<p className="font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed text-neutral-400">
+					<p className="font-kodemono mb-6 line-clamp-2 text-sm leading-relaxed primary-text">
 						{block?.subheading || "No subheading"}
 					</p>
 
@@ -128,7 +128,7 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
 					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Latest Insights
 					</h2>
-					<p className="font-kodemono mx-auto max-w-2xl text-base text-neutral-400 sm:text-lg">
+					<p className="font-kodemono mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Explore our latest thoughts on market analysis, trading strategies,
 						and technological innovations.
 					</p>

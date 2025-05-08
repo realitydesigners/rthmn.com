@@ -38,14 +38,14 @@ const OnboardingCard = ({
 						<h3
 							className={cn(
 								"truncate text-sm font-medium transition-colors duration-300",
-								isCompleted || isCurrent ? "text-white" : "text-neutral-400",
+								isCompleted || isCurrent ? "text-white" : "primary-text",
 							)}
 						>
 							{step.title}
 						</h3>
 						<button
 							onClick={() => setIsExpanded(!isExpanded)}
-							className="ml-2 rounded-md p-0.5 text-neutral-500 hover:bg-[#1C1E23] hover:text-neutral-300"
+							className="ml-2 rounded-md p-0.5 primary-text hover:bg-[#1C1E23] hover:primary-text"
 						>
 							{isExpanded ? (
 								<LuChevronUp size={14} />
@@ -56,7 +56,7 @@ const OnboardingCard = ({
 					</div>
 
 					{isExpanded && (
-						<p className="mt-1 text-xs text-neutral-500 transition-colors duration-300 group-hover:text-neutral-400">
+						<p className="mt-1 text-xs primary-text transition-colors duration-300 group-hover:primary-text">
 							{step.description}
 						</p>
 					)}
@@ -71,7 +71,7 @@ const OnboardingCard = ({
 								In Progress
 							</span>
 						) : (
-							<span className="inline-flex items-center gap-1 rounded-full border border-[#111215] bg-[#111] px-2 py-0.5 text-[10px] font-medium text-neutral-500">
+							<span className="inline-flex items-center gap-1 rounded-full border border-[#111215] bg-[#111] px-2 py-0.5 text-[10px] font-medium primary-text">
 								Not Started
 							</span>
 						)}
@@ -107,7 +107,7 @@ export const Onboarding = () => {
 							}}
 						/>
 					</div>
-					<span className="text-xs font-medium text-neutral-400">
+					<span className="text-xs font-medium primary-text">
 						{completedSteps.length}/{ONBOARDING_STEPS.length}
 					</span>
 				</div>

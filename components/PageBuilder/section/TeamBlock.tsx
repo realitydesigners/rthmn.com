@@ -25,7 +25,7 @@ const TeamBlock = ({ block }) => {
 								<p className="mb-2 bg-linear-to-r from-blue-100/100 to-blue-100/90 bg-clip-text text-xl leading-none font-bold tracking-wide text-transparent uppercase">
 									{block?.team.name}
 								</p>
-								<span className="text-xs leading-none tracking-widest text-neutral-400 uppercase">
+								<span className="text-xs leading-none tracking-widest primary-text uppercase">
 									{block?.team.role}
 								</span>
 							</div>

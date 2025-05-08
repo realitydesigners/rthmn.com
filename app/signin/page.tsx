@@ -199,7 +199,7 @@ export default function SignIn() {
 							<h1 className="font-outfit bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl lg:text-5xl">
 								Trading from another dimension
 							</h1>
-							<p className="font-kodemono max-w-[90%] text-base text-neutral-400/90 sm:text-lg">
+							<p className="font-kodemono max-w-[90%] text-base primary-text/90 sm:text-lg">
 								Take your trading to a new level.
 							</p>
 						</div>
@@ -214,7 +214,7 @@ export default function SignIn() {
 									value={email}
 									onChange={(e) => setEmail(e.target.value)}
 									placeholder="Enter your email"
-									className="w-full rounded-lg bg-[#1C1E23] px-4 py-2 font-mono text-white placeholder:text-neutral-400 focus:ring-2 focus:ring-neutral-500/20 focus:outline-none"
+									className="w-full rounded-lg bg-[#1C1E23] px-4 py-2 font-mono text-white placeholder:primary-text focus:ring-2 focus:ring-neutral-500/20 focus:outline-none"
 									required
 								/>
 								<button
@@ -231,14 +231,14 @@ export default function SignIn() {
 								</button>
 							</div>
 							{message && (
-								<p className="mt-2 text-center text-sm text-neutral-300">
+								<p className="mt-2 text-center text-sm primary-text">
 									{message}
 								</p>
 							)}
 						</form>
 
 						<div className="relative flex items-center justify-center">
-							<span className="relative px-4 text-xs text-neutral-400">
+							<span className="relative px-4 text-xs primary-text">
 								Or continue with
 							</span>
 						</div>
@@ -257,18 +257,18 @@ export default function SignIn() {
 								</span>
 							</button>
 						</form>
-						<p className="text-center font-mono text-xs text-neutral-500/90">
+						<p className="text-center font-mono text-xs primary-text/90">
 							Currently in beta. By signing in, you agree to our{" "}
 							<a
 								href="/terms"
-								className="text-neutral-400 transition-colors hover:text-neutral-300"
+								className="primary-text transition-colors hover:primary-text"
 							>
 								Terms of Service
 							</a>{" "}
 							and{" "}
 							<a
 								href="/privacy"
-								className="text-neutral-400 transition-colors hover:text-neutral-300"
+								className="primary-text transition-colors hover:primary-text"
 							>
 								Privacy Policy
 							</a>

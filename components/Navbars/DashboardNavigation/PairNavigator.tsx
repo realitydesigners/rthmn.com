@@ -599,7 +599,7 @@ const ActionButton = ({
 	variant?: "default" | "danger" | "success";
 }) => {
 	const variantStyles = {
-		default: "bg-[#1C1E23] hover:bg-[#32353C] text-neutral-300",
+		default: "bg-[#1C1E23] hover:bg-[#32353C] primary-text",
 		danger: "bg-red-500/10 text-red-400 hover:bg-red-500/20",
 		success: "bg-blue-500/10 text-blue-400 hover:bg-blue-500/20",
 	};
