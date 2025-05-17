@@ -129,39 +129,70 @@ export const SidebarWrapper = ({
 			'.sidebar-content [data-position="right"]',
 		);
 
-		const leftWidth =
-			leftSidebar?.getAttribute("data-locked") === "true"
-				? Number.parseInt(leftSidebar?.getAttribute("data-width") || "0")
-				: 0;
-		const rightWidth =
-			rightSidebar?.getAttribute("data-locked") === "true"
-				? Number.parseInt(rightSidebar?.getAttribute("data-width") || "0")
-				: 0;
-
-		if (isOpen && isLocked) {
-			if (position === "left") {
-				main.style.marginLeft = `${width}px`;
-				main.style.width = `calc(100% - ${width + rightWidth}px)`;
-				main.style.paddingLeft = "0";
-			} else {
-				main.style.marginRight = `${width}px`;
-				main.style.width = `calc(100% - ${width + leftWidth}px)`;
-				main.style.paddingRight = "0";
-			}
-		} else {
-			if (position === "left") {
+		const handleResize = () => {
+			const isMobile = window.innerWidth < 1024;
+			
+			if (isMobile) {
+				// Reset all spacing on mobile
 				main.style.marginLeft = "0";
-				main.style.width =
-					rightWidth > 0 ? `calc(100% - ${rightWidth}px)` : "100%";
-				main.style.paddingLeft = "64px";
-			} else {
 				main.style.marginRight = "0";
-				main.style.width =
-					leftWidth > 0 ? `calc(100% - ${leftWidth}px)` : "100%";
-				main.style.paddingRight = "64px";
+				main.style.width = "100%";
+				main.style.paddingLeft = "0";
+				main.style.paddingRight = "0";
+				return;
 			}
-		}
-		container.style.overflowX = "hidden";
+
+			const leftWidth =
+				leftSidebar?.getAttribute("data-locked") === "true"
+					? Number.parseInt(leftSidebar?.getAttribute("data-width") || "0")
+					: 0;
+			const rightWidth =
+				rightSidebar?.getAttribute("data-locked") === "true"
+					? Number.parseInt(rightSidebar?.getAttribute("data-width") || "0")
+					: 0;
+
+			if (isOpen && isLocked) {
+				if (position === "left") {
+					main.style.marginLeft = `${width}px`;
+					main.style.width = `calc(100% - ${width + rightWidth}px)`;
+					main.style.paddingLeft = "0";
+				} else {
+					main.style.marginRight = `${width}px`;
+					main.style.width = `calc(100% - ${width + leftWidth}px)`;
+					main.style.paddingRight = "0";
+				}
+			} else {
+				if (position === "left") {
+					main.style.marginLeft = "0";
+					main.style.width =
+						rightWidth > 0 ? `calc(100% - ${rightWidth}px)` : "100%";
+					main.style.paddingLeft = "64px";
+				} else {
+					main.style.marginRight = "0";
+					main.style.width =
+						leftWidth > 0 ? `calc(100% - ${leftWidth}px)` : "100%";
+					main.style.paddingRight = "64px";
+				}
+			}
+		};
+
+		// Initial setup
+		handleResize();
+
+		// Add resize listener
+		window.addEventListener('resize', handleResize);
+		
+		// Cleanup
+		return () => {
+			window.removeEventListener('resize', handleResize);
+			// Reset styles on unmount
+			main.style.marginLeft = "";
+			main.style.marginRight = "";
+			main.style.width = "";
+			main.style.paddingLeft = "";
+			main.style.paddingRight = "";
+		};
+
 	}, [isOpen, width, position, isLocked, mounted]);
 
 	if (!mounted) return null;
@@ -190,7 +221,7 @@ export const SidebarWrapper = ({
 			<div
 				className={cn(
 					"relative flex h-full w-full",
-					position === "left" ? "ml-16" : "mr-16",
+					position === "left" ? "lg:ml-16" : "lg:mr-16",
 				)}
 			>
 				<div

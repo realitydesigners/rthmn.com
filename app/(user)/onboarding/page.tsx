@@ -12,7 +12,7 @@ import IntroSequence from "./_components/Steps/IntroSequence";
 import PairsStep from "./_components/Steps/PairsStep";
 import ProfileUpload from "./_components/Steps/ProfileUpload";
 
-const COMPONENTS: {
+const COMPONENTS: { 
 	ProfileUpload: any;
 	ExperienceStep: any;
 	PairsStep: any;

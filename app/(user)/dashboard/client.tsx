@@ -4,19 +4,42 @@ import { useDashboard } from "@/providers/DashboardProvider/client";
 import { useUser } from "@/providers/UserProvider";
 import { useGridStore } from "@/stores/gridStore";
 import { motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
 
 export default function Dashboard() {
 	const { pairData, isLoading } = useDashboard();
 	const { selectedPairs, boxColors } = useUser();
-	const lastCols = useGridStore((state) => state.lastCols);
+	const getGridColumns = useGridStore((state) => state.getGridColumns);
+	const currentLayout = useGridStore((state) => state.currentLayout);
 	const orderedPairs = useGridStore((state) => state.orderedPairs);
 	const reorderPairs = useGridStore((state) => state.reorderPairs);
 	const setInitialPairs = useGridStore((state) => state.setInitialPairs);
 	const [isClient, setIsClient] = useState(false);
 	const [draggedItem, setDraggedItem] = useState<string | null>(null);
+	const [windowWidth, setWindowWidth] = useState(0);
+
+	// Handle window resize
+	useEffect(() => {
+		const updateWidth = () => {
+			setWindowWidth(window.innerWidth);
+		};
+		
+		// Set initial width
+		updateWidth();
+
+		// Add resize listener
+		window.addEventListener('resize', updateWidth);
+		return () => window.removeEventListener('resize', updateWidth);
+	}, []);
+
+	// Debug effect to monitor layout changes
+	useEffect(() => {
+		console.log('Current layout:', currentLayout);
+		console.log('Window width:', windowWidth);
+		console.log('Grid columns:', getGridColumns(windowWidth));
+	}, [currentLayout, windowWidth, getGridColumns]);
 
 	// Mark as client-side rendered
 	useEffect(() => {
@@ -103,25 +126,21 @@ export default function Dashboard() {
 		);
 	}
 
-	// Determine columns for style, ensuring client-side check for hydration
-	const gridColsStyle = isClient ? lastCols || 1 : 1;
-
 	// Render based on orderedPairs once available, or selectedPairs initially
 	const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
 
 	return (
-		<main className="w-full px-2 py-18 sm:px-4">
-			<div
-				className="grid w-full gap-4"
+		<main className="w-full px-2 py-18 lg:px-4">
+			<div 
+				className="grid w-full gap-2 lg:gap-4"
 				style={{
-					gridTemplateColumns: `repeat(${gridColsStyle}, minmax(0, 1fr))`,
+					gridTemplateColumns: `repeat(${getGridColumns(windowWidth)}, minmax(0, 1fr))`
 				}}
 			>
 				{/* Only render the list content after client-side mounting */}
 				{isClient &&
 					pairsToRender.map((pair) => {
-						const data = pairData[pair]; // Get data regardless of loading state
-
+						const data = pairData[pair];
 						return (
 							<motion.div
 								key={pair}
@@ -151,10 +170,8 @@ export default function Dashboard() {
 								<div data-pair={pair}>
 									<PairResoBox
 										pair={pair}
-										// Pass the raw slice now, filtering happens inside PairResoBox
 										boxSlice={data?.boxes?.[0]}
 										boxColors={boxColors}
-										// Pass the isLoading state down
 										isLoading={isLoading}
 									/>
 								</div>
