@@ -53,7 +53,7 @@ export default async function RootLayout({
 
 	return (
 		<html lang="en">
-			<GoogleTagManager gtmId="GTM-XYZ" />
+			{/* <GoogleTagManager gtmId="GTM-XYZ" /> */}
 			<body
 				className={`${dmmono.variable} ${outfit.variable} ${oxanium.variable} ${russo.variable} bg-black`}
 			>
@@ -65,10 +65,10 @@ export default async function RootLayout({
 					</QueryProvider>
 				</SupabaseProvider>
 				<Analytics />
-				<script
+				{/* <script
 					async
 					src="https://www.googletagmanager.com/gtag/js?id=G-0PXQE0RL1G"
-				></script>
+				></script> */}
 			</body>
 		</html>
 	);
