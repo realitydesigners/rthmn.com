@@ -72,26 +72,28 @@ const createStore = () => {
 	return create<GridState>()(
 		persist(
 			(set, get) => ({
-				currentLayout: getLayoutFromStorage(),
-				orderedPairs: getOrderFromStorage(),
+				currentLayout: 'balanced', // Default value for SSR
+				orderedPairs: [], // Default value for SSR
 				initialized: false,
 
 				setLayout: (layout: LayoutPreset) => {
 					console.log('Store - Setting layout to:', layout);
 					set({ currentLayout: layout });
-					saveLayoutToStorage(layout);
+					if (typeof window !== "undefined") {
+						saveLayoutToStorage(layout);
+					}
 				},
 
 				setInitialPairs: (pairs: string[]) => {
 					const state = get();
 					if (!state.initialized && pairs.length > 0) {
-						const initialOrder = getOrderFromStorage();
+						const initialOrder = typeof window !== "undefined" ? getOrderFromStorage() : [];
 						const finalOrder = initialOrder.length === pairs.length ? initialOrder : pairs;
 						set({
 							orderedPairs: finalOrder,
 							initialized: true,
 						});
-						if (initialOrder.length !== pairs.length) {
+						if (initialOrder.length !== pairs.length && typeof window !== "undefined") {
 							saveOrderToStorage(finalOrder);
 						}
 					}
@@ -99,7 +101,9 @@ const createStore = () => {
 
 				reorderPairs: (newOrder: string[]) => {
 					set({ orderedPairs: newOrder });
-					saveOrderToStorage(newOrder);
+					if (typeof window !== "undefined") {
+						saveOrderToStorage(newOrder);
+					}
 				},
 
 				getGridColumns: (windowWidth: number) => {
@@ -108,18 +112,18 @@ const createStore = () => {
 					
 					switch (state.currentLayout) {
 						case 'compact':
-							if (windowWidth >= BREAKPOINTS.xl) return 5;
-							if (windowWidth >= BREAKPOINTS.lg) return 4;
+							if (windowWidth >= BREAKPOINTS.xl) return 4;
+							if (windowWidth >= BREAKPOINTS.lg) return 3;
 							if (windowWidth >= BREAKPOINTS.sm) return 2;
 							return 1;
 						case 'expanded':
-							if (windowWidth >= BREAKPOINTS.xl) return 3;
+							if (windowWidth >= BREAKPOINTS.xl) return 2;
 							if (windowWidth >= BREAKPOINTS.lg) return 2;
 							return 1;
 						case 'balanced':
 						default:
-							if (windowWidth >= BREAKPOINTS.xl) return 4;
-							if (windowWidth >= BREAKPOINTS.lg) return 3;
+							if (windowWidth >= BREAKPOINTS.xl) return 3;
+							if (windowWidth >= BREAKPOINTS.lg) return 2;
 							if (windowWidth >= BREAKPOINTS.sm) return 2;
 							return 1;
 					}
@@ -143,7 +147,7 @@ const createStore = () => {
 						}
 					},
 				})),
-				skipHydration: true,
+				skipHydration: true, // Important: Skip hydration to prevent mismatch
 			},
 		),
 	);
