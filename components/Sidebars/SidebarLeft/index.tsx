@@ -1,7 +1,7 @@
 "use client";
 
-import { InstrumentsContent } from "@/app/(user)/onboarding/_components/FeatureTour/InstrumentsContent";
-import { VisualizerContent } from "@/app/(user)/onboarding/_components/FeatureTour/VisualizerContent";
+import { TourInstruments } from "@/app/(user)/onboarding/_components/Tours/TourInstruments";
+import { TourVisualizers } from "@/app/(user)/onboarding/_components/Tours/TourVisualizers";
 import { InstrumentsPanel } from "@/components/Panels/InstrumentsPanel";
 import { Sidebar } from "@/components/Sidebars/Sidebar";
 import { LuLayoutGrid, LuLineChart } from "react-icons/lu";
@@ -13,13 +13,13 @@ export const SidebarLeft = () => {
 		{
 			id: "instruments",
 			icon: LuLineChart,
-			tourContent: <InstrumentsContent />,
+			tourContent: <TourInstruments />,
 			panelContent: <InstrumentsPanel />,
 		},
 		{
 			id: "visualizer",
 			icon: LuLayoutGrid,
-			tourContent: <VisualizerContent />,
+			tourContent: <TourVisualizers />,
 			panelContent: (
 				<>
 					<ChartStyleOptions />

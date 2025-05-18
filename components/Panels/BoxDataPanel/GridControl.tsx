@@ -16,7 +16,7 @@ export const GridControl = () => {
 	const layouts: { id: LayoutPreset; label: string }[] = [
 		{ id: 'compact', label: 'Compact' },
 		{ id: 'balanced', label: 'Balanced' },
-		{ id: 'expanded', label: 'Expanded' }
+		
 	];
 
 	const handleLayoutChange = (layout: LayoutPreset) => {

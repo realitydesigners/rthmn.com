@@ -1,6 +1,6 @@
 "use client";
 
-import { FeatureTour } from "@/app/(user)/onboarding/_components/FeatureTour";
+import { FeatureTour } from "@/components/Buttons/FeatureTour";
 import { SidebarWrapper } from "@/components/Panels/SidebarPanelWrapper";
 import { ONBOARDING_STEPS, useOnboardingStore } from "@/stores/onboardingStore";
 import { cn } from "@/utils/cn";

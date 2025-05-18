@@ -135,7 +135,7 @@ export default function OnboardingPage() {
 	).length;
 
 	return (
-		<div className="relative min-h-screen bg-black">
+		<div className="relative min-h-screen bg-black z-[1000]">
 			{/* Main onboarding content */}
 			<motion.div
 				initial={{ opacity: 0 }}

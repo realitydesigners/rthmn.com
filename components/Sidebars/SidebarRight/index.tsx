@@ -1,7 +1,7 @@
 "use client";
 
-import { OnboardingContent } from "@/app/(user)/onboarding/_components/FeatureTour/OnboardingContent";
-import { SettingsContent } from "@/app/(user)/onboarding/_components/FeatureTour/SettingsContent";
+import { TourOnboarding } from "@/app/(user)/onboarding/_components/Tours/TourOnboarding";
+import { TourSettings } from "@/app/(user)/onboarding/_components/Tours/TourSettings";
 import { AccountPanel } from "@/components/Panels/AccountPanel";
 import { Onboarding } from "@/components/Panels/OnboardingPanel";
 import { Sidebar } from "@/components/Sidebars/Sidebar";
@@ -15,13 +15,13 @@ export const SidebarRight = () => {
 		{
 			id: "onboarding",
 			icon: LuGraduationCap,
-			tourContent: <OnboardingContent />,
+			tourContent: <TourOnboarding />,
 			panelContent: <Onboarding />,
 		},
 		{
 			id: "settings",
 			icon: LuSettings,
-			tourContent: <SettingsContent />,
+			tourContent: <TourSettings />,
 			panelContent: (
 				<>
 					<ColorStyleOptions />

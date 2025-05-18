@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type LayoutPreset = 'compact' | 'balanced' | 'expanded';
+export type LayoutPreset = 'compact' | 'balanced';
 
 interface GridState {
 	currentLayout: LayoutPreset;
@@ -116,10 +116,7 @@ const createStore = () => {
 							if (windowWidth >= BREAKPOINTS.lg) return 3;
 							if (windowWidth >= BREAKPOINTS.sm) return 2;
 							return 1;
-						case 'expanded':
-							if (windowWidth >= BREAKPOINTS.xl) return 2;
-							if (windowWidth >= BREAKPOINTS.lg) return 2;
-							return 1;
+					
 						case 'balanced':
 						default:
 							if (windowWidth >= BREAKPOINTS.xl) return 3;

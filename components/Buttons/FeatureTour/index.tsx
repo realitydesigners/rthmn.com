@@ -128,7 +128,6 @@ export function FeatureTour({
 							"shadow-lg shadow-blue-400/30",
 							"shadow-md shadow-blue-400/20",
 							"inset-ring inset-ring-blue-400/25",
-							"ring-1 ring-blue-400/40",
 							"hover:shadow-[inset_0_0_50px_rgba(63,255,162,0.6)]",
 							"hover:shadow-[inset_0_0_25px_rgba(63,255,162,0.5)]",
 							"hover:inset-shadow-sm hover:inset-shadow-blue-400/50",
@@ -137,8 +136,7 @@ export function FeatureTour({
 							"hover:border-blue-400/50",
 							"hover:shadow-lg hover:shadow-blue-400/40",
 							"hover:shadow-md hover:shadow-blue-400/30",
-							"hover:inset-ring hover:inset-ring-blue-400/35",
-							"hover:ring-1 hover:ring-blue-400/50",
+						
 						].join(" "),
 					!isCompleted &&
 						currentStepId &&
