@@ -1,5 +1,5 @@
-import type React from "react";
 import { cn } from "@/utils/cn";
+import type React from "react";
 
 interface ToggleProps {
 	isEnabled: boolean;

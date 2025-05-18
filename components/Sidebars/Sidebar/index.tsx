@@ -1,13 +1,13 @@
 "use client";
 
-import { FeatureTour } from "@/app/(user)/onboarding/_components/FeatureTour";
+import { FeatureTour } from "@/components/Buttons/FeatureTour";
 import { SidebarWrapper } from "@/components/Panels/SidebarPanelWrapper";
 import { ONBOARDING_STEPS, useOnboardingStore } from "@/stores/onboardingStore";
 import { cn } from "@/utils/cn";
 import { getSidebarState, setSidebarState } from "@/utils/localStorage";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 
 interface SidebarButton {
@@ -63,13 +63,8 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 		setIsLocked((prevLocked) => {
 			const newLockedState = !prevLocked;
 
-			if (!newLockedState) {
-				setIsOpen(false);
-				setActivePanel(undefined);
-				updateSidebarState(false, undefined, false);
-			} else {
-				updateSidebarState(isOpen, activePanel, true);
-			}
+			// When unlocking, keep the panel open but update state
+			updateSidebarState(isOpen, activePanel, newLockedState);
 
 			return newLockedState;
 		});
@@ -79,17 +74,14 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 		(panel: string) => {
 			if (isMobile) return;
 
-			if (activePanel === panel) {
-				setIsOpen(false);
-				setActivePanel(undefined);
-				updateSidebarState(false, undefined, isLocked);
-			} else {
-				setIsOpen(true);
-				setActivePanel(panel);
-				updateSidebarState(true, panel, isLocked);
-			}
+			const newIsOpen = activePanel !== panel || !isOpen;
+			const newActivePanel = newIsOpen ? panel : undefined;
+
+			setIsOpen(newIsOpen);
+			setActivePanel(newActivePanel);
+			updateSidebarState(newIsOpen, newActivePanel, isLocked);
 		},
-		[isMobile, activePanel, isLocked, updateSidebarState],
+		[isMobile, activePanel, isOpen, isLocked, updateSidebarState],
 	);
 
 	useEffect(() => {
@@ -106,6 +98,7 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 				if (!isClickInAnySidebar) {
 					setIsOpen(false);
 					setActivePanel(undefined);
+					updateSidebarState(false, undefined, false);
 				}
 			}
 		};
@@ -127,7 +120,7 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 			window.removeEventListener("resize", handleResize);
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [isLocked, isMobile, position, defaultPanel]);
+	}, [isLocked, isMobile, position, defaultPanel, updateSidebarState]);
 
 	useEffect(() => {
 		if (hasCompletedInitialOnboarding() && !hasCompletedAllSteps()) {
@@ -173,7 +166,7 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 		<div className="sidebar-content" ref={sidebarRef}>
 			<div
 				className={cn(
-					"fixed top-14 bottom-0 z-[120] flex w-16 flex-col items-center justify-between border-l bg-gradient-to-b from-[#0A0B0D] to-[#070809] py-4",
+					"fixed top-14 bottom-0 z-[100] flex w-16 flex-col items-center justify-between border-l bg-gradient-to-b from-[#0A0B0D] to-[#070809] py-4",
 					position === "left"
 						? "left-0 border-r border-[#1C1E23]"
 						: "right-0 border-l border-[#1C1E23]",

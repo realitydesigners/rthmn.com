@@ -19,27 +19,48 @@ export default function Dashboard() {
 	const [isClient, setIsClient] = useState(false);
 	const [draggedItem, setDraggedItem] = useState<string | null>(null);
 	const [windowWidth, setWindowWidth] = useState(0);
+	const [availableWidth, setAvailableWidth] = useState(0);
 
-	// Handle window resize
+	// Handle window resize and main element width changes
 	useEffect(() => {
-		const updateWidth = () => {
+		const updateWidths = () => {
 			setWindowWidth(window.innerWidth);
+			const main = document.querySelector("main");
+			if (main) {
+				setAvailableWidth(main.clientWidth);
+			}
 		};
-		
-		// Set initial width
-		updateWidth();
 
-		// Add resize listener
-		window.addEventListener('resize', updateWidth);
-		return () => window.removeEventListener('resize', updateWidth);
+		// Initial update
+		updateWidths();
+
+		// Set up ResizeObserver for main element
+		const main = document.querySelector("main");
+		let observer: ResizeObserver | null = null;
+
+		if (main) {
+			observer = new ResizeObserver(updateWidths);
+			observer.observe(main);
+		}
+
+		// Window resize handler
+		window.addEventListener("resize", updateWidths);
+
+		return () => {
+			window.removeEventListener("resize", updateWidths);
+			if (observer) {
+				observer.disconnect();
+			}
+		};
 	}, []);
 
 	// Debug effect to monitor layout changes
 	useEffect(() => {
-		console.log('Current layout:', currentLayout);
-		console.log('Window width:', windowWidth);
-		console.log('Grid columns:', getGridColumns(windowWidth));
-	}, [currentLayout, windowWidth, getGridColumns]);
+		// console.log('Current layout:', currentLayout);
+		// console.log('Window width:', windowWidth);
+		// console.log('Available width:', availableWidth);
+		// console.log('Grid columns:', getGridColumns(availableWidth));
+	}, [currentLayout, windowWidth, availableWidth, getGridColumns]);
 
 	// Mark as client-side rendered
 	useEffect(() => {
@@ -117,12 +138,12 @@ export default function Dashboard() {
 
 	if (!selectedPairs.length && !isLoading) {
 		return (
-			<main className="w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18">
+			<div className="w-full px-2 sm:px-4">
 				<NoInstruments />
 				<div className="mt-4 text-center text-sm primary-text">
 					Please complete the onboarding process to select your trading pairs.
 				</div>
-			</main>
+			</div>
 		);
 	}
 
@@ -130,14 +151,13 @@ export default function Dashboard() {
 	const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
 
 	return (
-		<main className="w-full px-2 py-18 lg:px-4">
-			<div 
-				className="grid w-full gap-2 lg:gap-4"
+		<div className="w-full px-2 ">
+			<div
+				className="grid w-full gap-2"
 				style={{
-					gridTemplateColumns: `repeat(${getGridColumns(windowWidth)}, minmax(0, 1fr))`
+					gridTemplateColumns: `repeat(${getGridColumns(availableWidth)}, minmax(0, 1fr))`,
 				}}
 			>
-				{/* Only render the list content after client-side mounting */}
 				{isClient &&
 					pairsToRender.map((pair) => {
 						const data = pairData[pair];
@@ -179,6 +199,6 @@ export default function Dashboard() {
 						);
 					})}
 			</div>
-		</main>
+		</div>
 	);
 }

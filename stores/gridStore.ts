@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type LayoutPreset = 'compact' | 'balanced' | 'expanded';
+export type LayoutPreset = "compact" | "balanced";
 
 interface GridState {
 	currentLayout: LayoutPreset;
@@ -21,18 +21,6 @@ const saveLayoutToStorage = (layout: LayoutPreset) => {
 		}
 	} catch (e) {
 		console.error("Failed to save layout:", e);
-	}
-};
-
-// Helper to get layout from storage
-const getLayoutFromStorage = (): LayoutPreset => {
-	try {
-		if (typeof window === "undefined") return 'balanced';
-		const saved = localStorage.getItem("rthmn-layout-preset");
-		return (saved as LayoutPreset) || 'balanced';
-	} catch (e) {
-		console.error("Failed to get layout:", e);
-		return 'balanced';
 	}
 };
 
@@ -59,11 +47,17 @@ const getOrderFromStorage = (): string[] => {
 	}
 };
 
-// Breakpoint definitions
-const BREAKPOINTS = {
-	sm: 640,
-	lg: 1024,
-	xl: 1400
+// Minimum widths needed for each column count
+const MIN_WIDTH_PER_COLUMN = {
+	compact: {
+		2: 500, // Need at least 500px for 2 columns
+		3: 800, // Need at least 800px for 3 columns
+		4: 1200, // Need at least 1200px for 4 columns
+	},
+	balanced: {
+		2: 800, // Need at least 500px for 2 columns
+		3: 1200, // Need at least 900px for 3 columns
+	},
 };
 
 let store: ReturnType<typeof createStore> | null = null;
@@ -72,28 +66,35 @@ const createStore = () => {
 	return create<GridState>()(
 		persist(
 			(set, get) => ({
-				currentLayout: 'balanced', // Default value for SSR
-				orderedPairs: [], // Default value for SSR
+				currentLayout:
+					typeof window !== "undefined"
+						? (localStorage.getItem("rthmn-layout-preset") as LayoutPreset) ||
+							"balanced"
+						: "balanced",
+				orderedPairs: [],
 				initialized: false,
 
 				setLayout: (layout: LayoutPreset) => {
-					console.log('Store - Setting layout to:', layout);
+					console.log("Store - Setting layout to:", layout);
 					set({ currentLayout: layout });
-					if (typeof window !== "undefined") {
-						saveLayoutToStorage(layout);
-					}
+					saveLayoutToStorage(layout);
 				},
 
 				setInitialPairs: (pairs: string[]) => {
 					const state = get();
 					if (!state.initialized && pairs.length > 0) {
-						const initialOrder = typeof window !== "undefined" ? getOrderFromStorage() : [];
-						const finalOrder = initialOrder.length === pairs.length ? initialOrder : pairs;
+						const initialOrder =
+							typeof window !== "undefined" ? getOrderFromStorage() : [];
+						const finalOrder =
+							initialOrder.length === pairs.length ? initialOrder : pairs;
 						set({
 							orderedPairs: finalOrder,
 							initialized: true,
 						});
-						if (initialOrder.length !== pairs.length && typeof window !== "undefined") {
+						if (
+							initialOrder.length !== pairs.length &&
+							typeof window !== "undefined"
+						) {
 							saveOrderToStorage(finalOrder);
 						}
 					}
@@ -108,46 +109,41 @@ const createStore = () => {
 
 				getGridColumns: (windowWidth: number) => {
 					const state = get();
-					console.log('Store - Getting columns for layout:', state.currentLayout, 'width:', windowWidth);
-					
+					const main = document.querySelector("main");
+					// Get actual available width accounting for sidebars
+					const availableWidth = main ? main.clientWidth : windowWidth;
+
+					console.log(
+						"Store - Getting columns for layout:",
+						state.currentLayout,
+						"available width:",
+						availableWidth,
+					);
+
 					switch (state.currentLayout) {
-						case 'compact':
-							if (windowWidth >= BREAKPOINTS.xl) return 4;
-							if (windowWidth >= BREAKPOINTS.lg) return 3;
-							if (windowWidth >= BREAKPOINTS.sm) return 2;
+						case "compact":
+							// Start with max columns and reduce based on available width
+							if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[4]) return 4;
+							if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[3]) return 3;
+							if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[2]) return 2;
 							return 1;
-						case 'expanded':
-							if (windowWidth >= BREAKPOINTS.xl) return 2;
-							if (windowWidth >= BREAKPOINTS.lg) return 2;
-							return 1;
-						case 'balanced':
+
+						case "balanced":
 						default:
-							if (windowWidth >= BREAKPOINTS.xl) return 3;
-							if (windowWidth >= BREAKPOINTS.lg) return 2;
-							if (windowWidth >= BREAKPOINTS.sm) return 2;
+							// Balanced layout never goes above 3 columns
+							if (availableWidth >= MIN_WIDTH_PER_COLUMN.balanced[3]) return 3;
+							if (availableWidth >= MIN_WIDTH_PER_COLUMN.balanced[2]) return 2;
 							return 1;
 					}
 				},
 			}),
 			{
 				name: "grid-storage",
-				storage: createJSONStorage(() => ({
-					getItem: () => {
-						if (typeof window === "undefined") return null;
-						return localStorage.getItem("grid-storage");
-					},
-					setItem: (name, value) => {
-						if (typeof window !== "undefined") {
-							localStorage.setItem(name, value);
-						}
-					},
-					removeItem: (name) => {
-						if (typeof window !== "undefined") {
-							localStorage.removeItem(name);
-						}
-					},
-				})),
-				skipHydration: true, // Important: Skip hydration to prevent mismatch
+				storage: createJSONStorage(() => localStorage),
+				partialize: (state) => ({
+					currentLayout: state.currentLayout,
+					orderedPairs: state.orderedPairs,
+				}),
 			},
 		),
 	);

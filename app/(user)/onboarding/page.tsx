@@ -12,7 +12,7 @@ import IntroSequence from "./_components/Steps/IntroSequence";
 import PairsStep from "./_components/Steps/PairsStep";
 import ProfileUpload from "./_components/Steps/ProfileUpload";
 
-const COMPONENTS: { 
+const COMPONENTS: {
 	ProfileUpload: any;
 	ExperienceStep: any;
 	PairsStep: any;
@@ -135,7 +135,7 @@ export default function OnboardingPage() {
 	).length;
 
 	return (
-		<div className="relative min-h-screen bg-black">
+		<div className="relative min-h-screen bg-black z-[1000]">
 			{/* Main onboarding content */}
 			<motion.div
 				initial={{ opacity: 0 }}

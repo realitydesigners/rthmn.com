@@ -87,7 +87,7 @@ const StarField = () => {
 	if (!mounted) return null;
 
 	return (
-		<div className="absolute inset-0 overflow-hidden">
+		<div className="absolute inset-0 overflow-hidden ">
 			{stars.map((star) => (
 				<motion.div
 					key={star.id}
@@ -171,7 +171,7 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 				...BASE_ANIMATIONS.transition,
 				delay,
 			}}
-			className="flex flex-col items-center justify-center space-y-8"
+			className="flex flex-col items-center justify-center space-y-8 "
 		>
 			{/* Logo */}
 			<motion.div
