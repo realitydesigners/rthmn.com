@@ -99,7 +99,8 @@ export const SidebarWrapper = ({
 		const state = getSidebarState();
 
 		setSidebarLocks({
-			...locks,
+			left: locks.left,
+			right: locks.right,
 			[position]: !isLocked,
 		});
 
@@ -208,10 +209,10 @@ export const SidebarWrapper = ({
 				ease: "easeInOut",
 			}}
 			className={cn(
-				"sidebar-content fixed top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+				"sidebar-content fixed z-[1000] top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
 				position === "left" ? "left-0" : "right-0",
 				isOpen ? "pointer-events-auto" : "pointer-events-none",
-				isLocked ? "z-[90]" : "z-[110]",
+				
 			)}
 			data-position={position}
 			data-locked={isLocked}
@@ -256,7 +257,17 @@ export const SidebarWrapper = ({
 						{children}
 					</div>
 
-					{/* Onboarding Overlay */}
+					{/* Tour Overlay */}
+					{isCurrentTourStep && !isCompleted && (
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.2 }}
+							className="fixed inset-0 -z-10 bg-[#070809]/80 backdrop-blur-[4px] pointer-events-none"
+						/>
+					)}
+
 					{/* Onboarding Overlay */}
 					{isCurrentTourStep && !isCompleted && (
 						<div className="pointer-events-none absolute inset-0 z-[1000]">

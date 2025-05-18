@@ -49,7 +49,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 	const pathSegments = formatPathname(pathname);
 
 	return (
-		<nav className="fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#1C1E23] bg-[#0A0B0D] p-1 lg:flex lg:h-14">
+		<nav className="fixed top-0 right-0 left-0 z-[2000] h-16 border-b border-[#1C1E23] bg-[#0A0B0D] p-1 lg:flex lg:h-14">
 			{/* Enhanced depth effects */}
 
 			<div className="group relative z-[110] h-full w-full">
