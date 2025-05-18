@@ -62,15 +62,10 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 	const handleLockToggle = useCallback(() => {
 		setIsLocked((prevLocked) => {
 			const newLockedState = !prevLocked;
-
-			if (!newLockedState) {
-				setIsOpen(false);
-				setActivePanel(undefined);
-				updateSidebarState(false, undefined, false);
-			} else {
-				updateSidebarState(isOpen, activePanel, true);
-			}
-
+			
+			// When unlocking, keep the panel open but update state
+			updateSidebarState(isOpen, activePanel, newLockedState);
+			
 			return newLockedState;
 		});
 	}, [isOpen, activePanel, updateSidebarState]);
@@ -79,17 +74,14 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 		(panel: string) => {
 			if (isMobile) return;
 
-			if (activePanel === panel) {
-				setIsOpen(false);
-				setActivePanel(undefined);
-				updateSidebarState(false, undefined, isLocked);
-			} else {
-				setIsOpen(true);
-				setActivePanel(panel);
-				updateSidebarState(true, panel, isLocked);
-			}
+			const newIsOpen = activePanel !== panel || !isOpen;
+			const newActivePanel = newIsOpen ? panel : undefined;
+
+			setIsOpen(newIsOpen);
+			setActivePanel(newActivePanel);
+			updateSidebarState(newIsOpen, newActivePanel, isLocked);
 		},
-		[isMobile, activePanel, isLocked, updateSidebarState],
+		[isMobile, activePanel, isOpen, isLocked, updateSidebarState],
 	);
 
 	useEffect(() => {
@@ -106,6 +98,7 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 				if (!isClickInAnySidebar) {
 					setIsOpen(false);
 					setActivePanel(undefined);
+					updateSidebarState(false, undefined, false);
 				}
 			}
 		};
@@ -127,7 +120,7 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 			window.removeEventListener("resize", handleResize);
 			document.removeEventListener("mousedown", handleClickOutside);
 		};
-	}, [isLocked, isMobile, position, defaultPanel]);
+	}, [isLocked, isMobile, position, defaultPanel, updateSidebarState]);
 
 	useEffect(() => {
 		if (hasCompletedInitialOnboarding() && !hasCompletedAllSteps()) {

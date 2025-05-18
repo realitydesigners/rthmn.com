@@ -53,7 +53,7 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
                 <DashboardProvider>
                     <div id='app-container'>
                         <NavbarSignedIn user={user} />
-                        <main className='w-full bg-black transition-all duration-300 pt-14 lg:px-16 ease-in-out'>{children}</main>
+                        <main className='w-full bg-black transition-all duration-300 ease-in-out pt-18 lg:pt-16 pb-2'>{children}</main>
                         <SidebarLeft />
                         <SidebarRight />
                         <DashboardNavigation />
@@ -64,3 +64,4 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
         </WebSocketProvider>
     );
 }
+

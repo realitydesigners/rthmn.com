@@ -120,60 +120,62 @@ export const SidebarWrapper = ({
 		if (!mounted) return;
 
 		const main = document.querySelector("main");
-		const container = document.getElementById("app-container");
-		if (!main || !container) return;
-
-		const leftSidebar = document.querySelector(
-			'.sidebar-content [data-position="left"]',
-		);
-		const rightSidebar = document.querySelector(
-			'.sidebar-content [data-position="right"]',
-		);
+		if (!main) return;
 
 		const handleResize = () => {
 			const isMobile = window.innerWidth < 1024;
+			const leftPanel = document.querySelector('[data-position="left"].sidebar-content');
+			const rightPanel = document.querySelector('[data-position="right"].sidebar-content');
 			
 			if (isMobile) {
-				// Reset all spacing on mobile
-				main.style.marginLeft = "0";
-				main.style.marginRight = "0";
+				main.style.paddingLeft = "";
+				main.style.paddingRight = "";
 				main.style.width = "100%";
-				main.style.paddingLeft = "0";
-				main.style.paddingRight = "0";
 				return;
 			}
 
-			const leftWidth =
-				leftSidebar?.getAttribute("data-locked") === "true"
-					? Number.parseInt(leftSidebar?.getAttribute("data-width") || "0")
-					: 0;
-			const rightWidth =
-				rightSidebar?.getAttribute("data-locked") === "true"
-					? Number.parseInt(rightSidebar?.getAttribute("data-width") || "0")
-					: 0;
+			// Reset all styles first
+			main.style.transition = "all 0.15s ease-in-out";
 
-			if (isOpen && isLocked) {
-				if (position === "left") {
-					main.style.marginLeft = `${width}px`;
-					main.style.width = `calc(100% - ${width + rightWidth}px)`;
-					main.style.paddingLeft = "0";
-				} else {
-					main.style.marginRight = `${width}px`;
-					main.style.width = `calc(100% - ${width + leftWidth}px)`;
-					main.style.paddingRight = "0";
-				}
+			// Get panel states - check both locked AND open state
+			const leftPanelLocked = leftPanel?.getAttribute('data-locked') === 'true';
+			const rightPanelLocked = rightPanel?.getAttribute('data-locked') === 'true';
+			const leftPanelOpen = leftPanel?.getAttribute('data-open') === 'true';
+			const rightPanelOpen = rightPanel?.getAttribute('data-open') === 'true';
+			
+			const leftWidth = leftPanel?.getAttribute('data-width') || '0';
+			const rightWidth = rightPanel?.getAttribute('data-width') || '0';
+
+			// Only adjust margins if panel is both locked AND open
+			const leftPanelActive = leftPanelLocked && leftPanelOpen;
+			const rightPanelActive = rightPanelLocked && rightPanelOpen;
+
+			// Reset to layout's default padding
+			main.style.paddingLeft = "64px";  // 16 * 4 = 64px (matches layout's px-16)
+			main.style.paddingRight = "64px";
+			main.style.width = "100%";
+
+			// Calculate margins and width based on active panels
+			if (leftPanelActive && rightPanelActive) {
+				main.style.paddingLeft = "0";
+				main.style.paddingRight = "0";
+				main.style.marginLeft = `${leftWidth}px`;
+				main.style.marginRight = `${rightWidth}px`;
+				main.style.width = `calc(100% - ${parseInt(leftWidth) + parseInt(rightWidth)}px)`;
+			} else if (leftPanelActive) {
+				main.style.paddingLeft = "0";
+				main.style.marginLeft = `${leftWidth}px`;
+				main.style.marginRight = "0";
+				main.style.width = `calc(100% - ${parseInt(leftWidth)}px)`;
+			} else if (rightPanelActive) {
+				main.style.paddingRight = "0";
+				main.style.marginRight = `${rightWidth}px`;
+				main.style.marginLeft = "0";
+				main.style.width = `calc(100% - ${parseInt(rightWidth)}px)`;
 			} else {
-				if (position === "left") {
-					main.style.marginLeft = "0";
-					main.style.width =
-						rightWidth > 0 ? `calc(100% - ${rightWidth}px)` : "100%";
-					main.style.paddingLeft = "64px";
-				} else {
-					main.style.marginRight = "0";
-					main.style.width =
-						leftWidth > 0 ? `calc(100% - ${leftWidth}px)` : "100%";
-					main.style.paddingRight = "64px";
-				}
+				// If no panels are active, reset margins
+				main.style.marginLeft = "0";
+				main.style.marginRight = "0";
 			}
 		};
 
@@ -186,12 +188,13 @@ export const SidebarWrapper = ({
 		// Cleanup
 		return () => {
 			window.removeEventListener('resize', handleResize);
-			// Reset styles on unmount
-			main.style.marginLeft = "";
-			main.style.marginRight = "";
-			main.style.width = "";
-			main.style.paddingLeft = "";
-			main.style.paddingRight = "";
+			main.style.transition = "";
+			// Reset to layout's default padding
+			main.style.paddingLeft = "64px";
+			main.style.paddingRight = "64px";
+			main.style.marginLeft = "0";
+			main.style.marginRight = "0";
+			main.style.width = "100%";
 		};
 
 	}, [isOpen, width, position, isLocked, mounted]);
@@ -209,25 +212,29 @@ export const SidebarWrapper = ({
 				ease: "easeInOut",
 			}}
 			className={cn(
-				"sidebar-content fixed  top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+				"sidebar-content fixed top-14 z-0 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
 				position === "left" ? "left-0" : "right-0",
 				isOpen ? "pointer-events-auto" : "pointer-events-none",
 				
 			)}
 			data-position={position}
 			data-locked={isLocked}
+			data-open={isOpen}
 			data-width={width}
-			style={{ width: `${width}px` }}
+			style={{ 
+				width: `${width}px`,
+				boxShadow: !isLocked && isOpen ? (position === "left" ? "4px 0 16px rgba(0,0,0,0.2)" : "-4px 0 16px rgba(0,0,0,0.2)") : "none"
+			}}
 		>
 			<div
 				className={cn(
 					"relative flex h-full w-full",
-					position === "left" ? "lg:ml-16" : "lg:mr-16",
+					position === "left" ? "ml-16" : "mr-16",
 				)}
 			>
 				<div
 					className={cn(
-						"relative flex h-full w-full flex-col  p-1",
+						"relative flex h-full w-full flex-col p-1",
 						position === "left" ? "border-r" : "border-l",
 						"border-[#111215]",
 					)}

@@ -109,7 +109,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 					<div className="relative flex items-center gap-2">
 						<Link
 							href="/support"
-							className="flex h-4 w-4 items-center justify-center"
+							className="h-4 w-4 items-center justify-center lg:flex hidden"
 						>
 							<LuHelpCircle className="h-4 w-4 text-[#818181] group-hover:text-white" />
 						</Link>
