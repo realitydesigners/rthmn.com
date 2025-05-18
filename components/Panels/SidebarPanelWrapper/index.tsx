@@ -209,7 +209,7 @@ export const SidebarWrapper = ({
 				ease: "easeInOut",
 			}}
 			className={cn(
-				"sidebar-content fixed z-[1000] top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+				"sidebar-content fixed  top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
 				position === "left" ? "left-0" : "right-0",
 				isOpen ? "pointer-events-auto" : "pointer-events-none",
 				
@@ -251,12 +251,6 @@ export const SidebarWrapper = ({
 							<LockButton isLocked={isLocked} onClick={handleLockToggle} />
 						)}
 					</div>
-
-					{/* Content */}
-					<div className="relative flex-1 overflow-y-auto px-2 pb-4">
-						{children}
-					</div>
-
 					{/* Tour Overlay */}
 					{isCurrentTourStep && !isCompleted && (
 						<motion.div
@@ -264,21 +258,15 @@ export const SidebarWrapper = ({
 							animate={{ opacity: 1 }}
 							exit={{ opacity: 0 }}
 							transition={{ duration: 0.2 }}
-							className="fixed inset-0 -z-10 bg-[#070809]/80 backdrop-blur-[4px] pointer-events-none"
+							className="fixed inset-0 bg-[#070809]/80 backdrop-blur-[4px] pointer-events-none"
 						/>
 					)}
-
+					<div className="relative flex-1 overflow-y-auto px-2 pb-4">
+						{children}
+					</div>
 					{/* Onboarding Overlay */}
 					{isCurrentTourStep && !isCompleted && (
 						<div className="pointer-events-none absolute inset-0 z-[1000]">
-							{/* Inner edge glows */}
-							<div className="absolute inset-0 overflow-hidden">
-								{/* Enhanced corner shadows */}
-
-								{/* Intense corner glows */}
-							</div>
-
-							{/* Additional corner radials for depth */}
 							<div className="absolute inset-0 overflow-hidden">
 								<div className="absolute -bottom-32 -left-16 h-32 w-32 bg-[#447DFC]/[0.35] blur-[24px]" />
 								<div className="absolute -right-16 -bottom-32 h-32 w-32 bg-[#447DFC]/[0.35] blur-[24px]" />
@@ -293,33 +281,8 @@ export const SidebarWrapper = ({
 						</div>
 					)}
 				</div>
-
-				{/* Resize handle */}
-				<div
-					className={cn(
-						"absolute top-0 bottom-0 w-4 cursor-ew-resize opacity-0 hover:opacity-100",
-						position === "left" ? "-right-4" : "-left-4",
-					)}
-					onMouseDown={(e) => {
-						e.preventDefault();
-						const startX = e.clientX;
-						const startWidth = width;
-
-						const handleMouseMove = (e: MouseEvent) => {
-							const delta = e.clientX - startX;
-							handleResize(startWidth + (position === "left" ? delta : -delta));
-						};
-
-						const handleMouseUp = () => {
-							window.removeEventListener("mousemove", handleMouseMove);
-							window.removeEventListener("mouseup", handleMouseUp);
-						};
-
-						window.addEventListener("mousemove", handleMouseMove);
-						window.addEventListener("mouseup", handleMouseUp);
-					}}
-				/>
 			</div>
+
 		</motion.div>
 	);
 };

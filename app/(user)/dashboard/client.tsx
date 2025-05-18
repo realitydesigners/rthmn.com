@@ -117,12 +117,12 @@ export default function Dashboard() {
 
 	if (!selectedPairs.length && !isLoading) {
 		return (
-			<main className="w-full px-2 pt-16 sm:px-4 lg:px-6 lg:pt-18">
+			<div className="w-full px-2 sm:px-4">
 				<NoInstruments />
 				<div className="mt-4 text-center text-sm primary-text">
 					Please complete the onboarding process to select your trading pairs.
 				</div>
-			</main>
+			</div>
 		);
 	}
 
@@ -130,14 +130,13 @@ export default function Dashboard() {
 	const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
 
 	return (
-		<main className="w-full px-2 py-18 lg:px-4">
+		<div className="w-full px-2 py-4 lg:px-4">
 			<div 
 				className="grid w-full gap-2 lg:gap-4"
 				style={{
 					gridTemplateColumns: `repeat(${getGridColumns(windowWidth)}, minmax(0, 1fr))`
 				}}
 			>
-				{/* Only render the list content after client-side mounting */}
 				{isClient &&
 					pairsToRender.map((pair) => {
 						const data = pairData[pair];
@@ -179,6 +178,6 @@ export default function Dashboard() {
 						);
 					})}
 			</div>
-		</main>
+		</div>
 	);
 }

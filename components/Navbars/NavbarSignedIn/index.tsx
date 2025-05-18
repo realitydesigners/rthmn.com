@@ -49,17 +49,17 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 	const pathSegments = formatPathname(pathname);
 
 	return (
-		<nav className="fixed top-0 right-0 left-0 z-[2000] h-16 border-b border-[#1C1E23] bg-[#0A0B0D] p-1 lg:flex lg:h-14">
+		<nav className="fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#1C1E23] bg-[#0A0B0D] p-1 lg:flex lg:h-14">
 			{/* Enhanced depth effects */}
 
-			<div className="group relative z-[110] h-full w-full">
+			<div className="group relative  h-full w-full">
 				<div className="relative flex h-full w-full items-center justify-between rounded-lg px-2">
 					{/* Left section */}
-					<div className="relative z-[1] flex items-center gap-3">
+					<div className="relative  flex items-center gap-3">
 						<div className="flex items-center">
 							<Link
 								href="/dashboard"
-								className="group relative z-[110] flex items-center gap-2 rounded-lg p-1.5"
+								className="group relative flex items-center gap-2 rounded-lg p-1.5"
 							>
 								<div className="flex h-7 w-7 items-center">
 									<LogoIcon />
@@ -106,7 +106,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 					</div>
 
 					{/* Right section - Connection Status */}
-					<div className="relative z-[110] flex items-center gap-2">
+					<div className="relative flex items-center gap-2">
 						<Link
 							href="/support"
 							className="flex h-4 w-4 items-center justify-center"
