@@ -1,12 +1,12 @@
-import React, { memo, useCallback, useState } from "react";
-import { LuBox } from "react-icons/lu";
+import { PanelSection } from "@/components/Panels/PanelComponents/PanelSection";
 import { StyleControl } from "@/components/Panels/PanelComponents/StyleControl";
 import { Toggle } from "@/components/Panels/PanelComponents/Toggle/Toggle";
-import { PanelSection } from "@/components/Panels/PanelComponents/PanelSection";
-import { cn } from "@/utils/cn";
-import { useTimeframeStore } from "@/stores/timeframeStore";
 import { useUser } from "@/providers/UserProvider";
 import type { BoxColors } from "@/stores/colorStore";
+import { useTimeframeStore } from "@/stores/timeframeStore";
+import { cn } from "@/utils/cn";
+import React, { memo, useCallback, useState } from "react";
+import { LuBox } from "react-icons/lu";
 
 type BoxStyleProperty =
 	| "borderRadius"

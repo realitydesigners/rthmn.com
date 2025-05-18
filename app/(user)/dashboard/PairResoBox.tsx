@@ -61,39 +61,6 @@ export const PairResoBox = ({
 	return (
 		<div className="no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]">
 			<div className="relative flex min-h-[250px] flex-col border-[0.5px] border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#040505]">
-				{/* <div className='absolute inset-0'>
-                    <svg className='h-full w-full opacity-[0.07]' xmlns='http://www.w3.org/2000/svg'>
-                        <title>Background Grid Pattern</title>
-                        <defs>
-                            <pattern id='grid' width='30' height='30' patternUnits='userSpaceOnUse'>
-                                <path d='M 30 0 L 0 0 0 30' fill='none' stroke='currentColor' strokeWidth='0.5' />
-                                <path
-                                    d='M 15 0 L 0 0 0 15'
-                                    fill='none'
-                                    stroke='currentColor'
-                                    strokeWidth='0.25'
-                                    opacity='0.5'
-                                />
-                            </pattern>
-                            <linearGradient id='gridFade' x1='0%' y1='0%' x2='100%' y2='100%'>
-                                <stop offset='0%' stopColor='white' stopOpacity='0.12' />
-                                <stop offset='50%' stopColor='white' stopOpacity='0.08' />
-                                <stop offset='100%' stopColor='white' stopOpacity='0.02' />
-                            </linearGradient>
-                            <radialGradient id='gridVignette' cx='50%' cy='50%' r='70%'>
-                                <stop offset='0%' stopColor='white' stopOpacity='1' />
-                                <stop offset='100%' stopColor='white' stopOpacity='0' />
-                            </radialGradient>
-                        </defs>
-                        <rect width='100%' height='100%' fill='url(#grid)' />
-                        <rect width='100%' height='100%' fill='url(#gridFade)' />
-                        <rect width='100%' height='100%' fill='url(#gridVignette)' opacity='0.1' />
-                    </svg>
-                </div> */}
-				{/* Enhanced depth effects */}
-				<div className="absolute inset-0 bg-[radial-gradient(100%_100%_at_50%_0%,rgba(255,255,255,0.02)_0%,transparent_50%)]" />
-
-				{/* Main content container */}
 				<div className="relative flex flex-grow flex-col items-center justify-start gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6">
 					{/* Header section with enhanced depth */}
 					<div className="flex w-full flex-col items-center gap-2">

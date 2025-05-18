@@ -22,7 +22,7 @@ import React, {
 	memo,
 	useCallback,
 } from "react";
-import { FaSearch, FaTimes, FaStar } from "react-icons/fa";
+import { FaSearch, FaStar, FaTimes } from "react-icons/fa";
 
 interface LoadingSpinnerProps {
 	color?: string;

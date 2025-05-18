@@ -1,12 +1,12 @@
 "use client";
 
+import { useTimeframeStore } from "@/stores/timeframeStore";
 import type { Box } from "@/types/types";
 import { cn } from "@/utils/cn";
 import type React from "react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTimeframeStore } from "@/stores/timeframeStore";
-import { PanelSection } from "../PanelSection";
 import { LuLayoutGrid } from "react-icons/lu";
+import { PanelSection } from "../PanelSection";
 
 const TIME_INTERVALS = [
 	{ label: "1D", minutes: 1440 },

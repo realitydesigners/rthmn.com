@@ -25,7 +25,7 @@ export default function Dashboard() {
 	useEffect(() => {
 		const updateWidths = () => {
 			setWindowWidth(window.innerWidth);
-			const main = document.querySelector('main');
+			const main = document.querySelector("main");
 			if (main) {
 				setAvailableWidth(main.clientWidth);
 			}
@@ -35,19 +35,19 @@ export default function Dashboard() {
 		updateWidths();
 
 		// Set up ResizeObserver for main element
-		const main = document.querySelector('main');
+		const main = document.querySelector("main");
 		let observer: ResizeObserver | null = null;
-		
+
 		if (main) {
 			observer = new ResizeObserver(updateWidths);
 			observer.observe(main);
 		}
 
 		// Window resize handler
-		window.addEventListener('resize', updateWidths);
-		
+		window.addEventListener("resize", updateWidths);
+
 		return () => {
-			window.removeEventListener('resize', updateWidths);
+			window.removeEventListener("resize", updateWidths);
 			if (observer) {
 				observer.disconnect();
 			}
@@ -152,10 +152,10 @@ export default function Dashboard() {
 
 	return (
 		<div className="w-full px-2 ">
-			<div 
+			<div
 				className="grid w-full gap-2"
 				style={{
-					gridTemplateColumns: `repeat(${getGridColumns(availableWidth)}, minmax(0, 1fr))`
+					gridTemplateColumns: `repeat(${getGridColumns(availableWidth)}, minmax(0, 1fr))`,
 				}}
 			>
 				{isClient &&

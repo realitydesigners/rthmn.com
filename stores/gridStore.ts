@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type LayoutPreset = 'compact' | 'balanced';
+export type LayoutPreset = "compact" | "balanced";
 
 interface GridState {
 	currentLayout: LayoutPreset;
@@ -23,7 +23,6 @@ const saveLayoutToStorage = (layout: LayoutPreset) => {
 		console.error("Failed to save layout:", e);
 	}
 };
-
 
 // Helper to save order to storage
 const saveOrderToStorage = (pairs: string[]) => {
@@ -51,14 +50,14 @@ const getOrderFromStorage = (): string[] => {
 // Minimum widths needed for each column count
 const MIN_WIDTH_PER_COLUMN = {
 	compact: {
-		2: 500,  // Need at least 500px for 2 columns
-		3: 800,  // Need at least 800px for 3 columns
-		4: 1200  // Need at least 1200px for 4 columns
+		2: 500, // Need at least 500px for 2 columns
+		3: 800, // Need at least 800px for 3 columns
+		4: 1200, // Need at least 1200px for 4 columns
 	},
 	balanced: {
-		2: 800,  // Need at least 500px for 2 columns
-		3: 1200   // Need at least 900px for 3 columns
-	}
+		2: 800, // Need at least 500px for 2 columns
+		3: 1200, // Need at least 900px for 3 columns
+	},
 };
 
 let store: ReturnType<typeof createStore> | null = null;
@@ -67,14 +66,16 @@ const createStore = () => {
 	return create<GridState>()(
 		persist(
 			(set, get) => ({
-				currentLayout: typeof window !== "undefined" 
-					? localStorage.getItem("rthmn-layout-preset") as LayoutPreset || "balanced"
-					: "balanced",
+				currentLayout:
+					typeof window !== "undefined"
+						? (localStorage.getItem("rthmn-layout-preset") as LayoutPreset) ||
+							"balanced"
+						: "balanced",
 				orderedPairs: [],
 				initialized: false,
 
 				setLayout: (layout: LayoutPreset) => {
-					console.log('Store - Setting layout to:', layout);
+					console.log("Store - Setting layout to:", layout);
 					set({ currentLayout: layout });
 					saveLayoutToStorage(layout);
 				},
@@ -82,13 +83,18 @@ const createStore = () => {
 				setInitialPairs: (pairs: string[]) => {
 					const state = get();
 					if (!state.initialized && pairs.length > 0) {
-						const initialOrder = typeof window !== "undefined" ? getOrderFromStorage() : [];
-						const finalOrder = initialOrder.length === pairs.length ? initialOrder : pairs;
+						const initialOrder =
+							typeof window !== "undefined" ? getOrderFromStorage() : [];
+						const finalOrder =
+							initialOrder.length === pairs.length ? initialOrder : pairs;
 						set({
 							orderedPairs: finalOrder,
 							initialized: true,
 						});
-						if (initialOrder.length !== pairs.length && typeof window !== "undefined") {
+						if (
+							initialOrder.length !== pairs.length &&
+							typeof window !== "undefined"
+						) {
 							saveOrderToStorage(finalOrder);
 						}
 					}
@@ -103,21 +109,26 @@ const createStore = () => {
 
 				getGridColumns: (windowWidth: number) => {
 					const state = get();
-					const main = document.querySelector('main');
+					const main = document.querySelector("main");
 					// Get actual available width accounting for sidebars
 					const availableWidth = main ? main.clientWidth : windowWidth;
-					
-					console.log('Store - Getting columns for layout:', state.currentLayout, 'available width:', availableWidth);
-					
+
+					console.log(
+						"Store - Getting columns for layout:",
+						state.currentLayout,
+						"available width:",
+						availableWidth,
+					);
+
 					switch (state.currentLayout) {
-						case 'compact':
+						case "compact":
 							// Start with max columns and reduce based on available width
 							if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[4]) return 4;
 							if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[3]) return 3;
 							if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[2]) return 2;
 							return 1;
-					
-						case 'balanced':
+
+						case "balanced":
 						default:
 							// Balanced layout never goes above 3 columns
 							if (availableWidth >= MIN_WIDTH_PER_COLUMN.balanced[3]) return 3;
@@ -129,9 +140,9 @@ const createStore = () => {
 			{
 				name: "grid-storage",
 				storage: createJSONStorage(() => localStorage),
-				partialize: (state) => ({ 
+				partialize: (state) => ({
 					currentLayout: state.currentLayout,
-					orderedPairs: state.orderedPairs 
+					orderedPairs: state.orderedPairs,
 				}),
 			},
 		),

@@ -9,7 +9,7 @@ import {
 } from "@/utils/localStorage";
 import { motion } from "framer-motion";
 import type React from "react";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LuLock, LuUnlock } from "react-icons/lu";
 
 const LockButton = ({
@@ -124,9 +124,13 @@ export const SidebarWrapper = ({
 
 		const handleResize = () => {
 			const isMobile = window.innerWidth < 1024;
-			const leftPanel = document.querySelector('[data-position="left"].sidebar-content');
-			const rightPanel = document.querySelector('[data-position="right"].sidebar-content');
-			
+			const leftPanel = document.querySelector(
+				'[data-position="left"].sidebar-content',
+			);
+			const rightPanel = document.querySelector(
+				'[data-position="right"].sidebar-content',
+			);
+
 			if (isMobile) {
 				main.style.paddingLeft = "";
 				main.style.paddingRight = "";
@@ -138,20 +142,21 @@ export const SidebarWrapper = ({
 			main.style.transition = "all 0.15s ease-in-out";
 
 			// Get panel states - check both locked AND open state
-			const leftPanelLocked = leftPanel?.getAttribute('data-locked') === 'true';
-			const rightPanelLocked = rightPanel?.getAttribute('data-locked') === 'true';
-			const leftPanelOpen = leftPanel?.getAttribute('data-open') === 'true';
-			const rightPanelOpen = rightPanel?.getAttribute('data-open') === 'true';
-			
-			const leftWidth = leftPanel?.getAttribute('data-width') || '0';
-			const rightWidth = rightPanel?.getAttribute('data-width') || '0';
+			const leftPanelLocked = leftPanel?.getAttribute("data-locked") === "true";
+			const rightPanelLocked =
+				rightPanel?.getAttribute("data-locked") === "true";
+			const leftPanelOpen = leftPanel?.getAttribute("data-open") === "true";
+			const rightPanelOpen = rightPanel?.getAttribute("data-open") === "true";
+
+			const leftWidth = leftPanel?.getAttribute("data-width") || "0";
+			const rightWidth = rightPanel?.getAttribute("data-width") || "0";
 
 			// Only adjust margins if panel is both locked AND open
 			const leftPanelActive = leftPanelLocked && leftPanelOpen;
 			const rightPanelActive = rightPanelLocked && rightPanelOpen;
 
 			// Reset to layout's default padding
-			main.style.paddingLeft = "64px";  // 16 * 4 = 64px (matches layout's px-16)
+			main.style.paddingLeft = "64px"; // 16 * 4 = 64px (matches layout's px-16)
 			main.style.paddingRight = "64px";
 			main.style.width = "100%";
 
@@ -161,17 +166,17 @@ export const SidebarWrapper = ({
 				main.style.paddingRight = "0";
 				main.style.marginLeft = `${leftWidth}px`;
 				main.style.marginRight = `${rightWidth}px`;
-				main.style.width = `calc(100% - ${parseInt(leftWidth) + parseInt(rightWidth)}px)`;
+				main.style.width = `calc(100% - ${Number.parseInt(leftWidth) + Number.parseInt(rightWidth)}px)`;
 			} else if (leftPanelActive) {
 				main.style.paddingLeft = "0";
 				main.style.marginLeft = `${leftWidth}px`;
 				main.style.marginRight = "0";
-				main.style.width = `calc(100% - ${parseInt(leftWidth)}px)`;
+				main.style.width = `calc(100% - ${Number.parseInt(leftWidth)}px)`;
 			} else if (rightPanelActive) {
 				main.style.paddingRight = "0";
 				main.style.marginRight = `${rightWidth}px`;
 				main.style.marginLeft = "0";
-				main.style.width = `calc(100% - ${parseInt(rightWidth)}px)`;
+				main.style.width = `calc(100% - ${Number.parseInt(rightWidth)}px)`;
 			} else {
 				// If no panels are active, reset margins
 				main.style.marginLeft = "0";
@@ -183,11 +188,11 @@ export const SidebarWrapper = ({
 		handleResize();
 
 		// Add resize listener
-		window.addEventListener('resize', handleResize);
-		
+		window.addEventListener("resize", handleResize);
+
 		// Cleanup
 		return () => {
-			window.removeEventListener('resize', handleResize);
+			window.removeEventListener("resize", handleResize);
 			main.style.transition = "";
 			// Reset to layout's default padding
 			main.style.paddingLeft = "64px";
@@ -196,7 +201,6 @@ export const SidebarWrapper = ({
 			main.style.marginRight = "0";
 			main.style.width = "100%";
 		};
-
 	}, [isOpen, width, position, isLocked, mounted]);
 
 	if (!mounted) return null;
@@ -215,15 +219,19 @@ export const SidebarWrapper = ({
 				"sidebar-content fixed top-14 z-0 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
 				position === "left" ? "left-0" : "right-0",
 				isOpen ? "pointer-events-auto" : "pointer-events-none",
-				
 			)}
 			data-position={position}
 			data-locked={isLocked}
 			data-open={isOpen}
 			data-width={width}
-			style={{ 
+			style={{
 				width: `${width}px`,
-				boxShadow: !isLocked && isOpen ? (position === "left" ? "4px 0 16px rgba(0,0,0,0.2)" : "-4px 0 16px rgba(0,0,0,0.2)") : "none"
+				boxShadow:
+					!isLocked && isOpen
+						? position === "left"
+							? "4px 0 16px rgba(0,0,0,0.2)"
+							: "-4px 0 16px rgba(0,0,0,0.2)"
+						: "none",
 			}}
 		>
 			<div
@@ -289,7 +297,6 @@ export const SidebarWrapper = ({
 					)}
 				</div>
 			</div>
-
 		</motion.div>
 	);
 };

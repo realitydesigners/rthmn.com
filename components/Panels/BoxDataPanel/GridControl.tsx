@@ -1,19 +1,21 @@
 "use client";
 import { useGridStore } from "@/stores/gridStore";
 import type { LayoutPreset } from "@/stores/gridStore";
-import { LuLayoutGrid } from "react-icons/lu";
 import { useEffect, useState } from "react";
+import { LuLayoutGrid } from "react-icons/lu";
 
 export const GridControl = () => {
 	const { currentLayout, setLayout } = useGridStore();
 	const [mounted, setMounted] = useState(false);
-	const [localLayout, setLocalLayout] = useState<LayoutPreset>('balanced');
+	const [localLayout, setLocalLayout] = useState<LayoutPreset>("balanced");
 
 	// Handle client-side mounting and hydration
 	useEffect(() => {
 		setMounted(true);
 		// Get the saved layout from localStorage
-		const savedLayout = localStorage.getItem("rthmn-layout-preset") as LayoutPreset;
+		const savedLayout = localStorage.getItem(
+			"rthmn-layout-preset",
+		) as LayoutPreset;
 		if (savedLayout) {
 			setLocalLayout(savedLayout);
 			setLayout(savedLayout);
@@ -23,12 +25,12 @@ export const GridControl = () => {
 	}, [setLayout, currentLayout]);
 
 	const layouts: { id: LayoutPreset; label: string }[] = [
-		{ id: 'compact', label: 'Compact' },
-		{ id: 'balanced', label: 'Balanced' },
+		{ id: "compact", label: "Compact" },
+		{ id: "balanced", label: "Balanced" },
 	];
 
 	const handleLayoutChange = (layout: LayoutPreset) => {
-		console.log('Setting layout to:', layout);
+		console.log("Setting layout to:", layout);
 		setLocalLayout(layout);
 		setLayout(layout);
 	};
@@ -66,8 +68,8 @@ export const GridControl = () => {
 						onClick={() => handleLayoutChange(layout.id)}
 						className={`font-outfit relative flex h-7 items-center rounded-md px-2 text-[10px] font-medium transition-all duration-200 ${
 							localLayout === layout.id
-								? 'bg-[#1C1E23] text-white'
-								: 'text-[#818181] hover:text-white'
+								? "bg-[#1C1E23] text-white"
+								: "text-[#818181] hover:text-white"
 						}`}
 					>
 						{layout.label}

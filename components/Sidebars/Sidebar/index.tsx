@@ -7,7 +7,7 @@ import { cn } from "@/utils/cn";
 import { getSidebarState, setSidebarState } from "@/utils/localStorage";
 import { usePathname } from "next/navigation";
 import type React from "react";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { IconType } from "react-icons";
 
 interface SidebarButton {
@@ -62,10 +62,10 @@ export const Sidebar = ({ position, buttons, defaultPanel }: SidebarProps) => {
 	const handleLockToggle = useCallback(() => {
 		setIsLocked((prevLocked) => {
 			const newLockedState = !prevLocked;
-			
+
 			// When unlocking, keep the panel open but update state
 			updateSidebarState(isOpen, activePanel, newLockedState);
-			
+
 			return newLockedState;
 		});
 	}, [isOpen, activePanel, updateSidebarState]);

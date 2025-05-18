@@ -7,10 +7,7 @@ interface InstrumentsContentProps {
 
 export function TourInstruments({ onComplete }: InstrumentsContentProps) {
 	return (
-		<TourContentWrapper
-			className="w-[350px]"
-			onComplete={onComplete}
-		>
+		<TourContentWrapper className="w-[350px]" onComplete={onComplete}>
 			<div className="w-full p-2">
 				<h3 className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl font-bold text-transparent">
 					Instruments

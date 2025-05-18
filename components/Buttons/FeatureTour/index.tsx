@@ -136,7 +136,6 @@ export function FeatureTour({
 							"hover:border-blue-400/50",
 							"hover:shadow-lg hover:shadow-blue-400/40",
 							"hover:shadow-md hover:shadow-blue-400/30",
-						
 						].join(" "),
 					!isCompleted &&
 						currentStepId &&
