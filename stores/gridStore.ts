@@ -109,16 +109,15 @@ const createStore = () => {
 
 				getGridColumns: (windowWidth: number) => {
 					const state = get();
+
+					// During SSR or no width provided, return 1 column
+					if (typeof window === "undefined" || !windowWidth) {
+						return 1;
+					}
+
 					const main = document.querySelector("main");
 					// Get actual available width accounting for sidebars
 					const availableWidth = main ? main.clientWidth : windowWidth;
-
-					console.log(
-						"Store - Getting columns for layout:",
-						state.currentLayout,
-						"available width:",
-						availableWidth,
-					);
 
 					switch (state.currentLayout) {
 						case "compact":

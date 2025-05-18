@@ -53,7 +53,7 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 				<DashboardProvider>
 					<div id="app-container">
 						<NavbarSignedIn user={user} />
-						<main className="w-full bg-black transition-all duration-300 ease-in-out pt-18 lg:pt-16 pb-2">
+						<main className="w-full bg-black transition-all duration-300 ease-in-out pb-2">
 							{children}
 						</main>
 						<SidebarLeft />

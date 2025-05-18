@@ -11,6 +11,7 @@ import ExperienceStep from "./_components/Steps/ExperienceStep";
 import IntroSequence from "./_components/Steps/IntroSequence";
 import PairsStep from "./_components/Steps/PairsStep";
 import ProfileUpload from "./_components/Steps/ProfileUpload";
+import { TourButton } from "@/components/Buttons/TourButton";
 
 const COMPONENTS: {
 	ProfileUpload: any;
@@ -135,13 +136,13 @@ export default function OnboardingPage() {
 	).length;
 
 	return (
-		<div className="relative min-h-screen bg-black z-[1000]">
+		<div className="relative min-h-screen bg-black">
 			{/* Main onboarding content */}
 			<motion.div
 				initial={{ opacity: 0 }}
 				animate={{ opacity: showIntro ? 0 : 1 }}
 				transition={{ duration: 0.3 }}
-				className="flex min-h-screen items-center justify-center p-4"
+				className="flex min-h-screen items-center justify-center p-4 sm:p-6"
 			>
 				<motion.div
 					initial={{ opacity: 0, scale: 0.98, filter: "blur(10px)" }}
@@ -152,12 +153,12 @@ export default function OnboardingPage() {
 						maxWidth: currentStep?.id === "pairs" ? "48rem" : "28rem",
 					}}
 					transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-					className={`relative w-full rounded-2xl border border-[#0A0B0D] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}
+					className={`relative w-full rounded-2xl border border-[#0A0B0D] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 sm:p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}
 				>
 					{/* Progress indicator */}
 					<div className="no-select absolute -top-3 left-1/2 -translate-x-1/2">
-						<div className="flex items-center gap-2 rounded-full border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 text-xs font-medium shadow-xl">
-							<div className="flex h-1.5 w-12 items-center rounded-full bg-[#0A0B0D]">
+						<div className="flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-medium shadow-xl">
+							<div className="flex h-1.5 w-8 sm:w-12 items-center rounded-full bg-[#0A0B0D]">
 								<motion.div
 									className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80"
 									initial={false}
@@ -165,7 +166,7 @@ export default function OnboardingPage() {
 									transition={{ duration: 0.5, ease: "easeInOut" }}
 								/>
 							</div>
-							<span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent">
+							<span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent whitespace-nowrap">
 								Step {stepNumber} of {totalSteps}
 							</span>
 						</div>
@@ -186,37 +187,32 @@ export default function OnboardingPage() {
 					</AnimatePresence>
 
 					{/* Navigation */}
-					<div className="font-outfit flex justify-end space-x-3">
+					<div className="font-outfit flex justify-end space-x-3 mt-6">
 						{stepNumber > 1 && (
-							<button
-								type="button"
+							<TourButton
 								onClick={handleBack}
-								className="group relative rounded-lg border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-2 text-sm font-medium primary-text transition-all duration-200 hover:border-[#32353C] hover:from-[#0A0B0D] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20"
+								variant="black"
 							>
-								<div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.03] to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
 								Back
-							</button>
+							</TourButton>
 						)}
-						<button
-							type="button"
+						<TourButton
 							onClick={handleNext}
 							disabled={
 								(currentStep.id === "experience" && !userData.experience) ||
 								(currentStep.id === "pairs" &&
 									userData.selectedPairs.length < 4)
 							}
-							className="group relative flex items-center justify-center overflow-hidden rounded-xl border border-blue-400/20 bg-gradient-to-b from-blue-400/10 via-blue-400/5 to-transparent px-6 py-2.5 text-sm font-medium text-blue-400  transition-all duration-300 hover:border-blue-400/30 hover:text-blue-400  active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:shadow-none"
+							variant="blue"
 						>
-							<span className="relative">
-								{ONBOARDING_STEPS[
-									ONBOARDING_STEPS.findIndex(
-										(step) => step.id === currentStepId,
-									) + 1
-								]?.type === "feature-tour"
-									? "Complete"
-									: "Next"}
-							</span>
-						</button>
+							{ONBOARDING_STEPS[
+								ONBOARDING_STEPS.findIndex(
+									(step) => step.id === currentStepId,
+								) + 1
+							]?.type === "feature-tour"
+								? "Complete"
+								: "Next"}
+						</TourButton>
 					</div>
 
 					{/* Bottom pattern */}
@@ -225,12 +221,12 @@ export default function OnboardingPage() {
 			</motion.div>
 
 			{/* Step title with enhanced styling */}
-			<div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4">
-				<div className="no-select group relative flex items-center gap-2 rounded-full border border-[#1C1E23]  bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-400/20 hover:shadow-blue-400/10">
-					<div className="flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-400/20 to-blue-400/10">
+			<div className="absolute bottom-4 sm:bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4">
+				<div className="no-select group relative flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-400/20 hover:shadow-blue-400/10">
+					<div className="flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-400/20 to-blue-400/10">
 						<div className="h-1.5 w-1.5 rounded-full bg-blue-400" />
 					</div>
-					<span className="no-select text-sm font-medium text-white/70 transition-colors group-hover:text-white">
+					<span className="no-select text-xs sm:text-sm font-medium text-white/70 transition-colors group-hover:text-white whitespace-nowrap">
 						{currentStep?.id === "profile"
 							? "Upload Profile Photo"
 							: currentStep?.id === "experience"

@@ -33,6 +33,7 @@ export default function Dashboard() {
 
 		// Initial update
 		updateWidths();
+		setIsClient(true);
 
 		// Set up ResizeObserver for main element
 		const main = document.querySelector("main");
@@ -61,11 +62,6 @@ export default function Dashboard() {
 		// console.log('Available width:', availableWidth);
 		// console.log('Grid columns:', getGridColumns(availableWidth));
 	}, [currentLayout, windowWidth, availableWidth, getGridColumns]);
-
-	// Mark as client-side rendered
-	useEffect(() => {
-		setIsClient(true);
-	}, []);
 
 	// Initialize ordered pairs from selected pairs
 	useEffect(() => {
@@ -150,12 +146,15 @@ export default function Dashboard() {
 	// Render based on orderedPairs once available, or selectedPairs initially
 	const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
 
+	// Only use client-side width calculation after hydration
+	const gridCols = !isClient ? 1 : getGridColumns(availableWidth);
+
 	return (
-		<div className="w-full px-2 ">
+		<div className="w-full px-2 pt-18 lg:pt-16">
 			<div
 				className="grid w-full gap-2"
 				style={{
-					gridTemplateColumns: `repeat(${getGridColumns(availableWidth)}, minmax(0, 1fr))`,
+					gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
 				}}
 			>
 				{isClient &&
