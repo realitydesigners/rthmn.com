@@ -1,6 +1,6 @@
-import { LuChevronDown, LuChevronUp } from "react-icons/lu";
-import type { IconType } from "react-icons";
 import { cn } from "@/utils/cn";
+import type { IconType } from "react-icons";
+import { LuChevronDown, LuChevronUp } from "react-icons/lu";
 
 interface PanelSectionProps {
 	title: string;

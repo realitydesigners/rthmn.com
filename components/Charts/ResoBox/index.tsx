@@ -167,7 +167,7 @@ const ResoBoxRecursive = memo(
 				)}
 
 				{showPriceLines && shouldShowTopPrice && (
-					<div className="absolute top-0 -right-16 z-10 w-16 opacity-90">
+					<div className="absolute top-0 -right-16  w-16 opacity-90">
 						<div
 							className="w-5 border-[0.05px] transition-all"
 							style={{
@@ -186,7 +186,7 @@ const ResoBoxRecursive = memo(
 				)}
 
 				{showPriceLines && shouldShowBottomPrice && (
-					<div className="absolute -right-16 bottom-0 z-10 w-16 opacity-90">
+					<div className="absolute -right-16 bottom-0  w-16 opacity-90">
 						<div
 							className="w-5 border-[0.05px] transition-all"
 							style={{

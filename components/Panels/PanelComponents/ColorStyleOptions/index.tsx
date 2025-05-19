@@ -1,10 +1,11 @@
+"use client";
+import type { Preset } from "@/stores/colorStore";
+import { useColorStore, usePresetStore } from "@/stores/colorStore";
+import { cn } from "@/utils/cn";
 import type React from "react";
-import { memo, useCallback, useEffect, useState, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { LuPalette } from "react-icons/lu";
 import { PanelSection } from "../PanelSection";
-import { cn } from "@/utils/cn";
-import type { Preset } from "@/stores/colorStore";
-import { usePresetStore, useColorStore } from "@/stores/colorStore";
 
 interface ColorStyleOptionsProps {
 	noContainer?: boolean;

@@ -1,9 +1,9 @@
 import {
+	DM_Mono,
 	Kode_Mono,
 	Outfit,
 	Oxanium,
 	Russo_One,
-	DM_Mono,
 } from "next/font/google";
 
 export const oxanium = Oxanium({

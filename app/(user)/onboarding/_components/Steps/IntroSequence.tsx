@@ -1,3 +1,4 @@
+import { TourButton } from "@/components/Buttons/TourButton";
 import { client } from "@/lib/sanity/lib/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -87,7 +88,7 @@ const StarField = () => {
 	if (!mounted) return null;
 
 	return (
-		<div className="absolute inset-0 overflow-hidden">
+		<div className="absolute inset-0 overflow-hidden ">
 			{stars.map((star) => (
 				<motion.div
 					key={star.id}
@@ -157,6 +158,56 @@ type StepProps = {
 	isInteractive?: boolean;
 };
 
+const LogoAnimation = ({ isExiting }: { isExiting: boolean }) => {
+	const [hasMovedToCorner, setHasMovedToCorner] = useState(false);
+
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setHasMovedToCorner(true);
+		}, 3000);
+		return () => clearTimeout(timer);
+	}, []);
+
+	return (
+		<motion.div
+			className={`fixed z-50 ${hasMovedToCorner ? "h-14" : ""}`}
+			initial={{
+				top: "50%",
+				left: "50%",
+				x: "-50%",
+				y: "-50%",
+			}}
+			animate={{
+				top: hasMovedToCorner ? "0" : "50%",
+				left: hasMovedToCorner ? "0" : "50%",
+				x: hasMovedToCorner ? "0" : "-50%",
+				y: hasMovedToCorner ? "0" : "-50%",
+			}}
+			transition={{
+				duration: 1,
+				ease: [0.19, 1, 0.22, 1],
+			}}
+		>
+			<motion.div
+				className={`relative ${hasMovedToCorner ? "p-2  w-14 h-14" : "w-48 h-48"}`}
+				transition={{
+					duration: 1,
+					ease: [0.19, 1, 0.22, 1],
+				}}
+			>
+				<Image
+					src="/rthmn-onboarding-logo.png"
+					alt="Rthmn Logo"
+					width={96}
+					height={96}
+					className="relative w-full h-full object-contain"
+					priority
+				/>
+			</motion.div>
+		</motion.div>
+	);
+};
+
 const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 	useEffect(() => {
 		const timer = setTimeout(onComplete, duration);
@@ -171,68 +222,13 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 				...BASE_ANIMATIONS.transition,
 				delay,
 			}}
-			className="flex flex-col items-center justify-center space-y-8"
+			className="flex flex-col items-center justify-center space-y-8 px-6 text-center"
 		>
-			{/* Logo */}
-			<motion.div
-				{...BASE_ANIMATIONS.fade}
-				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-				className="relative mx-auto mb-6 flex h-24 w-24"
-			>
-				{/* Holographic glow effect */}
-				<motion.div
-					animate={{
-						boxShadow: [
-							"0 0 20px rgba(255,255,255,0.1)",
-							"0 0 60px rgba(255,255,255,0.2)",
-							"0 0 20px rgba(255,255,255,0.1)",
-						],
-						filter: [
-							"brightness(1) blur(8px)",
-							"brightness(1.2) blur(12px)",
-							"brightness(1) blur(8px)",
-						],
-					}}
-					exit={{
-						boxShadow: "0 0 0px rgba(255,255,255,0)",
-						filter: "brightness(0.5) blur(20px)",
-					}}
-					transition={{
-						duration: 3,
-						repeat: Number.POSITIVE_INFINITY,
-						ease: "linear",
-					}}
-					className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#1C1E23] to-[#1C1E23]"
-				/>
-				<svg
-					className="relative"
-					width="80"
-					height="80"
-					viewBox="0 0 100 100"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg"
-					aria-labelledby="logoTitle"
-				>
-					<title id="logoTitle">Logo</title>
-					<g clipPath="url(#clip0_1208_27417)">
-						<path
-							d="M27.512 73.5372L27.512 28.512C27.512 27.9597 27.9597 27.512 28.512 27.512L70.4597 27.512C71.0229 27.512 71.475 27.9769 71.4593 28.54L70.8613 49.9176C70.8462 50.4588 70.4031 50.8896 69.8617 50.8896L50.7968 50.8896C49.891 50.8896 49.4519 51.9975 50.1117 52.618L92.25 92.25M92.25 92.25L48.2739 92.25L7.75002 92.25C7.19773 92.25 6.75002 91.8023 6.75002 91.25L6.75 7.75C6.75 7.19771 7.19772 6.75 7.75 6.75L91.25 6.75003C91.8023 6.75003 92.25 7.19775 92.25 7.75003L92.25 92.25Z"
-							stroke="white"
-							strokeWidth="8"
-						/>
-					</g>
-					<defs>
-						<clipPath id="clip0_1208_27417">
-							<rect width="100" height="100" fill="white" />
-						</clipPath>
-					</defs>
-				</svg>
-			</motion.div>
 			{/* Title */}
 			<motion.h1
 				{...BASE_ANIMATIONS.fade}
 				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-				className="font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-7xl font-bold text-transparent"
+				className="font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-4xl sm:text-5xl md:text-7xl font-bold text-transparent"
 			>
 				Welcome to Rthmn
 			</motion.h1>
@@ -240,7 +236,7 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 			<motion.p
 				{...BASE_ANIMATIONS.fade}
 				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
-				className="font-outfit text-lg text-white/60"
+				className="font-outfit max-w-md mx-auto text-base sm:text-lg text-white/60"
 			>
 				The future of trading and first gamified trading platform.
 			</motion.p>
@@ -264,18 +260,18 @@ const PatternRecognitionStep = ({
 		onAnimationComplete={() => {
 			setTimeout(onComplete, duration);
 		}}
-		className="flex max-w-3xl flex-col items-center justify-center space-y-12"
+		className="flex max-w-3xl flex-col items-center justify-center space-y-12 px-6"
 	>
 		<motion.div
 			{...BASE_ANIMATIONS.fade}
-			transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
+			transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.1 }}
 			className="relative space-y-6"
 		>
 			<div className="space-y-2">
 				<motion.div
 					{...BASE_ANIMATIONS.fade}
-					transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.5 }}
-					className="font-outfit text-center text-4xl leading-tight font-bold tracking-tight text-balance"
+					transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
+					className="font-outfit text-center text-2xl sm:text-3xl md:text-4xl leading-tight font-bold tracking-tight text-balance"
 				>
 					<span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
 						Rthmn is a tool designed to compress time allowing you to see the
@@ -289,8 +285,8 @@ const PatternRecognitionStep = ({
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			transition={{ delay: delay + 1 }}
-			className="flex justify-center gap-6"
+			transition={{ delay: delay + 0.5 }}
+			className="flex flex-wrap justify-center gap-4 sm:gap-6"
 		>
 			{team.map((member, i) => (
 				<motion.div
@@ -300,7 +296,7 @@ const PatternRecognitionStep = ({
 					transition={{ delay: delay + 1 + i * 0.1 }}
 					className="group relative flex flex-col items-center"
 				>
-					<div className="relative h-14 w-14 overflow-hidden rounded-full border border-[#1C1E23] bg-[#1C1E23] backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
+					<div className="relative h-12 w-12 sm:h-14 sm:w-14 overflow-hidden rounded-full border border-[#1C1E23] bg-[#1C1E23] backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
 						{member.image && (
 							<Image
 								src={member.image.url}
@@ -310,18 +306,6 @@ const PatternRecognitionStep = ({
 								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
 							/>
 						)}
-						{/* Glow effect */}
-						<motion.div
-							className="absolute inset-0 rounded-full bg-gradient-to-b from-[#1C1E23] to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-							animate={{
-								opacity: [0, 0.2, 0],
-							}}
-							transition={{
-								duration: 2,
-								repeat: Number.POSITIVE_INFINITY,
-								ease: "easeInOut",
-							}}
-						/>
 					</div>
 					<motion.div
 						initial={{ opacity: 0, y: 5 }}
@@ -329,7 +313,7 @@ const PatternRecognitionStep = ({
 						transition={{ delay: delay + 1.2 + i * 0.1 }}
 						className="mt-3 text-center"
 					>
-						<span className="font-mono text-sm text-white/40 transition-colors duration-300 group-hover:text-white/90">
+						<span className="font-mono text-xs sm:text-sm text-white/40 transition-colors duration-300 group-hover:text-white/90">
 							{member.name}
 						</span>
 						{member.role && (
@@ -337,7 +321,7 @@ const PatternRecognitionStep = ({
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
 								transition={{ delay: delay + 1.4 + i * 0.1 }}
-								className="mt-0.5 block font-mono text-[10px] text-white/30"
+								className="mt-0.5 block font-mono text-[9px] sm:text-[10px] text-white/30"
 							>
 								{member.role}
 							</motion.span>
@@ -365,82 +349,87 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 				...BASE_ANIMATIONS.transition,
 				delay,
 			}}
-			className="max-w-xl space-y-6"
+			className="max-w-xl space-y-6 px-4 sm:px-0"
 		>
-			<motion.h1
+			<motion.h2
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="font-outfit mb-8 bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent"
+				className="font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent"
 			>
 				Terms of Service
-			</motion.h1>
+			</motion.h2>
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="space-y-6 rounded-xl border border-[#1C1E23] bg-[#1C1E23] p-6"
+				className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-6 shadow-2xl"
 			>
-				<p className="font-mono text-sm leading-relaxed text-white/60">
-					By checking this box, I acknowledge that I have read and agree to
-					Rthmn's{" "}
-					<a
-						href="/terms-of-service"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="font-bold text-white underline"
-					>
-						Terms of Service
-					</a>{" "}
-					and{" "}
-					<a
-						href="/privacy"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="font-bold text-white underline"
-					>
-						Privacy Policy
-					</a>
-					. I understand that my use of the platform is subject to these
-					agreements.
-				</p>
+				{/* Highlight effect */}
+				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]" />
 
-				<div className="flex items-center gap-3">
-					<button
-						onClick={() => setAccepted(!accepted)}
-						className={`group relative h-6 w-6 overflow-hidden rounded-md border transition-all ${
-							accepted
-								? "border-white-500 bg-white-500/20"
-								: "border-[#32353C] bg-[#1C1E23] hover:border-white/30 hover:bg-[#1C1E23]"
-						}`}
-					>
-						<motion.div
-							initial={false}
-							animate={{
-								opacity: accepted ? 1 : 0,
-								scale: accepted ? 1 : 0.8,
-							}}
-							transition={{ duration: 0.2 }}
-							className="text-white-400 absolute inset-0 flex items-center justify-center"
+				<div className="space-y-6">
+					<p className="font-mono text-sm leading-relaxed text-white/70">
+						By checking this box, I acknowledge that I have read and agree to
+						Rthmn's{" "}
+						<a
+							href="/terms-of-service"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-white font-bold transition-colors"
 						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
+							Terms of Service
+						</a>{" "}
+						and{" "}
+						<a
+							href="/privacy"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-white font-bold transition-colors"
+						>
+							Privacy Policy
+						</a>
+						. I understand that my use of the platform is subject to these
+						agreements.
+					</p>
+
+					<div className="flex items-center gap-3">
+						<button
+							onClick={() => setAccepted(!accepted)}
+							className={`group relative h-6 w-6 overflow-hidden rounded-lg border transition-all duration-300 ${
+								accepted
+									? "border-white-400/50 bg-white-400/10"
+									: "border-[#32353C] bg-[#0A0B0D] hover:border-white-400/30 hover:bg-white-400/5"
+							}`}
+						>
+							<motion.div
+								initial={false}
+								animate={{
+									opacity: accepted ? 1 : 0,
+									scale: accepted ? 1 : 0.8,
+								}}
+								transition={{ duration: 0.2 }}
+								className="absolute inset-0 flex items-center justify-center text-white "
 							>
-								<path
-									d="M20 6L9 17L4 12"
-									stroke="currentColor"
-									strokeWidth="3"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</motion.div>
-					</button>
-					<label className="cursor-pointer font-mono text-sm text-white/70 select-none">
-						I agree to the terms and conditions
-					</label>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M20 6L9 17L4 12"
+										stroke="currentColor"
+										strokeWidth="3"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+								</svg>
+							</motion.div>
+						</button>
+						<label className="cursor-pointer font-mono text-sm text-white/70 select-none">
+							I agree to the terms and conditions
+						</label>
+					</div>
 				</div>
 			</motion.div>
 
@@ -448,9 +437,9 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 				initial={{ opacity: 0 }}
 				animate={{ opacity: 1 }}
 				transition={{ delay: delay + 0.4 }}
-				className="flex justify-center"
+				className="flex justify-center pt-2"
 			>
-				<button
+				<TourButton
 					onClick={() => {
 						if (accepted) {
 							setAccepted(true);
@@ -458,29 +447,39 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 						}
 					}}
 					disabled={!accepted}
-					className={`group relative overflow-hidden rounded-xl px-8 py-3 transition-all ${
-						accepted
-							? "bg-[#1C1E23] hover:bg-[#32353C]"
-							: "cursor-not-allowed bg-[#1C1E23] text-white/30"
-					}`}
+					variant="black"
 				>
-					<div
-						className={`absolute inset-0 bg-gradient-to-r from-[#1C1E23] to-white/0 opacity-0 transition-opacity ${accepted ? "" : ""}`}
-					/>
-					<span className="relative font-mono text-sm text-white/90">
-						Continue
-					</span>
-				</button>
+					Continue
+				</TourButton>
 			</motion.div>
 		</motion.div>
 	);
 };
 
 export default function IntroSequence({ onComplete }: Props) {
-	const [currentStep, setCurrentStep] = useState(0);
+	const [currentStep, setCurrentStep] = useState(-1);
 	const [isExiting, setIsExiting] = useState(false);
+	const [hasMovedToCorner, setHasMovedToCorner] = useState(false);
 	const audioRef = useRef<HTMLAudioElement | null>(null);
 	const [team, setTeam] = useState<any[]>([]);
+
+	const totalSteps = 3;
+
+	// Handle initial logo animation and step transition
+	useEffect(() => {
+		const initialDelay = setTimeout(() => {
+			setHasMovedToCorner(true);
+
+			// Show welcome step after logo animation completes
+			const stepDelay = setTimeout(() => {
+				setCurrentStep(0);
+			}, 1000);
+
+			return () => clearTimeout(stepDelay);
+		}, 3000);
+
+		return () => clearTimeout(initialDelay);
+	}, []);
 
 	useEffect(() => {
 		const query = `*[_type == "team"] {
@@ -517,14 +516,59 @@ export default function IntroSequence({ onComplete }: Props) {
 		</div>
 	);
 
-	const renderCurrentStep = () => {
+	const handleStepComplete = useCallback(() => {
+		if (currentStep < totalSteps - 1) {
+			setCurrentStep(currentStep + 1);
+		} else {
+			setIsExiting(true);
+			setTimeout(onComplete, 800);
+		}
+	}, [currentStep, onComplete, totalSteps]);
+
+	return (
+		<AnimatePresence mode="wait">
+			<motion.div
+				initial={{ opacity: 1 }}
+				animate={{
+					opacity: isExiting ? 0 : 1,
+					filter: isExiting ? "blur(20px)" : "blur(0px)",
+				}}
+				transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+				className="fixed inset-0 z-[99999] overflow-hidden bg-black"
+				style={{ position: "fixed", isolation: "isolate" }}
+			>
+				<AuroraBackground />
+				<LightShadows isExiting={isExiting} />
+				<StarField />
+
+				<ImagePreloader />
+				<LogoAnimation isExiting={isExiting} />
+
+				{/* Only render step content after logo has moved */}
+				<AnimatePresence mode="wait">
+					{currentStep >= 0 && (
+						<motion.div
+							className="no-select relative z-10 flex h-full items-center justify-center"
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							transition={{ duration: 0.5 }}
+						>
+							{renderCurrentStep()}
+						</motion.div>
+					)}
+				</AnimatePresence>
+			</motion.div>
+		</AnimatePresence>
+	);
+
+	function renderCurrentStep() {
 		switch (currentStep) {
 			case 0:
 				return (
 					<WelcomeStep
 						key="welcome"
 						duration={5000}
-						delay={1}
+						delay={0.2} // Reduced delay since we're already handling timing
 						onComplete={handleStepComplete}
 					/>
 				);
@@ -540,59 +584,17 @@ export default function IntroSequence({ onComplete }: Props) {
 				);
 			case 2:
 				return (
-					<LegalStep key="legal" delay={0} onComplete={handleStepComplete} />
+					<LegalStep
+						key="legal"
+						delay={0}
+						onComplete={() => {
+							setIsExiting(true);
+							setTimeout(onComplete, 800);
+						}}
+					/>
 				);
 			default:
 				return null;
 		}
-	};
-
-	const totalSteps = Object.keys(
-		Object.fromEntries(
-			Object.entries(renderCurrentStep.toString().match(/case \d+:/g) || []),
-		),
-	).length;
-
-	const handleStepComplete = useCallback(() => {
-		// Start audio on first step completion
-
-		if (currentStep < totalSteps - 1) {
-			setCurrentStep(currentStep + 1);
-		} else {
-			setIsExiting(true);
-			setTimeout(onComplete, 1000);
-		}
-	}, [currentStep, onComplete, totalSteps]);
-
-	useEffect(() => {
-		return () => {
-			if (audioRef.current) {
-				audioRef.current.pause();
-				audioRef.current = null;
-			}
-		};
-	}, []);
-
-	return (
-		<AnimatePresence mode="wait">
-			<motion.div
-				initial={{ opacity: 1 }}
-				animate={{
-					opacity: isExiting ? 0 : 1,
-					filter: isExiting ? "blur(20px)" : "blur(0px)",
-				}}
-				transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
-				className="fixed inset-0 z-[1000] overflow-hidden bg-black"
-			>
-				<AuroraBackground />
-				<LightShadows isExiting={isExiting} />
-				<StarField />
-
-				<ImagePreloader />
-				<motion.div className="no-select relative z-10 flex h-full items-center justify-center">
-					{renderCurrentStep()}
-				</motion.div>
-			</motion.div>
-		</AnimatePresence>
-	);
+	}
 }

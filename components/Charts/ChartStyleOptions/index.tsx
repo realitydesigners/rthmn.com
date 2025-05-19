@@ -1,9 +1,11 @@
+"use client";
+
+import { PanelSection } from "@/components/Panels/PanelComponents/PanelSection";
 import { useColorStore } from "@/stores/colorStore";
 import { cn } from "@/utils/cn";
 import type React from "react";
 import { memo, useState } from "react";
 import { LuBox, LuBoxes, LuLineChart, LuLock } from "react-icons/lu";
-import { PanelSection } from "@/components/Panels/PanelComponents/PanelSection";
 
 // Custom Square icon component
 const SquareIcon = ({

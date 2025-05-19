@@ -9,7 +9,7 @@ import {
 } from "@/utils/localStorage";
 import { motion } from "framer-motion";
 import type React from "react";
-import { useCallback, useEffect, useState, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { LuLock, LuUnlock } from "react-icons/lu";
 
 const LockButton = ({
@@ -99,7 +99,8 @@ export const SidebarWrapper = ({
 		const state = getSidebarState();
 
 		setSidebarLocks({
-			...locks,
+			left: locks.left,
+			right: locks.right,
 			[position]: !isLocked,
 		});
 
@@ -119,60 +120,67 @@ export const SidebarWrapper = ({
 		if (!mounted) return;
 
 		const main = document.querySelector("main");
-		const container = document.getElementById("app-container");
-		if (!main || !container) return;
-
-		const leftSidebar = document.querySelector(
-			'.sidebar-content [data-position="left"]',
-		);
-		const rightSidebar = document.querySelector(
-			'.sidebar-content [data-position="right"]',
-		);
+		if (!main) return;
 
 		const handleResize = () => {
 			const isMobile = window.innerWidth < 1024;
-			
+			const leftPanel = document.querySelector(
+				'[data-position="left"].sidebar-content',
+			);
+			const rightPanel = document.querySelector(
+				'[data-position="right"].sidebar-content',
+			);
+
 			if (isMobile) {
-				// Reset all spacing on mobile
-				main.style.marginLeft = "0";
-				main.style.marginRight = "0";
+				main.style.paddingLeft = "";
+				main.style.paddingRight = "";
 				main.style.width = "100%";
-				main.style.paddingLeft = "0";
-				main.style.paddingRight = "0";
 				return;
 			}
 
-			const leftWidth =
-				leftSidebar?.getAttribute("data-locked") === "true"
-					? Number.parseInt(leftSidebar?.getAttribute("data-width") || "0")
-					: 0;
-			const rightWidth =
-				rightSidebar?.getAttribute("data-locked") === "true"
-					? Number.parseInt(rightSidebar?.getAttribute("data-width") || "0")
-					: 0;
+			// Reset all styles first
+			main.style.transition = "all 0.15s ease-in-out";
 
-			if (isOpen && isLocked) {
-				if (position === "left") {
-					main.style.marginLeft = `${width}px`;
-					main.style.width = `calc(100% - ${width + rightWidth}px)`;
-					main.style.paddingLeft = "0";
-				} else {
-					main.style.marginRight = `${width}px`;
-					main.style.width = `calc(100% - ${width + leftWidth}px)`;
-					main.style.paddingRight = "0";
-				}
+			// Get panel states - check both locked AND open state
+			const leftPanelLocked = leftPanel?.getAttribute("data-locked") === "true";
+			const rightPanelLocked =
+				rightPanel?.getAttribute("data-locked") === "true";
+			const leftPanelOpen = leftPanel?.getAttribute("data-open") === "true";
+			const rightPanelOpen = rightPanel?.getAttribute("data-open") === "true";
+
+			const leftWidth = leftPanel?.getAttribute("data-width") || "0";
+			const rightWidth = rightPanel?.getAttribute("data-width") || "0";
+
+			// Only adjust margins if panel is both locked AND open
+			const leftPanelActive = leftPanelLocked && leftPanelOpen;
+			const rightPanelActive = rightPanelLocked && rightPanelOpen;
+
+			// Reset to layout's default padding
+			main.style.paddingLeft = "64px"; // 16 * 4 = 64px (matches layout's px-16)
+			main.style.paddingRight = "64px";
+			main.style.width = "100%";
+
+			// Calculate margins and width based on active panels
+			if (leftPanelActive && rightPanelActive) {
+				main.style.paddingLeft = "0";
+				main.style.paddingRight = "0";
+				main.style.marginLeft = `${leftWidth}px`;
+				main.style.marginRight = `${rightWidth}px`;
+				main.style.width = `calc(100% - ${Number.parseInt(leftWidth) + Number.parseInt(rightWidth)}px)`;
+			} else if (leftPanelActive) {
+				main.style.paddingLeft = "0";
+				main.style.marginLeft = `${leftWidth}px`;
+				main.style.marginRight = "0";
+				main.style.width = `calc(100% - ${Number.parseInt(leftWidth)}px)`;
+			} else if (rightPanelActive) {
+				main.style.paddingRight = "0";
+				main.style.marginRight = `${rightWidth}px`;
+				main.style.marginLeft = "0";
+				main.style.width = `calc(100% - ${Number.parseInt(rightWidth)}px)`;
 			} else {
-				if (position === "left") {
-					main.style.marginLeft = "0";
-					main.style.width =
-						rightWidth > 0 ? `calc(100% - ${rightWidth}px)` : "100%";
-					main.style.paddingLeft = "64px";
-				} else {
-					main.style.marginRight = "0";
-					main.style.width =
-						leftWidth > 0 ? `calc(100% - ${leftWidth}px)` : "100%";
-					main.style.paddingRight = "64px";
-				}
+				// If no panels are active, reset margins
+				main.style.marginLeft = "0";
+				main.style.marginRight = "0";
 			}
 		};
 
@@ -180,19 +188,19 @@ export const SidebarWrapper = ({
 		handleResize();
 
 		// Add resize listener
-		window.addEventListener('resize', handleResize);
-		
+		window.addEventListener("resize", handleResize);
+
 		// Cleanup
 		return () => {
-			window.removeEventListener('resize', handleResize);
-			// Reset styles on unmount
-			main.style.marginLeft = "";
-			main.style.marginRight = "";
-			main.style.width = "";
-			main.style.paddingLeft = "";
-			main.style.paddingRight = "";
+			window.removeEventListener("resize", handleResize);
+			main.style.transition = "";
+			// Reset to layout's default padding
+			main.style.paddingLeft = "64px";
+			main.style.paddingRight = "64px";
+			main.style.marginLeft = "0";
+			main.style.marginRight = "0";
+			main.style.width = "100%";
 		};
-
 	}, [isOpen, width, position, isLocked, mounted]);
 
 	if (!mounted) return null;
@@ -208,25 +216,33 @@ export const SidebarWrapper = ({
 				ease: "easeInOut",
 			}}
 			className={cn(
-				"sidebar-content fixed top-14 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+				"sidebar-content fixed top-14 z-0 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
 				position === "left" ? "left-0" : "right-0",
 				isOpen ? "pointer-events-auto" : "pointer-events-none",
-				isLocked ? "z-[90]" : "z-[110]",
 			)}
 			data-position={position}
 			data-locked={isLocked}
+			data-open={isOpen}
 			data-width={width}
-			style={{ width: `${width}px` }}
+			style={{
+				width: `${width}px`,
+				boxShadow:
+					!isLocked && isOpen
+						? position === "left"
+							? "4px 0 16px rgba(0,0,0,0.2)"
+							: "-4px 0 16px rgba(0,0,0,0.2)"
+						: "none",
+			}}
 		>
 			<div
 				className={cn(
 					"relative flex h-full w-full",
-					position === "left" ? "lg:ml-16" : "lg:mr-16",
+					position === "left" ? "ml-16" : "mr-16",
 				)}
 			>
 				<div
 					className={cn(
-						"relative flex h-full w-full flex-col  p-1",
+						"relative flex h-full w-full flex-col p-1",
 						position === "left" ? "border-r" : "border-l",
 						"border-[#111215]",
 					)}
@@ -250,24 +266,22 @@ export const SidebarWrapper = ({
 							<LockButton isLocked={isLocked} onClick={handleLockToggle} />
 						)}
 					</div>
-
-					{/* Content */}
+					{/* Tour Overlay */}
+					{isCurrentTourStep && !isCompleted && (
+						<motion.div
+							initial={{ opacity: 0 }}
+							animate={{ opacity: 1 }}
+							exit={{ opacity: 0 }}
+							transition={{ duration: 0.2 }}
+							className="fixed inset-0 bg-[#070809]/80 backdrop-blur-[4px] pointer-events-none"
+						/>
+					)}
 					<div className="relative flex-1 overflow-y-auto px-2 pb-4">
 						{children}
 					</div>
-
-					{/* Onboarding Overlay */}
 					{/* Onboarding Overlay */}
 					{isCurrentTourStep && !isCompleted && (
 						<div className="pointer-events-none absolute inset-0 z-[1000]">
-							{/* Inner edge glows */}
-							<div className="absolute inset-0 overflow-hidden">
-								{/* Enhanced corner shadows */}
-
-								{/* Intense corner glows */}
-							</div>
-
-							{/* Additional corner radials for depth */}
 							<div className="absolute inset-0 overflow-hidden">
 								<div className="absolute -bottom-32 -left-16 h-32 w-32 bg-[#447DFC]/[0.35] blur-[24px]" />
 								<div className="absolute -right-16 -bottom-32 h-32 w-32 bg-[#447DFC]/[0.35] blur-[24px]" />
@@ -282,32 +296,6 @@ export const SidebarWrapper = ({
 						</div>
 					)}
 				</div>
-
-				{/* Resize handle */}
-				<div
-					className={cn(
-						"absolute top-0 bottom-0 w-4 cursor-ew-resize opacity-0 hover:opacity-100",
-						position === "left" ? "-right-4" : "-left-4",
-					)}
-					onMouseDown={(e) => {
-						e.preventDefault();
-						const startX = e.clientX;
-						const startWidth = width;
-
-						const handleMouseMove = (e: MouseEvent) => {
-							const delta = e.clientX - startX;
-							handleResize(startWidth + (position === "left" ? delta : -delta));
-						};
-
-						const handleMouseUp = () => {
-							window.removeEventListener("mousemove", handleMouseMove);
-							window.removeEventListener("mouseup", handleMouseUp);
-						};
-
-						window.addEventListener("mousemove", handleMouseMove);
-						window.addEventListener("mouseup", handleMouseUp);
-					}}
-				/>
 			</div>
 		</motion.div>
 	);

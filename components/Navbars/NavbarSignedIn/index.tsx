@@ -3,6 +3,7 @@
 import { LogoIcon } from "@/components/Icons/icons";
 import { useWebSocket } from "@/providers/WebsocketProvider";
 import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -49,26 +50,31 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 	const pathSegments = formatPathname(pathname);
 
 	return (
-		<nav className="fixed top-0 right-0 left-0 z-[100] h-16 border-b border-[#1C1E23] bg-[#0A0B0D] p-1 lg:flex lg:h-14">
+		<nav className="fixed top-0 right-0 left-0 z-[1000] h-14 border-b border-[#1C1E23] bg-[#0A0B0D]  lg:flex ">
 			{/* Enhanced depth effects */}
 
-			<div className="group relative z-[110] h-full w-full">
-				<div className="relative flex h-full w-full items-center justify-between rounded-lg px-2">
+			<div className="group relative  h-full w-full">
+				<div className="relative flex h-full w-full items-center justify-between rounded-lg pr-2">
 					{/* Left section */}
-					<div className="relative z-[1] flex items-center gap-3">
-						<div className="flex items-center">
+					<div className="relative flex items-center lg:gap-2 ">
+						<div className="flex items-center  justify-center lg:border-r lg:w-16 lg:border-[#1C1E23]">
 							<Link
 								href="/dashboard"
-								className="group relative z-[110] flex items-center gap-2 rounded-lg p-1.5"
+								className="group relative flex items-center  rounded-lg "
 							>
-								<div className="flex h-7 w-7 items-center">
-									<LogoIcon />
+								<div className="flex h-14 w-14 items-center p-2">
+									<Image
+										src="/rthmn-onboarding-logo.png"
+										alt="Rthmn Logo"
+										width={96}
+										height={96}
+										className="relative w-full h-full object-contain"
+										priority
+									/>
 								</div>
-								<span className="font-russo tracking ml-2 text-[16px] text-white">
-									RTHMN
-								</span>
 							</Link>
 						</div>
+
 						{/* Breadcrumb */}
 						<div className="flex hidden items-center text-[#818181] lg:flex">
 							{Array.isArray(pathSegments) ? (
@@ -106,10 +112,10 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 					</div>
 
 					{/* Right section - Connection Status */}
-					<div className="relative z-[110] flex items-center gap-2">
+					<div className="relative flex items-center gap-2">
 						<Link
 							href="/support"
-							className="flex h-4 w-4 items-center justify-center"
+							className="h-4 w-4 items-center justify-center lg:flex hidden"
 						>
 							<LuHelpCircle className="h-4 w-4 text-[#818181] group-hover:text-white" />
 						</Link>
