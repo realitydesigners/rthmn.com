@@ -72,11 +72,9 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 										priority
 									/>
 								</div>
-								
 							</Link>
-							
 						</div>
-				
+
 						{/* Breadcrumb */}
 						<div className="flex hidden items-center text-[#818181] lg:flex">
 							{Array.isArray(pathSegments) ? (

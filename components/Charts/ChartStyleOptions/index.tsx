@@ -1,3 +1,5 @@
+"use client";
+
 import { PanelSection } from "@/components/Panels/PanelComponents/PanelSection";
 import { useColorStore } from "@/stores/colorStore";
 import { cn } from "@/utils/cn";

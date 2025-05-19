@@ -1,5 +1,6 @@
 "use client";
 
+import { TourButton } from "@/components/Buttons/TourButton";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,7 +12,6 @@ import ExperienceStep from "./_components/Steps/ExperienceStep";
 import IntroSequence from "./_components/Steps/IntroSequence";
 import PairsStep from "./_components/Steps/PairsStep";
 import ProfileUpload from "./_components/Steps/ProfileUpload";
-import { TourButton } from "@/components/Buttons/TourButton";
 
 const COMPONENTS: {
 	ProfileUpload: any;
@@ -189,10 +189,7 @@ export default function OnboardingPage() {
 					{/* Navigation */}
 					<div className="font-outfit flex justify-end space-x-3 mt-6">
 						{stepNumber > 1 && (
-							<TourButton
-								onClick={handleBack}
-								variant="black"
-							>
+							<TourButton onClick={handleBack} variant="black">
 								Back
 							</TourButton>
 						)}

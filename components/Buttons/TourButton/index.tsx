@@ -12,7 +12,7 @@ export function TourButton({
 	disabled = false,
 }: TourButtonProps) {
 	const isBlue = variant === "blue";
-	
+
 	return (
 		<button
 			onClick={onClick}
@@ -26,17 +26,25 @@ export function TourButton({
 			}`}
 		>
 			{/* Glow overlay */}
-			<div className={`absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
-				isBlue ? "bg-blue-400/[0.03]" : "bg-gradient-to-b from-white/[0.03] to-transparent"
-			}`} />
+			<div
+				className={`absolute inset-0 rounded-xl opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${
+					isBlue
+						? "bg-blue-400/[0.03]"
+						: "bg-gradient-to-b from-white/[0.03] to-transparent"
+				}`}
+			/>
 			{/* Top highlight */}
-			<div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${
-				isBlue ? "via-blue-400/20" : "via-white/10"
-			} to-transparent`} />
+			<div
+				className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent ${
+					isBlue ? "via-blue-400/20" : "via-white/10"
+				} to-transparent`}
+			/>
 			{/* Bottom highlight */}
-			<div className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent ${
-				isBlue ? "via-blue-400/10" : "via-white/5"
-			} to-transparent`} />
+			<div
+				className={`absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent ${
+					isBlue ? "via-blue-400/10" : "via-white/5"
+				} to-transparent`}
+			/>
 			<span className="font-outfit relative">{children}</span>
 		</button>
 	);

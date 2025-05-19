@@ -128,8 +128,6 @@ export const AccountPanel = () => {
 						</div>
 					</div>
 				</div>
-
-		
 			</div>
 		</div>
 	);

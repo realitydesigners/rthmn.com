@@ -1,8 +1,8 @@
+import { TourButton } from "@/components/Buttons/TourButton";
 import { client } from "@/lib/sanity/lib/client";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { TourButton } from "@/components/Buttons/TourButton";
 
 interface Props {
 	onComplete: () => void;
@@ -188,7 +188,7 @@ const LogoAnimation = ({ isExiting }: { isExiting: boolean }) => {
 				ease: [0.19, 1, 0.22, 1],
 			}}
 		>
-			<motion.div 
+			<motion.div
 				className={`relative ${hasMovedToCorner ? "p-2  w-14 h-14" : "w-48 h-48"}`}
 				transition={{
 					duration: 1,
@@ -306,7 +306,6 @@ const PatternRecognitionStep = ({
 								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
 							/>
 						)}
-
 					</div>
 					<motion.div
 						initial={{ opacity: 0, y: 5 }}
@@ -366,10 +365,11 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 			>
 				{/* Highlight effect */}
 				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]" />
-				
+
 				<div className="space-y-6">
 					<p className="font-mono text-sm leading-relaxed text-white/70">
-						By checking this box, I acknowledge that I have read and agree to Rthmn's{" "}
+						By checking this box, I acknowledge that I have read and agree to
+						Rthmn's{" "}
 						<a
 							href="/terms-of-service"
 							target="_blank"
@@ -387,7 +387,8 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 						>
 							Privacy Policy
 						</a>
-						. I understand that my use of the platform is subject to these agreements.
+						. I understand that my use of the platform is subject to these
+						agreements.
 					</p>
 
 					<div className="flex items-center gap-3">

@@ -1,3 +1,5 @@
+"use client";
+
 import { PanelSection } from "@/components/Panels/PanelComponents/PanelSection";
 import { StyleControl } from "@/components/Panels/PanelComponents/StyleControl";
 import { Toggle } from "@/components/Panels/PanelComponents/Toggle/Toggle";

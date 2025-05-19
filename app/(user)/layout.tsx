@@ -1,4 +1,5 @@
 import { DashboardNavigation } from "@/components/Navbars/DashboardNavigation";
+import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 import { NavbarSignedIn } from "@/components/Navbars/NavbarSignedIn";
 import { SidebarLeft } from "@/components/Sidebars/SidebarLeft";
 import { SidebarRight } from "@/components/Sidebars/SidebarRight";
@@ -9,7 +10,6 @@ import { UserProvider } from "@/providers/UserProvider";
 import { WebSocketProvider } from "@/providers/WebsocketProvider";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 
 interface UserLayoutProps {
 	children: React.ReactNode;
