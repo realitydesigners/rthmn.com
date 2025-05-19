@@ -1,4 +1,5 @@
 import { DashboardNavigation } from "@/components/Navbars/DashboardNavigation";
+import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 import { NavbarSignedIn } from "@/components/Navbars/NavbarSignedIn";
 import { SidebarLeft } from "@/components/Sidebars/SidebarLeft";
 import { SidebarRight } from "@/components/Sidebars/SidebarRight";
@@ -53,12 +54,13 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 				<DashboardProvider>
 					<div id="app-container">
 						<NavbarSignedIn user={user} />
-						<main className="w-full bg-black transition-all duration-300 ease-in-out pt-18 lg:pt-16 pb-2">
+						<main className="w-full bg-black transition-all duration-300 ease-in-out pb-2">
 							{children}
 						</main>
 						<SidebarLeft />
 						<SidebarRight />
-						<DashboardNavigation />
+						<MobileNavbar />
+						{/* <DashboardNavigation /> */}
 						{modal}
 					</div>
 				</DashboardProvider>

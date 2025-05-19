@@ -1,3 +1,4 @@
+"use client";
 import type { Preset } from "@/stores/colorStore";
 import { useColorStore, usePresetStore } from "@/stores/colorStore";
 import { cn } from "@/utils/cn";
