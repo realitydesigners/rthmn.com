@@ -310,9 +310,9 @@ export const ResoBox3D = memo(
 					gl={{ antialias: true }}
 					shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
 				>
-					<ambientLight intensity={0.25} />
+					<ambientLight intensity={1} />
 					<directionalLight
-						position={[20, 5, 60]}
+						position={[10, 10, 40]}
 						intensity={2}
 						shadow-mapSize={[1024, 1024]}
 					/>
