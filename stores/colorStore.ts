@@ -21,12 +21,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -36,12 +36,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -51,12 +51,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -66,12 +66,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -81,12 +81,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -96,12 +96,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -111,12 +111,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -126,12 +126,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -141,12 +141,12 @@ const DEFAULT_PRESETS: Preset[] = [
 		negative: "#303238",
 		styles: {
 			borderRadius: 4,
-			shadowIntensity: 0.1,
-			opacity: 0.51,
+			shadowIntensity: 0.4,
+			opacity: 0.61,
 			showBorder: true,
 			globalTimeframeControl: false,
 			showLineChart: false,
-			perspective: false,
+
 			viewMode: "default",
 		},
 	},
@@ -171,7 +171,6 @@ export interface BoxColors {
 		showBorder: boolean;
 		globalTimeframeControl: boolean;
 		showLineChart: boolean;
-		perspective?: boolean;
 		viewMode?: "default" | "3d" | "line";
 	};
 }
@@ -188,12 +187,11 @@ const DEFAULT_BOX_COLORS: BoxColors = {
 	negative: "#303238",
 	styles: {
 		borderRadius: 4,
-		shadowIntensity: 0.1,
+		shadowIntensity: 0.4,
 		opacity: 0.51,
 		showBorder: true,
 		globalTimeframeControl: false,
 		showLineChart: false,
-		perspective: false,
 		viewMode: "default",
 	},
 };

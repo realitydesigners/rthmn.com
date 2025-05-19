@@ -13,8 +13,8 @@ const useBoxColors = (box: Box, boxColors: BoxColors) => {
 		const baseColor = box.value > 0 ? boxColors.positive : boxColors.negative;
 		const opacity = boxColors.styles?.opacity ?? 0.2;
 		const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
-		const shadowY = Math.floor(shadowIntensity * 16);
-		const shadowBlur = Math.floor(shadowIntensity * 80);
+		const shadowY = Math.floor(shadowIntensity);
+		const shadowBlur = Math.floor(shadowIntensity * 50);
 		const shadowColor = (alpha: number) =>
 			(box.value > 0 ? boxColors.positive : boxColors.negative).replace(
 				")",
@@ -47,7 +47,7 @@ const useBoxStyles = (
 	index: number,
 ) => {
 	return useMemo(() => {
-		const calculatedSize = containerSize * 0.86 ** index;
+		const calculatedSize = containerSize * 0.83 ** index;
 		const isFirstDifferent =
 			prevBox &&
 			((box.value > 0 && prevBox.value < 0) ||
@@ -121,7 +121,7 @@ const ResoBoxRecursive = memo(
 			prevBox?.value < 0 && box.value < 0 && !isFirstDifferent;
 
 		// Only show price lines for largest box and first different boxes when we have more than 15 boxes
-		const shouldLimitPriceLines = sortedBoxes.length > 12;
+		const shouldLimitPriceLines = sortedBoxes.length > 18;
 		const shouldShowTopPrice =
 			(!isFirstDifferent || (isFirstDifferent && box.value > 0)) &&
 			(!shouldLimitPriceLines || isFirstDifferent || index === 0) &&
@@ -137,6 +137,15 @@ const ResoBoxRecursive = memo(
 				className="absolute border border-black"
 				style={baseStyles}
 			>
+				{/* Black background layer */}
+				<div
+					className="absolute inset-0"
+					style={{
+						borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+						backgroundColor: "#000000",
+					}}
+				/>
+
 				<div
 					className="absolute inset-0"
 					style={{
@@ -153,30 +162,11 @@ const ResoBoxRecursive = memo(
 						opacity: colors.opacity,
 					}}
 				/>
-
-				{isFirstDifferent && (
-					<div
-						className="absolute inset-0"
-						style={{
-							borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-							backgroundColor: colors.baseColor,
-							opacity: colors.opacity * 0.5,
-							boxShadow: `inset 0 2px 15px ${colors.shadowColor(0.2)}`,
-						}}
-					/>
-				)}
-
 				{showPriceLines && shouldShowTopPrice && (
-					<div className="absolute top-0 -right-16  w-16 opacity-90">
-						<div
-							className="w-5 border-[0.05px] transition-all"
-							style={{
-								borderColor: `${colors.baseColor.replace(")", ", 1)")}`,
-							}}
-						/>
+					<div className="absolute top-0 -right-12  border-dashed  opacity-90">
 						<div className="absolute -top-3.5 right-0">
 							<span
-								className="font-dmmono  text-[8px] tracking-wider"
+								className="font-dmmono  text-[8px] text-white tracking-wider"
 								style={{ color: colors.baseColor }}
 							>
 								{formatPrice(box.high, pair)}
@@ -186,13 +176,7 @@ const ResoBoxRecursive = memo(
 				)}
 
 				{showPriceLines && shouldShowBottomPrice && (
-					<div className="absolute -right-16 bottom-0  w-16 opacity-90">
-						<div
-							className="w-5 border-[0.05px] transition-all"
-							style={{
-								borderColor: `${colors.baseColor.replace(")", ", 1)")}`,
-							}}
-						/>
+					<div className="absolute -right-12 bottom-0   opacity-90">
 						<div className="absolute -top-3.5 right-0">
 							<span
 								className="font-dmmono  text-[8px] tracking-wider"
