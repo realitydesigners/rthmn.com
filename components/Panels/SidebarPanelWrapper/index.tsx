@@ -243,8 +243,9 @@ export const SidebarWrapper = ({
 				<div
 					className={cn(
 						"relative flex h-full w-full flex-col",
-						position === "left" ? "border-r border-[#1C1E23]" : "border-l border-[#1C1E23]",
-
+						position === "left"
+							? "border-r border-[#1C1E23]"
+							: "border-l border-[#1C1E23]",
 					)}
 				>
 					{/* Header */}

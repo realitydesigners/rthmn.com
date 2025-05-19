@@ -13,8 +13,8 @@ const useBoxColors = (box: Box, boxColors: BoxColors) => {
 		const baseColor = box.value > 0 ? boxColors.positive : boxColors.negative;
 		const opacity = boxColors.styles?.opacity ?? 0.2;
 		const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
-		const shadowY = Math.floor(shadowIntensity * 16);
-		const shadowBlur = Math.floor(shadowIntensity * 80);
+		const shadowY = Math.floor(shadowIntensity);
+		const shadowBlur = Math.floor(shadowIntensity * 50);
 		const shadowColor = (alpha: number) =>
 			(box.value > 0 ? boxColors.positive : boxColors.negative).replace(
 				")",
@@ -137,6 +137,15 @@ const ResoBoxRecursive = memo(
 				className="absolute border border-black"
 				style={baseStyles}
 			>
+				{/* Black background layer */}
+				<div
+					className="absolute inset-0"
+					style={{
+						borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
+						backgroundColor: "#000000",
+					}}
+				/>
+
 				<div
 					className="absolute inset-0"
 					style={{
@@ -153,22 +162,8 @@ const ResoBoxRecursive = memo(
 						opacity: colors.opacity,
 					}}
 				/>
-
-				{isFirstDifferent && (
-					<div
-						className="absolute inset-0"
-						style={{
-							borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-							backgroundColor: colors.baseColor,
-							opacity: colors.opacity * 0.5,
-							boxShadow: `inset 0 2px 15px ${colors.shadowColor(0.2)}`,
-						}}
-					/>
-				)}
-
 				{showPriceLines && shouldShowTopPrice && (
 					<div className="absolute top-0 -right-12  border-dashed  opacity-90">
-					
 						<div className="absolute -top-3.5 right-0">
 							<span
 								className="font-dmmono  text-[8px] text-white tracking-wider"
@@ -182,7 +177,6 @@ const ResoBoxRecursive = memo(
 
 				{showPriceLines && shouldShowBottomPrice && (
 					<div className="absolute -right-12 bottom-0   opacity-90">
-					
 						<div className="absolute -top-3.5 right-0">
 							<span
 								className="font-dmmono  text-[8px] tracking-wider"
