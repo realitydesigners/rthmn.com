@@ -9,6 +9,7 @@ import { UserProvider } from "@/providers/UserProvider";
 import { WebSocketProvider } from "@/providers/WebsocketProvider";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 
 interface UserLayoutProps {
 	children: React.ReactNode;
@@ -58,7 +59,8 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 						</main>
 						<SidebarLeft />
 						<SidebarRight />
-						<DashboardNavigation />
+						<MobileNavbar />
+						{/* <DashboardNavigation /> */}
 						{modal}
 					</div>
 				</DashboardProvider>

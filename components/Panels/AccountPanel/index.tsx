@@ -129,12 +129,7 @@ export const AccountPanel = () => {
 					</div>
 				</div>
 
-				{/* Footer */}
-				<div className="mt-4 pb-4 text-center">
-					<p className="font-outfit text-xs text-zinc-500">
-						© {new Date().getFullYear()} Rthmn
-					</p>
-				</div>
+		
 			</div>
 		</div>
 	);

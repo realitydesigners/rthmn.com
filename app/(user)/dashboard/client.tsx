@@ -150,7 +150,7 @@ export default function Dashboard() {
 	const gridCols = !isClient ? 1 : getGridColumns(availableWidth);
 
 	return (
-		<div className="w-full px-2 pt-18 lg:pt-16">
+		<div className="w-full px-2 pb-24 lg:pb-2 pt-16">
 			<div
 				className="grid w-full gap-2"
 				style={{
