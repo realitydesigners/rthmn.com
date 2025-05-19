@@ -6,7 +6,6 @@ import { motion } from "framer-motion";
 interface MobilePanelWrapperProps {
 	isOpen: boolean;
 	title?: string;
-	onClose: () => void;
 	children: React.ReactNode;
 	isCurrentTourStep?: boolean;
 	isCompleted?: boolean;

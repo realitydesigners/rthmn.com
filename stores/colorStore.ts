@@ -192,7 +192,6 @@ const DEFAULT_BOX_COLORS: BoxColors = {
 		showBorder: true,
 		globalTimeframeControl: false,
 		showLineChart: false,
-		perspective: false,
 		viewMode: "default",
 	},
 };
