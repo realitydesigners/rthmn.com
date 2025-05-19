@@ -60,7 +60,7 @@ export const PairResoBox = ({
 
 	return (
 		<div className="no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]">
-			<div className="relative flex min-h-[250px] flex-col border-[0.5px] border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#040505]">
+			<div className="relative flex min-h-[250px] flex-col border-[0.5px] border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#040505]">
 				<div className="relative flex flex-grow flex-col items-center justify-start gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6">
 					{/* Header section with enhanced depth */}
 					<div className="flex w-full flex-col items-center gap-2">
@@ -84,7 +84,7 @@ export const PairResoBox = ({
 					<div
 						className={`relative flex h-full min-h-[100px] w-full flex-grow  ${
 							boxColors?.styles?.viewMode !== "3d" && settings.showPriceLines
-								? "pr-16"
+								? "pr-12"
 								: "p-0"
 						}`}
 					>

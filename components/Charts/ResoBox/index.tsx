@@ -47,7 +47,7 @@ const useBoxStyles = (
 	index: number,
 ) => {
 	return useMemo(() => {
-		const calculatedSize = containerSize * 0.86 ** index;
+		const calculatedSize = containerSize * 0.83 ** index;
 		const isFirstDifferent =
 			prevBox &&
 			((box.value > 0 && prevBox.value < 0) ||
@@ -121,7 +121,7 @@ const ResoBoxRecursive = memo(
 			prevBox?.value < 0 && box.value < 0 && !isFirstDifferent;
 
 		// Only show price lines for largest box and first different boxes when we have more than 15 boxes
-		const shouldLimitPriceLines = sortedBoxes.length > 12;
+		const shouldLimitPriceLines = sortedBoxes.length > 18;
 		const shouldShowTopPrice =
 			(!isFirstDifferent || (isFirstDifferent && box.value > 0)) &&
 			(!shouldLimitPriceLines || isFirstDifferent || index === 0) &&
@@ -167,16 +167,11 @@ const ResoBoxRecursive = memo(
 				)}
 
 				{showPriceLines && shouldShowTopPrice && (
-					<div className="absolute top-0 -right-16  w-16 opacity-90">
-						<div
-							className="w-5 border-[0.05px] transition-all"
-							style={{
-								borderColor: `${colors.baseColor.replace(")", ", 1)")}`,
-							}}
-						/>
+					<div className="absolute top-0 -right-12  border-dashed  opacity-90">
+					
 						<div className="absolute -top-3.5 right-0">
 							<span
-								className="font-dmmono  text-[8px] tracking-wider"
+								className="font-dmmono  text-[8px] text-white tracking-wider"
 								style={{ color: colors.baseColor }}
 							>
 								{formatPrice(box.high, pair)}
@@ -186,13 +181,8 @@ const ResoBoxRecursive = memo(
 				)}
 
 				{showPriceLines && shouldShowBottomPrice && (
-					<div className="absolute -right-16 bottom-0  w-16 opacity-90">
-						<div
-							className="w-5 border-[0.05px] transition-all"
-							style={{
-								borderColor: `${colors.baseColor.replace(")", ", 1)")}`,
-							}}
-						/>
+					<div className="absolute -right-12 bottom-0   opacity-90">
+					
 						<div className="absolute -top-3.5 right-0">
 							<span
 								className="font-dmmono  text-[8px] tracking-wider"
