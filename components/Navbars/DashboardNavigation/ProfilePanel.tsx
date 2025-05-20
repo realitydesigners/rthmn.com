@@ -93,7 +93,7 @@ export const ProfilePanel = () => {
 
 	return (
 		<div className="fixed bottom-0 left-1/2 z-[90] h-[px] w-screen -translate-x-1/2 rounded-[2.5em] border-t border-[#0A0B0D] bg-black pb-20">
-			<div className="scrollbar-hide h-full overflow-y-auto px-4 pt-8">
+			<div className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] h-full overflow-y-auto px-4 pt-8">
 				{/* Profile Header */}
 				<div className="mb-6">
 					<div className="flex flex-col items-center">

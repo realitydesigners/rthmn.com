@@ -15,7 +15,10 @@ import { LuLock, LuUnlock } from "react-icons/lu";
 const LockButton = ({
 	isLocked,
 	onClick,
-}: { isLocked: boolean; onClick: () => void }) => (
+}: {
+	isLocked: boolean;
+	onClick: () => void;
+}) => (
 	<button
 		type="button"
 		onClick={onClick}
@@ -216,7 +219,7 @@ export const SidebarWrapper = ({
 				ease: "easeInOut",
 			}}
 			className={cn(
-				"sidebar-content fixed top-14 z-0 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+				"sidebar-content fixed top-14 z-0 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809] ",
 				position === "left" ? "left-0" : "right-0",
 				isOpen ? "pointer-events-auto" : "pointer-events-none",
 			)}
@@ -236,7 +239,7 @@ export const SidebarWrapper = ({
 		>
 			<div
 				className={cn(
-					"relative flex h-full w-full",
+					"relative flex h-full w-full ",
 					position === "left" ? "ml-16" : "mr-16",
 				)}
 			>
@@ -277,7 +280,7 @@ export const SidebarWrapper = ({
 							className="fixed inset-0 bg-[#070809]/80 backdrop-blur-[4px] pointer-events-none"
 						/>
 					)}
-					<div className="relative flex-1 overflow-y-auto px-2 pb-4">
+					<div className="relative flex-1 overflow-y-auto px-2 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 						{children}
 					</div>
 					{/* Onboarding Overlay */}

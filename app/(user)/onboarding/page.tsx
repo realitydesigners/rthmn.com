@@ -33,7 +33,7 @@ export default function OnboardingPage() {
 		updateUserData,
 		setCurrentStep,
 	} = useOnboardingStore();
-	const [showIntro, setShowIntro] = useState(true);
+	const [showIntro, setShowIntro] = useState(false);
 
 	const currentStep = ONBOARDING_STEPS.find(
 		(step) => step.id === currentStepId,

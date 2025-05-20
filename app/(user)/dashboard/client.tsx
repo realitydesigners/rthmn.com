@@ -150,9 +150,9 @@ export default function Dashboard() {
 	const gridCols = !isClient ? 1 : getGridColumns(availableWidth);
 
 	return (
-		<div className="w-full px-2 pb-24 lg:pb-2 pt-16">
+		<div className="w-full px-2 pb-24 lg:pb-2 pt-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 			<div
-				className="grid w-full gap-2"
+				className="grid w-full gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 				style={{
 					gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
 				}}
@@ -184,7 +184,7 @@ export default function Dashboard() {
 										damping: 20,
 									},
 								}}
-								className="relative cursor-grab active:cursor-grabbing"
+								className="relative cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 							>
 								<div data-pair={pair}>
 									<PairResoBox
