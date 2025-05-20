@@ -409,7 +409,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 		<div className={`relative ${className}`}>
 			<div
 				ref={scrollContainerRef}
-				className="scrollbar-hide h-full w-full overflow-x-auto"
+				className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] h-full w-full overflow-x-auto"
 			>
 				<div className="relative h-full pt-6">
 					{/* Trend Change Markers */}

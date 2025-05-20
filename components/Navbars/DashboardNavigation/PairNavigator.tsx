@@ -3,27 +3,16 @@
 import { useLongPress } from "@/hooks/useLongPress";
 import { useDashboard } from "@/providers/DashboardProvider/client";
 import { useUser } from "@/providers/UserProvider";
+import { cn } from "@/utils/cn";
 import {
 	CRYPTO_PAIRS,
 	EQUITY_PAIRS,
 	ETF_PAIRS,
 	FOREX_PAIRS,
 } from "@/utils/instruments";
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type React from "react";
-import {
-	LuArrowRight,
-	LuBitcoin,
-	LuBookmark,
-	LuDollarSign,
-	LuLineChart,
-	LuList,
-	LuPlus,
-	LuSearch,
-	LuTrash2,
-	LuTrendingUp,
-} from "react-icons/lu";
+import { LuBookmark, LuPlus, LuSearch, LuTrash2 } from "react-icons/lu";
 
 const useSound = () => {
 	const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -59,82 +48,31 @@ const navigationButtons = [
 	{ mode: "etf", label: "ETF" },
 ];
 
-const useIntersectionObserver = (
-	scrollRef: React.RefObject<HTMLDivElement>,
-	currentPairs: string[],
-	setActiveIndex: (index: number) => void,
-) => {
-	const { play } = useSound();
-
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (!scrollRef.current) return;
-
-				// Find the entry closest to the center of the viewport
-				let closestEntry = null;
-				let minDistance = Number.POSITIVE_INFINITY;
-
-				entries.forEach((entry) => {
-					const rect = entry.boundingClientRect;
-					const viewportHeight = window.innerHeight;
-					const centerY = viewportHeight / 2;
-					const elementCenterY = rect.top + rect.height / 2;
-					const distance = Math.abs(centerY - elementCenterY);
-
-					if (distance < minDistance && entry.isIntersecting) {
-						minDistance = distance;
-						closestEntry = entry;
-					}
-				});
-
-				if (closestEntry && minDistance < 10) {
-					// Only trigger if very close to center
-					const index = Number.parseInt(
-						closestEntry.target.getAttribute("data-index") || "0",
-					);
-					setActiveIndex(index);
-					play();
-				}
-			},
-			{
-				root: scrollRef.current,
-				threshold: [0.5, 0.6, 0.7, 0.8, 0.9, 1],
-				rootMargin: "-40% 0px -40% 0px", // Tighter margin for more precise center detection
-			},
-		);
-
-		const pairElements = document.querySelectorAll(".pair-item");
-		pairElements.forEach((element) => observer.observe(element));
-
-		return () => observer.disconnect();
-	}, [currentPairs, scrollRef, setActiveIndex, play]);
+const FilterButton = ({
+	isActive,
+	onClick,
+	label,
+}: {
+	isActive: boolean;
+	onClick: () => void;
+	label: string;
+}) => {
+	return (
+		<button
+			onClick={onClick}
+			className={cn(
+				"font-outfit px-4 py-2 text-sm font-medium rounded-full transition-all duration-200",
+				isActive
+					? "bg-[#32353C] text-white"
+					: "text-[#818181] hover:text-white",
+			)}
+		>
+			{label}
+		</button>
+	);
 };
 
-const PairFilters = ({
-	viewMode,
-	setViewMode,
-}: { viewMode: string; setViewMode: (mode: string) => void }) => (
-	<div className="absolute right-0 bottom-22 left-0 z-[1000]">
-		<div className="scrollbar-hide flex items-center justify-start gap-2 overflow-x-auto px-4 py-2">
-			{navigationButtons.map((button) => (
-				<PairFilterButtons
-					key={button.mode}
-					isActive={viewMode === button.mode}
-					onClick={() => setViewMode(button.mode)}
-					label={button.label}
-				/>
-			))}
-		</div>
-	</div>
-);
-
-interface PairNavigatorProps {
-	isModalOpen?: boolean;
-	onClose?: () => void;
-}
-
-export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
+export const PairNavigator = () => {
 	const { pairData } = useDashboard();
 	const { selectedPairs, togglePair } = useUser();
 	const [activeIndex, setActiveIndex] = useState(0);
@@ -153,23 +91,16 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
 				return; // Do nothing if not a favorite
 			}
 
-			// Close the navigation panel first
-			if (onClose) {
-				onClose();
+			// Scroll to the pair
+			const pairElement = document.querySelector(`[data-pair="${pair}"]`);
+			if (pairElement) {
+				pairElement.scrollIntoView({
+					behavior: "smooth",
+					block: "center",
+				});
 			}
-
-			// Wait for the panel to close, then scroll to the pair
-			setTimeout(() => {
-				const pairElement = document.querySelector(`[data-pair="${pair}"]`);
-				if (pairElement) {
-					pairElement.scrollIntoView({
-						behavior: "smooth",
-						block: "center",
-					});
-				}
-			}, 500); // Increased delay to match the panel transition
 		},
-		[selectedPairs, onClose],
+		[selectedPairs],
 	);
 
 	// Add scroll handler to cancel actions
@@ -266,118 +197,86 @@ export const PairNavigator = ({ isModalOpen, onClose }: PairNavigatorProps) => {
 	}, [handleScroll]);
 
 	return (
-		<div
-			className={`scrollbar-hide fixed right-0 bottom-0 left-0 z-[90] rounded-t-3xl rounded-t-[3em] border-t border-[#0A0B0D] bg-gradient-to-b from-[#010101] via-[#0a0a0a] to-[#010101] pt-3 transition-all duration-500 ease-in-out ${
-				isModalOpen ? "h-[175px] lg:hidden" : "h-[50vh]"
-			}`}
-		>
+		<div className="flex h-full flex-col touch-none">
+			{/* Search */}
+
 			<SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-			{/* Main container */}
-			<div className="relative h-[calc(100%-120px)]">
-				{/* Scrollable list */}
-				<div
-					ref={scrollRef}
-					className="scrollbar-hide absolute inset-0 overflow-y-scroll"
-					style={{
-						scrollSnapType: "y mandatory",
-						WebkitOverflowScrolling: "touch",
-						scrollBehavior: "smooth",
-					}}
-				>
-					{/* Top spacer */}
-					<div className="h-[calc(40vh-32px)]" />
-
-					{/* Pairs list */}
-					<div className="space-y-0 px-4">
-						{currentPairs.map((pair, index) => (
-							<div
-								key={pair}
-								data-index={index}
-								className="pair-item"
-								style={{
-									scrollSnapAlign: "center",
-									scrollSnapStop: "always",
-								}}
-							>
-								<PairItem
-									pair={pair}
-									index={index}
-									isActive={activeIndex === index}
-									isFavorite={selectedPairs.includes(pair)}
-									currentPrice={pairData[pair]?.currentOHLC?.close}
-									showRemove={showRemoveForPair === pair}
-									showAdd={showAddForPair === pair}
-									onIndexChange={handleIndexChange}
-									onRemove={() => {
-										togglePair(pair);
-										setShowRemoveForPair(null);
-									}}
-									onCancelRemove={() => setShowRemoveForPair(null)}
-									setShowRemoveForPair={setShowRemoveForPair}
-									setShowAddForPair={setShowAddForPair}
-									toggleFavorite={() => togglePair(pair)}
-									viewMode={viewMode}
-									onViewClick={() => handlePairClick(pair)}
-									onLongPressReset={() => {}}
-									style={{
-										height: "50px",
-										opacity: activeIndex === index ? 1 : 0.3,
-										transform: `scale(${activeIndex === index ? 1 : 0.95})`,
-										transition: "all 0.2s ease-out",
-										cursor: selectedPairs.includes(pair)
-											? "pointer"
-											: "default",
-									}}
-								/>
-							</div>
-						))}
-					</div>
-
-					{/* Bottom spacer */}
-					<div className="h-[calc(40vh-32px)]" />
-				</div>
-			</div>
-
-			{!isModalOpen && (
-				<PairFilters viewMode={viewMode} setViewMode={setViewMode} />
-			)}
-		</div>
-	);
-};
-
-export const PairFilterButtons = ({
-	isActive,
-	onClick,
-	label,
-}: { isActive: boolean; onClick: () => void; label: string }) => {
-	return (
-		<button onClick={onClick} className="group relative flex items-center">
+			{/* Pairs */}
 			<div
-				className={`group flex h-9 w-full items-center justify-center rounded-full bg-gradient-to-b p-[1px] transition-all duration-200 ${
-					isActive
-						? "from-[#32353C] to-[#282828]"
-						: "from-[#32353C] to-[#1C1E23] hover:from-[#32353C] hover:to-[#282828]"
-				}`}
+				ref={scrollRef}
+				className="flex-1 overflow-y-auto px-4 pb-20 touch-pan-y [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+				style={{ WebkitOverflowScrolling: "touch" }}
 			>
-				<div
-					className={`font-outfit flex h-full w-full items-center justify-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-sm font-medium ${
-						isActive ? "text-neutral-200" : "text-[#818181]"
-					}`}
-				>
-					{label}
+				{currentPairs.map((pair, index) => (
+					<div
+						key={pair}
+						data-index={index}
+						data-pair={pair}
+						className="pair-item mb-2"
+					>
+						<PairItem
+							pair={pair}
+							index={index}
+							isActive={activeIndex === index}
+							isFavorite={selectedPairs.includes(pair)}
+							currentPrice={pairData[pair]?.currentOHLC?.close}
+							showRemove={showRemoveForPair === pair}
+							showAdd={showAddForPair === pair}
+							onIndexChange={handleIndexChange}
+							onRemove={() => {
+								togglePair(pair);
+								setShowRemoveForPair(null);
+							}}
+							onCancelRemove={() => setShowRemoveForPair(null)}
+							setShowRemoveForPair={setShowRemoveForPair}
+							setShowAddForPair={setShowAddForPair}
+							toggleFavorite={() => togglePair(pair)}
+							viewMode={viewMode}
+							onViewClick={() => handlePairClick(pair)}
+							onLongPressReset={() => {}}
+							style={{
+								height: "50px",
+								opacity: activeIndex === index ? 1 : 0.3,
+								transform: `scale(${activeIndex === index ? 1 : 0.95})`,
+								transition: "all 0.2s ease-out",
+								cursor: selectedPairs.includes(pair) ? "pointer" : "default",
+							}}
+						/>
+					</div>
+				))}
+			</div>
+
+			{/* Navigation Buttons */}
+			<div className="absolute inset-x-0 bottom-30 pt-6">
+				<div className="w-full px-4 -mb-5">
+					<div className="flex w-auto overflow-x-auto touch-pan-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+						<div className="flex gap-2 min-w-fit">
+							{navigationButtons.map((button) => (
+								<FilterButton
+									key={button.mode}
+									isActive={viewMode === button.mode}
+									onClick={() => setViewMode(button.mode)}
+									label={button.label}
+								/>
+							))}
+						</div>
+					</div>
 				</div>
 			</div>
-		</button>
+		</div>
 	);
 };
 
 export const SearchBar = ({
 	searchQuery,
 	setSearchQuery,
-}: { searchQuery: string; setSearchQuery: (query: string) => void }) => {
+}: {
+	searchQuery: string;
+	setSearchQuery: (query: string) => void;
+}) => {
 	return (
-		<div className="relative z-[99] flex justify-center px-4">
+		<div className="relative z-[99] flex justify-center ">
 			<div className="relative flex w-full items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] shadow-xl transition-all duration-200 hover:from-[#32353C] hover:to-[#282828] sm:max-w-[300px] lg:max-w-[300px]">
 				<div className="flex h-12 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#1C1E23]">
 					<LuSearch className="ml-4 h-5 w-5 text-[#32353C]" />
@@ -433,7 +332,11 @@ const PairPrice = ({
 	price,
 	isJPY,
 	isActive,
-}: { price: number; isJPY: boolean; isActive: boolean }) => (
+}: {
+	price: number;
+	isJPY: boolean;
+	isActive: boolean;
+}) => (
 	<div
 		className={`font-dmmono  ml-2 text-sm ${isActive ? "text-white" : "text-[#0A0B0D]"}`}
 	>

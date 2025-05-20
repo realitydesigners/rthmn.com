@@ -1,4 +1,3 @@
-import { DashboardNavigation } from "@/components/Navbars/DashboardNavigation";
 import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 import { NavbarSignedIn } from "@/components/Navbars/NavbarSignedIn";
 import { SidebarLeft } from "@/components/Sidebars/SidebarLeft";
@@ -52,15 +51,17 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 		<WebSocketProvider>
 			<UserProvider>
 				<DashboardProvider>
-					<div id="app-container">
+					<div
+						id="app-container"
+						className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+					>
 						<NavbarSignedIn user={user} />
-						<main className="w-full bg-black transition-all duration-300 ease-in-out pb-2">
+						<main className="w-full bg-black transition-all duration-300 ease-in-out pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
 							{children}
 						</main>
 						<SidebarLeft />
 						<SidebarRight />
 						<MobileNavbar />
-						{/* <DashboardNavigation /> */}
 						{modal}
 					</div>
 				</DashboardProvider>

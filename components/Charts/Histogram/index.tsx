@@ -566,7 +566,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 			<div className="mr-12">
 				<div
 					ref={scrollContainerRef}
-					className="scrollbar-hide h-full w-full overflow-x-auto pr-12"
+					className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] h-full w-full overflow-x-auto pr-12"
 				>
 					<div className="relative h-full pt-6">
 						<div className="pointer-events-none absolute -top-0 right-0 left-0 z-0 ml-[18px] h-6">

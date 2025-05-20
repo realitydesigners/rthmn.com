@@ -11,10 +11,14 @@ import { Analytics } from "@vercel/analytics/react";
 import type { Metadata, Viewport } from "next";
 import { preconnect, prefetchDNS } from "react-dom";
 import "@/lib/styles/main.css";
+import { cn } from "@/utils/cn";
+import { Inter } from "next/font/google";
 
 const title = "RTHMN | Next Generation Forex / Stocks Toolkit";
 const description =
 	"RTHMN is a next generation algorithmic trading platform that provides real-time trading signals, 3D pattern recognition, gamified learning, AI-powered predictions, and comprehensive risk management.";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
 	metadataBase: new URL(getURL()),
@@ -36,6 +40,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
 	maximumScale: 1,
 };
+
 export default async function RootLayout({
 	children,
 }: Readonly<{
@@ -52,10 +57,20 @@ export default async function RootLayout({
 	} = await supabase.auth.getUser();
 
 	return (
-		<html lang="en">
+		<html
+			lang="en"
+			className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+		>
 			{/* <GoogleTagManager gtmId="GTM-XYZ" /> */}
 			<body
-				className={`${dmmono.variable} ${outfit.variable} ${oxanium.variable} ${russo.variable} bg-black`}
+				className={cn(
+					inter.className,
+					dmmono.variable,
+					outfit.variable,
+					oxanium.variable,
+					russo.variable,
+					"bg-black overflow-x-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
+				)}
 			>
 				<SupabaseProvider initialUser={user}>
 					<QueryProvider>
