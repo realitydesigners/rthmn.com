@@ -176,7 +176,11 @@ const SearchResultItem = memo(
 		pair,
 		isSelected,
 		onSelect,
-	}: { pair: string; isSelected: boolean; onSelect: () => void }) => {
+	}: {
+		pair: string;
+		isSelected: boolean;
+		onSelect: () => void;
+	}) => {
 		const { priceData } = useWebSocket();
 		const price = priceData[pair]?.price;
 
@@ -281,7 +285,9 @@ const useFilteredPairs = (searchQuery: string, selectedPairs: string[]) => {
 const SearchBar = memo(
 	({
 		onSearchStateChange,
-	}: { onSearchStateChange: (isSearching: boolean) => void }) => {
+	}: {
+		onSearchStateChange: (isSearching: boolean) => void;
+	}) => {
 		const [searchQuery, setSearchQuery] = useState("");
 		const [showResults, setShowResults] = useState(false);
 		const { selectedPairs, togglePair } = useUser();
@@ -505,7 +511,11 @@ const FilterButton = ({
 	isActive,
 	onClick,
 	label,
-}: { isActive: boolean; onClick: () => void; label: React.ReactNode }) => {
+}: {
+	isActive: boolean;
+	onClick: () => void;
+	label: React.ReactNode;
+}) => {
 	return (
 		<button
 			type="button"
@@ -661,7 +671,7 @@ export const InstrumentsPanel = () => {
 			<div
 				ref={contentRef}
 				className={cn(
-					"flex-1 overflow-y-auto min-h-0 hide-scrollbar",
+					"flex-1 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]",
 					isSearching ? "opacity-30" : "opacity-100",
 				)}
 			>
