@@ -117,7 +117,7 @@ export const PairResoBox = ({
 					</div>
 
 					{/* Timeframe Control with enhanced separator */}
-					<div className="relative h-14 w-full flex-shrink-0">
+					<div className="relative h-20 w-full flex-shrink-0">
 						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1C1E23] to-transparent" />
 						<TimeFrameSlider showPanel={false} pair={pair} />
 					</div>

@@ -52,6 +52,7 @@ const TimeFrameSliderContent = memo(
 			startIndex,
 			maxBoxCount,
 		});
+		const [containerWidth, setContainerWidth] = useState(0);
 
 		const [dragState, setDragState] = useState<{
 			isDragging: boolean;
@@ -73,6 +74,20 @@ const TimeFrameSliderContent = memo(
 				if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
 				window.removeEventListener("mousemove", handleGlobalMouseMove);
 			};
+		}, []);
+
+		// Add resize observer to track container width
+		useEffect(() => {
+			if (!barContainerRef.current) return;
+
+			const observer = new ResizeObserver((entries) => {
+				if (entries[0]) {
+					setContainerWidth(entries[0].contentRect.width);
+				}
+			});
+
+			observer.observe(barContainerRef.current);
+			return () => observer.disconnect();
 		}, []);
 
 		// Convert to reversed index for calculations
@@ -424,6 +439,28 @@ const TimeFrameSliderContent = memo(
 			);
 		}, []);
 
+		// Calculate which intervals to show based on container width
+		const visibleIntervals = useMemo(() => {
+			if (containerWidth < 200) {
+				// Very small: show only 1D, 1H, 1m
+				return TIME_INTERVALS.filter(interval => 
+					[1440, 60, 1].includes(interval.minutes)
+				);
+			} else if (containerWidth < 300) {
+				// Small: show 1D, 12H, 4H, 1H, 15m, 1m
+				return TIME_INTERVALS.filter(interval => 
+					[1440, 720, 240, 60, 15, 1].includes(interval.minutes)
+				);
+			} else if (containerWidth < 400) {
+				// Medium: show most intervals
+				return TIME_INTERVALS.filter(interval => 
+					[1440, 720, 360, 240, 120, 60, 30, 15, 5, 1].includes(interval.minutes)
+				);
+			}
+			// Large: show all intervals
+			return TIME_INTERVALS;
+		}, [containerWidth]);
+
 		// Enhanced edge handles with more prominent visual feedback and larger touch targets
 		const renderEdgeHandles = useMemo(() => {
 			return (
@@ -584,11 +621,11 @@ const TimeFrameSliderContent = memo(
 					</div>
 				</div>
 
-				{/* Time intervals scale */}
+				{/* Dynamic time intervals scale */}
 				<div className="mt-2 w-full">
 					<div className="flex w-full justify-between px-[7px]">
 						{TIME_INTERVALS.map((interval, i) => {
-							// Calculate position based on index in the array
+							// Always show full range of labels
 							const position = (i / (TIME_INTERVALS.length - 1)) * 37;
 							const isInRange = position >= reversedStartIndex && 
 								position <= (reversedStartIndex + reversedMaxBoxCount);
@@ -608,10 +645,11 @@ const TimeFrameSliderContent = memo(
 									/>
 									<span
 										className={cn(
-											"mt-1 font-dmmono text-[10px] tracking-wider transition-all duration-200",
+											"mt-1 font-dmmono text-[9px] tracking-wider transition-all duration-200",
 											isInRange
 												? "text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-												: "text-white/30"
+												: "text-white/30",
+											"whitespace-nowrap"
 										)}
 									>
 										{interval.label}
