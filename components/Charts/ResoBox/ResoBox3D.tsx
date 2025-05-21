@@ -7,6 +7,7 @@ import { Edges, Line, OrbitControls, Text } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 // Helper functions matching BoxSection exactly
 interface BoxDimensions {
@@ -322,6 +323,15 @@ export const ResoBox3D = memo(
 						enablePan={false}
 						maxDistance={70}
 						minDistance={40}
+						touches={{
+							ONE: 0,  // NONE
+							TWO: 1   // ROTATE
+						}}
+						mouseButtons={{
+							LEFT: 0,   // ROTATE
+							MIDDLE: 0, // NONE
+							RIGHT: 0   // NONE
+						}}
 					/>
 					<OriginLines />
 					<group>
