@@ -270,6 +270,146 @@ const TimeFrameSliderContent = memo(
 			],
 		);
 
+		const handleTouchStart = useCallback(
+			(e: React.TouchEvent, type: "left" | "right" | "position") => {
+				e.preventDefault();
+				e.stopPropagation();
+
+				if (!barContainerRef.current) return;
+
+				// Clear any existing timeouts
+				if (edgeTimeoutRef.current) clearTimeout(edgeTimeoutRef.current);
+				if (resetTimeoutRef.current) clearTimeout(resetTimeoutRef.current);
+				edgeTimeoutRef.current = null;
+				resetTimeoutRef.current = null;
+
+				// Remove any existing global mouse move listener
+				window.removeEventListener("mousemove", handleGlobalMouseMove);
+
+				onDragStart?.(type);
+
+				const rect = barContainerRef.current.getBoundingClientRect();
+				const barWidth = rect.width / 38;
+				const touch = e.touches[0];
+				const startX = touch.clientX;
+				const previousIndex =
+					type === "left"
+						? reversedStartIndex
+						: type === "right"
+							? reversedMaxBoxCount
+							: reversedStartIndex;
+
+				const handleTouchMove = (e: TouchEvent) => {
+					if (!barContainerRef.current) return;
+					e.preventDefault();
+
+					const touch = e.touches[0];
+					const totalDeltaX = touch.clientX - startX;
+					const newIndex = Math.round(totalDeltaX / barWidth);
+
+					if (newIndex === 0) return;
+
+					requestAnimationFrame(() => {
+						const updates: { startIndex?: number; maxBoxCount?: number } = {};
+
+						switch (type) {
+							case "left": {
+								const newReversedStartIndex = Math.max(
+									0,
+									Math.min(36, previousIndex + newIndex),
+								);
+								const newMaxBoxCount = Math.max(
+									1,
+									Math.min(
+										38 - newReversedStartIndex,
+										reversedMaxBoxCount +
+											(previousIndex - newReversedStartIndex),
+									),
+								);
+								const newStartIndex = Math.min(
+									37 - (newReversedStartIndex + newMaxBoxCount - 1),
+									36,
+								);
+
+								if (newStartIndex !== lastUpdateRef.current.startIndex) {
+									updates.startIndex = newStartIndex;
+								}
+								if (newMaxBoxCount !== lastUpdateRef.current.maxBoxCount) {
+									updates.maxBoxCount = newMaxBoxCount;
+								}
+								break;
+							}
+							case "right": {
+								const proposedMaxBoxCount = previousIndex + newIndex;
+								const newMaxBoxCount = Math.max(
+									1,
+									Math.min(proposedMaxBoxCount, 38 - reversedStartIndex),
+								);
+								const newStartIndex =
+									37 - (reversedStartIndex + newMaxBoxCount - 1);
+
+								if (
+									newMaxBoxCount !== lastUpdateRef.current.maxBoxCount &&
+									newMaxBoxCount >= 1 &&
+									newStartIndex >= 0
+								) {
+									updates.maxBoxCount = newMaxBoxCount;
+									updates.startIndex = newStartIndex;
+								}
+								break;
+							}
+							case "position": {
+								const newReversedStartIndex = Math.max(
+									0,
+									Math.min(previousIndex + newIndex, 38 - reversedMaxBoxCount),
+								);
+								const newStartIndex =
+									37 - (newReversedStartIndex + reversedMaxBoxCount - 1);
+
+								if (newStartIndex !== lastUpdateRef.current.startIndex) {
+									updates.startIndex = newStartIndex;
+								}
+								break;
+							}
+						}
+
+						if (Object.keys(updates).length > 0) {
+							for (const [key, value] of Object.entries(updates)) {
+								onStyleChange(key, value);
+							}
+							lastUpdateRef.current = {
+								startIndex:
+									updates.startIndex ?? lastUpdateRef.current.startIndex,
+								maxBoxCount:
+									updates.maxBoxCount ?? lastUpdateRef.current.maxBoxCount,
+							};
+						}
+					});
+				};
+
+				const handleTouchEnd = () => {
+					setDragState({ isDragging: false, dragType: null });
+					window.removeEventListener("touchmove", handleTouchMove);
+					window.removeEventListener("touchend", handleTouchEnd);
+					window.removeEventListener("touchcancel", handleTouchEnd);
+					onDragEnd?.();
+				};
+
+				window.addEventListener("touchmove", handleTouchMove, { passive: false });
+				window.addEventListener("touchend", handleTouchEnd);
+				window.addEventListener("touchcancel", handleTouchEnd);
+				setDragState({ isDragging: true, dragType: type });
+			},
+			[
+				reversedStartIndex,
+				reversedMaxBoxCount,
+				onStyleChange,
+				onDragStart,
+				onDragEnd,
+				handleGlobalMouseMove,
+			],
+		);
+
 		// Get time label for a given index
 		const getTimeLabel = useCallback((index: number) => {
 			const minutes = Math.max(
@@ -284,35 +424,49 @@ const TimeFrameSliderContent = memo(
 			);
 		}, []);
 
-		// Enhanced edge handles with more prominent visual feedback
+		// Enhanced edge handles with more prominent visual feedback and larger touch targets
 		const renderEdgeHandles = useMemo(() => {
 			return (
 				<>
 					<div
-						className="group/left pointer-events-auto absolute -inset-y-3 -left-2 z-10 w-4 cursor-ew-resize will-change-transform"
+						className="group/left pointer-events-auto absolute -inset-y-6 -left-4 z-10 w-8 cursor-ew-resize will-change-transform"
 						onMouseDown={(e) => handleMouseDown(e, "left")}
+						onTouchStart={(e) => handleTouchStart(e, "left")}
 					>
-						<div className="absolute inset-y-3 right-[8px] w-[2px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/left:from-white/95 group-hover/left:via-white/80 group-hover/left:to-white/95 group-hover/left:shadow-[0_0_25px_rgba(255,255,255,0.7)]" />
-						<div className="absolute inset-y-3 right-[7px] w-[3px] bg-gradient-to-r from-white/0 to-[#32353C] opacity-0 transition-opacity duration-200 group-hover/left:opacity-100" />
+						{/* Main handle line with enhanced hover and active states */}
+						<div className="absolute inset-y-6 right-[16px] w-[3px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/left:w-[4px] group-hover/left:from-white/95 group-hover/left:via-white/80 group-hover/left:to-white/95 group-hover/left:shadow-[0_0_30px_rgba(255,255,255,0.8)] group-active/left:w-[5px] group-active/left:from-white group-active/left:via-white/90 group-active/left:to-white group-active/left:shadow-[0_0_40px_rgba(255,255,255,0.9)]" />
+						
+						{/* Enhanced glow effect */}
+						<div className="absolute inset-y-6 right-[15px] w-[4px] bg-gradient-to-r from-white/0 to-[#32353C] opacity-0 transition-all duration-200 group-hover/left:opacity-100 group-hover/left:w-[6px] group-active/left:w-[8px] group-active/left:opacity-100" />
+						
+						{/* Additional hover indicator */}
+						<div className="absolute inset-y-6 right-[18px] w-[8px] bg-gradient-to-r from-white/0 to-white/10 opacity-0 blur-[2px] transition-all duration-200 group-hover/left:opacity-100 group-active/left:opacity-100 group-active/left:to-white/20" />
 					</div>
 
 					<div
-						className="group/right pointer-events-auto absolute -inset-y-3 -right-2 z-10 w-4 cursor-ew-resize will-change-transform"
+						className="group/right pointer-events-auto absolute -inset-y-6 -right-4 z-10 w-8 cursor-ew-resize will-change-transform"
 						onMouseDown={(e) => handleMouseDown(e, "right")}
+						onTouchStart={(e) => handleTouchStart(e, "right")}
 					>
-						<div className="absolute inset-y-3 left-[8px] w-[2px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/right:from-white/95 group-hover/right:via-white/80 group-hover/right:to-white/95 group-hover/right:shadow-[0_0_25px_rgba(255,255,255,0.7)]" />
-						<div className="absolute inset-y-3 left-[7px] w-[3px] bg-gradient-to-l from-white/0 to-[#32353C] opacity-0 transition-opacity duration-200 group-hover/right:opacity-100" />
+						{/* Main handle line with enhanced hover and active states */}
+						<div className="absolute inset-y-6 left-[16px] w-[3px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/right:w-[4px] group-hover/right:from-white/95 group-hover/right:via-white/80 group-hover/right:to-white/95 group-hover/right:shadow-[0_0_30px_rgba(255,255,255,0.8)] group-active/right:w-[5px] group-active/right:from-white group-active/right:via-white/90 group-active/right:to-white group-active/right:shadow-[0_0_40px_rgba(255,255,255,0.9)]" />
+						
+						{/* Enhanced glow effect */}
+						<div className="absolute inset-y-6 left-[15px] w-[4px] bg-gradient-to-l from-white/0 to-[#32353C] opacity-0 transition-all duration-200 group-hover/right:opacity-100 group-hover/right:w-[6px] group-active/right:w-[8px] group-active/right:opacity-100" />
+						
+						{/* Additional hover indicator */}
+						<div className="absolute inset-y-6 left-[18px] w-[8px] bg-gradient-to-l from-white/0 to-white/10 opacity-0 blur-[2px] transition-all duration-200 group-hover/right:opacity-100 group-active/right:opacity-100 group-active/right:to-white/20" />
 					</div>
 				</>
 			);
-		}, [handleMouseDown]);
+		}, [handleMouseDown, handleTouchStart]);
 
 		return (
 			<div className="relative h-full px-[7px] pb-6">
 				{/* Main slider container */}
 				<div
 					ref={barContainerRef}
-					className="group/bars relative flex h-8 items-center"
+					className="group/bars relative flex h-12 items-center touch-none"
 				>
 					{/* Base layer with diagonal lines pattern */}
 					<div className="absolute inset-0 overflow-hidden opacity-10">
@@ -366,7 +520,7 @@ const TimeFrameSliderContent = memo(
 						<div className="absolute inset-0 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.2)]" />
 					</div>
 
-					{/* Invisible click handlers */}
+					{/* Invisible click/touch handlers with larger touch targets */}
 					<div className="relative flex h-full w-full">
 						{Array.from({ length: 38 }).map((_, i) => {
 							const timeInfo = getTimeLabel(i);
@@ -395,44 +549,76 @@ const TimeFrameSliderContent = memo(
 											handleMouseDown(e, "right");
 										}
 									}}
+									onTouchStart={(e) => {
+										const reversedI = i;
+										const isSelected =
+											reversedI >= reversedStartIndex &&
+											reversedI < reversedStartIndex + reversedMaxBoxCount;
+										const isNearLeftEdge =
+											Math.abs(reversedI - reversedStartIndex) <= 1;
+										const isNearRightEdge =
+											Math.abs(
+												reversedI -
+													(reversedStartIndex + reversedMaxBoxCount - 1),
+											) <= 1;
+
+										if (isSelected) {
+											handleTouchStart(e, "position");
+										} else if (isNearLeftEdge) {
+											handleTouchStart(e, "left");
+										} else if (isNearRightEdge) {
+											handleTouchStart(e, "right");
+										}
+									}}
 								/>
 							);
 						})}
 					</div>
 
-					{/* Edge handles */}
+					{/* Edge handles container with enhanced active state */}
 					<div
-						className="pointer-events-none absolute inset-y-0 z-0 will-change-transform"
+						className="pointer-events-none absolute inset-y-0 z-0 will-change-transform transition-[filter] duration-200 [&:has(*:active)]:brightness-110"
 						style={selectionStyle}
 					>
 						{renderEdgeHandles}
 					</div>
 				</div>
 
-				{/* Dynamic Timeframe Scale */}
-				<div className="mt-2 flex items-center justify-between  font-dmmono  text-[10px] tracking-wider text-[#32353C]">
-					<span>{getTimeLabel(reversedStartIndex).label}</span>
-					<span>
-						{getTimeLabel(reversedStartIndex + reversedMaxBoxCount).label}
-					</span>
-				</div>
+				{/* Time intervals scale */}
+				<div className="mt-2 w-full">
+					<div className="flex w-full justify-between px-[7px]">
+						{TIME_INTERVALS.map((interval, i) => {
+							// Calculate position based on index in the array
+							const position = (i / (TIME_INTERVALS.length - 1)) * 37;
+							const isInRange = position >= reversedStartIndex && 
+								position <= (reversedStartIndex + reversedMaxBoxCount);
 
-				{/* Enhanced DynamicTimeScale component */}
-				<div className="mt-4 flex w-full flex-col">
-					{/* Time intervals */}
-					<div className="flex justify-between px-1">
-						{TIME_INTERVALS.map((interval, i) => (
-							<div
-								key={interval.label}
-								className="flex flex-col items-center"
-								style={{
-									width: `${100 / TIME_INTERVALS.length}%`,
-									opacity: i % 2 === 0 ? 1 : 0.5,
-								}}
-							>
-								<div className="h-2 w-[1px] bg-gradient-to-b from-[#32353C] to-transparent" />
-							</div>
-						))}
+							return (
+								<div
+									key={interval.label}
+									className="flex flex-col items-center"
+								>
+									<div
+										className={cn(
+											"h-3 w-[1px] will-change-transform transition-all duration-200",
+											isInRange
+												? "bg-gradient-to-b from-white/90 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.6)]"
+												: "bg-gradient-to-b from-white/20 to-transparent"
+										)}
+									/>
+									<span
+										className={cn(
+											"mt-1 font-dmmono text-[10px] tracking-wider transition-all duration-200",
+											isInRange
+												? "text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
+												: "text-white/30"
+										)}
+									>
+										{interval.label}
+									</span>
+								</div>
+							);
+						})}
 					</div>
 				</div>
 			</div>
