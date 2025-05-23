@@ -5,6 +5,7 @@ import { SidebarRight } from "@/components/Sidebars/SidebarRight";
 import { getSubscription, getUser } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { DashboardProvider } from "@/providers/DashboardProvider/client";
+import { SignalProvider } from "@/providers/SignalProvider/client";
 import { UserProvider } from "@/providers/UserProvider";
 import { WebSocketProvider } from "@/providers/WebsocketProvider";
 import { headers } from "next/headers";
@@ -51,19 +52,21 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 		<WebSocketProvider>
 			<UserProvider>
 				<DashboardProvider>
-					<div
-						id="app-container"
-						className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
-					>
-						<NavbarSignedIn user={user} />
-						<main className="w-full bg-black transition-all duration-300 ease-in-out pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-							{children}
-						</main>
-						<SidebarLeft />
-						<SidebarRight />
-						<MobileNavbar />
-						{modal}
-					</div>
+					<SignalProvider>
+						<div
+							id="app-container"
+							className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+						>
+							<NavbarSignedIn user={user} />
+							<main className="w-full bg-black transition-all duration-300 ease-in-out pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+								{children}
+							</main>
+							<SidebarLeft />
+							<SidebarRight />
+							<MobileNavbar />
+							{/* {modal} */}
+						</div>
+					</SignalProvider>
 				</DashboardProvider>
 			</UserProvider>
 		</WebSocketProvider>

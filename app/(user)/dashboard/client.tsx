@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
+import { SignalDisplay } from "@/components/SignalDisplay";
 
 export default function Dashboard() {
 	const { pairData, isLoading } = useDashboard();
@@ -20,6 +21,7 @@ export default function Dashboard() {
 	const [draggedItem, setDraggedItem] = useState<string | null>(null);
 	const [windowWidth, setWindowWidth] = useState(0);
 	const [availableWidth, setAvailableWidth] = useState(0);
+	const [showSignals, setShowSignals] = useState(false);
 
 	// Handle window resize and main element width changes
 	useEffect(() => {
@@ -151,6 +153,27 @@ export default function Dashboard() {
 
 	return (
 		<div className="w-full px-2 pb-24 lg:pb-2 pt-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+			{/* Signals Toggle Button */}
+			<div className="mb-4 flex justify-end">
+				<button
+					onClick={() => setShowSignals(!showSignals)}
+					className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+						showSignals
+							? "bg-blue-600 hover:bg-blue-700 text-white"
+							: "bg-gray-800 hover:bg-gray-700 text-gray-300"
+					}`}
+				>
+					{showSignals ? "Hide Signals" : "Show Signals"}
+				</button>
+			</div>
+
+			{/* Signals Display */}
+			{showSignals && (
+				<div className="mb-6">
+					<SignalDisplay />
+				</div>
+			)}
+
 			<div
 				className="grid w-full gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
 				style={{

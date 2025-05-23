@@ -41,6 +41,9 @@ export const PairResoBox = ({
 		),
 	);
 
+
+	console.log("boxSlice", boxSlice);
+
 	const currentPrice = pair ? priceData[pair]?.price : null;
 
 	// Memoize the filtered boxes based on timeframe settings
