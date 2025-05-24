@@ -1,5 +1,6 @@
 "use client";
 
+import { SignalDisplay } from "@/components/SignalDisplay";
 import { useDashboard } from "@/providers/DashboardProvider/client";
 import { useUser } from "@/providers/UserProvider";
 import { useGridStore } from "@/stores/gridStore";
@@ -7,7 +8,6 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
-import { SignalDisplay } from "@/components/SignalDisplay";
 
 export default function Dashboard() {
 	const { pairData, isLoading } = useDashboard();

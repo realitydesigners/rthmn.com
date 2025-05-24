@@ -28,4 +28,4 @@ export interface SignalContextType {
 	addPattern: (pattern: PatternMatch) => void;
 	clearPatterns: () => void;
 	enableScanning: (enabled: boolean) => void;
-} 
+}
