@@ -1,6 +1,4 @@
 "use client";
-
-import { LogoIcon } from "@/components/Icons/icons";
 import { useWebSocket } from "@/providers/WebsocketProvider";
 import type { User } from "@supabase/supabase-js";
 import Image from "next/image";

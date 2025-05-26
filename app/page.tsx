@@ -1,5 +1,6 @@
 import { FAQBlock } from "@/components/PageBuilder/blocks/faqBlock";
 import { SectionBoxes } from "@/components/Sections/SectionBoxes";
+import { SectionBoxes3D } from "@/components/Sections/SectionBoxes3D";
 import { SectionCTA } from "@/components/Sections/SectionCTA";
 import { SectionHero } from "@/components/Sections/SectionHero";
 import { SectionHistogram } from "@/components/Sections/SectionHistogram";
@@ -63,14 +64,16 @@ export default async function Homepage() {
 
 	return (
 		<div className="h-full">
-			<SectionMarketDisplay marketData={marketData} />
+			<SectionBoxes3D />
+			{/* <SectionMarketDisplay marketData={marketData} />
 			<SectionRthmnDemo marketData={marketData} />
-			{/* <SectionMarketTicker marketData={marketData} /> */}
+			<SectionMarketTicker marketData={marketData} />
 			<SectionBoxes />
-			{/* <SectionHistogram />
+
+			<SectionHistogram />
             <SectionHero marketData={marketData} />
-            */}
-			{/* Pass fetched data to SectionPricing */}
+           
+		
 			<SectionPricing
 				user={user} // Pass fetched user
 				products={products ?? []} // Pass fetched products (default to empty array)
@@ -78,7 +81,7 @@ export default async function Homepage() {
 			/>
 
 			<FAQBlock items={faqItems} />
-			<SectionCTA />
+			<SectionCTA /> */}
 		</div>
 	);
 }
