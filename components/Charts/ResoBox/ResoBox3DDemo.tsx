@@ -262,10 +262,18 @@ interface AnimatedStructureProps {
 	};
 	slice: BoxSlice;
 	boxColors: BoxColors;
+	rotation?: { x: number; y: number; z: number };
+	isFocused?: boolean;
 }
 
 const AnimatedStructure = memo(
-	({ structure, slice, boxColors }: AnimatedStructureProps) => {
+	({
+		structure,
+		slice,
+		boxColors,
+		rotation,
+		isFocused,
+	}: AnimatedStructureProps) => {
 		const groupRef = useRef<THREE.Group>(null);
 		const [currentPosition, setCurrentPosition] = useState(structure.position);
 		const [currentScale, setCurrentScale] = useState(structure.scale);
@@ -290,6 +298,13 @@ const AnimatedStructure = memo(
 				currentScaleValue + (targetScale - currentScaleValue) * lerpFactor;
 
 			groupRef.current.scale.setScalar(newScale);
+
+			// Apply rotation if provided and this is the focused structure
+			if (rotation && isFocused) {
+				groupRef.current.rotation.x = rotation.x;
+				groupRef.current.rotation.y = rotation.y;
+				groupRef.current.rotation.z = rotation.z;
+			}
 		});
 
 		return (
@@ -318,6 +333,12 @@ export const ResoBox3DCircular = memo(
 	({ slice, className = "", boxColors }: ResoBox3DCircularProps) => {
 		const containerRef = useRef<HTMLDivElement>(null);
 		const [focusedIndex, setFocusedIndex] = useState(0);
+		const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
+		const [boxRotation, setBoxRotation] = useState({ x: 0, y: 0, z: 0 });
+
+		const [savedCameraPosition, setSavedCameraPosition] = useState<
+			[number, number, number]
+		>([0, 0, 60]);
 
 		// Define the four cryptocurrency structures with individual animation states
 		const cryptoStructures = useMemo(
@@ -411,6 +432,23 @@ export const ResoBox3DCircular = memo(
 			return positions;
 		}, [focusedIndex, cryptoStructures]);
 
+		// Find which structure is actually closest to the front center (for UI display)
+		const actualFocusedIndex = useMemo(() => {
+			let closestIndex = 0;
+			let closestDistance = Number.POSITIVE_INFINITY;
+
+			calculatePositions.forEach((pos, index) => {
+				// Distance from front center [0, 0, positive z]
+				const distance = Math.sqrt(pos.position[0] ** 2 + pos.position[2] ** 2);
+				if (distance < closestDistance && pos.position[2] > 0) {
+					closestDistance = distance;
+					closestIndex = index;
+				}
+			});
+
+			return closestIndex;
+		}, [calculatePositions]);
+
 		const handleNext = () => {
 			setFocusedIndex((prev) => (prev + 1) % cryptoStructures.length);
 		};
@@ -422,6 +460,21 @@ export const ResoBox3DCircular = memo(
 			);
 		};
 
+		const toggleViewMode = () => {
+			setViewMode((prev) => (prev === "scene" ? "box" : "scene"));
+			// Reset box rotation when switching modes
+			if (viewMode === "box") {
+				setBoxRotation({ x: 0, y: 0, z: 0 });
+			}
+		};
+
+		const rotateBox = (axis: "x" | "y" | "z", direction: 1 | -1) => {
+			setBoxRotation((prev) => ({
+				...prev,
+				[axis]: prev[axis] + (direction * Math.PI) / 4, // 45 degree increments
+			}));
+		};
+
 		if (!slice?.boxes || slice.boxes.length === 0) {
 			return null;
 		}
@@ -429,7 +482,11 @@ export const ResoBox3DCircular = memo(
 		return (
 			<div ref={containerRef} className={`relative h-full w-full ${className}`}>
 				<Canvas
-					camera={{ position: [0, 0, 60], fov: 50 }}
+					key={viewMode} // Force remount when switching modes to reset camera
+					camera={{
+						position: [0, 0, 60],
+						fov: 50,
+					}}
 					gl={{ antialias: true }}
 					shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
 				>
@@ -441,12 +498,18 @@ export const ResoBox3DCircular = memo(
 					/>
 
 					<OrbitControls
-						enableZoom={true}
-						enablePan={false}
-						maxDistance={80}
-						minDistance={20}
+						enabled={viewMode === "box"}
+						enableZoom={viewMode === "box"}
+						enablePan={viewMode === "box"}
+						enableRotate={viewMode === "box"}
+						maxDistance={30}
+						minDistance={5}
 						autoRotate={false}
-						enableRotate={true}
+						target={
+							viewMode === "box"
+								? calculatePositions[actualFocusedIndex]?.position || [0, 0, 0]
+								: [0, 0, 0]
+						}
 					/>
 
 					{/* Connecting lines between structures */}
@@ -467,14 +530,29 @@ export const ResoBox3DCircular = memo(
 					</group> */}
 
 					{/* Render structures with smooth animated positioning */}
-					{calculatePositions.map((structure, index) => (
-						<AnimatedStructure
-							key={structure.pair}
-							structure={structure}
-							slice={structureSlices[index]}
-							boxColors={boxColors}
-						/>
-					))}
+					{calculatePositions.map((structure, index) => {
+						const isFocused = index === focusedIndex;
+						const isActuallyFocused = index === actualFocusedIndex;
+						const shouldShowStructure =
+							viewMode === "scene" || isActuallyFocused;
+
+						if (!shouldShowStructure) return null;
+
+						return (
+							<AnimatedStructure
+								key={structure.pair}
+								structure={structure}
+								slice={structureSlices[index]}
+								boxColors={boxColors}
+								rotation={
+									viewMode === "box" && isActuallyFocused
+										? boxRotation
+										: undefined
+								}
+								isFocused={isFocused}
+							/>
+						);
+					})}
 
 					{/* Central origin indicator for focused structure */}
 					<mesh position={[0, -8, 0]}>
@@ -483,63 +561,169 @@ export const ResoBox3DCircular = memo(
 					</mesh>
 				</Canvas>
 
-				{/* Navigation Controls */}
-				<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-30">
+				{/* View Mode Toggle - Above bottom section */}
+				<div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-50">
 					<button
 						type="button"
-						onClick={handlePrevious}
-						className="group flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full hover:bg-[#24FF66]/10 hover:border-[#24FF66]/60 transition-all duration-300"
+						onClick={toggleViewMode}
+						className={`px-6 py-3 bg-black/60 backdrop-blur-sm border-2 border-[#24FF66]/50 rounded-lg hover:bg-[#24FF66]/20 hover:border-[#24FF66] transition-all duration-300 text-base font-mono shadow-lg ${
+							viewMode === "box"
+								? "bg-[#24FF66]/30 border-[#24FF66] shadow-[0_0_20px_rgba(36,255,102,0.4)]"
+								: ""
+						}`}
 					>
-						<svg
-							className="w-5 h-5 text-[#24FF66] group-hover:text-white transition-colors"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							aria-label="Previous structure"
-						>
-							<title>Previous structure</title>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M15 19l-7-7 7-7"
-							/>
-						</svg>
-					</button>
-
-					{/* Current structure indicator */}
-					<div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full">
-						<span className="text-[#24FF66] font-mono text-sm font-bold">
-							{cryptoStructures[focusedIndex].pair}
+						<span className="text-[#24FF66] font-bold">
+							{viewMode === "scene" ? "🌐 SCENE MODE" : "📦 BOX MODE"}
 						</span>
-						<span className="text-white/60 text-xs">
-							{cryptoStructures[focusedIndex].name}
-						</span>
-					</div>
-
-					<button
-						type="button"
-						onClick={handleNext}
-						className="group flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full hover:bg-[#24FF66]/10 hover:border-[#24FF66]/60 transition-all duration-300"
-					>
-						<svg
-							className="w-5 h-5 text-[#24FF66] group-hover:text-white transition-colors"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							aria-label="Next structure"
-						>
-							<title>Next structure</title>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M9 5l7 7-7 7"
-							/>
-						</svg>
 					</button>
 				</div>
 
+				{/* Navigation Controls */}
+				<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-30">
+					{viewMode === "scene" && (
+						<>
+							<button
+								type="button"
+								onClick={handlePrevious}
+								className="group flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full hover:bg-[#24FF66]/10 hover:border-[#24FF66]/60 transition-all duration-300"
+							>
+								<svg
+									className="w-5 h-5 text-[#24FF66] group-hover:text-white transition-colors"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-label="Previous structure"
+								>
+									<title>Previous structure</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M15 19l-7-7 7-7"
+									/>
+								</svg>
+							</button>
+
+							{/* Current structure indicator */}
+							<div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full">
+								<span className="text-[#24FF66] font-mono text-sm font-bold">
+									{cryptoStructures[actualFocusedIndex].pair}
+								</span>
+								<span className="text-white/60 text-xs">
+									{cryptoStructures[actualFocusedIndex].name}
+								</span>
+							</div>
+
+							<button
+								type="button"
+								onClick={handleNext}
+								className="group flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full hover:bg-[#24FF66]/10 hover:border-[#24FF66]/60 transition-all duration-300"
+							>
+								<svg
+									className="w-5 h-5 text-[#24FF66] group-hover:text-white transition-colors"
+									fill="none"
+									stroke="currentColor"
+									viewBox="0 0 24 24"
+									aria-label="Next structure"
+								>
+									<title>Next structure</title>
+									<path
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M9 5l7 7-7 7"
+									/>
+								</svg>
+							</button>
+						</>
+					)}
+
+					{/* Box Mode Controls */}
+					{viewMode === "box" && (
+						<div className="flex items-center gap-4">
+							{/* Rotation Controls */}
+							<div className="flex items-center gap-2 px-4 py-3 bg-black/60 backdrop-blur-sm border-2 border-[#24FF66]/50 rounded-lg shadow-lg">
+								<span className="text-[#24FF66] text-sm font-mono font-bold">
+									ROTATE BOX:
+								</span>
+
+								{/* X-axis */}
+								<div className="flex items-center gap-2">
+									<span className="text-white text-sm font-bold">X</span>
+									<button
+										type="button"
+										onClick={() => rotateBox("x", -1)}
+										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
+									>
+										-
+									</button>
+									<button
+										type="button"
+										onClick={() => rotateBox("x", 1)}
+										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
+									>
+										+
+									</button>
+								</div>
+
+								{/* Y-axis */}
+								<div className="flex items-center gap-2">
+									<span className="text-white text-sm font-bold">Y</span>
+									<button
+										type="button"
+										onClick={() => rotateBox("y", -1)}
+										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
+									>
+										-
+									</button>
+									<button
+										type="button"
+										onClick={() => rotateBox("y", 1)}
+										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
+									>
+										+
+									</button>
+								</div>
+
+								{/* Z-axis */}
+								<div className="flex items-center gap-2">
+									<span className="text-white text-sm font-bold">Z</span>
+									<button
+										type="button"
+										onClick={() => rotateBox("z", -1)}
+										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
+									>
+										-
+									</button>
+									<button
+										type="button"
+										onClick={() => rotateBox("z", 1)}
+										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
+									>
+										+
+									</button>
+								</div>
+
+								{/* Reset */}
+								<button
+									type="button"
+									onClick={() => setBoxRotation({ x: 0, y: 0, z: 0 })}
+									className="px-4 py-2 bg-red-600/60 border-2 border-red-500/50 rounded text-white text-sm font-bold hover:bg-red-500/80 hover:border-red-400"
+								>
+									RESET
+								</button>
+							</div>
+
+							{/* Current structure in box mode */}
+							<div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full">
+								<span className="text-[#24FF66] font-mono text-sm font-bold">
+									{cryptoStructures[actualFocusedIndex].pair}
+								</span>
+								<span className="text-white/60 text-xs">Box Mode</span>
+							</div>
+						</div>
+					)}
+				</div>
 				{/* Structure indicators */}
 				<div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
 					{cryptoStructures.map((crypto, index) => (

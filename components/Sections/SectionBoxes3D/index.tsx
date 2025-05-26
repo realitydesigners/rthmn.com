@@ -53,31 +53,6 @@ export const SectionBoxes3D = memo(() => {
 					/>
 				)}
 			</div>
-
-			{/* 		
-			<div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
-				{Array.from({ length: 6 }, (_, i) => (
-					<motion.div
-						key={`floating-element-${i}-${20 + i * 15}-${30 + i * 10}`}
-						className="absolute w-1 h-1 bg-[#24FF66] rounded-full opacity-30"
-						style={{
-							left: `${20 + i * 15}%`,
-							top: `${30 + i * 10}%`,
-						}}
-						animate={{
-							y: [-20, 20, -20],
-							opacity: [0.3, 0.8, 0.3],
-							scale: [1, 1.5, 1],
-						}}
-						transition={{
-							duration: 4 + i,
-							repeat: Number.POSITIVE_INFINITY,
-							ease: "easeInOut",
-							delay: i * 0.5,
-						}}
-					/>
-				))}
-			</div> */}
 		</section>
 	);
 });
