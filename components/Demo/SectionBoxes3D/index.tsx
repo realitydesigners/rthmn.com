@@ -442,62 +442,65 @@ export const SectionBoxes3D = memo(() => {
 				{/* Content Section */}
 				<section className="relative min-h-screen w-full bg-gradient-to-b from-black via-[#0A0B0D] to-[#050506] pt-24">
 					<div className="container mx-auto px-6 py-24">
-						<div className="max-w-4xl mx-auto space-y-16">
+						<div className="max-w-7xl mx-auto space-y-20">
 							{/* Header */}
 							<motion.div
 								initial={{ opacity: 0, y: 30 }}
 								whileInView={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.8, delay: 0.2 }}
-								className="text-center space-y-6"
+								className="text-center space-y-8"
 							>
-								<h2 className="font-outfit text-5xl lg:text-7xl font-bold text-white tracking-tight">
-									Advanced Market
-									<span className="block text-[#24FF66]">Visualization</span>
+								<h2 className="font-russo text-4xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[0.85] uppercase">
+									ADVANCED MARKET
+									<span className="block text-[#24FF66] mt-2">
+										VISUALIZATION
+									</span>
 								</h2>
-								<p className="font-outfit text-xl text-white/70 max-w-2xl mx-auto leading-relaxed">
+								<p className="font-outfit text-lg lg:text-xl text-white/70 max-w-3xl mx-auto leading-relaxed">
 									Experience multi-dimensional market analysis through our
-									revolutionary 3D box visualization system.
+									revolutionary 3D box visualization system. Transform complex
+									data into actionable insights with unprecedented clarity.
 								</p>
 							</motion.div>
 
 							{/* Feature Grid */}
-							<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+							<div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
 								{[
 									{
 										title: "Real-time Analysis",
 										description:
-											"Live market data processed and visualized in real-time with sub-second latency.",
-										icon: "📊",
+											"Live market data processed and visualized in real-time with sub-second latency for immediate insights.",
+										category: "PERFORMANCE",
 									},
 									{
 										title: "Multi-Asset Support",
 										description:
-											"Analyze Bitcoin, Ethereum, Solana, and other major cryptocurrencies simultaneously.",
-										icon: "🔄",
+											"Analyze Bitcoin, Ethereum, Solana, and other major cryptocurrencies simultaneously in one unified view.",
+										category: "COVERAGE",
 									},
 									{
 										title: "3D Nested Structures",
 										description:
-											"Understand complex market relationships through intuitive 3D nested box representations.",
-										icon: "📦",
+											"Understand complex market relationships through intuitive 3D nested box representations and hierarchical data.",
+										category: "VISUALIZATION",
 									},
 									{
 										title: "Interactive Controls",
 										description:
-											"Navigate between different market views and timeframes with smooth transitions.",
-										icon: "🎮",
+											"Navigate between different market views and timeframes with smooth transitions and responsive controls.",
+										category: "INTERFACE",
 									},
 									{
 										title: "Technical Indicators",
 										description:
-											"Integrated RSI, MACD, and volatility metrics for comprehensive analysis.",
-										icon: "📈",
+											"Integrated RSI, MACD, and volatility metrics for comprehensive technical analysis and market insights.",
+										category: "ANALYTICS",
 									},
 									{
 										title: "Trading Insights",
 										description:
-											"AI-powered market analysis with support and resistance level identification.",
-										icon: "🧠",
+											"AI-powered market analysis with support and resistance level identification for strategic decision making.",
+										category: "INTELLIGENCE",
 									},
 								].map((feature, index) => (
 									<motion.div
@@ -505,22 +508,71 @@ export const SectionBoxes3D = memo(() => {
 										initial={{ opacity: 0, y: 30 }}
 										whileInView={{ opacity: 1, y: 0 }}
 										transition={{ duration: 0.6, delay: index * 0.1 }}
-										className="group relative p-6 rounded-xl bg-gradient-to-b from-[#1C1E23]/40 to-[#0F1012]/20 border border-[#1C1E23]/30 hover:border-[#24FF66]/30 transition-all duration-300"
+										className="group relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-[#24FF66]/30 transition-all duration-500 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
 									>
-										<div className="space-y-4">
-											<div className="text-3xl">{feature.icon}</div>
-											<h3 className="font-outfit text-xl font-semibold text-white group-hover:text-[#24FF66] transition-colors">
+										{/* Background glow */}
+										<div className="absolute inset-0 bg-gradient-to-b from-white/[0.02] via-transparent to-black/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+										{/* Top highlight */}
+										<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+
+										{/* Hover glow effect */}
+										<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-[#24FF66]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+										<div className="relative z-10 p-6 lg:p-8 space-y-4">
+											{/* Category badge */}
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30">
+												<span className="font-outfit text-xs font-semibold text-[#24FF66] uppercase tracking-wider">
+													{feature.category}
+												</span>
+											</div>
+
+											{/* Title */}
+											<h3 className="font-russo text-lg lg:text-xl font-bold text-white group-hover:text-[#24FF66] transition-colors duration-300 uppercase tracking-tight">
 												{feature.title}
 											</h3>
-											<p className="font-outfit text-white/60 leading-relaxed">
+
+											{/* Description */}
+											<p className="font-outfit text-sm lg:text-base text-white/60 leading-relaxed group-hover:text-white/80 transition-colors duration-300">
 												{feature.description}
 											</p>
-										</div>
 
-										<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-[#24FF66]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+											{/* Bottom accent line */}
+											<div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-[#24FF66] to-transparent group-hover:w-full transition-all duration-500" />
+										</div>
 									</motion.div>
 								))}
 							</div>
+
+							{/* Stats Section */}
+							<motion.div
+								initial={{ opacity: 0, y: 30 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.8, delay: 0.4 }}
+								className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
+							>
+								{[
+									{ value: "< 100ms", label: "Latency" },
+									{ value: "50+", label: "Cryptocurrencies" },
+									{ value: "24/7", label: "Real-time Data" },
+									{ value: "99.9%", label: "Uptime" },
+								].map((stat, index) => (
+									<motion.div
+										key={stat.label}
+										initial={{ opacity: 0, scale: 0.9 }}
+										whileInView={{ opacity: 1, scale: 1 }}
+										transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+										className="text-center space-y-2"
+									>
+										<div className="font-russo text-2xl lg:text-3xl xl:text-4xl font-black text-[#24FF66] tracking-tighter">
+											{stat.value}
+										</div>
+										<div className="font-outfit text-sm lg:text-base text-white/60 uppercase tracking-wider">
+											{stat.label}
+										</div>
+									</motion.div>
+								))}
+							</motion.div>
 
 							{/* Call to Action */}
 							<motion.div
@@ -529,30 +581,55 @@ export const SectionBoxes3D = memo(() => {
 								transition={{ duration: 0.8, delay: 0.6 }}
 								className="text-center space-y-8"
 							>
-								<h3 className="font-outfit text-3xl font-bold text-white">
-									Ready to explore the future of market analysis?
+								<h3 className="font-russo text-2xl lg:text-3xl xl:text-4xl font-black text-white uppercase tracking-tighter">
+									Ready to decode the market?
 								</h3>
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.95 }}
-									className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#24FF66] to-[#1ECC52] text-black font-outfit font-semibold rounded-full hover:shadow-[0_0_30px_rgba(36,255,102,0.3)] transition-all duration-300"
-								>
-									<span>Start Trading</span>
-									<svg
-										className="w-5 h-5"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										aria-hidden="true"
+
+								<div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+									<motion.button
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+										className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#24FF66] to-[#1ECC52] text-black font-outfit font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(36,255,102,0.3)] transition-all duration-300"
 									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M13 7l5 5m0 0l-5 5m5-5H6"
-										/>
-									</svg>
-								</motion.button>
+										<span>Start Trading</span>
+										<svg
+											className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-hidden="true"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M13 7l5 5m0 0l-5 5m5-5H6"
+											/>
+										</svg>
+									</motion.button>
+
+									<motion.button
+										whileHover={{ scale: 1.05 }}
+										whileTap={{ scale: 0.95 }}
+										className="group relative inline-flex items-center gap-3 px-8 py-4 border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm text-white font-outfit font-semibold rounded-xl hover:border-[#32353C]/80 hover:shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300"
+									>
+										<span>Watch Demo</span>
+										<svg
+											className="w-5 h-5 transition-transform duration-300 group-hover:scale-110"
+											fill="none"
+											stroke="currentColor"
+											viewBox="0 0 24 24"
+											aria-hidden="true"
+										>
+											<path
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth={2}
+												d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M19 10a9 9 0 11-18 0 9 9 0 0118 0z"
+											/>
+										</svg>
+									</motion.button>
+								</div>
 							</motion.div>
 						</div>
 					</div>

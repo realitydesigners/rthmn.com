@@ -903,34 +903,6 @@ export const ResoBox3DCircular = memo(
 											<NavButton direction="right" onClick={handleNext} />
 										</div>
 									</div>
-
-									{/* Additional Controls */}
-									<div className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-										{/* Background glow */}
-										<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
-
-										{/* Top highlight */}
-										<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-
-										<div className="relative z-10 flex items-center gap-2">
-											<BaseButton
-												onClick={() => setIsTradingPanelOpen(true)}
-												variant="success"
-												size="md"
-												className="group"
-											>
-												<LuInfo className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-											</BaseButton>
-
-											<BaseButton
-												variant="secondary"
-												size="md"
-												className="group"
-											>
-												<LuHelpCircle className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-											</BaseButton>
-										</div>
-									</div>
 								</>
 							)}
 

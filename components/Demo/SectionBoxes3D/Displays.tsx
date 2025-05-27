@@ -45,25 +45,6 @@ export const ModeToggle = memo(({ viewMode, onToggle }: ModeToggleProps) => (
 						}`}
 					/>
 				</div>
-
-				{/* Icon and label */}
-				<div className="flex items-center gap-2">
-					{viewMode === "scene" ? (
-						<>
-							<LuOrbit className="w-4 h-4 text-[#24FF66]" />
-							<span className="font-outfit text-sm font-medium text-white">
-								Switch to Focus
-							</span>
-						</>
-					) : (
-						<>
-							<LuBox className="w-4 h-4 text-blue-400" />
-							<span className="font-outfit text-sm font-medium text-white">
-								Back to Scene
-							</span>
-						</>
-					)}
-				</div>
 			</div>
 		</button>
 	</div>

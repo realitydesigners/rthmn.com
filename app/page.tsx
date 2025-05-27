@@ -1,6 +1,7 @@
 import { FAQBlock } from "@/components/PageBuilder/blocks/faqBlock";
 import { SectionBoxes } from "@/components/Sections/SectionBoxes";
 import { SectionBoxes3D } from "@/components/Demo/SectionBoxes3D";
+import { SectionInstrumentsPanel } from "@/components/Demo/SectionInstrumentsPanel";
 import { SectionCTA } from "@/components/Sections/SectionCTA";
 import { SectionHero } from "@/components/Sections/SectionHero";
 import { SectionHistogram } from "@/components/Sections/SectionHistogram";
@@ -65,6 +66,7 @@ export default async function Homepage() {
 	return (
 		<div className="h-full">
 			<SectionBoxes3D />
+			<SectionInstrumentsPanel />
 			{/* <SectionMarketDisplay marketData={marketData} />
 			<SectionRthmnDemo marketData={marketData} />
 			<SectionMarketTicker marketData={marketData} />
