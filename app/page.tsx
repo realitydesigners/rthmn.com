@@ -1,6 +1,6 @@
 import { FAQBlock } from "@/components/PageBuilder/blocks/faqBlock";
 import { SectionBoxes } from "@/components/Sections/SectionBoxes";
-import { SectionBoxes3D } from "@/components/Sections/SectionBoxes3D";
+import { SectionBoxes3D } from "@/components/Demo/SectionBoxes3D";
 import { SectionCTA } from "@/components/Sections/SectionCTA";
 import { SectionHero } from "@/components/Sections/SectionHero";
 import { SectionHistogram } from "@/components/Sections/SectionHistogram";

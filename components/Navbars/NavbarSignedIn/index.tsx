@@ -77,10 +77,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
 						<div className="flex hidden items-center text-[#818181] lg:flex">
 							{Array.isArray(pathSegments) ? (
 								pathSegments.map((segment, index, array) => (
-									<div
-										key={`${segment}-${index}`}
-										className="flex items-center gap-1.5"
-									>
+									<div key={segment} className="flex items-center gap-1.5">
 										<div className="flex items-center gap-1.5 rounded-md px-1.5 py-1">
 											{getSegmentIcon(segment) && (
 												<span className="text-[#32353C]">

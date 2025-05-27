@@ -78,16 +78,6 @@ export const DemoNavbar = memo(({ y, opacity }: DemoNavbarProps) => {
 						</div>
 					</div>
 
-					{/* Center section - Mock GridControl */}
-					<div className="absolute top-1/2 left-1/2 hidden -translate-x-1/2 -translate-y-1/2 lg:block">
-						<div className="flex items-center gap-2 px-3 py-1.5 bg-[#1C1E23]/40 border border-[#1C1E23]/60 rounded-lg">
-							<span className="font-outfit text-xs text-[#818181] uppercase tracking-wide">
-								Live Demo
-							</span>
-							<div className="w-2 h-2 bg-[#24FF66] rounded-full animate-pulse" />
-						</div>
-					</div>
-
 					{/* Right section - Mock Connection Status */}
 					<div className="relative flex items-center gap-2">
 						<div className="h-4 w-4 items-center justify-center lg:flex hidden">
