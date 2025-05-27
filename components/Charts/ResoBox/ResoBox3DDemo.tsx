@@ -9,9 +9,258 @@ import {
 	sequences,
 } from "@/components/Constants/constants";
 import { Edges, Line, OrbitControls, Text } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
-import React, { memo, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import {
+	LuChevronLeft,
+	LuChevronRight,
+	LuEye,
+	LuBox,
+	LuBarChart3,
+	LuInfo,
+	LuHelpCircle,
+	LuLayoutDashboard,
+	LuOrbit,
+} from "react-icons/lu";
+import { TradingInfoPanel, mockTradingData } from "./TradingPanel";
+import Image from "next/image";
+
+const cryptoStructures = [
+	{
+		pair: "BTC",
+		name: "Bitcoin",
+		startOffset: 4,
+		speed: 0.8, // Slower than base
+	},
+	{
+		pair: "ETH",
+		name: "Ethereum",
+		startOffset: 20, // Different starting position
+		speed: 1.2, // Faster than base
+	},
+	{
+		pair: "SOL",
+		name: "Solana",
+		startOffset: 8, // Different starting position
+		speed: 0.6, // Much slower
+	},
+	{
+		pair: "ADA",
+		name: "Cardano",
+		startOffset: 40, // Different starting position
+		speed: 1.0, // Base speed
+	},
+];
+
+// Modular Button Components
+interface BaseButtonProps {
+	onClick?: () => void;
+	disabled?: boolean;
+	className?: string;
+	children: React.ReactNode;
+	variant?: "primary" | "secondary" | "ghost" | "danger";
+	size?: "sm" | "md" | "lg";
+}
+
+const BaseButton = memo(
+	({
+		onClick,
+		disabled = false,
+		className = "",
+		children,
+		variant = "secondary",
+		size = "md",
+	}: BaseButtonProps) => {
+		const sizeClasses = {
+			sm: "h-8 w-8 text-xs",
+			md: "h-10 w-10 text-sm",
+			lg: "h-12 w-12 text-base",
+		};
+
+		const variantClasses = {
+			primary:
+				"bg-gradient-to-b from-white/20 via-white/10 to-transparent border-white/40 text-white hover:border-white/60 hover:from-white/30 hover:via-white/15 hover:shadow-[0_0_20px_rgba(255,255,255,0.3)]",
+			secondary:
+				"bg-gradient-to-b from-[#1C1E23]/80 via-[#0F1012]/60 to-[#0A0B0D]/40 border-[#1C1E23]/60 text-white/80 hover:border-[#32353C]/80 hover:from-[#1C1E23] hover:via-[#0F1012] hover:text-white hover:shadow-[0_0_15px_rgba(0,0,0,0.4)]",
+			ghost:
+				"bg-black/40 backdrop-blur-sm border-white/30 text-white hover:bg-white/10 hover:border-white/60 hover:text-white",
+			danger:
+				"bg-gradient-to-b from-red-500/20 via-red-500/10 to-transparent border-red-500/40 text-red-400 hover:border-red-500/60 hover:from-red-500/30 hover:via-red-500/15 hover:shadow-[0_0_20px_rgba(239,68,68,0.3)]",
+		};
+
+		return (
+			<button
+				type="button"
+				onClick={onClick}
+				disabled={disabled}
+				className={`
+				group relative flex items-center justify-center rounded-full border transition-all duration-300
+				${sizeClasses[size]}
+				${variantClasses[variant]}
+				${disabled ? "opacity-50 cursor-not-allowed" : ""}
+				${className}
+			`}
+			>
+				{/* Subtle inner glow */}
+				<div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/[0.03] via-transparent to-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+
+				{/* Top highlight */}
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+				{/* Content */}
+				<div className="relative z-10">{children}</div>
+			</button>
+		);
+	},
+);
+
+BaseButton.displayName = "BaseButton";
+
+// Navigation Button Component
+interface NavButtonProps {
+	direction: "left" | "right";
+	onClick: () => void;
+	disabled?: boolean;
+}
+
+const NavButton = memo(({ direction, onClick, disabled }: NavButtonProps) => (
+	<BaseButton
+		onClick={onClick}
+		disabled={disabled}
+		variant="ghost"
+		size="lg"
+		className="shadow-lg"
+	>
+		{direction === "left" ? (
+			<LuChevronLeft className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-0.5" />
+		) : (
+			<LuChevronRight className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" />
+		)}
+	</BaseButton>
+));
+
+NavButton.displayName = "NavButton";
+
+// Control Panel Component
+interface ControlPanelProps {
+	children: React.ReactNode;
+	title?: string;
+	className?: string;
+}
+
+const ControlPanel = memo(
+	({ children, title, className = "" }: ControlPanelProps) => (
+		<div
+			className={`
+		relative overflow-hidden rounded-xl border border-[#1C1E23]/60 
+		bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 
+		backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]
+		${className}
+	`}
+		>
+			{/* Subtle radial glow */}
+			<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.03),transparent_50%)]" />
+
+			{/* Top border highlight */}
+			<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+
+			<div className="relative z-10 p-4">
+				{title && (
+					<div className="mb-3 flex items-center gap-2">
+						<span className="font-outfit text-xs font-medium tracking-wider text-[#818181] uppercase">
+							{title}
+						</span>
+					</div>
+				)}
+				{children}
+			</div>
+		</div>
+	),
+);
+
+ControlPanel.displayName = "ControlPanel";
+
+// Mode Toggle Component
+interface ModeToggleProps {
+	viewMode: "scene" | "box";
+	onToggle: () => void;
+}
+
+const ModeToggle = memo(({ viewMode, onToggle }: ModeToggleProps) => (
+	<BaseButton
+		onClick={onToggle}
+		variant="primary"
+		size="lg"
+		className="px-6 w-auto shadow-lg"
+	>
+		<div className="flex items-center gap-2">
+			{viewMode === "scene" ? (
+				<>
+					<LuBox className="w-4 h-4" />
+					<span className="font-outfit text-sm font-medium tracking-wide">
+						BOX MODE
+					</span>
+				</>
+			) : (
+				<>
+					<LuEye className="w-4 h-4" />
+					<span className="font-outfit text-sm font-medium tracking-wide">
+						SCENE MODE
+					</span>
+				</>
+			)}
+		</div>
+	</BaseButton>
+));
+
+ModeToggle.displayName = "ModeToggle";
+
+// Structure Indicator Component
+interface StructureIndicatorProps {
+	structures: Array<{ pair: string; name: string }>;
+	activeIndex: number;
+	onSelect: (index: number) => void;
+}
+
+const StructureIndicator = memo(
+	({ structures, activeIndex, onSelect }: StructureIndicatorProps) => (
+		<ControlPanel className="px-6 py-3">
+			<div className="flex items-center gap-4">
+				{/* Current structure info */}
+				<div className="flex items-center gap-3">
+					<span className="font-outfit text-lg font-bold text-[#24FF66] tracking-wide">
+						{structures[activeIndex].pair}
+					</span>
+					<span className="font-outfit text-sm text-white/60">
+						{structures[activeIndex].name}
+					</span>
+				</div>
+
+				{/* Dot indicators */}
+				<div className="flex gap-2">
+					{structures.map((structure, index) => (
+						<button
+							key={structure.pair}
+							type="button"
+							onClick={() => onSelect(index)}
+							className={`
+							w-2 h-2 rounded-full transition-all duration-300
+							${
+								index === activeIndex
+									? "bg-[#24FF66] shadow-[0_0_8px_rgba(36,255,102,0.6)] scale-125"
+									: "bg-white/20 hover:bg-white/40 hover:scale-110"
+							}
+						`}
+						/>
+					))}
+				</div>
+			</div>
+		</ControlPanel>
+	),
+);
+
+StructureIndicator.displayName = "StructureIndicator";
 
 // Helper functions matching BoxSection exactly
 interface BoxDimensions {
@@ -275,8 +524,6 @@ const AnimatedStructure = memo(
 		isFocused,
 	}: AnimatedStructureProps) => {
 		const groupRef = useRef<THREE.Group>(null);
-		const [currentPosition, setCurrentPosition] = useState(structure.position);
-		const [currentScale, setCurrentScale] = useState(structure.scale);
 
 		// Smooth animation using useFrame
 		useFrame(() => {
@@ -322,6 +569,70 @@ const AnimatedStructure = memo(
 
 AnimatedStructure.displayName = "AnimatedStructure";
 
+// Camera Controller Component for smooth transitions
+interface CameraControllerProps {
+	viewMode: "scene" | "box";
+	isTransitioning: boolean;
+	setIsTransitioning: (value: boolean) => void;
+	focusedStructurePosition: [number, number, number];
+}
+
+const CameraController = memo(
+	({
+		viewMode,
+		isTransitioning,
+		setIsTransitioning,
+		focusedStructurePosition,
+	}: CameraControllerProps) => {
+		const { camera } = useThree();
+		const scenePosition = useRef(new THREE.Vector3(0, 0, 60));
+		const boxPosition = useRef(
+			new THREE.Vector3(
+				focusedStructurePosition[0] + 15,
+				focusedStructurePosition[1] + 10,
+				focusedStructurePosition[2] + 15,
+			),
+		);
+		const targetLookAt = useRef(new THREE.Vector3(...focusedStructurePosition));
+
+		// Update box position when focused structure changes
+		useFrame(() => {
+			if (viewMode === "box") {
+				boxPosition.current.set(
+					focusedStructurePosition[0] + 15,
+					focusedStructurePosition[1] + 10,
+					focusedStructurePosition[2] + 15,
+				);
+				targetLookAt.current.set(...focusedStructurePosition);
+			}
+
+			if (isTransitioning) {
+				const lerpFactor = 0.1;
+				const targetPos =
+					viewMode === "scene" ? scenePosition.current : boxPosition.current;
+				const lookAtPos =
+					viewMode === "scene"
+						? new THREE.Vector3(0, 0, 0)
+						: targetLookAt.current;
+
+				camera.position.lerp(targetPos, lerpFactor);
+				camera.lookAt(lookAtPos);
+
+				// Check if we're close enough to stop transitioning
+				const distance = camera.position.distanceTo(targetPos);
+				if (distance < 0.1) {
+					setIsTransitioning(false);
+					camera.position.copy(targetPos);
+				}
+			}
+		});
+
+		return null;
+	},
+);
+
+CameraController.displayName = "CameraController";
+
 // Circular arrangement of four box structures
 interface ResoBox3DCircularProps {
 	slice: BoxSlice;
@@ -334,42 +645,14 @@ export const ResoBox3DCircular = memo(
 		const containerRef = useRef<HTMLDivElement>(null);
 		const [focusedIndex, setFocusedIndex] = useState(0);
 		const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
-		const [boxRotation, setBoxRotation] = useState({ x: 0, y: 0, z: 0 });
+		const [isTransitioning, setIsTransitioning] = useState(false);
+		const [isTradingPanelOpen, setIsTradingPanelOpen] = useState(false);
 
 		const [savedCameraPosition, setSavedCameraPosition] = useState<
 			[number, number, number]
 		>([0, 0, 60]);
 
 		// Define the four cryptocurrency structures with individual animation states
-		const cryptoStructures = useMemo(
-			() => [
-				{
-					pair: "BTC",
-					name: "Bitcoin",
-					startOffset: 4,
-					speed: 0.8, // Slower than base
-				},
-				{
-					pair: "ETH",
-					name: "Ethereum",
-					startOffset: 20, // Different starting position
-					speed: 1.2, // Faster than base
-				},
-				{
-					pair: "SOL",
-					name: "Solana",
-					startOffset: 8, // Different starting position
-					speed: 0.6, // Much slower
-				},
-				{
-					pair: "ADA",
-					name: "Cardano",
-					startOffset: 40, // Different starting position
-					speed: 1.0, // Base speed
-				},
-			],
-			[],
-		);
 
 		// Individual animation states for each structure
 		const [structureSteps, setStructureSteps] = useState(() =>
@@ -389,7 +672,7 @@ export const ResoBox3DCircular = memo(
 			}, 800); // Slower interval (was 200ms in original)
 
 			return () => clearInterval(interval);
-		}, [cryptoStructures]);
+		}, []); // Remove cryptoStructures from dependency array
 
 		// Generate individual data slices for each structure
 		const structureSlices = useMemo(() => {
@@ -430,7 +713,7 @@ export const ResoBox3DCircular = memo(
 			});
 
 			return positions;
-		}, [focusedIndex, cryptoStructures]);
+		}, [focusedIndex]); // Remove cryptoStructures from dependency array
 
 		// Find which structure is actually closest to the front center (for UI display)
 		const actualFocusedIndex = useMemo(() => {
@@ -461,18 +744,17 @@ export const ResoBox3DCircular = memo(
 		};
 
 		const toggleViewMode = () => {
-			setViewMode((prev) => (prev === "scene" ? "box" : "scene"));
-			// Reset box rotation when switching modes
-			if (viewMode === "box") {
-				setBoxRotation({ x: 0, y: 0, z: 0 });
-			}
-		};
+			const newMode = viewMode === "scene" ? "box" : "scene";
+			setViewMode(newMode);
+			setIsTransitioning(true);
 
-		const rotateBox = (axis: "x" | "y" | "z", direction: 1 | -1) => {
-			setBoxRotation((prev) => ({
-				...prev,
-				[axis]: prev[axis] + (direction * Math.PI) / 4, // 45 degree increments
-			}));
+			// Handle panel state
+			if (newMode === "scene") {
+				setIsTradingPanelOpen(false);
+			} else {
+				// Open trading panel when entering box mode
+				setIsTradingPanelOpen(true);
+			}
 		};
 
 		if (!slice?.boxes || slice.boxes.length === 0) {
@@ -480,56 +762,41 @@ export const ResoBox3DCircular = memo(
 		}
 
 		return (
-			<div ref={containerRef} className={`relative h-full w-full ${className}`}>
+			<div
+				ref={containerRef}
+				className={`relative h-full w-full  ${className}`}
+			>
 				<Canvas
-					key={viewMode} // Force remount when switching modes to reset camera
 					camera={{
 						position: [0, 0, 60],
 						fov: 50,
 					}}
-					gl={{ antialias: true }}
-					shadows={{ enabled: true, type: THREE.PCFSoftShadowMap }}
+					resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
+					dpr={1}
 				>
 					<ambientLight intensity={1} />
-					<directionalLight
-						position={[10, 10, 100]}
-						intensity={1}
-						shadow-mapSize={[2048, 2048]}
-					/>
+					<directionalLight position={[10, 10, 100]} intensity={1} />
 
-					<OrbitControls
-						enabled={viewMode === "box"}
-						enableZoom={viewMode === "box"}
-						enablePan={viewMode === "box"}
-						enableRotate={viewMode === "box"}
-						maxDistance={30}
-						minDistance={5}
-						autoRotate={false}
-						target={
-							viewMode === "box"
-								? calculatePositions[actualFocusedIndex]?.position || [0, 0, 0]
-								: [0, 0, 0]
+					<CameraController
+						viewMode={viewMode}
+						isTransitioning={isTransitioning}
+						setIsTransitioning={setIsTransitioning}
+						focusedStructurePosition={
+							calculatePositions[actualFocusedIndex]?.position || [0, 0, 0]
 						}
 					/>
 
-					{/* Connecting lines between structures */}
-					{/* <group>
-						{calculatePositions.map((structure, index) => {
-							const nextIndex = (index + 1) % calculatePositions.length;
-							const nextStructure = calculatePositions[nextIndex];
-							return (
-								<Line
-									key={`line-${structure.pair}-${nextStructure.pair}`}
-									points={[structure.position, nextStructure.position]}
-									color="#24FF66"
-									lineWidth={1}
-									opacity={0.2}
-								/>
-							);
-						})}
-					</group> */}
+					<OrbitControls
+						enabled={viewMode === "box" && !isTransitioning}
+						enableRotate={viewMode === "box" && !isTransitioning}
+						maxDistance={40}
+						minDistance={5}
+						autoRotate={false}
+						target={
+							calculatePositions[actualFocusedIndex]?.position || [0, 0, 0]
+						}
+					/>
 
-					{/* Render structures with smooth animated positioning */}
 					{calculatePositions.map((structure, index) => {
 						const isFocused = index === focusedIndex;
 						const isActuallyFocused = index === actualFocusedIndex;
@@ -544,201 +811,71 @@ export const ResoBox3DCircular = memo(
 								structure={structure}
 								slice={structureSlices[index]}
 								boxColors={boxColors}
-								rotation={
-									viewMode === "box" && isActuallyFocused
-										? boxRotation
-										: undefined
-								}
+								rotation={undefined}
 								isFocused={isFocused}
 							/>
 						);
 					})}
-
-					{/* Central origin indicator for focused structure */}
-					<mesh position={[0, -8, 0]}>
-						<sphereGeometry args={[0.3]} />
-						<meshBasicMaterial color="#24FF66" opacity={0.4} transparent />
-					</mesh>
 				</Canvas>
 
 				{/* View Mode Toggle - Above bottom section */}
 				<div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-50">
-					<button
-						type="button"
-						onClick={toggleViewMode}
-						className={`px-6 py-3 bg-black/60 backdrop-blur-sm border-2 border-[#24FF66]/50 rounded-lg hover:bg-[#24FF66]/20 hover:border-[#24FF66] transition-all duration-300 text-base font-mono shadow-lg ${
-							viewMode === "box"
-								? "bg-[#24FF66]/30 border-[#24FF66] shadow-[0_0_20px_rgba(36,255,102,0.4)]"
-								: ""
-						}`}
-					>
-						<span className="text-[#24FF66] font-bold">
-							{viewMode === "scene" ? "🌐 SCENE MODE" : "📦 BOX MODE"}
-						</span>
-					</button>
+					<ModeToggle viewMode={viewMode} onToggle={toggleViewMode} />
 				</div>
 
 				{/* Navigation Controls */}
 				<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex items-center gap-4 z-30">
 					{viewMode === "scene" && (
 						<>
-							<button
-								type="button"
-								onClick={handlePrevious}
-								className="group flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full hover:bg-[#24FF66]/10 hover:border-[#24FF66]/60 transition-all duration-300"
+							<NavButton direction="left" onClick={handlePrevious} />
+							<StructureIndicator
+								structures={cryptoStructures}
+								activeIndex={actualFocusedIndex}
+								onSelect={setFocusedIndex}
+							/>
+							<NavButton direction="right" onClick={handleNext} />
+							<BaseButton
+								onClick={() => setIsTradingPanelOpen(true)}
+								variant="ghost"
+								size="md"
+								className="ml-4"
 							>
-								<svg
-									className="w-5 h-5 text-[#24FF66] group-hover:text-white transition-colors"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-label="Previous structure"
-								>
-									<title>Previous structure</title>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M15 19l-7-7 7-7"
-									/>
-								</svg>
-							</button>
-
-							{/* Current structure indicator */}
-							<div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full">
-								<span className="text-[#24FF66] font-mono text-sm font-bold">
-									{cryptoStructures[actualFocusedIndex].pair}
-								</span>
-								<span className="text-white/60 text-xs">
-									{cryptoStructures[actualFocusedIndex].name}
-								</span>
-							</div>
-
-							<button
-								type="button"
-								onClick={handleNext}
-								className="group flex items-center justify-center w-12 h-12 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full hover:bg-[#24FF66]/10 hover:border-[#24FF66]/60 transition-all duration-300"
-							>
-								<svg
-									className="w-5 h-5 text-[#24FF66] group-hover:text-white transition-colors"
-									fill="none"
-									stroke="currentColor"
-									viewBox="0 0 24 24"
-									aria-label="Next structure"
-								>
-									<title>Next structure</title>
-									<path
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth={2}
-										d="M9 5l7 7-7 7"
-									/>
-								</svg>
-							</button>
+								<LuInfo className="w-4 h-4" />
+							</BaseButton>
 						</>
 					)}
 
 					{/* Box Mode Controls */}
 					{viewMode === "box" && (
 						<div className="flex items-center gap-4">
-							{/* Rotation Controls */}
-							<div className="flex items-center gap-2 px-4 py-3 bg-black/60 backdrop-blur-sm border-2 border-[#24FF66]/50 rounded-lg shadow-lg">
-								<span className="text-[#24FF66] text-sm font-mono font-bold">
-									ROTATE BOX:
-								</span>
-
-								{/* X-axis */}
-								<div className="flex items-center gap-2">
-									<span className="text-white text-sm font-bold">X</span>
-									<button
-										type="button"
-										onClick={() => rotateBox("x", -1)}
-										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
-									>
-										-
-									</button>
-									<button
-										type="button"
-										onClick={() => rotateBox("x", 1)}
-										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
-									>
-										+
-									</button>
-								</div>
-
-								{/* Y-axis */}
-								<div className="flex items-center gap-2">
-									<span className="text-white text-sm font-bold">Y</span>
-									<button
-										type="button"
-										onClick={() => rotateBox("y", -1)}
-										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
-									>
-										-
-									</button>
-									<button
-										type="button"
-										onClick={() => rotateBox("y", 1)}
-										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
-									>
-										+
-									</button>
-								</div>
-
-								{/* Z-axis */}
-								<div className="flex items-center gap-2">
-									<span className="text-white text-sm font-bold">Z</span>
-									<button
-										type="button"
-										onClick={() => rotateBox("z", -1)}
-										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
-									>
-										-
-									</button>
-									<button
-										type="button"
-										onClick={() => rotateBox("z", 1)}
-										className="w-8 h-8 bg-black/60 border-2 border-[#24FF66]/50 rounded text-[#24FF66] text-sm font-bold hover:bg-[#24FF66]/20 hover:border-[#24FF66]"
-									>
-										+
-									</button>
-								</div>
-
-								{/* Reset */}
-								<button
-									type="button"
-									onClick={() => setBoxRotation({ x: 0, y: 0, z: 0 })}
-									className="px-4 py-2 bg-red-600/60 border-2 border-red-500/50 rounded text-white text-sm font-bold hover:bg-red-500/80 hover:border-red-400"
-								>
-									RESET
-								</button>
-							</div>
-
 							{/* Current structure in box mode */}
-							<div className="flex items-center gap-2 px-4 py-2 bg-black/40 backdrop-blur-sm border border-[#24FF66]/30 rounded-full">
-								<span className="text-[#24FF66] font-mono text-sm font-bold">
-									{cryptoStructures[actualFocusedIndex].pair}
-								</span>
-								<span className="text-white/60 text-xs">Box Mode</span>
-							</div>
+							<StructureIndicator
+								structures={cryptoStructures}
+								activeIndex={actualFocusedIndex}
+								onSelect={setFocusedIndex}
+							/>
+
+							{/* Trading Panel Toggle */}
+							<BaseButton
+								onClick={() => setIsTradingPanelOpen(!isTradingPanelOpen)}
+								variant={isTradingPanelOpen ? "primary" : "ghost"}
+								size="md"
+								className="ml-4"
+							>
+								<LuBarChart3 className="w-4 h-4" />
+							</BaseButton>
 						</div>
 					)}
 				</div>
-				{/* Structure indicators */}
-				<div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex gap-2 z-30">
-					{cryptoStructures.map((crypto, index) => (
-						<button
-							type="button"
-							key={crypto.pair}
-							onClick={() => setFocusedIndex(index)}
-							className={`w-2 h-2 rounded-full transition-all duration-300 ${
-								index === focusedIndex
-									? "bg-[#24FF66] shadow-[0_0_8px_rgba(36,255,102,0.6)]"
-									: "bg-white/20 hover:bg-white/40"
-							}`}
-						/>
-					))}
-				</div>
+
+				{/* Trading Info Side Panel */}
+				{/* <TradingInfoPanel
+					isOpen={isTradingPanelOpen}
+					onClose={() => setIsTradingPanelOpen(false)}
+					tradingData={
+						mockTradingData[cryptoStructures[actualFocusedIndex].pair]
+					}
+				/> */}
 			</div>
 		);
 	},
