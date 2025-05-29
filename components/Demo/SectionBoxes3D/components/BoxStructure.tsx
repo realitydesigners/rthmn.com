@@ -1,16 +1,16 @@
-import { memo, useRef, useMemo } from "react";
-import { useFrame } from "@react-three/fiber";
-import { Edges } from "@react-three/drei";
-import * as THREE from "three";
-import type { BoxSlice } from "@/types/types";
 import type { BoxColors } from "@/stores/colorStore";
+import type { BoxSlice } from "@/types/types";
+import { Edges } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
+import { memo, useMemo, useRef } from "react";
+import * as THREE from "three";
 import {
+	type BoxDimensions,
+	easeInOutCubic,
+	generateScatteredPosition,
 	getBoxDimensions,
 	getCornerPosition,
 	lerp,
-	easeInOutCubic,
-	generateScatteredPosition,
-	type BoxDimensions,
 } from "../utils/mathUtils";
 
 export const BoxStructure = memo(

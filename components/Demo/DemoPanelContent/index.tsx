@@ -2,14 +2,14 @@
 
 import { memo } from "react";
 import {
-	LuTrendingUp,
-	LuTrendingDown,
 	LuActivity,
 	LuBarChart3,
+	LuBell,
 	LuPieChart,
 	LuSettings,
+	LuTrendingDown,
+	LuTrendingUp,
 	LuUser,
-	LuBell,
 } from "react-icons/lu";
 
 // Demo Instruments Panel Content

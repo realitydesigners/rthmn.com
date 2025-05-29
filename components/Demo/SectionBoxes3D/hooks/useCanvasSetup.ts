@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const useCanvasSetup = () => {
 	const [isClient, setIsClient] = useState(false);

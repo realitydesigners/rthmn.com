@@ -1,4 +1,4 @@
-import { Kode_Mono, Russo_One, Oxanium, Outfit } from "next/font/google";
+import { Kode_Mono, Outfit, Oxanium, Russo_One } from "next/font/google";
 
 export const oxanium = Oxanium({
 	subsets: ["latin"],

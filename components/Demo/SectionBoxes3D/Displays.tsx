@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { LuOrbit, LuBox, LuChevronRight, LuChevronLeft } from "react-icons/lu";
+import { LuBox, LuChevronLeft, LuChevronRight, LuOrbit } from "react-icons/lu";
 
 // Enhanced Mode Toggle Component
 interface ModeToggleProps {

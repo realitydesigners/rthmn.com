@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import { memo } from "react";
 import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
+import Image from "next/image";
+import { memo } from "react";
 import {
 	LuChevronRight,
 	LuHelpCircle,

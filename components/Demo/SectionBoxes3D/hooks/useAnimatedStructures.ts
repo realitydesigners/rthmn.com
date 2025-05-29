@@ -1,10 +1,10 @@
-import { useState, useEffect, useMemo } from "react";
 import {
 	BASE_VALUES,
 	createDemoStep,
 	createMockBoxData,
 	sequences,
 } from "@/components/Constants/constants";
+import { useEffect, useMemo, useState } from "react";
 
 const cryptoStructures = [
 	{ pair: "ETH", name: "Ethereum", startOffset: 20, speed: 1.2 },

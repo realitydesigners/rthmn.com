@@ -1,7 +1,7 @@
-import { memo, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import * as THREE from "three";
 import type { MotionValue } from "framer-motion";
+import { memo, useEffect, useState } from "react";
+import * as THREE from "three";
 import { lerp } from "../utils/mathUtils";
 
 interface CameraControllerProps {

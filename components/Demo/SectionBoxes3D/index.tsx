@@ -1,29 +1,29 @@
 "use client";
 
-import { ResoBox3DCircular } from "@/components/Demo/ResoBox3DDemo";
-import { HeroText } from "./HeroText";
-import type { BoxSlice } from "@/types/types";
 import {
 	BASE_VALUES,
 	createDemoStep,
 	createMockBoxData,
 	sequences,
 } from "@/components/Constants/constants";
-import { motion, useScroll, useTransform } from "framer-motion";
-import type { MotionValue } from "framer-motion";
-import type React from "react";
-import { memo, useMemo, useRef, useState, useEffect } from "react";
-import { DemoNavbar } from "@/components/Navbars/DemoNavbar";
 import { DemoSidebarLeft } from "@/components/Demo/DemoSidebarLeft";
 import { DemoSidebarRight } from "@/components/Demo/DemoSidebarRight";
-import { TradingAdvantage } from "./TradingAdvantage";
-import { StructureIndicator, NavButton, BaseButton } from "./Displays";
-import { LuBarChart3, LuLayoutDashboard, LuTrendingUp } from "react-icons/lu";
-import { useAnimatedStructures } from "./hooks/useAnimatedStructures";
+import { ResoBox3DCircular } from "@/components/Demo/ResoBox3DDemo";
 import {
 	TradingInfoPanel,
 	mockTradingData,
 } from "@/components/Demo/TradingPanel";
+import { DemoNavbar } from "@/components/Navbars/DemoNavbar";
+import type { BoxSlice } from "@/types/types";
+import { motion, useScroll, useTransform } from "framer-motion";
+import type { MotionValue } from "framer-motion";
+import type React from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { LuBarChart3, LuLayoutDashboard, LuTrendingUp } from "react-icons/lu";
+import { BaseButton, NavButton, StructureIndicator } from "./Displays";
+import { HeroText } from "./HeroText";
+import { TradingAdvantage } from "./TradingAdvantage";
+import { useAnimatedStructures } from "./hooks/useAnimatedStructures";
 
 type CryptoStructure = {
 	pair: string;

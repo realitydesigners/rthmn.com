@@ -2,11 +2,11 @@
 
 import { memo } from "react";
 import {
-	LuTrendingUp,
-	LuTrendingDown,
 	LuActivity,
 	LuBarChart3,
 	LuClock,
+	LuTrendingDown,
+	LuTrendingUp,
 	LuX,
 } from "react-icons/lu";
 

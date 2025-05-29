@@ -1,11 +1,11 @@
 "use client";
 
-import { memo, useState, useEffect } from "react";
+import { DemoSettingsPanel } from "@/components/Demo/DemoPanelContent";
+import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
 import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
+import { memo, useEffect, useState } from "react";
 import { LuGraduationCap, LuSettings, LuUser } from "react-icons/lu";
-import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
-import { DemoSettingsPanel } from "@/components/Demo/DemoPanelContent";
 
 interface DemoSidebarRightProps {
 	x?: MotionValue<number>;

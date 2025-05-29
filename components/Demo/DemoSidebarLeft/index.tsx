@@ -1,20 +1,20 @@
 "use client";
 
-import { memo, useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import type { MotionValue } from "framer-motion";
 import {
-	LuLineChart,
-	LuLayoutGrid,
-	LuTrendingUp,
-	LuBarChart3,
-} from "react-icons/lu";
-import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
-import {
+	DemoAnalyticsPanel,
 	DemoInstrumentsPanel,
 	DemoVisualizerPanel,
-	DemoAnalyticsPanel,
 } from "@/components/Demo/DemoPanelContent";
+import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
+import { motion } from "framer-motion";
+import type { MotionValue } from "framer-motion";
+import { memo, useEffect, useState } from "react";
+import {
+	LuBarChart3,
+	LuLayoutGrid,
+	LuLineChart,
+	LuTrendingUp,
+} from "react-icons/lu";
 
 interface DemoSidebarLeftProps {
 	x?: MotionValue<number>;

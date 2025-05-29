@@ -1,23 +1,23 @@
 "use client";
 
-import {
-	motion,
-	useScroll,
-	useTransform,
-	Reorder,
-	useDragControls,
-} from "framer-motion";
-import { memo, useRef, useState, useMemo, useCallback, useEffect } from "react";
-import { FaSearch, FaTimes, FaStar } from "react-icons/fa";
 import { cn } from "@/utils/cn";
 import {
-	INSTRUMENTS,
-	FOREX_PAIRS,
 	CRYPTO_PAIRS,
 	EQUITY_PAIRS,
 	ETF_PAIRS,
+	FOREX_PAIRS,
+	INSTRUMENTS,
 	formatPrice,
 } from "@/utils/instruments";
+import {
+	Reorder,
+	motion,
+	useDragControls,
+	useScroll,
+	useTransform,
+} from "framer-motion";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FaSearch, FaStar, FaTimes } from "react-icons/fa";
 
 // Generate realistic mock prices for demo
 const generateMockPrice = (pair: string): { price: number; change: number } => {

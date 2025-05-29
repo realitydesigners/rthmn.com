@@ -1,6 +1,6 @@
 import { NavbarSignedOut } from "@/components/Navbars/NavbarSignedOut";
 import { SectionFooter } from "@/components/Sections/SectionFooter";
-import { kodemono, russo, oxanium, outfit } from "@/lib/styles/fonts";
+import { kodemono, outfit, oxanium, russo } from "@/lib/styles/fonts";
 import { createClient } from "@/lib/supabase/server";
 import { QueryProvider } from "@/providers/QueryProvider";
 import SupabaseProvider from "@/providers/SupabaseProvider";

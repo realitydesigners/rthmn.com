@@ -1,19 +1,19 @@
 "use client";
 
-import React from "react";
 import type { BoxSlice } from "@/types/types";
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
-import { memo, useMemo, useState, useEffect } from "react";
 import type { MotionValue } from "framer-motion";
+import React from "react";
+import { memo, useEffect, useMemo, useState } from "react";
+import { BoxStructure } from "./SectionBoxes3D/components/BoxStructure";
+import { CameraController } from "./SectionBoxes3D/components/CameraController";
+import { useAnimatedStructures } from "./SectionBoxes3D/hooks/useAnimatedStructures";
+import { useCanvasSetup } from "./SectionBoxes3D/hooks/useCanvasSetup";
 import {
 	calculateCircularPosition,
 	generateScatteredPosition,
 } from "./SectionBoxes3D/utils/mathUtils";
-import { useCanvasSetup } from "./SectionBoxes3D/hooks/useCanvasSetup";
-import { useAnimatedStructures } from "./SectionBoxes3D/hooks/useAnimatedStructures";
-import { BoxStructure } from "./SectionBoxes3D/components/BoxStructure";
-import { CameraController } from "./SectionBoxes3D/components/CameraController";
 
 export const ResoBox3DCircular = memo(
 	({
