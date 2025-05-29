@@ -18,6 +18,7 @@ import {
 } from "./SectionBoxes3D/Displays";
 import * as THREE from "three";
 import { LuBarChart3, LuLayoutDashboard } from "react-icons/lu";
+import type { MotionValue } from "framer-motion";
 
 const cryptoStructures = [
 	{ pair: "ETH", name: "Ethereum", startOffset: 20, speed: 1.2 },
@@ -343,7 +344,47 @@ const AnimatedStructure = memo(
 	},
 );
 
-// Unified Camera Controller
+// Custom hook to handle client-side mounting and canvas sizing
+const useCanvasResize = () => {
+	const [isClient, setIsClient] = useState(false);
+	const [canvasDimensions, setCanvasDimensions] = useState({
+		width: 0,
+		height: 0,
+	});
+
+	useEffect(() => {
+		setIsClient(true);
+
+		const updateDimensions = () => {
+			setCanvasDimensions({
+				width: window.innerWidth,
+				height: window.innerHeight,
+			});
+		};
+
+		// Initial size
+		updateDimensions();
+
+		// Listen for resize events
+		const handleResize = () => {
+			requestAnimationFrame(updateDimensions);
+		};
+
+		window.addEventListener("resize", handleResize, { passive: true });
+
+		// Force resize after a short delay to ensure proper initialization
+		const timeoutId = setTimeout(updateDimensions, 100);
+
+		return () => {
+			window.removeEventListener("resize", handleResize);
+			clearTimeout(timeoutId);
+		};
+	}, []);
+
+	return { isClient, canvasDimensions };
+};
+
+// Enhanced Camera Controller with proper initialization
 const CameraController = memo(
 	({
 		viewMode,
@@ -352,6 +393,8 @@ const CameraController = memo(
 		focusedPosition,
 		scrollProgress,
 		introMode,
+		isClient,
+		cameraDistance,
 	}: {
 		viewMode: "scene" | "box";
 		isTransitioning: boolean;
@@ -359,16 +402,81 @@ const CameraController = memo(
 		focusedPosition: [number, number, number];
 		scrollProgress: number;
 		introMode: boolean;
+		isClient: boolean;
+		cameraDistance?: MotionValue<number>;
 	}) => {
-		const { camera } = useThree();
+		const { camera, gl } = useThree();
+		const [isInitialized, setIsInitialized] = useState(false);
+		const [currentCameraDistance, setCurrentCameraDistance] = useState(() => {
+			// Get initial camera distance immediately to avoid zoom animation on refresh
+			return cameraDistance ? cameraDistance.get() : 1;
+		});
+
+		// Subscribe to cameraDistance changes
+		useEffect(() => {
+			if (!cameraDistance) return;
+
+			// Set initial value immediately
+			setCurrentCameraDistance(cameraDistance.get());
+
+			const unsubscribe = cameraDistance.onChange((value) => {
+				setCurrentCameraDistance(value);
+			});
+
+			return unsubscribe;
+		}, [cameraDistance]);
+
+		// Force canvas resize on initialization
+		useEffect(() => {
+			if (isClient && !isInitialized) {
+				const canvas = gl.domElement;
+
+				// Ensure canvas takes full viewport size
+				canvas.style.position = "absolute";
+				canvas.style.top = "0";
+				canvas.style.left = "0";
+				canvas.style.width = "100vw";
+				canvas.style.height = "100vh";
+
+				// Force WebGL resize
+				gl.setSize(window.innerWidth, window.innerHeight);
+
+				// Update camera aspect ratio
+				if (camera instanceof THREE.PerspectiveCamera) {
+					camera.aspect = window.innerWidth / window.innerHeight;
+					camera.updateProjectionMatrix();
+				}
+
+				// Set initial camera position based on current scroll state
+				if (cameraDistance && scrollProgress >= 0.25) {
+					const baseDistance = 70;
+					const initialDistance = baseDistance / currentCameraDistance;
+					camera.position.setZ(initialDistance);
+				}
+
+				setIsInitialized(true);
+			}
+		}, [
+			isClient,
+			gl,
+			camera,
+			isInitialized,
+			cameraDistance,
+			scrollProgress,
+			currentCameraDistance,
+		]);
 
 		useFrame(() => {
-			// Handle scroll-based camera movement during intro
-			if (scrollProgress >= 0.25) {
-				const progress = Math.min(1, (scrollProgress - 0.25) / 0.1);
-				const easedProgress = easeInOutCubic(progress);
-				const distance = 70 / (1 + easedProgress * 0);
-				camera.position.setZ(distance);
+			if (!isClient || !isInitialized) return;
+
+			// Use cameraDistance for smooth zooming instead of scroll-based movement
+			if (cameraDistance && scrollProgress >= 0.25) {
+				// Convert scale (0.8-1.0) to camera distance (70-87.5)
+				// When scale is 1.0 (no scaling), camera should be at 70
+				// When scale is 0.8 (20% smaller), camera should be further (87.5)
+				const baseDistance = 70;
+				const targetDistance = baseDistance / currentCameraDistance;
+				camera.position.setZ(targetDistance);
 			}
 
 			// Handle view mode transitions
@@ -406,25 +514,26 @@ CameraController.displayName = "CameraController";
 interface ResoBox3DCircularProps {
 	slice: BoxSlice;
 	className?: string;
-
 	onDominantStateChange?: (dominantState: string) => void;
 	onCurrentSliceChange?: (slice: BoxSlice) => void; // New prop to expose current focused slice
 	introMode?: boolean; // New prop to enable intro scattered state
 	formationProgress?: number; // Progress from 0 (scattered) to 1 (formed)
 	scrollProgress?: number; // New prop for scroll-based camera movement
+	cameraDistance?: MotionValue<number>; // MotionValue for camera distance based on scroll
 }
 
 export const ResoBox3DCircular = memo(
 	({
 		slice,
 		className = "",
-
 		onDominantStateChange,
 		onCurrentSliceChange,
 		introMode = false,
 		formationProgress = 1,
 		scrollProgress = 0,
+		cameraDistance,
 	}: ResoBox3DCircularProps) => {
+		const { isClient, canvasDimensions } = useCanvasResize();
 		const [focusedIndex, setFocusedIndex] = useState(0);
 		const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
 		const [isTransitioning, setIsTransitioning] = useState(false);
@@ -545,14 +654,46 @@ export const ResoBox3DCircular = memo(
 				),
 		};
 
+		// Don't render until client-side and dimensions are available
+		if (
+			!isClient ||
+			canvasDimensions.width === 0 ||
+			canvasDimensions.height === 0
+		) {
+			return (
+				<div className={`relative h-full w-full bg-black ${className}`}>
+					<div className="absolute inset-0 flex items-center justify-center">
+						<div className="animate-pulse text-white/50">Loading...</div>
+					</div>
+				</div>
+			);
+		}
+
 		if (!slice?.boxes?.length) return null;
 
 		return (
-			<div className={`relative h-full w-full bg-black  ${className}`}>
+			<div className={`relative h-full w-full bg-red-200 ${className}`}>
 				<Canvas
 					camera={{ position: [0, 0, 70], fov: 50 }}
-					resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
-					className="absolute inset-0 w-screen h-screen z-0"
+					resize={{
+						scroll: true,
+						debounce: { scroll: 0, resize: 0 },
+					}}
+					style={{
+						position: "absolute",
+						top: 0,
+						left: 0,
+						width: "100vw",
+						height: "100vh",
+						zIndex: 0,
+					}}
+					className="absolute inset-0"
+					dpr={[1, 2]} // Optimize for performance
+					gl={{
+						antialias: true,
+						alpha: true,
+						preserveDrawingBuffer: false,
+					}}
 				>
 					<ambientLight intensity={2} />
 					<directionalLight position={[0, 60, 180]} intensity={1} />
@@ -566,6 +707,8 @@ export const ResoBox3DCircular = memo(
 						}
 						scrollProgress={scrollProgress}
 						introMode={introMode}
+						isClient={isClient}
+						cameraDistance={cameraDistance}
 					/>
 
 					<OrbitControls

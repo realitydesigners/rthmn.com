@@ -42,7 +42,7 @@ const Screen = memo(
 				style={{
 					scale,
 				}}
-				className="relative w-full h-full"
+				className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-20"
 			>
 				{/* Animated border that appears when UI is loaded */}
 				<motion.div
@@ -82,21 +82,6 @@ export const SectionBoxes3D = memo(() => {
 	// Use the current slice from ResoBox3DCircular if available, otherwise use initial
 	const structureSlice = currentStructureSlice || initialStructureSlice;
 
-	// Custom box colors for 3D visualization
-	const boxColors = {
-		positive: "#24FF66", // Matrix green
-		negative: "#303238", // Dark gray
-		styles: {
-			borderRadius: 4,
-			shadowIntensity: 0.4,
-			opacity: 0.9,
-			showBorder: true,
-			globalTimeframeControl: false,
-			showLineChart: false,
-			viewMode: "3d" as const,
-		},
-	};
-
 	// Intro sequence timing - Made much snappier:
 	// 0-0.05: Scattered boxes with text
 	// 0.05-0.25: Formation animation (faster)
@@ -108,9 +93,18 @@ export const SectionBoxes3D = memo(() => {
 	);
 
 	// Formation progress for the intro animation
-	const [currentScrollProgress, setCurrentScrollProgress] = useState(0);
+	const [currentScrollProgress, setCurrentScrollProgress] = useState(() => {
+		// Get initial scroll progress immediately to avoid intro animation on refresh
+		if (typeof window !== "undefined") {
+			return scrollYProgress.get();
+		}
+		return 0;
+	});
 
 	useEffect(() => {
+		// Set initial scroll progress immediately on mount
+		setCurrentScrollProgress(scrollYProgress.get());
+
 		const unsubscribe = scrollYProgress.onChange((value) => {
 			setCurrentScrollProgress(value);
 		});
@@ -157,26 +151,43 @@ export const SectionBoxes3D = memo(() => {
 					{/* Hero Text */}
 					<HeroText opacity={introTextOpacity} />
 
-					{/* Single continuous experience with Screen wrapper */}
+					{/* 3D Canvas - Always full screen, no scaling */}
+					{structureSlice && structureSlice.boxes.length > 0 && (
+						<ResoBox3DCircular
+							slice={structureSlice}
+							className="h-full w-full absolute inset-0 z-0"
+							onDominantStateChange={setDominantState}
+							onCurrentSliceChange={setCurrentStructureSlice}
+							introMode={formationProgress < 1}
+							formationProgress={formationProgress}
+							scrollProgress={currentScrollProgress}
+							cameraDistance={scale} // Pass scale as camera distance
+						/>
+					)}
+
+					{/* UI Elements with Screen wrapper for scaling - Overlay on top */}
 					<Screen
 						scale={scale}
 						scrollYProgress={scrollYProgress}
 						showScreen={true}
 					>
-						<DemoNavbar y={navbarY} opacity={navbarOpacity} />
-						<DemoSidebarLeft x={leftSidebarX} opacity={leftSidebarOpacity} />
-						<DemoSidebarRight x={rightSidebarX} opacity={rightSidebarOpacity} />
-						{structureSlice && structureSlice.boxes.length > 0 && (
-							<ResoBox3DCircular
-								slice={structureSlice}
-								className="h-full w-full absolute"
-								onDominantStateChange={setDominantState}
-								onCurrentSliceChange={setCurrentStructureSlice}
-								introMode={formationProgress < 1}
-								formationProgress={formationProgress}
-								scrollProgress={currentScrollProgress}
-							/>
-						)}
+						<div className="absolute inset-0 z-10">
+							<div className="pointer-events-auto">
+								<DemoNavbar y={navbarY} opacity={navbarOpacity} />
+							</div>
+							<div className="pointer-events-auto">
+								<DemoSidebarLeft
+									x={leftSidebarX}
+									opacity={leftSidebarOpacity}
+								/>
+							</div>
+							<div className="pointer-events-auto">
+								<DemoSidebarRight
+									x={rightSidebarX}
+									opacity={rightSidebarOpacity}
+								/>
+							</div>
+						</div>
 					</Screen>
 				</div>
 			</div>
