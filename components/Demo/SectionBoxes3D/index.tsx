@@ -17,17 +17,27 @@ import { DemoNavbar } from "@/components/Navbars/DemoNavbar";
 import { DemoSidebarLeft } from "@/components/Demo/DemoSidebarLeft";
 import { DemoSidebarRight } from "@/components/Demo/DemoSidebarRight";
 import { TradingAdvantage } from "./TradingAdvantage";
+import { StructureIndicator, NavButton, BaseButton } from "./Displays";
+import { LuBarChart3, LuLayoutDashboard } from "react-icons/lu";
+import { useAnimatedStructures } from "./hooks/useAnimatedStructures";
 
 interface ScreenProps {
 	scale: MotionValue<number>;
 	scrollYProgress: MotionValue<number>;
 	children: React.ReactNode;
 	showScreen: boolean;
+	focusedIndex: number;
 }
 
 // Screen component that wraps the entire demo with animated border and scaling
 const Screen = memo(
-	({ scale, scrollYProgress, children, showScreen }: ScreenProps) => {
+	({
+		scale,
+		scrollYProgress,
+		children,
+		showScreen,
+		focusedIndex,
+	}: ScreenProps) => {
 		// Border animation - appears after all UI elements are loaded
 		const borderOpacity = useTransform(
 			scrollYProgress,
@@ -42,7 +52,7 @@ const Screen = memo(
 				style={{
 					scale,
 				}}
-				className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-20"
+				className="absolute inset-0 w-full h-full  pointer-events-none z-20"
 			>
 				{/* Animated border that appears when UI is loaded */}
 				<motion.div
@@ -65,12 +75,17 @@ export const SectionBoxes3D = memo(() => {
 		offset: ["start start", "end start"],
 	});
 
-	// State to track the dominant state from the 3D visualization
-	const [dominantState, setDominantState] = useState("neutral");
-
 	// State to track the current structure slice from ResoBox3DCircular (first structure)
 	const [currentStructureSlice, setCurrentStructureSlice] =
 		useState<BoxSlice | null>(null);
+
+	// UI state for the 3D controls
+	const [focusedIndex, setFocusedIndex] = useState(0);
+	const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
+	const [isTradingPanelOpen, setIsTradingPanelOpen] = useState(false);
+
+	// Get crypto structures for UI
+	const { cryptoStructures } = useAnimatedStructures();
 
 	// Create initial structure slice for the intro (will be updated by ResoBox3DCircular)
 	const initialStructureSlice = useMemo(() => {
@@ -81,18 +96,6 @@ export const SectionBoxes3D = memo(() => {
 
 	// Use the current slice from ResoBox3DCircular if available, otherwise use initial
 	const structureSlice = currentStructureSlice || initialStructureSlice;
-
-	// Intro sequence timing - Made much snappier:
-	// 0-0.05: Scattered boxes with text
-	// 0.05-0.25: Formation animation (faster)
-	// 0.25+: UI elements start appearing
-	const introTextOpacity = useTransform(
-		scrollYProgress,
-		[0, 0.1, 0.25, 0.35],
-		[1, 1, 1, 0],
-	);
-
-	// Formation progress for the intro animation
 	const [currentScrollProgress, setCurrentScrollProgress] = useState(() => {
 		// Get initial scroll progress immediately to avoid intro animation on refresh
 		if (typeof window !== "undefined") {
@@ -115,92 +118,123 @@ export const SectionBoxes3D = memo(() => {
 		0,
 		Math.min(1, (currentScrollProgress - 0.1) / 0.2),
 	);
+	const introTextOpacity = useTransform(
+		scrollYProgress,
+		[0, 0.1, 0.25, 0.35],
+		[1, 1, 1, 0],
+	);
 
-	// Screen component animations (start after formation completes at 0.25)
-	// Scale animation happens in first part, then stays at final scale
 	const scale = useTransform(scrollYProgress, [0.25, 0.35], [1.0, 0.8]);
-	// Movement starts much earlier to avoid long dead zone
-	const containerY = useTransform(scrollYProgress, [0.6, 0.8], [0, -500]);
-
-	// UI element animations (start after formation completes at 0.25)
 	const leftSidebarX = useTransform(scrollYProgress, [0.25, 0.35], [-64, 0]);
-	const leftSidebarOpacity = useTransform(
-		scrollYProgress,
-		[0.25, 0.35],
-		[0, 1],
-	);
-
 	const rightSidebarX = useTransform(scrollYProgress, [0.25, 0.35], [64, 0]);
-	const rightSidebarOpacity = useTransform(
-		scrollYProgress,
-		[0.25, 0.35],
-		[0, 1],
-	);
-
+	const sidebarOpacity = useTransform(scrollYProgress, [0.25, 0.35], [0, 1]);
 	const navbarY = useTransform(scrollYProgress, [0.25, 0.35], [-56, 0]);
-	const navbarOpacity = useTransform(scrollYProgress, [0.25, 0.35], [0, 1]);
+
+	// Navigation functions for the UI controls
+	const navigation = {
+		next: () => setFocusedIndex((prev) => (prev + 1) % cryptoStructures.length),
+		previous: () =>
+			setFocusedIndex(
+				(prev) =>
+					(prev - 1 + cryptoStructures.length) % cryptoStructures.length,
+			),
+	};
 
 	return (
 		<div ref={containerRef} className="relative">
-			{/* Extended height for intro sequence and Screen interaction */}
 			<div className="h-[300vh] relative">
 				<div className="sticky top-0 h-screen w-full flex items-center justify-center relative">
-					{/* Aurora Background - always present */}
-					{/* <AuroraBackground dominantState={dominantState} /> */}
-
-					{/* Hero Text */}
 					<HeroText opacity={introTextOpacity} />
-
-					{/* 3D Canvas - Always full screen, no scaling */}
 					{structureSlice && structureSlice.boxes.length > 0 && (
 						<ResoBox3DCircular
 							slice={structureSlice}
 							className="h-full w-full absolute inset-0 z-0"
-							onDominantStateChange={setDominantState}
 							onCurrentSliceChange={setCurrentStructureSlice}
+							focusedIndex={focusedIndex}
 							introMode={formationProgress < 1}
 							formationProgress={formationProgress}
 							scrollProgress={currentScrollProgress}
-							cameraDistance={scale} // Pass scale as camera distance
+							cameraDistance={scale}
 						/>
 					)}
-
-					{/* UI Elements with Screen wrapper for scaling - Overlay on top */}
 					<Screen
 						scale={scale}
 						scrollYProgress={scrollYProgress}
 						showScreen={true}
+						focusedIndex={focusedIndex}
 					>
-						<div className="absolute inset-0 z-10">
-							<div className="pointer-events-auto">
-								<DemoNavbar y={navbarY} opacity={navbarOpacity} />
-							</div>
-							<div className="pointer-events-auto">
-								<DemoSidebarLeft
-									x={leftSidebarX}
-									opacity={leftSidebarOpacity}
-								/>
-							</div>
-							<div className="pointer-events-auto">
-								<DemoSidebarRight
-									x={rightSidebarX}
-									opacity={rightSidebarOpacity}
-								/>
-							</div>
-						</div>
+						<DemoNavbar y={navbarY} opacity={sidebarOpacity} />
+						<DemoSidebarLeft x={leftSidebarX} opacity={sidebarOpacity} />
+						<DemoSidebarRight x={rightSidebarX} opacity={sidebarOpacity} />
+
+						{/* UI Controls - only show when not in intro mode */}
+						{formationProgress >= 1 && (
+							<>
+								<div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
+									<StructureIndicator
+										structures={cryptoStructures}
+										activeIndex={focusedIndex}
+										onSelect={setFocusedIndex}
+									/>
+								</div>
+
+								<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
+									<div className="flex items-center gap-4">
+										{viewMode === "scene" && (
+											<div className="flex items-center gap-3 px-4 py-2 rounded-xl">
+												<div className="relative z-10 flex items-center gap-3">
+													<NavButton
+														direction="left"
+														onClick={navigation.previous}
+													/>
+													<NavButton
+														direction="right"
+														onClick={navigation.next}
+													/>
+												</div>
+											</div>
+										)}
+
+										{viewMode === "box" && (
+											<div className="flex items-center gap-3 px-4 py-2 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+												<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
+												<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+
+												<div className="relative z-10 flex items-center gap-3">
+													<span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
+														Focus Mode
+													</span>
+													<div className="w-px h-6 bg-gradient-to-b from-transparent via-[#32353C] to-transparent" />
+													<BaseButton
+														onClick={() =>
+															setIsTradingPanelOpen(!isTradingPanelOpen)
+														}
+														variant={
+															isTradingPanelOpen ? "primary" : "secondary"
+														}
+														size="md"
+														className="group"
+													>
+														<LuBarChart3 className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+													</BaseButton>
+													<BaseButton
+														variant="secondary"
+														size="md"
+														className="group"
+													>
+														<LuLayoutDashboard className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+													</BaseButton>
+												</div>
+											</div>
+										)}
+									</div>
+								</div>
+							</>
+						)}
 					</Screen>
 				</div>
 			</div>
-
-			{/* Movement Phase - Container moves up */}
-			<motion.div
-				style={{ y: containerY }}
-				className="relative"
-				transformTemplate={({ y }) => `translate3d(0, ${y}, 0)`}
-			>
-				{/* Trading Advantage Section */}
-				<TradingAdvantage />
-			</motion.div>
+			<TradingAdvantage />
 		</div>
 	);
 });

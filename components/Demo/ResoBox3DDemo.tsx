@@ -1,614 +1,79 @@
 "use client";
 
-import type { BoxColors } from "@/stores/colorStore";
-import type { Box, BoxSlice } from "@/types/types";
-import {
-	BASE_VALUES,
-	createDemoStep,
-	createMockBoxData,
-	sequences,
-} from "@/components/Constants/constants";
-import { Edges, OrbitControls } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { memo, useEffect, useMemo, useRef, useState } from "react";
-import {
-	StructureIndicator,
-	NavButton,
-	BaseButton,
-} from "./SectionBoxes3D/Displays";
-import * as THREE from "three";
-import { LuBarChart3, LuLayoutDashboard } from "react-icons/lu";
+import React from "react";
+import type { BoxSlice } from "@/types/types";
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { memo, useMemo, useState, useEffect } from "react";
 import type { MotionValue } from "framer-motion";
-
-const cryptoStructures = [
-	{ pair: "ETH", name: "Ethereum", startOffset: 20, speed: 1.2 },
-	{ pair: "BTC", name: "Bitcoin", startOffset: 4, speed: 0.8 },
-	{ pair: "SOL", name: "Solana", startOffset: 8, speed: 0.6 },
-	{ pair: "ADA", name: "Cardano", startOffset: 40, speed: 1.0 },
-];
-
-// Utility functions
-const easeInOutCubic = (t: number): number =>
-	t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
-
-const lerp = (start: number, end: number, factor: number) =>
-	start + (end - start) * factor;
-
-const calculateBoxScale = (index: number) => (1 / Math.sqrt(1.5)) ** index;
-
-interface BoxDimensions {
-	size: number;
-	scale: number;
-}
-
-const getBoxDimensions = (index: number, baseSize = 12): BoxDimensions => {
-	const scale = calculateBoxScale(index);
-	return { size: baseSize * scale, scale };
-};
-
-const getCornerPosition = (
-	current: BoxDimensions,
-	parent: BoxDimensions,
-	isUp: boolean,
-): [number, number, number] => {
-	const offset = (parent.size - current.size) / 2;
-	return [offset, isUp ? offset : -offset, offset];
-};
-
-// 3D Box Component with simplified animation and material
-const Box3D = memo(
-	({
-		box,
-
-		absolutePosition,
-		dimensions,
-		scatteredPosition,
-		formationProgress = 1,
-		animationDelay = 0,
-	}: {
-		box: Box;
-
-		absolutePosition: [number, number, number];
-		dimensions: BoxDimensions;
-		scatteredPosition?: [number, number, number];
-		formationProgress?: number;
-		animationDelay?: number;
-	}) => {
-		const groupRef = useRef<THREE.Group>(null);
-		const color = box.value > 0 ? boxColors.positive : boxColors.negative;
-
-		useFrame(() => {
-			if (!groupRef.current || !scatteredPosition) return;
-
-			const delayedProgress = Math.max(
-				0,
-				Math.min(
-					1,
-					(formationProgress - animationDelay) / (1 - animationDelay),
-				),
-			);
-			const easedProgress = easeInOutCubic(delayedProgress);
-
-			const pos = scatteredPosition.map((start, i) =>
-				lerp(start, absolutePosition[i], easedProgress),
-			);
-			groupRef.current.position.set(pos[0], pos[1], pos[2]);
-		});
-
-		return (
-			<group
-				ref={groupRef}
-				position={scatteredPosition ? [0, 0, 0] : absolutePosition}
-			>
-				<mesh scale={dimensions.size} castShadow receiveShadow>
-					<boxGeometry />
-					<meshPhysicalMaterial
-						color={color}
-						metalness={0.4}
-						roughness={0.1}
-						clearcoat={1}
-						clearcoatRoughness={0.1}
-						transmission={0.1}
-						thickness={0.5}
-						ior={1.5}
-						envMapIntensity={1.5}
-					/>
-					<Edges
-						threshold={15}
-						color={new THREE.Color(color).multiplyScalar(0.1)}
-					/>
-				</mesh>
-			</group>
-		);
-	},
-);
-
-// Box Structure Component - renders a complete nested box structure
-interface BoxStructureProps {
-	slice: BoxSlice;
-	boxColors: BoxColors;
-	pair: string;
-	centerPosition: [number, number, number];
-	scatteredPositions?: Map<number, [number, number, number]>;
-	formationProgress?: number;
-}
-
-const boxColors = {
-	positive: "#24FF66", // Matrix green
-	negative: "#303238", // Dark gray
-	styles: {
-		borderRadius: 4,
-		shadowIntensity: 0.4,
-		opacity: 0.9,
-		showBorder: true,
-		globalTimeframeControl: false,
-		showLineChart: false,
-		viewMode: "3d" as const,
-	},
-};
-
-const BoxStructure = memo(
-	({
-		slice,
-
-		pair,
-		centerPosition,
-		scatteredPositions,
-		formationProgress = 1,
-	}: BoxStructureProps) => {
-		// Prepare sorted boxes with original index
-		const sortedBoxes = useMemo(
-			() =>
-				slice.boxes
-					.map((box, i) => ({ ...box, originalIndex: i }))
-					.sort((a, b) => Math.abs(b.value) - Math.abs(a.value)),
-			[slice.boxes],
-		);
-
-		// Calculate all absolute positions and dimensions relative to center position
-		const calculatedPositionsAndDimensions = useMemo(() => {
-			const positions = new Map<
-				number,
-				{
-					absolutePosition: [number, number, number];
-					dimensions: BoxDimensions;
-				}
-			>();
-			const baseSize = 12;
-
-			sortedBoxes.forEach((box, index) => {
-				const currentDimensions = getBoxDimensions(index, baseSize);
-				let calculatedPosition: [number, number, number] = [0, 0, 0];
-				const currentSignPositive = box.value > 0;
-
-				if (index === 0) {
-					calculatedPosition = [...centerPosition];
-				} else {
-					const prevSortedBox = sortedBoxes[index - 1];
-					const prevSortedBoxData = positions.get(prevSortedBox.originalIndex);
-
-					if (prevSortedBoxData) {
-						const parentPosition = prevSortedBoxData.absolutePosition;
-						const parentDimensions = prevSortedBoxData.dimensions;
-						const prevSignPositive = prevSortedBox.value > 0;
-
-						const positionSignPositive =
-							currentSignPositive === prevSignPositive
-								? currentSignPositive
-								: prevSignPositive;
-
-						const [offsetX, offsetY, offsetZ] = getCornerPosition(
-							currentDimensions,
-							parentDimensions,
-							positionSignPositive,
-						);
-
-						const initialPosition: [number, number, number] = [
-							parentPosition[0] + offsetX,
-							parentPosition[1] + offsetY,
-							parentPosition[2] + offsetZ,
-						];
-
-						const epsilon = 0.005;
-						const offsetVector: [number, number, number] = [
-							offsetX,
-							offsetY,
-							offsetZ,
-						];
-						const magnitude = Math.sqrt(
-							offsetVector[0] ** 2 +
-								offsetVector[1] ** 2 +
-								offsetVector[2] ** 2,
-						);
-
-						if (magnitude > 0) {
-							const normalizedOffset: [number, number, number] = [
-								(offsetVector[0] / magnitude) * epsilon,
-								(offsetVector[1] / magnitude) * epsilon,
-								(offsetVector[2] / magnitude) * epsilon,
-							];
-							calculatedPosition = [
-								initialPosition[0] + normalizedOffset[0],
-								initialPosition[1] + normalizedOffset[1],
-								initialPosition[2] + normalizedOffset[2],
-							];
-						} else {
-							calculatedPosition = initialPosition;
-						}
-					} else {
-						console.warn(
-							"Could not find previous box data for positioning:",
-							prevSortedBox.originalIndex,
-						);
-						calculatedPosition = [...centerPosition];
-					}
-				}
-
-				positions.set(box.originalIndex, {
-					absolutePosition: calculatedPosition,
-					dimensions: currentDimensions,
-				});
-			});
-
-			return positions;
-		}, [sortedBoxes, centerPosition]);
-
-		// Custom box colors for 3D visualization
-
-		return (
-			<group>
-				{/* Render all boxes in this structure */}
-				{sortedBoxes.map((box, index) => {
-					const data = calculatedPositionsAndDimensions.get(box.originalIndex);
-					if (!data) return null;
-					const { absolutePosition, dimensions } = data;
-
-					// Get or generate scattered position if needed
-					let scatteredPos = scatteredPositions?.get(box.originalIndex);
-					if (!scatteredPos && scatteredPositions) {
-						scatteredPos = [
-							Math.random() * 60 + 30,
-							(Math.random() - 0.5) * 40,
-							(Math.random() - 0.5) * 60,
-						];
-						scatteredPositions.set(box.originalIndex, scatteredPos);
-					}
-
-					return (
-						<Box3D
-							key={`${pair}-${box.originalIndex}`}
-							box={box}
-							absolutePosition={absolutePosition}
-							dimensions={dimensions}
-							scatteredPosition={scatteredPos}
-							formationProgress={formationProgress}
-							animationDelay={index * 0.1}
-						/>
-					);
-				})}
-			</group>
-		);
-	},
-);
-
-BoxStructure.displayName = "BoxStructure";
-
-// Simplified Animated Structure Component
-const AnimatedStructure = memo(
-	({
-		structure,
-		slice,
-		isFocused,
-		scatteredPositions,
-		formationProgress = 1,
-	}: {
-		structure: {
-			position: [number, number, number];
-			scale: number;
-			opacity: number;
-			pair: string;
-		};
-		slice: BoxSlice;
-		isFocused?: boolean;
-		scatteredPositions?: Map<number, [number, number, number]>;
-		formationProgress?: number;
-	}) => {
-		const groupRef = useRef<THREE.Group>(null);
-
-		useFrame(() => {
-			if (!groupRef.current) return;
-
-			const { position, scale } = structure;
-			const current = groupRef.current;
-			const lerpFactor = 0.08;
-
-			// Animate position and scale
-			current.position.x = lerp(current.position.x, position[0], lerpFactor);
-			current.position.y = lerp(current.position.y, position[1], lerpFactor);
-			current.position.z = lerp(current.position.z, position[2], lerpFactor);
-			current.scale.setScalar(lerp(current.scale.x, scale, lerpFactor));
-		});
-
-		return (
-			<group ref={groupRef}>
-				<BoxStructure
-					slice={slice}
-					boxColors={boxColors}
-					pair={structure.pair}
-					centerPosition={[0, 0, 0]}
-					scatteredPositions={scatteredPositions}
-					formationProgress={formationProgress}
-				/>
-			</group>
-		);
-	},
-);
-
-// Custom hook to handle client-side mounting and canvas sizing
-const useCanvasResize = () => {
-	const [isClient, setIsClient] = useState(false);
-	const [canvasDimensions, setCanvasDimensions] = useState({
-		width: 0,
-		height: 0,
-	});
-
-	useEffect(() => {
-		setIsClient(true);
-
-		const updateDimensions = () => {
-			setCanvasDimensions({
-				width: window.innerWidth,
-				height: window.innerHeight,
-			});
-		};
-
-		// Initial size
-		updateDimensions();
-
-		// Listen for resize events
-		const handleResize = () => {
-			requestAnimationFrame(updateDimensions);
-		};
-
-		window.addEventListener("resize", handleResize, { passive: true });
-
-		// Force resize after a short delay to ensure proper initialization
-		const timeoutId = setTimeout(updateDimensions, 100);
-
-		return () => {
-			window.removeEventListener("resize", handleResize);
-			clearTimeout(timeoutId);
-		};
-	}, []);
-
-	return { isClient, canvasDimensions };
-};
-
-// Enhanced Camera Controller with proper initialization
-const CameraController = memo(
-	({
-		viewMode,
-		isTransitioning,
-		setIsTransitioning,
-		focusedPosition,
-		scrollProgress,
-		introMode,
-		isClient,
-		cameraDistance,
-	}: {
-		viewMode: "scene" | "box";
-		isTransitioning: boolean;
-		setIsTransitioning: (value: boolean) => void;
-		focusedPosition: [number, number, number];
-		scrollProgress: number;
-		introMode: boolean;
-		isClient: boolean;
-		cameraDistance?: MotionValue<number>;
-	}) => {
-		const { camera, gl } = useThree();
-		const [isInitialized, setIsInitialized] = useState(false);
-		const [currentCameraDistance, setCurrentCameraDistance] = useState(() => {
-			// Get initial camera distance immediately to avoid zoom animation on refresh
-			return cameraDistance ? cameraDistance.get() : 1;
-		});
-
-		// Subscribe to cameraDistance changes
-		useEffect(() => {
-			if (!cameraDistance) return;
-
-			// Set initial value immediately
-			setCurrentCameraDistance(cameraDistance.get());
-
-			const unsubscribe = cameraDistance.onChange((value) => {
-				setCurrentCameraDistance(value);
-			});
-
-			return unsubscribe;
-		}, [cameraDistance]);
-
-		// Force canvas resize on initialization
-		useEffect(() => {
-			if (isClient && !isInitialized) {
-				const canvas = gl.domElement;
-
-				// Ensure canvas takes full viewport size
-				canvas.style.position = "absolute";
-				canvas.style.top = "0";
-				canvas.style.left = "0";
-				canvas.style.width = "100vw";
-				canvas.style.height = "100vh";
-
-				// Force WebGL resize
-				gl.setSize(window.innerWidth, window.innerHeight);
-
-				// Update camera aspect ratio
-				if (camera instanceof THREE.PerspectiveCamera) {
-					camera.aspect = window.innerWidth / window.innerHeight;
-					camera.updateProjectionMatrix();
-				}
-
-				// Set initial camera position based on current scroll state
-				if (cameraDistance && scrollProgress >= 0.25) {
-					const baseDistance = 70;
-					const initialDistance = baseDistance / currentCameraDistance;
-					camera.position.setZ(initialDistance);
-				}
-
-				setIsInitialized(true);
-			}
-		}, [
-			isClient,
-			gl,
-			camera,
-			isInitialized,
-			cameraDistance,
-			scrollProgress,
-			currentCameraDistance,
-		]);
-
-		useFrame(() => {
-			if (!isClient || !isInitialized) return;
-
-			// Use cameraDistance for smooth zooming instead of scroll-based movement
-			if (cameraDistance && scrollProgress >= 0.25) {
-				// Convert scale (0.8-1.0) to camera distance (70-87.5)
-				// When scale is 1.0 (no scaling), camera should be at 70
-				// When scale is 0.8 (20% smaller), camera should be further (87.5)
-				const baseDistance = 70;
-				const targetDistance = baseDistance / currentCameraDistance;
-				camera.position.setZ(targetDistance);
-			}
-
-			// Handle view mode transitions
-			if (isTransitioning) {
-				const targetPos =
-					viewMode === "scene"
-						? new THREE.Vector3(0, 0, 70)
-						: new THREE.Vector3(
-								focusedPosition[0] + 15,
-								focusedPosition[1] + 10,
-								focusedPosition[2] + 15,
-							);
-				const lookAt =
-					viewMode === "scene"
-						? new THREE.Vector3(0, 0, 0)
-						: new THREE.Vector3(...focusedPosition);
-
-				camera.position.lerp(targetPos, 0.1);
-				camera.lookAt(lookAt);
-
-				if (camera.position.distanceTo(targetPos) < 0.1) {
-					setIsTransitioning(false);
-					camera.position.copy(targetPos);
-				}
-			}
-		});
-
-		return null;
-	},
-);
-
-CameraController.displayName = "CameraController";
-
-// Circular arrangement of four box structures
-interface ResoBox3DCircularProps {
-	slice: BoxSlice;
-	className?: string;
-	onDominantStateChange?: (dominantState: string) => void;
-	onCurrentSliceChange?: (slice: BoxSlice) => void; // New prop to expose current focused slice
-	introMode?: boolean; // New prop to enable intro scattered state
-	formationProgress?: number; // Progress from 0 (scattered) to 1 (formed)
-	scrollProgress?: number; // New prop for scroll-based camera movement
-	cameraDistance?: MotionValue<number>; // MotionValue for camera distance based on scroll
-}
+import {
+	calculateCircularPosition,
+	generateScatteredPosition,
+} from "./SectionBoxes3D/utils/mathUtils";
+import { useCanvasSetup } from "./SectionBoxes3D/hooks/useCanvasSetup";
+import { useAnimatedStructures } from "./SectionBoxes3D/hooks/useAnimatedStructures";
+import { BoxStructure } from "./SectionBoxes3D/components/BoxStructure";
+import { CameraController } from "./SectionBoxes3D/components/CameraController";
 
 export const ResoBox3DCircular = memo(
 	({
 		slice,
 		className = "",
-		onDominantStateChange,
 		onCurrentSliceChange,
+		focusedIndex: externalFocusedIndex,
 		introMode = false,
 		formationProgress = 1,
 		scrollProgress = 0,
 		cameraDistance,
-	}: ResoBox3DCircularProps) => {
-		const { isClient, canvasDimensions } = useCanvasResize();
-		const [focusedIndex, setFocusedIndex] = useState(0);
+	}: {
+		slice: BoxSlice;
+		className?: string;
+		onCurrentSliceChange?: (slice: BoxSlice) => void;
+		focusedIndex?: number;
+		introMode?: boolean;
+		formationProgress?: number;
+		scrollProgress?: number;
+		cameraDistance?: MotionValue<number>;
+	}) => {
+		const { isClient, canvasDimensions } = useCanvasSetup();
+		const { cryptoStructures, structureSlices } = useAnimatedStructures();
+		const [internalFocusedIndex, setInternalFocusedIndex] = useState(0);
+		const focusedIndex = externalFocusedIndex ?? internalFocusedIndex;
 		const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
 		const [isTransitioning, setIsTransitioning] = useState(false);
-		const [isTradingPanelOpen, setIsTradingPanelOpen] = useState(false);
-		const [structureSteps, setStructureSteps] = useState<number[]>(
-			cryptoStructures.map((crypto) => crypto.startOffset),
-		);
 
-		// Creative step animation - cycles through different market states
-		useEffect(() => {
-			const interval = setInterval(() => {
-				setStructureSteps((prevSteps) =>
-					prevSteps.map((step, index) => {
-						const crypto = cryptoStructures[index];
-						const increment = crypto.speed * 0.5; // Much slower base speed
-						return (step + increment) % sequences.length;
-					}),
-				);
-			}, 800); // Slower interval (was 200ms in original)
-
-			return () => clearInterval(interval);
-		}, []); // Remove cryptoStructures from dependency array
-
-		// Generate structure data - this changes with structureSteps to create the animation
-		const structureSlices = useMemo(() => {
-			return cryptoStructures.map((crypto, index) => {
-				const step = structureSteps[index];
-				const values = createDemoStep(Math.floor(step), sequences, BASE_VALUES);
-				return {
-					timestamp: new Date().toISOString(),
-					boxes: createMockBoxData(values),
-				};
-			});
-		}, [structureSteps]);
-
-		// Generate scattered positions - fixed for intro mode consistency
+		if (!slice?.boxes?.length) return null;
+		// Generate scattered positions for intro
 		const scatteredPositions = useMemo(() => {
 			if (!introMode) return undefined;
-
 			const positions = new Map<number, [number, number, number]>();
-			// Generate positions for more boxes to ensure all nested boxes get scattered
 			for (let i = 0; i < 12; i++) {
-				const scatteredPos: [number, number, number] = [
-					Math.random() * 60 + 30,
-					(Math.random() - 0.5) * 40,
-					(Math.random() - 0.5) * 60,
-				];
-				positions.set(i, scatteredPos);
+				positions.set(i, generateScatteredPosition());
 			}
 			return positions;
 		}, [introMode]);
 
-		// Calculate circular positions
+		// Calculate structure positions and properties
 		const structures = useMemo(
 			() =>
 				cryptoStructures.map((crypto, index) => {
-					const angle =
-						((index - focusedIndex) * Math.PI * 2) / cryptoStructures.length +
-						Math.PI / 2;
+					const position = calculateCircularPosition(
+						index,
+						focusedIndex,
+						cryptoStructures.length,
+					);
 					const isFocused = index === focusedIndex;
 					return {
 						...crypto,
-						position: [Math.cos(angle) * 35, 0, Math.sin(angle) * 35] as [
-							number,
-							number,
-							number,
-						],
+						position,
 						scale: isFocused ? 1.2 : 0.8,
 						opacity: isFocused ? 1 : 0.7,
 					};
 				}),
-			[focusedIndex],
+			[cryptoStructures, focusedIndex],
 		);
 
-		// Find actual focused structure (closest to front)
+		// Calculate focused structure and dominant state
 		const actualFocusedIndex = introMode
 			? 0
 			: structures.reduce((closest, struct, index) => {
@@ -622,78 +87,23 @@ export const ResoBox3DCircular = memo(
 						: closest;
 				}, 0);
 
-		// Calculate and emit dominant state - use animated data
 		const currentSlice = introMode
-			? structureSlices[0] // Use animated first structure data during intro
+			? structureSlices[0]
 			: structureSlices[actualFocusedIndex];
 
-		const dominantState = useMemo(() => {
-			if (!currentSlice?.boxes?.length) return "neutral";
-			const largest = currentSlice.boxes.reduce((max, box) =>
-				Math.abs(box.value) > Math.abs(max.value) ? box : max,
-			);
-			return largest.value > 0 ? "blue" : "red";
-		}, [currentSlice]);
-
-		useEffect(
-			() => onDominantStateChange?.(dominantState),
-			[dominantState, onDominantStateChange],
-		);
 		useEffect(
 			() => onCurrentSliceChange?.(currentSlice),
 			[currentSlice, onCurrentSliceChange],
 		);
 
-		const navigation = {
-			next: () =>
-				setFocusedIndex((prev) => (prev + 1) % cryptoStructures.length),
-			previous: () =>
-				setFocusedIndex(
-					(prev) =>
-						(prev - 1 + cryptoStructures.length) % cryptoStructures.length,
-				),
-		};
-
-		// Don't render until client-side and dimensions are available
-		if (
-			!isClient ||
-			canvasDimensions.width === 0 ||
-			canvasDimensions.height === 0
-		) {
-			return (
-				<div className={`relative h-full w-full bg-black ${className}`}>
-					<div className="absolute inset-0 flex items-center justify-center">
-						<div className="animate-pulse text-white/50">Loading...</div>
-					</div>
-				</div>
-			);
-		}
-
-		if (!slice?.boxes?.length) return null;
-
 		return (
-			<div className={`relative h-full w-full bg-red-200 ${className}`}>
+			<div className={`relative h-full w-full bg-black ${className}`}>
 				<Canvas
 					camera={{ position: [0, 0, 70], fov: 50 }}
-					resize={{
-						scroll: true,
-						debounce: { scroll: 0, resize: 0 },
-					}}
-					style={{
-						position: "absolute",
-						top: 0,
-						left: 0,
-						width: "100vw",
-						height: "100vh",
-						zIndex: 0,
-					}}
-					className="absolute inset-0"
-					dpr={[1, 2]} // Optimize for performance
-					gl={{
-						antialias: true,
-						alpha: true,
-						preserveDrawingBuffer: false,
-					}}
+					resize={{ scroll: true, debounce: { scroll: 0, resize: 0 } }}
+					className="absolute inset-0 z-0 left-0 top-0 w-[100vw] h-[100vh]"
+					dpr={[1, 2]}
+					gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
 				>
 					<ambientLight intensity={2} />
 					<directionalLight position={[0, 60, 180]} intensity={1} />
@@ -721,7 +131,6 @@ export const ResoBox3DCircular = memo(
 					/>
 
 					{structures.map((structure, index) => {
-						// Show only first structure during intro, or based on view mode
 						if (introMode && index !== 0) return null;
 						if (
 							!introMode &&
@@ -730,89 +139,28 @@ export const ResoBox3DCircular = memo(
 						)
 							return null;
 
-						// Use animated structure data instead of static slice
 						const currentSlice = structureSlices[index];
 
 						return (
-							<AnimatedStructure
+							<BoxStructure
 								key={structure.pair}
+								slice={currentSlice}
+								pair={structure.pair}
 								structure={
 									introMode
 										? {
-												...structure,
 												position: [0, 0, 40],
 												scale: 1.0,
 												opacity: 1.0,
 											}
 										: structure
 								}
-								slice={currentSlice} // This now changes with the animation!
-								isFocused={index === focusedIndex}
 								scatteredPositions={introMode ? scatteredPositions : undefined}
 								formationProgress={formationProgress}
 							/>
 						);
 					})}
 				</Canvas>
-
-				{/* Top Structure Indicator - hidden during intro */}
-				{!introMode && (
-					<div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50">
-						<StructureIndicator
-							structures={cryptoStructures}
-							activeIndex={focusedIndex}
-							onSelect={setFocusedIndex}
-						/>
-					</div>
-				)}
-
-				{/* Bottom Navigation Controls - hidden during intro */}
-				{!introMode && (
-					<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30">
-						<div className="flex items-center gap-4">
-							{viewMode === "scene" && (
-								<div className="flex items-center gap-3 px-4 py-2 rounded-xl ">
-									<div className="relative z-10 flex items-center gap-3">
-										<NavButton direction="left" onClick={navigation.previous} />
-										<NavButton direction="right" onClick={navigation.next} />
-									</div>
-								</div>
-							)}
-
-							{viewMode === "box" && (
-								<div className="flex items-center gap-3 px-4 py-2 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-									{/* Background glow */}
-									<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
-
-									{/* Top highlight */}
-									<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-
-									<div className="relative z-10 flex items-center gap-3">
-										<span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
-											Focus Mode
-										</span>
-
-										<div className="w-px h-6 bg-gradient-to-b from-transparent via-[#32353C] to-transparent" />
-
-										{/* Trading Panel Toggle */}
-										<BaseButton
-											onClick={() => setIsTradingPanelOpen(!isTradingPanelOpen)}
-											variant={isTradingPanelOpen ? "primary" : "secondary"}
-											size="md"
-											className="group"
-										>
-											<LuBarChart3 className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-										</BaseButton>
-
-										<BaseButton variant="secondary" size="md" className="group">
-											<LuLayoutDashboard className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-										</BaseButton>
-									</div>
-								</div>
-							)}
-						</div>
-					</div>
-				)}
 			</div>
 		);
 	},
