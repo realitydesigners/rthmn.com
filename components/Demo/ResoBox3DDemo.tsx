@@ -21,6 +21,7 @@ export const ResoBox3DCircular = memo(
 		className = "",
 		onCurrentSliceChange,
 		focusedIndex: externalFocusedIndex,
+		viewMode: externalViewMode,
 		introMode = false,
 		formationProgress = 1,
 		scrollProgress = 0,
@@ -30,6 +31,7 @@ export const ResoBox3DCircular = memo(
 		className?: string;
 		onCurrentSliceChange?: (slice: BoxSlice) => void;
 		focusedIndex?: number;
+		viewMode?: "scene" | "box";
 		introMode?: boolean;
 		formationProgress?: number;
 		scrollProgress?: number;
@@ -39,8 +41,10 @@ export const ResoBox3DCircular = memo(
 		const { cryptoStructures, structureSlices } = useAnimatedStructures();
 		const [internalFocusedIndex, setInternalFocusedIndex] = useState(0);
 		const focusedIndex = externalFocusedIndex ?? internalFocusedIndex;
-		const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
-		const [isTransitioning, setIsTransitioning] = useState(false);
+		const [internalViewMode, setInternalViewMode] = useState<"scene" | "box">(
+			"scene",
+		);
+		const viewMode = externalViewMode ?? internalViewMode;
 
 		if (!slice?.boxes?.length) return null;
 		// Generate scattered positions for intro
@@ -57,20 +61,35 @@ export const ResoBox3DCircular = memo(
 		const structures = useMemo(
 			() =>
 				cryptoStructures.map((crypto, index) => {
-					const position = calculateCircularPosition(
+					const basePosition = calculateCircularPosition(
 						index,
 						focusedIndex,
 						cryptoStructures.length,
 					);
 					const isFocused = index === focusedIndex;
+
+					// In box mode, bring the focused structure forward and rotate it
+					const position =
+						viewMode === "box" && isFocused
+							? ([
+									basePosition[0] * 0.3,
+									basePosition[1] * 0.3,
+									basePosition[2] * 0.3 + 20,
+								] as [number, number, number])
+							: basePosition;
+
 					return {
 						...crypto,
 						position,
 						scale: isFocused ? 1.2 : 0.8,
 						opacity: isFocused ? 1 : 0.7,
+						rotation:
+							viewMode === "box" && isFocused
+								? ([0.1, -0.75, 0] as [number, number, number])
+								: undefined,
 					};
 				}),
-			[cryptoStructures, focusedIndex],
+			[cryptoStructures, focusedIndex, viewMode],
 		);
 
 		// Calculate focused structure and dominant state
@@ -110,11 +129,6 @@ export const ResoBox3DCircular = memo(
 
 					<CameraController
 						viewMode={viewMode}
-						isTransitioning={isTransitioning}
-						setIsTransitioning={setIsTransitioning}
-						focusedPosition={
-							structures[actualFocusedIndex]?.position || [0, 0, 0]
-						}
 						scrollProgress={scrollProgress}
 						introMode={introMode}
 						isClient={isClient}
@@ -122,8 +136,8 @@ export const ResoBox3DCircular = memo(
 					/>
 
 					<OrbitControls
-						enabled={viewMode === "box" && !isTransitioning}
-						enableRotate={viewMode === "box" && !isTransitioning}
+						enabled={viewMode === "box"}
+						enableRotate={viewMode === "box"}
 						maxDistance={40}
 						minDistance={5}
 						autoRotate={false}
@@ -153,10 +167,16 @@ export const ResoBox3DCircular = memo(
 												scale: 1.0,
 												opacity: 1.0,
 											}
-										: structure
+										: {
+												position: structure.position,
+												scale: structure.scale,
+												opacity: structure.opacity,
+												rotation: structure.rotation,
+											}
 								}
 								scatteredPositions={introMode ? scatteredPositions : undefined}
 								formationProgress={formationProgress}
+								isFocused={index === focusedIndex}
 							/>
 						);
 					})}

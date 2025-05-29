@@ -18,8 +18,17 @@ import { DemoSidebarLeft } from "@/components/Demo/DemoSidebarLeft";
 import { DemoSidebarRight } from "@/components/Demo/DemoSidebarRight";
 import { TradingAdvantage } from "./TradingAdvantage";
 import { StructureIndicator, NavButton, BaseButton } from "./Displays";
-import { LuBarChart3, LuLayoutDashboard } from "react-icons/lu";
+import { LuBarChart3, LuLayoutDashboard, LuTrendingUp } from "react-icons/lu";
 import { useAnimatedStructures } from "./hooks/useAnimatedStructures";
+import {
+	TradingInfoPanel,
+	mockTradingData,
+} from "@/components/Demo/TradingPanel";
+
+type CryptoStructure = {
+	pair: string;
+	name: string;
+};
 
 interface ScreenProps {
 	scale: MotionValue<number>;
@@ -67,6 +76,103 @@ const Screen = memo(
 );
 
 Screen.displayName = "Screen";
+
+// DemoBottomNavbar component for the UI controls
+const DemoBottomNavbar = memo(
+	({
+		cryptoStructures,
+		focusedIndex,
+		setFocusedIndex,
+		viewMode,
+		setViewMode,
+		isTradingPanelOpen,
+		setIsTradingPanelOpen,
+		navigation,
+	}: {
+		cryptoStructures: CryptoStructure[];
+		focusedIndex: number;
+		setFocusedIndex: (index: number) => void;
+		viewMode: "scene" | "box";
+		setViewMode: (mode: "scene" | "box") => void;
+		isTradingPanelOpen: boolean;
+		setIsTradingPanelOpen: (open: boolean) => void;
+		navigation: {
+			next: () => void;
+			previous: () => void;
+		};
+	}) => (
+		<>
+			<div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
+				<StructureIndicator
+					structures={cryptoStructures}
+					activeIndex={focusedIndex}
+					onSelect={setFocusedIndex}
+				/>
+			</div>
+
+			<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
+				<div className="flex items-center gap-4">
+					{/* Always show navigation controls with mode toggle */}
+					<div className="flex items-center gap-3 px-4 py-2 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+						<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
+						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+
+						<div className="relative z-10 flex items-center gap-3">
+							{/* Scene navigation when in scene mode */}
+							{viewMode === "scene" && (
+								<>
+									<NavButton direction="left" onClick={navigation.previous} />
+									<NavButton direction="right" onClick={navigation.next} />
+									<div className="w-px h-6 bg-gradient-to-b from-transparent via-[#32353C] to-transparent" />
+								</>
+							)}
+
+							{/* Focus mode label when in box mode */}
+							{viewMode === "box" && (
+								<>
+									<span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
+										Focus Mode
+									</span>
+									<div className="w-px h-6 bg-gradient-to-b from-transparent via-[#32353C] to-transparent" />
+								</>
+							)}
+
+							{/* Mode toggle button */}
+							<BaseButton
+								onClick={() =>
+									setViewMode(viewMode === "scene" ? "box" : "scene")
+								}
+								variant={viewMode === "box" ? "primary" : "secondary"}
+								size="md"
+								className="group"
+							>
+								{viewMode === "scene" ? (
+									<LuLayoutDashboard className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+								) : (
+									<LuBarChart3 className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+								)}
+							</BaseButton>
+
+							{/* Trading panel toggle - only in box mode */}
+							{viewMode === "box" && (
+								<BaseButton
+									onClick={() => setIsTradingPanelOpen(!isTradingPanelOpen)}
+									variant={isTradingPanelOpen ? "primary" : "secondary"}
+									size="md"
+									className="group"
+								>
+									<LuTrendingUp className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
+								</BaseButton>
+							)}
+						</div>
+					</div>
+				</div>
+			</div>
+		</>
+	),
+);
+
+DemoBottomNavbar.displayName = "DemoBottomNavbar";
 
 export const SectionBoxes3D = memo(() => {
 	const containerRef = useRef<HTMLDivElement>(null);
@@ -151,6 +257,7 @@ export const SectionBoxes3D = memo(() => {
 							className="h-full w-full absolute inset-0 z-0"
 							onCurrentSliceChange={setCurrentStructureSlice}
 							focusedIndex={focusedIndex}
+							viewMode={viewMode}
 							introMode={formationProgress < 1}
 							formationProgress={formationProgress}
 							scrollProgress={currentScrollProgress}
@@ -170,65 +277,26 @@ export const SectionBoxes3D = memo(() => {
 						{/* UI Controls - only show when not in intro mode */}
 						{formationProgress >= 1 && (
 							<>
-								<div className="absolute top-20 left-1/2 transform -translate-x-1/2 z-50 pointer-events-auto">
-									<StructureIndicator
-										structures={cryptoStructures}
-										activeIndex={focusedIndex}
-										onSelect={setFocusedIndex}
-									/>
-								</div>
+								<DemoBottomNavbar
+									cryptoStructures={cryptoStructures}
+									focusedIndex={focusedIndex}
+									setFocusedIndex={setFocusedIndex}
+									viewMode={viewMode}
+									setViewMode={setViewMode}
+									isTradingPanelOpen={isTradingPanelOpen}
+									setIsTradingPanelOpen={setIsTradingPanelOpen}
+									navigation={navigation}
+								/>
 
-								<div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
-									<div className="flex items-center gap-4">
-										{viewMode === "scene" && (
-											<div className="flex items-center gap-3 px-4 py-2 rounded-xl">
-												<div className="relative z-10 flex items-center gap-3">
-													<NavButton
-														direction="left"
-														onClick={navigation.previous}
-													/>
-													<NavButton
-														direction="right"
-														onClick={navigation.next}
-													/>
-												</div>
-											</div>
-										)}
-
-										{viewMode === "box" && (
-											<div className="flex items-center gap-3 px-4 py-2 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-												<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
-												<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-
-												<div className="relative z-10 flex items-center gap-3">
-													<span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
-														Focus Mode
-													</span>
-													<div className="w-px h-6 bg-gradient-to-b from-transparent via-[#32353C] to-transparent" />
-													<BaseButton
-														onClick={() =>
-															setIsTradingPanelOpen(!isTradingPanelOpen)
-														}
-														variant={
-															isTradingPanelOpen ? "primary" : "secondary"
-														}
-														size="md"
-														className="group"
-													>
-														<LuBarChart3 className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-													</BaseButton>
-													<BaseButton
-														variant="secondary"
-														size="md"
-														className="group"
-													>
-														<LuLayoutDashboard className="w-4 h-4 transition-transform duration-300 group-hover:scale-110" />
-													</BaseButton>
-												</div>
-											</div>
-										)}
-									</div>
-								</div>
+								{/* Trading Info Panel */}
+								<TradingInfoPanel
+									isOpen={isTradingPanelOpen}
+									onClose={() => setIsTradingPanelOpen(false)}
+									tradingData={
+										mockTradingData[cryptoStructures[focusedIndex]?.pair] ||
+										mockTradingData.BTC
+									}
+								/>
 							</>
 						)}
 					</Screen>

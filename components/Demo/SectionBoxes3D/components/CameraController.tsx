@@ -6,9 +6,6 @@ import { lerp } from "../utils/mathUtils";
 
 interface CameraControllerProps {
 	viewMode: "scene" | "box";
-	isTransitioning: boolean;
-	setIsTransitioning: (value: boolean) => void;
-	focusedPosition: [number, number, number];
 	scrollProgress: number;
 	introMode: boolean;
 	isClient: boolean;
@@ -18,9 +15,6 @@ interface CameraControllerProps {
 export const CameraController = memo(
 	({
 		viewMode,
-		isTransitioning,
-		setIsTransitioning,
-		focusedPosition,
 		scrollProgress,
 		introMode,
 		isClient,
@@ -61,56 +55,20 @@ export const CameraController = memo(
 				camera.updateProjectionMatrix();
 			}
 
-			if (cameraDistance && scrollProgress >= 0.25) {
-				const baseDistance = 70;
-				const initialDistance = baseDistance / currentCameraDistance;
-				camera.position.setZ(initialDistance);
-			}
+			// Set initial camera position without conflicts
+			camera.position.set(0, 0, 70);
 
 			setIsInitialized(true);
-		}, [
-			isClient,
-			gl,
-			camera,
-			isInitialized,
-			cameraDistance,
-			scrollProgress,
-			currentCameraDistance,
-		]);
+		}, [isClient, gl, camera, isInitialized]);
 
 		useFrame(() => {
 			if (!isClient || !isInitialized) return;
 
-			// Handle camera distance for zooming
-			if (cameraDistance && scrollProgress >= 0.25) {
+			// Handle camera distance for zooming in scene mode
+			if (cameraDistance && scrollProgress >= 0.25 && viewMode === "scene") {
 				const baseDistance = 70;
 				const targetDistance = baseDistance / currentCameraDistance;
 				camera.position.setZ(targetDistance);
-			}
-
-			// Handle view mode transitions
-			if (isTransitioning) {
-				const targetPos =
-					viewMode === "scene"
-						? new THREE.Vector3(0, 0, 70)
-						: new THREE.Vector3(
-								focusedPosition[0] + 15,
-								focusedPosition[1] + 10,
-								focusedPosition[2] + 15,
-							);
-
-				const lookAt =
-					viewMode === "scene"
-						? new THREE.Vector3(0, 0, 0)
-						: new THREE.Vector3(...focusedPosition);
-
-				camera.position.lerp(targetPos, 0.1);
-				camera.lookAt(lookAt);
-
-				if (camera.position.distanceTo(targetPos) < 0.1) {
-					setIsTransitioning(false);
-					camera.position.copy(targetPos);
-				}
 			}
 		});
 

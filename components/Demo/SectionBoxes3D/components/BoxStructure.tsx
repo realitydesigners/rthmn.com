@@ -20,6 +20,7 @@ export const BoxStructure = memo(
 		structure,
 		scatteredPositions,
 		formationProgress = 1,
+		isFocused = false,
 	}: {
 		slice: BoxSlice;
 		pair: string;
@@ -27,9 +28,11 @@ export const BoxStructure = memo(
 			position: [number, number, number];
 			scale: number;
 			opacity: number;
+			rotation?: [number, number, number];
 		};
 		scatteredPositions?: Map<number, [number, number, number]>;
 		formationProgress?: number;
+		isFocused?: boolean;
 	}) => {
 		const groupRef = useRef<THREE.Group>(null);
 
@@ -64,7 +67,7 @@ export const BoxStructure = memo(
 								: prevBox.value > 0,
 						);
 
-						const epsilon = 0.005;
+						const epsilon = isFocused ? 0.005 : 0.01;
 						const magnitude = Math.sqrt(
 							offsetX ** 2 + offsetY ** 2 + offsetZ ** 2,
 						);
@@ -90,13 +93,13 @@ export const BoxStructure = memo(
 			});
 
 			return { sortedBoxes, positions };
-		}, [slice.boxes]);
+		}, [slice.boxes, isFocused]);
 
 		// Handle structure-level animation (position, scale)
 		useFrame(() => {
 			if (!groupRef.current) return;
 
-			const { position, scale } = structure;
+			const { position, scale, rotation } = structure;
 			const current = groupRef.current;
 			const lerpFactor = 0.08;
 
@@ -104,6 +107,18 @@ export const BoxStructure = memo(
 			current.position.y = lerp(current.position.y, position[1], lerpFactor);
 			current.position.z = lerp(current.position.z, position[2], lerpFactor);
 			current.scale.setScalar(lerp(current.scale.x, scale, lerpFactor));
+
+			// Apply rotation if provided
+			if (rotation) {
+				current.rotation.x = lerp(current.rotation.x, rotation[0], lerpFactor);
+				current.rotation.y = lerp(current.rotation.y, rotation[1], lerpFactor);
+				current.rotation.z = lerp(current.rotation.z, rotation[2], lerpFactor);
+			} else {
+				// Return to default rotation when not in box mode
+				current.rotation.x = lerp(current.rotation.x, 0, lerpFactor);
+				current.rotation.y = lerp(current.rotation.y, 0, lerpFactor);
+				current.rotation.z = lerp(current.rotation.z, 0, lerpFactor);
+			}
 		});
 
 		return (

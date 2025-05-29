@@ -171,57 +171,53 @@ export const TradingInfoPanel = memo(
 	({ isOpen, onClose, tradingData }: TradingInfoPanelProps) => (
 		<div
 			className={`
-		fixed top-0 right-0 h-[70vh] w-80 z-40 mr-4 transform transition-transform duration-300 ease-in-out mt-20
-		${isOpen ? "translate-x-0" : "translate-x-full"}
+		fixed top-20 right-20 h-[calc(100vh-8rem)] w-80 z-50 transition-all duration-300 ease-in-out
+		${isOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"}
 	`}
 		>
-			{/* Backdrop */}
-			{isOpen && (
-				<button
-					type="button"
-					className="fixed inset-0 bg-black/20 backdrop-blur-sm z-30 cursor-pointer"
-					onClick={onClose}
-					onKeyDown={(e) => e.key === "Escape" && onClose()}
-					aria-label="Close trading panel"
-				/>
-			)}
-
 			{/* Panel */}
-			<div className="relative h-full bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/92 backdrop-blur-xl border-l border-[#1C1E23]/60 shadow-[0_0_50px_rgba(0,0,0,0.8)] z-40 rounded-l-xl">
-				{/* Subtle radial glow */}
-				<div className="absolute inset-0 bg-[radial-gradient(circle_at_0%_50%,rgba(255,255,255,0.03),transparent_50%)] rounded-l-xl" />
+			<div className="relative h-full bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-xl border border-[#1C1E23]/40 shadow-[0_0_40px_rgba(0,0,0,0.6)] rounded-xl overflow-hidden">
+				{/* Subtle glow effect */}
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.02),transparent_50%)] rounded-xl" />
+
+				{/* Top border highlight */}
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
 
 				{/* Header */}
-				<div className="relative z-10 p-6 border-b border-[#1C1E23]/40">
-					<div className="flex items-center justify-between mb-4">
+				<div className="relative z-10 p-4 border-b border-[#1C1E23]/30">
+					<div className="flex items-center justify-between mb-3">
 						<div className="flex items-center gap-3">
-							<div className="w-8 h-8 rounded-full bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center">
-								<LuBarChart3 className="w-4 h-4 text-white" />
-							</div>
 							<div>
 								<h2 className="font-russo text-lg font-bold text-white">
-									{tradingData.pair}
-								</h2>
-								<p className="font-russo text-sm text-white/60">
 									{tradingData.name}
+								</h2>
+								<p className="font-russo text-xs text-white/50">
+									Live Market Data
 								</p>
 							</div>
 						</div>
-						<BaseButton onClick={onClose} variant="ghost" size="sm">
-							<LuX className="w-4 h-4" />
-						</BaseButton>
+						<div>
+							<BaseButton
+								onClick={onClose}
+								variant="ghost"
+								size="sm"
+								className="pointer-events-auto"
+							>
+								<LuX className="w-4 h-4" />
+							</BaseButton>
+						</div>
 					</div>
 
 					{/* Price and Change */}
-					<div className="flex items-center gap-4">
-						<span className="font-russo text-2xl font-bold text-white">
+					<div className="flex items-center justify-between">
+						<span className="font-russo text-xl font-bold text-white">
 							{tradingData.price}
 						</span>
 						<div
-							className={`flex items-center gap-1 px-2 py-1 rounded-full text-sm font-medium ${
+							className={`flex items-center gap-1 px-2 py-1 rounded-lg text-sm font-medium ${
 								tradingData.change24h > 0
-									? "bg-green-500/10 text-green-400"
-									: "bg-red-500/10 text-red-400"
+									? "bg-[#24FF66]/10 text-[#24FF66] border border-[#24FF66]/20"
+									: "bg-red-500/10 text-red-400 border border-red-500/20"
 							}`}
 						>
 							{tradingData.change24h > 0 ? (
@@ -235,92 +231,73 @@ export const TradingInfoPanel = memo(
 				</div>
 
 				{/* Content */}
-				<div className="relative z-10 p-6 space-y-6 overflow-y-auto h-[calc(100%-140px)]">
-					{/* Market Data */}
-					<div className="space-y-4">
-						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
-							Market Data
-						</h3>
-						<div className="grid grid-cols-2 gap-4">
-							<div className="space-y-1">
-								<p className="font-russo text-xs text-white/60">24h Volume</p>
-								<p className="font-russo text-sm font-medium text-white">
-									{tradingData.volume}
-								</p>
-							</div>
-							<div className="space-y-1">
-								<p className="font-russo text-xs text-white/60">Market Cap</p>
-								<p className="font-russo text-sm font-medium text-white">
-									{tradingData.marketCap}
-								</p>
-							</div>
-							<div className="space-y-1">
-								<p className="font-russo text-xs text-white/60">24h High</p>
-								<p className="font-russo text-sm font-medium text-green-400">
-									{tradingData.high24h}
-								</p>
-							</div>
-							<div className="space-y-1">
-								<p className="font-russo text-xs text-white/60">24h Low</p>
-								<p className="font-russo text-sm font-medium text-red-400">
-									{tradingData.low24h}
-								</p>
-							</div>
+				<div className="relative z-10 p-4 space-y-4 overflow-y-auto h-[calc(100%-140px)]">
+					{/* Market Overview */}
+					<div className="grid grid-cols-2 gap-3">
+						<div className="p-3 rounded-lg bg-gradient-to-br from-[#1C1E23]/40 to-[#0F1012]/20 border border-[#1C1E23]/30">
+							<p className="font-russo text-xs text-white/50 mb-1">
+								24h Volume
+							</p>
+							<p className="font-russo text-sm font-medium text-white">
+								{tradingData.volume}
+							</p>
+						</div>
+						<div className="p-3 rounded-lg bg-gradient-to-br from-[#1C1E23]/40 to-[#0F1012]/20 border border-[#1C1E23]/30">
+							<p className="font-russo text-xs text-white/50 mb-1">
+								Market Cap
+							</p>
+							<p className="font-russo text-sm font-medium text-white">
+								{tradingData.marketCap}
+							</p>
+						</div>
+						<div className="p-3 rounded-lg bg-gradient-to-br from-[#24FF66]/5 to-transparent border border-[#24FF66]/20">
+							<p className="font-russo text-xs text-white/50 mb-1">24h High</p>
+							<p className="font-russo text-sm font-medium text-[#24FF66]">
+								{tradingData.high24h}
+							</p>
+						</div>
+						<div className="p-3 rounded-lg bg-gradient-to-br from-red-500/5 to-transparent border border-red-500/20">
+							<p className="font-russo text-xs text-white/50 mb-1">24h Low</p>
+							<p className="font-russo text-sm font-medium text-red-400">
+								{tradingData.low24h}
+							</p>
 						</div>
 					</div>
 
-					{/* Technical Analysis */}
-					<div className="space-y-4">
-						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
-							Technical Analysis
+					{/* Technical Indicators */}
+					<div className="space-y-3">
+						<h3 className="font-russo text-sm font-medium text-white/80 uppercase tracking-wider">
+							Technical Indicators
 						</h3>
-						<div className="space-y-3">
-							<div className="flex items-center justify-between">
-								<span className="font-russo text-sm text-white/80">Trend</span>
-								<div
-									className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-										tradingData.trend === "bullish"
-											? "bg-green-500/10 text-green-400"
-											: tradingData.trend === "bearish"
-												? "bg-red-500/10 text-red-400"
-												: "bg-yellow-500/10 text-yellow-400"
-									}`}
-								>
-									<LuActivity className="w-3 h-3" />
-									{tradingData.trend.toUpperCase()}
-								</div>
-							</div>
-
-							<div className="flex items-center justify-between">
-								<span className="font-russo text-sm text-white/80">RSI</span>
+						<div className="space-y-2">
+							<div className="flex items-center justify-between p-2 rounded-lg bg-[#1C1E23]/20">
+								<span className="font-russo text-sm text-white/70">RSI</span>
 								<span
 									className={`font-russo text-sm font-medium ${
 										tradingData.rsi > 70
 											? "text-red-400"
 											: tradingData.rsi < 30
-												? "text-green-400"
+												? "text-[#24FF66]"
 												: "text-white"
 									}`}
 								>
 									{tradingData.rsi}
 								</span>
 							</div>
-
-							<div className="flex items-center justify-between">
-								<span className="font-russo text-sm text-white/80">MACD</span>
+							<div className="flex items-center justify-between p-2 rounded-lg bg-[#1C1E23]/20">
+								<span className="font-russo text-sm text-white/70">MACD</span>
 								<span
 									className={`font-russo text-sm font-medium ${
 										tradingData.macd === "positive"
-											? "text-green-400"
+											? "text-[#24FF66]"
 											: "text-red-400"
 									}`}
 								>
 									{tradingData.macd.toUpperCase()}
 								</span>
 							</div>
-
-							<div className="flex items-center justify-between">
-								<span className="font-russo text-sm text-white/80">
+							<div className="flex items-center justify-between p-2 rounded-lg bg-[#1C1E23]/20">
+								<span className="font-russo text-sm text-white/70">
 									Volatility
 								</span>
 								<span className="font-russo text-sm font-medium text-white">
@@ -330,22 +307,22 @@ export const TradingInfoPanel = memo(
 						</div>
 					</div>
 
-					{/* Support & Resistance */}
-					<div className="space-y-4">
-						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
+					{/* Key Levels */}
+					<div className="space-y-3">
+						<h3 className="font-russo text-sm font-medium text-white/80 uppercase tracking-wider">
 							Key Levels
 						</h3>
-						<div className="space-y-3">
-							<div className="flex items-center justify-between">
-								<span className="font-russo text-sm text-white/80">
+						<div className="space-y-2">
+							<div className="flex items-center justify-between p-2 rounded-lg bg-[#24FF66]/5 border border-[#24FF66]/20">
+								<span className="font-russo text-sm text-white/70">
 									Support
 								</span>
-								<span className="font-russo text-sm font-medium text-green-400">
+								<span className="font-russo text-sm font-medium text-[#24FF66]">
 									{tradingData.support}
 								</span>
 							</div>
-							<div className="flex items-center justify-between">
-								<span className="font-russo text-sm text-white/80">
+							<div className="flex items-center justify-between p-2 rounded-lg bg-red-500/5 border border-red-500/20">
+								<span className="font-russo text-sm text-white/70">
 									Resistance
 								</span>
 								<span className="font-russo text-sm font-medium text-red-400">
@@ -355,28 +332,23 @@ export const TradingInfoPanel = memo(
 						</div>
 					</div>
 
-					{/* Trading Conditions */}
-					<div className="space-y-4">
-						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
-							Current Conditions
-						</h3>
-						<div className="p-4 rounded-lg bg-gradient-to-br from-[#1C1E23]/40 to-[#0F1012]/20 border border-[#1C1E23]/30">
-							<div className="flex items-start gap-3">
-								<div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-									<LuClock className="w-3 h-3 text-white" />
-								</div>
-								<div className="space-y-2">
-									<p className="font-russo text-sm font-medium text-white">
-										Market Analysis
-									</p>
-									<p className="font-russo text-xs text-white/70 leading-relaxed">
-										{tradingData.trend === "bullish"
-											? `${tradingData.name} is showing strong bullish momentum with RSI at ${tradingData.rsi}. Price is testing resistance at ${tradingData.resistance}.`
-											: tradingData.trend === "bearish"
-												? `${tradingData.name} is experiencing bearish pressure with RSI at ${tradingData.rsi}. Support level at ${tradingData.support} is being tested.`
-												: `${tradingData.name} is consolidating in a neutral range. Watch for breakout above ${tradingData.resistance} or breakdown below ${tradingData.support}.`}
-									</p>
-								</div>
+					{/* Market Analysis */}
+					<div className="p-3 rounded-lg bg-gradient-to-br from-[#1C1E23]/30 to-[#0F1012]/10 border border-[#1C1E23]/20">
+						<div className="flex items-start gap-3">
+							<div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+								<LuActivity className="w-3 h-3 text-white/70" />
+							</div>
+							<div className="space-y-1">
+								<p className="font-russo text-sm font-medium text-white">
+									Market Outlook
+								</p>
+								<p className="font-russo text-xs text-white/60 leading-relaxed">
+									{tradingData.trend === "bullish"
+										? `Strong bullish momentum with RSI at ${tradingData.rsi}. Testing resistance at ${tradingData.resistance}.`
+										: tradingData.trend === "bearish"
+											? `Bearish pressure with RSI at ${tradingData.rsi}. Support at ${tradingData.support} being tested.`
+											: `Consolidating range. Watch for breakout above ${tradingData.resistance} or breakdown below ${tradingData.support}.`}
+								</p>
 							</div>
 						</div>
 					</div>
