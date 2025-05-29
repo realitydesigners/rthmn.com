@@ -557,111 +557,331 @@ export const SectionInstrumentsPanel = memo(() => {
 		>
 			<div className="container mx-auto px-6">
 				<div className="max-w-7xl mx-auto">
-					<div className="grid lg:grid-cols-2 gap-16 items-center">
-						{/* Left side - Content */}
-						<motion.div style={{ y, opacity }} className="space-y-8">
-							{/* Header */}
-							<div className="space-y-6">
-								<motion.h2
+					<div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-start">
+						{/* Left side - Enhanced Content */}
+						<motion.div style={{ y, opacity }} className="space-y-12">
+							{/* Header Section */}
+							<div className="space-y-8">
+								<motion.div
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
 									transition={{ duration: 0.8 }}
-									className="font-russo text-4xl lg:text-5xl xl:text-6xl font-black text-white tracking-tighter leading-[0.85] uppercase"
+									className="space-y-4"
 								>
-									PRECISION
-									<span className="block text-[#24FF66] mt-2">
-										INSTRUMENT CONTROL
-									</span>
-								</motion.h2>
+									{/* Overline */}
+									<div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-[#24FF66]/30 bg-gradient-to-r from-[#24FF66]/10 to-transparent">
+										<div className="w-2 h-2 rounded-full bg-[#24FF66] animate-pulse" />
+										<span className="font-outfit text-sm font-semibold text-[#24FF66] uppercase tracking-wider">
+											Advanced Trading Tools
+										</span>
+									</div>
 
-								<motion.p
+									<h2 className="font-russo text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[0.8] uppercase">
+										PRECISION
+										<span className="block text-[#24FF66] mt-2 relative">
+											INSTRUMENT CONTROL
+											{/* Animated underline */}
+											<motion.div
+												initial={{ width: 0 }}
+												whileInView={{ width: "100%" }}
+												transition={{ duration: 1.2, delay: 0.5 }}
+												className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-[#24FF66] via-[#1ECC52] to-transparent"
+											/>
+										</span>
+									</h2>
+								</motion.div>
+
+								<motion.div
 									initial={{ opacity: 0, y: 30 }}
 									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.8, delay: 0.2 }}
-									className="font-outfit text-lg lg:text-xl text-white/70 leading-relaxed max-w-2xl"
+									transition={{ duration: 0.8, delay: 0.3 }}
+									className="space-y-6"
 								>
-									Navigate through hundreds of financial instruments with
-									lightning-fast search, intelligent filtering, and
-									drag-and-drop organization. Your trading universe, perfectly
-									organized.
-								</motion.p>
+									<p className="font-outfit text-xl lg:text-2xl text-white/80 leading-relaxed font-light">
+										Navigate through{" "}
+										<span className="text-[#24FF66] font-semibold">
+											hundreds of financial instruments
+										</span>{" "}
+										with lightning-fast search, intelligent filtering, and
+										drag-and-drop organization.
+									</p>
+
+									<p className="font-outfit text-lg text-white/60 leading-relaxed max-w-2xl">
+										Your trading universe, perfectly organized. From forex pairs
+										to cryptocurrencies, stocks to ETFs — find, organize, and
+										track everything in one unified interface.
+									</p>
+								</motion.div>
 							</div>
 
-							{/* Features */}
+							{/* Key Features Grid */}
 							<motion.div
 								initial={{ opacity: 0, y: 30 }}
 								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8, delay: 0.4 }}
-								className="grid gap-6"
+								transition={{ duration: 0.8, delay: 0.5 }}
+								className="grid md:grid-cols-2 gap-8"
 							>
-								{[
-									{
-										title: "Instant Search",
-										description:
-											"Find any instrument in milliseconds with intelligent autocomplete and fuzzy matching.",
-										category: "SPEED",
-									},
-									{
-										title: "Smart Filtering",
-										description:
-											"Organize by asset class, favorites, or custom categories with one-click filtering.",
-										category: "ORGANIZATION",
-									},
-									{
-										title: "Drag & Drop",
-										description:
-											"Reorder your watchlist with intuitive drag-and-drop controls for optimal workflow.",
-										category: "CONTROL",
-									},
-								].map((feature, index) => (
-									<motion.div
-										key={feature.title}
-										initial={{ opacity: 0, x: -30 }}
-										whileInView={{ opacity: 1, x: 0 }}
-										transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-										className="group relative p-6 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm hover:border-[#24FF66]/30 transition-all duration-300"
-									>
-										{/* Category badge */}
-										<div className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30 mb-3">
-											<span className="font-outfit text-xs font-semibold text-[#24FF66] uppercase tracking-wider">
-												{feature.category}
-											</span>
-										</div>
+								{/* Feature 1 - Search */}
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									whileInView={{ opacity: 1, scale: 1 }}
+									transition={{ duration: 0.6, delay: 0.7 }}
+									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-[#24FF66]/40 transition-all duration-500"
+								>
+									{/* Background glow */}
+									<div className="absolute inset-0 bg-gradient-to-br from-[#24FF66]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-										<h3 className="font-russo text-lg font-bold text-white group-hover:text-[#24FF66] transition-colors duration-300 uppercase tracking-tight mb-2">
-											{feature.title}
-										</h3>
-
-										<p className="font-outfit text-sm text-white/60 leading-relaxed group-hover:text-white/80 transition-colors duration-300">
-											{feature.description}
-										</p>
-
-										{/* Hover accent */}
-										<div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-[#24FF66] to-transparent group-hover:w-full transition-all duration-500" />
-									</motion.div>
-								))}
-							</motion.div>
-
-							{/* Stats */}
-							<motion.div
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8, delay: 0.8 }}
-								className="grid grid-cols-3 gap-6 pt-8"
-							>
-								{[
-									{ value: "500+", label: "Instruments" },
-									{ value: "< 50ms", label: "Search Speed" },
-									{ value: "100%", label: "Customizable" },
-								].map((stat, index) => (
-									<div key={stat.label} className="text-center">
-										<div className="font-russo text-2xl lg:text-3xl font-black text-[#24FF66] tracking-tighter">
-											{stat.value}
-										</div>
-										<div className="font-outfit text-sm text-white/60 uppercase tracking-wider">
-											{stat.label}
+									{/* Icon */}
+									<div className="relative z-10 mb-6">
+										<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#24FF66]/20 to-[#24FF66]/5 border border-[#24FF66]/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+											<FaSearch className="w-7 h-7 text-[#24FF66]" />
 										</div>
 									</div>
+
+									<div className="relative z-10 space-y-4">
+										<div className="space-y-2">
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
+												<span className="font-outfit text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+													INSTANT
+												</span>
+											</div>
+											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight group-hover:text-[#24FF66] transition-colors duration-300">
+												Lightning Search
+											</h3>
+										</div>
+
+										<p className="font-outfit text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
+											Find any instrument in{" "}
+											<span className="text-[#24FF66] font-semibold">
+												milliseconds
+											</span>{" "}
+											with intelligent autocomplete, fuzzy matching, and
+											real-time filtering across all asset classes.
+										</p>
+
+										{/* Performance indicator */}
+										<div className="flex items-center gap-3 pt-2">
+											<div className="flex items-center gap-2">
+												<div className="w-2 h-2 rounded-full bg-[#24FF66] animate-pulse" />
+												<span className="font-mono text-sm text-[#24FF66] font-bold">
+													&lt; 50ms
+												</span>
+											</div>
+											<span className="font-outfit text-xs text-white/50">
+												Average search time
+											</span>
+										</div>
+									</div>
+								</motion.div>
+
+								{/* Feature 2 - Organization */}
+								<motion.div
+									initial={{ opacity: 0, scale: 0.95 }}
+									whileInView={{ opacity: 1, scale: 1 }}
+									transition={{ duration: 0.6, delay: 0.8 }}
+									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-[#24FF66]/40 transition-all duration-500"
+								>
+									{/* Background glow */}
+									<div className="absolute inset-0 bg-gradient-to-br from-[#24FF66]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+									{/* Icon */}
+									<div className="relative z-10 mb-6">
+										<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#24FF66]/20 to-[#24FF66]/5 border border-[#24FF66]/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+											<svg
+												className="w-7 h-7 text-[#24FF66]"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<title>Organization Icon</title>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 11H5m14-7H5m14 14H5"
+												/>
+											</svg>
+										</div>
+									</div>
+
+									<div className="relative z-10 space-y-4">
+										<div className="space-y-2">
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
+												<span className="font-outfit text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+													SMART
+												</span>
+											</div>
+											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight group-hover:text-[#24FF66] transition-colors duration-300">
+												Auto Organization
+											</h3>
+										</div>
+
+										<p className="font-outfit text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
+											Intelligent categorization by{" "}
+											<span className="text-[#24FF66] font-semibold">
+												asset class
+											</span>
+											, custom favorites, and dynamic filtering that adapts to
+											your trading patterns.
+										</p>
+
+										{/* Category indicators */}
+										<div className="flex items-center gap-2 pt-2">
+											{["FX", "Crypto", "Stocks", "ETF"].map((category, i) => (
+												<div
+													key={category}
+													className="px-2 py-1 rounded bg-[#24FF66]/10 border border-[#24FF66]/20"
+												>
+													<span className="font-outfit text-xs font-medium text-[#24FF66]">
+														{category}
+													</span>
+												</div>
+											))}
+										</div>
+									</div>
+								</motion.div>
+							</motion.div>
+
+							{/* Drag & Drop Showcase */}
+							<motion.div
+								initial={{ opacity: 0, y: 30 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.8, delay: 0.9 }}
+								className="relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-r from-[#0A0B0D] via-[#070809] to-[#050506] p-8"
+							>
+								{/* Background pattern */}
+								<div className="absolute inset-0 opacity-5">
+									<div
+										className="absolute inset-0"
+										style={{
+											backgroundImage:
+												"radial-gradient(circle at 25% 25%, #24FF66 2px, transparent 2px)",
+											backgroundSize: "24px 24px",
+										}}
+									/>
+								</div>
+
+								<div className="relative z-10 flex items-center gap-8">
+									<div className="flex-1 space-y-4">
+										<div className="space-y-2">
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
+												<span className="font-outfit text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+													INTUITIVE
+												</span>
+											</div>
+											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight">
+												Drag & Drop Control
+											</h3>
+										</div>
+
+										<p className="font-outfit text-white/70 leading-relaxed">
+											Reorder your watchlist with intuitive drag-and-drop
+											controls. Organize instruments exactly how you want them
+											for optimal trading workflow.
+										</p>
+
+										<div className="flex items-center gap-3">
+											<div className="flex items-center gap-2">
+												<div className="w-2 h-2 rounded-full bg-[#24FF66]" />
+												<span className="font-outfit text-sm text-white/60">
+													Instant reordering
+												</span>
+											</div>
+											<div className="flex items-center gap-2">
+												<div className="w-2 h-2 rounded-full bg-[#24FF66]" />
+												<span className="font-outfit text-sm text-white/60">
+													Visual feedback
+												</span>
+											</div>
+										</div>
+									</div>
+
+									{/* Visual drag indicator */}
+									<div className="hidden lg:block">
+										<div className="relative">
+											<motion.div
+												animate={{ y: [0, -10, 0] }}
+												transition={{
+													duration: 2,
+													repeat: Number.POSITIVE_INFINITY,
+													ease: "easeInOut",
+												}}
+												className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#24FF66]/20 to-[#24FF66]/5 border border-[#24FF66]/30 flex items-center justify-center"
+											>
+												<svg
+													className="w-6 h-6 text-[#24FF66]"
+													fill="none"
+													stroke="currentColor"
+													viewBox="0 0 24 24"
+												>
+													<title>Drag and Drop Icon</title>
+													<path
+														strokeLinecap="round"
+														strokeLinejoin="round"
+														strokeWidth={2}
+														d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
+													/>
+												</svg>
+											</motion.div>
+											<motion.div
+												animate={{ opacity: [0.3, 1, 0.3] }}
+												transition={{
+													duration: 2,
+													repeat: Number.POSITIVE_INFINITY,
+													ease: "easeInOut",
+												}}
+												className="absolute inset-0 rounded-lg bg-[#24FF66]/10 blur-xl"
+											/>
+										</div>
+									</div>
+								</div>
+							</motion.div>
+
+							{/* Performance Stats */}
+							<motion.div
+								initial={{ opacity: 0, y: 30 }}
+								whileInView={{ opacity: 1, y: 0 }}
+								transition={{ duration: 0.8, delay: 1.1 }}
+								className="grid grid-cols-3 gap-8 pt-4"
+							>
+								{[
+									{
+										value: "500+",
+										label: "Instruments",
+										sublabel: "Across all markets",
+									},
+									{
+										value: "< 50ms",
+										label: "Search Speed",
+										sublabel: "Lightning fast",
+									},
+									{
+										value: "100%",
+										label: "Customizable",
+										sublabel: "Your way",
+									},
+								].map((stat, index) => (
+									<motion.div
+										key={stat.label}
+										initial={{ opacity: 0, scale: 0.9 }}
+										whileInView={{ opacity: 1, scale: 1 }}
+										transition={{ duration: 0.5, delay: 1.3 + index * 0.1 }}
+										className="text-center group"
+									>
+										<div className="space-y-2">
+											<div className="font-russo text-3xl lg:text-4xl font-black text-[#24FF66] tracking-tighter group-hover:scale-110 transition-transform duration-300">
+												{stat.value}
+											</div>
+											<div className="space-y-1">
+												<div className="font-outfit text-sm font-semibold text-white uppercase tracking-wider">
+													{stat.label}
+												</div>
+												<div className="font-outfit text-xs text-white/50">
+													{stat.sublabel}
+												</div>
+											</div>
+										</div>
+									</motion.div>
 								))}
 							</motion.div>
 						</motion.div>

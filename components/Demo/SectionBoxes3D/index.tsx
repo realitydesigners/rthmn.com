@@ -1,7 +1,7 @@
 "use client";
 
 import { ResoBox3DCircular } from "@/components/Demo/ResoBox3DDemo";
-import type { BoxColors } from "@/stores/colorStore";
+import { HeroText } from "./HeroText";
 import type { BoxSlice } from "@/types/types";
 import {
 	BASE_VALUES,
@@ -13,77 +13,9 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import type React from "react";
 import { memo, useMemo, useRef, useState, useEffect } from "react";
-import Image from "next/image";
-
 import { DemoNavbar } from "@/components/Navbars/DemoNavbar";
 import { DemoSidebarLeft } from "@/components/Demo/DemoSidebarLeft";
 import { DemoSidebarRight } from "@/components/Demo/DemoSidebarRight";
-
-// Aurora Background Component - matches the one from SectionBoxes
-const AuroraBackground = ({ dominantState }: { dominantState: string }) => {
-	// Define colors using GRID.04 color scheme from color store
-	const colors = {
-		blue: {
-			primary: "#24FF661F", // #24FF66 with 12% opacity - Matrix green for positive
-			secondary: "#24FF6614", // #24FF66 with 8% opacity
-			tertiary: "#24FF660A", // #24FF66 with 4% opacity
-		},
-		red: {
-			primary: "#3032381F", // #303238 with 12% opacity - Dark gray for negative
-			secondary: "#30323814", // #303238 with 8% opacity
-			tertiary: "#3032380A", // #303238 with 4% opacity
-		},
-		neutral: {
-			primary: "#24FF661F", // Default to matrix green
-			secondary: "#24FF6614",
-			tertiary: "#24FF660A",
-		},
-	};
-
-	const currentColors =
-		colors[dominantState as keyof typeof colors] || colors.neutral;
-
-	return (
-		<motion.div
-			initial={{ opacity: 0 }}
-			animate={{
-				opacity: 1,
-			}}
-			transition={{
-				opacity: {
-					duration: 2,
-					ease: "easeInOut",
-				},
-			}}
-			className="pointer-events-none absolute inset-0 overflow-hidden"
-		>
-			{/* Single subtle bottom glow */}
-			<motion.div
-				animate={{
-					opacity: [0.6, 1, 0.6],
-				}}
-				transition={{
-					opacity: {
-						duration: 12,
-						repeat: Number.POSITIVE_INFINITY,
-						ease: "easeInOut",
-					},
-				}}
-				className="absolute inset-0"
-				style={
-					{
-						background: `linear-gradient(to top, 
-						${currentColors.primary} 0%,
-						${currentColors.secondary} 25%,
-						${currentColors.tertiary} 50%,
-						transparent 70%)`,
-						filter: "blur(100px)",
-					} as React.CSSProperties
-				}
-			/>
-		</motion.div>
-	);
-};
 
 interface ScreenProps {
 	scale: MotionValue<number>;
@@ -98,7 +30,7 @@ const Screen = memo(
 		// Border animation - appears after all UI elements are loaded
 		const borderOpacity = useTransform(
 			scrollYProgress,
-			[0.6, 0.62], // Start after sidebars finish (at 40%) and complete by 50%
+			[0.34, 0.37], // Start after sidebars finish and complete quickly
 			[0, 1],
 		);
 
@@ -135,18 +67,19 @@ export const SectionBoxes3D = memo(() => {
 	// State to track the dominant state from the 3D visualization
 	const [dominantState, setDominantState] = useState("neutral");
 
-	// State to track the current BTC slice from ResoBox3DCircular
-	const [currentBtcSlice, setCurrentBtcSlice] = useState<BoxSlice | null>(null);
+	// State to track the current structure slice from ResoBox3DCircular (first structure)
+	const [currentStructureSlice, setCurrentStructureSlice] =
+		useState<BoxSlice | null>(null);
 
-	// Create initial BTC slice for the intro (will be updated by ResoBox3DCircular)
-	const initialBtcSlice = useMemo(() => {
-		const currentValues = createDemoStep(4, sequences, BASE_VALUES); // Use BTC's startOffset
+	// Create initial structure slice for the intro (will be updated by ResoBox3DCircular)
+	const initialStructureSlice = useMemo(() => {
+		const currentValues = createDemoStep(4, sequences, BASE_VALUES); // Use first structure's startOffset
 		const mockBoxData = createMockBoxData(currentValues);
 		return { timestamp: new Date().toISOString(), boxes: mockBoxData };
 	}, []);
 
 	// Use the current slice from ResoBox3DCircular if available, otherwise use initial
-	const btcSlice = currentBtcSlice || initialBtcSlice;
+	const structureSlice = currentStructureSlice || initialStructureSlice;
 
 	// Custom box colors for 3D visualization
 	const boxColors = {
@@ -163,14 +96,14 @@ export const SectionBoxes3D = memo(() => {
 		},
 	};
 
-	// Intro sequence timing:
-	// 0-0.2: Scattered boxes with text
-	// 0.2-0.5: Formation animation
-	// 0.5+: UI elements start appearing
+	// Intro sequence timing - Made much snappier:
+	// 0-0.05: Scattered boxes with text
+	// 0.05-0.25: Formation animation (faster)
+	// 0.25+: UI elements start appearing
 	const introTextOpacity = useTransform(
 		scrollYProgress,
-		[0, 0.1, 0.3, 0.5],
-		[0, 1, 1, 0],
+		[0, 0.1, 0.25, 0.35],
+		[1, 1, 1, 0],
 	);
 
 	// Formation progress for the intro animation
@@ -185,228 +118,43 @@ export const SectionBoxes3D = memo(() => {
 
 	const formationProgress = Math.max(
 		0,
-		Math.min(1, (currentScrollProgress - 0.2) / 0.3),
+		Math.min(1, (currentScrollProgress - 0.1) / 0.2),
 	);
 
-	// Screen component animations (start after formation completes)
+	// Screen component animations (start after formation completes at 0.25)
 	// Scale animation happens in first part, then stays at final scale
-	const scale = useTransform(scrollYProgress, [0.5, 0.7], [1.0, 0.7]);
-	// Movement only happens at the very end to transition to content
-	const containerY = useTransform(scrollYProgress, [0.95, 1], [0, -1000]);
+	const scale = useTransform(scrollYProgress, [0.25, 0.35], [1.0, 0.8]);
+	// Movement starts much earlier to avoid long dead zone
+	const containerY = useTransform(scrollYProgress, [0.6, 0.8], [0, -500]);
 
-	// UI element animations (start after formation completes)
-	const leftSidebarX = useTransform(scrollYProgress, [0.5, 0.6], [-64, 0]);
-	const leftSidebarOpacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
+	// UI element animations (start after formation completes at 0.25)
+	const leftSidebarX = useTransform(scrollYProgress, [0.25, 0.35], [-64, 0]);
+	const leftSidebarOpacity = useTransform(
+		scrollYProgress,
+		[0.25, 0.35],
+		[0, 1],
+	);
 
-	const rightSidebarX = useTransform(scrollYProgress, [0.5, 0.6], [64, 0]);
-	const rightSidebarOpacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
+	const rightSidebarX = useTransform(scrollYProgress, [0.25, 0.35], [64, 0]);
+	const rightSidebarOpacity = useTransform(
+		scrollYProgress,
+		[0.25, 0.35],
+		[0, 1],
+	);
 
-	const navbarY = useTransform(scrollYProgress, [0.5, 0.6], [-56, 0]);
-	const navbarOpacity = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
+	const navbarY = useTransform(scrollYProgress, [0.25, 0.35], [-56, 0]);
+	const navbarOpacity = useTransform(scrollYProgress, [0.25, 0.35], [0, 1]);
 
 	return (
 		<div ref={containerRef} className="relative">
 			{/* Extended height for intro sequence and Screen interaction */}
-			<div className="h-[500vh] relative">
+			<div className="h-[300vh] relative">
 				<div className="sticky top-0 h-screen w-full flex items-center justify-center relative">
 					{/* Aurora Background - always present */}
 					{/* <AuroraBackground dominantState={dominantState} /> */}
 
 					{/* Hero Text */}
-					<motion.div
-						style={{ opacity: introTextOpacity }}
-						className="absolute top-1/2 left-0 transform -translate-y-1/2 z-50 text-left pl-16 lg:pl-24"
-					>
-						{/* Main Title with Explosive Effect */}
-						<motion.h1
-							initial={{ scale: 0.5, opacity: 0, rotateX: -30 }}
-							animate={{ scale: 1, opacity: 1, rotateX: 0 }}
-							transition={{
-								duration: 2,
-								delay: 0.5,
-								ease: [0.16, 1, 0.3, 1],
-								scale: { type: "spring", stiffness: 80, damping: 12 },
-							}}
-							className="font-russo text-6xl lg:text-8xl xl:text-9xl font-black text-white tracking-tighter leading-[0.8] mb-6 relative"
-							style={{
-								textShadow:
-									"0 0 60px rgba(255,255,255,0.15), 0 0 120px rgba(255,255,255,0.08)",
-								filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.4))",
-								WebkitTextStroke: "2px rgba(255,255,255,0.1)",
-							}}
-						>
-							{/* First word with stagger effect */}
-							<motion.div className="overflow-hidden">
-								<motion.span
-									initial={{ y: 200, opacity: 0 }}
-									animate={{ y: 0, opacity: 1 }}
-									transition={{
-										duration: 1.2,
-										delay: 1,
-										ease: [0.25, 0.46, 0.45, 0.94],
-									}}
-									className="block"
-								>
-									MARKET
-								</motion.span>
-							</motion.div>
-
-							{/* Second word with different timing */}
-							<motion.div className="overflow-hidden">
-								<motion.span
-									initial={{ y: 200, opacity: 0 }}
-									animate={{ y: 0, opacity: 1 }}
-									transition={{
-										duration: 1.2,
-										delay: 1.3,
-										ease: [0.25, 0.46, 0.45, 0.94],
-									}}
-									className="block relative"
-								>
-									DECODED
-									{/* Glitch effect overlay */}
-									<motion.span
-										initial={{ opacity: 0 }}
-										animate={{
-											opacity: [0, 0.3, 0],
-											x: [0, 2, -2, 0],
-											filter: [
-												"hue-rotate(0deg)",
-												"hue-rotate(90deg)",
-												"hue-rotate(0deg)",
-											],
-										}}
-										transition={{
-											duration: 0.2,
-											delay: 2.5,
-											repeat: 3,
-											repeatDelay: 0.8,
-										}}
-										className="absolute inset-0 text-white mix-blend-difference"
-									>
-										DECODED
-									</motion.span>
-								</motion.span>
-							</motion.div>
-
-							{/* Floating particles around text */}
-							<motion.div
-								initial={{ opacity: 0 }}
-								animate={{ opacity: 1 }}
-								transition={{ duration: 1, delay: 3 }}
-								className="absolute inset-0 pointer-events-none"
-							>
-								{[...Array(12)].map((_, i) => (
-									<motion.div
-										key={`text-particle-${Date.now()}-${i}`}
-										initial={{ opacity: 0, scale: 0 }}
-										animate={{
-											opacity: [0, 1, 0],
-											scale: [0, 1, 0],
-											x: [0, (Math.random() - 0.5) * 400],
-											y: [0, (Math.random() - 0.5) * 300],
-										}}
-										transition={{
-											duration: 3,
-											delay: 3 + i * 0.1,
-											repeat: Number.POSITIVE_INFINITY,
-											repeatDelay: 4,
-										}}
-										className="absolute w-1 h-1 bg-white rounded-full"
-										style={{
-											left: "50%",
-											top: "50%",
-										}}
-									/>
-								))}
-							</motion.div>
-						</motion.h1>
-
-						{/* Subtitle and Content */}
-						<motion.div
-							initial={{ opacity: 0, x: -50 }}
-							animate={{ opacity: 1, x: 0 }}
-							transition={{
-								duration: 1.2,
-								delay: 2.5,
-								ease: [0.25, 0.46, 0.45, 0.94],
-							}}
-							className="max-w-2xl space-y-6"
-						>
-							<motion.p className="font-outfit text-xl lg:text-2xl font-light text-white/80 leading-relaxed tracking-wide">
-								Where chaos becomes clarity
-							</motion.p>
-
-							<motion.p
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 1, delay: 3.2 }}
-								className="font-outfit text-lg text-white/60 leading-relaxed max-w-xl"
-							>
-								Experience the future of market analysis through our
-								revolutionary 3D visualization engine. Transform complex data
-								into actionable insights with unprecedented clarity.
-							</motion.p>
-
-							<motion.div
-								initial={{ opacity: 0, y: 20 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ duration: 1, delay: 3.8 }}
-								className="pt-4"
-							>
-								<motion.button
-									whileHover={{
-										scale: 1.05,
-										boxShadow: "0 0 30px rgba(255,255,255,0.2)",
-									}}
-									whileTap={{ scale: 0.95 }}
-									className="group relative px-8 py-4 bg-white text-black font-outfit font-semibold text-lg rounded-full overflow-hidden transition-all duration-300"
-								>
-									<span className="relative z-10">Explore the Platform</span>
-
-									{/* Button glow effect */}
-									<motion.div
-										className="absolute inset-0 bg-gradient-to-r from-white to-gray-100"
-										initial={{ scale: 1 }}
-										whileHover={{ scale: 1.05 }}
-										transition={{ duration: 0.3 }}
-									/>
-
-									{/* Arrow icon */}
-									<motion.svg
-										className="inline-block w-5 h-5 ml-2 relative z-10"
-										fill="none"
-										stroke="currentColor"
-										viewBox="0 0 24 24"
-										initial={{ x: 0 }}
-										whileHover={{ x: 5 }}
-										transition={{ duration: 0.3 }}
-										aria-hidden="true"
-									>
-										<path
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth={2}
-											d="M13 7l5 5m0 0l-5 5m5-5H6"
-										/>
-									</motion.svg>
-								</motion.button>
-							</motion.div>
-						</motion.div>
-
-						{/* Ambient light rays */}
-						<motion.div
-							initial={{ opacity: 0, scale: 0.8 }}
-							animate={{ opacity: 0.6, scale: 1.2 }}
-							transition={{ duration: 3, delay: 1 }}
-							className="absolute inset-0 pointer-events-none"
-							style={{
-								background:
-									"radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 70%)",
-								filter: "blur(40px)",
-							}}
-						/>
-					</motion.div>
+					<HeroText opacity={introTextOpacity} />
 
 					{/* Single continuous experience with Screen wrapper */}
 					<Screen
@@ -417,16 +165,15 @@ export const SectionBoxes3D = memo(() => {
 						<DemoNavbar y={navbarY} opacity={navbarOpacity} />
 						<DemoSidebarLeft x={leftSidebarX} opacity={leftSidebarOpacity} />
 						<DemoSidebarRight x={rightSidebarX} opacity={rightSidebarOpacity} />
-						{btcSlice && btcSlice.boxes.length > 0 && (
+						{structureSlice && structureSlice.boxes.length > 0 && (
 							<ResoBox3DCircular
-								slice={btcSlice}
-								boxColors={boxColors}
+								slice={structureSlice}
 								className="h-full w-full absolute"
 								onDominantStateChange={setDominantState}
-								onCurrentSliceChange={setCurrentBtcSlice}
-								showOnlyBTC={formationProgress < 1}
+								onCurrentSliceChange={setCurrentStructureSlice}
 								introMode={formationProgress < 1}
 								formationProgress={formationProgress}
+								scrollProgress={currentScrollProgress}
 							/>
 						)}
 					</Screen>
