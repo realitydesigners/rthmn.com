@@ -124,7 +124,7 @@ export const StartButton: FC<StartButtonProps> = ({
 
 	const buttonClasses = `group relative flex items-center overflow-hidden rounded-full ${
 		styles.wrapper
-	} p-[2px] transition-all duration-300 font-outfit ${
+	} p-[2px] transition-all duration-300 font-russo ${
 		disabled
 			? "cursor-not-allowed opacity-50"
 			: isLoading

@@ -199,10 +199,10 @@ export const TradingInfoPanel = memo(
 								<LuBarChart3 className="w-4 h-4 text-white" />
 							</div>
 							<div>
-								<h2 className="font-outfit text-lg font-bold text-white">
+								<h2 className="font-russo text-lg font-bold text-white">
 									{tradingData.pair}
 								</h2>
-								<p className="font-outfit text-sm text-white/60">
+								<p className="font-russo text-sm text-white/60">
 									{tradingData.name}
 								</p>
 							</div>
@@ -214,7 +214,7 @@ export const TradingInfoPanel = memo(
 
 					{/* Price and Change */}
 					<div className="flex items-center gap-4">
-						<span className="font-outfit text-2xl font-bold text-white">
+						<span className="font-russo text-2xl font-bold text-white">
 							{tradingData.price}
 						</span>
 						<div
@@ -238,31 +238,31 @@ export const TradingInfoPanel = memo(
 				<div className="relative z-10 p-6 space-y-6 overflow-y-auto h-[calc(100%-140px)]">
 					{/* Market Data */}
 					<div className="space-y-4">
-						<h3 className="font-outfit text-sm font-medium text-[#818181] uppercase tracking-wider">
+						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
 							Market Data
 						</h3>
 						<div className="grid grid-cols-2 gap-4">
 							<div className="space-y-1">
-								<p className="font-outfit text-xs text-white/60">24h Volume</p>
-								<p className="font-outfit text-sm font-medium text-white">
+								<p className="font-russo text-xs text-white/60">24h Volume</p>
+								<p className="font-russo text-sm font-medium text-white">
 									{tradingData.volume}
 								</p>
 							</div>
 							<div className="space-y-1">
-								<p className="font-outfit text-xs text-white/60">Market Cap</p>
-								<p className="font-outfit text-sm font-medium text-white">
+								<p className="font-russo text-xs text-white/60">Market Cap</p>
+								<p className="font-russo text-sm font-medium text-white">
 									{tradingData.marketCap}
 								</p>
 							</div>
 							<div className="space-y-1">
-								<p className="font-outfit text-xs text-white/60">24h High</p>
-								<p className="font-outfit text-sm font-medium text-green-400">
+								<p className="font-russo text-xs text-white/60">24h High</p>
+								<p className="font-russo text-sm font-medium text-green-400">
 									{tradingData.high24h}
 								</p>
 							</div>
 							<div className="space-y-1">
-								<p className="font-outfit text-xs text-white/60">24h Low</p>
-								<p className="font-outfit text-sm font-medium text-red-400">
+								<p className="font-russo text-xs text-white/60">24h Low</p>
+								<p className="font-russo text-sm font-medium text-red-400">
 									{tradingData.low24h}
 								</p>
 							</div>
@@ -271,12 +271,12 @@ export const TradingInfoPanel = memo(
 
 					{/* Technical Analysis */}
 					<div className="space-y-4">
-						<h3 className="font-outfit text-sm font-medium text-[#818181] uppercase tracking-wider">
+						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
 							Technical Analysis
 						</h3>
 						<div className="space-y-3">
 							<div className="flex items-center justify-between">
-								<span className="font-outfit text-sm text-white/80">Trend</span>
+								<span className="font-russo text-sm text-white/80">Trend</span>
 								<div
 									className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
 										tradingData.trend === "bullish"
@@ -292,9 +292,9 @@ export const TradingInfoPanel = memo(
 							</div>
 
 							<div className="flex items-center justify-between">
-								<span className="font-outfit text-sm text-white/80">RSI</span>
+								<span className="font-russo text-sm text-white/80">RSI</span>
 								<span
-									className={`font-outfit text-sm font-medium ${
+									className={`font-russo text-sm font-medium ${
 										tradingData.rsi > 70
 											? "text-red-400"
 											: tradingData.rsi < 30
@@ -307,9 +307,9 @@ export const TradingInfoPanel = memo(
 							</div>
 
 							<div className="flex items-center justify-between">
-								<span className="font-outfit text-sm text-white/80">MACD</span>
+								<span className="font-russo text-sm text-white/80">MACD</span>
 								<span
-									className={`font-outfit text-sm font-medium ${
+									className={`font-russo text-sm font-medium ${
 										tradingData.macd === "positive"
 											? "text-green-400"
 											: "text-red-400"
@@ -320,10 +320,10 @@ export const TradingInfoPanel = memo(
 							</div>
 
 							<div className="flex items-center justify-between">
-								<span className="font-outfit text-sm text-white/80">
+								<span className="font-russo text-sm text-white/80">
 									Volatility
 								</span>
-								<span className="font-outfit text-sm font-medium text-white">
+								<span className="font-russo text-sm font-medium text-white">
 									{tradingData.volatility}%
 								</span>
 							</div>
@@ -332,23 +332,23 @@ export const TradingInfoPanel = memo(
 
 					{/* Support & Resistance */}
 					<div className="space-y-4">
-						<h3 className="font-outfit text-sm font-medium text-[#818181] uppercase tracking-wider">
+						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
 							Key Levels
 						</h3>
 						<div className="space-y-3">
 							<div className="flex items-center justify-between">
-								<span className="font-outfit text-sm text-white/80">
+								<span className="font-russo text-sm text-white/80">
 									Support
 								</span>
-								<span className="font-outfit text-sm font-medium text-green-400">
+								<span className="font-russo text-sm font-medium text-green-400">
 									{tradingData.support}
 								</span>
 							</div>
 							<div className="flex items-center justify-between">
-								<span className="font-outfit text-sm text-white/80">
+								<span className="font-russo text-sm text-white/80">
 									Resistance
 								</span>
-								<span className="font-outfit text-sm font-medium text-red-400">
+								<span className="font-russo text-sm font-medium text-red-400">
 									{tradingData.resistance}
 								</span>
 							</div>
@@ -357,7 +357,7 @@ export const TradingInfoPanel = memo(
 
 					{/* Trading Conditions */}
 					<div className="space-y-4">
-						<h3 className="font-outfit text-sm font-medium text-[#818181] uppercase tracking-wider">
+						<h3 className="font-russo text-sm font-medium text-[#818181] uppercase tracking-wider">
 							Current Conditions
 						</h3>
 						<div className="p-4 rounded-lg bg-gradient-to-br from-[#1C1E23]/40 to-[#0F1012]/20 border border-[#1C1E23]/30">
@@ -366,10 +366,10 @@ export const TradingInfoPanel = memo(
 									<LuClock className="w-3 h-3 text-white" />
 								</div>
 								<div className="space-y-2">
-									<p className="font-outfit text-sm font-medium text-white">
+									<p className="font-russo text-sm font-medium text-white">
 										Market Analysis
 									</p>
-									<p className="font-outfit text-xs text-white/70 leading-relaxed">
+									<p className="font-russo text-xs text-white/70 leading-relaxed">
 										{tradingData.trend === "bullish"
 											? `${tradingData.name} is showing strong bullish momentum with RSI at ${tradingData.rsi}. Price is testing resistance at ${tradingData.resistance}.`
 											: tradingData.trend === "bearish"

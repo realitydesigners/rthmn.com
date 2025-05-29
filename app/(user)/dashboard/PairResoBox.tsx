@@ -66,13 +66,13 @@ export const PairResoBox = ({
 					<div className="flex w-full flex-col items-center gap-2">
 						<div className="flex w-full items-center justify-between">
 							<div className="flex items-center gap-4">
-								<div className="font-outfit text-lg font-bold tracking-wider text-white/90 drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
+								<div className="font-russo text-lg font-bold tracking-wider text-white/90 drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
 									{pair?.toUpperCase()}
 								</div>
 								{isLoading || !currentPrice ? (
 									<TextSkeleton className="h-4 w-16" />
 								) : (
-									<div className="font-dmmono  text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+									<div className="font-kodemono  text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
 										{formatPrice(currentPrice, pair)}
 									</div>
 								)}

@@ -132,7 +132,7 @@ const DraggableInstrumentItem = memo(
 						>
 							<div className="relative flex w-full items-center px-4">
 								{/* Instrument name */}
-								<span className="ml-4 font-outfit flex-1 text-sm font-bold tracking-wide text-white transition-colors">
+								<span className="ml-4 font-russo flex-1 text-sm font-bold tracking-wide text-white transition-colors">
 									{pair}
 								</span>
 
@@ -213,7 +213,7 @@ const MockInstrumentItem = memo(
 					{/* Instrument name */}
 					<span
 						className={cn(
-							"font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
+							"font-russo flex-1 text-sm font-bold tracking-wide transition-colors",
 							isSelected
 								? "text-white"
 								: "text-[#32353C] group-hover/item:text-[#545963]",
@@ -314,7 +314,7 @@ const MockSearchBar = memo(
 						onChange={(e) => setSearchQuery(e.target.value)}
 						onFocus={() => setIsFocused(true)}
 						onBlur={() => setIsFocused(false)}
-						className="font-outfit relative h-full flex-1 bg-transparent px-4 text-sm font-medium text-[#545963] placeholder-[#32353C] transition-colors outline-none"
+						className="font-russo relative h-full flex-1 bg-transparent px-4 text-sm font-medium text-[#545963] placeholder-[#32353C] transition-colors outline-none"
 					/>
 
 					{/* Clear Button */}
@@ -364,7 +364,7 @@ const FilterButton = memo(
 
 				<span
 					className={cn(
-						"relative z-10 font-outfit text-xs font-medium tracking-wide whitespace-nowrap flex items-center gap-2",
+						"relative z-10 font-russo text-xs font-medium tracking-wide whitespace-nowrap flex items-center gap-2",
 						"transition-colors duration-300 ease-in-out",
 						isActive
 							? "text-white"
@@ -479,7 +479,7 @@ const MockInstrumentsPanel = memo(() => {
 					<div className="space-y-2">
 						<div className="flex items-center gap-2 mb-3">
 							<FaStar size={10} className="text-[#24FF66]" />
-							<span className="font-outfit text-xs font-medium text-[#545963] uppercase tracking-wider">
+							<span className="font-russo text-xs font-medium text-[#545963] uppercase tracking-wider">
 								Selected Pairs ({selectedPairs.length})
 							</span>
 						</div>
@@ -503,7 +503,7 @@ const MockInstrumentsPanel = memo(() => {
 				{/* Other Categories */}
 				{activeFilter !== "selected" && (
 					<div className="space-y-2">
-						<span className="font-outfit text-xs font-medium text-[#545963] uppercase tracking-wider block mb-3">
+						<span className="font-russo text-xs font-medium text-[#545963] uppercase tracking-wider block mb-3">
 							{activeFilter === "fx" && "Foreign Exchange"}
 							{activeFilter === "crypto" && "Cryptocurrency"}
 							{activeFilter === "stocks" && "Stocks"}
@@ -526,7 +526,7 @@ const MockInstrumentsPanel = memo(() => {
 						))}
 						{filteredInstruments.length === 0 && searchQuery && (
 							<div className="text-center py-8">
-								<span className="font-outfit text-sm text-[#32353C]">
+								<span className="font-russo text-sm text-[#32353C]">
 									No instruments found for "{searchQuery}"
 								</span>
 							</div>
@@ -571,7 +571,7 @@ export const SectionInstrumentsPanel = memo(() => {
 									{/* Overline */}
 									<div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-[#24FF66]/30 bg-gradient-to-r from-[#24FF66]/10 to-transparent">
 										<div className="w-2 h-2 rounded-full bg-[#24FF66] animate-pulse" />
-										<span className="font-outfit text-sm font-semibold text-[#24FF66] uppercase tracking-wider">
+										<span className="font-russo text-sm font-semibold text-[#24FF66] uppercase tracking-wider">
 											Advanced Trading Tools
 										</span>
 									</div>
@@ -597,7 +597,7 @@ export const SectionInstrumentsPanel = memo(() => {
 									transition={{ duration: 0.8, delay: 0.3 }}
 									className="space-y-6"
 								>
-									<p className="font-outfit text-xl lg:text-2xl text-white/80 leading-relaxed font-light">
+									<p className="font-russo text-xl lg:text-2xl text-white/80 leading-relaxed font-light">
 										Navigate through{" "}
 										<span className="text-[#24FF66] font-semibold">
 											hundreds of financial instruments
@@ -606,7 +606,7 @@ export const SectionInstrumentsPanel = memo(() => {
 										drag-and-drop organization.
 									</p>
 
-									<p className="font-outfit text-lg text-white/60 leading-relaxed max-w-2xl">
+									<p className="font-russo text-lg text-white/60 leading-relaxed max-w-2xl">
 										Your trading universe, perfectly organized. From forex pairs
 										to cryptocurrencies, stocks to ETFs — find, organize, and
 										track everything in one unified interface.
@@ -641,7 +641,7 @@ export const SectionInstrumentsPanel = memo(() => {
 									<div className="relative z-10 space-y-4">
 										<div className="space-y-2">
 											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
-												<span className="font-outfit text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+												<span className="font-russo text-xs font-bold text-[#24FF66] uppercase tracking-wider">
 													INSTANT
 												</span>
 											</div>
@@ -650,7 +650,7 @@ export const SectionInstrumentsPanel = memo(() => {
 											</h3>
 										</div>
 
-										<p className="font-outfit text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
+										<p className="font-russo text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
 											Find any instrument in{" "}
 											<span className="text-[#24FF66] font-semibold">
 												milliseconds
@@ -667,7 +667,7 @@ export const SectionInstrumentsPanel = memo(() => {
 													&lt; 50ms
 												</span>
 											</div>
-											<span className="font-outfit text-xs text-white/50">
+											<span className="font-russo text-xs text-white/50">
 												Average search time
 											</span>
 										</div>
@@ -707,7 +707,7 @@ export const SectionInstrumentsPanel = memo(() => {
 									<div className="relative z-10 space-y-4">
 										<div className="space-y-2">
 											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
-												<span className="font-outfit text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+												<span className="font-russo text-xs font-bold text-[#24FF66] uppercase tracking-wider">
 													SMART
 												</span>
 											</div>
@@ -716,7 +716,7 @@ export const SectionInstrumentsPanel = memo(() => {
 											</h3>
 										</div>
 
-										<p className="font-outfit text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
+										<p className="font-russo text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
 											Intelligent categorization by{" "}
 											<span className="text-[#24FF66] font-semibold">
 												asset class
@@ -732,7 +732,7 @@ export const SectionInstrumentsPanel = memo(() => {
 													key={category}
 													className="px-2 py-1 rounded bg-[#24FF66]/10 border border-[#24FF66]/20"
 												>
-													<span className="font-outfit text-xs font-medium text-[#24FF66]">
+													<span className="font-russo text-xs font-medium text-[#24FF66]">
 														{category}
 													</span>
 												</div>
@@ -765,7 +765,7 @@ export const SectionInstrumentsPanel = memo(() => {
 									<div className="flex-1 space-y-4">
 										<div className="space-y-2">
 											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
-												<span className="font-outfit text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+												<span className="font-russo text-xs font-bold text-[#24FF66] uppercase tracking-wider">
 													INTUITIVE
 												</span>
 											</div>
@@ -774,7 +774,7 @@ export const SectionInstrumentsPanel = memo(() => {
 											</h3>
 										</div>
 
-										<p className="font-outfit text-white/70 leading-relaxed">
+										<p className="font-russo text-white/70 leading-relaxed">
 											Reorder your watchlist with intuitive drag-and-drop
 											controls. Organize instruments exactly how you want them
 											for optimal trading workflow.
@@ -783,13 +783,13 @@ export const SectionInstrumentsPanel = memo(() => {
 										<div className="flex items-center gap-3">
 											<div className="flex items-center gap-2">
 												<div className="w-2 h-2 rounded-full bg-[#24FF66]" />
-												<span className="font-outfit text-sm text-white/60">
+												<span className="font-russo text-sm text-white/60">
 													Instant reordering
 												</span>
 											</div>
 											<div className="flex items-center gap-2">
 												<div className="w-2 h-2 rounded-full bg-[#24FF66]" />
-												<span className="font-outfit text-sm text-white/60">
+												<span className="font-russo text-sm text-white/60">
 													Visual feedback
 												</span>
 											</div>
@@ -873,10 +873,10 @@ export const SectionInstrumentsPanel = memo(() => {
 												{stat.value}
 											</div>
 											<div className="space-y-1">
-												<div className="font-outfit text-sm font-semibold text-white uppercase tracking-wider">
+												<div className="font-russo text-sm font-semibold text-white uppercase tracking-wider">
 													{stat.label}
 												</div>
-												<div className="font-outfit text-xs text-white/50">
+												<div className="font-russo text-xs text-white/50">
 													{stat.sublabel}
 												</div>
 											</div>

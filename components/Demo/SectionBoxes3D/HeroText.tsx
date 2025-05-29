@@ -43,7 +43,7 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 						}}
 						className="block"
 					>
-						MARKET
+						TRADE
 					</motion.span>
 				</motion.div>
 
@@ -59,7 +59,7 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 						}}
 						className="block relative"
 					>
-						DECODED
+						SMARTER
 					</motion.span>
 				</motion.div>
 			</motion.h1>
@@ -75,10 +75,10 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 				}}
 				className="max-w-2xl space-y-6"
 			>
-				<p className="font-outfit text-lg text-white/60 leading-relaxed max-w-xl">
-					Experience the future of market analysis through our revolutionary 3D
-					visualization engine. Transform complex data into actionable insights
-					with unprecedented clarity.
+				<p className="font-outfit text-xl text-white/80 leading-relaxed max-w-xl">
+					Turn market chaos into profitable trades. Our revolutionary 3D
+					visualization reveals hidden opportunities and gives you the unfair
+					advantage every trader needs.
 				</p>
 
 				<motion.div
@@ -97,9 +97,9 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 							transition: { duration: 0.2 },
 						}}
 						whileTap={{ scale: 0.95 }}
-						className="group relative px-8 py-4 bg-white text-black font-outfit font-semibold text-lg rounded-full overflow-hidden transition-all duration-300 hover:shadow-lg"
+						className="group relative px-8 py-4 bg-[#24FF66] text-black font-outfit font-bold text-lg rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(36,255,102,0.4)]"
 					>
-						<span className="relative z-10">Explore the Platform</span>
+						<span className="relative z-10">Start Winning Trades</span>
 
 						{/* Simplified Arrow */}
 						<motion.svg

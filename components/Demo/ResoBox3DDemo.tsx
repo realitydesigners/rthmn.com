@@ -657,7 +657,7 @@ export const ResoBox3DCircular = memo(
 									<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 
 									<div className="relative z-10 flex items-center gap-3">
-										<span className="font-outfit text-xs text-[#818181] uppercase tracking-wider">
+										<span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
 											Focus Mode
 										</span>
 

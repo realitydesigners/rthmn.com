@@ -1,6 +1,6 @@
 import { NavbarSignedOut } from "@/components/Navbars/NavbarSignedOut";
 import { SectionFooter } from "@/components/Sections/SectionFooter";
-import { dmmono, outfit, oxanium, russo } from "@/lib/styles/fonts";
+import { kodemono, russo, oxanium, outfit } from "@/lib/styles/fonts";
 import { createClient } from "@/lib/supabase/server";
 import { QueryProvider } from "@/providers/QueryProvider";
 import SupabaseProvider from "@/providers/SupabaseProvider";
@@ -65,7 +65,7 @@ export default async function RootLayout({
 			<body
 				className={cn(
 					inter.className,
-					dmmono.variable,
+					kodemono.variable,
 					outfit.variable,
 					oxanium.variable,
 					russo.variable,

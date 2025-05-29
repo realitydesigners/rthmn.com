@@ -66,7 +66,7 @@ export default function CourseClient({ course }: { course: Course }) {
 							<CourseIcon icon={course.icon} />
 						</div>
 						<div className="flex-1 space-y-4">
-							<h1 className="font-outfit bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
+							<h1 className="font-russo bg-gradient-to-br from-white via-white to-neutral-300 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-5xl">
 								{course.title}
 							</h1>
 							<p className="max-w-2xl text-lg primary-text">
@@ -100,7 +100,7 @@ export default function CourseClient({ course }: { course: Course }) {
 
 					{/* Course Modules */}
 					<div className="space-y-8">
-						<h2 className="font-outfit text-2xl font-semibold text-white">
+						<h2 className="font-russo text-2xl font-semibold text-white">
 							Course Content
 						</h2>
 						<div className="space-y-4">

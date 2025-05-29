@@ -45,7 +45,7 @@ export function TourButton({
 					isBlue ? "via-blue-400/10" : "via-white/5"
 				} to-transparent`}
 			/>
-			<span className="font-outfit relative">{children}</span>
+			<span className="font-russo relative">{children}</span>
 		</button>
 	);
 }

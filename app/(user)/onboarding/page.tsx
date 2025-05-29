@@ -187,7 +187,7 @@ export default function OnboardingPage() {
 					</AnimatePresence>
 
 					{/* Navigation */}
-					<div className="font-outfit flex justify-end space-x-3 mt-6">
+					<div className="font-russo flex justify-end space-x-3 mt-6">
 						{stepNumber > 1 && (
 							<TourButton onClick={handleBack} variant="black">
 								Back

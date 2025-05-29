@@ -26,10 +26,10 @@ export function GitHubBlock({
 					</div>
 					<div className="flex flex-col items-center justify-between md:flex-row">
 						<div>
-							<h2 className="font-outfit mb-2 text-2xl font-bold text-white">
+							<h2 className="font-russo mb-2 text-2xl font-bold text-white">
 								{title}
 							</h2>
-							<p className="font-dmmono  mb-8 primary-text md:mb-0">
+							<p className="font-kodemono  mb-8 primary-text md:mb-0">
 								{description}
 							</p>
 						</div>

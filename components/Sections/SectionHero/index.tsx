@@ -36,14 +36,14 @@ export const SectionHero: React.FC<BoxComponentProps> = ({ marketData }) => {
 					<div className="absolute inset-x-0 top-[-10%] -z-10 mx-auto h-[200px] w-[70%] scale-125 rounded-full bg-[radial-gradient(circle_at_center,rgba(0,204,122,0.1),transparent_60%)] opacity-60 blur-3xl" />
 
 					<h1
-						className={`text-neutral-gradient font-outfit relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[8em] lg:leading-[1em]`}
+						className={`text-neutral-gradient font-russo relative z-10 text-[3em] leading-[1em] font-bold tracking-tight lg:text-[8em] lg:leading-[1em]`}
 					>
 						Unlock Market
 						<br />
 						Patterns, Instantly.
 					</h1>
 					<p
-						className={`text-dark-neutral font-dmmono  mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
+						className={`text-dark-neutral font-kodemono  mb-6 w-11/12 pt-6 text-lg lg:text-xl`}
 					>
 						Experience the future of market analysis. RTHMN's AI identifies
 						predictive patterns, giving you a unique edge.

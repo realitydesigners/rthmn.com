@@ -54,7 +54,7 @@ export const PriceAxis: React.FC<PriceAxisProps> = ({
 								style={{ borderColor: color, opacity: 0.9 }}
 							/>
 							<span
-								className="ml-1 font-dmmono text-[9px] tracking-wider"
+								className="ml-1 font-kodemono text-[9px] tracking-wider"
 								style={{ color, textShadow: "0 0 3px rgba(0,0,0,0.6)" }}
 							>
 								{formatPrice(price, pair)}

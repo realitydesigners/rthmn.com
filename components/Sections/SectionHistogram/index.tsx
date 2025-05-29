@@ -99,10 +99,10 @@ export const SectionHistogram = () => {
 		<section className="relative overflow-hidden bg-black py-16 text-center sm:py-24">
 			{/* Text Content Container */}
 			<div className="mx-auto mb-12 max-w-3xl px-4 sm:px-6 lg:px-8">
-				<h2 className="font-outfit text-neutral-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+				<h2 className="font-russo text-neutral-gradient relative mb-6 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
 					Visualize Market Dynamics
 				</h2>
-				<p className="font-outfit text-md mx-auto mt-4 max-w-2xl primary-text sm:text-lg lg:text-xl">
+				<p className="font-russo text-md mx-auto mt-4 max-w-2xl primary-text sm:text-lg lg:text-xl">
 					Dive deep into order flow with our volume profile histogram. Identify
 					key support/resistance levels and understand market conviction at a
 					glance.
@@ -143,7 +143,7 @@ export const SectionHistogram = () => {
 								aria-hidden="true"
 							/>
 						</div>
-						<h3 className="font-outfit mt-6 text-lg font-semibold text-white">
+						<h3 className="font-russo mt-6 text-lg font-semibold text-white">
 							{benefit.title}
 						</h3>
 						<p className="mt-2 text-base primary-text">{benefit.description}</p>

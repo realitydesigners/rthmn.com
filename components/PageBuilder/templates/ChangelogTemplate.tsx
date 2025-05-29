@@ -5,33 +5,33 @@ export const ChangelogTemplate: PortableTextComponents = {
 	block: {
 		normal: ({ children }) => (
 			<div className="mb-4">
-				<p className={`font-outfit leading-relaxed primary-text`}>{children}</p>
+				<p className={`font-russo leading-relaxed primary-text`}>{children}</p>
 			</div>
 		),
 		h1: ({ children }) => (
 			<h1
-				className={`font-outfit mb-6 text-3xl leading-relaxed font-bold primary-text`}
+				className={`font-russo mb-6 text-3xl leading-relaxed font-bold primary-text`}
 			>
 				{children}
 			</h1>
 		),
 		h2: ({ children }) => (
 			<h2
-				className={`font-outfit mb-4text-2xl leading-relaxed font-bold text-white`}
+				className={`font-russo mb-4text-2xl leading-relaxed font-bold text-white`}
 			>
 				{children}
 			</h2>
 		),
 		h3: ({ children }) => (
 			<h3
-				className={`font-outfit mb-3 text-xl leading-relaxed font-bold text-white`}
+				className={`font-russo mb-3 text-xl leading-relaxed font-bold text-white`}
 			>
 				{children}
 			</h3>
 		),
 		h4: ({ children }) => (
 			<h4
-				className={`font-outfit mb-2 text-lg leading-relaxed font-bold text-white`}
+				className={`font-russo mb-2 text-lg leading-relaxed font-bold text-white`}
 			>
 				{children}
 			</h4>

@@ -29,12 +29,12 @@ export const SectionCTA = () => {
 				>
 					{/* Larger, glowing heading */}
 					<h2
-						className="font-outfit text-neutral-gradient mb-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl"
+						className="font-russo text-neutral-gradient mb-6 text-5xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl"
 						style={{ textShadow: "0 0 15px rgba(209, 213, 219, 0.3)" }} // Subtle glow matching gradient
 					>
 						Ready to Elevate Your Trading?
 					</h2>
-					<p className="font-outfit mx-auto mt-6 max-w-xl text-lg primary-text">
+					<p className="font-russo mx-auto mt-6 max-w-xl text-lg primary-text">
 						Join RTHMN today and start identifying high-probability patterns
 						with confidence. Gain your edge.
 					</p>

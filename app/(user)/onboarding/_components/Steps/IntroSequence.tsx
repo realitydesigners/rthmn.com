@@ -228,7 +228,7 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 			<motion.h1
 				{...BASE_ANIMATIONS.fade}
 				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-				className="font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-4xl sm:text-5xl md:text-7xl font-bold text-transparent"
+				className="font-russo bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-4xl sm:text-5xl md:text-7xl font-bold text-transparent"
 			>
 				Welcome to Rthmn
 			</motion.h1>
@@ -236,7 +236,7 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 			<motion.p
 				{...BASE_ANIMATIONS.fade}
 				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
-				className="font-outfit max-w-md mx-auto text-base sm:text-lg text-white/60"
+				className="font-russo max-w-md mx-auto text-base sm:text-lg text-white/60"
 			>
 				The future of trading and first gamified trading platform.
 			</motion.p>
@@ -271,7 +271,7 @@ const PatternRecognitionStep = ({
 				<motion.div
 					{...BASE_ANIMATIONS.fade}
 					transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-					className="font-outfit text-center text-2xl sm:text-3xl md:text-4xl leading-tight font-bold tracking-tight text-balance"
+					className="font-russo text-center text-2xl sm:text-3xl md:text-4xl leading-tight font-bold tracking-tight text-balance"
 				>
 					<span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
 						Rthmn is a tool designed to compress time allowing you to see the
@@ -354,7 +354,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 			<motion.h2
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="font-outfit bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent"
+				className="font-russo bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent"
 			>
 				Terms of Service
 			</motion.h2>

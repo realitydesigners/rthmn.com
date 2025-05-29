@@ -161,10 +161,10 @@ const BenefitsList = memo(
 							<FaCheck className="h-3.5 w-3.5 text-blue-400" />
 						</div>
 						<div>
-							<h3 className="font-outfit text-base font-semibold text-white">
+							<h3 className="font-russo text-base font-semibold text-white">
 								{benefit.title}
 							</h3>
-							<p className="font-dmmono  mt-1 text-sm primary-text">
+							<p className="font-kodemono  mt-1 text-sm primary-text">
 								{benefit.description}
 							</p>
 						</div>
@@ -278,14 +278,14 @@ export function SectionPricing({ user, products, subscription }: Props) {
 								transition={{ duration: 0.6 }}
 								className="space-y-3"
 							>
-								<h2 className="font-outfit text-neutral-gradient text-xl font-medium tracking-tight lg:text-2xl">
+								<h2 className="font-russo text-neutral-gradient text-xl font-medium tracking-tight lg:text-2xl">
 									Box Seat
 								</h2>
 								<div className="flex items-baseline gap-3">
-									<h2 className="font-outfit text-neutral-gradient text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
+									<h2 className="font-russo text-neutral-gradient text-5xl font-bold tracking-tight sm:text-6xl lg:text-7xl">
 										{priceString}
 									</h2>
-									<span className="font-dmmono  text-lg primary-text">
+									<span className="font-kodemono  text-lg primary-text">
 										/month
 									</span>
 								</div>
@@ -295,7 +295,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 								initial={{ opacity: 0, y: 20 }}
 								whileInView={{ opacity: 1, y: 0 }}
 								transition={{ duration: 0.6, delay: 0.1 }}
-								className="font-outfit text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg"
+								className="font-russo text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg"
 								style={{ textShadow: "0 0 8px rgba(200, 200, 255, 0.1)" }}
 							>
 								{product.description}

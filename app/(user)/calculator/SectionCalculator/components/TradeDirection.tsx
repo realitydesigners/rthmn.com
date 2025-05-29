@@ -18,7 +18,7 @@ export const TradeDirection = memo(
 						: "border-[#1C1E23] bg-black/40 primary-text hover:border-[#32353C]"
 				}`}
 			>
-				<span className="font-dmmono ">Long</span>
+				<span className="font-kodemono ">Long</span>
 			</button>
 			<button
 				onClick={() => onDirectionChange("short")}
@@ -28,7 +28,7 @@ export const TradeDirection = memo(
 						: "border-[#1C1E23] bg-black/40 primary-text hover:border-[#32353C]"
 				}`}
 			>
-				<span className="font-dmmono ">Short</span>
+				<span className="font-kodemono ">Short</span>
 			</button>
 		</div>
 	),

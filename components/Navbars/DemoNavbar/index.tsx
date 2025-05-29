@@ -66,7 +66,7 @@ export const DemoNavbar = memo(({ y, opacity }: DemoNavbarProps) => {
 												{getSegmentIcon(segment)}
 											</span>
 										)}
-										<span className="font-outfit text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
+										<span className="font-russo text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
 											{segment}
 										</span>
 									</div>
@@ -86,7 +86,7 @@ export const DemoNavbar = memo(({ y, opacity }: DemoNavbarProps) => {
 						{/* Mock Connection Badge */}
 						<div className="flex items-center gap-2 px-2 py-1 bg-[#1C1E23]/40 border border-[#24FF66]/30 rounded-md">
 							<div className="w-2 h-2 bg-[#24FF66] rounded-full" />
-							<span className="font-outfit text-xs text-[#24FF66] uppercase tracking-wide">
+							<span className="font-russo text-xs text-[#24FF66] uppercase tracking-wide">
 								Connected
 							</span>
 						</div>

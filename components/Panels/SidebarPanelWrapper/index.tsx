@@ -262,7 +262,7 @@ export const SidebarWrapper = ({
 								position === "right" && "flex-1 justify-end",
 							)}
 						>
-							<h2 className="font-outfit text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
+							<h2 className="font-russo text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
 								{title}
 							</h2>
 						</div>

@@ -30,7 +30,7 @@ export const ModeToggle = memo(({ viewMode, onToggle }: ModeToggleProps) => (
 								: "bg-blue-400 shadow-[0_0_8px_rgba(59,130,246,0.6)]"
 						}`}
 					/>
-					<span className="font-outfit text-xs font-medium tracking-wider text-[#818181] uppercase">
+					<span className="font-russo text-xs font-medium tracking-wider text-[#818181] uppercase">
 						{viewMode === "scene" ? "Scene Mode" : "Focus Mode"}
 					</span>
 				</div>
@@ -62,7 +62,7 @@ interface StructureIndicatorProps {
 export const StructureIndicator = memo(
 	({ structures, activeIndex, onSelect }: StructureIndicatorProps) => (
 		<div className="relative">
-			<div className="flex items-center gap-4 px-6 py-3 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+			<div className="flex items-center gap-4 px-4 py-3 rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
 				{/* Background glow */}
 				<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
 
@@ -73,17 +73,14 @@ export const StructureIndicator = memo(
 					{/* Current structure info */}
 					<div className="flex items-center gap-3">
 						<div className="flex items-center gap-2">
-							<div className="w-8 h-8 rounded-lg bg-gradient-to-b from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30 flex items-center justify-center">
-								<span className="font-outfit text-sm font-bold text-[#24FF66]">
+							<div className="w-auto h-8 rounded-lg px-2 bg-gradient-to-b from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30 flex items-center justify-center">
+								<span className="font-russo text-sm font-bold text-[#24FF66]">
 									{structures[activeIndex].pair}
 								</span>
 							</div>
 							<div className="flex flex-col">
-								<span className="font-outfit text-sm font-medium text-white">
+								<span className="font-russo text-sm font-medium text-white">
 									{structures[activeIndex].name}
-								</span>
-								<span className="font-outfit text-xs text-[#818181]">
-									Active Structure
 								</span>
 							</div>
 						</div>
@@ -121,7 +118,7 @@ export const ControlPanel = memo(
 			<div className="relative z-10 p-4">
 				{title && (
 					<div className="mb-3 flex items-center gap-2">
-						<span className="font-outfit text-xs font-medium tracking-wider text-[#818181] uppercase">
+						<span className="font-russo text-xs font-medium tracking-wider text-[#818181] uppercase">
 							{title}
 						</span>
 					</div>

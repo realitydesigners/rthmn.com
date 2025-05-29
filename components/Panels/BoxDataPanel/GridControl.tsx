@@ -46,7 +46,7 @@ export const GridControl = () => {
 					{layouts.map((layout) => (
 						<div
 							key={layout.id}
-							className="font-outfit relative flex h-7 items-center rounded-md px-2 text-[10px] font-medium text-[#818181]"
+							className="font-russo relative flex h-7 items-center rounded-md px-2 text-[10px] font-medium text-[#818181]"
 						>
 							{layout.label}
 						</div>
@@ -66,7 +66,7 @@ export const GridControl = () => {
 					<button
 						key={layout.id}
 						onClick={() => handleLayoutChange(layout.id)}
-						className={`font-outfit relative flex h-7 items-center rounded-md px-2 text-[10px] font-medium transition-all duration-200 ${
+						className={`font-russo relative flex h-7 items-center rounded-md px-2 text-[10px] font-medium transition-all duration-200 ${
 							localLayout === layout.id
 								? "bg-[#1C1E23] text-white"
 								: "text-[#818181] hover:text-white"

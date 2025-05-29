@@ -166,7 +166,7 @@ const ResoBoxRecursive = memo(
 					<div className="absolute top-0 -right-12  border-dashed  opacity-90">
 						<div className="absolute -top-3.5 right-0">
 							<span
-								className="font-dmmono  text-[8px] text-white tracking-wider"
+								className="font-kodemono  text-[8px] text-white tracking-wider"
 								style={{ color: colors.baseColor }}
 							>
 								{formatPrice(box.high, pair)}
@@ -179,7 +179,7 @@ const ResoBoxRecursive = memo(
 					<div className="absolute -right-12 bottom-0   opacity-90">
 						<div className="absolute -top-3.5 right-0">
 							<span
-								className="font-dmmono  text-[8px] tracking-wider"
+								className="font-kodemono  text-[8px] tracking-wider"
 								style={{ color: colors.baseColor }}
 							>
 								{formatPrice(box.low, pair)}

@@ -25,10 +25,10 @@ export const DemoInstrumentsPanel = memo(() => {
 	return (
 		<div className="space-y-4 p-4">
 			<div className="space-y-2">
-				<h3 className="font-outfit text-sm font-medium text-white">
+				<h3 className="font-russo text-sm font-medium text-white">
 					Active Instruments
 				</h3>
-				<p className="font-outfit text-xs text-[#818181]">
+				<p className="font-russo text-xs text-[#818181]">
 					Real-time cryptocurrency market data
 				</p>
 			</div>
@@ -44,10 +44,10 @@ export const DemoInstrumentsPanel = memo(() => {
 								<LuActivity size={14} className="text-[#24FF66]" />
 							</div>
 							<div>
-								<div className="font-outfit text-sm font-medium text-white">
+								<div className="font-russo text-sm font-medium text-white">
 									{instrument.symbol}
 								</div>
-								<div className="font-outfit text-xs text-[#818181]">
+								<div className="font-russo text-xs text-[#818181]">
 									{instrument.price}
 								</div>
 							</div>
@@ -59,7 +59,7 @@ export const DemoInstrumentsPanel = memo(() => {
 								<LuTrendingDown size={14} className="text-red-400" />
 							)}
 							<span
-								className={`font-outfit text-xs font-medium ${
+								className={`font-russo text-xs font-medium ${
 									instrument.trend === "up" ? "text-[#24FF66]" : "text-red-400"
 								}`}
 							>
@@ -71,21 +71,19 @@ export const DemoInstrumentsPanel = memo(() => {
 			</div>
 
 			<div className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-4">
-				<h4 className="font-outfit text-sm font-medium text-white mb-2">
+				<h4 className="font-russo text-sm font-medium text-white mb-2">
 					Market Overview
 				</h4>
 				<div className="grid grid-cols-2 gap-4">
 					<div className="text-center">
-						<div className="font-outfit text-lg font-bold text-[#24FF66]">
+						<div className="font-russo text-lg font-bold text-[#24FF66]">
 							+5.2%
 						</div>
-						<div className="font-outfit text-xs text-[#818181]">24h Change</div>
+						<div className="font-russo text-xs text-[#818181]">24h Change</div>
 					</div>
 					<div className="text-center">
-						<div className="font-outfit text-lg font-bold text-white">
-							$2.1T
-						</div>
-						<div className="font-outfit text-xs text-[#818181]">Market Cap</div>
+						<div className="font-russo text-lg font-bold text-white">$2.1T</div>
+						<div className="font-russo text-xs text-[#818181]">Market Cap</div>
 					</div>
 				</div>
 			</div>
@@ -106,10 +104,10 @@ export const DemoVisualizerPanel = memo(() => {
 	return (
 		<div className="space-y-4 p-4">
 			<div className="space-y-2">
-				<h3 className="font-outfit text-sm font-medium text-white">
+				<h3 className="font-russo text-sm font-medium text-white">
 					Visualization Options
 				</h3>
-				<p className="font-outfit text-xs text-[#818181]">
+				<p className="font-russo text-xs text-[#818181]">
 					Choose how to display market data
 				</p>
 			</div>
@@ -140,13 +138,13 @@ export const DemoVisualizerPanel = memo(() => {
 							</div>
 							<div className="flex-1">
 								<div
-									className={`font-outfit text-sm font-medium ${
+									className={`font-russo text-sm font-medium ${
 										chart.active ? "text-[#24FF66]" : "text-white"
 									}`}
 								>
 									{chart.name}
 								</div>
-								<div className="font-outfit text-xs text-[#818181]">
+								<div className="font-russo text-xs text-[#818181]">
 									{chart.active ? "Currently active" : "Click to activate"}
 								</div>
 							</div>
@@ -156,12 +154,12 @@ export const DemoVisualizerPanel = memo(() => {
 			</div>
 
 			<div className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-4">
-				<h4 className="font-outfit text-sm font-medium text-white mb-3">
+				<h4 className="font-russo text-sm font-medium text-white mb-3">
 					Display Settings
 				</h4>
 				<div className="space-y-3">
 					<div className="flex items-center justify-between">
-						<span className="font-outfit text-xs text-[#818181]">
+						<span className="font-russo text-xs text-[#818181]">
 							Animation Speed
 						</span>
 						<div className="w-20 h-2 bg-[#1C1E23] rounded-full">
@@ -169,7 +167,7 @@ export const DemoVisualizerPanel = memo(() => {
 						</div>
 					</div>
 					<div className="flex items-center justify-between">
-						<span className="font-outfit text-xs text-[#818181]">
+						<span className="font-russo text-xs text-[#818181]">
 							Transparency
 						</span>
 						<div className="w-20 h-2 bg-[#1C1E23] rounded-full">
@@ -196,10 +194,10 @@ export const DemoAnalyticsPanel = memo(() => {
 	return (
 		<div className="space-y-4 p-4">
 			<div className="space-y-2">
-				<h3 className="font-outfit text-sm font-medium text-white">
+				<h3 className="font-russo text-sm font-medium text-white">
 					Technical Analysis
 				</h3>
-				<p className="font-outfit text-xs text-[#818181]">
+				<p className="font-russo text-xs text-[#818181]">
 					Real-time market indicators and signals
 				</p>
 			</div>
@@ -210,14 +208,14 @@ export const DemoAnalyticsPanel = memo(() => {
 						key={metric.label}
 						className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-3"
 					>
-						<div className="font-outfit text-xs text-[#818181] mb-1">
+						<div className="font-russo text-xs text-[#818181] mb-1">
 							{metric.label}
 						</div>
-						<div className="font-outfit text-sm font-bold text-white mb-1">
+						<div className="font-russo text-sm font-bold text-white mb-1">
 							{metric.value}
 						</div>
 						<div
-							className={`font-outfit text-xs ${
+							className={`font-russo text-xs ${
 								metric.status === "bullish" || metric.status === "high"
 									? "text-[#24FF66]"
 									: metric.status === "overbought"
@@ -232,25 +230,25 @@ export const DemoAnalyticsPanel = memo(() => {
 			</div>
 
 			<div className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-4">
-				<h4 className="font-outfit text-sm font-medium text-white mb-3">
+				<h4 className="font-russo text-sm font-medium text-white mb-3">
 					Trading Signals
 				</h4>
 				<div className="space-y-2">
 					<div className="flex items-center gap-2">
 						<div className="w-2 h-2 bg-[#24FF66] rounded-full" />
-						<span className="font-outfit text-xs text-white">
+						<span className="font-russo text-xs text-white">
 							Strong Buy Signal - BTC
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<div className="w-2 h-2 bg-blue-400 rounded-full" />
-						<span className="font-outfit text-xs text-white">
+						<span className="font-russo text-xs text-white">
 							Hold Signal - ETH
 						</span>
 					</div>
 					<div className="flex items-center gap-2">
 						<div className="w-2 h-2 bg-red-400 rounded-full" />
-						<span className="font-outfit text-xs text-white">
+						<span className="font-russo text-xs text-white">
 							Sell Signal - SOL
 						</span>
 					</div>
@@ -274,10 +272,10 @@ export const DemoSettingsPanel = memo(() => {
 	return (
 		<div className="space-y-4 p-4">
 			<div className="space-y-2">
-				<h3 className="font-outfit text-sm font-medium text-white">
+				<h3 className="font-russo text-sm font-medium text-white">
 					Application Settings
 				</h3>
-				<p className="font-outfit text-xs text-[#818181]">
+				<p className="font-russo text-xs text-[#818181]">
 					Customize your trading experience
 				</p>
 			</div>
@@ -288,7 +286,7 @@ export const DemoSettingsPanel = memo(() => {
 						key={setting.label}
 						className="flex items-center justify-between rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-3"
 					>
-						<span className="font-outfit text-sm text-white">
+						<span className="font-russo text-sm text-white">
 							{setting.label}
 						</span>
 						<div
@@ -307,7 +305,7 @@ export const DemoSettingsPanel = memo(() => {
 			</div>
 
 			<div className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-4">
-				<h4 className="font-outfit text-sm font-medium text-white mb-3">
+				<h4 className="font-russo text-sm font-medium text-white mb-3">
 					Account Info
 				</h4>
 				<div className="space-y-2">
@@ -316,8 +314,8 @@ export const DemoSettingsPanel = memo(() => {
 							<LuUser size={14} className="text-[#24FF66]" />
 						</div>
 						<div>
-							<div className="font-outfit text-sm text-white">Demo User</div>
-							<div className="font-outfit text-xs text-[#818181]">
+							<div className="font-russo text-sm text-white">Demo User</div>
+							<div className="font-russo text-xs text-[#818181]">
 								demo@rthmn.com
 							</div>
 						</div>

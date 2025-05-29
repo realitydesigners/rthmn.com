@@ -166,7 +166,7 @@ export function PairSlider({
 							<div className="relative z-10 flex flex-col items-center">
 								<div className="flex items-center gap-8">
 									<h3
-										className={`font-outfit text-5xl font-bold tracking-tight transition-all duration-300 ${
+										className={`font-russo text-5xl font-bold tracking-tight transition-all duration-300 ${
 											isActive
 												? "text-neutral-gradient scale-110"
 												: "scale-90 primary-text/40"
@@ -237,7 +237,7 @@ export function PairSlider({
 
 								{isActive && (
 									<div className="mt-4 flex items-center gap-2">
-										<div className="font-dmmono  text-lg primary-text">
+										<div className="font-kodemono  text-lg primary-text">
 											{latestPrice?.toFixed(item.pair.includes("JPY") ? 3 : 5)}
 										</div>
 										<div className="flex items-center gap-3">

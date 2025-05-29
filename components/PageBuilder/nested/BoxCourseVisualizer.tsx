@@ -19,7 +19,7 @@ type ColorScheme = "blue-red" | "white-gradient";
 
 // Memoize FeatureTags component
 const FeatureTags = memo(() => (
-	<div className="font-outfit flex flex-wrap justify-center gap-4 text-xs sm:text-sm lg:justify-start lg:gap-6">
+	<div className="font-russo flex flex-wrap justify-center gap-4 text-xs sm:text-sm lg:justify-start lg:gap-6">
 		{FEATURE_TAGS.map((feature, index) => (
 			<motion.div
 				initial={{ opacity: 0, x: -20 }}
@@ -31,7 +31,7 @@ const FeatureTags = memo(() => (
 				<div className="items-centergap-1.5 relative flex">
 					<div className="absolute -inset-0.5 rounded-full bg-[#22c55e]/20 opacity-0 blur-sm transition-opacity duration-500 group-hover:opacity-100" />
 					<feature.icon className="relative mr-2 h-3 w-3 text-white sm:h-4 sm:w-4" />
-					<span className="font-dmmono  primary-text transition-colors duration-300 group-hover:text-white">
+					<span className="font-kodemono  primary-text transition-colors duration-300 group-hover:text-white">
 						{feature.text}
 					</span>
 				</div>
@@ -244,12 +244,12 @@ const BoxCourseVisualizer = ({ value }: BoxVisualizerProps) => {
 	return (
 		<div className="flex h-full w-full flex-col items-center justify-center space-y-6 py-8">
 			{value.title && (
-				<h3 className="font-outfit text-center text-xl font-semibold text-white">
+				<h3 className="font-russo text-center text-xl font-semibold text-white">
 					{value.title}
 				</h3>
 			)}
 			{value.description && (
-				<p className="font-outfit max-w-2xl text-center text-base primary-text">
+				<p className="font-russo max-w-2xl text-center text-base primary-text">
 					{value.description}
 				</p>
 			)}

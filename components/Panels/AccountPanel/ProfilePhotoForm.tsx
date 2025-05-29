@@ -114,7 +114,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 	};
 
 	return (
-		<div className="font-outfit relative h-full w-full">
+		<div className="font-russo relative h-full w-full">
 			{/* Hidden file input */}
 			<input
 				ref={fileInputRef}
@@ -158,7 +158,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 				)}
 
 				{/* Simple hover text */}
-				<div className="font-outfit absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+				<div className="font-russo absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-200 group-hover:opacity-100">
 					<span className="rounded-full bg-black/50 px-3 py-1.5 text-xs font-medium text-white backdrop-blur-sm sm:px-4 sm:py-2 sm:text-sm">
 						Change Photo
 					</span>
@@ -173,7 +173,7 @@ export default function ProfilePhotoForm({ avatarUrl, userId }: Props) {
 			)}
 
 			{/* Help Text - Hidden on very small screens */}
-			<div className="font-outfit mt-2 hidden text-center text-xs text-zinc-500 sm:block">
+			<div className="font-russo mt-2 hidden text-center text-xs text-zinc-500 sm:block">
 				Click to change • Max 2MB
 			</div>
 		</div>

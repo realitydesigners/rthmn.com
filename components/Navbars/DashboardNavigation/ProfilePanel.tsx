@@ -54,7 +54,7 @@ const MenuButton = ({
 				<div className="rounded-md bg-[#1C1E23] p-2">
 					<Icon className={`h-4 w-4 ${textColor}`} />
 				</div>
-				<span className={`font-outfit text-sm ${textColor}`}>{label}</span>
+				<span className={`font-russo text-sm ${textColor}`}>{label}</span>
 			</div>
 		</div>
 	);
@@ -111,10 +111,10 @@ export const ProfilePanel = () => {
 							)}
 						</div>
 						<div className="mt-4 text-center">
-							<h2 className="font-outfit text-xl font-bold text-white">
+							<h2 className="font-russo text-xl font-bold text-white">
 								{user.user_metadata?.full_name || "Your Profile"}
 							</h2>
-							<p className="font-outfit mt-1 text-sm text-zinc-400">
+							<p className="font-russo mt-1 text-sm text-zinc-400">
 								{user.email}
 							</p>
 						</div>

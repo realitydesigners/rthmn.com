@@ -106,7 +106,9 @@ export function SectionFooter() {
 									RTHMN
 								</div>
 							</Link>
-							<p className={`font-dmmono  mt-4 max-w-md text-sm primary-text`}>
+							<p
+								className={`font-kodemono  mt-4 max-w-md text-sm primary-text`}
+							>
 								Advanced pattern recognition for algorithmic trading. Built by
 								traders, for traders.
 							</p>
@@ -130,7 +132,7 @@ export function SectionFooter() {
 					<div className="grid grid-cols-2 gap-8 lg:grid-cols-3">
 						{/* Links Sections */}
 						{Object.entries(FOOTER_LINKS).map(([category, links]) => (
-							<div key={category} className="font-dmmono ">
+							<div key={category} className="font-kodemono ">
 								<h3 className="text-sm font-semibold text-white uppercase">
 									{category}
 								</h3>
@@ -153,7 +155,7 @@ export function SectionFooter() {
 						))}
 					</div>
 				</div>
-				<div className="font-dmmono  mt-8 border-t border-[#1C1E23] pt-8 text-[11px] leading-relaxed primary-text">
+				<div className="font-kodemono  mt-8 border-t border-[#1C1E23] pt-8 text-[11px] leading-relaxed primary-text">
 					<h4 className="mb-2 text-xs font-semibold  uppercase">
 						Risk Disclosure & Disclaimer
 					</h4>
@@ -195,7 +197,7 @@ export function SectionFooter() {
 				</div>
 				{/* Bottom Section */}
 				<div
-					className={`font-dmmono  mt-12 flex flex-col items-center justify-between border-t border-[#1C1E23] pt-8 lg:flex-row`}
+					className={`font-kodemono  mt-12 flex flex-col items-center justify-between border-t border-[#1C1E23] pt-8 lg:flex-row`}
 				>
 					<p className="text-xs primary-text">
 						© 2024 Rthmn. All rights reserved.

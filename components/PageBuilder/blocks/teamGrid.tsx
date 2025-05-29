@@ -26,7 +26,7 @@ export function TeamGridBlock({ members = [] }: TeamGridBlockProps) {
 	return (
 		<div className="w-full py-12">
 			<div className="flex w-full flex-col">
-				<h2 className="font-outfit mb-12 text-center text-5xl font-bold">
+				<h2 className="font-russo mb-12 text-center text-5xl font-bold">
 					Our Team
 				</h2>
 				<TeamCard members={members} />
@@ -65,7 +65,7 @@ export function TeamCard({ members = [] }: { members: TeamMember[] }) {
 					<div className="absolute right-0 bottom-0 left-0 translate-y-2 p-6 transition-all duration-500 ease-out group-hover:translate-y-0">
 						<div className="space-y-3">
 							<div className="flex items-center justify-between">
-								<h3 className="group-hover:text-shadow font-outfit text-2xl font-semibold tracking-wide text-white/90 transition-all duration-300 group-hover:text-white">
+								<h3 className="group-hover:text-shadow font-russo text-2xl font-semibold tracking-wide text-white/90 transition-all duration-300 group-hover:text-white">
 									{member.name}
 								</h3>
 								<div className="flex gap-4">
@@ -91,10 +91,10 @@ export function TeamCard({ members = [] }: { members: TeamMember[] }) {
 									)}
 								</div>
 							</div>
-							<p className="font-dmmono  font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
+							<p className="font-kodemono  font-medium tracking-wide text-white/70 transition-colors duration-300 group-hover:text-white/90">
 								{member.role}
 							</p>
-							<p className="font-outfit text-sm leading-relaxed text-[#BFC2CA] transition-colors duration-300 group-hover:text-white/70">
+							<p className="font-russo text-sm leading-relaxed text-[#BFC2CA] transition-colors duration-300 group-hover:text-white/70">
 								{member.shortBio}
 							</p>
 						</div>

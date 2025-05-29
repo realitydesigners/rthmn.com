@@ -87,7 +87,7 @@ const PairItem = memo(
 					{/* Instrument name */}
 					<span
 						className={cn(
-							"font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
+							"font-russo flex-1 text-sm font-bold tracking-wide transition-colors",
 							isSelected
 								? "text-white"
 								: "text-[#32353C] group-hover/item:text-[#545963]",
@@ -100,7 +100,7 @@ const PairItem = memo(
 					<div className="flex items-center">
 						<span
 							className={cn(
-								"font-dmmono  w-[70px] text-right text-sm tracking-wider transition-colors",
+								"font-kodemono  w-[70px] text-right text-sm tracking-wider transition-colors",
 								isSelected
 									? "text-[#545963]"
 									: "text-[#32353C] group-hover/item:text-[#32353C]",
@@ -201,7 +201,7 @@ const SearchResultItem = memo(
 					{/* Instrument name */}
 					<span
 						className={cn(
-							"font-outfit  flex-1 text-sm font-bold tracking-wide transition-colors",
+							"font-russo  flex-1 text-sm font-bold tracking-wide transition-colors",
 							isSelected
 								? "text-white/90 group-hover/result:text-white"
 								: "text-[#32353C] group-hover/result:text-[#545963]",
@@ -214,7 +214,7 @@ const SearchResultItem = memo(
 					<div className="flex items-center">
 						<span
 							className={cn(
-								"font-dmmono  w-[70px] text-right text-sm tracking-wider transition-colors",
+								"font-kodemono  w-[70px] text-right text-sm tracking-wider transition-colors",
 								isSelected
 									? "text-[#545963]"
 									: "text-[#32353C] group-hover/result:text-[#32353C]",
@@ -346,7 +346,7 @@ const SearchBar = memo(
 							setSearchQuery(value);
 						}}
 						onFocus={() => setShowResults(true)}
-						className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-[#545963] placeholder-[#32353C] transition-colors outline-none"
+						className="font-russo relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-[#545963] placeholder-[#32353C] transition-colors outline-none"
 					/>
 
 					{/* Clear Button */}
@@ -459,13 +459,13 @@ const DraggableItem = memo(
 								{/* <div className='relative flex h-8 w-8 items-center justify-center'></div> */}
 
 								{/* Instrument name */}
-								<span className="ml-4 font-outfit flex-1 text-sm font-bold tracking-wide text-white transition-colors">
+								<span className="ml-4 font-russo flex-1 text-sm font-bold tracking-wide text-white transition-colors">
 									{item}
 								</span>
 
 								{/* Price */}
 								<div className="flex items-center">
-									<span className="font-dmmono  w-[70px] text-right text-sm tracking-wider text-[#545963] transition-colors">
+									<span className="font-kodemono  w-[70px] text-right text-sm tracking-wider text-[#545963] transition-colors">
 										{priceData[item]?.price ? (
 											formatPrice(priceData[item].price, item)
 										) : (
@@ -544,7 +544,7 @@ const FilterButton = ({
 			{/* Label */}
 			<span
 				className={cn(
-					"relative z-10 font-outfit text-[12px] font-medium tracking-wide whitespace-nowrap flex items-center justify-center",
+					"relative z-10 font-russo text-[12px] font-medium tracking-wide whitespace-nowrap flex items-center justify-center",
 					"transition-colors duration-300 ease-in-out",
 					isActive ? "text-white" : "text-[#32353C] group-hover:text-[#545963]",
 				)}

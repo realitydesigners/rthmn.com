@@ -168,7 +168,7 @@ const CornerElement = ({
 
 // Memoize FeatureTags component - Minimalist/Floating Style
 const FeatureTags = memo(() => (
-	<div className="font-outfit mt-8 flex flex-col items-center gap-3 lg:flex-row lg:items-start lg:gap-4">
+	<div className="font-russo mt-8 flex flex-col items-center gap-3 lg:flex-row lg:items-start lg:gap-4">
 		{FEATURE_TAGS.map((feature, index) => (
 			<motion.div
 				initial={{ opacity: 0, x: -15 }}
@@ -178,7 +178,7 @@ const FeatureTags = memo(() => (
 				className="group flex cursor-pointer items-center gap-2"
 			>
 				<feature.icon className="h-3.5 w-3.5 primary-text transition-colors duration-300 group-hover:text-blue-400 group-hover:drop-shadow-[0_0_3px_rgba(34,197,94,0.4)]" />
-				<span className="font-dmmono  text-xs primary-text transition-colors duration-300 group-hover:text-neutral-200">
+				<span className="font-kodemono  text-xs primary-text transition-colors duration-300 group-hover:text-neutral-200">
 					{feature.text}
 				</span>
 			</motion.div>
@@ -275,10 +275,10 @@ const StaticContent = memo(() => (
 					transition={{ duration: 0.6 }}
 					className="space-y-3"
 				>
-					<h2 className="font-outfit text-neutral-gradient text-xl leading-none font-medium tracking-tight lg:text-2xl">
+					<h2 className="font-russo text-neutral-gradient text-xl leading-none font-medium tracking-tight lg:text-2xl">
 						Multi-Dimensional
 					</h2>
-					<h2 className="font-outfit text-neutral-gradient -mt-4 text-5xl leading-none font-bold tracking-tight sm:text-6xl lg:text-7xl">
+					<h2 className="font-russo text-neutral-gradient -mt-4 text-5xl leading-none font-bold tracking-tight sm:text-6xl lg:text-7xl">
 						Trend Analysis
 					</h2>
 				</motion.div>
@@ -290,7 +290,7 @@ const StaticContent = memo(() => (
 					className="space-y-8"
 				>
 					<p
-						className="font-outfit text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg"
+						className="font-russo text-neutral-gradient max-w-xl text-base leading-relaxed sm:text-lg"
 						style={{ textShadow: "0 0 8px rgba(200, 200, 255, 0.1)" }}
 					>
 						Transform market data into clear visual insights. Rthmn analyzes
