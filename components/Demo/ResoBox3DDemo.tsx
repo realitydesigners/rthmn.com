@@ -552,22 +552,10 @@ export const ResoBox3DCircular = memo(
 				<Canvas
 					camera={{ position: [0, 0, 70], fov: 50 }}
 					resize={{ scroll: false, debounce: { scroll: 0, resize: 0 } }}
-					dpr={1}
-					gl={{
-						antialias: true,
-						alpha: true,
-						powerPreference: "high-performance",
-					}}
 					className="absolute inset-0 w-screen h-screen z-0"
 				>
 					<ambientLight intensity={2} />
-					<directionalLight
-						position={[100, 100, 100]}
-						intensity={1}
-						castShadow
-						shadow-mapSize-width={2048}
-						shadow-mapSize-height={2048}
-					/>
+					<directionalLight position={[0, 60, 180]} intensity={1} />
 
 					<CameraController
 						viewMode={viewMode}

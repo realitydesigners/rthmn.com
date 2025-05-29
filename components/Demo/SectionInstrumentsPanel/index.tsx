@@ -138,21 +138,9 @@ const DraggableInstrumentItem = memo(
 
 								{/* Price */}
 								<div className="flex items-center gap-3">
-									<span className="font-mono w-[80px] text-right text-sm tracking-wider text-[#545963] transition-colors">
+									<span className="font-kodemono w-[80px] text-right text-sm tracking-wider text-[#545963] transition-colors">
 										{mockData ? formatPrice(mockData.price, pair) : "N/A"}
 									</span>
-
-									{/* Change indicator */}
-									<div
-										className={cn(
-											"w-[60px] text-right text-xs font-medium",
-											isPositive ? "text-[#24FF66]" : "text-red-400",
-										)}
-									>
-										{mockData
-											? `${isPositive ? "+" : ""}${formatPrice(Math.abs(mockData.change), pair)}`
-											: "N/A"}
-									</div>
 
 									{/* Toggle button */}
 									<div className="ml-2 flex w-6 justify-center">
@@ -226,24 +214,12 @@ const MockInstrumentItem = memo(
 					<div className="flex items-center gap-3">
 						<span
 							className={cn(
-								"font-mono w-[80px] text-right text-sm tracking-wider transition-colors",
+								"font-kodemono w-[80px] text-right text-sm tracking-wider transition-colors",
 								isSelected ? "text-[#545963]" : "text-[#32353C]",
 							)}
 						>
 							{mockData ? formatPrice(mockData.price, pair) : "N/A"}
 						</span>
-
-						{/* Change indicator */}
-						<div
-							className={cn(
-								"w-[60px] text-right text-xs font-medium",
-								isPositive ? "text-[#24FF66]" : "text-red-400",
-							)}
-						>
-							{mockData
-								? `${isPositive ? "+" : ""}${formatPrice(Math.abs(mockData.change), pair)}`
-								: "N/A"}
-						</div>
 
 						{/* Toggle button */}
 						<div className="ml-2 flex w-6 justify-center">
@@ -445,8 +421,7 @@ const MockInstrumentsPanel = memo(() => {
 				<div className="flex gap-2 mt-4 overflow-x-auto">
 					<FilterButton
 						isActive={activeFilter === "selected"}
-						label="Selected"
-						icon={<FaStar size={10} />}
+						label="Favorites"
 						onClick={() => setActiveFilter("selected")}
 					/>
 					<FilterButton
@@ -477,12 +452,6 @@ const MockInstrumentsPanel = memo(() => {
 				{/* Selected Pairs with Drag & Drop */}
 				{activeFilter === "selected" && (
 					<div className="space-y-2">
-						<div className="flex items-center gap-2 mb-3">
-							<FaStar size={10} className="text-[#24FF66]" />
-							<span className="font-russo text-xs font-medium text-[#545963] uppercase tracking-wider">
-								Selected Pairs ({selectedPairs.length})
-							</span>
-						</div>
 						<Reorder.Group
 							axis="y"
 							values={selectedPairs}
@@ -569,23 +538,23 @@ export const SectionInstrumentsPanel = memo(() => {
 									className="space-y-4"
 								>
 									{/* Overline */}
-									<div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-[#24FF66]/30 bg-gradient-to-r from-[#24FF66]/10 to-transparent">
-										<div className="w-2 h-2 rounded-full bg-[#24FF66] animate-pulse" />
-										<span className="font-russo text-sm font-semibold text-[#24FF66] uppercase tracking-wider">
-											Advanced Trading Tools
+									<div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-white/20 bg-gradient-to-r from-white/5 to-transparent">
+										<div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+										<span className="font-russo text-sm font-semibold text-white/90 uppercase tracking-wider">
+											Professional Trading Arsenal
 										</span>
 									</div>
 
 									<h2 className="font-russo text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[0.8] uppercase">
-										PRECISION
-										<span className="block text-[#24FF66] mt-2 relative">
-											INSTRUMENT CONTROL
+										MASTER EVERY
+										<span className="block text-white mt-2 relative">
+											MARKET INSTANTLY
 											{/* Animated underline */}
 											<motion.div
 												initial={{ width: 0 }}
 												whileInView={{ width: "100%" }}
 												transition={{ duration: 1.2, delay: 0.5 }}
-												className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-[#24FF66] via-[#1ECC52] to-transparent"
+												className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-white via-white/60 to-transparent"
 											/>
 										</span>
 									</h2>
@@ -598,18 +567,18 @@ export const SectionInstrumentsPanel = memo(() => {
 									className="space-y-6"
 								>
 									<p className="font-russo text-xl lg:text-2xl text-white/80 leading-relaxed font-light">
-										Navigate through{" "}
-										<span className="text-[#24FF66] font-semibold">
-											hundreds of financial instruments
+										<span className="text-white font-semibold">
+											Access 300+ trading instruments
 										</span>{" "}
-										with lightning-fast search, intelligent filtering, and
-										drag-and-drop organization.
+										across crypto, forex, stocks, and ETFs with the speed that
+										separates winners from losers.
 									</p>
 
-									<p className="font-russo text-lg text-white/60 leading-relaxed max-w-2xl">
-										Your trading universe, perfectly organized. From forex pairs
-										to cryptocurrencies, stocks to ETFs — find, organize, and
-										track everything in one unified interface.
+									<p className="font-outfit text-lg text-white/60 leading-relaxed max-w-2xl">
+										Find any instrument in milliseconds. Build your personalized
+										favorites. Switch between Bitcoin, Apple stock, EUR/USD, and
+										SPY ETF faster than your competition can blink. This is how
+										professionals dominate multiple markets simultaneously.
 									</p>
 								</motion.div>
 							</div>
@@ -626,49 +595,50 @@ export const SectionInstrumentsPanel = memo(() => {
 									initial={{ opacity: 0, scale: 0.95 }}
 									whileInView={{ opacity: 1, scale: 1 }}
 									transition={{ duration: 0.6, delay: 0.7 }}
-									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-[#24FF66]/40 transition-all duration-500"
+									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500"
 								>
 									{/* Background glow */}
-									<div className="absolute inset-0 bg-gradient-to-br from-[#24FF66]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+									<div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
 									{/* Icon */}
 									<div className="relative z-10 mb-6">
-										<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#24FF66]/20 to-[#24FF66]/5 border border-[#24FF66]/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-											<FaSearch className="w-7 h-7 text-[#24FF66]" />
+										<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+											<FaSearch className="w-7 h-7 text-white" />
 										</div>
 									</div>
 
 									<div className="relative z-10 space-y-4">
 										<div className="space-y-2">
-											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
-												<span className="font-russo text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20">
+												<span className="font-russo text-xs font-bold text-white uppercase tracking-wider">
 													INSTANT
 												</span>
 											</div>
-											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight group-hover:text-[#24FF66] transition-colors duration-300">
+											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight group-hover:text-white/90 transition-colors duration-300">
 												Lightning Search
 											</h3>
 										</div>
 
 										<p className="font-russo text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
-											Find any instrument in{" "}
-											<span className="text-[#24FF66] font-semibold">
-												milliseconds
-											</span>{" "}
-											with intelligent autocomplete, fuzzy matching, and
-											real-time filtering across all asset classes.
+											Type any symbol and watch results appear{" "}
+											<span className="text-white font-semibold">
+												instantly
+											</span>
+											. No more scrolling through endless lists. Find Bitcoin,
+											Tesla, EUR/USD, or any of our 300+ instruments in under 50
+											milliseconds.
 										</p>
 
 										{/* Performance indicator */}
 										<div className="flex items-center gap-3 pt-2">
 											<div className="flex items-center gap-2">
-												<div className="w-2 h-2 rounded-full bg-[#24FF66] animate-pulse" />
-												<span className="font-mono text-sm text-[#24FF66] font-bold">
+												<div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+												<span className="font-mono text-sm text-white font-bold">
 													&lt; 50ms
 												</span>
 											</div>
 											<span className="font-russo text-xs text-white/50">
-												Average search time
+												Search response time
 											</span>
 										</div>
 									</div>
@@ -679,64 +649,54 @@ export const SectionInstrumentsPanel = memo(() => {
 									initial={{ opacity: 0, scale: 0.95 }}
 									whileInView={{ opacity: 1, scale: 1 }}
 									transition={{ duration: 0.6, delay: 0.8 }}
-									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-[#24FF66]/40 transition-all duration-500"
+									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500"
 								>
 									{/* Background glow */}
-									<div className="absolute inset-0 bg-gradient-to-br from-[#24FF66]/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+									<div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
 									{/* Icon */}
 									<div className="relative z-10 mb-6">
-										<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#24FF66]/20 to-[#24FF66]/5 border border-[#24FF66]/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-											<svg
-												className="w-7 h-7 text-[#24FF66]"
-												fill="none"
-												stroke="currentColor"
-												viewBox="0 0 24 24"
-											>
-												<title>Organization Icon</title>
-												<path
-													strokeLinecap="round"
-													strokeLinejoin="round"
-													strokeWidth={2}
-													d="M19 11H5m14-7H5m14 14H5"
-												/>
-											</svg>
+										<div className="w-16 h-16 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+											<FaStar className="w-7 h-7 text-white" />
 										</div>
 									</div>
 
 									<div className="relative z-10 space-y-4">
 										<div className="space-y-2">
-											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
-												<span className="font-russo text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20">
+												<span className="font-russo text-xs font-bold text-white uppercase tracking-wider">
 													SMART
 												</span>
 											</div>
-											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight group-hover:text-[#24FF66] transition-colors duration-300">
-												Auto Organization
+											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight group-hover:text-white/90 transition-colors duration-300">
+												Smart Favorites
 											</h3>
 										</div>
 
 										<p className="font-russo text-white/70 leading-relaxed group-hover:text-white/90 transition-colors duration-300">
-											Intelligent categorization by{" "}
-											<span className="text-[#24FF66] font-semibold">
-												asset class
+											Build your personal watchlist of winning instruments.
+											Organize by{" "}
+											<span className="text-white font-semibold">
+												favorites, crypto, forex, stocks, and ETFs
 											</span>
-											, custom favorites, and dynamic filtering that adapts to
-											your trading patterns.
+											. Drag and drop to reorder. Your most profitable trades,
+											always within reach.
 										</p>
 
 										{/* Category indicators */}
 										<div className="flex items-center gap-2 pt-2">
-											{["FX", "Crypto", "Stocks", "ETF"].map((category, i) => (
-												<div
-													key={category}
-													className="px-2 py-1 rounded bg-[#24FF66]/10 border border-[#24FF66]/20"
-												>
-													<span className="font-russo text-xs font-medium text-[#24FF66]">
-														{category}
-													</span>
-												</div>
-											))}
+											{["Favorites", "Crypto", "Forex", "Stocks"].map(
+												(category, i) => (
+													<div
+														key={category}
+														className="px-2 py-1 rounded bg-white/10 border border-white/20"
+													>
+														<span className="font-russo text-xs font-medium text-white/80">
+															{category}
+														</span>
+													</div>
+												),
+											)}
 										</div>
 									</div>
 								</motion.div>
@@ -755,7 +715,7 @@ export const SectionInstrumentsPanel = memo(() => {
 										className="absolute inset-0"
 										style={{
 											backgroundImage:
-												"radial-gradient(circle at 25% 25%, #24FF66 2px, transparent 2px)",
+												"radial-gradient(circle at 25% 25%, #ffffff 2px, transparent 2px)",
 											backgroundSize: "24px 24px",
 										}}
 									/>
@@ -764,33 +724,34 @@ export const SectionInstrumentsPanel = memo(() => {
 								<div className="relative z-10 flex items-center gap-8">
 									<div className="flex-1 space-y-4">
 										<div className="space-y-2">
-											<div className="inline-flex items-center px-3 py-1 rounded-full bg-[#24FF66]/10 border border-[#24FF66]/20">
-												<span className="font-russo text-xs font-bold text-[#24FF66] uppercase tracking-wider">
+											<div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20">
+												<span className="font-russo text-xs font-bold text-white uppercase tracking-wider">
 													INTUITIVE
 												</span>
 											</div>
 											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight">
-												Drag & Drop Control
+												Drag & Drop Mastery
 											</h3>
 										</div>
 
 										<p className="font-russo text-white/70 leading-relaxed">
-											Reorder your watchlist with intuitive drag-and-drop
-											controls. Organize instruments exactly how you want them
-											for optimal trading workflow.
+											Reorder your favorites instantly with professional
+											drag-and-drop controls. Build the perfect watchlist for
+											your trading style. Your most important instruments,
+											exactly where you need them.
 										</p>
 
 										<div className="flex items-center gap-3">
 											<div className="flex items-center gap-2">
-												<div className="w-2 h-2 rounded-full bg-[#24FF66]" />
+												<div className="w-2 h-2 rounded-full bg-white" />
 												<span className="font-russo text-sm text-white/60">
 													Instant reordering
 												</span>
 											</div>
 											<div className="flex items-center gap-2">
-												<div className="w-2 h-2 rounded-full bg-[#24FF66]" />
+												<div className="w-2 h-2 rounded-full bg-white" />
 												<span className="font-russo text-sm text-white/60">
-													Visual feedback
+													Smooth animations
 												</span>
 											</div>
 										</div>
@@ -806,10 +767,10 @@ export const SectionInstrumentsPanel = memo(() => {
 													repeat: Number.POSITIVE_INFINITY,
 													ease: "easeInOut",
 												}}
-												className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#24FF66]/20 to-[#24FF66]/5 border border-[#24FF66]/30 flex items-center justify-center"
+												className="w-12 h-12 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center"
 											>
 												<svg
-													className="w-6 h-6 text-[#24FF66]"
+													className="w-6 h-6 text-white"
 													fill="none"
 													stroke="currentColor"
 													viewBox="0 0 24 24"
@@ -830,7 +791,7 @@ export const SectionInstrumentsPanel = memo(() => {
 													repeat: Number.POSITIVE_INFINITY,
 													ease: "easeInOut",
 												}}
-												className="absolute inset-0 rounded-lg bg-[#24FF66]/10 blur-xl"
+												className="absolute inset-0 rounded-lg bg-white/10 blur-xl"
 											/>
 										</div>
 									</div>
@@ -846,19 +807,19 @@ export const SectionInstrumentsPanel = memo(() => {
 							>
 								{[
 									{
-										value: "500+",
+										value: "300+",
 										label: "Instruments",
-										sublabel: "Across all markets",
+										sublabel: "Crypto, Forex, Stocks, ETFs",
 									},
 									{
 										value: "< 50ms",
 										label: "Search Speed",
-										sublabel: "Lightning fast",
+										sublabel: "Faster than you can think",
 									},
 									{
 										value: "100%",
 										label: "Customizable",
-										sublabel: "Your way",
+										sublabel: "Your perfect setup",
 									},
 								].map((stat, index) => (
 									<motion.div
@@ -869,7 +830,7 @@ export const SectionInstrumentsPanel = memo(() => {
 										className="text-center group"
 									>
 										<div className="space-y-2">
-											<div className="font-russo text-3xl lg:text-4xl font-black text-[#24FF66] tracking-tighter group-hover:scale-110 transition-transform duration-300">
+											<div className="font-russo text-3xl lg:text-4xl font-black text-white tracking-tighter group-hover:scale-110 transition-transform duration-300">
 												{stat.value}
 											</div>
 											<div className="space-y-1">
