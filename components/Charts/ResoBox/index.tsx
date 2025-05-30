@@ -4,8 +4,79 @@ import { useUser } from "@/providers/UserProvider";
 import type { BoxColors } from "@/stores/colorStore";
 import type { Box, BoxSlice } from "@/types/types";
 import { INSTRUMENTS, formatPrice } from "@/utils/instruments";
+import { create, props } from "@/lib/styles/atomic";
 import type React from "react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
+
+// Atomic CSS styles
+const styles = create({
+	// Main container styles
+	container: {
+		position: 'relative',
+		aspectRatio: '1',
+		height: '100%',
+		width: '100%',
+	},
+	
+	innerContainer: {
+		position: 'relative',
+		height: '100%',
+		width: '100%',
+	},
+	
+	// Box styles
+	boxContainer: {
+		position: 'absolute',
+		borderWidth: '1px',
+		borderStyle: 'solid',
+		borderColor: '#000000',
+	},
+	
+	backgroundLayer: {
+		position: 'absolute',
+		inset: 0,
+		backgroundColor: '#000000',
+	},
+	
+	shadowLayer: {
+		position: 'absolute',
+		inset: 0,
+	},
+	
+	gradientLayer: {
+		position: 'absolute',
+		inset: 0,
+	},
+	
+	// Price line styles
+	priceLineTop: {
+		position: 'absolute',
+		top: 0,
+		right: '-3rem',
+		borderStyle: 'dashed',
+		opacity: 0.9,
+	},
+	
+	priceLineBottom: {
+		position: 'absolute',
+		right: '-3rem',
+		bottom: 0,
+		opacity: 0.9,
+	},
+	
+	priceLabel: {
+		position: 'absolute',
+		top: '-0.875rem',
+		right: 0,
+	},
+	
+	priceText: {
+		fontFamily: 'Kodemono, monospace',
+		fontSize: '8px',
+		color: '#ffffff',
+		letterSpacing: '0.05em',
+	},
+});
 
 // Optimized color computation
 const useBoxColors = (box: Box, boxColors: BoxColors) => {
@@ -70,14 +141,9 @@ const useBoxStyles = (
 			margin: boxColors.styles?.showBorder ? "-1px" : "0",
 			borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
 			borderWidth: boxColors.styles?.showBorder ? "1px" : "0",
-			position: "absolute",
-			border: boxColors.styles?.showBorder ? "1px solid black" : "none",
 		};
 
-		return {
-			baseStyles,
-			isFirstDifferent,
-		};
+		return { baseStyles, isFirstDifferent };
 	}, [box, prevBox, boxColors.styles, containerSize, index]);
 };
 
@@ -89,11 +155,11 @@ interface BoxProps {
 	containerSize: number;
 	slice: BoxSlice;
 	sortedBoxes: Box[];
-	pair: string;
+	pair?: string;
 	showPriceLines?: boolean;
 }
 
-// Recursive Box component - renamed to ResoBoxRecursive
+// Recursive component for nested boxes with atomic CSS
 const ResoBoxRecursive = memo(
 	({
 		box,
@@ -134,20 +200,19 @@ const ResoBoxRecursive = memo(
 		return (
 			<div
 				key={`${slice.timestamp}-${index}`}
-				className="absolute border border-black"
+				{...props(styles.boxContainer)}
 				style={baseStyles}
 			>
 				{/* Black background layer */}
 				<div
-					className="absolute inset-0"
+					{...props(styles.backgroundLayer)}
 					style={{
 						borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
-						backgroundColor: "#000000",
 					}}
 				/>
 
 				<div
-					className="absolute inset-0"
+					{...props(styles.shadowLayer)}
 					style={{
 						borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
 						boxShadow: `inset 0 ${colors.shadowY}px ${colors.shadowBlur}px ${colors.shadowColor(colors.shadowIntensity)}`,
@@ -155,7 +220,7 @@ const ResoBoxRecursive = memo(
 				/>
 
 				<div
-					className="absolute inset-0"
+					{...props(styles.gradientLayer)}
 					style={{
 						borderRadius: `${boxColors.styles?.borderRadius ?? 0}px`,
 						background: `linear-gradient(to bottom right, ${colors.baseColor.replace(")", `, ${colors.opacity}`)} 100%, transparent 100%)`,
@@ -163,10 +228,10 @@ const ResoBoxRecursive = memo(
 					}}
 				/>
 				{showPriceLines && shouldShowTopPrice && (
-					<div className="absolute top-0 -right-12  border-dashed  opacity-90">
-						<div className="absolute -top-3.5 right-0">
+					<div {...props(styles.priceLineTop)}>
+						<div {...props(styles.priceLabel)}>
 							<span
-								className="font-dmmono  text-[8px] text-white tracking-wider"
+								{...props(styles.priceText)}
 								style={{ color: colors.baseColor }}
 							>
 								{formatPrice(box.high, pair)}
@@ -176,10 +241,10 @@ const ResoBoxRecursive = memo(
 				)}
 
 				{showPriceLines && shouldShowBottomPrice && (
-					<div className="absolute -right-12 bottom-0   opacity-90">
-						<div className="absolute -top-3.5 right-0">
+					<div {...props(styles.priceLineBottom)}>
+						<div {...props(styles.priceLabel)}>
 							<span
-								className="font-dmmono  text-[8px] tracking-wider"
+								{...props(styles.priceText)}
 								style={{ color: colors.baseColor }}
 							>
 								{formatPrice(box.low, pair)}
@@ -216,7 +281,7 @@ interface ResoBoxProps {
 	showPriceLines?: boolean;
 }
 
-// Main ResoBox component with optimized rendering
+// Main ResoBox component with atomic CSS
 export const ResoBox = memo(
 	({
 		slice,
@@ -267,9 +332,13 @@ export const ResoBox = memo(
 		return (
 			<div
 				ref={boxRef}
-				className={`relative aspect-square h-full w-full ${className}`}
+				{...props(styles.container)}
+				style={{ 
+					// Merge any additional className styles if needed
+					...(className ? {} : {})
+				}}
 			>
-				<div className="relative h-full w-full">
+				<div {...props(styles.innerContainer)}>
 					{sortedBoxes.length > 0 && (
 						<ResoBoxRecursive
 							box={sortedBoxes[0]}
@@ -288,3 +357,5 @@ export const ResoBox = memo(
 		);
 	},
 );
+
+ResoBox.displayName = "ResoBox";

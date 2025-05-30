@@ -5,9 +5,20 @@ import type { BoxColors } from "@/stores/colorStore";
 import type { Box, BoxSlice } from "@/types/types";
 import { Edges, Line, OrbitControls, Text } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { create, props } from "@/lib/styles/atomic";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+
+// Atomic CSS styles for 3D ResoBox
+const styles = create({
+	container: {
+		position: 'relative',
+		aspectRatio: '1',
+		height: '100%',
+		width: '100%',
+	},
+});
 
 // Helper functions matching BoxSection exactly
 interface BoxDimensions {
@@ -304,7 +315,7 @@ export const ResoBox3D = memo(
 		return (
 			<div
 				ref={containerRef}
-				className={`relative aspect-square h-full w-full ${className}`}
+				{...props(styles.container)}
 			>
 				<Canvas
 					camera={{ position: [25, 5, 25], fov: 30 }}
