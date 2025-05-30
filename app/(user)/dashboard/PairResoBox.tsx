@@ -8,7 +8,148 @@ import type { BoxColors } from "@/stores/colorStore";
 import { useTimeframeStore } from "@/stores/timeframeStore";
 import type { BoxSlice } from "@/types/types";
 import { formatPrice } from "@/utils/instruments";
+import { create, props, keyframes } from "@/lib/styles/atomic";
 import React, { useCallback, useMemo } from "react";
+
+// Atomic CSS styles using our custom system
+const pulse = keyframes({
+	'0%, 100%': { opacity: 1 },
+	'50%': { opacity: 0.5 },
+});
+
+const styles = create({
+	container: {
+		width: '100%',
+		display: 'flex',
+		flexDirection: 'column',
+		overflow: 'hidden',
+		backgroundColor: '#0A0B0D',
+		userSelect: 'none',
+	},
+	
+	contentWrapper: {
+		position: 'relative',
+		display: 'flex',
+		minHeight: '250px',
+		flexDirection: 'column',
+		borderWidth: '0.5px',
+		borderStyle: 'solid',
+		borderColor: '#1C1E23',
+		background: 'linear-gradient(to bottom, #0A0B0D, #040505)',
+	},
+	
+	innerContent: {
+		position: 'relative',
+		display: 'flex',
+		flexGrow: 1,
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		gap: '0.5rem',
+		padding: '1rem',
+	},
+	
+	header: {
+		display: 'flex',
+		width: '100%',
+		flexDirection: 'column',
+		alignItems: 'center',
+		gap: '0.5rem',
+	},
+	
+	headerRow: {
+		display: 'flex',
+		width: '100%',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+	},
+	
+	headerLeft: {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '1.5rem',
+	},
+	
+	pairName: {
+		fontFamily: 'Russo One, monospace',
+		fontSize: '1.125rem',
+		fontWeight: '700',
+		letterSpacing: '0.05em',
+		color: 'rgba(255, 255, 255, 0.9)',
+		filter: 'drop-shadow(0 2px 3px rgba(0, 0, 0, 0.5))',
+	},
+	
+	price: {
+		fontFamily: 'Kodemono, monospace',
+		fontSize: '0.875rem',
+		fontWeight: '500',
+		color: 'rgba(255, 255, 255, 0.7)',
+		filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
+	},
+	
+	chartContainer: {
+		position: 'relative',
+		display: 'flex',
+		height: '100%',
+		minHeight: '100px',
+		width: '100%',
+		flexGrow: 1,
+		padding: 0,
+	},
+	
+	chartContainerWithPriceLines: {
+		paddingRight: '3rem',
+	},
+	
+	chartInner: {
+		position: 'relative',
+		height: '100%',
+		width: '100%',
+		aspectRatio: '1',
+	},
+	
+	chartOverlay: {
+		position: 'absolute',
+		inset: 0,
+	},
+	
+	timeframeSection: {
+		position: 'relative',
+		height: '5rem',
+		width: '100%',
+		flexShrink: 0,
+	},
+	
+	timeframeSeparator: {
+		position: 'absolute',
+		insetInlineStart: 0,
+		insetInlineEnd: 0,
+		top: 0,
+		height: '1px',
+		background: 'linear-gradient(to right, transparent, #1C1E23, transparent)',
+	},
+	
+	textSkeleton: {
+		animationName: pulse,
+		animationDuration: '2s',
+		animationIterationCount: 'infinite',
+		borderRadius: '0.25rem',
+		backgroundColor: '#0F1012',
+		height: '1rem',
+		width: '4rem',
+	},
+	
+	chartSkeleton: {
+		aspectRatio: '1',
+		height: '100%',
+		width: '100%',
+		animationName: pulse,
+		animationDuration: '2s',
+		animationIterationCount: 'infinite',
+		borderRadius: '0.25rem',
+		backgroundColor: '#0F1012',
+	},
+});
 
 interface PairResoBoxProps {
 	pair?: string;
@@ -17,13 +158,13 @@ interface PairResoBoxProps {
 	isLoading?: boolean;
 }
 
-// Simple inline skeleton components
-const TextSkeleton = ({ className }: { className?: string }) => (
-	<div className={`animate-pulse rounded bg-[#0F1012] ${className}`} />
+// Atomic CSS-powered skeleton components
+const TextSkeleton = ({ size = "small" }: { size?: "small" }) => (
+	<div {...props(styles.textSkeleton)} />
 );
 
 const ChartSkeleton = () => (
-	<div className="aspect-square h-full w-full animate-pulse rounded bg-[#0F1012]" />
+	<div {...props(styles.chartSkeleton)} />
 );
 
 export const PairResoBox = ({
@@ -57,22 +198,23 @@ export const PairResoBox = ({
 	}, [boxSlice, settings.startIndex, settings.maxBoxCount]);
 
 	const showChart = !isLoading && filteredBoxSlice;
+	const showPriceLines = boxColors?.styles?.viewMode !== "3d" && settings.showPriceLines;
 
 	return (
-		<div className="no-select group relative flex w-full flex-col overflow-hidden bg-[#0A0B0D]">
-			<div className="relative flex min-h-[250px] flex-col border-[0.5px] border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#040505]">
-				<div className="relative flex flex-grow flex-col items-center justify-start gap-2 p-3 sm:gap-3 sm:p-4 lg:gap-4 lg:p-6">
-					{/* Header section with enhanced depth */}
-					<div className="flex w-full flex-col items-center gap-2">
-						<div className="flex w-full items-center justify-between">
-							<div className="flex items-center gap-4">
-								<div className="font-russo text-lg font-bold tracking-wider text-white/90 drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]">
+		<div {...props(styles.container)}>
+			<div {...props(styles.contentWrapper)}>
+				<div {...props(styles.innerContent)}>
+					{/* Header section */}
+					<div {...props(styles.header)}>
+						<div {...props(styles.headerRow)}>
+							<div {...props(styles.headerLeft)}>
+								<div {...props(styles.pairName)}>
 									{pair?.toUpperCase()}
 								</div>
 								{isLoading || !currentPrice ? (
-									<TextSkeleton className="h-4 w-16" />
+									<TextSkeleton size="small" />
 								) : (
-									<div className="font-kodemono  text-sm font-medium text-white/70 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">
+									<div {...props(styles.price)}>
 										{formatPrice(currentPrice, pair)}
 									</div>
 								)}
@@ -80,19 +222,16 @@ export const PairResoBox = ({
 						</div>
 					</div>
 
-					{/* Chart Section with enhanced container */}
-					<div
-						className={`relative flex h-full min-h-[100px] w-full flex-grow  ${
-							boxColors?.styles?.viewMode !== "3d" && settings.showPriceLines
-								? "pr-12"
-								: "p-0"
-						}`}
-					>
-						<div className="absolute inset-0 " />
+					{/* Chart Section */}
+					<div {...props(
+						styles.chartContainer,
+						showPriceLines && styles.chartContainerWithPriceLines
+					)}>
+						<div {...props(styles.chartOverlay)} />
 						{showChart ? (
 							boxColors?.styles?.viewMode === "3d" ? (
-								<div className="relative h-full w-full aspect-square">
-									<div className="absolute inset-0" />
+								<div {...props(styles.chartInner)}>
+									<div {...props(styles.chartOverlay)} />
 									<ResoBox3D
 										slice={filteredBoxSlice}
 										pair={pair}
@@ -100,8 +239,8 @@ export const PairResoBox = ({
 									/>
 								</div>
 							) : (
-								<div className="relative h-full w-full aspect-square">
-									<div className="absolute inset-0" />
+								<div {...props(styles.chartInner)}>
+									<div {...props(styles.chartOverlay)} />
 									<ResoBox
 										slice={filteredBoxSlice}
 										className="h-full w-full"
@@ -116,9 +255,9 @@ export const PairResoBox = ({
 						)}
 					</div>
 
-					{/* Timeframe Control with enhanced separator */}
-					<div className="relative h-20 w-full flex-shrink-0">
-						<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1C1E23] to-transparent" />
+					{/* Timeframe Control */}
+					<div {...props(styles.timeframeSection)}>
+						<div {...props(styles.timeframeSeparator)} />
 						<TimeFrameSlider showPanel={false} pair={pair} />
 					</div>
 				</div>

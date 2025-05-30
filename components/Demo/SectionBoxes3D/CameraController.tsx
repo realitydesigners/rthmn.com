@@ -2,7 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import type { MotionValue } from "framer-motion";
 import { memo, useEffect, useState } from "react";
 import * as THREE from "three";
-import { lerp } from "../utils/mathUtils";
+import { lerp } from "./mathUtils";
 
 interface CameraControllerProps {
 	viewMode: "scene" | "box";

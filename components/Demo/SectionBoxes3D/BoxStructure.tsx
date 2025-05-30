@@ -11,7 +11,7 @@ import {
 	getBoxDimensions,
 	getCornerPosition,
 	lerp,
-} from "../utils/mathUtils";
+} from "./mathUtils";
 
 export const BoxStructure = memo(
 	({

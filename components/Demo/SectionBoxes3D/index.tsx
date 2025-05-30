@@ -23,7 +23,7 @@ import { LuBarChart3, LuLayoutDashboard, LuTrendingUp } from "react-icons/lu";
 import { BaseButton, NavButton, StructureIndicator } from "./Displays";
 import { HeroText } from "./HeroText";
 import { TradingAdvantage } from "./TradingAdvantage";
-import { useAnimatedStructures } from "./hooks/useAnimatedStructures";
+import { useAnimatedStructures } from "./useAnimatedStructures";
 
 type CryptoStructure = {
 	pair: string;

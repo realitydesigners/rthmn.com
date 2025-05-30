@@ -6,14 +6,14 @@ import { Canvas } from "@react-three/fiber";
 import type { MotionValue } from "framer-motion";
 import React from "react";
 import { memo, useEffect, useMemo, useState } from "react";
-import { BoxStructure } from "./SectionBoxes3D/components/BoxStructure";
-import { CameraController } from "./SectionBoxes3D/components/CameraController";
-import { useAnimatedStructures } from "./SectionBoxes3D/hooks/useAnimatedStructures";
-import { useCanvasSetup } from "./SectionBoxes3D/hooks/useCanvasSetup";
+import { BoxStructure } from "./SectionBoxes3D/BoxStructure";
+import { CameraController } from "./SectionBoxes3D/CameraController";
+import { useAnimatedStructures } from "./SectionBoxes3D/useAnimatedStructures";
+import { useCanvasSetup } from "./SectionBoxes3D/useCanvasSetup";
 import {
 	calculateCircularPosition,
 	generateScatteredPosition,
-} from "./SectionBoxes3D/utils/mathUtils";
+} from "./SectionBoxes3D/mathUtils";
 
 export const ResoBox3DCircular = memo(
 	({
