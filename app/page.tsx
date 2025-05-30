@@ -1,4 +1,5 @@
 import { SectionBoxes3D } from "@/components/Demo/SectionBoxes3D";
+import { LineChart3D } from "@/components/Demo/LineChart3D";
 import { SectionInstrumentsPanel } from "@/components/Demo/SectionInstrumentsPanel";
 import { FAQBlock } from "@/components/PageBuilder/blocks/faqBlock";
 import { SectionBoxes } from "@/components/Sections/SectionBoxes";
@@ -66,6 +67,7 @@ export default async function Homepage() {
 	return (
 		<div className="h-full">
 			<SectionBoxes3D />
+			<LineChart3D />
 			<SectionInstrumentsPanel />
 			{/* <SectionMarketDisplay marketData={marketData} />
 			<SectionRthmnDemo marketData={marketData} />
