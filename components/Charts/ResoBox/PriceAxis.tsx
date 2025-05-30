@@ -1,7 +1,47 @@
 import type { BoxColors, BoxSlice } from "@/types/types";
 import { formatPrice } from "@/utils/instruments";
+import { create, props } from "@/lib/styles/atomic";
 import type React from "react";
 import { useMemo } from "react";
+
+// Atomic CSS styles for PriceAxis
+const styles = create({
+	container: {
+		pointerEvents: 'none',
+		position: 'absolute',
+		insetBlock: 0,
+		right: 0,
+		display: 'flex',
+		width: '4rem',
+		userSelect: 'none',
+	},
+	
+	innerContainer: {
+		position: 'relative',
+		flex: 1,
+	},
+	
+	tickContainer: {
+		position: 'absolute',
+		display: 'flex',
+		alignItems: 'center',
+	},
+	
+	tickLine: {
+		width: '1rem',
+		borderTopWidth: '1px',
+		borderTopStyle: 'solid',
+		opacity: 0.9,
+	},
+	
+	tickLabel: {
+		marginLeft: '0.25rem',
+		fontFamily: 'Kodemono, monospace',
+		fontSize: '9px',
+		letterSpacing: '0.05em',
+		textShadow: '0 0 3px rgba(0,0,0,0.6)',
+	},
+});
 
 interface PriceAxisProps {
 	slice: BoxSlice;
@@ -39,23 +79,23 @@ export const PriceAxis: React.FC<PriceAxisProps> = ({
 	const range = highest - lowest || 1; // prevent /0
 
 	return (
-		<div className="pointer-events-none absolute inset-y-0 right-0 flex w-16 select-none">
-			<div className="relative flex-1">
+		<div {...props(styles.container)}>
+			<div {...props(styles.innerContainer)}>
 				{ticks.map(({ price, color }) => {
 					const pct = ((highest - price) / range) * 100;
 					return (
 						<div
 							key={price}
-							className="absolute flex items-center"
+							{...props(styles.tickContainer)}
 							style={{ top: `calc(${pct}% - 0.5px)` }}
 						>
 							<div
-								className="w-4 border-t"
-								style={{ borderColor: color, opacity: 0.9 }}
+								{...props(styles.tickLine)}
+								style={{ borderColor: color }}
 							/>
 							<span
-								className="ml-1 font-dmmono text-[9px] tracking-wider"
-								style={{ color, textShadow: "0 0 3px rgba(0,0,0,0.6)" }}
+								{...props(styles.tickLabel)}
+								style={{ color }}
 							>
 								{formatPrice(price, pair)}
 							</span>
