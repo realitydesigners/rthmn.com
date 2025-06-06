@@ -13,17 +13,9 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 	return (
 		<motion.div
 			style={{ opacity }}
-			className="absolute top-1/2 left-0 transform -translate-y-1/2  flex  flex-col items-center justify-center z-50 text-left lg:pl-16 lg:pl-24"
+			className="absolute top-1/2 left-1/2 lg:left-0 transform -translate-x-1/2 lg:translate-x-0 -translate-y-1/2 flex flex-col items-center lg:items-start justify-center z-50 text-center lg:text-left lg:pl-16 xl:pl-24 px-4 lg:px-0"
 		>
-			<motion.h1
-				initial={{ scale: 0.5, rotateX: -30 }}
-				animate={{ scale: 1, rotateX: 0 }}
-				transition={{
-					duration: 2,
-					delay: 0.5,
-					ease: [0.16, 1, 0.3, 1],
-					scale: { type: "spring", stiffness: 80, damping: 12 },
-				}}
+			<h1
 				className="font-russo text-6xl lg:text-8xl xl:text-9xl font-black text-white tracking-tighter leading-[0.8] mb-6 relative"
 				style={{
 					textShadow:
@@ -32,71 +24,23 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 					WebkitTextStroke: "2px rgba(255,255,255,0.1)",
 				}}
 			>
-				{/* First word with stagger effect */}
-				<motion.div className="overflow-hidden">
-					<motion.span
-						initial={{ y: 200 }}
-						animate={{ y: 0 }}
-						transition={{
-							duration: 1.2,
-							delay: 0.1,
-							ease: [0.25, 0.46, 0.45, 0.94],
-						}}
-						className="block"
-					>
-						TRADE
-					</motion.span>
-				</motion.div>
+				<span className="block text-6xl lg:text-8xl xl:text-9xl">TRADE</span>
+				<span className="block text-6xl lg:text-8xl xl:text-9xl">SMARTER</span>
+			</h1>
 
-				{/* Second word with different timing */}
-				<motion.div className="overflow-hidden">
-					<motion.span
-						initial={{ y: 200 }}
-						animate={{ y: 0 }}
-						transition={{
-							duration: 1.2,
-							delay: 0.2,
-							ease: [0.25, 0.46, 0.45, 0.94],
-						}}
-						className="block"
-					>
-						SMARTER
-					</motion.span>
-				</motion.div>
-			</motion.h1>
-
-			{/* Subtitle and Content - No opacity animations */}
-			<motion.div
-				initial={{ y: 20 }}
-				animate={{ y: 0 }}
-				transition={{
-					duration: 1,
-					delay: 1.5,
-					ease: "easeOut",
-				}}
-				className="flex  flex-col px-12"
-			>
-				<p className="font-outfit text-xl text-white/80 leading-relaxed max-w-xl">
-					Turn market chaos into profitable trades. Our revolutionary 3D
-					visualization reveals hidden opportunities and gives you the unfair
-					advantage every trader needs.
+			<div className="flex flex-col px-0 ">
+				<p className="font-outfit text-lg lg:text-xl text-white/80 leading-relaxed lg:max-w-xl">
+				
+					Our revolutionary 3D visualization reveals hidden opportunities and gives you the unfair
+					advantage every trader needs. 
 				</p>
 
-				<motion.div
-					initial={{ y: 15 }}
-					animate={{ y: 0 }}
-					transition={{
-						duration: 0.8,
-						delay: 2.2,
-						ease: "easeOut",
-					}}
-					className="pt-4"
-				>
-					<StartButton href="/pricing" variant="shimmer" >
-							Start Winning Trades
-						</StartButton>
-				</motion.div>
-			</motion.div>
+				<div className="pt-4">
+					<StartButton href="/pricing" variant="shimmer">
+						Start Winning Trades
+					</StartButton>
+				</div>
+			</div>
 		</motion.div>
 	);
 });
