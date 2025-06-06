@@ -25,7 +25,7 @@ const LightShadows = ({ isExiting }: { isExiting: boolean }) =>
 				ease: "linear",
 				delay: i * 1,
 			}}
-			className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-blue-400/20 via-blue-400/10 to-transparent blur-3xl`}
+			className={`bg-gradient-radial absolute inset-0 h-[300px] w-[300px] overflow-hidden rounded-full from-[#24FF66]/20 via-[#24FF66]/10 to-transparent blur-3xl`}
 		/>
 	));
 
@@ -44,7 +44,7 @@ const AuroraBackground = () => (
 				ease: "linear",
 			},
 		}}
-		className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(59,130,246,0.3)_10%,rgba(99,102,241,0.2)_15%,rgba(147,197,253,0.3)_20%,rgba(167,139,250,0.2)_25%,rgba(96,165,250,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed]`}
+		className={`pointer-events-none absolute inset-0 overflow-hidden [background-image:var(--white-gradient),var(--aurora)] [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] [background-size:200%,_200%] [background-position:0%_50%,0%_50%] backdrop-blur-[100px] will-change-transform [--aurora:repeating-linear-gradient(100deg,rgba(36,255,102,0.3)_10%,rgba(30,204,82,0.2)_15%,rgba(36,255,102,0.3)_20%,rgba(30,204,82,0.2)_25%,rgba(36,255,102,0.3)_30%)] [--white-gradient:repeating-linear-gradient(100deg,rgba(255,255,255,0.05)_0%,rgba(255,255,255,0.05)_7%,transparent_10%,transparent_12%,rgba(255,255,255,0.05)_16%)] after:absolute after:inset-0 after:animate-[aurora_15s_linear_infinite] after:[background-image:var(--white-gradient),var(--aurora)] after:[background-size:200%,_200%] after:[background-attachment:fixed]`}
 	/>
 );
 
@@ -122,7 +122,7 @@ const StarField = () => {
 };
 const BASE_ANIMATIONS = {
 	transition: {
-		duration: 1.2,
+		duration: .8,
 		ease: [0.19, 1, 0.22, 1],
 	},
 	fade: {
@@ -164,7 +164,7 @@ const LogoAnimation = ({ isExiting }: { isExiting: boolean }) => {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setHasMovedToCorner(true);
-		}, 3000);
+		}, 1500);
 		return () => clearTimeout(timer);
 	}, []);
 
@@ -184,14 +184,14 @@ const LogoAnimation = ({ isExiting }: { isExiting: boolean }) => {
 				y: hasMovedToCorner ? "0" : "-50%",
 			}}
 			transition={{
-				duration: 1,
+				duration: 0.6,
 				ease: [0.19, 1, 0.22, 1],
 			}}
 		>
 			<motion.div
 				className={`relative ${hasMovedToCorner ? "p-2  w-14 h-14" : "w-48 h-48"}`}
 				transition={{
-					duration: 1,
+					duration: 0.6,
 					ease: [0.19, 1, 0.22, 1],
 				}}
 			>
@@ -208,7 +208,7 @@ const LogoAnimation = ({ isExiting }: { isExiting: boolean }) => {
 	);
 };
 
-const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
+const WelcomeStep = ({ duration = 2000, delay, onComplete }: StepProps) => {
 	useEffect(() => {
 		const timer = setTimeout(onComplete, duration);
 		return () => clearTimeout(timer);
@@ -227,16 +227,16 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 			{/* Title */}
 			<motion.h1
 				{...BASE_ANIMATIONS.fade}
-				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.4 }}
-				className="font-russo bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-4xl sm:text-5xl md:text-7xl font-bold text-transparent"
+				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
+				className="font-russo text-4xl sm:text-5xl md:text-7xl font-bold text-white"
 			>
 				Welcome to Rthmn
 			</motion.h1>
 			{/* Subtitle */}
 			<motion.p
 				{...BASE_ANIMATIONS.fade}
-				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.6 }}
-				className="font-russo max-w-md mx-auto text-base sm:text-lg text-white/60"
+				transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.3 }}
+				className="font-kodemono max-w-md mx-auto text-base sm:text-lg text-white/60"
 			>
 				The future of trading and first gamified trading platform.
 			</motion.p>
@@ -245,7 +245,7 @@ const WelcomeStep = ({ duration = 3000, delay, onComplete }: StepProps) => {
 };
 
 const PatternRecognitionStep = ({
-	duration = 6000,
+	duration = 4000,
 	delay,
 	onComplete,
 	team,
@@ -270,13 +270,11 @@ const PatternRecognitionStep = ({
 			<div className="space-y-2">
 				<motion.div
 					{...BASE_ANIMATIONS.fade}
-					transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.2 }}
-					className="font-russo text-center text-2xl sm:text-3xl md:text-4xl leading-tight font-bold tracking-tight text-balance"
+					transition={{ ...BASE_ANIMATIONS.transition, delay: delay + 0.15 }}
+					className="font-russo text-center text-2xl sm:text-3xl md:text-4xl leading-tight font-bold tracking-tight text-balance text-white"
 				>
-					<span className="bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">
-						Rthmn is a tool designed to compress time allowing you to see the
-						market in a way that is not possible with traditional tools
-					</span>
+					Rthmn is a tool designed to compress time allowing you to see the
+					market in a way that is not possible with traditional tools
 				</motion.div>
 			</div>
 		</motion.div>
@@ -285,7 +283,7 @@ const PatternRecognitionStep = ({
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{ opacity: 1 }}
-			transition={{ delay: delay + 0.5 }}
+			transition={{ delay: delay + 0.3 }}
 			className="flex flex-wrap justify-center gap-4 sm:gap-6"
 		>
 			{team.map((member, i) => (
@@ -293,7 +291,7 @@ const PatternRecognitionStep = ({
 					key={member.slug}
 					initial={{ opacity: 0, scale: 0.8 }}
 					animate={{ opacity: 1, scale: 1 }}
-					transition={{ delay: delay + 1 + i * 0.1 }}
+					transition={{ delay: delay + 0.5 + i * 0.05 }}
 					className="group relative flex flex-col items-center"
 				>
 					<div className="relative h-12 w-12 sm:h-14 sm:w-14 overflow-hidden rounded-full border border-[#1C1E23] bg-[#1C1E23] backdrop-blur-sm transition-transform duration-300 group-hover:scale-105">
@@ -303,25 +301,25 @@ const PatternRecognitionStep = ({
 								alt={member.name}
 								width={56}
 								height={56}
-								className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+								className="h-full w-full object-cover transition-transform duration-300 bg-black group-hover:scale-110"
 							/>
 						)}
 					</div>
 					<motion.div
 						initial={{ opacity: 0, y: 5 }}
 						animate={{ opacity: 1, y: 0 }}
-						transition={{ delay: delay + 1.2 + i * 0.1 }}
+						transition={{ delay: delay + 0.6 + i * 0.05 }}
 						className="mt-3 text-center"
 					>
-						<span className="font-mono text-xs sm:text-sm text-white/40 transition-colors duration-300 group-hover:text-white/90">
+						<span className="font-kodemono text-xs sm:text-sm text-white/70 transition-colors duration-300 group-hover:text-white/90">
 							{member.name}
 						</span>
 						{member.role && (
 							<motion.span
 								initial={{ opacity: 0 }}
 								animate={{ opacity: 1 }}
-								transition={{ delay: delay + 1.4 + i * 0.1 }}
-								className="mt-0.5 block font-mono text-[9px] sm:text-[10px] text-white/30"
+								transition={{ delay: delay + 0.7 + i * 0.05 }}
+								className="font-kodemono mt-0.5 block text-[9px] sm:text-[10px] text-white/50"
 							>
 								{member.role}
 							</motion.span>
@@ -354,27 +352,27 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 			<motion.h2
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="font-russo bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-center text-3xl font-bold text-transparent"
+				className="font-russo text-center text-3xl font-bold text-white"
 			>
 				Terms of Service
 			</motion.h2>
 			<motion.div
 				initial={{ opacity: 0, y: 20 }}
 				animate={{ opacity: 1, y: 0 }}
-				className="relative overflow-hidden rounded-xl border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-6 shadow-2xl"
+				className="relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-6"
 			>
-				{/* Highlight effect */}
-				<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]" />
+				{/* Top highlight */}
+				<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 
 				<div className="space-y-6">
-					<p className="font-mono text-sm leading-relaxed text-white/70">
+					<p className="font-kodemono text-sm leading-relaxed text-white/60">
 						By checking this box, I acknowledge that I have read and agree to
 						Rthmn's{" "}
 						<a
 							href="/terms-of-service"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-white font-bold transition-colors"
+							className="text-[#24FF66] font-bold transition-colors hover:text-[#1ECC52]"
 						>
 							Terms of Service
 						</a>{" "}
@@ -383,7 +381,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 							href="/privacy"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-white font-bold transition-colors"
+							className="text-[#24FF66] font-bold transition-colors hover:text-[#1ECC52]"
 						>
 							Privacy Policy
 						</a>
@@ -396,8 +394,8 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 							onClick={() => setAccepted(!accepted)}
 							className={`group relative h-6 w-6 overflow-hidden rounded-lg border transition-all duration-300 ${
 								accepted
-									? "border-white-400/50 bg-white-400/10"
-									: "border-[#32353C] bg-[#0A0B0D] hover:border-white-400/30 hover:bg-white-400/5"
+									? "border-[#24FF66]/50 bg-[#24FF66]/10"
+									: "border-[#32353C] bg-[#0A0B0D] hover:border-[#24FF66]/30 hover:bg-[#24FF66]/5"
 							}`}
 						>
 							<motion.div
@@ -407,7 +405,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 									scale: accepted ? 1 : 0.8,
 								}}
 								transition={{ duration: 0.2 }}
-								className="absolute inset-0 flex items-center justify-center text-white "
+								className="absolute inset-0 flex items-center justify-center text-[#24FF66]"
 							>
 								<svg
 									width="14"
@@ -426,7 +424,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 								</svg>
 							</motion.div>
 						</button>
-						<label className="cursor-pointer font-mono text-sm text-white/70 select-none">
+						<label className="cursor-pointer font-kodemono text-sm text-white/60 select-none">
 							I agree to the terms and conditions
 						</label>
 					</div>
@@ -447,7 +445,7 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
 						}
 					}}
 					disabled={!accepted}
-					variant="black"
+					variant="green"
 				>
 					Continue
 				</TourButton>
@@ -473,10 +471,10 @@ export default function IntroSequence({ onComplete }: Props) {
 			// Show welcome step after logo animation completes
 			const stepDelay = setTimeout(() => {
 				setCurrentStep(0);
-			}, 1000);
+			}, 600);
 
 			return () => clearTimeout(stepDelay);
-		}, 3000);
+		}, 1500);
 
 		return () => clearTimeout(initialDelay);
 	}, []);
@@ -507,6 +505,7 @@ export default function IntroSequence({ onComplete }: Props) {
 							key={member.slug}
 							src={member.image.url}
 							alt=""
+				
 							width={56}
 							height={56}
 							priority
@@ -521,7 +520,7 @@ export default function IntroSequence({ onComplete }: Props) {
 			setCurrentStep(currentStep + 1);
 		} else {
 			setIsExiting(true);
-			setTimeout(onComplete, 800);
+			setTimeout(onComplete, 500);
 		}
 	}, [currentStep, onComplete, totalSteps]);
 
@@ -567,8 +566,8 @@ export default function IntroSequence({ onComplete }: Props) {
 				return (
 					<WelcomeStep
 						key="welcome"
-						duration={5000}
-						delay={0.2} // Reduced delay since we're already handling timing
+						duration={2000}
+						delay={0.1} // Reduced delay since we're already handling timing
 						onComplete={handleStepComplete}
 					/>
 				);
@@ -576,7 +575,7 @@ export default function IntroSequence({ onComplete }: Props) {
 				return (
 					<PatternRecognitionStep
 						key="pattern"
-						duration={10000}
+						duration={4000}
 						delay={0}
 						onComplete={handleStepComplete}
 						team={team}
@@ -589,7 +588,7 @@ export default function IntroSequence({ onComplete }: Props) {
 						delay={0}
 						onComplete={() => {
 							setIsExiting(true);
-							setTimeout(onComplete, 800);
+							setTimeout(onComplete, 500);
 						}}
 					/>
 				);
