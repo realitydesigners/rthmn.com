@@ -119,23 +119,23 @@ export function FeatureTour({
 					isCurrentTour &&
 						!isCompleted &&
 						[
-							"border-blue-400/40",
-							"shadow-[inset_0_0_35px_rgba(63,255,162,0.4)]",
-							"shadow-[inset_0_0_15px_rgba(63,255,162,0.5)]",
-							"inset-shadow-sm inset-shadow-blue-400/40",
-							"inset-shadow-xs inset-shadow-blue-400/30",
-							"bg-linear-45/oklch from-blue-400/25 via-blue-400/15 to-transparent",
-							"shadow-lg shadow-blue-400/30",
-							"shadow-md shadow-blue-400/20",
-							"inset-ring inset-ring-blue-400/25",
-							"hover:shadow-[inset_0_0_50px_rgba(63,255,162,0.6)]",
-							"hover:shadow-[inset_0_0_25px_rgba(63,255,162,0.5)]",
-							"hover:inset-shadow-sm hover:inset-shadow-blue-400/50",
-							"hover:inset-shadow-xs hover:inset-shadow-blue-400/40",
-							"hover:bg-linear-45/oklch hover:from-blue-400/35 hover:via-blue-400/20 hover:to-transparent",
-							"hover:border-blue-400/50",
-							"hover:shadow-lg hover:shadow-blue-400/40",
-							"hover:shadow-md hover:shadow-blue-400/30",
+							"border-[#24FF66]/40",
+							"shadow-[inset_0_0_35px_rgba(36,255,102,0.4)]",
+							"shadow-[inset_0_0_15px_rgba(36,255,102,0.5)]",
+							"inset-shadow-sm inset-shadow-[#24FF66]/40",
+							"inset-shadow-xs inset-shadow-[#24FF66]/30",
+							"bg-linear-45/oklch from-[#24FF66]/25 via-[#24FF66]/15 to-transparent",
+							"shadow-lg shadow-[#24FF66]/30",
+							"shadow-md shadow-[#24FF66]/20",
+							"inset-ring inset-ring-[#24FF66]/25",
+							"hover:shadow-[inset_0_0_50px_rgba(36,255,102,0.6)]",
+							"hover:shadow-[inset_0_0_25px_rgba(36,255,102,0.5)]",
+							"hover:inset-shadow-sm hover:inset-shadow-[#24FF66]/50",
+							"hover:inset-shadow-xs hover:inset-shadow-[#24FF66]/40",
+							"hover:bg-linear-45/oklch hover:from-[#24FF66]/35 hover:via-[#24FF66]/20 hover:to-transparent",
+							"hover:border-[#24FF66]/50",
+							"hover:shadow-lg hover:shadow-[#24FF66]/40",
+							"hover:shadow-md hover:shadow-[#24FF66]/30",
 						].join(" "),
 					!isCompleted &&
 						currentStepId &&
@@ -147,7 +147,7 @@ export function FeatureTour({
 				<Icon
 					size={20}
 					className={cn("transition-colors", {
-						"text-blue-400 group-hover:text-blue-400/80":
+						"text-[#24FF66] group-hover:text-[#1ECC52]":
 							isCurrentTour && !isCompleted,
 						"text-[#818181] group-hover:text-white":
 							!isCurrentTour || isCompleted,
