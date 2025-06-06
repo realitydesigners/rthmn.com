@@ -17,12 +17,8 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 		>
 			<h1
 				className="font-russo text-6xl lg:text-8xl xl:text-9xl font-black text-white tracking-tighter leading-[0.8] mb-6 relative"
-				style={{
-					textShadow:
-						"0 0 60px rgba(255,255,255,0.15), 0 0 120px rgba(255,255,255,0.08)",
-					filter: "drop-shadow(0 20px 40px rgba(0,0,0,0.4))",
-					WebkitTextStroke: "2px rgba(255,255,255,0.1)",
-				}}
+				
+			
 			>
 				<span className="block text-6xl lg:text-8xl xl:text-9xl">TRADE</span>
 				<span className="block text-6xl lg:text-8xl xl:text-9xl">SMARTER</span>
