@@ -200,7 +200,7 @@ export default function OnboardingPage() {
 								(currentStep.id === "pairs" &&
 									userData.selectedPairs.length < 4)
 							}
-							variant="blue"
+							variant="green"
 						>
 							{ONBOARDING_STEPS[
 								ONBOARDING_STEPS.findIndex(
