@@ -84,7 +84,7 @@ export default function PairsStep({
 					<motion.h2
 						initial={{ opacity: 0, y: 10 }}
 						animate={{ opacity: 1, y: 0 }}
-						className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl sm:text-3xl font-bold text-transparent"
+						className="font-russo text-2xl sm:text-3xl font-bold text-white"
 					>
 						Select Trading Instruments
 					</motion.h2>
@@ -93,7 +93,7 @@ export default function PairsStep({
 							initial={{ opacity: 0, y: 10 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.1 }}
-							className="pr-4 text-sm sm:text-base primary-text"
+							className="font-kodemono pr-4 text-sm sm:text-base text-white/60"
 						>
 							Choose your favorite trading pairs, you can always add more later
 						</motion.p>
@@ -108,7 +108,7 @@ export default function PairsStep({
 								{[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
 									<motion.div
 										key={i}
-										className={`h-1 w-4 sm:w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-blue-400/80" : "bg-[#32353C]"}`}
+										className={`h-1 w-4 sm:w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-[#24FF66]" : "bg-[#32353C]"}`}
 										initial={false}
 										animate={{
 											scale: i < selectedPairs.length ? 1 : 0.95,
@@ -117,7 +117,7 @@ export default function PairsStep({
 								))}
 							</div>
 							<span
-								className={`text-[10px] sm:text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-blue-400" : "text-[#32353C]"}`}
+								className={`text-[10px] sm:text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-[#24FF66]" : "text-[#32353C]"}`}
 							>
 								{selectedPairs.length}/{MIN_PAIRS_REQUIRED}
 							</span>
@@ -132,9 +132,12 @@ export default function PairsStep({
 					transition={{ delay: 0.2 }}
 					className="relative"
 				>
-					<div className="relative flex items-center rounded-full bg-gradient-to-b from-[#32353C] to-[#1C1E23] p-[1px] transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]">
-						<div className="flex h-8 sm:h-10 w-full items-center rounded-full bg-gradient-to-b from-[#0A0A0A] to-[#121212]">
-							<FaSearch className="ml-3 sm:ml-4 text-sm sm:text-base text-[#32353C]" />
+					<div className="relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 focus-within:border-[#24FF66]/50 focus-within:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
+						{/* Top highlight */}
+						<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+						
+						<div className="flex h-8 sm:h-10 w-full items-center">
+							<FaSearch className="ml-3 sm:ml-4 text-sm sm:text-base text-white/60" />
 							<input
 								type="text"
 								placeholder="Search instruments..."
@@ -144,7 +147,7 @@ export default function PairsStep({
 										e.target.value.replace(/\s/g, "").toUpperCase(),
 									)
 								}
-								className="font-russo w-full bg-transparent px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-[#32353C] focus:outline-none"
+								className="font-kodemono w-full bg-transparent px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-white/40 focus:outline-none"
 							/>
 						</div>
 					</div>
@@ -152,10 +155,7 @@ export default function PairsStep({
 			</div>
 
 			{/* Scrollable Pairs Grid */}
-			<motion.div
-				initial={{ opacity: 0 }}
-				animate={{ opacity: 1 }}
-				transition={{ duration: 0.3 }}
+			<div
 				className="mt-3 sm:mt-4 flex-1 space-y-2 overflow-y-auto pr-2"
 				style={{
 					scrollbarWidth: "thin",
@@ -182,7 +182,7 @@ export default function PairsStep({
 
 					return (
 						<div key={group.label}>
-							<h3 className="font-kodemono sticky top-0 z-90 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium tracking-wider text-[#32353C] uppercase">
+							<h3 className="font-kodemono sticky top-0 z-90 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium tracking-wider text-white/50 uppercase">
 								{group.label}
 							</h3>
 							<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
@@ -190,57 +190,45 @@ export default function PairsStep({
 									const isSelected = selectedPairs.includes(item);
 
 									return (
-										<motion.button
+										<button
 											key={item}
-											initial={{ opacity: 0 }}
-											animate={{ opacity: 1 }}
-											transition={{
-												duration: 0.3,
-												delay: (groupIndex * pairs.length + index) * 0.05,
-											}}
 											onClick={() => handlePairClick(item)}
-											className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b transition-all duration-300 ${
+											className={`group relative w-full overflow-hidden rounded-xl border transition-all duration-300 ${
 												isSelected
-													? "border-blue-400/50 from-blue-400/20 to-blue-400/0"
-													: "border-[#1C1E23] from-[#0A0B0D] to-[#070809] hover:border-blue-400/30"
+													? "border-[#24FF66]/50 bg-black shadow-[0_0_20px_rgba(36,255,102,0.2)]"
+													: "border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-[#24FF66]/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
 											}`}
 										>
-											<motion.div
-												initial={false}
-												animate={{
-													opacity: isSelected ? 1 : 0,
-													scale: isSelected ? 1 : 0.98,
-												}}
-												transition={{
-													type: "spring",
-													stiffness: 200,
-													damping: 20,
-												}}
-												className={`absolute inset-0 bg-gradient-to-b from-blue-400/10 to-transparent`}
-											/>
+											{/* Top highlight */}
+											<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+
+											{/* Selection highlight - no opacity transitions */}
+											{isSelected && (
+												<div className="absolute inset-0 bg-gradient-to-b from-[#24FF66]/10 to-transparent" />
+											)}
 
 											<div className="relative flex items-center justify-between rounded-xl p-2.5 sm:p-4">
 												<div className="flex items-center">
-													<span className="font-russo text-xs sm:text-[13px] font-bold tracking-wider text-white">
+													<span className={`font-russo text-xs sm:text-[13px] font-bold tracking-wider ${isSelected ? "text-white" : "text-white/80"}`}>
 														{item}
 													</span>
 												</div>
 												<div className="flex items-center">
-													<span className="font-kodemono mr-2 sm:mr-3 text-xs sm:text-[13px] font-medium tracking-wider text-[#32353C] transition-all group-hover:mr-3 sm:group-hover:mr-4">
+													<span className={`font-kodemono mr-2 sm:mr-3 text-xs sm:text-[13px] font-medium tracking-wider group-hover:mr-3 sm:group-hover:mr-4 ${isSelected ? "text-[#24FF66]" : "text-white/50"}`}>
 														{priceData[item]?.price
 															? formatPrice(priceData[item].price, item)
 															: "N/A"}
 													</span>
 												</div>
 											</div>
-										</motion.button>
+										</button>
 									);
 								})}
 							</div>
 						</div>
 					);
 				})}
-			</motion.div>
+			</div>
 		</div>
 	);
 }

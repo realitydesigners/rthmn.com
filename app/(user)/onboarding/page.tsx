@@ -160,7 +160,7 @@ export default function OnboardingPage() {
 						<div className="flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-medium shadow-xl">
 							<div className="flex h-1.5 w-8 sm:w-12 items-center rounded-full bg-[#0A0B0D]">
 								<motion.div
-									className="h-full rounded-full bg-gradient-to-r from-blue-400 to-blue-400/80"
+									className="h-full rounded-full bg-gradient-to-r from-[#24FF66] to-[#1ECC52]"
 									initial={false}
 									animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
 									transition={{ duration: 0.5, ease: "easeInOut" }}
@@ -219,9 +219,9 @@ export default function OnboardingPage() {
 
 			{/* Step title with enhanced styling */}
 			<div className="absolute bottom-4 sm:bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4">
-				<div className="no-select group relative flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-blue-400/20 hover:shadow-blue-400/10">
-					<div className="flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-gradient-to-b from-blue-400/20 to-blue-400/10">
-						<div className="h-1.5 w-1.5 rounded-full bg-blue-400" />
+				<div className="no-select group relative flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 shadow-xl transition-all duration-300 hover:border-[#24FF66]/20 hover:shadow-[#24FF66]/10">
+					<div className="flex h-4 sm:h-5 w-4 sm:w-5 items-center justify-center rounded-full bg-gradient-to-b from-[#24FF66]/20 to-[#24FF66]/10">
+						<div className="h-1.5 w-1.5 rounded-full bg-[#24FF66]" />
 					</div>
 					<span className="no-select text-xs sm:text-sm font-medium text-white/70 transition-colors group-hover:text-white whitespace-nowrap">
 						{currentStep?.id === "profile"
@@ -232,7 +232,7 @@ export default function OnboardingPage() {
 									? "Select Trading Pairs"
 									: ""}
 					</span>
-					<div className="absolute inset-0 -z-10 rounded-full bg-blue-400 opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10" />
+					<div className="absolute inset-0 -z-10 rounded-full bg-[#24FF66] opacity-0 blur-xl transition-opacity duration-300 group-hover:opacity-10" />
 				</div>
 			</div>
 			{showIntro && <IntroSequence onComplete={() => setShowIntro(false)} />}

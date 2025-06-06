@@ -36,7 +36,7 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 				<motion.h2
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
-					className="bg-gradient-to-r from-white to-white/60 bg-clip-text text-2xl sm:text-3xl font-bold text-transparent"
+					className="font-russo text-2xl sm:text-3xl font-bold text-white"
 				>
 					Trading Experience
 				</motion.h2>
@@ -44,7 +44,7 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 					initial={{ opacity: 0, y: 10 }}
 					animate={{ opacity: 1, y: 0 }}
 					transition={{ delay: 0.1 }}
-					className="text-sm sm:text-base primary-text"
+					className="font-kodemono text-sm sm:text-base text-white/60"
 				>
 					Help us personalize your experience by telling us about your trading
 					background.
@@ -68,18 +68,21 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ delay: 0.2 + index * 0.1 }}
 							onClick={() => setExperience(level.id)}
-							className={`group relative w-full overflow-hidden rounded-xl border bg-gradient-to-b p-0.5 transition-all duration-300 ${
+							className={`group relative w-full overflow-hidden rounded-xl border transition-all duration-300 ${
 								isSelected
-									? "border-blue-400/50 from-blue-400/20 to-blue-400/0"
-									: "border-[#1C1E23] from-[#0A0B0D] to-[#070809] hover:border-blue-400/30 hover:from-[#1A1A1A] hover:to-[#111]"
+									? "border-[#24FF66]/50 bg-black shadow-[0_0_20px_rgba(36,255,102,0.2)]"
+									: "border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-[#24FF66]/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
 							}`}
 						>
+							{/* Top highlight */}
+							<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+
 							{/* Highlight Effect */}
 							<div
 								className={`absolute inset-0 bg-gradient-to-b transition-opacity duration-300 ${
 									isSelected
-										? "from-blue-400/10 to-transparent opacity-100"
-										: "from-[#1C1E23] to-transparent opacity-0 group-hover:opacity-100"
+										? "from-[#24FF66]/10 to-transparent opacity-100"
+										: "from-[#24FF66]/5 to-transparent opacity-0 group-hover:opacity-100"
 								}`}
 							/>
 
@@ -87,10 +90,10 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 							<div className="relative flex items-center gap-3 sm:gap-4 rounded-xl p-3 sm:p-4">
 								{/* Icon Container */}
 								<div
-									className={`rounded-lg bg-gradient-to-b p-2.5 sm:p-3 transition-colors duration-300 ${
+									className={`rounded-lg p-2.5 sm:p-3 transition-colors duration-300 ${
 										isSelected
-											? "from-blue-400/30 via-blue-400/10 to-blue-400/5 text-blue-400"
-											: "from-[#1C1E23] via-[#1C1E23] to-transparent primary-text group-hover:primary-text"
+											? "bg-[#24FF66]/20 text-[#24FF66]"
+											: "bg-[#1C1E23] text-white/60 group-hover:text-white/80"
 									}`}
 								>
 									<Icon className="h-5 w-5 sm:h-6 sm:w-6" />
@@ -99,12 +102,12 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 								{/* Text Content */}
 								<div className="flex-1 text-left">
 									<div
-										className={`text-sm sm:text-base font-medium transition-colors duration-300 ${isSelected ? "text-white" : "primary-text"}`}
+										className={`font-russo text-sm sm:text-base font-medium transition-colors duration-300 ${isSelected ? "text-white" : "text-white/80"}`}
 									>
 										{level.title}
 									</div>
 									<div
-										className={`text-xs sm:text-sm transition-colors duration-300 ${isSelected ? "primary-text" : "primary-text"}`}
+										className={`font-kodemono text-xs sm:text-sm transition-colors duration-300 ${isSelected ? "text-white/70" : "text-white/60"}`}
 									>
 										{level.description}
 									</div>
@@ -112,7 +115,7 @@ export default function ExperienceStep({ experience, setExperience }: Props) {
 
 								{/* Selection Indicator */}
 								<div
-									className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full transition-colors duration-300 ${isSelected ? "bg-blue-400" : "bg-[#32353C] group-hover:bg-[#32353C]"}`}
+									className={`h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full transition-colors duration-300 ${isSelected ? "bg-[#24FF66]" : "bg-[#32353C] group-hover:bg-[#24FF66]/50"}`}
 								/>
 							</div>
 						</motion.button>

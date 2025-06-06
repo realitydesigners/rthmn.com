@@ -10,15 +10,7 @@ import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 
-// Atomic CSS styles for 3D ResoBox
-const styles = create({
-	container: {
-		position: 'relative',
-		aspectRatio: '1',
-		height: '100%',
-		width: '100%',
-	},
-});
+
 
 // Atomic CSS styles for 3D ResoBox
 const styles = create({
