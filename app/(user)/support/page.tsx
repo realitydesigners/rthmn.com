@@ -55,17 +55,17 @@ const MessageBubble = ({
 				)}
 			>
 				<div className="flex items-center gap-2">
-					<div className="font-outfit text-sm font-medium text-white/90">
+					<div className="font-russo text-sm font-medium text-white/90">
 						{message.sender_name}
 					</div>
-					<div className="font-outfit text-xs text-white/40">
+					<div className="font-russo text-xs text-white/40">
 						{new Date(message.created_at || "").toLocaleTimeString([], {
 							hour: "2-digit",
 							minute: "2-digit",
 						})}
 					</div>
 				</div>
-				<div className="font-outfit text-sm text-white/80">
+				<div className="font-russo text-sm text-white/80">
 					{message.content}
 				</div>
 			</div>
@@ -285,14 +285,14 @@ export default function SupportPage() {
 						<div className="rounded-md bg-[#1C1E23] p-2">
 							<LuHelpCircle className="h-6 w-6 text-white" />
 						</div>
-						<h1 className="font-outfit text-2xl font-bold text-white">
+						<h1 className="font-russo text-2xl font-bold text-white">
 							Support Center
 						</h1>
 					</div>
 
 					{error && (
 						<div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4">
-							<p className="font-outfit text-sm text-red-500">{error}</p>
+							<p className="font-russo text-sm text-red-500">{error}</p>
 						</div>
 					)}
 
@@ -303,7 +303,7 @@ export default function SupportPage() {
 								className="group mb-8 flex w-full items-center justify-center gap-2 rounded-full bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] lg:w-auto"
 							>
 								<LuPlus className="h-4 w-4 text-white" />
-								<span className="font-outfit">Create New Support Thread</span>
+								<span className="font-russo">Create New Support Thread</span>
 							</button>
 							<div className="space-y-4">
 								{threads.map((thread) => (
@@ -315,28 +315,28 @@ export default function SupportPage() {
 										<div className="flex items-center justify-between">
 											<div className="flex items-center gap-3">
 												<LuMessageSquare className="h-4 w-4 text-zinc-400" />
-												<h3 className="font-outfit text-white">
+												<h3 className="font-russo text-white">
 													{thread.subject || "No Subject"}
 												</h3>
 											</div>
-											<span className="font-outfit text-sm text-zinc-400">
+											<span className="font-russo text-sm text-zinc-400">
 												{new Date(
 													thread.last_message_time || "",
 												).toLocaleDateString()}
 											</span>
 										</div>
 										{thread.last_message && (
-											<p className="font-outfit mt-2 text-sm text-zinc-400">
+											<p className="font-russo mt-2 text-sm text-zinc-400">
 												{thread.last_message}
 											</p>
 										)}
 										<div className="mt-2 flex items-center gap-2">
 											{thread.status === "open" ? (
-												<span className="font-outfit text-xs text-blue-400">
+												<span className="font-russo text-xs text-blue-400">
 													Open
 												</span>
 											) : (
-												<span className="font-outfit text-xs text-zinc-500">
+												<span className="font-russo text-xs text-zinc-500">
 													Closed
 												</span>
 											)}
@@ -348,14 +348,14 @@ export default function SupportPage() {
 					) : isCreatingThread ? (
 						<div className="mx-auto max-w-2xl">
 							<div className="mb-8">
-								<label className="font-outfit block text-sm text-zinc-400">
+								<label className="font-russo block text-sm text-zinc-400">
 									Subject
 								</label>
 								<input
 									type="text"
 									value={newThreadSubject}
 									onChange={(e) => setNewThreadSubject(e.target.value)}
-									className="font-outfit mt-2 block w-full rounded-lg border border-blue-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 focus:outline-none"
+									className="font-russo mt-2 block w-full rounded-lg border border-blue-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 focus:outline-none"
 									placeholder="Enter subject"
 									disabled={isLoading}
 								/>
@@ -365,7 +365,7 @@ export default function SupportPage() {
 									type="submit"
 									onClick={handleCreateThread}
 									disabled={isLoading}
-									className="font-outfit flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
+									className="font-russo flex w-full items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									{isLoading ? "Creating..." : "Create Thread"}
 								</button>
@@ -376,7 +376,7 @@ export default function SupportPage() {
 										setError(null);
 									}}
 									disabled={isLoading}
-									className="font-outfit flex w-full items-center justify-center rounded-lg border border-[#1C1E23] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
+									className="font-russo flex w-full items-center justify-center rounded-lg border border-[#1C1E23] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									Cancel
 								</button>
@@ -388,13 +388,13 @@ export default function SupportPage() {
 								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-3">
 										<LuMessageSquare className="h-4 w-4 text-zinc-400" />
-										<h2 className="font-outfit text-white">
+										<h2 className="font-russo text-white">
 											{selectedThread.subject}
 										</h2>
 									</div>
 									<button
 										onClick={() => setSelectedThread(null)}
-										className="font-outfit text-sm text-zinc-400 transition-colors hover:text-white"
+										className="font-russo text-sm text-zinc-400 transition-colors hover:text-white"
 									>
 										Back
 									</button>
@@ -419,11 +419,11 @@ export default function SupportPage() {
 										value={newMessage}
 										onChange={(e) => setNewMessage(e.target.value)}
 										placeholder="Type your message..."
-										className="font-outfit flex-1 rounded-lg border border-blue-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 focus:outline-none"
+										className="font-russo flex-1 rounded-lg border border-blue-500/20 bg-[#111] px-4 py-3 text-white placeholder-zinc-400 transition-all duration-200 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 focus:outline-none"
 									/>
 									<button
 										type="submit"
-										className="font-outfit flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23]"
+										className="font-russo flex items-center justify-center rounded-lg bg-[#111] px-6 py-3 text-white transition-all duration-200 hover:bg-[#1C1E23]"
 									>
 										Send
 									</button>

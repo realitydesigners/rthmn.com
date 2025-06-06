@@ -8,7 +8,17 @@ import { Canvas } from "@react-three/fiber";
 import { create, props } from "@/lib/styles/atomic";
 import React, { memo, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
+
+// Atomic CSS styles for 3D ResoBox
+const styles = create({
+	container: {
+		position: 'relative',
+		aspectRatio: '1',
+		height: '100%',
+		width: '100%',
+	},
+});
 
 // Atomic CSS styles for 3D ResoBox
 const styles = create({
@@ -335,13 +345,13 @@ export const ResoBox3D = memo(
 						maxDistance={70}
 						minDistance={40}
 						touches={{
-							ONE: 0,  // NONE
-							TWO: 1   // ROTATE
+							ONE: 0, // NONE
+							TWO: 1, // ROTATE
 						}}
 						mouseButtons={{
-							LEFT: 0,   // ROTATE
+							LEFT: 0, // ROTATE
 							MIDDLE: 0, // NONE
-							RIGHT: 0   // NONE
+							RIGHT: 0, // NONE
 						}}
 					/>
 					<OriginLines />

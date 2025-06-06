@@ -121,7 +121,7 @@ const DemoNavbar = memo(
                                 onClick={() => setActiveTab(tab.id as TabType)}
                                 className={`flex h-auto items-center rounded-full bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:from-[#32353C] hover:to-[#282828]`}>
                                 <span
-                                    className={`font-outfit flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-xs font-semibold ${
+                                    className={`font-russo flex w-full items-center gap-2 rounded-full bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-2 text-xs font-semibold ${
                                         activeTab === tab.id ? 'text-blue-400' : 'text-white hover:text-white'
                                     }`}>
                                     <tab.icon className='h-3 w-3' />

@@ -55,7 +55,7 @@ const Links = () => {
 
 	return (
 		<div className="group relative" onMouseLeave={handleMouseLeave}>
-			<div className="font-outfit flex">
+			<div className="font-russo flex">
 				<NavButton
 					href="/pricing"
 					onMouseEnter={() => handleMouseEnter("pricing")}
@@ -282,7 +282,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 									<div className="flex items-center gap-3">
 										<Link
 											href="/dashboard"
-											className="font-outfit flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
+											className="font-russo flex items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
 										>
 											<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-6 py-3 text-sm font-medium">
 												Dashboard
@@ -366,7 +366,7 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
 										<div className="flex items-center gap-3">
 											<Link
 												href="/dashboard"
-												className="font-outfit flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
+												className="font-russo flex w-full items-center justify-center space-x-3 rounded-md bg-linear-to-b from-[#32353C] to-[#1C1E23] p-[1px] text-white transition-all duration-200 hover:scale-[1.02] hover:from-[#32353C] hover:to-[#282828]"
 											>
 												<span className="flex w-full items-center justify-center rounded-md bg-linear-to-b from-[#0A0A0A] to-[#1C1E23] px-4 py-3 text-sm font-medium">
 													Dashboard
@@ -555,7 +555,7 @@ export const DesktopMenuContent = ({
 			case "pricing":
 				return (
 					<div
-						className={`${styles.dropdownContent} font-outfit w-[750px]`}
+						className={`${styles.dropdownContent} font-russo w-[750px]`}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 						onClick={onLinkClick}
@@ -581,7 +581,7 @@ export const DesktopMenuContent = ({
 			case "company":
 				return (
 					<div
-						className={`${styles.dropdownContent} font-outfit w-[600px]`}
+						className={`${styles.dropdownContent} font-russo w-[600px]`}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 						onClick={onLinkClick}
@@ -605,7 +605,7 @@ export const DesktopMenuContent = ({
 			case "resources":
 				return (
 					<div
-						className={`${styles.dropdownContent} font-outfit w-[700px]`}
+						className={`${styles.dropdownContent} font-russo w-[700px]`}
 						onMouseEnter={onMouseEnter}
 						onMouseLeave={onMouseLeave}
 						onClick={onLinkClick}

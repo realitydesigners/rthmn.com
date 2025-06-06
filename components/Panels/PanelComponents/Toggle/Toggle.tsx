@@ -24,7 +24,7 @@ export const Toggle: React.FC<ToggleProps> = ({
 	return (
 		<div className="group flex w-full items-center justify-between">
 			{title && (
-				<span className="font-outfit text-[13px] font-medium tracking-wide text-[#32353C] transition-colors duration-300 group-hover:text-[#545963]">
+				<span className="font-russo text-[13px] font-medium tracking-wide text-[#32353C] transition-colors duration-300 group-hover:text-[#545963]">
 					{title}
 				</span>
 			)}

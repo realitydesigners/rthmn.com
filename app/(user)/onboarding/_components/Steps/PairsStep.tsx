@@ -144,7 +144,7 @@ export default function PairsStep({
 										e.target.value.replace(/\s/g, "").toUpperCase(),
 									)
 								}
-								className="font-outfit w-full bg-transparent px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-[#32353C] focus:outline-none"
+								className="font-russo w-full bg-transparent px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm text-white placeholder-[#32353C] focus:outline-none"
 							/>
 						</div>
 					</div>
@@ -182,7 +182,7 @@ export default function PairsStep({
 
 					return (
 						<div key={group.label}>
-							<h3 className="font-dmmono sticky top-0 z-90 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium tracking-wider text-[#32353C] uppercase">
+							<h3 className="font-kodemono sticky top-0 z-90 py-1.5 sm:py-2 text-[10px] sm:text-xs font-medium tracking-wider text-[#32353C] uppercase">
 								{group.label}
 							</h3>
 							<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
@@ -221,12 +221,12 @@ export default function PairsStep({
 
 											<div className="relative flex items-center justify-between rounded-xl p-2.5 sm:p-4">
 												<div className="flex items-center">
-													<span className="font-outfit text-xs sm:text-[13px] font-bold tracking-wider text-white">
+													<span className="font-russo text-xs sm:text-[13px] font-bold tracking-wider text-white">
 														{item}
 													</span>
 												</div>
 												<div className="flex items-center">
-													<span className="font-dmmono mr-2 sm:mr-3 text-xs sm:text-[13px] font-medium tracking-wider text-[#32353C] transition-all group-hover:mr-3 sm:group-hover:mr-4">
+													<span className="font-kodemono mr-2 sm:mr-3 text-xs sm:text-[13px] font-medium tracking-wider text-[#32353C] transition-all group-hover:mr-3 sm:group-hover:mr-4">
 														{priceData[item]?.price
 															? formatPrice(priceData[item].price, item)
 															: "N/A"}

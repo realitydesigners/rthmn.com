@@ -22,10 +22,10 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 	return (
 		<div className="absolute top-4 right-16 left-0 z-10 flex items-center justify-between px-4">
 			<div className="flex items-baseline gap-2">
-				<h1 className="font-outfit text-xl font-bold tracking-wider text-white">
+				<h1 className="font-russo text-xl font-bold tracking-wider text-white">
 					{pair}
 				</h1>
-				<div className="font-dmmono  text-sm font-medium text-neutral-200">
+				<div className="font-kodemono  text-sm font-medium text-neutral-200">
 					{currentPrice || "-"}
 				</div>
 			</div>
@@ -38,7 +38,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent" />
 					<div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-400/10 to-transparent" />
 					<RiBarChartBoxLine className="relative h-4 w-4" />
-					<span className="font-outfit relative">Box Levels</span>
+					<span className="font-russo relative">Box Levels</span>
 				</button>
 				{showBoxLevels && (
 					<>
@@ -52,7 +52,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 						>
 							<div className="absolute inset-0 rounded-xl bg-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 							<BsBoxes className="relative h-4 w-4" />
-							<span className="font-outfit relative">All</span>
+							<span className="font-russo relative">All</span>
 						</button>
 						<button
 							onClick={() => setBoxVisibilityFilter("positive")}
@@ -64,7 +64,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 						>
 							<div className="absolute inset-0 rounded-xl bg-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 							<BsBoxArrowInUp className="relative h-4 w-4" />
-							<span className="font-outfit relative">Positive</span>
+							<span className="font-russo relative">Positive</span>
 						</button>
 						<button
 							onClick={() => setBoxVisibilityFilter("negative")}
@@ -76,7 +76,7 @@ const ChartControls: React.FC<ChartControlsProps> = ({
 						>
 							<div className="absolute inset-0 rounded-xl bg-red-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 							<BsBoxArrowInDown className="relative h-4 w-4" />
-							<span className="font-outfit relative">Negative</span>
+							<span className="font-russo relative">Negative</span>
 						</button>
 					</>
 				)}

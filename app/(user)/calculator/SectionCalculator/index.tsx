@@ -111,7 +111,7 @@ const InputField = memo(
 		placeholder?: string;
 	}) => (
 		<div className="relative">
-			<label className="font-dmmono  mb-2 flex items-center justify-between text-sm">
+			<label className="font-kodemono  mb-2 flex items-center justify-between text-sm">
 				<div className="flex items-center gap-2">
 					{label}
 					{tooltip && (
@@ -189,13 +189,13 @@ const ResultCard = memo(
 					>
 						{icon}
 					</div>
-					<div className="font-dmmono  text-sm primary-text">{label}</div>
+					<div className="font-kodemono  text-sm primary-text">{label}</div>
 				</div>
-				<div className="font-outfit text-2xl font-bold text-white">
+				<div className="font-russo text-2xl font-bold text-white">
 					{isInvalid ? "—" : value}
 				</div>
 				{subValue && !isInvalid && (
-					<div className="font-dmmono  mt-1 text-sm primary-text">
+					<div className="font-kodemono  mt-1 text-sm primary-text">
 						{subValue}
 					</div>
 				)}
@@ -376,10 +376,10 @@ export const SectionCalculator = () => {
 					transition={{ duration: 0.8 }}
 					className="mb-16 text-center"
 				>
-					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+					<h2 className="text-neutral-gradient font-russo mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Position Size Calculator
 					</h2>
-					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
+					<p className="font-kodemono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Calculate your optimal position size and risk management parameters
 						with precision.
 					</p>
@@ -390,7 +390,7 @@ export const SectionCalculator = () => {
 					{/* Quick Risk Templates - Left Sidebar */}
 					<div className="hidden w-1/4 shrink-0 lg:block">
 						<div className="sticky top-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
-							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
+							<h3 className="font-russo mb-6 text-lg font-semibold text-white">
 								Quick Risk Templates
 							</h3>
 							<div className="space-y-4">
@@ -409,13 +409,13 @@ export const SectionCalculator = () => {
 											<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
 										</div>
 										<div className="relative z-10">
-											<div className="font-outfit mb-1 text-lg font-semibold text-white">
+											<div className="font-russo mb-1 text-lg font-semibold text-white">
 												{template.label}
 											</div>
-											<div className="font-dmmono  mb-2 text-2xl text-blue-400">
+											<div className="font-kodemono  mb-2 text-2xl text-blue-400">
 												{template.value}%
 											</div>
-											<p className="font-dmmono  text-sm primary-text">
+											<p className="font-kodemono  text-sm primary-text">
 												{template.description}
 											</p>
 										</div>
@@ -429,7 +429,7 @@ export const SectionCalculator = () => {
 					<div className="w-full lg:w-1/2">
 						{/* Account & Risk Section */}
 						<div className="mb-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
-							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
+							<h3 className="font-russo mb-6 text-lg font-semibold text-white">
 								Account Details
 							</h3>
 							<div className="grid gap-6 md:grid-cols-3">
@@ -462,7 +462,7 @@ export const SectionCalculator = () => {
 
 						{/* Trade Direction Section */}
 						<div className="mb-8 rounded-xl border border-[#1C1E23] bg-black/40 p-6">
-							<h3 className="font-outfit mb-6 text-lg font-semibold text-white">
+							<h3 className="font-russo mb-6 text-lg font-semibold text-white">
 								Trade Direction
 							</h3>
 							<TradeDirection
@@ -474,7 +474,7 @@ export const SectionCalculator = () => {
 						{/* Price Levels Section */}
 						<div className="rounded-xl border border-[#1C1E23] bg-black/40 p-6">
 							<div className="mb-6 flex items-center justify-between">
-								<h3 className="font-outfit text-lg font-semibold text-white">
+								<h3 className="font-russo text-lg font-semibold text-white">
 									Price Levels
 								</h3>
 								<div className="flex gap-2">

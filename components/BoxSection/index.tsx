@@ -255,7 +255,7 @@ export const BoxSection: React.FC<AutoBoxModuleProps> = ({
 							<div className="h-1 w-1 rounded-full bg-blue-400/50" />
 							<div className="h-1 w-1 rounded-full bg-blue-400/20" />
 						</div>
-						<span className="font-dmmono  text-[10px] tracking-wider text-white/40">
+						<span className="font-kodemono  text-[10px] tracking-wider text-white/40">
 							{currentConfigIndex + 1}/{CONFIGS.length}
 						</span>
 					</div>

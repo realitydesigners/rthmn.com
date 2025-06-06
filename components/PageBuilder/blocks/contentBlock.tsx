@@ -27,8 +27,8 @@ export function ContentBlock({
 				)}
 
 				{content ? (
-					<div className="prose prose-lg dark:prose-invert mx-auto max-w-4xl">
-						<PortableText value={content} template="default" />
+					<div className="mx-auto max-w-4xl">
+						<PortableText value={content} template="about" />
 					</div>
 				) : (
 					<div className="flex min-h-[30vh] items-center justify-center">

@@ -28,7 +28,7 @@ export function LegalContentBlock({
 
 				{content ? (
 					<div className="prose prose-lg dark:prose-invert mx-auto max-w-4xl">
-						<PortableText value={content} template="default" />
+						<PortableText value={content} template="changelog" />
 					</div>
 				) : (
 					<div className="flex min-h-[30vh] items-center justify-center">

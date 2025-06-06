@@ -132,7 +132,7 @@ const HeadingBlock = ({ block }) => {
 								/>
 								<SubHeading
 									heading={block.subheading}
-									className={`font-outfit bg-linear-to-r from-blue-100/80 to-blue-100/70 bg-clip-text p-1 text-xl leading-tight text-transparent`}
+									className={`font-russo bg-linear-to-r from-blue-100/80 to-blue-100/70 bg-clip-text p-1 text-xl leading-tight text-transparent`}
 								/>
 								<div className="w-full">
 									<TeamSection team={block.team} theme={className} />

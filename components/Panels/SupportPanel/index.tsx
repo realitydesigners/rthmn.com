@@ -191,9 +191,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 						<div className="rounded-md bg-[#1C1E23] p-2">
 							<LuHelpCircle className="h-4 w-4 text-white" />
 						</div>
-						<h2 className="font-outfit text-xl font-bold text-white">
-							Support
-						</h2>
+						<h2 className="font-russo text-xl font-bold text-white">Support</h2>
 					</div>
 					<button
 						type="button"
@@ -207,7 +205,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 				{/* Error Message */}
 				{error && (
 					<div className="border-b border-red-500/20 bg-red-500/10 p-4">
-						<p className="font-outfit text-sm text-red-500">{error}</p>
+						<p className="font-russo text-sm text-red-500">{error}</p>
 					</div>
 				)}
 
@@ -230,25 +228,25 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 										className="cursor-pointer rounded-lg border border-[#1C1E23] p-4 transition-all duration-200 hover:bg-[#1C1E23]"
 									>
 										<div className="flex items-center justify-between">
-											<h3 className="font-outfit font-medium text-white">
+											<h3 className="font-russo font-medium text-white">
 												{thread.subject || "No Subject"}
 											</h3>
-											<span className="font-outfit text-sm text-zinc-400">
+											<span className="font-russo text-sm text-zinc-400">
 												{new Date(
 													thread.last_message_time || "",
 												).toLocaleDateString()}
 											</span>
 										</div>
-										<p className="font-outfit mt-2 text-sm text-zinc-400">
+										<p className="font-russo mt-2 text-sm text-zinc-400">
 											{thread.last_message}
 										</p>
 										<div className="mt-2 flex items-center gap-2">
 											{thread.status === "open" ? (
-												<span className="font-outfit text-xs text-blue-500">
+												<span className="font-russo text-xs text-blue-500">
 													Open
 												</span>
 											) : (
-												<span className="font-outfit text-xs text-zinc-500">
+												<span className="font-russo text-xs text-zinc-500">
 													Closed
 												</span>
 											)}
@@ -260,7 +258,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 					) : isCreatingThread ? (
 						<form onSubmit={handleCreateThread} className="p-4">
 							<div>
-								<label className="font-outfit block text-sm font-medium text-zinc-400">
+								<label className="font-russo block text-sm font-medium text-zinc-400">
 									Subject
 								</label>
 								<input
@@ -268,7 +266,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 									value={newThreadSubject}
 									onChange={(e) => setNewThreadSubject(e.target.value)}
 									disabled={isLoading}
-									className="font-outfit mt-1 block w-full rounded-md border border-[#1C1E23] bg-[#1C1E23] px-3 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
+									className="font-russo mt-1 block w-full rounded-md border border-[#1C1E23] bg-[#1C1E23] px-3 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
 									placeholder="Enter subject"
 								/>
 							</div>
@@ -276,7 +274,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 								<button
 									type="submit"
 									disabled={isLoading}
-									className="font-outfit flex-1 rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50"
+									className="font-russo flex-1 rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50"
 								>
 									{isLoading ? "Creating..." : "Create Thread"}
 								</button>
@@ -284,7 +282,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 									type="button"
 									onClick={() => setIsCreatingThread(false)}
 									disabled={isLoading}
-									className="font-outfit rounded-full border border-[#1C1E23] px-4 py-2 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
+									className="font-russo rounded-full border border-[#1C1E23] px-4 py-2 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 								>
 									Cancel
 								</button>
@@ -294,12 +292,12 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 						<div className="flex h-full flex-col">
 							<div className="border-b border-[#1C1E23] p-4">
 								<div className="flex items-center justify-between">
-									<h3 className="font-outfit font-medium text-white">
+									<h3 className="font-russo font-medium text-white">
 										{selectedThread.subject}
 									</h3>
 									<button
 										onClick={() => setSelectedThread(null)}
-										className="font-outfit text-sm text-zinc-400 hover:text-white"
+										className="font-russo text-sm text-zinc-400 hover:text-white"
 									>
 										Back
 									</button>
@@ -312,7 +310,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 										className={`flex ${message.sender_type === "support_team" ? "justify-start" : "justify-end"}`}
 									>
 										<div
-											className={`font-outfit max-w-[80%] rounded-lg p-3 ${
+											className={`font-russo max-w-[80%] rounded-lg p-3 ${
 												message.sender_type === "support_team"
 													? "bg-[#1C1E23] text-white"
 													: "bg-blue-600 text-white"
@@ -342,12 +340,12 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 										onChange={(e) => setNewMessage(e.target.value)}
 										disabled={isLoading}
 										placeholder="Type your message..."
-										className="font-outfit flex-1 rounded-md border border-[#1C1E23] bg-[#1C1E23] px-4 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
+										className="font-russo flex-1 rounded-md border border-[#1C1E23] bg-[#1C1E23] px-4 py-2 text-white placeholder-zinc-400 disabled:opacity-50"
 									/>
 									<button
 										type="submit"
 										disabled={isLoading}
-										className="font-outfit rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50"
+										className="font-russo rounded-full bg-blue-600 px-4 py-2 text-white transition-all duration-200 hover:bg-blue-700 disabled:opacity-50"
 									>
 										{isLoading ? "Sending..." : "Send"}
 									</button>
@@ -359,7 +357,7 @@ export const SupportPanel = ({ isOpen, onClose }: SupportPanelProps) => {
 
 				{/* Footer */}
 				<div className="mt-4 border-t border-[#1C1E23] pb-4 text-center">
-					<p className="font-outfit text-xs text-zinc-500">
+					<p className="font-russo text-xs text-zinc-500">
 						© {new Date().getFullYear()} Rthmn
 					</p>
 				</div>

@@ -45,7 +45,7 @@ export const SelectedPairs = () => {
 
 	return (
 		<div ref={containerRef} className="flex h-full flex-col">
-			<div className="font-dmmono  flex h-8 items-center justify-between border-b border-[#0A0B0D] px-4 text-xs font-medium tracking-wider text-[#818181]">
+			<div className="font-kodemono  flex h-8 items-center justify-between border-b border-[#0A0B0D] px-4 text-xs font-medium tracking-wider text-[#818181]">
 				<div className="flex w-[140px] items-center gap-2">
 					<span className="uppercase">Symbol</span>
 					<FaChevronDown size={8} className="opacity-50" />
@@ -65,12 +65,12 @@ export const SelectedPairs = () => {
 							className="group flex h-9 cursor-default items-center justify-between rounded border border-transparent bg-[#111] px-2 transition-all select-none hover:border-[#1C1E23] "
 						>
 							<div className="flex items-center overflow-hidden">
-								<span className="font-outfit truncate text-[13px] font-bold tracking-wider text-white">
+								<span className="font-russo truncate text-[13px] font-bold tracking-wider text-white">
 									{pair}
 								</span>
 							</div>
 							<div className="flex shrink-0 items-center gap-3">
-								<span className="font-dmmono  text-[13px] font-medium tracking-wider text-[#32353C]">
+								<span className="font-kodemono  text-[13px] font-medium tracking-wider text-[#32353C]">
 									{currentPrice ? formatPrice(currentPrice) : "0"}
 								</span>
 								{isActive && (

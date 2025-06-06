@@ -410,7 +410,9 @@ const TimeFrameSliderContent = memo(
 					onDragEnd?.();
 				};
 
-				window.addEventListener("touchmove", handleTouchMove, { passive: false });
+				window.addEventListener("touchmove", handleTouchMove, {
+					passive: false,
+				});
 				window.addEventListener("touchend", handleTouchEnd);
 				window.addEventListener("touchcancel", handleTouchEnd);
 				setDragState({ isDragging: true, dragType: type });
@@ -443,18 +445,20 @@ const TimeFrameSliderContent = memo(
 		const visibleIntervals = useMemo(() => {
 			if (containerWidth < 200) {
 				// Very small: show only 1D, 1H, 1m
-				return TIME_INTERVALS.filter(interval => 
-					[1440, 60, 1].includes(interval.minutes)
+				return TIME_INTERVALS.filter((interval) =>
+					[1440, 60, 1].includes(interval.minutes),
 				);
 			} else if (containerWidth < 300) {
 				// Small: show 1D, 12H, 4H, 1H, 15m, 1m
-				return TIME_INTERVALS.filter(interval => 
-					[1440, 720, 240, 60, 15, 1].includes(interval.minutes)
+				return TIME_INTERVALS.filter((interval) =>
+					[1440, 720, 240, 60, 15, 1].includes(interval.minutes),
 				);
 			} else if (containerWidth < 400) {
 				// Medium: show most intervals
-				return TIME_INTERVALS.filter(interval => 
-					[1440, 720, 360, 240, 120, 60, 30, 15, 5, 1].includes(interval.minutes)
+				return TIME_INTERVALS.filter((interval) =>
+					[1440, 720, 360, 240, 120, 60, 30, 15, 5, 1].includes(
+						interval.minutes,
+					),
 				);
 			}
 			// Large: show all intervals
@@ -472,10 +476,10 @@ const TimeFrameSliderContent = memo(
 					>
 						{/* Main handle line with enhanced hover and active states */}
 						<div className="absolute inset-y-6 right-[16px] w-[3px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/left:w-[4px] group-hover/left:from-white/95 group-hover/left:via-white/80 group-hover/left:to-white/95 group-hover/left:shadow-[0_0_30px_rgba(255,255,255,0.8)] group-active/left:w-[5px] group-active/left:from-white group-active/left:via-white/90 group-active/left:to-white group-active/left:shadow-[0_0_40px_rgba(255,255,255,0.9)]" />
-						
+
 						{/* Enhanced glow effect */}
 						<div className="absolute inset-y-6 right-[15px] w-[4px] bg-gradient-to-r from-white/0 to-[#32353C] opacity-0 transition-all duration-200 group-hover/left:opacity-100 group-hover/left:w-[6px] group-active/left:w-[8px] group-active/left:opacity-100" />
-						
+
 						{/* Additional hover indicator */}
 						<div className="absolute inset-y-6 right-[18px] w-[8px] bg-gradient-to-r from-white/0 to-white/10 opacity-0 blur-[2px] transition-all duration-200 group-hover/left:opacity-100 group-active/left:opacity-100 group-active/left:to-white/20" />
 					</div>
@@ -487,10 +491,10 @@ const TimeFrameSliderContent = memo(
 					>
 						{/* Main handle line with enhanced hover and active states */}
 						<div className="absolute inset-y-6 left-[16px] w-[3px] bg-gradient-to-b from-white/80 via-white/60 to-white/80 shadow-[0_0_20px_rgba(255,255,255,0.6)] transition-all duration-200 group-hover/right:w-[4px] group-hover/right:from-white/95 group-hover/right:via-white/80 group-hover/right:to-white/95 group-hover/right:shadow-[0_0_30px_rgba(255,255,255,0.8)] group-active/right:w-[5px] group-active/right:from-white group-active/right:via-white/90 group-active/right:to-white group-active/right:shadow-[0_0_40px_rgba(255,255,255,0.9)]" />
-						
+
 						{/* Enhanced glow effect */}
 						<div className="absolute inset-y-6 left-[15px] w-[4px] bg-gradient-to-l from-white/0 to-[#32353C] opacity-0 transition-all duration-200 group-hover/right:opacity-100 group-hover/right:w-[6px] group-active/right:w-[8px] group-active/right:opacity-100" />
-						
+
 						{/* Additional hover indicator */}
 						<div className="absolute inset-y-6 left-[18px] w-[8px] bg-gradient-to-l from-white/0 to-white/10 opacity-0 blur-[2px] transition-all duration-200 group-hover/right:opacity-100 group-active/right:opacity-100 group-active/right:to-white/20" />
 					</div>
@@ -627,8 +631,9 @@ const TimeFrameSliderContent = memo(
 						{TIME_INTERVALS.map((interval, i) => {
 							// Always show full range of labels
 							const position = (i / (TIME_INTERVALS.length - 1)) * 37;
-							const isInRange = position >= reversedStartIndex && 
-								position <= (reversedStartIndex + reversedMaxBoxCount);
+							const isInRange =
+								position >= reversedStartIndex &&
+								position <= reversedStartIndex + reversedMaxBoxCount;
 
 							return (
 								<div
@@ -640,16 +645,16 @@ const TimeFrameSliderContent = memo(
 											"h-3 w-[1px] will-change-transform transition-all duration-200",
 											isInRange
 												? "bg-gradient-to-b from-white/90 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.6)]"
-												: "bg-gradient-to-b from-white/20 to-transparent"
+												: "bg-gradient-to-b from-white/20 to-transparent",
 										)}
 									/>
 									<span
 										className={cn(
-											"mt-1 font-dmmono text-[9px] tracking-wider transition-all duration-200",
+											"mt-1 font-kodemono text-[9px] tracking-wider transition-all duration-200",
 											isInRange
 												? "text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
 												: "text-white/30",
-											"whitespace-nowrap"
+											"whitespace-nowrap",
 										)}
 									>
 										{interval.label}
