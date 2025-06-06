@@ -201,7 +201,7 @@ const ChartStyleOption: React.FC<ChartStyleOptionProps> = ({
 			{/* Title */}
 			<span
 				className={cn(
-					"font-outfit text-[13px] font-medium tracking-wide transition-all duration-300",
+					"font-russo text-[13px] font-medium tracking-wide transition-all duration-300",
 					locked
 						? "text-[#32353C]/40"
 						: isActive

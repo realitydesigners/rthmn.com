@@ -559,7 +559,7 @@ export const PriceSidebar = ({
 			return (
 				<div
 					key={`price-${index}`}
-					className={`font-dmmono  absolute left-0 w-full pl-2 transition-colors ${isHighlightedPrice ? "z-10 p-1 text-[10px] font-bold text-white" : "text-[8px] text-[#0A0B0D]"}`}
+					className={`font-kodemono  absolute left-0 w-full pl-2 transition-colors ${isHighlightedPrice ? "z-10 p-1 text-[10px] font-bold text-white" : "text-[8px] text-[#0A0B0D]"}`}
 					style={{
 						top: !isNaN(line.y) ? line.y - 6 : 0,
 					}}

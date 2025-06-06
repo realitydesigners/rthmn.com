@@ -23,11 +23,6 @@ export class BoxCalculator {
 		this.boxLows = new Float64Array(BoxSizes.length);
 	}
 
-	private roundToDigits(value: number, digits: number): number {
-		const multiplier = 10 ** digits;
-		return Math.round(value * multiplier) / multiplier;
-	}
-
 	calculateBoxArrays(candles: CandleData[]): any {
 		if (candles.length === 0) return {};
 

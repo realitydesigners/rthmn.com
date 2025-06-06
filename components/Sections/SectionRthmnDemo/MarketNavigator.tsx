@@ -74,14 +74,14 @@ export function MarketNavigator({
 					placeholder="Search pairs..."
 					value={searchQuery}
 					onChange={(e) => setSearchQuery(e.target.value)}
-					className="font-outfit w-full rounded-lg border border-[#1C1E23] bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-[#1C1E23]"
+					className="font-russo w-full rounded-lg border border-[#1C1E23] bg-black/40 py-2 pr-4 pl-10 text-sm text-white placeholder-white/40 outline-hidden focus:border-[#1C1E23]"
 				/>
 			</div>
 
 			{/* Market Categories */}
 			<div className="grid grid-cols-2 gap-2">
 				<button className="rounded-lg border border-[#1C1E23] bg-black/40 p-3 text-left hover:border-[#1C1E23]">
-					<span className="font-outfit text-sm font-medium text-white">
+					<span className="font-russo text-sm font-medium text-white">
 						Favorites
 					</span>
 					<div className="mt-1 text-xs primary-text">
@@ -119,7 +119,7 @@ export function MarketNavigator({
 										<FaStar className="h-4 w-4" />
 									</button>
 									<div>
-										<div className="font-outfit text-sm font-medium text-white">
+										<div className="font-russo text-sm font-medium text-white">
 											{item.pair.replace("_", "/")}
 										</div>
 										<div className="text-xs primary-text">

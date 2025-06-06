@@ -33,7 +33,7 @@ export const PanelSection = ({
 							className="text-[#666] transition-colors group-hover:text-[#888]"
 						/>
 					</div>
-					<span className="font-outfit text-[13px] font-medium tracking-wide text-[#666] transition-colors group-hover:text-[#888]">
+					<span className="font-russo text-[13px] font-medium tracking-wide text-[#666] transition-colors group-hover:text-[#888]">
 						{title}
 					</span>
 				</div>

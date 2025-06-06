@@ -1,10 +1,4 @@
-import {
-	DM_Mono,
-	Kode_Mono,
-	Outfit,
-	Oxanium,
-	Russo_One,
-} from "next/font/google";
+import { Kode_Mono, Outfit, Oxanium, Russo_One } from "next/font/google";
 
 export const oxanium = Oxanium({
 	subsets: ["latin"],
@@ -17,19 +11,19 @@ export const russo = Russo_One({
 	subsets: ["latin"],
 	display: "swap",
 	weight: ["400"],
-	variable: "--font-russo  ",
+	variable: "--font-russo ",
+});
+
+export const kodemono = Kode_Mono({
+	subsets: ["latin"],
+	display: "swap",
+	weight: ["400", "500", "600", "700"],
+	variable: "--font-kodemono",
 });
 
 export const outfit = Outfit({
 	subsets: ["latin"],
 	display: "swap",
-	weight: ["400", "500", "600", "700"],
-	variable: "--font-outfit ",
-});
-
-export const dmmono = DM_Mono({
-	subsets: ["latin"],
-	display: "swap",
-	weight: ["300", "400"],
-	variable: "--font-dmmono ",
+	weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+	variable: "--font-outfit",
 });

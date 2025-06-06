@@ -46,12 +46,12 @@ export default function CustomerPortalForm({ subscription }: Props) {
 					<LuCreditCard className="h-4 w-4 text-white" />
 				</div>
 				<div className="min-w-0">
-					<h3 className="font-outfit text-base font-semibold text-white">
+					<h3 className="font-russo text-base font-semibold text-white">
 						{subscription?.prices
 							? `${subscription.prices.name || "Pro"} Plan`
 							: "No active subscription"}
 					</h3>
-					<p className="font-outfit text-xs text-zinc-400">
+					<p className="font-russo text-xs text-zinc-400">
 						{subscription
 							? `${subscriptionPrice}/${subscription.prices.interval}`
 							: "Choose a plan to get started"}
@@ -74,7 +74,7 @@ export default function CustomerPortalForm({ subscription }: Props) {
 						className="flex w-auto items-center justify-center gap-2 rounded-full bg-[#1C1E23] px-4 py-2 text-white transition-all duration-200 hover:bg-[#1C1E23] disabled:opacity-50"
 					>
 						<LuCreditCard className="h-4 w-4 text-white" />
-						<span className="font-outfit text-sm">
+						<span className="font-russo text-sm">
 							{isSubmitting ? "Loading..." : "Manage Plan"}
 						</span>
 					</button>

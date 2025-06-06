@@ -18,11 +18,11 @@ export function LearnPageClient({ courses }: { courses: Course[] }) {
 			{/* Hero Section */}
 			<div className="mx-auto mt-40 max-w-5xl px-6 sm:px-8 lg:px-12">
 				<div className="relative z-10 text-center">
-					<h1 className="font-outfit mx-auto max-w-4xl text-6xl font-bold text-white md:text-7xl">
+					<h1 className="font-russo mx-auto max-w-4xl text-6xl font-bold text-white md:text-7xl">
 						Learn to trade with
 						<span className=""> confidence</span>
 					</h1>
-					<p className="font-outfit mx-auto mt-8 max-w-2xl text-xl text-white/90">
+					<p className="font-russo mx-auto mt-8 max-w-2xl text-xl text-white/90">
 						Master the art of trading through our comprehensive courses. From
 						fundamentals to advanced strategies.
 					</p>
@@ -38,7 +38,7 @@ export function LearnPageClient({ courses }: { courses: Course[] }) {
 										{/* Left side with icon and info */}
 										<div className="flex items-center gap-5">
 											<div>
-												<h2 className="font-outfit text-xl font-medium text-white">
+												<h2 className="font-russo text-xl font-medium text-white">
 													{course.title}
 												</h2>
 												<p className="mt-1 text-sm text-white/60">

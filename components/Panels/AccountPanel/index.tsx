@@ -70,11 +70,11 @@ export const AccountPanel = () => {
 						/>
 					</div>
 					<div className="flex items-center">
-						<h1 className="font-outfit mb-1 text-center text-xl font-bold text-white">
+						<h1 className="font-russo mb-1 text-center text-xl font-bold text-white">
 							{user.user_metadata?.full_name || "Your Profile"}
 						</h1>
 					</div>
-					<p className="font-outfit max-w-full text-center text-sm break-words text-zinc-400">
+					<p className="font-russo max-w-full text-center text-sm break-words text-zinc-400">
 						{user.email}
 					</p>
 				</div>
@@ -104,10 +104,10 @@ export const AccountPanel = () => {
 									<LuLogOut className="h-4 w-4 text-white" />
 								</div>
 								<div className="min-w-0">
-									<h3 className="font-outfit text-base font-semibold text-white">
+									<h3 className="font-russo text-base font-semibold text-white">
 										Account Access
 									</h3>
-									<p className="font-outfit text-xs text-zinc-400">
+									<p className="font-russo text-xs text-zinc-400">
 										Sign out of your account
 									</p>
 								</div>
@@ -120,7 +120,7 @@ export const AccountPanel = () => {
 									className="flex w-auto items-center justify-center gap-2 rounded-full bg-red-500/10 px-4 py-2 text-red-500 transition-all duration-200 hover:bg-red-500/20 disabled:opacity-50"
 								>
 									<LuLogOut className="h-4 w-4" />
-									<span className="font-outfit text-sm">
+									<span className="font-russo text-sm">
 										{isSigningOut ? "Signing out..." : "Sign out"}
 									</span>
 								</button>

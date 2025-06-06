@@ -59,7 +59,7 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 					<div className="mb-4 flex items-center gap-4 text-xs primary-text">
 						<div className="flex items-center gap-2">
 							<FaCalendar className="h-3 w-3 primary-text" />
-							<span className="font-dmmono ">
+							<span className="font-kodemono ">
 								{new Date(block?.publicationDate).toLocaleDateString("en-US", {
 									year: "numeric",
 									month: "short",
@@ -69,19 +69,19 @@ const PostCard = ({ post, index }: { post: Post; index: number }) => {
 						</div>
 						<div className="flex items-center gap-2">
 							<FaClock className="h-3 w-3 primary-text" />
-							<span className="font-dmmono ">5 min read</span>
+							<span className="font-kodemono ">5 min read</span>
 						</div>
 					</div>
 
 					{/* Title */}
 					<Link href={`/posts/${post.slug.current}`}>
-						<h3 className="font-outfit mb-3 text-2xl font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-white">
+						<h3 className="font-russo mb-3 text-2xl font-bold tracking-tight text-white transition-colors duration-300 group-hover:text-white">
 							{block?.heading || "No title"}
 						</h3>
 					</Link>
 
 					{/* Description */}
-					<p className="font-dmmono  mb-6 line-clamp-2 text-sm leading-relaxed primary-text">
+					<p className="font-kodemono  mb-6 line-clamp-2 text-sm leading-relaxed primary-text">
 						{block?.subheading || "No subheading"}
 					</p>
 
@@ -125,10 +125,10 @@ export function SectionBlogPosts({ initialPosts }: { initialPosts: Post[] }) {
 					viewport={{ once: true }}
 					className="mb-16 text-center"
 				>
-					<h2 className="text-neutral-gradient font-outfit mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+					<h2 className="text-neutral-gradient font-russo mb-6 text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
 						Latest Insights
 					</h2>
-					<p className="font-dmmono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
+					<p className="font-kodemono  mx-auto max-w-2xl text-base primary-text sm:text-lg">
 						Explore our latest thoughts on market analysis, trading strategies,
 						and technological innovations.
 					</p>

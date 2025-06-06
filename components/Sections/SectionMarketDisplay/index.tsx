@@ -113,12 +113,12 @@ const MarketHeading = memo(() => (
 			transition={{ duration: 0.8 }}
 		>
 			<div className="mb-8">
-				<h2 className="font-outfit text-neutral-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]">
+				<h2 className="font-russo text-neutral-gradient relative text-[3em] leading-[1em] font-bold tracking-tight sm:text-[5em] lg:text-[7em]">
 					Find Patterns.
 					<br />
 					Unlock Your Edge.
 				</h2>
-				<p className="font-outfit text-md primary-text mx-auto max-w-2xl px-4 sm:text-lg lg:text-2xl">
+				<p className="font-russo text-md primary-text mx-auto max-w-2xl px-4 sm:text-lg lg:text-2xl">
 					Enter a new dimension to trading and discover the same patterns you
 					already trade, visualized in a way never seen before.
 				</p>
