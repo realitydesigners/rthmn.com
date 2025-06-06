@@ -37,23 +37,20 @@ export const StartButton: FC<StartButtonProps> = ({
 	const buttonStyles = {
 		default: {
 			wrapper:
-				"relative bg-gradient-to-r from-white/90 via-white/95 to-white/90 text-zinc-800 hover:from-white hover:via-white hover:to-white before:absolute before:inset-0 before:bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_20%,rgba(255,255,255,0.2)_35%,rgba(255,255,255,0.1)_45%,rgba(255,255,255,0.2)_55%,rgba(255,255,255,0)_80%,transparent_100%)] before:bg-[length:300%_100%] before:animate-[shimmer_6s_linear_infinite]",
-			inner: "bg-gradient-to-b from-[#1C1E23] to-black/5",
-			shimmer: "",
+				"relative bg-[#24FF66] text-black hover:bg-[#1ECC52] border border-[#24FF66]/50 shadow-[0_0_20px_rgba(36,255,102,0.3)]",
+			inner: "bg-transparent",
 			size: "px-8 py-4 text-[15px]",
 		},
 		shimmer: {
 			wrapper:
-				"relative bg-gradient-to-r from-white/95 via-white to-white/95 text-zinc-800 backdrop-blur-sm hover:from-white hover:via-white hover:to-white before:absolute before:inset-0 before:bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_10%,rgba(255,255,255,0.4)_45%,rgba(255,255,255,0.2)_55%,rgba(255,255,255,0.4)_80%,rgba(255,255,255,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_4s_linear_infinite] before:backdrop-blur-sm shadow-[inset_0_1px_0px_rgba(255,255,255,1),inset_0_-1px_0px_rgba(0,0,0,0.1)] after:absolute after:inset-0 after:rounded-full after:shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_2px_rgba(0,0,0,0.1)]",
-			inner: "bg-gradient-to-b from-transparent via-black/10 to-black/30",
-			shimmer: "",
+				"relative bg-[#24FF66] text-black hover:bg-[#1ECC52] border border-[#24FF66]/50 shadow-[0_0_20px_rgba(36,255,102,0.3)] hover:shadow-[0_0_30px_rgba(36,255,102,0.5)] before:absolute before:inset-0 before:bg-[linear-gradient(45deg,transparent_30%,rgba(255,255,255,0.3)_50%,transparent_70%)] before:bg-[length:200%_200%] before:animate-[shimmer_3s_ease-in-out_infinite]",
+			inner: "bg-transparent",
 			size: "px-8 py-4 text-[15px]",
 		},
 		"shimmer-sm": {
 			wrapper:
-				"relative bg-gradient-to-r from-white/95 via-white to-white/95 text-zinc-800 backdrop-blur-sm hover:from-white hover:via-white hover:to-white before:absolute before:inset-0 before:bg-[linear-gradient(120deg,transparent_0%,rgba(255,255,255,0)_10%,rgba(255,255,255,0.4)_45%,rgba(255,255,255,0.2)_55%,rgba(255,255,255,0.4)_80%,rgba(255,255,255,0)_90%,transparent_100%)] before:bg-[length:400%_100%] before:animate-[shimmer_4s_linear_infinite] before:backdrop-blur-sm shadow-[inset_0_1px_0px_rgba(255,255,255,1),inset_0_-1px_0px_rgba(0,0,0,0.1)] after:absolute after:inset-0 after:rounded-full after:shadow-[0_0_15px_rgba(255,255,255,0.2),inset_0_2px_2px_rgba(0,0,0,0.1)]",
-			inner: "bg-gradient-to-b from-transparent via-black/10 to-black/20",
-			shimmer: "",
+				"relative bg-[#24FF66] text-black hover:bg-[#1ECC52] border border-[#24FF66]/50 shadow-[0_0_15px_rgba(36,255,102,0.3)] hover:shadow-[0_0_25px_rgba(36,255,102,0.5)] before:absolute before:inset-0 before:bg-[linear-gradient(45deg,transparent_30%,rgba(255,255,255,0.3)_50%,transparent_70%)] before:bg-[length:200%_200%] before:animate-[shimmer_3s_ease-in-out_infinite]",
+			inner: "bg-transparent",
 			size: "px-4 py-2 text-sm",
 		},
 	};
@@ -62,7 +59,7 @@ export const StartButton: FC<StartButtonProps> = ({
 
 	const ButtonContent = () => (
 		<span
-			className={`relative flex w-full items-center justify-center space-x-3 rounded-full ${styles.size} font-semibold tracking-wide transition-all duration-300 group-hover:tracking-wider text-zinc-800 drop-shadow-sm`}
+			className={`relative flex w-full items-center justify-center space-x-3 rounded-full ${styles.size} font-semibold tracking-wide transition-all duration-300 group-hover:tracking-wider text-black font-kodemono uppercase`}
 		>
 			{isLoading ? (
 				<div className="flex items-center gap-3">
@@ -124,12 +121,12 @@ export const StartButton: FC<StartButtonProps> = ({
 
 	const buttonClasses = `group relative flex items-center overflow-hidden rounded-full ${
 		styles.wrapper
-	} p-[2px] transition-all duration-300 font-russo ${
+	} transition-all duration-300 ${
 		disabled
 			? "cursor-not-allowed opacity-50"
 			: isLoading
 				? "cursor-wait"
-				: "hover:scale-[1.02] active:scale-[0.98] hover:shadow-[0_0_30px_rgba(16,185,129,0.3),inset_0_1px_0px_rgba(255,255,255,1),inset_0_-1px_0px_rgba(0,0,0,0.1)] hover:after:opacity-100"
+				: "hover:scale-[1.02] active:scale-[0.98]"
 	}`;
 
 	return (
@@ -137,10 +134,10 @@ export const StartButton: FC<StartButtonProps> = ({
 			<style jsx global>{`
                 @keyframes shimmer {
                     0% {
-                        background-position: 200% 50%;
+                        background-position: -200% -200%;
                     }
                     100% {
-                        background-position: -100% 50%;
+                        background-position: 200% 200%;
                     }
                 }
             `}</style>
@@ -159,17 +156,13 @@ export const StartButton: FC<StartButtonProps> = ({
 						disabled={disabled || isLoading}
 						className={buttonClasses}
 					>
-						<span
-							className={`relative flex w-full items-center rounded-full ${styles.inner} backdrop-blur-[2px]`}
-						>
+						<span className={`relative flex w-full items-center rounded-full ${styles.inner}`}>
 							<ButtonContent />
 						</span>
 					</button>
 				) : (
 					<Link href={href} className={buttonClasses}>
-						<span
-							className={`relative flex w-full items-center rounded-full ${styles.inner} backdrop-blur-[2px]`}
-						>
+						<span className={`relative flex w-full items-center rounded-full ${styles.inner}`}>
 							<ButtonContent />
 						</span>
 					</Link>

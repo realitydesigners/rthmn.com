@@ -9,8 +9,10 @@ import { useEffect, useMemo, useState } from "react";
 const cryptoStructures = [
 	{ pair: "ETH", name: "Ethereum", startOffset: 20, speed: 1.2 },
 	{ pair: "BTC", name: "Bitcoin", startOffset: 4, speed: 0.8 },
-	{ pair: "SOL", name: "Solana", startOffset: 8, speed: 0.6 },
-	{ pair: "ADA", name: "Cardano", startOffset: 40, speed: 1.0 },
+	{ pair: "GBPUSD", name: "GBPUSD", startOffset: 18, speed: 0.7 },
+	{ pair: "EURUSD", name: "EURUSD", startOffset: 8, speed: 0.6 },
+	{ pair: "USDCAD", name: "USDCAD", startOffset: 8, speed: 0.9 },
+
 ];
 
 export const useAnimatedStructures = () => {

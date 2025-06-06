@@ -25,20 +25,20 @@ export function SectionFooter() {
 
 	const FOOTER_LINKS = {
 		product: [
-			{ name: "Features", href: "#" },
+			{ name: "Features", href: "/" },
 			{ name: "Pricing", href: "/pricing" },
 			{ name: "FAQ", href: "/faq" },
-			{ name: "Learn", href: "/learn" },
+			{ name: "Learn", href: "/" },
 		],
 
 		company: [
-			{ name: "About", href: "/about" },
-			{ name: "Algorithmn", href: "/algorithmn" },
+			{ name: "About", href: "/" },
+			{ name: "Algorithmn", href: "/" },
 			{ name: "Changelog", href: "/changelog" },
 			{ name: "Blog", href: "/blog" },
 		],
 		legal: [
-			{ name: "Contact", href: "/contact" },
+			{ name: "Contact", href: "/" },
 			{ name: "Privacy", href: "/privacy" },
 			{ name: "Terms", href: "/terms-of-service" },
 		],
@@ -51,7 +51,7 @@ export function SectionFooter() {
 			icon: FaInstagram,
 			href: "https://www.instagram.com/rthmnapp/",
 		},
-		{ name: "GitHub", icon: FaGithub, href: "https://github.com/rthmnapp" },
+		{ name: "GitHub", icon: FaGithub, href: "https://github.com/realitydesigners/" },
 		{
 			name: "Youtube",
 			icon: FaYoutube,

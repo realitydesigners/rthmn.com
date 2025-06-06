@@ -1,5 +1,6 @@
 "use client";
 
+import { StartButton } from "@/components/Sections/StartNowButton";
 import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { memo } from "react";
@@ -91,34 +92,9 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 					}}
 					className="pt-4"
 				>
-					<motion.button
-						whileHover={{
-							scale: 1.05,
-							transition: { duration: 0.2 },
-						}}
-						whileTap={{ scale: 0.95 }}
-						className="group relative px-8 py-4 bg-[#24FF66] text-black font-outfit font-bold text-lg rounded-full overflow-hidden transition-all duration-300 hover:shadow-[0_0_30px_rgba(36,255,102,0.4)]"
-					>
-						<span className="relative z-10">Start Winning Trades</span>
-
-						{/* Simplified Arrow */}
-						<motion.svg
-							className="inline-block w-5 h-5 ml-2 relative z-10"
-							fill="none"
-							stroke="currentColor"
-							viewBox="0 0 24 24"
-							whileHover={{ x: 3 }}
-							transition={{ duration: 0.2 }}
-							aria-hidden="true"
-						>
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								strokeWidth={2}
-								d="M13 7l5 5m0 0l-5 5m5-5H6"
-							/>
-						</motion.svg>
-					</motion.button>
+					<StartButton href="/pricing" variant="shimmer" >
+							Start Winning Trades
+						</StartButton>
 				</motion.div>
 			</motion.div>
 		</motion.div>
