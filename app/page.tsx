@@ -67,16 +67,16 @@ export default async function Homepage() {
 	return (
 		<div className="h-full">
 			<SectionBoxes3D />
-			<LineChart3D />
+			{/* <LineChart3D /> */}
 			<SectionInstrumentsPanel />
-			{/* <SectionMarketDisplay marketData={marketData} />
-			<SectionRthmnDemo marketData={marketData} />
+			{/* <SectionMarketDisplay marketData={marketData} />*/}
+			{/* <SectionRthmnDemo marketData={marketData} />
 			<SectionMarketTicker marketData={marketData} />
 			<SectionBoxes />
 
 			<SectionHistogram />
             <SectionHero marketData={marketData} />
-           
+            */}
 		
 			<SectionPricing
 				user={user} // Pass fetched user
@@ -85,7 +85,7 @@ export default async function Homepage() {
 			/>
 
 			<FAQBlock items={faqItems} />
-			<SectionCTA /> */}
+			<SectionCTA /> 
 		</div>
 	);
 }

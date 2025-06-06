@@ -12,7 +12,7 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 	return (
 		<motion.div
 			style={{ opacity }}
-			className="absolute top-1/2 left-0 transform -translate-y-1/2 z-50 text-left pl-16 lg:pl-24"
+			className="absolute top-1/2 left-0 transform -translate-y-1/2  flex  flex-col items-center justify-center z-50 text-left lg:pl-16 lg:pl-24"
 		>
 			<motion.h1
 				initial={{ scale: 0.5, rotateX: -30 }}
@@ -57,7 +57,7 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 							delay: 0.2,
 							ease: [0.25, 0.46, 0.45, 0.94],
 						}}
-						className="block relative"
+						className="block"
 					>
 						SMARTER
 					</motion.span>
@@ -73,7 +73,7 @@ export const HeroText = memo(({ opacity = 1 }: HeroTextProps) => {
 					delay: 1.5,
 					ease: "easeOut",
 				}}
-				className="max-w-2xl space-y-6"
+				className="flex  flex-col px-12"
 			>
 				<p className="font-outfit text-xl text-white/80 leading-relaxed max-w-xl">
 					Turn market chaos into profitable trades. Our revolutionary 3D

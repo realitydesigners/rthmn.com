@@ -186,9 +186,7 @@ const MockInstrumentItem = memo(
 		const isPositive = mockData?.change > 0;
 
 		return (
-			<motion.div
-				initial={{ opacity: 0, x: -20 }}
-				animate={{ opacity: 1, x: 0 }}
+			<div
 				className={cn(
 					"group/item relative flex h-12 w-full items-center rounded-lg transition-all duration-300 select-none cursor-pointer",
 					isSelected
@@ -244,7 +242,7 @@ const MockInstrumentItem = memo(
 						</div>
 					</div>
 				</div>
-			</motion.div>
+			</div>
 		);
 	},
 );
@@ -266,7 +264,7 @@ const MockSearchBar = memo(
 			<div className="relative">
 				<div
 					className={cn(
-						"group/search relative flex h-12 items-center overflow-hidden rounded-lg transition-all duration-300",
+						"group/search relative flex h-12 items-center overflow-hidden scrollbar-hide rounded-lg transition-all duration-300",
 						isFocused ? "ring-1 ring-[#1C1E23]" : "",
 					)}
 				>
@@ -404,9 +402,16 @@ const MockInstrumentsPanel = memo(() => {
 	}, []);
 
 	return (
-		<div className="w-full max-w-sm bg-gradient-to-b from-[#0A0B0D] to-[#070809] border border-[#1C1E23]/60 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
+		<div className="w-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] border border-[#1C1E23]/60 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
 			{/* Header */}
-			<div className="p-6 border-b border-[#111215]">
+
+				{/* Subtle glow effect */}
+				<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.02),transparent_50%)] rounded-xl" />
+
+				{/* Top border highlight */}
+				<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+			<div className="p-4 sm:p-6 border-b border-[#111215]">
 				<h3 className="font-russo text-lg font-bold text-white uppercase tracking-tight mb-4">
 					Instruments
 				</h3>
@@ -480,18 +485,13 @@ const MockInstrumentsPanel = memo(() => {
 							{searchQuery && ` (${filteredInstruments.length} results)`}
 						</span>
 						{filteredInstruments.map((pair, index) => (
-							<motion.div
-								key={pair}
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								transition={{ delay: index * 0.05 }}
-							>
+							<div key={pair}>
 								<MockInstrumentItem
 									pair={pair}
 									isSelected={selectedPairs.includes(pair)}
 									onToggle={() => togglePairSelection(pair)}
 								/>
-							</motion.div>
+							</div>
 						))}
 						{filteredInstruments.length === 0 && searchQuery && (
 							<div className="text-center py-8">
@@ -511,61 +511,31 @@ MockInstrumentsPanel.displayName = "MockInstrumentsPanel";
 
 export const SectionInstrumentsPanel = memo(() => {
 	const containerRef = useRef<HTMLDivElement>(null);
-	const { scrollYProgress } = useScroll({
-		target: containerRef,
-		offset: ["start end", "end start"],
-	});
-
-	const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
-	const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
 
 	return (
 		<section
 			ref={containerRef}
-			className="relative min-h-screen w-full bg-gradient-to-b from-[#050506] via-[#0A0B0D] to-black py-24"
+			className="relative min-h-screen w-full py-16 sm:py-24"
 		>
-			<div className="container mx-auto px-6">
+			<div className="container mx-auto px-4 sm:px-6">
 				<div className="max-w-7xl mx-auto">
-					<div className="grid lg:grid-cols-[1.2fr_0.8fr] gap-20 items-start">
+					<div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-20 items-start">
 						{/* Left side - Enhanced Content */}
-						<motion.div style={{ y, opacity }} className="space-y-12">
+						<div className="space-y-8 sm:space-y-12 order-2 lg:order-1">
 							{/* Header Section */}
 							<div className="space-y-8">
-								<motion.div
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.8 }}
-									className="space-y-4"
-								>
-									{/* Overline */}
-									<div className="inline-flex items-center gap-3 px-4 py-2 rounded-full border border-white/20 bg-gradient-to-r from-white/5 to-transparent">
-										<div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-										<span className="font-russo text-sm font-semibold text-white/90 uppercase tracking-wider">
-											Professional Trading Arsenal
-										</span>
-									</div>
-
+								<div className="space-y-4">
 									<h2 className="font-russo text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[0.8] uppercase">
 										MASTER EVERY
 										<span className="block text-white mt-2 relative">
 											MARKET INSTANTLY
-											{/* Animated underline */}
-											<motion.div
-												initial={{ width: 0 }}
-												whileInView={{ width: "100%" }}
-												transition={{ duration: 1.2, delay: 0.5 }}
-												className="absolute -bottom-2 left-0 h-1 bg-gradient-to-r from-white via-white/60 to-transparent"
-											/>
+											{/* Static underline */}
+											<div className="absolute -bottom-2 left-0 h-1 w-full bg-gradient-to-r from-white via-white/60 to-transparent" />
 										</span>
 									</h2>
-								</motion.div>
+								</div>
 
-								<motion.div
-									initial={{ opacity: 0, y: 30 }}
-									whileInView={{ opacity: 1, y: 0 }}
-									transition={{ duration: 0.8, delay: 0.3 }}
-									className="space-y-6"
-								>
+								<div className="space-y-6">
 									<p className="font-russo text-xl lg:text-2xl text-white/80 leading-relaxed font-light">
 										<span className="text-white font-semibold">
 											Access 300+ trading instruments
@@ -580,23 +550,13 @@ export const SectionInstrumentsPanel = memo(() => {
 										SPY ETF faster than your competition can blink. This is how
 										professionals dominate multiple markets simultaneously.
 									</p>
-								</motion.div>
+								</div>
 							</div>
 
 							{/* Key Features Grid */}
-							<motion.div
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8, delay: 0.5 }}
-								className="grid md:grid-cols-2 gap-8"
-							>
+							<div className="grid md:grid-cols-2 gap-8">
 								{/* Feature 1 - Search */}
-								<motion.div
-									initial={{ opacity: 0, scale: 0.95 }}
-									whileInView={{ opacity: 1, scale: 1 }}
-									transition={{ duration: 0.6, delay: 0.7 }}
-									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500"
-								>
+								<div className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500">
 									{/* Background glow */}
 									<div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -642,15 +602,10 @@ export const SectionInstrumentsPanel = memo(() => {
 											</span>
 										</div>
 									</div>
-								</motion.div>
+								</div>
 
 								{/* Feature 2 - Organization */}
-								<motion.div
-									initial={{ opacity: 0, scale: 0.95 }}
-									whileInView={{ opacity: 1, scale: 1 }}
-									transition={{ duration: 0.6, delay: 0.8 }}
-									className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500"
-								>
+								<div className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500">
 									{/* Background glow */}
 									<div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -699,27 +654,12 @@ export const SectionInstrumentsPanel = memo(() => {
 											)}
 										</div>
 									</div>
-								</motion.div>
-							</motion.div>
+								</div>
+							</div>
 
 							{/* Drag & Drop Showcase */}
-							<motion.div
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8, delay: 0.9 }}
-								className="relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-r from-[#0A0B0D] via-[#070809] to-[#050506] p-8"
-							>
-								{/* Background pattern */}
-								<div className="absolute inset-0 opacity-5">
-									<div
-										className="absolute inset-0"
-										style={{
-											backgroundImage:
-												"radial-gradient(circle at 25% 25%, #ffffff 2px, transparent 2px)",
-											backgroundSize: "24px 24px",
-										}}
-									/>
-								</div>
+							<div className="relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-r from-[#0A0B0D] via-[#070809] to-[#050506] p-8">
+						
 
 								<div className="relative z-10 flex items-center gap-8">
 									<div className="flex-1 space-y-4">
@@ -730,7 +670,7 @@ export const SectionInstrumentsPanel = memo(() => {
 												</span>
 											</div>
 											<h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight">
-												Drag & Drop Mastery
+												Drag & Drop
 											</h3>
 										</div>
 
@@ -760,15 +700,7 @@ export const SectionInstrumentsPanel = memo(() => {
 									{/* Visual drag indicator */}
 									<div className="hidden lg:block">
 										<div className="relative">
-											<motion.div
-												animate={{ y: [0, -10, 0] }}
-												transition={{
-													duration: 2,
-													repeat: Number.POSITIVE_INFINITY,
-													ease: "easeInOut",
-												}}
-												className="w-12 h-12 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center"
-											>
+											<div className="w-12 h-12 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center">
 												<svg
 													className="w-6 h-6 text-white"
 													fill="none"
@@ -783,28 +715,14 @@ export const SectionInstrumentsPanel = memo(() => {
 														d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
 													/>
 												</svg>
-											</motion.div>
-											<motion.div
-												animate={{ opacity: [0.3, 1, 0.3] }}
-												transition={{
-													duration: 2,
-													repeat: Number.POSITIVE_INFINITY,
-													ease: "easeInOut",
-												}}
-												className="absolute inset-0 rounded-lg bg-white/10 blur-xl"
-											/>
+											</div>
 										</div>
 									</div>
 								</div>
-							</motion.div>
+							</div>
 
 							{/* Performance Stats */}
-							<motion.div
-								initial={{ opacity: 0, y: 30 }}
-								whileInView={{ opacity: 1, y: 0 }}
-								transition={{ duration: 0.8, delay: 1.1 }}
-								className="grid grid-cols-3 gap-8 pt-4"
-							>
+							<div className="grid grid-cols-3 gap-8 pt-4">
 								{[
 									{
 										value: "300+",
@@ -813,20 +731,17 @@ export const SectionInstrumentsPanel = memo(() => {
 									},
 									{
 										value: "< 50ms",
-										label: "Search Speed",
-										sublabel: "Faster than you can think",
+										label: "Live Data",
+										sublabel: "Calculating incoming data in real-time",
 									},
 									{
 										value: "100%",
 										label: "Customizable",
-										sublabel: "Your perfect setup",
+										sublabel: "Build your perfect setup (BETA)",
 									},
 								].map((stat, index) => (
-									<motion.div
+									<div
 										key={stat.label}
-										initial={{ opacity: 0, scale: 0.9 }}
-										whileInView={{ opacity: 1, scale: 1 }}
-										transition={{ duration: 0.5, delay: 1.3 + index * 0.1 }}
 										className="text-center group"
 									>
 										<div className="space-y-2">
@@ -842,21 +757,17 @@ export const SectionInstrumentsPanel = memo(() => {
 												</div>
 											</div>
 										</div>
-									</motion.div>
+									</div>
 								))}
-							</motion.div>
-						</motion.div>
+							</div>
+						</div>
 
 						{/* Right side - Mock Panel */}
-						<motion.div
-							style={{ y: useTransform(scrollYProgress, [0, 1], [50, -50]) }}
-							initial={{ opacity: 0, scale: 0.9 }}
-							whileInView={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 1, delay: 0.3 }}
-							className="flex justify-center lg:justify-end"
-						>
-							<MockInstrumentsPanel />
-						</motion.div>
+						<div className="flex justify-center lg:justify-end lg:sticky top-24 order-1 lg:order-2">
+							<div className="w-full max-w-sm lg:max-w-sm">
+								<MockInstrumentsPanel />
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
