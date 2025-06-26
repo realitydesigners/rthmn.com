@@ -159,7 +159,7 @@ export const ResoBox3DCircular = memo(
     );
 
     return (
-      <div className={`relative h-full w-full bg-black ${className}`}>
+      <div className={`relative h-full w-full ${className}`}>
         <Canvas
           camera={{ position: [0, 0, 70], fov: 50 }}
           resize={{ scroll: true, debounce: { scroll: 0, resize: 0 } }}
