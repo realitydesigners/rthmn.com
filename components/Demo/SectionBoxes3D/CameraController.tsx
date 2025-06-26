@@ -5,75 +5,77 @@ import * as THREE from "three";
 import { lerp } from "./mathUtils";
 
 interface CameraControllerProps {
-	viewMode: "scene" | "box";
-	scrollProgress: number;
-	introMode: boolean;
-	isClient: boolean;
-	cameraDistance?: MotionValue<number>;
+  viewMode: "scene" | "box";
+  scrollProgress: number;
+  introMode: boolean;
+  isClient: boolean;
+  cameraDistance?: MotionValue<number>;
 }
 
 export const CameraController = memo(
-	({
-		viewMode,
-		scrollProgress,
-		introMode,
-		isClient,
-		cameraDistance,
-	}: CameraControllerProps) => {
-		const { camera, gl } = useThree();
-		const [isInitialized, setIsInitialized] = useState(false);
-		const [currentCameraDistance, setCurrentCameraDistance] = useState(() => {
-			return cameraDistance ? cameraDistance.get() : 1;
-		});
+  ({
+    viewMode,
+    scrollProgress,
+    introMode,
+    isClient,
+    cameraDistance,
+  }: CameraControllerProps) => {
+    const { camera, gl } = useThree();
+    const [isInitialized, setIsInitialized] = useState(false);
+    const [currentCameraDistance, setCurrentCameraDistance] = useState(() => {
+      return cameraDistance ? cameraDistance.get() : 1;
+    });
 
-		// Subscribe to camera distance changes
-		useEffect(() => {
-			if (!cameraDistance) return;
+    // Subscribe to camera distance changes
+    useEffect(() => {
+      if (!cameraDistance) return;
 
-			setCurrentCameraDistance(cameraDistance.get());
-			const unsubscribe = cameraDistance.onChange(setCurrentCameraDistance);
-			return unsubscribe;
-		}, [cameraDistance]);
+      setCurrentCameraDistance(cameraDistance.get());
+      const unsubscribe = cameraDistance.onChange(setCurrentCameraDistance);
+      return unsubscribe;
+    }, [cameraDistance]);
 
-		// Initialize canvas
-		useEffect(() => {
-			if (!isClient || isInitialized) return;
+    // Initialize canvas
+    useEffect(() => {
+      if (!isClient || isInitialized) return;
 
-			const canvas = gl.domElement;
-			Object.assign(canvas.style, {
-				position: "absolute",
-				top: "0",
-				left: "0",
-				width: "100vw",
-				height: "100vh",
-			});
+      const canvas = gl.domElement;
+      Object.assign(canvas.style, {
+        position: "absolute",
+        top: "0",
+        left: "0",
+        width: "100vw",
+        height: "100vh",
+      });
 
-			gl.setSize(window.innerWidth, window.innerHeight);
+      gl.setSize(window.innerWidth, window.innerHeight);
 
-			if (camera instanceof THREE.PerspectiveCamera) {
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-			}
+      if (camera instanceof THREE.PerspectiveCamera) {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+      }
 
-			// Set initial camera position without conflicts
-			camera.position.set(0, 0, 70);
+      // Set initial camera position without conflicts
+      camera.position.set(0, 0, 70);
 
-			setIsInitialized(true);
-		}, [isClient, gl, camera, isInitialized]);
+      setIsInitialized(true);
+    }, [isClient, gl, camera, isInitialized]);
 
-		useFrame(() => {
-			if (!isClient || !isInitialized) return;
+    useFrame(() => {
+      if (!isClient || !isInitialized) return;
 
-			// Handle camera distance for zooming in scene mode
-			if (cameraDistance && scrollProgress >= 0.25 && viewMode === "scene") {
-				const baseDistance = 70;
-				const targetDistance = baseDistance / currentCameraDistance;
-				camera.position.setZ(targetDistance);
-			}
-		});
+      // Handle camera distance for zooming in scene mode
+      // Only apply scaling if we have meaningful scroll progress
+      if (cameraDistance && scrollProgress >= 0.25 && viewMode === "scene") {
+        const baseDistance = 70;
+        const targetDistance = baseDistance / currentCameraDistance;
+        // Smooth camera position changes to avoid jarring movements
+        camera.position.setZ(lerp(camera.position.z, targetDistance, 0.1));
+      }
+    });
 
-		return null;
-	},
+    return null;
+  }
 );
 
 CameraController.displayName = "CameraController";
