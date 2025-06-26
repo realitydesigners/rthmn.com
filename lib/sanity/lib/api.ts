@@ -8,10 +8,10 @@ export const dataset: string = checkValue(
   "NEXT_PUBLIC_SANITY_DATASET"
 );
 
-export const token = checkValue(
-  process.env.SANITY_ACCESS_TOKEN,
-  "SANITY_ACCESS_TOKEN"
-);
+export const token =
+  typeof window === "undefined"
+    ? checkValue(process.env.SANITY_ACCESS_TOKEN, "SANITY_ACCESS_TOKEN")
+    : undefined;
 
 export const hookSecret = process.env.SANITY_HOOK_SECRET;
 
