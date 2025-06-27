@@ -484,70 +484,23 @@ export const DemoSidebarRight = memo(
                   key={button.id}
                   type="button"
                   onClick={(e) => {
-                    console.log("Top button click event fired for:", button.id);
                     e.preventDefault();
                     e.stopPropagation();
                     handleButtonClick(button.id);
                   }}
                   disabled={!sidebarLoaded}
                   className={cn(
-                    "group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition-all duration-300 z-[160] pointer-events-auto",
+                    "group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded transition-all duration-200 z-[160] pointer-events-auto",
+                    isActive
+                      ? "bg-[#1C1E23]"
+                      : "bg-transparent hover:bg-[#1C1E23]/60",
                     !sidebarLoaded ? "opacity-50 cursor-not-allowed" : ""
                   )}
                 >
-                  {/* Active state background */}
-                  {isActive && (
-                    <>
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          borderRadius: "4px",
-                          background:
-                            "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)",
-                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                        }}
-                      />
-                      <div
-                        className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
-                        style={{
-                          width: "30px",
-                          height: "4px",
-                          transform: "translateY(-50%) rotate(-90deg)",
-                          filter: "blur(10px)",
-                          transformOrigin: "center",
-                        }}
-                      />
-                    </>
-                  )}
-
-                  {/* Inactive hover state */}
-                  {!isActive && (
-                    <>
-                      <div
-                        className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
-                        style={{
-                          borderRadius: "4px",
-                          background:
-                            "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
-                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                        }}
-                      />
-                      <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{
-                          borderRadius: "4px",
-                          background:
-                            "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                        }}
-                      />
-                    </>
-                  )}
-
                   <IconComponent
                     size={20}
                     className={cn(
-                      "relative z-10 transition-colors duration-300",
+                      "transition-colors duration-200",
                       isActive
                         ? "text-white"
                         : "text-[#B0B0B0] group-hover:text-white"
@@ -576,73 +529,23 @@ export const DemoSidebarRight = memo(
                   key={button.id}
                   type="button"
                   onClick={(e) => {
-                    console.log(
-                      "Bottom button click event fired for:",
-                      button.id
-                    );
                     e.preventDefault();
                     e.stopPropagation();
                     handleButtonClick(button.id);
                   }}
                   disabled={!sidebarLoaded}
                   className={cn(
-                    "group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition-all duration-300 z-[160] pointer-events-auto",
+                    "group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded transition-all duration-200 z-[160] pointer-events-auto",
+                    isActive
+                      ? "bg-[#1C1E23]"
+                      : "bg-transparent hover:bg-[#1C1E23]/60",
                     !sidebarLoaded ? "opacity-50 cursor-not-allowed" : ""
                   )}
                 >
-                  {/* Active state background */}
-                  {isActive && (
-                    <>
-                      <div
-                        className="absolute inset-0"
-                        style={{
-                          borderRadius: "4px",
-                          background:
-                            "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)",
-                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                        }}
-                      />
-                      <div
-                        className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
-                        style={{
-                          width: "30px",
-                          height: "4px",
-                          transform: "translateY(-50%) rotate(-90deg)",
-                          filter: "blur(10px)",
-                          transformOrigin: "center",
-                        }}
-                      />
-                    </>
-                  )}
-
-                  {/* Inactive hover state */}
-                  {!isActive && (
-                    <>
-                      <div
-                        className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
-                        style={{
-                          borderRadius: "4px",
-                          background:
-                            "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
-                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                        }}
-                      />
-                      <div
-                        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        style={{
-                          borderRadius: "4px",
-                          background:
-                            "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-                          boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-                        }}
-                      />
-                    </>
-                  )}
-
                   <IconComponent
                     size={20}
                     className={cn(
-                      "relative z-10 transition-colors duration-300",
+                      "transition-colors duration-200",
                       isActive
                         ? "text-white"
                         : "text-[#B0B0B0] group-hover:text-white"

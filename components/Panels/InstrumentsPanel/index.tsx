@@ -583,7 +583,7 @@ const FilterButton = ({
       type="button"
       onClick={onClick}
       className={cn(
-        "group rounded-full px-2 relative flex-1 flex h-7 min-w-7 justify-center items-center",
+        "group rounded-full px-4 relative w-auto flex flex h-7 min-w-7 justify-center items-center px-2",
         "transition-all duration-300 ease-in-out overflow-hidden"
       )}
     >
@@ -723,10 +723,6 @@ export const InstrumentsPanel = () => {
       { label: "CRYPTO", items: CRYPTO_PAIRS },
       { label: "STOCKS", items: EQUITY_PAIRS },
       { label: "ETF", items: ETF_PAIRS },
-      { label: "FX", items: FOREX_PAIRS },
-      { label: "CRYPTO", items: CRYPTO_PAIRS },
-      { label: "STOCKS", items: EQUITY_PAIRS },
-      { label: "ETF", items: ETF_PAIRS },
     ]
       .map((group) => {
         const availablePairs = group.items.filter(
@@ -757,8 +753,8 @@ export const InstrumentsPanel = () => {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="w-full">
-        <div className="w-full flex gap-1 py-2">
+      <div className="w-full flex gap-2 w-auto ">
+        <div className="w-auto overflow-x-auto flex flex-wrap gap-2 py-2">
           <FilterButton
             isActive={activeFilter === "selected"}
             onClick={() => scrollToSection("selected")}

@@ -10,8 +10,8 @@ interface BackgroundProps {
 // Define gradient themes for different sections
 const sectionThemes = {
   hero: {
-    colors: ["#1a2040", "#2d1b40", "#1a4040"],
-    accents: ["#3b82f6", "#8b5cf6", "#06b6d4"],
+    colors: ["#1a4040", "#2d4040", "#1a2040"],
+    accents: ["#4EFF6E", "#10b981", "#06b6d4"],
   },
   boxes3d: {
     colors: ["#0B1426", "#1A0B26", "#0A1B1A"],

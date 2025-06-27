@@ -41,13 +41,9 @@ export const DemoSidebarLeft = memo(({ x, opacity }: DemoSidebarLeftProps) => {
   ];
 
   const handleButtonClick = (buttonId: string) => {
-    console.log("Button clicked:", buttonId, "activePanel:", activePanel);
-
     if (activePanel === buttonId) {
-      console.log("Closing panel");
       setActivePanel(null);
     } else {
-      console.log("Opening panel:", buttonId);
       setActivePanel(buttonId);
     }
   };
@@ -75,49 +71,17 @@ export const DemoSidebarLeft = memo(({ x, opacity }: DemoSidebarLeftProps) => {
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  console.log("Button click event fired for:", button.id);
                   handleButtonClick(button.id);
                 }}
-                className="group relative z-[160] flex h-10 w-10 items-center justify-center transition-all duration-200 overflow-hidden pointer-events-auto"
-                style={{
-                  borderRadius: "4px",
-                  background: isActive
-                    ? "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)"
-                    : undefined,
-                  boxShadow: isActive
-                    ? "0px 4px 4px 0px rgba(0, 0, 0, 0.25)"
-                    : undefined,
-                }}
+                className={`group relative z-[160] flex h-10 w-10 items-center justify-center transition-all duration-200 rounded pointer-events-auto ${
+                  isActive
+                    ? "bg-[#1C1E23]"
+                    : "bg-transparent hover:bg-[#1C1E23]/60"
+                }`}
               >
-                {/* Green indicator for active panel */}
-                {isActive && (
-                  <div
-                    className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
-                    style={{
-                      width: "30px",
-                      height: "4px",
-                      transform: "translateY(-50%) rotate(-90deg)",
-                      filter: "blur(10px)",
-                      transformOrigin: "center",
-                    }}
-                  />
-                )}
-
-                {/* Hover background for non-active buttons */}
-                {!isActive && (
-                  <div
-                    className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    style={{
-                      borderRadius: "4px",
-                      background:
-                        "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-                    }}
-                  />
-                )}
-
                 <IconComponent
                   size={20}
-                  className={`relative z-10 transition-colors duration-200 ${
+                  className={`transition-colors duration-200 ${
                     isActive
                       ? "text-white"
                       : "text-[#B0B0B0] group-hover:text-white"
@@ -142,30 +106,10 @@ export const DemoSidebarLeft = memo(({ x, opacity }: DemoSidebarLeftProps) => {
           isOpen={!!activePanel}
           title={activePanelData.label}
           position="left"
-          onClose={() => {
-            console.log("Panel close clicked");
-            setActivePanel(null);
-          }}
+          onClose={() => setActivePanel(null)}
         >
           {activePanelData.panelContent}
         </DemoSidebarWrapper>
-      )}
-
-      {/* Debug info */}
-      {process.env.NODE_ENV === "development" && (
-        <div className="fixed top-4 left-20 z-[200] bg-black/80 text-white p-2 text-xs rounded">
-          <div>Active Panel: {activePanel || "none"}</div>
-          <div>Panel Data: {activePanelData ? "exists" : "null"}</div>
-          <button
-            onClick={() => {
-              console.log("Test button clicked!");
-              setActivePanel("instruments");
-            }}
-            className="mt-2 px-2 py-1 bg-red-500 text-white text-xs rounded"
-          >
-            Test Click
-          </button>
-        </div>
       )}
     </>
   );
