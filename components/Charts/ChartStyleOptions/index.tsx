@@ -226,12 +226,6 @@ const ChartStyleOptionsContent = memo(() => {
     updateStyles({ viewMode: id === "3d" ? "3d" : "default" });
   };
 
-  const handleZenModeToggle = () => {
-    if (typeof window !== "undefined" && window.toggleZenMode) {
-      window.toggleZenMode();
-    }
-  };
-
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
@@ -246,28 +240,6 @@ const ChartStyleOptionsContent = memo(() => {
             onClick={() => handleStyleChange(style.id)}
           />
         ))}
-      </div>
-
-      {/* Zen Mode Toggle */}
-      <div className="border-t border-[#111215] pt-3">
-        <button
-          onClick={handleZenModeToggle}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 hover:border-[#32353C]/80 hover:from-[#1C1E23]/40 hover:to-[#0F1012]/40 transition-all duration-200 group"
-        >
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#1C1E23]/40 to-[#0F1012]/20 group-hover:border-[#24FF66]/30 group-hover:from-[#24FF66]/20 group-hover:to-[#24FF66]/10 transition-all duration-200">
-            <span className="text-xs font-bold text-[#818181] group-hover:text-[#24FF66] transition-colors duration-200">
-              ZEN
-            </span>
-          </div>
-          <div className="flex-1 text-left">
-            <div className="font-russo text-sm font-medium text-white group-hover:text-[#24FF66] transition-colors duration-200">
-              Zen Mode
-            </div>
-            <div className="font-russo text-xs text-[#818181] group-hover:text-[#24FF66]/80 transition-colors duration-200">
-              3D circular view
-            </div>
-          </div>
-        </button>
       </div>
     </div>
   );

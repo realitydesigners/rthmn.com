@@ -3,6 +3,7 @@
 import { useDashboard } from "@/providers/DashboardProvider/client";
 import { useUser } from "@/providers/UserProvider";
 import { useGridStore } from "@/stores/gridStore";
+import { useZenModeStore } from "@/stores/zenModeStore";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
@@ -24,11 +25,11 @@ export default function Dashboard() {
   const orderedPairs = useGridStore((state) => state.orderedPairs);
   const reorderPairs = useGridStore((state) => state.reorderPairs);
   const setInitialPairs = useGridStore((state) => state.setInitialPairs);
+  const { isZenMode, toggleZenMode } = useZenModeStore();
   const [isClient, setIsClient] = useState(false);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [availableWidth, setAvailableWidth] = useState(0);
-  const [isZenMode, setIsZenMode] = useState(false);
 
   // Handle window resize and main element width changes
   useEffect(() => {
@@ -159,9 +160,7 @@ export default function Dashboard() {
   const gridCols = !isClient ? 1 : getGridColumns(availableWidth);
 
   // Zen Mode toggle function (will be accessible from sidebar)
-  window.toggleZenMode = () => {
-    setIsZenMode(!isZenMode);
-  };
+  window.toggleZenMode = toggleZenMode;
 
   // Zen Mode View
   if (isZenMode) {

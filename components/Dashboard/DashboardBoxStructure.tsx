@@ -1,8 +1,10 @@
+import { useUser } from "@/providers/UserProvider";
 import type { BoxColors } from "@/stores/colorStore";
 import type { BoxSlice } from "@/types/types";
+import { useTimeframeStore } from "@/stores/timeframeStore";
 import { Edges } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { memo, useMemo, useRef } from "react";
+import { memo, useMemo, useRef, useCallback } from "react";
 import * as THREE from "three";
 import {
   type BoxDimensions,
@@ -11,9 +13,9 @@ import {
   getBoxDimensions,
   getCornerPosition,
   lerp,
-} from "./mathUtils";
+} from "../Demo/SectionBoxes3D/mathUtils";
 
-export const BoxStructure = memo(
+export const DashboardBoxStructure = memo(
   ({
     slice,
     pair,
@@ -21,6 +23,7 @@ export const BoxStructure = memo(
     scatteredPositions,
     formationProgress = 1,
     isFocused = false,
+    boxColors: propBoxColors,
   }: {
     slice: BoxSlice;
     pair: string;
@@ -33,12 +36,49 @@ export const BoxStructure = memo(
     scatteredPositions?: Map<number, [number, number, number]>;
     formationProgress?: number;
     isFocused?: boolean;
+    boxColors?: BoxColors;
   }) => {
     const groupRef = useRef<THREE.Group>(null);
+    const { boxColors: userBoxColors } = useUser();
+
+    // Merge boxColors similar to ResoBox3D
+    const mergedBoxColors = useMemo(() => {
+      if (!propBoxColors) return userBoxColors;
+      return {
+        ...userBoxColors,
+        ...propBoxColors,
+        styles: {
+          ...userBoxColors.styles,
+          ...propBoxColors.styles,
+        },
+      };
+    }, [propBoxColors, userBoxColors]);
+
+    // Get timeframe settings for this pair
+    const settings = useTimeframeStore(
+      useCallback(
+        (state) =>
+          pair ? state.getSettingsForPair(pair) : state.global.settings,
+        [pair]
+      )
+    );
+
+    // Filter boxes based on timeframe settings
+    const filteredSlice = useMemo(() => {
+      if (!slice?.boxes) return slice;
+      return {
+        ...slice,
+        boxes:
+          slice.boxes.slice(
+            settings.startIndex,
+            settings.startIndex + settings.maxBoxCount
+          ) || [],
+      };
+    }, [slice, settings.startIndex, settings.maxBoxCount]);
 
     // Calculate box positions and dimensions
     const calculatedData = useMemo(() => {
-      const sortedBoxes = slice.boxes
+      const sortedBoxes = filteredSlice.boxes
         .map((box, i) => ({ ...box, originalIndex: i }))
         .sort((a, b) => Math.abs(b.value) - Math.abs(a.value));
 
@@ -93,7 +133,7 @@ export const BoxStructure = memo(
       });
 
       return { sortedBoxes, positions };
-    }, [slice.boxes, isFocused]);
+    }, [filteredSlice.boxes, isFocused]);
 
     // Handle structure-level animation (position, scale)
     useFrame(() => {
@@ -114,7 +154,7 @@ export const BoxStructure = memo(
         current.rotation.y = lerp(current.rotation.y, rotation[1], lerpFactor);
         current.rotation.z = lerp(current.rotation.z, rotation[2], lerpFactor);
       } else {
-        // Return to default rotation when not in box mode
+        // Return to default rotation when not in focus mode
         current.rotation.x = lerp(current.rotation.x, 0, lerpFactor);
         current.rotation.y = lerp(current.rotation.y, 0, lerpFactor);
         current.rotation.z = lerp(current.rotation.z, 0, lerpFactor);
@@ -135,7 +175,7 @@ export const BoxStructure = memo(
           }
 
           return (
-            <BoxMesh
+            <DashboardBoxMesh
               key={`${pair}-${box.originalIndex}`}
               box={box}
               absolutePosition={data.absolutePosition}
@@ -143,6 +183,9 @@ export const BoxStructure = memo(
               scatteredPosition={scatteredPos}
               formationProgress={formationProgress}
               animationDelay={index * 0.1}
+              boxColors={mergedBoxColors}
+              isFocused={isFocused}
+              pair={pair}
             />
           );
         })}
@@ -151,8 +194,8 @@ export const BoxStructure = memo(
   }
 );
 
-// Individual box mesh component (inlined)
-const BoxMesh = memo(
+// Individual dashboard box mesh component with trading-specific features
+const DashboardBoxMesh = memo(
   ({
     box,
     absolutePosition,
@@ -160,6 +203,9 @@ const BoxMesh = memo(
     scatteredPosition,
     formationProgress = 1,
     animationDelay = 0,
+    boxColors,
+    isFocused = false,
+    pair,
   }: {
     box: { value: number; originalIndex: number };
     absolutePosition: [number, number, number];
@@ -167,14 +213,19 @@ const BoxMesh = memo(
     scatteredPosition?: [number, number, number];
     formationProgress?: number;
     animationDelay?: number;
+    boxColors?: BoxColors;
+    isFocused?: boolean;
+    pair: string;
   }) => {
     const meshRef = useRef<THREE.Group>(null);
 
-    const boxColors: BoxColors = {
-      positive: "#24FF66",
-      negative: "#303238",
+    // Use user's color preferences or fallback to defaults
+    const colors = {
+      positive: boxColors?.positive || "#E2E8F0",
+      negative: boxColors?.negative || "#2D3748",
     };
-    const color = box.value > 0 ? boxColors.positive : boxColors.negative;
+
+    const color = box.value > 0 ? colors.positive : colors.negative;
 
     useFrame(() => {
       if (!meshRef.current || !scatteredPosition) return;
@@ -200,24 +251,34 @@ const BoxMesh = memo(
           <boxGeometry />
           <meshPhysicalMaterial
             color={color}
-            metalness={0.4}
-            roughness={0.1}
-            clearcoat={1}
-            clearcoatRoughness={0.1}
-            transmission={0.1}
-            thickness={0.5}
-            ior={1.5}
-            envMapIntensity={1.5}
+            transparent={false}
+            opacity={1}
+            metalness={0.3}
+            side={THREE.FrontSide}
+            depthWrite={true}
           />
           <Edges
+            scale={1.001}
             threshold={15}
             color={new THREE.Color(color).multiplyScalar(0.1)}
           />
         </mesh>
+
+        {/* Future enhancement: Add floating price/volume indicators */}
+        {isFocused && (
+          <group position={[0, dimensions.size[1] + 0.5, 0]}>
+            {/* This is where we could add floating text or indicators */}
+            {/* For now, just a subtle glow effect */}
+            <mesh>
+              <sphereGeometry args={[0.1, 8, 8]} />
+              <meshBasicMaterial color={color} transparent opacity={0.3} />
+            </mesh>
+          </group>
+        )}
       </group>
     );
   }
 );
 
-BoxStructure.displayName = "BoxStructure";
-BoxMesh.displayName = "BoxMesh";
+DashboardBoxStructure.displayName = "DashboardBoxStructure";
+DashboardBoxMesh.displayName = "DashboardBoxMesh";

@@ -3,11 +3,12 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { motion } from "framer-motion";
-import React, { memo, useMemo, useState } from "react";
+import React, { memo, useMemo, useState, useCallback } from "react";
 import { LuEye, LuLayoutDashboard, LuBarChart3 } from "react-icons/lu";
 import type { BoxColors } from "@/stores/colorStore";
 import type { BoxSlice } from "@/types/types";
-import { BoxStructure } from "@/components/Demo/SectionBoxes3D/BoxStructure";
+import { useTimeframeStore } from "@/stores/timeframeStore";
+import { DashboardBoxStructure } from "./DashboardBoxStructure";
 import {
   calculateCircularPosition,
   generateScatteredPosition,
@@ -22,7 +23,7 @@ interface ZenModeProps {
   isLoading?: boolean;
 }
 
-// Create structure data from pair data
+// Create structure data from pair data (filtering now handled in DashboardBoxStructure)
 const createStructureFromPair = (
   pair: string,
   boxSlice?: BoxSlice
@@ -267,7 +268,7 @@ export const ZenMode = memo(
             }
 
             return (
-              <BoxStructure
+              <DashboardBoxStructure
                 key={structure.pair}
                 slice={currentSlice}
                 pair={structure.pair}
@@ -279,6 +280,7 @@ export const ZenMode = memo(
                 }}
                 formationProgress={1}
                 isFocused={index === focusedIndex}
+                boxColors={boxColors}
               />
             );
           })}
