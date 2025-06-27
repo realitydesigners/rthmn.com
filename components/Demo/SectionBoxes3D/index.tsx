@@ -181,6 +181,19 @@ export const SectionBoxes3D = memo(() => {
     offset: ["start start", "end start"],
   });
 
+  // Mobile detection and touch handling
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024 || "ontouchstart" in window);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   // State to track the current structure slice from ResoBox3DCircular (first structure)
   const [currentStructureSlice, setCurrentStructureSlice] =
     useState<BoxSlice | null>(null);
@@ -244,10 +257,15 @@ export const SectionBoxes3D = memo(() => {
     });
     return unsubscribe;
   }, [scrollYProgress]);
+  // Mobile-optimized scroll thresholds - slightly different for touch devices
+  const scrollThresholds = isMobile
+    ? { start: 0.12, end: 0.22 } // Slightly earlier on mobile for better touch response
+    : { start: 0.15, end: 0.25 };
+
   // Only show intro text during formation, then allow scroll-based fade
   const introTextOpacity = useTransform(
     scrollYProgress,
-    [0, 0.1, 0.25, 0.35],
+    [0, 0.05, scrollThresholds.start, scrollThresholds.end],
     isFormationComplete ? [1, 1, 1, 0] : [1, 1, 1, 1] // Keep visible until formation complete
   );
 
@@ -256,11 +274,31 @@ export const SectionBoxes3D = memo(() => {
     ? currentScrollProgress
     : 0;
 
-  const scale = useTransform(scrollYProgress, [0.25, 0.35], [1.0, 0.8]);
-  const leftSidebarX = useTransform(scrollYProgress, [0.25, 0.35], [-64, 0]);
-  const rightSidebarX = useTransform(scrollYProgress, [0.25, 0.35], [64, 0]);
-  const sidebarOpacity = useTransform(scrollYProgress, [0.25, 0.35], [0, 1]);
-  const navbarY = useTransform(scrollYProgress, [0.25, 0.35], [-56, 0]);
+  const scale = useTransform(
+    scrollYProgress,
+    [scrollThresholds.start, scrollThresholds.end],
+    [1.0, 0.8]
+  );
+  const leftSidebarX = useTransform(
+    scrollYProgress,
+    [scrollThresholds.start, scrollThresholds.end],
+    [-64, 0]
+  );
+  const rightSidebarX = useTransform(
+    scrollYProgress,
+    [scrollThresholds.start, scrollThresholds.end],
+    [64, 0]
+  );
+  const sidebarOpacity = useTransform(
+    scrollYProgress,
+    [scrollThresholds.start, scrollThresholds.end],
+    [0, 1]
+  );
+  const navbarY = useTransform(
+    scrollYProgress,
+    [scrollThresholds.start, scrollThresholds.end],
+    [-56, 0]
+  );
 
   // Navigation functions for the UI controls
   const navigation = {
@@ -272,10 +310,18 @@ export const SectionBoxes3D = memo(() => {
   };
 
   return (
-    <div ref={containerRef} className="relative">
+    <div
+      ref={containerRef}
+      className="relative"
+      style={{
+        // Mobile scroll optimizations
+        WebkitOverflowScrolling: "touch",
+        touchAction: "pan-y", // Allow vertical scrolling but prevent horizontal
+        overscrollBehavior: "contain", // Prevent scroll chaining
+      }}
+    >
       <div className="h-[300vh] relative">
         <div className="sticky top-0 h-screen w-full flex items-center justify-center relative">
-          <HeroText opacity={introTextOpacity} />
           {structureSlice && structureSlice.boxes.length > 0 && (
             <ResoBox3DCircular
               slice={structureSlice}
@@ -296,7 +342,11 @@ export const SectionBoxes3D = memo(() => {
             focusedIndex={focusedIndex}
           >
             <DemoNavbar y={navbarY} opacity={sidebarOpacity} />
-            <DemoSidebarLeft x={leftSidebarX} opacity={sidebarOpacity} />
+            <DemoSidebarLeft
+              x={leftSidebarX}
+              opacity={sidebarOpacity}
+              scrollYProgress={scrollYProgress}
+            />
             <DemoSidebarRight x={rightSidebarX} opacity={sidebarOpacity} />
 
             {/* UI Controls - animate in with same opacity as other UI elements */}
@@ -329,6 +379,7 @@ export const SectionBoxes3D = memo(() => {
               </>
             )}
           </Screen>
+          <HeroText opacity={introTextOpacity} />
         </div>
       </div>
       <TradingAdvantage />

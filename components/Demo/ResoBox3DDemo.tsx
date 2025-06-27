@@ -57,9 +57,18 @@ export const ResoBox3DCircular = memo(
       return positions;
     }, []); // Only generate once, never changes
 
+    // Mobile-responsive scroll thresholds
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 1024 || "ontouchstart" in window);
+    const scrollThreshold = isMobile ? 0.12 : 0.15;
+    const transitionRange = isMobile ? 0.04 : 0.05;
+
     // Determine what to show based on intro mode and scroll progress
-    const showOnlyFirstStructure = introMode || scrollProgress < 0.25;
-    const showCircularArrangement = !introMode && scrollProgress >= 0.25;
+    const showOnlyFirstStructure =
+      introMode || scrollProgress < scrollThreshold;
+    const showCircularArrangement =
+      !introMode && scrollProgress >= scrollThreshold;
 
     // Calculate transition progress for the first structure moving to circular position
     // This happens immediately when formation completes, preparing for circular arrangement
@@ -68,7 +77,7 @@ export const ResoBox3DCircular = memo(
     // Calculate transition progress for other structures appearing
     // This only happens when user scrolls
     const circularAppearanceProgress = showCircularArrangement
-      ? Math.min(1, (scrollProgress - 0.25) / 0.1) // Quick fade-in over 0.1 scroll range
+      ? Math.min(1, (scrollProgress - scrollThreshold) / transitionRange) // Quick fade-in optimized for device
       : 0;
 
     // Calculate structure positions and properties

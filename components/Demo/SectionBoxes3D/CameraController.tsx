@@ -64,14 +64,32 @@ export const CameraController = memo(
     useFrame(() => {
       if (!isClient || !isInitialized) return;
 
+      const baseDistance = 70;
+      let targetDistance = baseDistance;
+
+      // Mobile-responsive scroll threshold and lerp factor
+      const isMobile =
+        typeof window !== "undefined" &&
+        (window.innerWidth < 1024 || "ontouchstart" in window);
+      const scrollThreshold = isMobile ? 0.12 : 0.15;
+      const lerpFactor = isMobile ? 0.35 : 0.25; // Faster on mobile for better touch responsiveness
+
       // Handle camera distance for zooming in scene mode
-      // Only apply scaling if we have meaningful scroll progress
-      if (cameraDistance && scrollProgress >= 0.25 && viewMode === "scene") {
-        const baseDistance = 70;
-        const targetDistance = baseDistance / currentCameraDistance;
-        // Smooth camera position changes to avoid jarring movements
-        camera.position.setZ(lerp(camera.position.z, targetDistance, 0.1));
+      if (cameraDistance && viewMode === "scene") {
+        if (scrollProgress >= scrollThreshold) {
+          // Apply scaling when scrolled down
+          targetDistance = baseDistance / currentCameraDistance;
+        } else {
+          // Return to original distance when scrolled back up
+          targetDistance = baseDistance;
+        }
+      } else if (viewMode === "box") {
+        // In box mode, use a closer distance for better viewing
+        targetDistance = baseDistance * 0.6;
       }
+
+      // Smooth camera position changes with device-optimized lerp factor
+      camera.position.setZ(lerp(camera.position.z, targetDistance, lerpFactor));
     });
 
     return null;

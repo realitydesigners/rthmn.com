@@ -2,6 +2,7 @@
 
 import { cn } from "@/utils/cn";
 import { motion } from "framer-motion";
+import type { MotionValue } from "framer-motion";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
 import { LuLock, LuUnlock, LuX } from "react-icons/lu";
@@ -48,6 +49,7 @@ export const DemoSidebarWrapper = ({
   position,
   initialWidth = 350,
   onClose,
+  opacity,
 }: {
   isOpen: boolean;
   children: React.ReactNode;
@@ -55,6 +57,7 @@ export const DemoSidebarWrapper = ({
   position: "left" | "right";
   initialWidth?: number;
   onClose: () => void;
+  opacity?: MotionValue<number>;
 }) => {
   const [width, setWidth] = useState(initialWidth);
   const [isLocked, setIsLocked] = useState(false);
@@ -80,6 +83,7 @@ export const DemoSidebarWrapper = ({
       )}
       style={{
         width: `${width}px`,
+        opacity: opacity,
         boxShadow: isOpen
           ? position === "left"
             ? "4px 0 16px rgba(0,0,0,0.3)"

@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useState, useMemo } from "react";
+import { memo, useState, useMemo, useRef, useCallback, useEffect } from "react";
 import {
   LuActivity,
   LuBarChart3,
@@ -9,12 +9,14 @@ import {
   LuLayoutGrid,
   LuLineChart,
   LuLock,
+  LuPalette,
   LuPieChart,
   LuSettings,
   LuTrendingDown,
   LuTrendingUp,
   LuUser,
 } from "react-icons/lu";
+import { FaSearch, FaStar, FaTimes } from "react-icons/fa";
 import { cn } from "@/utils/cn";
 import {
   FOREX_PAIRS,
@@ -24,6 +26,7 @@ import {
   formatPrice,
   INSTRUMENTS,
 } from "@/utils/instruments";
+import { useColorStore, usePresetStore } from "@/stores/colorStore";
 
 // Generate mock prices for instruments using real data
 const generateMockPrice = (symbol: string) => {
@@ -67,6 +70,7 @@ const createMockPriceData = () => {
 // Demo Instruments Panel Content - Enhanced to match real InstrumentsPanel
 export const DemoInstrumentsPanel = memo(() => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeFilter, setActiveFilter] = useState("selected");
   const [selectedPairs, setSelectedPairs] = useState([
     "EURUSD",
@@ -75,12 +79,15 @@ export const DemoInstrumentsPanel = memo(() => {
     "GBPUSD",
     "AAPL",
   ]);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   // Use real instrument data
   const mockPriceData = useMemo(() => createMockPriceData(), []);
 
+  const isSearching = !!searchQuery;
+
   // Toggle pair selection
-  const togglePairSelection = (pair: string) => {
+  const togglePair = (pair: string) => {
     setSelectedPairs((prev) => {
       if (prev.includes(pair)) {
         return prev.filter((p) => p !== pair);
@@ -90,217 +97,370 @@ export const DemoInstrumentsPanel = memo(() => {
     });
   };
 
-  // Filter pairs based on search and category
-  const filteredPairs = useMemo(() => {
-    if (searchQuery) {
-      const allPairs = [
-        ...FOREX_PAIRS,
-        ...CRYPTO_PAIRS,
-        ...EQUITY_PAIRS,
-        ...ETF_PAIRS,
-      ];
-      return allPairs
-        .filter((pair) =>
-          pair.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        .sort((a, b) => {
-          const aSelected = selectedPairs.includes(a);
-          const bSelected = selectedPairs.includes(b);
-          if (aSelected && !bSelected) return -1;
-          if (!aSelected && bSelected) return 1;
-          return 0;
+  const scrollToSection = useCallback((filter: string) => {
+    setActiveFilter(filter);
+
+    // Give time for the DOM to update
+    setTimeout(() => {
+      const element = document.querySelector(`[data-section="${filter}"]`);
+      if (element && contentRef.current) {
+        const headerHeight = 200; // Approximate height of search + filters
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition - headerHeight;
+
+        contentRef.current.scrollTo({
+          top: contentRef.current.scrollTop + offsetPosition,
+          behavior: "smooth",
         });
-    }
+      }
+    }, 100);
+  }, []);
 
-    // Return pairs by category
-    switch (activeFilter) {
-      case "selected":
-        return selectedPairs;
-      case "fx":
-        return FOREX_PAIRS;
-      case "crypto":
-        return CRYPTO_PAIRS;
-      case "stocks":
-        return EQUITY_PAIRS;
-      case "etf":
-        return ETF_PAIRS;
-      default:
-        return [];
-    }
-  }, [searchQuery, selectedPairs, activeFilter]);
+  // Memoized search results
+  const searchResults = useMemo(() => {
+    if (!isSearching) return [];
 
-  // Mock pair item component
-  const DemoPairItem = ({
-    item,
-    isSelected = false,
-  }: {
-    item: string;
-    isSelected?: boolean;
-  }) => (
-    <div
-      className={`group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden ${
-        isSelected
-          ? "rounded bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
-          : "rounded-lg"
-      }`}
-      style={isSelected ? { borderRadius: "4px" } : {}}
-    >
-      {!isSelected && (
-        <div
-          className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
-          style={{
-            borderRadius: "4px",
-            background:
-              "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
-            boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-          }}
-        />
-      )}
-      <div className="relative flex w-full items-center px-3">
-        <span
-          className={`font-outfit flex-1 text-sm font-bold tracking-wide transition-colors ${
-            isSelected
-              ? "text-white"
-              : "text-[#32353C] group-hover/item:text-[#545963]"
-          }`}
-        >
-          {item}
+    const allPairs = [
+      ...FOREX_PAIRS,
+      ...CRYPTO_PAIRS,
+      ...EQUITY_PAIRS,
+      ...ETF_PAIRS,
+    ];
+
+    return allPairs
+      .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => {
+        const aSelected = selectedPairs.includes(a);
+        const bSelected = selectedPairs.includes(b);
+        if (aSelected && !bSelected) return -1;
+        if (!aSelected && bSelected) return 1;
+        return a.localeCompare(b);
+      });
+  }, [searchQuery, selectedPairs, isSearching]);
+
+  // Memoized available pairs groups
+  // Demo components matching the real ones exactly
+  const DemoLoadingSpinner = ({ color = "#3b82f6" }: { color?: string }) => {
+    const [showFallback, setShowFallback] = useState(false);
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setShowFallback(true);
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }, []);
+
+    if (showFallback) {
+      return (
+        <span className="font-mono text-[11px] tracking-wider opacity-50">
+          N/A
         </span>
-        <div className="flex items-center">
-          <span
-            className={`font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors ${
-              isSelected
-                ? "text-[#545963]"
-                : "text-[#32353C] group-hover/item:text-[#32353C]"
-            }`}
-          >
-            {mockPriceData[item]
-              ? formatPrice(mockPriceData[item].price, item)
-              : "N/A"}
-          </span>
-          <div className="z-90 ml-2 flex w-6 justify-center">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                togglePairSelection(item);
+      );
+    }
+
+    return (
+      <div className="relative h-3 w-3">
+        <div
+          className="absolute inset-0 rounded-full border-2"
+          style={{ borderColor: `${color}20` }}
+        />
+        <div
+          className="absolute inset-0 animate-spin rounded-full border-t-2"
+          style={{ borderColor: color }}
+        />
+      </div>
+    );
+  };
+
+  const DemoPairItem = memo(
+    ({
+      item,
+      isSelected = false,
+      onToggle,
+    }: {
+      item: string;
+      isSelected?: boolean;
+      onToggle: () => void;
+    }) => {
+      const price = mockPriceData[item]?.price;
+
+      return (
+        <div
+          className={cn(
+            "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
+            isSelected
+              ? "bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+              : ""
+          )}
+          style={{ borderRadius: "4px" }}
+        >
+          {/* Hover background for non-selected items */}
+          {!isSelected && (
+            <div
+              className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
+                boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
               }}
-              className={`relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200 opacity-0 group-hover/item:opacity-100 ${
+            />
+          )}
+          <div className="relative flex w-full items-center px-3">
+            {/* Instrument name */}
+            <span
+              className={cn(
+                "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
                 isSelected
-                  ? "border-[#111215] bg-[#111215] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
-                  : "border-[#111215] bg-[#111215] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
-              }`}
+                  ? "text-white"
+                  : "text-[#32353C] group-hover/item:text-[#545963]"
+              )}
             >
-              {isSelected ? "×" : "+"}
-            </button>
+              {item}
+            </span>
+
+            {/* Price */}
+            <div className="flex items-center">
+              <span
+                className={cn(
+                  "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+                  isSelected
+                    ? "text-[#545963]"
+                    : "text-[#32353C] group-hover/item:text-[#32353C]"
+                )}
+              >
+                {price ? (
+                  formatPrice(price, item)
+                ) : (
+                  <DemoLoadingSpinner color={isSelected ? "#4EFF6E" : "#444"} />
+                )}
+              </span>
+              <div className="z-90 ml-2 flex w-6 justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  className={cn(
+                    "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
+                    "opacity-0 group-hover/item:opacity-100",
+                    isSelected
+                      ? [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                      : [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                  )}
+                >
+                  {isSelected ? (
+                    <FaTimes size={8} />
+                  ) : (
+                    <span className="text-[9px] font-medium">+</span>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      );
+    }
   );
 
-  // Mock filter button component
-  const DemoFilterButton = ({
-    isActive,
-    label,
-    onClick,
-  }: {
-    isActive: boolean;
-    label: React.ReactNode;
-    onClick: () => void;
-  }) => (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group relative w-auto flex h-7 min-w-7 justify-center items-center px-2 transition-all duration-300 ease-in-out overflow-hidden flex-shrink-0"
-    >
-      {isActive && (
-        <>
-          <div
-            className="absolute inset-0"
-            style={{
-              borderRadius: "4px",
-              background:
-                "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)",
-              boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-            }}
-          />
-          <div
-            className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
-            style={{
-              width: "30px",
-              height: "4px",
-              transform: "translateY(-50%) rotate(-90deg)",
-              filter: "blur(10px)",
-              transformOrigin: "center",
-            }}
-          />
-        </>
-      )}
-      {!isActive && (
-        <>
-          <div
-            className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
-            style={{
-              borderRadius: "4px",
-              background:
-                "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
-              boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-            }}
-          />
-          <div
-            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-            style={{
-              borderRadius: "4px",
-              background:
-                "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-              boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-            }}
-          />
-        </>
-      )}
-      <span className="relative z-10 font-outfit text-[12px] font-medium tracking-wide whitespace-nowrap flex items-center justify-center transition-colors duration-300 ease-in-out text-white">
-        {label}
-      </span>
-    </button>
-  );
-
-  return (
-    <div className="h-full flex flex-col overflow-hidden">
-      {/* Filter buttons */}
-      <div className="w-full overflow-x-auto overflow-y-hidden py-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        <div className="flex gap-2 min-w-max">
-          <DemoFilterButton
-            isActive={activeFilter === "selected"}
-            onClick={() => setActiveFilter("selected")}
-            label="★"
-          />
-          <DemoFilterButton
-            isActive={activeFilter === "fx"}
-            onClick={() => setActiveFilter("fx")}
-            label="FX"
-          />
-          <DemoFilterButton
-            isActive={activeFilter === "crypto"}
-            onClick={() => setActiveFilter("crypto")}
-            label="Crypto"
-          />
-          <DemoFilterButton
-            isActive={activeFilter === "stocks"}
-            onClick={() => setActiveFilter("stocks")}
-            label="Stocks"
-          />
-          <DemoFilterButton
-            isActive={activeFilter === "etf"}
-            onClick={() => setActiveFilter("etf")}
-            label="ETF"
-          />
+  const DemoPairGroup = memo(
+    ({
+      label,
+      items,
+      count,
+    }: {
+      label: string;
+      items: React.ReactNode;
+      count: number;
+    }) => {
+      return (
+        <div className="mb-8">
+          <div className="space-y-1 animate-in fade-in duration-300">
+            {items}
+          </div>
         </div>
-      </div>
+      );
+    }
+  );
 
-      {/* Search bar */}
-      <div className="flex-none overflow-hidden w-full mb-2">
+  // Search result item with highlighting
+  const DemoSearchPairItem = memo(
+    ({
+      item,
+      searchQuery: query,
+      isSelected = false,
+      onToggle,
+    }: {
+      item: string;
+      searchQuery: string;
+      isSelected?: boolean;
+      onToggle: () => void;
+    }) => {
+      const price = mockPriceData[item]?.price;
+
+      // Highlight component
+      const HighlightedText = ({
+        text,
+        highlight,
+      }: {
+        text: string;
+        highlight: string;
+      }) => {
+        if (!highlight.trim()) {
+          return <span>{text}</span>;
+        }
+
+        const regex = new RegExp(`(${highlight})`, "gi");
+        const parts = text.split(regex);
+
+        return (
+          <span>
+            {parts.map((part, index) =>
+              regex.test(part) ? (
+                <span
+                  key={index}
+                  className="bg-[#4EFF6E] text-[#111316] px-1 rounded-sm font-medium"
+                >
+                  {part}
+                </span>
+              ) : (
+                <span key={index}>{part}</span>
+              )
+            )}
+          </span>
+        );
+      };
+
+      return (
+        <div
+          className={cn(
+            "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
+            isSelected
+              ? "rounded bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+              : "rounded-lg"
+          )}
+          style={isSelected ? { borderRadius: "4px" } : {}}
+        >
+          {/* Hover background for non-selected items */}
+          {!isSelected && (
+            <div
+              className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
+                boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
+              }}
+            />
+          )}
+          <div className="relative flex w-full items-center px-3">
+            {/* Instrument name with highlighting */}
+            <span
+              className={cn(
+                "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
+                isSelected
+                  ? "text-white"
+                  : "text-[#32353C] group-hover/item:text-[#545963]"
+              )}
+            >
+              <HighlightedText text={item} highlight={query} />
+            </span>
+
+            {/* Price */}
+            <div className="flex items-center">
+              <span
+                className={cn(
+                  "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+                  isSelected
+                    ? "text-[#545963]"
+                    : "text-[#32353C] group-hover/item:text-[#32353C]"
+                )}
+              >
+                {price ? (
+                  formatPrice(price, item)
+                ) : (
+                  <DemoLoadingSpinner color={isSelected ? "#4EFF6E" : "#444"} />
+                )}
+              </span>
+              <div className="z-90 ml-2 flex w-6 justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  className={cn(
+                    "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
+                    "opacity-0 group-hover/item:opacity-100",
+                    isSelected
+                      ? [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                      : [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                  )}
+                >
+                  {isSelected ? (
+                    <FaTimes size={8} />
+                  ) : (
+                    <span className="text-[9px] font-medium">+</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  );
+
+  const DemoSearchBar = memo(
+    ({
+      searchQuery: query,
+      onSearchChange,
+      onFocus,
+      onBlur,
+      isFocused,
+    }: {
+      searchQuery: string;
+      onSearchChange: (query: string) => void;
+      onFocus: () => void;
+      onBlur: () => void;
+      isFocused: boolean;
+    }) => {
+      const inputRef = useRef<HTMLInputElement>(null);
+
+      // Keyboard shortcut to focus search
+      useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === "/" && !isFocused) {
+            e.preventDefault();
+            inputRef.current?.focus();
+          }
+          if (e.key === "Escape" && isFocused) {
+            inputRef.current?.blur();
+            onSearchChange("");
+          }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+      }, [isFocused, onSearchChange]);
+
+      return (
         <div className="relative">
+          {/* Search Input */}
           <div
             className="group/search relative flex h-10 items-center overflow-hidden transition-all duration-300"
             style={{
@@ -310,37 +470,222 @@ export const DemoInstrumentsPanel = memo(() => {
               boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
             }}
           >
-            <div className="relative ml-3 transition-colors duration-300 text-[#32353C]">
-              🔍
+            {/* Search Icon */}
+            <div
+              className={cn(
+                "relative ml-3 transition-colors duration-300",
+                isFocused ? "text-[#4EFF6E]" : "text-[#32353C]"
+              )}
+            >
+              <FaSearch size={12} />
             </div>
+
+            {/* Input */}
             <input
+              ref={inputRef}
               type="text"
               spellCheck={false}
               placeholder="Search instruments..."
-              value={searchQuery}
-              onChange={(e) =>
-                setSearchQuery(e.target.value.toUpperCase().replace(/\s/g, ""))
-              }
+              value={query}
+              onChange={(e) => {
+                const value = e.target.value.toUpperCase().replace(/\s/g, "");
+                onSearchChange(value);
+              }}
+              onFocus={onFocus}
+              onBlur={onBlur}
               className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#545963] transition-colors outline-none"
             />
-            {searchQuery && (
+
+            {/* Clear Button */}
+            {query && (
               <button
                 type="button"
-                onClick={() => setSearchQuery("")}
+                onClick={() => onSearchChange("")}
                 className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
               >
-                ×
+                <FaTimes size={8} />
               </button>
+            )}
+
+            {/* Keyboard hint */}
+            {!isFocused && !query && (
+              <div className="absolute right-3 text-[10px] text-[#32353C] font-outfit">
+                /
+              </div>
             )}
           </div>
         </div>
+      );
+    }
+  );
+
+  const DemoFilterButton = ({
+    isActive,
+    onClick,
+    label,
+  }: {
+    isActive: boolean;
+    onClick: () => void;
+    label: React.ReactNode;
+  }) => {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={cn(
+          "group rounded-full px-4 relative w-auto flex flex h-7 min-w-7 justify-center items-center px-2",
+          "transition-all duration-300 ease-in-out overflow-hidden"
+        )}
+      >
+        {/* Active indicator */}
+        {isActive && (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
+            />
+            <div
+              className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
+              style={{
+                width: "30px",
+                height: "4px",
+                transform: "translateY(-50%) rotate(-90deg)",
+                filter: "blur(10px)",
+                transformOrigin: "center",
+              }}
+            />
+          </>
+        )}
+
+        {/* Inactive background */}
+        {!isActive && (
+          <>
+            <div
+              className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
+            />
+          </>
+        )}
+
+        {/* Label */}
+        <span
+          className={cn(
+            "relative z-10 font-outfit text-[12px] font-medium tracking-wide whitespace-nowrap flex items-center justify-center",
+            "transition-colors duration-300 ease-in-out",
+            "text-white"
+          )}
+        >
+          {label}
+        </span>
+      </button>
+    );
+  };
+
+  // Memoized available pairs groups - defined after all components to avoid lexical declaration issues
+  const availablePairsGroups = useMemo(() => {
+    if (isSearching) return [];
+
+    return [
+      { label: "FX", items: FOREX_PAIRS },
+      { label: "CRYPTO", items: CRYPTO_PAIRS },
+      { label: "STOCKS", items: EQUITY_PAIRS },
+      { label: "ETF", items: ETF_PAIRS },
+    ]
+      .map((group) => {
+        const availablePairs = group.items.filter(
+          (item) => !selectedPairs.includes(item)
+        );
+        if (availablePairs.length === 0) return null;
+
+        const items = availablePairs.map((item) => (
+          <DemoPairItem
+            key={item}
+            item={item}
+            isSelected={false}
+            onToggle={() => togglePair(item)}
+          />
+        ));
+
+        return (
+          <DemoPairGroup
+            key={group.label}
+            label={group.label}
+            items={items}
+            count={availablePairs.length}
+          />
+        );
+      })
+      .filter(Boolean);
+  }, [selectedPairs, isSearching]);
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden">
+      <div className="w-full flex gap-2 w-auto ">
+        <div className="w-auto overflow-x-auto flex flex-wrap gap-2 py-2">
+          <DemoFilterButton
+            isActive={activeFilter === "selected"}
+            onClick={() => scrollToSection("selected")}
+            label={<FaStar size={10} />}
+          />
+          <DemoFilterButton
+            isActive={activeFilter === "fx"}
+            onClick={() => scrollToSection("fx")}
+            label="FX"
+          />
+          <DemoFilterButton
+            isActive={activeFilter === "crypto"}
+            onClick={() => scrollToSection("crypto")}
+            label="Crypto"
+          />
+          <DemoFilterButton
+            isActive={activeFilter === "stocks"}
+            onClick={() => scrollToSection("stocks")}
+            label="Stocks"
+          />
+          <DemoFilterButton
+            isActive={activeFilter === "etf"}
+            onClick={() => scrollToSection("etf")}
+            label="ETF"
+          />
+        </div>
+      </div>
+      <div className="flex-none overflow-hidden w-full mb-2">
+        <DemoSearchBar
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
+          onFocus={() => setIsSearchFocused(true)}
+          onBlur={() => setIsSearchFocused(false)}
+          isFocused={isSearchFocused}
+        />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* Scrollable content section */}
+      <div
+        ref={contentRef}
+        className="flex-1 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+      >
         <div className="space-y-4">
           {/* Search Results */}
-          {searchQuery && (
+          {isSearching && (
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-4">
                 <div className="pl-1 flex items-center gap-2">
@@ -356,16 +701,19 @@ export const DemoInstrumentsPanel = memo(() => {
                     boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
                   }}
                 >
-                  {filteredPairs.length} found
+                  {searchResults.length} found
                 </div>
               </div>
-              {filteredPairs.length > 0 ? (
+
+              {searchResults.length > 0 ? (
                 <div className="space-y-1">
-                  {filteredPairs.map((pair) => (
-                    <DemoPairItem
+                  {searchResults.map((pair) => (
+                    <DemoSearchPairItem
                       key={pair}
                       item={pair}
+                      searchQuery={searchQuery}
                       isSelected={selectedPairs.includes(pair)}
+                      onToggle={() => togglePair(pair)}
                     />
                   ))}
                 </div>
@@ -385,133 +733,41 @@ export const DemoInstrumentsPanel = memo(() => {
                   >
                     "{searchQuery}"
                   </div>
+                  <div className="font-outfit text-xs text-[#32353C] mt-3">
+                    Try searching for forex pairs, crypto, stocks, or ETFs
+                  </div>
                 </div>
               )}
             </div>
           )}
 
           {/* Regular Content */}
-          {!searchQuery && (
+          {!isSearching && (
             <>
-              {/* Show favorites at top when selected filter is active */}
-              {activeFilter === "selected" && selectedPairs.length > 0 && (
-                <div className="space-y-1 mb-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="pl-1 flex items-center gap-2">
-                      <h3 className="font-outfit text-xs font-medium text-white">
-                        Favorites
-                      </h3>
-                    </div>
-                    <div
-                      className="px-2 py-1 text-xs font-outfit font-medium text-white rounded-full"
-                      style={{
-                        background:
-                          "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-                        boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-                      }}
-                    >
-                      {selectedPairs.length}
-                    </div>
-                  </div>
-                  {selectedPairs.map((pair) => (
-                    <DemoPairItem key={pair} item={pair} isSelected={true} />
-                  ))}
+              {selectedPairs.length > 0 && (
+                <div data-section="selected">
+                  <DemoPairGroup
+                    label="Selected Pairs"
+                    items={selectedPairs.map((item) => (
+                      <DemoPairItem
+                        key={item}
+                        item={item}
+                        isSelected={true}
+                        onToggle={() => togglePair(item)}
+                      />
+                    ))}
+                    count={selectedPairs.length}
+                  />
                 </div>
               )}
-
-              {/* Show all available pairs when favorites filter is active */}
-              {activeFilter === "selected" && (
-                <div className="space-y-6">
-                  {/* FX Pairs */}
-                  <div className="space-y-1">
-                    <div className="pl-1 flex items-center gap-2 mb-3">
-                      <h3 className="font-outfit text-xs font-medium text-white">
-                        FX
-                      </h3>
-                    </div>
-                    {FOREX_PAIRS.filter((pair) => !selectedPairs.includes(pair))
-                      .slice(0, 8)
-                      .map((pair) => (
-                        <DemoPairItem
-                          key={pair}
-                          item={pair}
-                          isSelected={false}
-                        />
-                      ))}
-                  </div>
-
-                  {/* Crypto Pairs */}
-                  <div className="space-y-1">
-                    <div className="pl-1 flex items-center gap-2 mb-3">
-                      <h3 className="font-outfit text-xs font-medium text-white">
-                        Crypto
-                      </h3>
-                    </div>
-                    {CRYPTO_PAIRS.filter(
-                      (pair) => !selectedPairs.includes(pair)
-                    )
-                      .slice(0, 8)
-                      .map((pair) => (
-                        <DemoPairItem
-                          key={pair}
-                          item={pair}
-                          isSelected={false}
-                        />
-                      ))}
-                  </div>
-
-                  {/* Stocks */}
-                  <div className="space-y-1">
-                    <div className="pl-1 flex items-center gap-2 mb-3">
-                      <h3 className="font-outfit text-xs font-medium text-white">
-                        Stocks
-                      </h3>
-                    </div>
-                    {EQUITY_PAIRS.filter(
-                      (pair) => !selectedPairs.includes(pair)
-                    )
-                      .slice(0, 8)
-                      .map((pair) => (
-                        <DemoPairItem
-                          key={pair}
-                          item={pair}
-                          isSelected={false}
-                        />
-                      ))}
-                  </div>
-
-                  {/* ETFs */}
-                  <div className="space-y-1">
-                    <div className="pl-1 flex items-center gap-2 mb-3">
-                      <h3 className="font-outfit text-xs font-medium text-white">
-                        ETF
-                      </h3>
-                    </div>
-                    {ETF_PAIRS.filter((pair) => !selectedPairs.includes(pair))
-                      .slice(0, 8)
-                      .map((pair) => (
-                        <DemoPairItem
-                          key={pair}
-                          item={pair}
-                          isSelected={false}
-                        />
-                      ))}
-                  </div>
+              {availablePairsGroups.map((group) => (
+                <div
+                  key={group.props.label}
+                  data-section={group.props.label.toLowerCase()}
+                >
+                  {group}
                 </div>
-              )}
-
-              {/* Show all pairs for category filters, with favorites marked */}
-              {activeFilter !== "selected" && (
-                <div className="space-y-1">
-                  {filteredPairs.map((pair) => (
-                    <DemoPairItem
-                      key={pair}
-                      item={pair}
-                      isSelected={selectedPairs.includes(pair)}
-                    />
-                  ))}
-                </div>
-              )}
+              ))}
             </>
           )}
         </div>
@@ -874,39 +1130,33 @@ export const DemoVisualizerPanel = memo(() => {
         >
           <DemoTimeframeSlider />
         </div>
-      </div>
-
-      {/* Display Settings */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <LuSettings size={16} className="text-white" />
-          <h3 className="font-outfit text-sm font-medium text-white">
-            Display Settings
-          </h3>
-        </div>
-        <div
-          className="rounded-lg border border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 space-y-3"
-          style={{
-            boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-          }}
-        >
-          <div className="flex items-center justify-between">
-            <span className="font-outfit text-xs text-[#545963]">
-              Animation Speed
-            </span>
-            <div className="w-20 h-2 bg-[#1C1E23] rounded-full">
-              <div className="w-12 h-2 bg-[#4EFF6E] rounded-full" />
-            </div>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-outfit text-xs text-[#545963]">
-              Transparency
-            </span>
-            <div className="w-20 h-2 bg-[#1C1E23] rounded-full">
-              <div className="w-16 h-2 bg-[#4EFF6E] rounded-full" />
-            </div>
-          </div>
-        </div>
+        {/* CSS Styles for range inputs */}
+        <style jsx global>{`
+          input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: var(--thumb-size);
+            width: var(--thumb-size);
+            border-radius: 50%;
+            background: var(--thumb-color);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: grab;
+            transition: all 0.15s ease;
+          }
+          input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.25);
+          }
+          input[type="range"]::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(0.95);
+            box-shadow: 0 0 8px rgba(255, 255, 255, 0.08);
+          }
+          input[type="range"]::-webkit-slider-runnable-track {
+            background: transparent;
+          }
+        `}</style>
       </div>
     </div>
   );
@@ -914,86 +1164,14 @@ export const DemoVisualizerPanel = memo(() => {
 
 DemoVisualizerPanel.displayName = "DemoVisualizerPanel";
 
-// Demo Analytics Panel Content
-export const DemoAnalyticsPanel = memo(() => {
-  const metrics = [
-    { label: "RSI", value: "68.5", status: "overbought" },
-    { label: "MACD", value: "+0.025", status: "bullish" },
-    { label: "Volume", value: "2.1B", status: "high" },
-    { label: "Volatility", value: "12.3%", status: "moderate" },
-  ];
-
-  return (
-    <div className="space-y-4 p-4">
-      <div className="space-y-2">
-        <h3 className="font-russo text-sm font-medium text-white">
-          Technical Analysis
-        </h3>
-        <p className="font-russo text-xs text-[#818181]">
-          Real-time market indicators and signals
-        </p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-2">
-        {metrics.map((metric) => (
-          <div
-            key={metric.label}
-            className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-3"
-          >
-            <div className="font-russo text-xs text-[#818181] mb-1">
-              {metric.label}
-            </div>
-            <div className="font-russo text-sm font-bold text-white mb-1">
-              {metric.value}
-            </div>
-            <div
-              className={`font-russo text-xs ${
-                metric.status === "bullish" || metric.status === "high"
-                  ? "text-[#24FF66]"
-                  : metric.status === "overbought"
-                    ? "text-red-400"
-                    : "text-blue-400"
-              }`}
-            >
-              {metric.status}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-4">
-        <h4 className="font-russo text-sm font-medium text-white mb-3">
-          Trading Signals
-        </h4>
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-[#24FF66] rounded-full" />
-            <span className="font-russo text-xs text-white">
-              Strong Buy Signal - BTC
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-blue-400 rounded-full" />
-            <span className="font-russo text-xs text-white">
-              Hold Signal - ETH
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-red-400 rounded-full" />
-            <span className="font-russo text-xs text-white">
-              Sell Signal - SOL
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-DemoAnalyticsPanel.displayName = "DemoAnalyticsPanel";
-
 // Demo Settings Panel Content
 export const DemoSettingsPanel = memo(() => {
+  const { boxColors, updateBoxColors, updateStyles } = useColorStore();
+  const { presets, selectedPreset, selectPreset } = usePresetStore();
+  const [customPositive, setCustomPositive] = useState(boxColors.positive);
+  const [customNegative, setCustomNegative] = useState(boxColors.negative);
+  const [boxStyle, setBoxStyle] = useState("gradient");
+
   const settings = [
     { label: "Dark Mode", enabled: true },
     { label: "Real-time Updates", enabled: true },
@@ -1001,54 +1179,478 @@ export const DemoSettingsPanel = memo(() => {
     { label: "Email Notifications", enabled: true },
   ];
 
-  return (
-    <div className="space-y-4 p-4">
-      <div className="space-y-2">
-        <h3 className="font-russo text-sm font-medium text-white">
-          Application Settings
-        </h3>
-        <p className="font-russo text-xs text-[#818181]">
-          Customize your trading experience
-        </p>
-      </div>
+  // Update custom colors when box colors change
+  useEffect(() => {
+    setCustomPositive(boxColors.positive);
+    setCustomNegative(boxColors.negative);
+  }, [boxColors.positive, boxColors.negative]);
 
-      <div className="space-y-2">
-        {settings.map((setting) => (
-          <div
-            key={setting.label}
-            className="flex items-center justify-between rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-3"
-          >
-            <span className="font-russo text-sm text-white">
-              {setting.label}
-            </span>
-            <div
-              className={`relative w-10 h-5 rounded-full transition-colors duration-200 ${
-                setting.enabled ? "bg-[#24FF66]" : "bg-[#1C1E23]"
-              }`}
-            >
-              <div
-                className={`absolute top-0.5 w-4 h-4 bg-white rounded-full transition-transform duration-200 ${
-                  setting.enabled ? "translate-x-5" : "translate-x-0.5"
-                }`}
-              />
+  const handlePresetSelect = (presetName: string) => {
+    const preset = presets.find((p) => p.name === presetName);
+    if (preset) {
+      selectPreset(presetName);
+      updateBoxColors({
+        positive: preset.positive,
+        negative: preset.negative,
+        styles: preset.styles,
+      });
+    }
+  };
+
+  const handleCustomColorChange = (
+    type: "positive" | "negative",
+    color: string
+  ) => {
+    if (type === "positive") {
+      setCustomPositive(color);
+      updateBoxColors({ positive: color });
+    } else {
+      setCustomNegative(color);
+      updateBoxColors({ negative: color });
+    }
+    // Clear preset selection when using custom colors
+    selectPreset(null);
+  };
+
+  const boxStyles = [
+    {
+      id: "gradient",
+      name: "Gradient",
+      preview: "linear-gradient(135deg, #4EFF6E, #2DD4BF)",
+    },
+    { id: "solid", name: "Solid", preview: "#4EFF6E" },
+    { id: "outline", name: "Outline", preview: "transparent" },
+  ];
+
+  return (
+    <div className="space-y-6 p-4">
+      {/* Color Style Section */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <LuPalette size={16} className="text-white" />
+          <h3 className="font-outfit text-sm font-medium text-white">
+            Color Style
+          </h3>
+        </div>
+        <div
+          className="rounded-lg border border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-2 space-y-4"
+          style={{
+            boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+          }}
+        >
+          {/* Presets Grid */}
+          <div className="grid grid-cols-3 gap-2">
+            {presets.map((preset) => {
+              const isSelected = selectedPreset === preset.name;
+              return (
+                <button
+                  key={preset.name}
+                  type="button"
+                  onClick={() => handlePresetSelect(preset.name)}
+                  className={cn(
+                    "group relative flex h-[72px] flex-col items-center justify-center gap-2 overflow-hidden rounded-lg border bg-gradient-to-b p-2 transition-all duration-200",
+                    isSelected
+                      ? "border-[#1C1E23] from-[#1C1E23]/80 to-[#0F0F0F]/90 shadow-[0_0_30px_rgba(0,0,0,0.5)] hover:border-[#32353C] hover:from-[#1c1c1c]/80 hover:to-[#141414]/90"
+                      : "border-[#0A0B0D] from-[#141414]/30 to-[#0A0A0A]/40 hover:border-[#1C1E23] hover:from-[#1C1E23]/40 hover:to-[#0F0F0F]/50"
+                  )}
+                  style={{
+                    backgroundImage: `radial-gradient(circle at 30% 30%, ${preset.positive}${isSelected ? "11" : "05"}, ${preset.negative}${isSelected ? "22" : "08"})`,
+                    backdropFilter: "blur(20px)",
+                  }}
+                >
+                  <div
+                    className={cn(
+                      "absolute inset-0",
+                      isSelected ? "opacity-50" : "opacity-20"
+                    )}
+                    style={{
+                      background: `radial-gradient(circle at 30% 30%, ${preset.positive}${isSelected ? "22" : "11"}, ${preset.negative}${isSelected ? "33" : "15"})`,
+                    }}
+                  />
+
+                  <div className="relative h-8 w-8 overflow-hidden rounded-full shadow-xl">
+                    <div
+                      className="absolute inset-0 transition-transform duration-200 group-hover:scale-110"
+                      style={{
+                        background: `radial-gradient(circle at 30% 30%, ${preset.positive}, ${preset.negative})`,
+                        boxShadow: `
+                          inset 0 0 15px ${preset.positive}66,
+                          inset 2px 2px 4px ${preset.positive}33,
+                          0 0 20px ${preset.positive}22
+                        `,
+                      }}
+                    />
+                  </div>
+
+                  <div className="relative flex flex-col items-center">
+                    <span className="font-kodemono text-[8px] font-medium tracking-widest text-[#32353C] uppercase transition-colors group-hover:text-[#818181]">
+                      {preset.name}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Custom Color Inputs */}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-between">
+              <span className="font-kodemono text-[10px] font-medium tracking-wider text-[#32353C] uppercase">
+                Custom Colors
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="group flex flex-col gap-2">
+                <div className="relative h-10 w-full overflow-hidden rounded-lg border border-[#0A0B0D] bg-[#0C0C0C] transition-all duration-200 hover:border-[#1C1E23] hover:bg-[#111]">
+                  <div className="absolute inset-0 flex items-center px-3">
+                    <span className="font-kodemono text-[8px] font-medium tracking-wider text-[#32353C] uppercase">
+                      Up Trend
+                    </span>
+                    <div
+                      className="ml-auto h-6 w-6 rounded-full shadow-lg"
+                      style={{
+                        background: customPositive,
+                        boxShadow: `0 0 10px ${customPositive}33`,
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="color"
+                    value={customPositive}
+                    onChange={(e) =>
+                      handleCustomColorChange("positive", e.target.value)
+                    }
+                    className="h-full w-full cursor-pointer opacity-0"
+                  />
+                </div>
+              </div>
+              <div className="group flex flex-col gap-2">
+                <div className="relative h-10 w-full overflow-hidden rounded-lg border border-[#0A0B0D] bg-[#0C0C0C] transition-all duration-200 hover:border-[#1C1E23] hover:bg-[#111]">
+                  <div className="absolute inset-0 flex items-center px-3">
+                    <span className="font-kodemono text-[8px] font-medium tracking-wider text-[#32353C] uppercase">
+                      Dn Trend
+                    </span>
+                    <div
+                      className="ml-auto h-6 w-6 rounded-full shadow-lg"
+                      style={{
+                        background: customNegative,
+                        boxShadow: `0 0 10px ${customNegative}33`,
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="color"
+                    value={customNegative}
+                    onChange={(e) =>
+                      handleCustomColorChange("negative", e.target.value)
+                    }
+                    className="h-full w-full cursor-pointer opacity-0"
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        ))}
+        </div>
       </div>
 
-      <div className="rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/60 p-4">
-        <h4 className="font-russo text-sm font-medium text-white mb-3">
-          Account Info
-        </h4>
-        <div className="space-y-2">
-          <div className="flex items-center gap-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30">
-              <LuUser size={14} className="text-[#24FF66]" />
+      {/* Box Style Section */}
+      <div className="space-y-3">
+        <div className="flex items-center gap-2">
+          <LuBox size={16} className="text-white" />
+          <h3 className="font-outfit text-sm font-medium text-white">
+            Box Style
+          </h3>
+        </div>
+        <div
+          className="rounded-lg border border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809] space-y-2"
+          style={{
+            boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+          }}
+        >
+          <div className="flex flex-col gap-2">
+            {/* Preview Container */}
+            <div className="group relative flex flex-col overflow-hidden rounded-lg transition-all duration-300">
+              <div className="relative flex flex-col rounded-lg">
+                {/* Grid background */}
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]" />
+
+                <div className="relative flex h-full items-center justify-center p-8">
+                  {/* Preview Box */}
+                  <div
+                    className={cn(
+                      "relative h-24 w-24 transition-all duration-300",
+                      boxColors.styles?.showBorder && "border border-[#111215]"
+                    )}
+                    style={{
+                      borderRadius: `${boxColors.styles?.borderRadius || 4}px`,
+                      boxShadow: `
+                        inset 0 0 ${(boxColors.styles?.shadowIntensity || 0.4) * 50}px rgba(255, 255, 255, ${(boxColors.styles?.shadowIntensity || 0.4) * 0.3}),
+                        0 0 20px rgba(255, 255, 255, 0.05)
+                      `,
+                      backgroundColor: `rgba(255, 255, 255, ${(boxColors.styles?.opacity || 0.61) * 0.1})`,
+                    }}
+                  >
+                    <div
+                      className="absolute inset-0 transition-all duration-300"
+                      style={{
+                        borderRadius: `${boxColors.styles?.borderRadius || 4}px`,
+                        background: `
+                          radial-gradient(circle at center, 
+                            rgba(255, 255, 255, ${(boxColors.styles?.opacity || 0.61) * 0.05}),
+                            transparent 70%
+                          )
+                        `,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <div className="font-russo text-sm text-white">Demo User</div>
-              <div className="font-russo text-xs text-[#818181]">
-                demo@rthmn.com
+
+            {/* Controls Container */}
+            <div className="flex flex-col gap-2 p-4">
+              {/* StyleControl components */}
+              <div className="group relative space-y-1.5">
+                <div className="flex items-center justify-between px-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-russo text-[8px] font-medium tracking-wider text-[#BFC2CA] uppercase">
+                      Border Radius
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-russo text-[8px] text-white/70">
+                      {boxColors.styles?.borderRadius || 4}
+                    </span>
+                    <span className="font-russo text-[8px] tracking-wider text-white/30 uppercase">
+                      px
+                    </span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex w-full items-center px-2">
+                    <div className="relative h-[1px] w-full bg-white/[0.06]">
+                      <div
+                        className="absolute h-full bg-gradient-to-r from-[#32353C] to-[#1C1E23]"
+                        style={{
+                          width: `${(((boxColors.styles?.borderRadius || 4) - 0) / (16 - 0)) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={16}
+                    step={1}
+                    value={boxColors.styles?.borderRadius || 4}
+                    onChange={(e) =>
+                      updateStyles({
+                        borderRadius: Number.parseInt(e.target.value),
+                      })
+                    }
+                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing"
+                    style={
+                      {
+                        "--thumb-size": "12px",
+                        "--thumb-color": "#fff",
+                      } as React.CSSProperties
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="group relative space-y-1.5">
+                <div className="flex items-center justify-between px-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-russo text-[8px] font-medium tracking-wider text-[#BFC2CA] uppercase">
+                      Shadow Depth
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-russo text-[8px] text-white/70">
+                      {(boxColors.styles?.shadowIntensity || 0.4).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex w-full items-center px-2">
+                    <div className="relative h-[1px] w-full bg-white/[0.06]">
+                      <div
+                        className="absolute h-full bg-gradient-to-r from-[#32353C] to-[#1C1E23]"
+                        style={{
+                          width: `${(boxColors.styles?.shadowIntensity || 0.4) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={1}
+                    step={0.05}
+                    value={boxColors.styles?.shadowIntensity || 0.4}
+                    onChange={(e) =>
+                      updateStyles({
+                        shadowIntensity: Number.parseFloat(e.target.value),
+                      })
+                    }
+                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing"
+                    style={
+                      {
+                        "--thumb-size": "12px",
+                        "--thumb-color": "#fff",
+                      } as React.CSSProperties
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="group relative space-y-1.5">
+                <div className="flex items-center justify-between px-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-russo text-[8px] font-medium tracking-wider text-[#BFC2CA] uppercase">
+                      Opacity
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span className="font-russo text-[8px] text-white/70">
+                      {(boxColors.styles?.opacity || 0.61).toFixed(2)}
+                    </span>
+                  </div>
+                </div>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 flex w-full items-center px-2">
+                    <div className="relative h-[1px] w-full bg-white/[0.06]">
+                      <div
+                        className="absolute h-full bg-gradient-to-r from-[#32353C] to-[#1C1E23]"
+                        style={{
+                          width: `${(boxColors.styles?.opacity || 0.61) * 100}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <input
+                    type="range"
+                    min={0.01}
+                    max={1}
+                    step={0.05}
+                    value={boxColors.styles?.opacity || 0.61}
+                    onChange={(e) =>
+                      updateStyles({
+                        opacity: Number.parseFloat(e.target.value),
+                      })
+                    }
+                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing"
+                    style={
+                      {
+                        "--thumb-size": "12px",
+                        "--thumb-color": "#fff",
+                      } as React.CSSProperties
+                    }
+                  />
+                </div>
+              </div>
+
+              {/* Toggle Controls */}
+              <div className="flex flex-col gap-2 px-1 py-2">
+                <div className="group flex w-full items-center justify-between">
+                  <span className="font-russo text-[13px] font-medium tracking-wide text-[#32353C] transition-colors duration-300 group-hover:text-[#545963]">
+                    Show Border
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateStyles({
+                        showBorder: !boxColors.styles?.showBorder,
+                      })
+                    }
+                    className={cn(
+                      "relative h-5 w-10 cursor-pointer rounded-full border transition-all duration-300",
+                      "bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+                      boxColors.styles?.showBorder
+                        ? [
+                            "border-[#1C1E23]",
+                            "shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+                            "hover:border-white/[0.08] hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
+                          ]
+                        : [
+                            "border-[#111215]",
+                            "hover:border-[#1C1E23] hover:shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+                          ]
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "absolute inset-0 rounded-full transition-opacity duration-300",
+                        boxColors.styles?.showBorder
+                          ? "bg-[#1C1E23]"
+                          : "bg-[#111215]"
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        "absolute top-0.5 rounded-full transition-all duration-300 h-4 w-4",
+                        "bg-[#32353C] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+                        boxColors.styles?.showBorder
+                          ? [
+                              "translate-x-[1.375rem]",
+                              "bg-white/80",
+                              "hover:bg-white",
+                            ]
+                          : ["translate-x-0.5", "hover:bg-[#545963]"]
+                      )}
+                    />
+                  </button>
+                </div>
+                <div className="group flex w-full items-center justify-between">
+                  <span className="font-russo text-[13px] font-medium tracking-wide text-[#32353C] transition-colors duration-300 group-hover:text-[#545963]">
+                    Show Price Lines
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      updateStyles({
+                        showLineChart: !boxColors.styles?.showLineChart,
+                      })
+                    }
+                    className={cn(
+                      "relative h-5 w-10 cursor-pointer rounded-full border transition-all duration-300",
+                      "bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
+                      boxColors.styles?.showLineChart
+                        ? [
+                            "border-[#1C1E23]",
+                            "shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+                            "hover:border-white/[0.08] hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
+                          ]
+                        : [
+                            "border-[#111215]",
+                            "hover:border-[#1C1E23] hover:shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+                          ]
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "absolute inset-0 rounded-full transition-opacity duration-300",
+                        boxColors.styles?.showLineChart
+                          ? "bg-[#1C1E23]"
+                          : "bg-[#111215]"
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        "absolute top-0.5 rounded-full transition-all duration-300 h-4 w-4",
+                        "bg-[#32353C] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
+                        boxColors.styles?.showLineChart
+                          ? [
+                              "translate-x-[1.375rem]",
+                              "bg-white/80",
+                              "hover:bg-white",
+                            ]
+                          : ["translate-x-0.5", "hover:bg-[#545963]"]
+                      )}
+                    />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
