@@ -212,16 +212,28 @@ export const Sidebar = ({
             <Link
               key={linkButton.id}
               href={linkButton.href}
-              className={cn(
-                "group relative z-[120] flex h-10 w-10 items-center justify-center transition-all duration-200",
-                "rounded-lg border border-transparent bg-transparent",
-                "hover:border-[#1C1E23] hover:bg-gradient-to-b hover:from-[#1C1E23] hover:to-[#0F0F0F] hover:shadow-lg hover:shadow-black/20"
-              )}
+              className="group relative z-[120] flex h-10 w-10 items-center justify-center transition-all duration-200 overflow-hidden"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
               title={linkButton.title}
             >
+              {/* Hover background */}
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  borderRadius: "4px",
+                  background:
+                    "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                }}
+              />
+
               <linkButton.icon
                 size={20}
-                className="text-[#818181] transition-colors group-hover:text-white"
+                className="relative z-10 text-[#818181] transition-colors group-hover:text-white"
               />
             </Link>
           ))}

@@ -82,10 +82,10 @@ const PairItem = memo(
         className={cn(
           "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
           isSelected
-            ? "rounded bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
-            : "rounded-lg"
+            ? "bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+            : ""
         )}
-        style={isSelected ? { borderRadius: "4px" } : {}}
+        style={{ borderRadius: "4px" }}
       >
         {/* Hover background for non-selected items */}
         {!isSelected && (
@@ -386,7 +386,7 @@ const SearchBar = memo(
         <div
           className="group/search relative flex h-10 items-center overflow-hidden transition-all duration-300"
           style={{
-            borderRadius: "12px",
+            borderRadius: "4px",
             background:
               "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
             boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
@@ -459,10 +459,11 @@ const DraggableItem = memo(
         style={{ position: "relative", zIndex: 0 }}
       >
         <motion.div
-          className="relative flex w-full items-center rounded-lg overflow-hidden"
+          className="relative flex w-full items-center overflow-hidden"
           layout="position"
           transition={{ duration: 0.15 }}
           whileDrag={{ zIndex: 50 }}
+          style={{ borderRadius: "4px" }}
         >
           <div
             className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
@@ -582,7 +583,7 @@ const FilterButton = ({
       type="button"
       onClick={onClick}
       className={cn(
-        "group relative w-auto flex flex h-7 min-w-7 justify-center items-center px-2",
+        "group rounded-full px-2 relative flex-1 flex h-7 min-w-7 justify-center items-center",
         "transition-all duration-300 ease-in-out overflow-hidden"
       )}
     >
@@ -722,6 +723,10 @@ export const InstrumentsPanel = () => {
       { label: "CRYPTO", items: CRYPTO_PAIRS },
       { label: "STOCKS", items: EQUITY_PAIRS },
       { label: "ETF", items: ETF_PAIRS },
+      { label: "FX", items: FOREX_PAIRS },
+      { label: "CRYPTO", items: CRYPTO_PAIRS },
+      { label: "STOCKS", items: EQUITY_PAIRS },
+      { label: "ETF", items: ETF_PAIRS },
     ]
       .map((group) => {
         const availablePairs = group.items.filter(
@@ -752,8 +757,8 @@ export const InstrumentsPanel = () => {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="w-full flex gap-2 w-auto ">
-        <div className="w-auto overflow-x-auto flex flex-wrap gap-2 py-2">
+      <div className="w-full">
+        <div className="w-full flex gap-1 py-2">
           <FilterButton
             isActive={activeFilter === "selected"}
             onClick={() => scrollToSection("selected")}
@@ -801,9 +806,8 @@ export const InstrumentsPanel = () => {
           {isSearching && (
             <div className="space-y-3">
               <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-4 bg-[#4EFF6E] rounded-full"></div>
-                  <h3 className="font-outfit text-sm font-medium text-white">
+                <div className="pl-1 flex items-center gap-2">
+                  <h3 className="font-outfit text-xs font-medium text-white">
                     Search Results
                   </h3>
                 </div>
@@ -825,7 +829,7 @@ export const InstrumentsPanel = () => {
                     <PairItem
                       key={pair}
                       item={pair}
-                      isSelected={selectedPairs.includes(pair)}
+                      isSelected={false}
                       onToggle={() => togglePair(pair)}
                     />
                   ))}

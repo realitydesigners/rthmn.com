@@ -61,7 +61,7 @@ const Screen = memo(
         style={{
           scale,
         }}
-        className="absolute inset-0 w-full h-full lg:flex hidden pointer-events-none z-20"
+        className="absolute inset-0 w-full h-full lg:flex hidden pointer-events-none z-[1000]"
       >
         {/* Animated border that appears when UI is loaded */}
         <motion.div

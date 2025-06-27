@@ -142,17 +142,6 @@ export default function Dashboard() {
     }
   };
 
-  if (!selectedPairs.length && !isLoading) {
-    return (
-      <div className="w-full px-2 sm:px-4">
-        <NoInstruments />
-        <div className="mt-4 text-center text-sm primary-text">
-          Please complete the onboarding process to select your trading pairs.
-        </div>
-      </div>
-    );
-  }
-
   // Render based on orderedPairs once available, or selectedPairs initially
   const pairsToRender = orderedPairs.length > 0 ? orderedPairs : selectedPairs;
 
