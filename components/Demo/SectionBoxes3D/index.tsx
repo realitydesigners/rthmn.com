@@ -347,7 +347,11 @@ export const SectionBoxes3D = memo(() => {
               opacity={sidebarOpacity}
               scrollYProgress={scrollYProgress}
             />
-            <DemoSidebarRight x={rightSidebarX} opacity={sidebarOpacity} />
+            <DemoSidebarRight
+              x={rightSidebarX}
+              opacity={sidebarOpacity}
+              scrollYProgress={scrollYProgress}
+            />
 
             {/* UI Controls - animate in with same opacity as other UI elements */}
             {isFormationComplete && (

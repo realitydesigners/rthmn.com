@@ -1,9 +1,7 @@
 "use client";
 
-import {
-  DemoInstrumentsPanel,
-  DemoVisualizerPanel,
-} from "@/components/Demo/DemoPanelContent";
+import { DemoInstrumentsPanel } from "@/components/Demo/DemoPanelContent/DemoInstrumentsPanel";
+import { DemoVisualizerPanel } from "@/components/Demo/DemoPanelContent/DemoVisualizerPanel";
 import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
 import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";

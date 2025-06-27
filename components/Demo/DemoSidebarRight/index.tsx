@@ -15,20 +15,55 @@ import {
   LuShield,
 } from "react-icons/lu";
 import { cn } from "@/utils/cn";
-import { DemoSettingsPanel } from "../DemoPanelContent";
+import { DemoSettingsPanel } from "../DemoPanelContent/DemoSettingsPanel";
 
 interface DemoSidebarRightProps {
   x?: MotionValue<number>;
   opacity?: MotionValue<number>;
+  scrollYProgress?: MotionValue<number>;
 }
 
 // Demo Color Preset Component
 
 // Mock Demo Sidebar Right Component
 export const DemoSidebarRight = memo(
-  ({ x, opacity }: DemoSidebarRightProps) => {
+  ({ x, opacity, scrollYProgress }: DemoSidebarRightProps) => {
     const [activePanel, setActivePanel] = useState<string | null>(null);
     const [sidebarLoaded, setSidebarLoaded] = useState(false);
+
+    // Auto-close panel when scrolling significantly back up
+    useEffect(() => {
+      if (!scrollYProgress || !activePanel) return;
+
+      let lastScrollValue = scrollYProgress.get();
+      let scrollStartPosition = lastScrollValue;
+
+      const unsubscribe = scrollYProgress.onChange((currentValue) => {
+        // If scrolling back up (decreasing scroll value) and panel is open
+        if (currentValue < lastScrollValue && activePanel) {
+          // Calculate how much we've scrolled back up
+          const scrollDistance = scrollStartPosition - currentValue;
+
+          // Close panel after scrolling back up a significant amount (equivalent to ~60px)
+          // Mobile-optimized threshold - more responsive on touch devices
+          const isMobile =
+            typeof window !== "undefined" &&
+            (window.innerWidth < 1024 || "ontouchstart" in window);
+          const closeThreshold = isMobile ? 0.03 : 0.05; // Even more responsive on mobile
+
+          if (scrollDistance > closeThreshold) {
+            setActivePanel(null);
+          }
+        } else if (currentValue > lastScrollValue) {
+          // Reset start position when scrolling down
+          scrollStartPosition = currentValue;
+        }
+
+        lastScrollValue = currentValue;
+      });
+
+      return unsubscribe;
+    }, [scrollYProgress, activePanel]);
 
     // Simulate sidebar loading completion after animation
     useEffect(() => {
@@ -40,12 +75,12 @@ export const DemoSidebarRight = memo(
     }, []);
 
     const mockButtons = [
-      {
-        id: "onboarding",
-        icon: LuGraduationCap,
-        label: "Tutorial",
-        panelContent: <DemoSettingsPanel />,
-      },
+      // {
+      //   id: "onboarding",
+      //   icon: LuGraduationCap,
+      //   label: "Tutorial",
+      //   panelContent: <DemoSettingsPanel />,
+      // },
       {
         id: "settings",
         icon: LuSettings,
@@ -174,6 +209,7 @@ export const DemoSidebarRight = memo(
             title={activePanelData.label}
             position="right"
             onClose={() => setActivePanel(null)}
+            opacity={opacity}
           >
             {activePanelData.panelContent}
           </DemoSidebarWrapper>
