@@ -223,8 +223,7 @@ const SearchBar = memo(
         <div
           className="group/search rounded-full relative flex h-10 items-center overflow-hidden transition-all duration-300"
           style={{
-            background:
-              "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
+            background: "linear-gradient(180deg, #24282D -5%, #111316 80%)",
             boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
           }}
         >
@@ -263,13 +262,6 @@ const SearchBar = memo(
             >
               <FaTimes size={8} />
             </button>
-          )}
-
-          {/* Keyboard hint */}
-          {!isFocused && !searchQuery && (
-            <div className="absolute right-3 text-[10px] text-[#32353C] font-outfit">
-              /
-            </div>
           )}
         </div>
       </div>
