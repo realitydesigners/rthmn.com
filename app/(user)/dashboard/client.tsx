@@ -33,9 +33,9 @@ export default function Dashboard() {
   const [windowWidth, setWindowWidth] = useState(0);
   const [availableWidth, setAvailableWidth] = useState(0);
 
-  // Signal alerts
-  const { signals, newSignals, clearSignalAlert, clearAllAlerts } =
-    useSignals(10000); // Poll every 10 seconds
+  // Signal alerts - now using real-time subscriptions
+  const { signals, newSignals, clearSignalAlert, clearAllAlerts, isConnected } =
+    useSignals();
 
   // Helper function to get active patterns for a specific pair
   const getActivePatternsForPair = (pair: string): number[] => {
@@ -174,7 +174,11 @@ export default function Dashboard() {
   const gridCols = !isClient ? 1 : getGridColumns(availableWidth);
 
   // Zen Mode toggle function (will be accessible from sidebar)
-  window.toggleZenMode = toggleZenMode;
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.toggleZenMode = toggleZenMode;
+    }
+  }, [toggleZenMode]);
 
   // Zen Mode View
   if (isZenMode) {
@@ -185,13 +189,6 @@ export default function Dashboard() {
           orderedPairs={pairsToRender}
           boxColors={boxColors}
           isLoading={isLoading}
-        />
-
-        {/* Signal Alerts */}
-        <SignalAlerts
-          newSignals={newSignals}
-          onClearSignal={clearSignalAlert}
-          onClearAll={clearAllAlerts}
         />
       </div>
     );

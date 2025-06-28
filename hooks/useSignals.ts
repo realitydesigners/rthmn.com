@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { useEffect, useState, useRef } from "react";
 
 interface Signal {
   id: string;
@@ -10,59 +9,78 @@ interface Signal {
   created_at: string;
 }
 
-export function useSignals(refreshInterval = 10000) {
+export function useSignals() {
   const [signals, setSignals] = useState<Signal[]>([]);
   const [newSignals, setNewSignals] = useState<Signal[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [lastChecked, setLastChecked] = useState<string | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const lastCheckRef = useRef<string | null>(null);
 
-  // Use the same client creation as SupabaseProvider
-  const supabase = createClient();
-
-  const fetchSignals = async (retryCount = 0) => {
+  // Direct REST API call instead of Supabase client
+  const fetchSignals = async (isInitial = false) => {
     try {
-      const { data, error } = await supabase
-        .from("signals")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(50);
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-      if (error) {
-        console.error("Error fetching signals:", error);
-
-        // Retry on network errors (max 2 retries)
-        if (retryCount < 2 && error.message?.includes("NetworkError")) {
-          setTimeout(() => fetchSignals(retryCount + 1), 2000);
-          return;
-        }
+      if (!supabaseUrl || !supabaseKey) {
+        console.error("Missing Supabase credentials");
         return;
       }
+
+      // Direct REST API call
+      const response = await fetch(
+        `${supabaseUrl}/rest/v1/signals?order=created_at.desc&limit=50`,
+        {
+          method: "GET",
+          headers: {
+            apikey: supabaseKey,
+            Authorization: `Bearer ${supabaseKey}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        console.error("HTTP error:", response.status, response.statusText);
+        setIsConnected(false);
+        return;
+      }
+
+      const data = await response.json();
+      console.log("Successfully fetched signals:", data.length);
+      setIsConnected(true);
 
       if (data) {
-        const currentTime = new Date().toISOString();
-
-        // TEMPORARY: Always show recent signals for debugging
-        if (data.length > 0) {
-          setNewSignals(data.slice(0, 5)); // Show last 5 as new always
-        } else {
-          setNewSignals([]);
-        }
-
         setSignals(data);
-        setLastChecked(currentTime);
-      } else {
-        setNewSignals([]);
+
+        if (isInitial) {
+          // On initial load, show last 3 as new
+          if (data.length > 0) {
+            setNewSignals(data.slice(0, 3));
+            lastCheckRef.current = data[0]?.created_at || null;
+          }
+        } else {
+          // Check for new signals since last check
+          if (lastCheckRef.current && data.length > 0) {
+            const newSignalsSinceLastCheck = data.filter(
+              (signal: Signal) => signal.created_at > lastCheckRef.current!
+            );
+
+            if (newSignalsSinceLastCheck.length > 0) {
+              setNewSignals((prev) => [...newSignalsSinceLastCheck, ...prev]);
+              lastCheckRef.current = data[0].created_at;
+            }
+          }
+        }
       }
     } catch (error) {
-      console.error("Error in fetchSignals:", error);
-
-      // Retry on network errors (max 2 retries)
-      if (retryCount < 2) {
-        setTimeout(() => fetchSignals(retryCount + 1), 2000);
-        return;
-      }
+      console.error("Direct API call error:", error);
+      setIsConnected(false);
     } finally {
-      setIsLoading(false);
+      if (isInitial) {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -78,24 +96,25 @@ export function useSignals(refreshInterval = 10000) {
 
   useEffect(() => {
     // Initial fetch
-    fetchSignals();
+    fetchSignals(true);
 
-    // Set up interval for polling
+    // Set up polling every 10 seconds
     const interval = setInterval(() => {
-      fetchSignals();
-    }, refreshInterval);
+      fetchSignals(false);
+    }, 10000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [refreshInterval]);
+  }, []);
 
   return {
     signals,
     newSignals,
     isLoading,
+    isConnected,
     clearSignalAlert,
     clearAllAlerts,
-    refetch: fetchSignals,
+    refetch: () => fetchSignals(true),
   };
 }
