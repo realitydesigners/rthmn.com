@@ -6,14 +6,7 @@ import type { User } from "@supabase/supabase-js";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LuChevronRight,
-  LuEye,
-  LuEyeOff,
-  LuHelpCircle,
-  LuLayoutDashboard,
-  LuOrbit,
-} from "react-icons/lu";
+import { LuChevronRight, LuLayoutDashboard, LuOrbit } from "react-icons/lu";
 import { ConnectionBadge } from "../../Badges/ConnectionBadge";
 import { GridControl } from "../../Panels/BoxDataPanel/GridControl";
 
