@@ -14,42 +14,42 @@ import { TimeFrameSlider } from "@/components/Panels/PanelComponents/TimeFrameSl
 import { LuLayoutGrid, LuLineChart, LuSettings } from "react-icons/lu";
 
 export const MobileNavbar = () => {
-	const buttons = [
-		{
-			id: "instruments",
-			icon: LuLineChart,
-			tourContent: <TourInstruments />,
-			panelContent: <PairNavigator />,
-		},
-		{
-			id: "visualizer",
-			icon: LuLayoutGrid,
-			tourContent: <TourVisualizers />,
-			panelContent: (
-				<>
-					<ChartStyleOptions />
-					<TimeFrameSlider global />
-				</>
-			),
-		},
-		{
-			id: "settings",
-			icon: LuSettings,
-			tourContent: <TourSettings />,
-			panelContent: (
-				<>
-					<ColorStyleOptions />
-					<BoxVisualizer />
-				</>
-			),
-		},
-		{
-			id: "account",
-			icon: ProfileIcon,
-			tourContent: <></>,
-			panelContent: <AccountPanel />,
-		},
-	];
+  const buttons = [
+    {
+      id: "instruments",
+      icon: LuLineChart,
+      tourContent: <TourInstruments />,
+      panelContent: <PairNavigator />,
+    },
+    {
+      id: "visualizer",
+      icon: LuLayoutGrid,
+      tourContent: <TourVisualizers />,
+      panelContent: (
+        <>
+          <ChartStyleOptions />
+          <TimeFrameSlider global />
+        </>
+      ),
+    },
+    {
+      id: "settings",
+      icon: LuSettings,
+      tourContent: <TourSettings />,
+      panelContent: (
+        <>
+          <ColorStyleOptions />
+          <BoxVisualizer />
+        </>
+      ),
+    },
+    {
+      id: "account",
+      icon: ProfileIcon,
+      tourContent: <></>,
+      panelContent: <AccountPanel />,
+    },
+  ];
 
-	return <MobileNavbarContent buttons={buttons} />;
+  return <MobileNavbarContent buttons={buttons} />;
 };

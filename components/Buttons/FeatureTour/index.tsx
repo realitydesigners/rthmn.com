@@ -249,14 +249,18 @@ export function FeatureTour({
                 ease: [0.2, 1, 0.2, 1],
               }}
               className={cn(
-                "fixed top-18 z-50",
+                "fixed z-[200]",
                 position === "left"
                   ? isOpen
-                    ? "left-4"
-                    : "left-20"
+                    ? "-left-[270px] top-18"
+                    : "left-16 -ml-2 top-18"
                   : isOpen
-                    ? "right-4"
-                    : "right-20"
+                    ? tourId === "onboarding"
+                      ? "-right-[270px] top-18"
+                      : "-right-[270px] bottom-30"
+                    : tourId === "onboarding"
+                      ? "right-16 -mr-2 top-18"
+                      : "right-16 -mr-2 bottom-30"
               )}
             >
               {React.cloneElement(children, {

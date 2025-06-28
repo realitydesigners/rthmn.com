@@ -273,7 +273,6 @@ export const SidebarWrapper = ({
 
               {/* Soft edge gradients */}
               <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(36,255,102,0.15),transparent_20%,transparent_90%,rgba(36,255,102,0.15))]" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(36,255,102,0.15),transparent_20%,transparent_90%,rgba(36,255,102,0.15))]" />
             </div>
           )}
         </div>

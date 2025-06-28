@@ -163,6 +163,25 @@ export const Sidebar = ({
     isSidebarStep,
   ]);
 
+  // Auto-open panel when current tour step matches this sidebar
+  useEffect(() => {
+    if (
+      currentStepId &&
+      isSidebarStep(currentStepId) &&
+      !isStepCompleted(currentStepId)
+    ) {
+      setIsOpen(true);
+      setActivePanel(currentStepId);
+      updateSidebarState(true, currentStepId, isLocked);
+    }
+  }, [
+    currentStepId,
+    isSidebarStep,
+    isStepCompleted,
+    isLocked,
+    updateSidebarState,
+  ]);
+
   if (
     !mounted ||
     isMobile ||
