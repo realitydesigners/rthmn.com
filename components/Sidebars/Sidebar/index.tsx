@@ -178,30 +178,132 @@ export const Sidebar = ({
 
   return (
     <div className="sidebar-content" ref={sidebarRef}>
+      {/* Add CSS keyframes for floating animations */}
+      <style jsx>{`
+        @keyframes float-0 {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          25% {
+            transform: translateY(-2px) rotate(0.5deg);
+          }
+          50% {
+            transform: translateY(-1px) rotate(0deg);
+          }
+          75% {
+            transform: translateY(-3px) rotate(-0.5deg);
+          }
+        }
+
+        @keyframes float-1 {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          20% {
+            transform: translateY(-3px) rotate(-0.5deg);
+          }
+          40% {
+            transform: translateY(-1px) rotate(0deg);
+          }
+          60% {
+            transform: translateY(-2px) rotate(0.5deg);
+          }
+          80% {
+            transform: translateY(-1px) rotate(0deg);
+          }
+        }
+
+        @keyframes float-2 {
+          0%,
+          100% {
+            transform: translateY(0px) rotate(0deg);
+          }
+          30% {
+            transform: translateY(-1px) rotate(0.3deg);
+          }
+          60% {
+            transform: translateY(-3px) rotate(-0.3deg);
+          }
+          90% {
+            transform: translateY(-2px) rotate(0.2deg);
+          }
+        }
+
+        @keyframes subtle-glow {
+          0%,
+          100% {
+            box-shadow:
+              0 0 5px rgba(255, 255, 255, 0.05),
+              0 0 10px rgba(255, 255, 255, 0.02);
+          }
+          50% {
+            box-shadow:
+              0 0 8px rgba(255, 255, 255, 0.08),
+              0 0 15px rgba(255, 255, 255, 0.04);
+          }
+        }
+      `}</style>
+
       <div
         className={cn(
-          "fixed top-14 bottom-0 z-[100] flex w-16 flex-col items-center justify-between border-l bg-gradient-to-b from-[#0A0B0D] to-[#070809] py-4",
-          position === "left"
-            ? "left-0 border-r border-[#1C1E23]"
-            : "right-0 border-l border-[#1C1E23]"
+          "fixed top-14 bottom-0 z-[150] flex w-16 flex-col items-center justify-between py-4 transition-all duration-200",
+          position === "left" ? "left-0" : "right-0"
         )}
+        style={{
+          // Move the icon bar to the right when left panel is active with spring-like easing
+          transform:
+            position === "left" && isOpen && activePanel
+              ? `translateX(${320}px)` // Default panel width
+              : position === "right" && isOpen && activePanel
+                ? `translateX(-${320}px)` // Move left when right panel is active
+                : "translateX(0)",
+          transition: "transform 0.4s cubic-bezier(0.23, 1, 0.320, 1)", // Spring-like easing
+          // Add subtle backdrop filter when panel is active for depth
+
+          // Subtle overall glow effect when no panels are active
+          filter:
+            !isOpen || !activePanel
+              ? "drop-shadow(0 0 10px rgba(255, 255, 255, 0.02))"
+              : "none",
+        }}
       >
         {/* Top buttons */}
         <div className="relative flex flex-col gap-2">
           {buttons
             .filter((button) => !["settings", "account"].includes(button.id))
-            .map((button) => (
-              <FeatureTour
+            .map((button, index) => (
+              <div
                 key={button.id}
-                icon={button.icon}
-                onClick={() => handlePanelToggle(button.id)}
-                isActive={activePanel === button.id}
-                isOpen={isOpen}
-                tourId={button.id}
-                position={position}
+                className="relative"
+                style={{
+                  // Subtle floating animation for inactive buttons - using individual properties to avoid shorthand/non-shorthand conflicts
+                  animationName:
+                    !isOpen || activePanel !== button.id
+                      ? `float-${index % 3}`
+                      : "none",
+                  animationDuration: "4s",
+                  animationTimingFunction: "ease-in-out",
+                  animationIterationCount: "infinite",
+                  animationDelay: `${index * 0.8}s`,
+                }}
               >
-                {button.tourContent}
-              </FeatureTour>
+                <FeatureTour
+                  icon={button.icon}
+                  onClick={() => handlePanelToggle(button.id)}
+                  isActive={activePanel === button.id}
+                  isOpen={isOpen}
+                  tourId={button.id}
+                  position={position}
+                  isLocked={isLocked && activePanel === button.id}
+                  onLockToggle={
+                    activePanel === button.id ? handleLockToggle : undefined
+                  }
+                >
+                  {button.tourContent}
+                </FeatureTour>
+              </div>
             ))}
         </div>
 
@@ -215,9 +317,6 @@ export const Sidebar = ({
               className="group relative z-[120] flex h-10 w-10 items-center justify-center transition-all duration-200 overflow-hidden"
               style={{
                 borderRadius: "4px",
-                background:
-                  "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
-                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
               }}
               title={linkButton.title}
             >
@@ -250,6 +349,9 @@ export const Sidebar = ({
                 isOpen={isOpen}
                 tourId={button.id}
                 position={position}
+                isLocked={isLocked && activePanel === button.id}
+                onLockToggle={handleLockToggle}
+                title={button.id.charAt(0).toUpperCase() + button.id.slice(1)}
               >
                 {button.tourContent}
               </FeatureTour>

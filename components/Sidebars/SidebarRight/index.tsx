@@ -48,11 +48,6 @@ export const SidebarRight = () => {
   ];
 
   return (
-    <Sidebar
-      position="right"
-      buttons={buttons}
-      linkButtons={linkButtons}
-      defaultPanel="onboarding"
-    />
+    <Sidebar position="right" buttons={buttons} linkButtons={linkButtons} />
   );
 };

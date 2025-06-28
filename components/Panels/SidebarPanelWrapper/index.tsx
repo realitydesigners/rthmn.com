@@ -13,39 +13,6 @@ import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { LuLock, LuUnlock } from "react-icons/lu";
 
-const LockButton = ({
-  isLocked,
-  onClick,
-}: {
-  isLocked: boolean;
-  onClick: () => void;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={cn(
-      "group relative z-[120] flex h-7 w-7 items-center justify-center rounded-lg border transition-all duration-200",
-      isLocked
-        ? "border-[#32353C] bg-gradient-to-b from-[#1C1E23] to-[#0F0F0F] text-white shadow-lg shadow-black/20"
-        : "border-transparent bg-transparent text-[#32353C] hover:border-[#32353C] hover:bg-gradient-to-b hover:from-[#1C1E23] hover:to-[#0F0F0F] hover:text-white hover:shadow-lg hover:shadow-black/20"
-    )}
-  >
-    <div className="relative flex items-center justify-center">
-      {isLocked ? (
-        <LuLock
-          size={11}
-          className="transition-transform duration-200 group-hover:scale-110"
-        />
-      ) : (
-        <LuUnlock
-          size={11}
-          className="transition-transform duration-200 group-hover:scale-110"
-        />
-      )}
-    </div>
-  </button>
-);
-
 export const SidebarWrapper = ({
   isOpen,
   children,
@@ -53,7 +20,7 @@ export const SidebarWrapper = ({
   isLocked,
   onLockToggle,
   position,
-  initialWidth = 350,
+  initialWidth = 320,
   isCurrentTourStep,
   isCompleted,
 }: {
@@ -96,7 +63,7 @@ export const SidebarWrapper = ({
   }, [position, onLockToggle]);
 
   const handleResize = useCallback((newWidth: number) => {
-    setWidth(Math.max(350, Math.min(600, newWidth)));
+    setWidth(Math.max(320, Math.min(600, newWidth)));
   }, []);
 
   const handleLockToggle = useCallback(() => {
@@ -142,6 +109,8 @@ export const SidebarWrapper = ({
         main.style.width = "100%";
         main.style.marginLeft = "0";
         main.style.marginRight = "0";
+        main.style.filter = "";
+        main.style.transform = "";
         return;
       }
 
@@ -167,23 +136,37 @@ export const SidebarWrapper = ({
       main.style.paddingRight = "64px";
       main.style.width = "100%";
 
+      // Add subtle depth effects when panels are active
+      const anyPanelActive = leftPanelActive || rightPanelActive;
+      if (anyPanelActive) {
+        main.style.filter = "brightness(0.98) contrast(1.02)";
+        main.style.transform = "scale(0.995)";
+      } else {
+        main.style.filter = "";
+        main.style.transform = "";
+      }
+
       // Calculate margins and width based on active panels
+      // Since panels now stick to edges and icon bars move over them,
+      // we need to account for both panel width AND icon bar width + spacing for visual separation
+      const iconBarWidth = 60; // w-16 (64px) + 12px spacing for visual separation
+
       if (leftPanelActive && rightPanelActive) {
         main.style.paddingLeft = "0";
         main.style.paddingRight = "0";
-        main.style.marginLeft = `${leftWidth}px`;
-        main.style.marginRight = `${rightWidth}px`;
-        main.style.width = `calc(100% - ${Number.parseInt(leftWidth) + Number.parseInt(rightWidth)}px)`;
+        main.style.marginLeft = `${Number.parseInt(leftWidth) + iconBarWidth}px`;
+        main.style.marginRight = `${Number.parseInt(rightWidth) + iconBarWidth}px`;
+        main.style.width = `calc(100% - ${Number.parseInt(leftWidth) + Number.parseInt(rightWidth) + iconBarWidth * 2}px)`;
       } else if (leftPanelActive) {
         main.style.paddingLeft = "0";
-        main.style.marginLeft = `${leftWidth}px`;
+        main.style.marginLeft = `${Number.parseInt(leftWidth) + iconBarWidth}px`;
         main.style.marginRight = "0";
-        main.style.width = `calc(100% - ${Number.parseInt(leftWidth)}px)`;
+        main.style.width = `calc(100% - ${Number.parseInt(leftWidth) + iconBarWidth}px)`;
       } else if (rightPanelActive) {
         main.style.paddingRight = "0";
-        main.style.marginRight = `${rightWidth}px`;
+        main.style.marginRight = `${Number.parseInt(rightWidth) + iconBarWidth}px`;
         main.style.marginLeft = "0";
-        main.style.width = `calc(100% - ${Number.parseInt(rightWidth)}px)`;
+        main.style.width = `calc(100% - ${Number.parseInt(rightWidth) + iconBarWidth}px)`;
       } else {
         // If no panels are active, reset margins
         main.style.marginLeft = "0";
@@ -202,11 +185,13 @@ export const SidebarWrapper = ({
       window.removeEventListener("resize", handleResize);
       main.style.transition = "";
       // Reset to layout's default padding
-      main.style.paddingLeft = "64px";
-      main.style.paddingRight = "64px";
+      main.style.paddingLeft = "60px";
+      main.style.paddingRight = "60px";
       main.style.marginLeft = "0";
       main.style.marginRight = "0";
       main.style.width = "100%";
+      main.style.filter = "";
+      main.style.transform = "";
     };
   }, [isOpen, width, position, isLocked, mounted, isZenMode]);
 
@@ -216,14 +201,18 @@ export const SidebarWrapper = ({
     <motion.div
       initial={false}
       animate={{
-        x: isOpen ? 0 : position === "left" ? -width : width,
+        x: 0,
+        opacity: isOpen ? 1 : 0,
+        scale: isOpen ? 1 : 0.98,
       }}
       transition={{
-        duration: 0.15,
-        ease: "easeInOut",
+        duration: 0.4,
+        ease: [0.23, 1, 0.32, 1],
+        opacity: { duration: 0.25 },
+        scale: { duration: 0.4 },
       }}
       className={cn(
-        "sidebar-content fixed top-14 z-[10] bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809] ",
+        "sidebar-content fixed top-0 z-[10] bottom-0 hidden transform lg:flex",
         position === "left" ? "left-0" : "right-0",
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       )}
@@ -233,47 +222,31 @@ export const SidebarWrapper = ({
       data-width={width}
       style={{
         width: `${width}px`,
-        boxShadow:
-          !isLocked && isOpen
-            ? position === "left"
-              ? "4px 0 16px rgba(0,0,0,0.2)"
-              : "-4px 0 16px rgba(0,0,0,0.2)"
-            : "none",
+        // Simple dark background with barely visible content behind
+        background: "rgba(0, 0, 0, 0.96)",
+        backdropFilter: "blur(24px) saturate(140%) brightness(1.1)",
+        // Remove hard border
+        border: "none",
+        borderRadius: "0",
+        // Softer, more organic shadow
+        boxShadow: isOpen
+          ? `
+            ${position === "left" ? "4px" : "-4px"} 0 24px rgba(0, 0, 0, 0.2),
+            ${position === "left" ? "8px" : "-8px"} 0 48px rgba(0, 0, 0, 0.1),
+            ${position === "left" ? "1px" : "-12px"} 0 72px rgba(0, 0, 0, 0.05)
+          `
+          : "none",
+        // Very subtle glow for locked panels
+        ...(isLocked &&
+          isOpen && {
+            filter: "drop-shadow(0 0 16px rgba(36, 255, 102, 0.04))",
+          }),
       }}
     >
-      <div
-        className={cn(
-          "relative flex h-full w-full ",
-          position === "left" ? "ml-16" : "mr-16"
-        )}
-      >
-        <div
-          className={cn(
-            "relative flex h-full w-full flex-col",
-            position === "left"
-              ? "border-r border-[#1C1E23]"
-              : "border-l border-[#1C1E23]"
-          )}
-        >
-          {/* Header */}
-          <div className="relative z-10 flex h-12 items-center justify-between px-3">
-            {position === "right" && (
-              <LockButton isLocked={isLocked} onClick={handleLockToggle} />
-            )}
-            <div
-              className={cn(
-                "flex items-center justify-center",
-                position === "right" && "flex-1 justify-end"
-              )}
-            >
-              <h2 className="font-russo text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
-                {title}
-              </h2>
-            </div>
-            {position === "left" && (
-              <LockButton isLocked={isLocked} onClick={handleLockToggle} />
-            )}
-          </div>
+      <div className="relative flex h-full w-full">
+        <div className={cn("relative flex h-full w-full flex-col")}>
+          {/* Minimal header - just spacing for navbar */}
+          <div className="relative z-10 h-4 mt-12" />
           {/* Tour Overlay */}
           {isCurrentTourStep && !isCompleted && (
             <motion.div

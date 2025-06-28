@@ -165,8 +165,29 @@ export default function Dashboard() {
     return orderedPairs.length > 0 ? orderedPairs : selectedPairs;
   }, [orderedPairs, selectedPairs]);
 
-  // Only use client-side width calculation after hydration
-  const gridCols = !isClient ? 1 : getGridColumns(availableWidth);
+  // Calculate grid columns based on current layout and available width
+  const gridCols = useMemo(() => {
+    if (!isClient) return 1;
+
+    // Use the same constants as the store
+    const MIN_WIDTH_PER_COLUMN = {
+      compact: { 2: 500, 3: 800, 4: 1200 },
+      balanced: { 2: 800, 3: 1200 },
+    };
+
+    switch (currentLayout) {
+      case "compact":
+        if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[4]) return 4;
+        if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[3]) return 3;
+        if (availableWidth >= MIN_WIDTH_PER_COLUMN.compact[2]) return 2;
+        return 1;
+      case "balanced":
+      default:
+        if (availableWidth >= MIN_WIDTH_PER_COLUMN.balanced[3]) return 3;
+        if (availableWidth >= MIN_WIDTH_PER_COLUMN.balanced[2]) return 2;
+        return 1;
+    }
+  }, [isClient, availableWidth, currentLayout]);
 
   // Handle zen mode toggle - simplified since ZenMode handles its own transitions
   const handleZenModeToggle = useCallback(() => {

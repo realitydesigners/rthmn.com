@@ -221,17 +221,18 @@ const SearchBar = memo(
       <div className="relative">
         {/* Search Input */}
         <div
-          className="group/search rounded-full relative flex h-10 items-center overflow-hidden transition-all duration-300"
-          style={{
-            background: "linear-gradient(180deg, #24282D -5%, #111316 80%)",
-            boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
-          }}
+          className={cn(
+            "group/search relative flex h-10 items-center rounded-lg border transition-all duration-300",
+            isFocused
+              ? "bg-[#0A0B0D] border-[#32353C]/60"
+              : "bg-[#0F1114] border-[#1C1E23]/40 hover:border-[#32353C]/60"
+          )}
         >
           {/* Search Icon */}
           <div
             className={cn(
               "relative ml-3 transition-colors duration-300",
-              isFocused ? "text-[#fff]" : "text-[#32353C]"
+              isFocused ? "text-white" : "text-[#818181]"
             )}
           >
             <FaSearch size={12} />
@@ -250,7 +251,7 @@ const SearchBar = memo(
             }}
             onFocus={onFocus}
             onBlur={onBlur}
-            className="font-outfit relative h-full bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#545963] transition-colors outline-none"
+            className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#818181] transition-colors outline-none"
           />
 
           {/* Clear Button */}
@@ -258,7 +259,7 @@ const SearchBar = memo(
             <button
               type="button"
               onClick={() => onSearchChange("")}
-              className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-full border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
+              className="relative mr-3 flex h-5 w-5 items-center justify-center rounded text-[#818181] transition-all hover:text-white hover:bg-[#1C1E23]/50"
             >
               <FaTimes size={8} />
             </button>
@@ -581,35 +582,7 @@ export const InstrumentsPanel = () => {
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
-      <div className="w-full flex gap-2 w-auto ">
-        <div className="w-auto overflow-x-auto flex flex-wrap gap-2 py-2">
-          <FilterButton
-            isActive={activeFilter === "selected"}
-            onClick={() => scrollToSection("selected")}
-            label={<FaStar size={10} />}
-          />
-          <FilterButton
-            isActive={activeFilter === "fx"}
-            onClick={() => scrollToSection("fx")}
-            label="FX"
-          />
-          <FilterButton
-            isActive={activeFilter === "crypto"}
-            onClick={() => scrollToSection("crypto")}
-            label="Crypto"
-          />
-          <FilterButton
-            isActive={activeFilter === "stocks"}
-            onClick={() => scrollToSection("stocks")}
-            label="Stocks"
-          />
-          <FilterButton
-            isActive={activeFilter === "etf"}
-            onClick={() => scrollToSection("etf")}
-            label="ETF"
-          />
-        </div>
-      </div>
+      {/* Fixed Search Bar */}
       <div className="flex-none overflow-hidden w-full mb-2">
         <SearchBar
           searchQuery={searchQuery}
@@ -620,7 +593,59 @@ export const InstrumentsPanel = () => {
         />
       </div>
 
-      {/* Scrollable content section */}
+      {/* Compact Favorites + Filters Section */}
+      {!isSearching && (
+        <div className="flex-none mb-3">
+          {/* Compact Favorites - max 3 visible with count indicator */}
+          {selectedPairs.length > 0 && (
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-outfit text-xs font-medium text-white opacity-70">
+                  Selected
+                </h3>
+                <span className="font-outfit text-xs text-[#818181] bg-[#111316] px-2 py-0.5 rounded-full">
+                  {selectedPairs.length}
+                </span>
+              </div>
+              <div className="space-y-1 max-h-80 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <Reorder.Group
+                  axis="y"
+                  values={selectedPairs}
+                  onReorder={reorderPairs}
+                >
+                  {selectedPairsItems}
+                </Reorder.Group>
+              </div>
+            </div>
+          )}
+
+          {/* Compact Filter Buttons */}
+          <div className="flex gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <FilterButton
+              isActive={activeFilter === "fx"}
+              onClick={() => scrollToSection("fx")}
+              label="FX"
+            />
+            <FilterButton
+              isActive={activeFilter === "crypto"}
+              onClick={() => scrollToSection("crypto")}
+              label="Crypto"
+            />
+            <FilterButton
+              isActive={activeFilter === "stocks"}
+              onClick={() => scrollToSection("stocks")}
+              label="Stocks"
+            />
+            <FilterButton
+              isActive={activeFilter === "etf"}
+              onClick={() => scrollToSection("etf")}
+              label="ETF"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Scrollable content section for non-active pairs */}
       <div
         ref={contentRef}
         className="flex-1 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
@@ -682,27 +707,9 @@ export const InstrumentsPanel = () => {
             </div>
           )}
 
-          {/* Regular Content */}
+          {/* Available Pairs - only show these in scrollable area */}
           {!isSearching && (
             <>
-              {selectedPairs.length > 0 && (
-                <div data-section="selected">
-                  <PairGroup
-                    label="Selected Pairs"
-                    items={
-                      <Reorder.Group
-                        axis="y"
-                        values={selectedPairs}
-                        onReorder={reorderPairs}
-                      >
-                        {selectedPairsItems}
-                      </Reorder.Group>
-                    }
-                    count={selectedPairs.length}
-                    isSelected={true}
-                  />
-                </div>
-              )}
               {availablePairsGroups.map((group) => (
                 <div
                   key={group.props.label}
