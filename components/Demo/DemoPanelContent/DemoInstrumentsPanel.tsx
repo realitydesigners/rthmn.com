@@ -72,7 +72,7 @@ export const DemoInstrumentsPanel = memo(() => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeFilter, setActiveFilter] = useState("selected");
-  const [selectedPairs, setSelectedPairs] = useState([
+  const [favorites, setSelectedPairs] = useState([
     "EURUSD",
     "BTCUSD",
     "ETHUSD",
@@ -130,13 +130,13 @@ export const DemoInstrumentsPanel = memo(() => {
     return allPairs
       .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
       .sort((a, b) => {
-        const aSelected = selectedPairs.includes(a);
-        const bSelected = selectedPairs.includes(b);
+        const aSelected = favorites.includes(a);
+        const bSelected = favorites.includes(b);
         if (aSelected && !bSelected) return -1;
         if (!aSelected && bSelected) return 1;
         return a.localeCompare(b);
       });
-  }, [searchQuery, selectedPairs, isSearching]);
+  }, [searchQuery, favorites, isSearching]);
 
   // Memoized available pairs groups
   // Demo components matching the real ones exactly
@@ -612,7 +612,7 @@ export const DemoInstrumentsPanel = memo(() => {
     ]
       .map((group) => {
         const availablePairs = group.items.filter(
-          (item) => !selectedPairs.includes(item)
+          (item) => !favorites.includes(item)
         );
         if (availablePairs.length === 0) return null;
 
@@ -635,7 +635,7 @@ export const DemoInstrumentsPanel = memo(() => {
         );
       })
       .filter(Boolean);
-  }, [selectedPairs, isSearching]);
+  }, [favorites, isSearching]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -712,7 +712,7 @@ export const DemoInstrumentsPanel = memo(() => {
                       key={pair}
                       item={pair}
                       searchQuery={searchQuery}
-                      isSelected={selectedPairs.includes(pair)}
+                      isSelected={favorites.includes(pair)}
                       onToggle={() => togglePair(pair)}
                     />
                   ))}
@@ -744,11 +744,11 @@ export const DemoInstrumentsPanel = memo(() => {
           {/* Regular Content */}
           {!isSearching && (
             <>
-              {selectedPairs.length > 0 && (
+              {favorites.length > 0 && (
                 <div data-section="selected">
                   <DemoPairGroup
                     label="Selected Pairs"
-                    items={selectedPairs.map((item) => (
+                    items={favorites.map((item) => (
                       <DemoPairItem
                         key={item}
                         item={item}
@@ -756,7 +756,7 @@ export const DemoInstrumentsPanel = memo(() => {
                         onToggle={() => togglePair(item)}
                       />
                     ))}
-                    count={selectedPairs.length}
+                    count={favorites.length}
                   />
                 </div>
               )}

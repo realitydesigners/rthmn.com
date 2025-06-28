@@ -9,7 +9,7 @@ import { ZenModeControls } from "./ZenModeControls";
 
 export const ZenModeControlsWrapper = () => {
   const pathname = usePathname();
-  const { selectedPairs } = useUser();
+  const { favorites } = useUser();
   const { isZenMode } = useZenModeStore();
   const { viewMode, focusedIndex, setViewMode, setFocusedIndex } =
     useZenModeControlsStore();
@@ -19,10 +19,10 @@ export const ZenModeControlsWrapper = () => {
 
   // Reset zen focus when pairs change
   useEffect(() => {
-    if (focusedIndex >= selectedPairs.length) {
+    if (focusedIndex >= favorites.length) {
       setFocusedIndex(0);
     }
-  }, [selectedPairs.length, focusedIndex, setFocusedIndex]);
+  }, [favorites.length, focusedIndex, setFocusedIndex]);
 
   if (!isDashboard) return null;
 
@@ -31,7 +31,7 @@ export const ZenModeControlsWrapper = () => {
       viewMode={viewMode}
       onViewModeChange={setViewMode}
       focusedIndex={focusedIndex}
-      pairs={selectedPairs}
+      pairs={favorites}
       onFocusChange={setFocusedIndex}
       isZenMode={isZenMode}
     />

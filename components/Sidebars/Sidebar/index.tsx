@@ -197,6 +197,12 @@ export const Sidebar = ({
 
   return (
     <div className="sidebar-content" ref={sidebarRef}>
+      {/* IMPORTANT Dark overlay during onboarding tours */}
+      {currentStepId &&
+        isSidebarStep(currentStepId) &&
+        !isStepCompleted(currentStepId) && (
+          <div className="fixed inset-0 bg-black/60 z-[1] pointer-events-none" />
+        )}
       <div
         className={cn(
           "fixed top-14 bottom-0 z-[150] flex w-16 flex-col items-center justify-between py-4 transition-all duration-200",

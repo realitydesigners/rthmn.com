@@ -69,7 +69,7 @@ interface OnboardingState {
   userData: {
     photoUrl: string | null;
     experience: string;
-    selectedPairs: string[];
+    favorites: string[];
   };
   // Actions
   completeStep: (
@@ -97,7 +97,7 @@ export const useOnboardingStore = create<OnboardingState>()(
       userData: {
         photoUrl: null,
         experience: "",
-        selectedPairs: [],
+        favorites: [],
       },
 
       completeStep: (stepId, data) => {
@@ -165,7 +165,7 @@ export const useOnboardingStore = create<OnboardingState>()(
           userData: {
             photoUrl: null,
             experience: "",
-            selectedPairs: [],
+            favorites: [],
           },
         });
       },

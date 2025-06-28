@@ -480,7 +480,7 @@ const FilterButton = ({
 };
 
 export const InstrumentsPanel = () => {
-  const { selectedPairs, togglePair } = useUser();
+  const { favorites, togglePair } = useUser();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeFilter, setActiveFilter] = useState("selected");
@@ -511,14 +511,14 @@ export const InstrumentsPanel = () => {
   // Memoized selected pairs items
   const selectedPairsItems = useMemo(
     () =>
-      selectedPairs.map((item) => (
+      favorites.map((item) => (
         <DraggableItem
           key={item}
           item={item}
           onToggle={() => togglePair(item)}
         />
       )),
-    [selectedPairs, togglePair]
+    [favorites, togglePair]
   );
 
   // Memoized search results
@@ -535,13 +535,13 @@ export const InstrumentsPanel = () => {
     return allPairs
       .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
       .sort((a, b) => {
-        const aSelected = selectedPairs.includes(a);
-        const bSelected = selectedPairs.includes(b);
+        const aSelected = favorites.includes(a);
+        const bSelected = favorites.includes(b);
         if (aSelected && !bSelected) return -1;
         if (!aSelected && bSelected) return 1;
         return a.localeCompare(b);
       });
-  }, [searchQuery, selectedPairs, isSearching]);
+  }, [searchQuery, favorites, isSearching]);
 
   // Memoized available pairs groups
   const availablePairsGroups = useMemo(() => {
@@ -555,7 +555,7 @@ export const InstrumentsPanel = () => {
     ]
       .map((group) => {
         const availablePairs = group.items.filter(
-          (item) => !selectedPairs.includes(item)
+          (item) => !favorites.includes(item)
         );
         if (availablePairs.length === 0) return null;
 
@@ -578,7 +578,7 @@ export const InstrumentsPanel = () => {
         );
       })
       .filter(Boolean);
-  }, [selectedPairs, togglePair, isSearching]);
+  }, [favorites, togglePair, isSearching]);
 
   return (
     <div className="h-full flex flex-col overflow-hidden">
@@ -593,34 +593,11 @@ export const InstrumentsPanel = () => {
         />
       </div>
 
-      {/* Compact Favorites + Filters Section */}
+      {/* Filters Section */}
       {!isSearching && (
-        <div className="flex-none mb-3">
-          {/* Compact Favorites - max 3 visible with count indicator */}
-          {selectedPairs.length > 0 && (
-            <div className="mb-3">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-outfit text-xs font-medium text-white opacity-70">
-                  Selected
-                </h3>
-                <span className="font-outfit text-xs text-[#818181] bg-[#111316] px-2 py-0.5 rounded-full">
-                  {selectedPairs.length}
-                </span>
-              </div>
-              <div className="space-y-1 max-h-80 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <Reorder.Group
-                  axis="y"
-                  values={selectedPairs}
-                  onReorder={reorderPairs}
-                >
-                  {selectedPairsItems}
-                </Reorder.Group>
-              </div>
-            </div>
-          )}
-
+        <div className="flex-none mb-1">
           {/* Compact Filter Buttons */}
-          <div className="flex gap-1.5 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <div className="flex gap-2 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <FilterButton
               isActive={activeFilter === "fx"}
               onClick={() => scrollToSection("fx")}
@@ -641,6 +618,25 @@ export const InstrumentsPanel = () => {
               onClick={() => scrollToSection("etf")}
               label="ETF"
             />
+          </div>
+        </div>
+      )}
+
+      {/* Favorites Section */}
+      {!isSearching && favorites.length > 0 && (
+        <div className="flex-none ">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="font-outfit text-xs font-medium text-white opacity-70 pl-1">
+              Favorites
+            </h3>
+            <span className="font-outfit text-xs text-[#818181] bg-[#111316] px-2 py-0.5 rounded-full">
+              {favorites.length}
+            </span>
+          </div>
+          <div className="space-y-1 max-h-80 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+            <Reorder.Group axis="y" values={favorites} onReorder={reorderPairs}>
+              {selectedPairsItems}
+            </Reorder.Group>
           </div>
         </div>
       )}

@@ -22,7 +22,7 @@ declare global {
 
 export default function Dashboard() {
   const { pairData, isLoading } = useDashboard();
-  const { selectedPairs, boxColors } = useUser();
+  const { favorites, boxColors } = useUser();
   const getGridColumns = useGridStore((state) => state.getGridColumns);
   const currentLayout = useGridStore((state) => state.currentLayout);
   const orderedPairs = useGridStore((state) => state.orderedPairs);
@@ -96,8 +96,8 @@ export default function Dashboard() {
 
   // Initialize ordered pairs from selected pairs
   useEffect(() => {
-    setInitialPairs(selectedPairs);
-  }, [selectedPairs, setInitialPairs]);
+    setInitialPairs(favorites);
+  }, [favorites, setInitialPairs]);
 
   const handleDragStart = (pair: string) => {
     setDraggedItem(pair);
@@ -165,8 +165,8 @@ export default function Dashboard() {
 
   // Create stable reference for pairs to prevent unnecessary re-renders
   const pairsToRender = useMemo(() => {
-    return orderedPairs.length > 0 ? orderedPairs : selectedPairs;
-  }, [orderedPairs, selectedPairs]);
+    return orderedPairs.length > 0 ? orderedPairs : favorites;
+  }, [orderedPairs, favorites]);
 
   // Calculate grid columns based on current layout and available width
   const gridCols = useMemo(() => {

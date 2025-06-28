@@ -35,6 +35,7 @@ export function FeatureTour({
     useOnboardingStore();
   const [showTooltip, setShowTooltip] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
   const isCurrentTour = currentStepId === tourId;
   const isCompleted = isStepCompleted(tourId);
   const observerRef = useRef<ResizeObserver | null>(null);
@@ -109,7 +110,11 @@ export function FeatureTour({
 
   return (
     <>
-      <div className="relative">
+      <div
+        className="relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
         <button
           onClick={
             !isCompleted && currentStepId && currentStepId !== tourId
@@ -206,7 +211,7 @@ export function FeatureTour({
         )}
 
         {/* Unlock indicator - show when panel is active but not locked (for easy locking) */}
-        {!isLocked && isActive && onLockToggle && (
+        {!isLocked && isActive && onLockToggle && isHovered && (
           <button
             onClick={(e) => {
               e.stopPropagation();
