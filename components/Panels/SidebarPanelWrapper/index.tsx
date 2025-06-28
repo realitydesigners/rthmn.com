@@ -20,7 +20,7 @@ export const SidebarWrapper = ({
   isLocked,
   onLockToggle,
   position,
-  initialWidth = 320,
+  initialWidth = 280,
   isCurrentTourStep,
   isCompleted,
 }: {
@@ -63,7 +63,7 @@ export const SidebarWrapper = ({
   }, [position, onLockToggle]);
 
   const handleResize = useCallback((newWidth: number) => {
-    setWidth(Math.max(320, Math.min(600, newWidth)));
+    setWidth(Math.max(280, Math.min(600, newWidth)));
   }, []);
 
   const handleLockToggle = useCallback(() => {
@@ -212,7 +212,7 @@ export const SidebarWrapper = ({
         scale: { duration: 0.4 },
       }}
       className={cn(
-        "sidebar-content fixed top-0 z-[10] bottom-0 hidden transform lg:flex",
+        "sidebar-content fixed top-0 z-[25] bottom-0 hidden transform lg:flex",
         position === "left" ? "left-0" : "right-0",
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       )}

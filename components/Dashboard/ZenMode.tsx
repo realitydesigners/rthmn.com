@@ -12,7 +12,6 @@ import { DashboardBoxStructure } from "./DashboardBoxStructure";
 import { calculateCircularPosition } from "@/components/Demo/SectionBoxes3D/mathUtils";
 import { useCanvasSetup } from "@/components/Demo/SectionBoxes3D/useCanvasSetup";
 import { ZenModeLoading } from "@/app/(user)/dashboard/LoadingSkeleton";
-import { ZenModeControls } from "./ZenModeControls";
 
 interface ZenModeProps {
   pairData: Record<string, { boxes: BoxSlice[] }>;
@@ -20,6 +19,10 @@ interface ZenModeProps {
   boxColors?: BoxColors;
   isLoading?: boolean;
   isVisible?: boolean;
+  viewMode: "scene" | "focus";
+  onViewModeChange: (mode: "scene" | "focus") => void;
+  focusedIndex: number;
+  onFocusChange: (index: number) => void;
 }
 
 // Create structure data from pair data (filtering now handled in DashboardBoxStructure)
@@ -99,25 +102,27 @@ export const ZenMode = memo(
     boxColors,
     isLoading,
     isVisible = true,
+    viewMode,
+    onViewModeChange,
+    focusedIndex,
+    onFocusChange,
   }: ZenModeProps) => {
     const { isClient } = useCanvasSetup();
-    const [focusedIndex, setFocusedIndex] = useState(0);
-    const [viewMode, setViewMode] = useState<"scene" | "focus">("scene");
     const [internallyEntering, setInternallyEntering] = useState(false);
 
-    // Handle entering transition internally
+    // Handle entering transition internally with minimum loading time
     useEffect(() => {
       if (isVisible) {
         setInternallyEntering(true);
-        // Auto-hide loading after 300ms
+        // Minimum loading time of 1.5 seconds for better UX
         const timer = setTimeout(() => {
           setInternallyEntering(false);
-        }, 300);
+        }, 1500);
         return () => clearTimeout(timer);
       } else {
         setInternallyEntering(false);
       }
-    }, [isVisible]); // Remove internallyEntering from deps to prevent infinite loop
+    }, [isVisible]);
 
     const shouldShowLoading = internallyEntering;
 
@@ -133,24 +138,30 @@ export const ZenMode = memo(
         );
         const isFocused = index === focusedIndex;
 
-        // In focus mode, bring the focused structure forward
-        const position =
+        // In focus mode, center and bring forward the focused structure
+        const position: [number, number, number] =
           viewMode === "focus" && isFocused
-            ? ([
-                circularPosition[0] * 0.5, // Reduced from 0.3 to keep it further from camera
-                circularPosition[1] * 0.5, // Reduced from 0.3
-                circularPosition[2] * 0.5 + 30, // Increased offset from 20 to 30
-              ] as [number, number, number])
-            : circularPosition;
+            ? [0, 0, 25] // Center the focused structure and bring it forward
+            : circularPosition; // Normal circular positioning for scene mode
 
         return {
           pair,
           position,
-          scale: isFocused ? 1.2 : 0.8,
-          opacity: isFocused ? 1 : 0.7,
+          scale:
+            viewMode === "focus" && isFocused
+              ? 1.5 // Larger when focused
+              : isFocused
+                ? 1.2 // Normal focused size in scene mode
+                : 0.8, // Normal unfocused size in scene mode
+          opacity:
+            viewMode === "focus" && isFocused
+              ? 1 // Full opacity when focused
+              : isFocused
+                ? 1 // Full opacity when focused in scene mode
+                : 0.7, // Normal opacity when unfocused in scene mode
           rotation:
             viewMode === "focus" && isFocused
-              ? ([0.05, -0.3, 0] as [number, number, number]) // Reduced rotation angles for better view
+              ? ([0, -Math.PI / 4, 0] as [number, number, number]) // Isometric view flipped to opposite corner
               : undefined,
         };
       });
@@ -159,9 +170,9 @@ export const ZenMode = memo(
     // Reset focus when pairs change
     useEffect(() => {
       if (focusedIndex >= orderedPairs.length) {
-        setFocusedIndex(0);
+        onFocusChange(0);
       }
-    }, [orderedPairs.length, focusedIndex]);
+    }, [orderedPairs.length, focusedIndex, onFocusChange]);
 
     // Show loading screen during entering transition
     if (shouldShowLoading) {
@@ -189,7 +200,7 @@ export const ZenMode = memo(
       <div className="relative h-full w-full">
         <Canvas
           camera={{ position: [0, 0, 70], fov: 50 }}
-          className="absolute inset-0 w-screen h-screen z-0"
+          className="absolute inset-0 w-screen h-screen z-[1]"
           dpr={[1, 2]}
           gl={{
             antialias: true,
@@ -208,7 +219,11 @@ export const ZenMode = memo(
             maxDistance={100}
             minDistance={20}
             autoRotate={false}
-            target={structures[focusedIndex]?.position || [0, 0, 0]}
+            target={
+              viewMode === "focus"
+                ? [0, 0, 30]
+                : structures[focusedIndex]?.position || [0, 0, 0]
+            }
             enablePan={false}
             enableZoom={true}
             zoomSpeed={0.5}
@@ -217,18 +232,15 @@ export const ZenMode = memo(
           {/* Render all structures - only when visible */}
           {isVisible &&
             structures.map((structure, index) => {
-              // In focus mode, only show the focused structure
-              if (viewMode === "focus" && index !== focusedIndex) {
-                return null;
-              }
-
               const currentSlice = createStructureFromPair(
                 structure.pair,
                 pairData[structure.pair]?.boxes?.[0]
               );
 
-              // Only show structures that should be visible based on opacity
-              if (structure.opacity <= 0.01) {
+              const isFocused = index === focusedIndex;
+
+              // In focus mode, only show the focused structure
+              if (viewMode === "focus" && !isFocused) {
                 return null;
               }
 
@@ -243,7 +255,7 @@ export const ZenMode = memo(
                     opacity: structure.opacity,
                     rotation: structure.rotation,
                   }}
-                  isFocused={index === focusedIndex}
+                  isFocused={isFocused}
                   boxColors={boxColors}
                   isVisible={isVisible}
                   enableTransitions={true}
@@ -251,15 +263,6 @@ export const ZenMode = memo(
               );
             })}
         </Canvas>
-        {isVisible && (
-          <ZenModeControls
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
-            focusedIndex={focusedIndex}
-            pairs={orderedPairs}
-            onFocusChange={setFocusedIndex}
-          />
-        )}
       </div>
     );
   }

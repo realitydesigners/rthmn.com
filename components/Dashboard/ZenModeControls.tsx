@@ -12,21 +12,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LuLayoutDashboard,
   LuBarChart3,
-  LuChevronUp,
-  LuChevronDown,
   LuPlus,
   LuX,
+  LuLineChart,
+  LuLock,
+  LuChevronLeft,
+  LuChevronRight,
+  LuEye,
 } from "react-icons/lu";
-import { FaSearch } from "react-icons/fa";
 import { useUser } from "@/providers/UserProvider";
 import { useWebSocket } from "@/providers/WebsocketProvider";
 import { TimeFrameSlider } from "@/components/Panels/PanelComponents/TimeFrameSlider";
-import {
-  CRYPTO_PAIRS,
-  FOREX_PAIRS,
-  EQUITY_PAIRS,
-  ETF_PAIRS,
-} from "@/utils/instruments";
+import { CHART_STYLES } from "@/components/Charts/ChartStyleOptions";
+import { useColorStore } from "@/stores/colorStore";
+
 import { formatPrice } from "@/utils/instruments";
 import { cn } from "@/utils/cn";
 
@@ -36,6 +35,7 @@ interface ZenModeControlsProps {
   focusedIndex: number;
   pairs: string[];
   onFocusChange: (index: number) => void;
+  isZenMode: boolean;
 }
 
 interface CompactPairItemProps {
@@ -77,206 +77,76 @@ const CompactPairItem = memo(
 
 CompactPairItem.displayName = "CompactPairItem";
 
-const CompactPairSelector = memo(() => {
-  const { selectedPairs, togglePair } = useUser();
-  const { priceData } = useWebSocket();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showAll, setShowAll] = useState(false);
+const CompactChartStyleSelector = memo(() => {
+  const boxColors = useColorStore((state) => state.boxColors);
+  const updateStyles = useColorStore((state) => state.updateStyles);
 
-  const allPairs = useMemo(
-    () => [...FOREX_PAIRS, ...CRYPTO_PAIRS, ...EQUITY_PAIRS, ...ETF_PAIRS],
-    []
-  );
-
-  const filteredPairs = useMemo(() => {
-    if (!searchQuery) return allPairs;
-    return allPairs.filter((pair) =>
-      pair.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [allPairs, searchQuery]);
-
-  const displayPairs = useMemo(() => {
-    const selected = selectedPairs.filter((pair) =>
-      pair.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    const available = filteredPairs.filter(
-      (pair) => !selectedPairs.includes(pair)
-    );
-
-    const combinedPairs = [...selected, ...available];
-    return showAll ? combinedPairs : combinedPairs.slice(0, 6);
-  }, [selectedPairs, filteredPairs, searchQuery, showAll]);
+  const handleStyleChange = (id: string) => {
+    updateStyles({ viewMode: id === "3d" ? "3d" : "default" });
+  };
 
   return (
-    <div className="w-full space-y-3">
-      {/* Search input */}
-      <div className="relative">
-        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#818181] w-3.5 h-3.5" />
-        <input
-          type="text"
-          placeholder="Search instruments..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 bg-gradient-to-r from-[#0A0B0D]/95 to-[#0F1114]/95 border border-[#1C1E23]/60 rounded-xl text-sm text-white placeholder-[#818181] focus:outline-none focus:border-[#24FF66]/50 focus:shadow-[0_0_0_3px_rgba(36,255,102,0.1)] transition-all duration-200"
-        />
-      </div>
+    <div className="grid grid-cols-3 gap-2">
+      {Object.values(CHART_STYLES).map((style) => {
+        const Icon = style.icon;
+        const isActive =
+          boxColors.styles?.viewMode === (style.id === "3d" ? "3d" : "default");
 
-      {/* Pairs list */}
-      <div className="space-y-2 max-h-32 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {displayPairs.map((pair) => (
-          <CompactPairItem
-            key={pair}
-            pair={pair}
-            isSelected={selectedPairs.includes(pair)}
-            onToggle={() => togglePair(pair)}
-            price={priceData[pair]?.price}
-          />
-        ))}
-      </div>
+        return (
+          <button
+            key={style.id}
+            type="button"
+            onClick={
+              style.locked ? undefined : () => handleStyleChange(style.id)
+            }
+            className={cn(
+              "group relative flex h-16 flex-col items-center justify-center gap-1 rounded-lg border transition-all duration-300",
+              isActive
+                ? "border-[#24FF66]/40 bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]"
+                : "border-[#111215] bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/80 hover:border-[#1C1E23]",
+              style.locked ? "pointer-events-none opacity-60" : "cursor-pointer"
+            )}
+          >
+            {/* Icon */}
+            <Icon
+              size={16}
+              className={cn(
+                "transition-all duration-300",
+                isActive
+                  ? "text-[#24FF66]"
+                  : "text-[#545963] group-hover:text-white",
+                style.locked ? "opacity-40" : "group-hover:scale-105"
+              )}
+            />
 
-      {/* Show more/less button */}
-      {filteredPairs.length > 4 && (
-        <button
-          onClick={() => setShowAll(!showAll)}
-          className="w-full py-2 px-3 rounded-lg bg-gradient-to-r from-[#1C1E23]/60 to-[#24272D]/60 border border-[#32353C]/40 text-sm text-[#818181] hover:text-white hover:border-[#24FF66]/30 transition-all duration-200 flex items-center justify-center gap-2 group"
-        >
-          {showAll ? (
-            <>
-              Show Less{" "}
-              <LuChevronUp
-                size={14}
-                className="group-hover:translate-y-[-1px] transition-transform"
-              />
-            </>
-          ) : (
-            <>
-              Show More ({filteredPairs.length - 4}){" "}
-              <LuChevronDown
-                size={14}
-                className="group-hover:translate-y-[1px] transition-transform"
-              />
-            </>
-          )}
-        </button>
-      )}
+            {/* Title */}
+            <span
+              className={cn(
+                "font-russo text-[10px] font-medium tracking-wide transition-all duration-300",
+                style.locked
+                  ? "text-[#32353C]/40"
+                  : isActive
+                    ? "text-[#24FF66]"
+                    : "text-[#545963] group-hover:text-white"
+              )}
+            >
+              {style.title}
+            </span>
+
+            {/* Lock indicator */}
+            {style.locked && (
+              <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-[#1C1E23] border border-[#32353C] flex items-center justify-center">
+                <LuLock size={8} className="text-[#818181]" />
+              </div>
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 });
 
-CompactPairSelector.displayName = "CompactPairSelector";
-
-const DynamicContainer = memo(
-  ({
-    activePanel,
-    children,
-  }: {
-    activePanel: "pairs" | "timeframe" | null;
-    children: React.ReactNode;
-  }) => {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-    useEffect(() => {
-      if (containerRef.current) {
-        const updateDimensions = () => {
-          const rect = containerRef.current!.getBoundingClientRect();
-          setDimensions({ width: rect.width, height: rect.height });
-        };
-
-        updateDimensions();
-
-        // Use ResizeObserver to watch for size changes
-        const resizeObserver = new ResizeObserver(updateDimensions);
-        resizeObserver.observe(containerRef.current);
-
-        return () => resizeObserver.disconnect();
-      }
-    }, [activePanel]);
-
-    // Calculate dynamic notch position based on content
-    const getNotchPath = useCallback(() => {
-      if (activePanel !== "timeframe") {
-        return "M 2,0 L 98,0 Q 100,0 100,2 L 100,98 Q 100,100 98,100 L 2,100 Q 0,100 0,98 L 0,2 Q 0,0 2,0 Z";
-      }
-
-      // With the wider timeframe slider (minWidth 400px), we need to adjust the notch
-      // to properly frame the expanded slider area
-      const containerWidth = dimensions.width || 600;
-
-      // Calculate more accurate positions for the wider slider
-      // Left: px-1 padding (4px) + pairs button (40px) + gap (12px) + timeframe button (40px) + mr-6 (24px) + mx-2 margin (8px) ≈ 128px
-      // Right: mx-2 margin (8px) + ml-6 (24px) + left arrow (40px) + gap (12px) + right arrow (40px) + view button (40px) + px-1 padding (4px) ≈ 168px
-      const leftButtonsWidth = 128;
-      const rightButtonsWidth = 168;
-
-      const notchStart = Math.max(
-        15,
-        (leftButtonsWidth / containerWidth) * 100
-      );
-      const notchEnd = Math.min(
-        85,
-        100 - (rightButtonsWidth / containerWidth) * 100
-      );
-
-      return `M 2,25 L ${notchStart - 2},25 C ${notchStart},25 ${notchStart},22 ${notchStart + 2},20 L ${notchEnd - 2},20 C ${notchEnd},22 ${notchEnd},25 ${notchEnd + 2},25 L 98,25 Q 100,25 100,27 L 100,73 Q 100,75 98,75 L ${notchEnd + 2},75 C ${notchEnd},75 ${notchEnd},78 ${notchEnd - 2},80 L ${notchStart + 2},80 C ${notchStart},78 ${notchStart},75 ${notchStart - 2},75 L 2,75 Q 0,75 0,73 L 0,27 Q 0,25 2,25 Z`;
-    }, [activePanel, dimensions.width]);
-
-    return (
-      <div className="relative">
-        <div
-          ref={containerRef}
-          className="relative overflow-hidden"
-          style={{
-            borderRadius: activePanel === "timeframe" ? "0" : "8px",
-          }}
-        >
-          {/* Dynamic SVG border overlay */}
-          {dimensions.width > 0 && dimensions.height > 0 && (
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              style={{
-                width: dimensions.width,
-                height: dimensions.height,
-                top: 0,
-              }}
-            >
-              <defs>
-                <linearGradient
-                  id="pathGradient"
-                  x1="0%"
-                  y1="0%"
-                  x2="100%"
-                  y2="100%"
-                >
-                  <stop offset="0%" stopColor="#1F2328" />
-                  <stop offset="50%" stopColor="#0F1114" />
-                  <stop offset="100%" stopColor="#070809" />
-                </linearGradient>
-              </defs>
-              <motion.path
-                initial={false}
-                animate={{
-                  d: getNotchPath(),
-                }}
-                fill="url(#pathGradient)"
-                stroke="#32353C"
-                strokeWidth="1"
-                vectorEffect="non-scaling-stroke"
-                transition={{ duration: 0.3, ease: "easeOut" }}
-              />
-            </svg>
-          )}
-
-          {children}
-        </div>
-      </div>
-    );
-  }
-);
-
-DynamicContainer.displayName = "DynamicContainer";
+CompactChartStyleSelector.displayName = "CompactChartStyleSelector";
 
 export const ZenModeControls = memo(
   ({
@@ -285,28 +155,43 @@ export const ZenModeControls = memo(
     focusedIndex,
     pairs,
     onFocusChange,
+    isZenMode,
   }: ZenModeControlsProps) => {
     const [activePanel, setActivePanel] = useState<
-      "pairs" | "timeframe" | null
+      "pairs" | "timeframe" | "chartstyle" | null
     >(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const { priceData } = useWebSocket();
 
-    const togglePanel = useCallback((panel: "pairs" | "timeframe") => {
-      setActivePanel((current) => (current === panel ? null : panel));
-    }, []);
+    const togglePanel = useCallback(
+      (panel: "pairs" | "timeframe" | "chartstyle") => {
+        setActivePanel((current) => (current === panel ? null : panel));
+      },
+      []
+    );
+
+    // Handle clicking outside to close panel
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (
+          containerRef.current &&
+          !containerRef.current.contains(event.target as Node)
+        ) {
+          setActivePanel(null);
+        }
+      };
+
+      if (activePanel) {
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+          document.removeEventListener("mousedown", handleClickOutside);
+        };
+      }
+    }, [activePanel]);
 
     // Button configuration array for easier management
     const buttonsConfig = useMemo(
       () => [
-        // Left buttons
-        {
-          id: "pairs",
-          position: "left" as const,
-          icon: LuPlus,
-          onClick: () => togglePanel("pairs"),
-          isActive: activePanel === "pairs",
-          isVisible: true,
-          extraClasses: "",
-        },
         {
           id: "timeframe",
           position: "left" as const,
@@ -314,40 +199,43 @@ export const ZenModeControls = memo(
           onClick: () => togglePanel("timeframe"),
           isActive: activePanel === "timeframe",
           isVisible: true,
-          extraClasses: activePanel === "timeframe" ? "mr-6" : "",
+        },
+        {
+          id: "chartstyle",
+          position: "left" as const,
+          icon: LuLineChart,
+          onClick: () => togglePanel("chartstyle"),
+          isActive: activePanel === "chartstyle",
+          isVisible: !isZenMode, // Hide chart style button in zen mode since it only uses 3D
         },
         // Right buttons
         {
           id: "prev",
           position: "right" as const,
-          icon: null,
-          content: "←",
+          icon: LuChevronLeft,
+          content: null,
           onClick: () =>
             onFocusChange((focusedIndex - 1 + pairs.length) % pairs.length),
           isActive: false,
-          isVisible: viewMode === "scene",
-          extraClasses: activePanel === "timeframe" ? "ml-6" : "",
+          isVisible: isZenMode && viewMode === "scene",
         },
         {
           id: "next",
           position: "right" as const,
-          icon: null,
-          content: "→",
+          icon: LuChevronRight,
+          content: null,
           onClick: () => onFocusChange((focusedIndex + 1) % pairs.length),
           isActive: false,
-          isVisible: viewMode === "scene",
-          extraClasses: "",
+          isVisible: isZenMode && viewMode === "scene",
         },
         {
           id: "viewMode",
           position: "right" as const,
-          icon: viewMode === "scene" ? LuLayoutDashboard : LuBarChart3,
+          icon: viewMode === "scene" ? LuEye : LuEye,
           onClick: () =>
             onViewModeChange(viewMode === "scene" ? "focus" : "scene"),
           isActive: viewMode === "focus",
-          isVisible: true,
-          extraClasses: "",
-          useOldStyle: true, // Temporary flag for the view mode button
+          isVisible: isZenMode, // Only show view mode toggle in zen mode
         },
       ],
       [
@@ -358,6 +246,7 @@ export const ZenModeControls = memo(
         onFocusChange,
         onViewModeChange,
         togglePanel,
+        isZenMode,
       ]
     );
 
@@ -371,42 +260,19 @@ export const ZenModeControls = memo(
           onClick,
           isActive,
           isVisible,
-          extraClasses,
-          useOldStyle,
         } = buttonConfig;
 
         if (!isVisible) return null;
 
-        // Old style for view mode button (temporarily)
-        if (useOldStyle) {
-          return (
-            <button
-              key={id}
-              onClick={onClick}
-              className={cn(
-                "group relative overflow-hidden w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
-                isActive
-                  ? "bg-[#24FF66] text-black"
-                  : "bg-[#1C1E23] hover:bg-[#32353C] text-white",
-                extraClasses
-              )}
-            >
-              {IconComponent && (
-                <IconComponent className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-              )}
-            </button>
-          );
-        }
+        // Get button title for display
 
-        // New circular style for all other buttons
         return (
           <button
             key={id}
             onClick={onClick}
             className={cn(
-              "group relative overflow-hidden w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
-              isActive ? "text-[#24FF66]" : "text-[#B0B0B0] hover:text-white",
-              extraClasses
+              "group relative overflow-hidden w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200",
+              !isActive && "text-[#B0B0B0] hover:text-white"
             )}
             style={{
               background: isActive
@@ -417,21 +283,7 @@ export const ZenModeControls = memo(
                 : undefined,
             }}
           >
-            {/* Active indicator */}
-            {isActive && (
-              <div
-                className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#24FF66] z-10"
-                style={{
-                  width: "30px",
-                  height: "4px",
-                  transform: "translateY(-50%) rotate(-90deg)",
-                  filter: "blur(10px)",
-                  transformOrigin: "center",
-                }}
-              />
-            )}
-
-            {/* Hover background */}
+            {/* Hover background for non-active buttons */}
             {!isActive && (
               <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
@@ -441,109 +293,142 @@ export const ZenModeControls = memo(
                 }}
               />
             )}
-
-            {/* Icon or content */}
             {IconComponent ? (
-              <IconComponent className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+              <IconComponent
+                className={cn(
+                  "w-6 h-6 relative z-10 transition-colors duration-200",
+                  isActive ? "text-white" : ""
+                )}
+              />
             ) : (
-              <span className="relative z-10 text-lg font-medium">
+              <span
+                className={cn(
+                  "text-xl font-medium relative z-10 transition-colors duration-200",
+                  isActive ? "text-white" : ""
+                )}
+              >
                 {content}
               </span>
             )}
           </button>
         );
       },
-      []
+      [viewMode]
     );
 
     return (
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
-        <div className="flex flex-col items-center gap-2">
-          {/* Pairs panel - only show as popup above when active */}
+      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
+        <div
+          ref={containerRef}
+          className="relative flex flex-col items-center gap-1"
+        >
+          {/* Content panel - shows above buttons */}
           <AnimatePresence>
-            {activePanel === "pairs" && (
+            {activePanel && (
               <motion.div
-                initial={{ opacity: 0, y: 15, scale: 0.95, height: 0 }}
+                initial={{ opacity: 0, y: 8, scale: 0.98 }}
                 animate={{
                   opacity: 1,
                   y: 0,
                   scale: 1,
-                  height: "auto",
-                  width: 280,
+                  width: "auto",
                 }}
-                exit={{ opacity: 0, y: 15, scale: 0.95, height: 0 }}
+                exit={{ opacity: 0, y: 8, scale: 0.98 }}
                 transition={{
-                  duration: 0.25,
+                  duration: 0.2,
                   ease: "easeOut",
-                  height: { duration: 0.25 },
-                  width: { duration: 0.2 },
+                  width: { duration: 0.3, ease: "easeInOut" },
                 }}
-                className="max-w-[85vw] p-3 rounded-lg border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_6px_24px_rgba(0,0,0,0.3)] overflow-hidden"
+                className="p-3 rounded-xl border border-[#1C1E23]/40 bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
               >
-                <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-white/[0.02] via-transparent to-black/10" />
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1 h-4 bg-gradient-to-b from-[#24FF66] to-[#20E860] rounded-full"></div>
-                    <h3 className="font-russo text-sm font-bold text-white uppercase tracking-wider">
-                      Trading Pairs
-                    </h3>
+                {activePanel === "timeframe" && (
+                  <div className="w-full min-w-[320px]">
+                    <TimeFrameSlider showPanel={false} global />
                   </div>
-                  <CompactPairSelector />
-                </div>
+                )}
+                {activePanel === "chartstyle" && (
+                  <div className="w-full min-w-[250px]">
+                    <CompactChartStyleSelector />
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Main unified container */}
-          <DynamicContainer activePanel={activePanel}>
-            <div
-              className={cn(
-                "flex items-center relative z-10",
-                activePanel === "timeframe"
-                  ? "px-1 py-3 justify-between"
-                  : "px-4 py-3 gap-3"
-              )}
-            >
-              {/* Left buttons */}
-              <div className="flex items-center gap-3">
+          {/* Button container - clean and simple */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-full border bg-[#0A0B0D]/90 border-[#1C1E23]/60 backdrop-blur-sm shadow-[0_6px_24px_rgba(0,0,0,0.2)]">
+            {/* Left buttons */}
+            {buttonsConfig
+              .filter((btn) => btn.position === "left")
+              .map(renderButton)}
+
+            {/* Right buttons - only render container if there are visible right buttons or focus label */}
+            {(buttonsConfig.some(
+              (btn) => btn.position === "right" && btn.isVisible
+            ) ||
+              (isZenMode && viewMode === "focus")) && (
+              <>
+                {/* Prev button */}
                 {buttonsConfig
-                  .filter((btn) => btn.position === "left")
+                  .filter(
+                    (btn) => btn.position === "right" && btn.id === "prev"
+                  )
                   .map(renderButton)}
-              </div>
 
-              {/* Center area for timeframe slider when active */}
-              {activePanel === "timeframe" && (
-                <div className="flex-1 transform translate-y-6 min-w-0 mx-2">
-                  <AnimatePresence>
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ delay: 0.1, duration: 0.2 }}
-                      className="w-full"
-                      style={{ minWidth: "400px" }}
-                    >
-                      <TimeFrameSlider showPanel={false} global />
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-              )}
-
-              {/* Right buttons */}
-              <div className="flex items-center gap-3">
-                {viewMode === "focus" && (
-                  <span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
-                    Focus
-                  </span>
+                {/* Current pair price display in zen mode - between nav buttons */}
+                {isZenMode && pairs.length > 0 && viewMode === "scene" && (
+                  <div className="flex items-center gap-3 px-4 w-[160px] justify-center">
+                    <span className="font-russo text-xs font-medium text-white uppercase tracking-wide">
+                      {pairs[focusedIndex]}
+                    </span>
+                    <span className="font-kodemono text-sm text-white tabular-nums">
+                      {priceData[pairs[focusedIndex]]?.price
+                        ? formatPrice(
+                            priceData[pairs[focusedIndex]].price,
+                            pairs[focusedIndex]
+                          )
+                        : "—"}
+                    </span>
+                  </div>
                 )}
+
+                {/* Next button */}
                 {buttonsConfig
-                  .filter((btn) => btn.position === "right")
+                  .filter(
+                    (btn) => btn.position === "right" && btn.id === "next"
+                  )
                   .map(renderButton)}
-              </div>
-            </div>
-          </DynamicContainer>
+
+                {/* Other right buttons (like viewMode) */}
+                {buttonsConfig
+                  .filter(
+                    (btn) =>
+                      btn.position === "right" &&
+                      btn.id !== "prev" &&
+                      btn.id !== "next"
+                  )
+                  .map(renderButton)}
+              </>
+            )}
+          </div>
+
+          {/* Floating title below buttons - positioned absolutely */}
+          <AnimatePresence>
+            {activePanel && (
+              <motion.div
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -5 }}
+                transition={{ duration: 0.15 }}
+                className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 pointer-events-none"
+              >
+                <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
+                  {activePanel === "timeframe" && "TIMEFRAME"}
+                  {activePanel === "chartstyle" && "STYLE"}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     );

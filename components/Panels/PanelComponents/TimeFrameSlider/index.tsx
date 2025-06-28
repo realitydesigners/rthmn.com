@@ -503,7 +503,7 @@ const TimeFrameSliderContent = memo(
     }, [handleMouseDown, handleTouchStart]);
 
     return (
-      <div className="relative h-full px-[7px] pb-4">
+      <div className="relative h-full px-[7px] ">
         {/* Main slider container */}
         <div
           ref={barContainerRef}

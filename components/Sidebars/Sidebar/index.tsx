@@ -178,74 +178,6 @@ export const Sidebar = ({
 
   return (
     <div className="sidebar-content" ref={sidebarRef}>
-      {/* Add CSS keyframes for floating animations */}
-      <style jsx>{`
-        @keyframes float-0 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          25% {
-            transform: translateY(-2px) rotate(0.5deg);
-          }
-          50% {
-            transform: translateY(-1px) rotate(0deg);
-          }
-          75% {
-            transform: translateY(-3px) rotate(-0.5deg);
-          }
-        }
-
-        @keyframes float-1 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          20% {
-            transform: translateY(-3px) rotate(-0.5deg);
-          }
-          40% {
-            transform: translateY(-1px) rotate(0deg);
-          }
-          60% {
-            transform: translateY(-2px) rotate(0.5deg);
-          }
-          80% {
-            transform: translateY(-1px) rotate(0deg);
-          }
-        }
-
-        @keyframes float-2 {
-          0%,
-          100% {
-            transform: translateY(0px) rotate(0deg);
-          }
-          30% {
-            transform: translateY(-1px) rotate(0.3deg);
-          }
-          60% {
-            transform: translateY(-3px) rotate(-0.3deg);
-          }
-          90% {
-            transform: translateY(-2px) rotate(0.2deg);
-          }
-        }
-
-        @keyframes subtle-glow {
-          0%,
-          100% {
-            box-shadow:
-              0 0 5px rgba(255, 255, 255, 0.05),
-              0 0 10px rgba(255, 255, 255, 0.02);
-          }
-          50% {
-            box-shadow:
-              0 0 8px rgba(255, 255, 255, 0.08),
-              0 0 15px rgba(255, 255, 255, 0.04);
-          }
-        }
-      `}</style>
-
       <div
         className={cn(
           "fixed top-14 bottom-0 z-[150] flex w-16 flex-col items-center justify-between py-4 transition-all duration-200",
@@ -255,11 +187,11 @@ export const Sidebar = ({
           // Move the icon bar to the right when left panel is active with spring-like easing
           transform:
             position === "left" && isOpen && activePanel
-              ? `translateX(${320}px)` // Default panel width
+              ? `translateX(${280}px)` // Default panel width
               : position === "right" && isOpen && activePanel
-                ? `translateX(-${320}px)` // Move left when right panel is active
+                ? `translateX(-${280}px)` // Move left when right panel is active
                 : "translateX(0)",
-          transition: "transform 0.4s cubic-bezier(0.23, 1, 0.320, 1)", // Spring-like easing
+          transition: "transform 0.4s cubic-bezier(0.23, 1, 0.280, 1)", // Spring-like easing
           // Add subtle backdrop filter when panel is active for depth
 
           // Subtle overall glow effect when no panels are active
@@ -278,15 +210,8 @@ export const Sidebar = ({
                 key={button.id}
                 className="relative"
                 style={{
-                  // Subtle floating animation for inactive buttons - using individual properties to avoid shorthand/non-shorthand conflicts
-                  animationName:
-                    !isOpen || activePanel !== button.id
-                      ? `float-${index % 3}`
-                      : "none",
-                  animationDuration: "4s",
-                  animationTimingFunction: "ease-in-out",
-                  animationIterationCount: "infinite",
-                  animationDelay: `${index * 0.8}s`,
+                  // Removed floating animation to prevent icons moving up and down
+                  animationName: "none",
                 }}
               >
                 <FeatureTour
@@ -322,7 +247,7 @@ export const Sidebar = ({
             >
               {/* Hover background */}
               <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-280"
                 style={{
                   borderRadius: "4px",
                   background:

@@ -11,6 +11,7 @@ import { PairResoBox } from "./PairResoBox";
 import { useSignals } from "@/hooks/useSignals";
 import { SignalAlerts } from "@/components/Dashboard/SignalAlerts";
 import { ZenMode } from "@/components/Dashboard/ZenMode";
+import { useZenModeControlsStore } from "@/stores/zenModeControlsStore";
 
 // Extend window object for zen mode toggle
 declare global {
@@ -29,6 +30,8 @@ export default function Dashboard() {
   const setInitialPairs = useGridStore((state) => state.setInitialPairs);
   const { isZenMode, toggleZenMode, hasBeenAccessed, markAsAccessed } =
     useZenModeStore();
+  const { viewMode, focusedIndex, setViewMode, setFocusedIndex } =
+    useZenModeControlsStore();
   const [isClient, setIsClient] = useState(false);
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(0);
@@ -220,6 +223,10 @@ export default function Dashboard() {
             boxColors={boxColors}
             isLoading={isLoading}
             isVisible={isZenMode}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            focusedIndex={focusedIndex}
+            onFocusChange={setFocusedIndex}
           />
         </div>
       )}
@@ -233,12 +240,11 @@ export default function Dashboard() {
               gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
             }}
           >
-            {/* Signal Alerts */}
-            <SignalAlerts
+            {/* <SignalAlerts
               newSignals={newSignals}
               onClearSignal={clearSignalAlert}
               onClearAll={clearAllAlerts}
-            />
+            /> */}
             {isClient &&
               pairsToRender.map((pair) => {
                 const data = pairData[pair];

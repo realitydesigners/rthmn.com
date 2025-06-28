@@ -139,7 +139,7 @@ const ZenModeToggle = ({
         style={{
           background: isZenMode
             ? "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)"
-            : "linear-gradient(180deg, #1C1E23/40 -10%, #0A0B0D/60 100%)",
+            : "#000000",
           boxShadow: isZenMode ? "0px 2px 4px 0px rgba(0, 0, 0, 0.25)" : "none",
         }}
       >
@@ -149,7 +149,7 @@ const ZenModeToggle = ({
             "relative h-3 w-3 rounded-full border transition-all duration-300 transform shadow-sm",
             isZenMode
               ? "translate-x-5 border-[#32353C]/60 bg-[#B0B0B0]"
-              : "translate-x-1 border-[#32353C]/60 bg-[#818181]"
+              : "translate-x-1 border-[#32353C]/60 bg-white"
           )}
         />
       </button>
