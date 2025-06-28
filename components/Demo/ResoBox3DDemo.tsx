@@ -109,20 +109,21 @@ export const ResoBox3DCircular = memo(
             ];
           }
 
-          // In box mode, bring the focused structure forward and rotate it
-          const position =
+          // In box mode, center and bring forward the focused structure (matching ZenMode)
+          const position: [number, number, number] =
             viewMode === "box" && isFocused
-              ? ([
-                  basePosition[0] * 0.3,
-                  basePosition[1] * 0.3,
-                  basePosition[2] * 0.3 + 20,
-                ] as [number, number, number])
+              ? [0, 0, 25] // Match ZenMode focus positioning exactly
               : basePosition;
 
           return {
             ...crypto,
             position,
-            scale: isFocused ? 1.2 : 0.8,
+            scale:
+              viewMode === "box" && isFocused
+                ? 1.5 // Match ZenMode focus scale
+                : isFocused
+                  ? 1.2 // Normal focused size in scene mode
+                  : 0.8, // Normal unfocused size
             opacity:
               index === 0
                 ? isFocused
@@ -131,7 +132,7 @@ export const ResoBox3DCircular = memo(
                 : circularAppearanceProgress * (isFocused ? 1 : 0.7), // Others fade in on scroll
             rotation:
               viewMode === "box" && isFocused
-                ? ([0.1, -0.75, 0] as [number, number, number])
+                ? ([0, -Math.PI / 4, 0] as [number, number, number]) // Match ZenMode focus rotation
                 : undefined,
           };
         }),
@@ -190,10 +191,17 @@ export const ResoBox3DCircular = memo(
           <OrbitControls
             enabled={viewMode === "box"}
             enableRotate={viewMode === "box"}
-            maxDistance={40}
-            minDistance={5}
+            maxDistance={100}
+            minDistance={20}
             autoRotate={false}
-            target={structures[actualFocusedIndex]?.position || [0, 0, 0]}
+            target={
+              viewMode === "box"
+                ? [0, 0, 30] // Match ZenMode focus target
+                : structures[actualFocusedIndex]?.position || [0, 0, 0]
+            }
+            enablePan={false}
+            enableZoom={false}
+            zoomSpeed={0.5}
           />
 
           {/* Always show all structures with seamless transitions */}

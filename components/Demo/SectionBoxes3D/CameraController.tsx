@@ -84,8 +84,9 @@ export const CameraController = memo(
           targetDistance = baseDistance;
         }
       } else if (viewMode === "box") {
-        // In box mode, use a closer distance for better viewing
-        targetDistance = baseDistance * 0.6;
+        // In box mode, keep the same distance as ZenMode focus mode
+        // The OrbitControls target will handle the proper viewing angle
+        targetDistance = baseDistance;
       }
 
       // Smooth camera position changes with device-optimized lerp factor
