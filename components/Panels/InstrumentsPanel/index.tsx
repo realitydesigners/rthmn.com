@@ -184,169 +184,6 @@ const PairGroup = memo(
   }
 );
 
-// Component to highlight search terms within text
-const HighlightedText = ({
-  text,
-  highlight,
-}: {
-  text: string;
-  highlight: string;
-}) => {
-  if (!highlight.trim()) {
-    return <span>{text}</span>;
-  }
-
-  const regex = new RegExp(`(${highlight})`, "gi");
-  const parts = text.split(regex);
-
-  return (
-    <span>
-      {parts.map((part, index) =>
-        regex.test(part) ? (
-          <span
-            key={index}
-            className="bg-[#4EFF6E] text-[#111316] px-1 rounded-sm font-medium"
-          >
-            {part}
-          </span>
-        ) : (
-          <span key={index}>{part}</span>
-        )
-      )}
-    </span>
-  );
-};
-
-// Search result item with highlighting
-const SearchPairItem = memo(
-  ({
-    item,
-    searchQuery,
-    isSelected = false,
-    onToggle,
-  }: {
-    item: string;
-    searchQuery: string;
-    isSelected?: boolean;
-    onToggle: () => void;
-  }) => {
-    const { boxColors } = useUser();
-    const { priceData } = useWebSocket();
-    const price = priceData[item]?.price;
-
-    return (
-      <div
-        className={cn(
-          "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
-          isSelected
-            ? "rounded bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
-            : "rounded-lg"
-        )}
-        style={isSelected ? { borderRadius: "4px" } : {}}
-      >
-        {/* Hover background for non-selected items */}
-        {!isSelected && (
-          <div
-            className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
-            style={{
-              borderRadius: "4px",
-              background:
-                "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
-              boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
-            }}
-          />
-        )}
-        <div className="relative flex w-full items-center px-3">
-          {/* Instrument name with highlighting */}
-          <span
-            className={cn(
-              "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
-              isSelected
-                ? "text-white"
-                : "text-[#32353C] group-hover/item:text-[#545963]"
-            )}
-          >
-            <HighlightedText text={item} highlight={searchQuery} />
-          </span>
-
-          {/* Price */}
-          <div className="flex items-center">
-            <span
-              className={cn(
-                "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
-                isSelected
-                  ? "text-[#545963]"
-                  : "text-[#32353C] group-hover/item:text-[#32353C]"
-              )}
-            >
-              {price ? (
-                formatPrice(price, item)
-              ) : (
-                <LoadingSpinner
-                  key={`${item}-loading`}
-                  itemId={item}
-                  color={isSelected ? boxColors.positive : "#444"}
-                />
-              )}
-            </span>
-            <div className="z-90 ml-2 flex w-6 justify-center">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggle();
-                }}
-                className={cn(
-                  "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
-                  "opacity-0 group-hover/item:opacity-100",
-                  isSelected
-                    ? [
-                        "border-[#111215] bg-[#111215] text-white/40",
-                        "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
-                      ]
-                    : [
-                        "border-[#111215] bg-[#111215] text-white/40",
-                        "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
-                      ]
-                )}
-              >
-                {isSelected ? (
-                  <FaTimes size={8} />
-                ) : (
-                  <span className="text-[9px] font-medium">+</span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-);
-
-// Memoized filtered pairs calculation
-const useFilteredPairs = (searchQuery: string, selectedPairs: string[]) => {
-  return useMemo(() => {
-    if (!searchQuery) return [];
-
-    const allPairs = [
-      ...FOREX_PAIRS,
-      ...CRYPTO_PAIRS,
-      ...EQUITY_PAIRS,
-      ...ETF_PAIRS,
-    ];
-    return allPairs
-      .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
-      .sort((a, b) => {
-        const aSelected = selectedPairs.includes(a);
-        const bSelected = selectedPairs.includes(b);
-        if (aSelected && !bSelected) return -1;
-        if (!aSelected && bSelected) return 1;
-        return 0;
-      });
-  }, [searchQuery, selectedPairs]);
-};
-
 const SearchBar = memo(
   ({
     searchQuery,
@@ -384,9 +221,8 @@ const SearchBar = memo(
       <div className="relative">
         {/* Search Input */}
         <div
-          className="group/search relative flex h-10 items-center overflow-hidden transition-all duration-300"
+          className="group/search rounded-full relative flex h-10 items-center overflow-hidden transition-all duration-300"
           style={{
-            borderRadius: "4px",
             background:
               "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
             boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
@@ -396,7 +232,7 @@ const SearchBar = memo(
           <div
             className={cn(
               "relative ml-3 transition-colors duration-300",
-              isFocused ? "text-[#4EFF6E]" : "text-[#32353C]"
+              isFocused ? "text-[#fff]" : "text-[#32353C]"
             )}
           >
             <FaSearch size={12} />
@@ -415,7 +251,7 @@ const SearchBar = memo(
             }}
             onFocus={onFocus}
             onBlur={onBlur}
-            className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#545963] transition-colors outline-none"
+            className="font-outfit relative h-full bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#545963] transition-colors outline-none"
           />
 
           {/* Clear Button */}
@@ -423,7 +259,7 @@ const SearchBar = memo(
             <button
               type="button"
               onClick={() => onSearchChange("")}
-              className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
+              className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-full border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
             >
               <FaTimes size={8} />
             </button>

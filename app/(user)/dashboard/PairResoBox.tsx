@@ -24,6 +24,7 @@ const glowPulse = keyframes({
 
 const styles = create({
   container: {
+    position: "relative",
     width: "100%",
     display: "flex",
     flexDirection: "column",
@@ -37,8 +38,12 @@ const styles = create({
     display: "flex",
     minHeight: "250px",
     flexDirection: "column",
-    borderRadius: "12px",
-    overflow: "hidden",
+    borderWidth: "0.5px",
+    borderStyle: "solid",
+    borderColor: "#1C1E23",
+    background:
+      "linear-gradient(to bottom, rgba(10, 11, 13, 0.8), rgba(4, 5, 5, 0.8))",
+    zIndex: 1,
   },
 
   innerContent: {
@@ -206,52 +211,17 @@ export const PairResoBox = ({
 
   return (
     <div {...props(styles.container)}>
-      {/* Green glow effect when there are active patterns */}
+      {/* Green inner glow effect when there are active patterns */}
       {activePatterns.length > 0 && (
-        <>
-          {/* Outer glow with pulse animation - much more prominent */}
-          <div
-            className="absolute inset-0 pointer-events-none z-0"
-            style={{
-              background:
-                "radial-gradient(ellipse, #4EFF6E35, #4EFF6E20 50%, transparent 80%)",
-              borderRadius: "12px",
-              filter: "blur(25px)",
-              animationName: glowPulse,
-              animationDuration: "3s",
-              animationIterationCount: "infinite",
-              animationTimingFunction: "ease-in-out",
-            }}
-          />
-          {/* Inner glow - brighter */}
-          <div
-            className="absolute inset-0 pointer-events-none z-0"
-            style={{
-              background:
-                "radial-gradient(ellipse, #4EFF6E25, #4EFF6E15 40%, transparent 70%)",
-              borderRadius: "12px",
-              filter: "blur(15px)",
-            }}
-          />
-          {/* Border glow - much more visible */}
-          <div
-            className="absolute inset-0 pointer-events-none z-0"
-            style={{
-              border: "1px solid #4EFF6E40",
-              borderRadius: "12px",
-              boxShadow: "0 0 30px #4EFF6E25, inset 0 0 30px #4EFF6E15",
-            }}
-          />
-          {/* Additional inner highlight */}
-          <div
-            className="absolute inset-0 pointer-events-none z-0"
-            style={{
-              background:
-                "linear-gradient(135deg, #4EFF6E08, transparent 30%, transparent 70%, #4EFF6E08)",
-              borderRadius: "12px",
-            }}
-          />
-        </>
+        <div
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{
+            background:
+              "radial-gradient(ellipse, #4EFF6E60, #4EFF6E40 40%, #4EFF6E20 70%, transparent 90%)",
+            borderRadius: "12px",
+            boxShadow: "inset 0 0 50px #4EFF6E30",
+          }}
+        />
       )}
 
       <div {...props(styles.contentWrapper)}>
@@ -299,7 +269,6 @@ export const PairResoBox = ({
                     boxColors={boxColors}
                     pair={pair}
                     showPriceLines={settings.showPriceLines}
-                    activePatterns={activePatterns}
                   />
                 </div>
               )
