@@ -4,12 +4,10 @@ import type { BoxSlice } from "@/types/types";
 import { useTimeframeStore } from "@/stores/timeframeStore";
 import { Edges } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { memo, useMemo, useRef, useCallback } from "react";
+import { memo, useMemo, useRef, useCallback, useEffect } from "react";
 import * as THREE from "three";
 import {
   type BoxDimensions,
-  easeInOutCubic,
-  generateScatteredPosition,
   getBoxDimensions,
   getCornerPosition,
   lerp,
@@ -20,10 +18,10 @@ export const DashboardBoxStructure = memo(
     slice,
     pair,
     structure,
-    scatteredPositions,
-    formationProgress = 1,
     isFocused = false,
     boxColors: propBoxColors,
+    isVisible = true,
+    enableTransitions = false,
   }: {
     slice: BoxSlice;
     pair: string;
@@ -33,13 +31,15 @@ export const DashboardBoxStructure = memo(
       opacity: number;
       rotation?: [number, number, number];
     };
-    scatteredPositions?: Map<number, [number, number, number]>;
-    formationProgress?: number;
     isFocused?: boolean;
     boxColors?: BoxColors;
+    isVisible?: boolean;
+    enableTransitions?: boolean;
   }) => {
     const groupRef = useRef<THREE.Group>(null);
     const { boxColors: userBoxColors } = useUser();
+    const prevVisibleRef = useRef(isVisible);
+    const hasInitialized = useRef(false);
 
     // Merge boxColors similar to ResoBox3D
     const mergedBoxColors = useMemo(() => {
@@ -135,9 +135,37 @@ export const DashboardBoxStructure = memo(
       return { sortedBoxes, positions };
     }, [filteredSlice.boxes, isFocused]);
 
-    // Handle structure-level animation (position, scale)
+    // Immediately set initial transform to prevent any startup animation
+    useEffect(() => {
+      if (isVisible && groupRef.current && !hasInitialized.current) {
+        // First time becoming visible - set immediately without animation
+        const { position, scale, rotation } = structure;
+        const current = groupRef.current;
+
+        current.position.set(position[0], position[1], position[2]);
+        current.scale.setScalar(scale);
+
+        if (rotation) {
+          current.rotation.set(rotation[0], rotation[1], rotation[2]);
+        } else {
+          current.rotation.set(0, 0, 0);
+        }
+
+        hasInitialized.current = true;
+      }
+
+      prevVisibleRef.current = isVisible;
+    }, [isVisible, structure]);
+
+    // Handle smooth navigation transitions when enabled
     useFrame(() => {
-      if (!groupRef.current) return;
+      if (
+        !groupRef.current ||
+        !isVisible ||
+        !enableTransitions ||
+        !hasInitialized.current
+      )
+        return;
 
       const { position, scale, rotation } = structure;
       const current = groupRef.current;
@@ -167,25 +195,16 @@ export const DashboardBoxStructure = memo(
           const data = calculatedData.positions.get(box.originalIndex);
           if (!data) return null;
 
-          // Handle scattered positions for intro animation
-          let scatteredPos = scatteredPositions?.get(box.originalIndex);
-          if (!scatteredPos && scatteredPositions) {
-            scatteredPos = generateScatteredPosition();
-            scatteredPositions.set(box.originalIndex, scatteredPos);
-          }
-
           return (
             <DashboardBoxMesh
               key={`${pair}-${box.originalIndex}`}
               box={box}
               absolutePosition={data.absolutePosition}
               dimensions={data.dimensions}
-              scatteredPosition={scatteredPos}
-              formationProgress={formationProgress}
-              animationDelay={index * 0.1}
               boxColors={mergedBoxColors}
               isFocused={isFocused}
               pair={pair}
+              isVisible={isVisible}
             />
           );
         })}
@@ -200,22 +219,18 @@ const DashboardBoxMesh = memo(
     box,
     absolutePosition,
     dimensions,
-    scatteredPosition,
-    formationProgress = 1,
-    animationDelay = 0,
     boxColors,
     isFocused = false,
     pair,
+    isVisible = true,
   }: {
     box: { value: number; originalIndex: number };
     absolutePosition: [number, number, number];
     dimensions: BoxDimensions;
-    scatteredPosition?: [number, number, number];
-    formationProgress?: number;
-    animationDelay?: number;
     boxColors?: BoxColors;
     isFocused?: boolean;
     pair: string;
+    isVisible?: boolean;
   }) => {
     const meshRef = useRef<THREE.Group>(null);
 
@@ -227,26 +242,8 @@ const DashboardBoxMesh = memo(
 
     const color = box.value > 0 ? colors.positive : colors.negative;
 
-    useFrame(() => {
-      if (!meshRef.current || !scatteredPosition) return;
-
-      const delayedProgress = Math.max(
-        0,
-        Math.min(1, (formationProgress - animationDelay) / (1 - animationDelay))
-      );
-      const easedProgress = easeInOutCubic(delayedProgress);
-
-      const pos = scatteredPosition.map((start, i) =>
-        lerp(start, absolutePosition[i], easedProgress)
-      );
-      meshRef.current.position.set(pos[0], pos[1], pos[2]);
-    });
-
     return (
-      <group
-        ref={meshRef}
-        position={scatteredPosition ? [0, 0, 0] : absolutePosition}
-      >
+      <group ref={meshRef} position={absolutePosition}>
         <mesh scale={dimensions.size} castShadow receiveShadow>
           <boxGeometry />
           <meshPhysicalMaterial

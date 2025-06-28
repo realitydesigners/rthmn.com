@@ -24,7 +24,7 @@ interface NavbarSignedInProps {
 export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
   const pathname = usePathname();
   const { isConnected } = useWebSocket();
-  const { isZenMode, toggleZenMode } = useZenModeStore();
+  const { isZenMode, toggleZenMode, hasBeenAccessed } = useZenModeStore();
 
   if (pathname === "/account" || pathname === "/pricing") return null;
 
@@ -122,36 +122,61 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                 <span className="font-russo text-[11px] font-medium text-[#818181] uppercase tracking-wide">
                   ZEN
                 </span>
-                <button
-                  onClick={toggleZenMode}
-                  className={cn(
-                    "relative flex h-5 w-9 items-center rounded-full border transition-all duration-300",
-                    isZenMode
-                      ? "border-[#24FF66]/60 bg-[#24FF66]/20"
-                      : "border-[#1C1E23]/60 bg-[#0A0B0D]/80"
+                <div className="relative">
+                  {/* First-time user glow effect */}
+                  {!hasBeenAccessed && !isZenMode && (
+                    <div className="absolute inset-0 bg-[#24FF66]/20 rounded-full blur-sm animate-pulse" />
                   )}
-                  title={isZenMode ? "Exit Zen Mode" : "Enter Zen Mode"}
-                >
-                  {/* Toggle track */}
-                  <div
+                  <button
+                    onClick={() => {
+                      if (
+                        typeof window !== "undefined" &&
+                        window.toggleZenMode
+                      ) {
+                        window.toggleZenMode();
+                      } else {
+                        toggleZenMode();
+                      }
+                    }}
                     className={cn(
-                      "absolute inset-0 rounded-full transition-all duration-300",
+                      "relative flex h-5 w-9 items-center rounded-full border transition-all duration-300",
                       isZenMode
-                        ? "bg-gradient-to-r from-[#24FF66]/30 to-[#24FF66]/10"
-                        : "bg-gradient-to-r from-[#1C1E23]/40 to-[#0A0B0D]/60"
+                        ? "border-[#24FF66]/60 bg-[#24FF66]/20"
+                        : "border-[#1C1E23]/60 bg-[#0A0B0D]/80",
+                      // Add subtle glow for first-time users
+                      !hasBeenAccessed &&
+                        !isZenMode &&
+                        "shadow-[0_0_8px_rgba(36,255,102,0.3)]"
                     )}
-                  />
+                    title={
+                      !hasBeenAccessed
+                        ? "Try Zen Mode - 3D immersive view"
+                        : isZenMode
+                          ? "Exit Zen Mode"
+                          : "Enter Zen Mode"
+                    }
+                  >
+                    {/* Toggle track */}
+                    <div
+                      className={cn(
+                        "absolute inset-0 rounded-full transition-all duration-300",
+                        isZenMode
+                          ? "bg-gradient-to-r from-[#24FF66]/30 to-[#24FF66]/10"
+                          : "bg-gradient-to-r from-[#1C1E23]/40 to-[#0A0B0D]/60"
+                      )}
+                    />
 
-                  {/* Toggle handle */}
-                  <div
-                    className={cn(
-                      "relative h-3 w-3 rounded-full border transition-all duration-300 transform",
-                      isZenMode
-                        ? "translate-x-5 border-[#24FF66]/80 bg-[#24FF66] shadow-[0_0_8px_rgba(36,255,102,0.4)]"
-                        : "translate-x-1 border-[#32353C]/60 bg-[#818181]"
-                    )}
-                  />
-                </button>
+                    {/* Toggle handle */}
+                    <div
+                      className={cn(
+                        "relative h-3 w-3 rounded-full border transition-all duration-300 transform",
+                        isZenMode
+                          ? "translate-x-5 border-[#24FF66]/80 bg-[#24FF66] shadow-[0_0_8px_rgba(36,255,102,0.4)]"
+                          : "translate-x-1 border-[#32353C]/60 bg-[#818181]"
+                      )}
+                    />
+                  </button>
+                </div>
               </div>
             )}
 

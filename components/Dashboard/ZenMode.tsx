@@ -1,7 +1,7 @@
 "use client";
 
 import { OrbitControls } from "@react-three/drei";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { motion } from "framer-motion";
 import React, { memo, useMemo, useState, useCallback, useEffect } from "react";
 import { LuEye, LuLayoutDashboard, LuBarChart3 } from "react-icons/lu";
@@ -9,18 +9,16 @@ import type { BoxColors } from "@/stores/colorStore";
 import type { BoxSlice } from "@/types/types";
 import { useTimeframeStore } from "@/stores/timeframeStore";
 import { DashboardBoxStructure } from "./DashboardBoxStructure";
-import {
-  calculateCircularPosition,
-  generateScatteredPosition,
-} from "@/components/Demo/SectionBoxes3D/mathUtils";
-import { CameraController } from "@/components/Demo/SectionBoxes3D/CameraController";
+import { calculateCircularPosition } from "@/components/Demo/SectionBoxes3D/mathUtils";
 import { useCanvasSetup } from "@/components/Demo/SectionBoxes3D/useCanvasSetup";
+import { ZenModeLoading } from "@/app/(user)/dashboard/LoadingSkeleton";
 
 interface ZenModeProps {
   pairData: Record<string, { boxes: BoxSlice[] }>;
   orderedPairs: string[];
   boxColors?: BoxColors;
   isLoading?: boolean;
+  isVisible?: boolean;
 }
 
 // Create structure data from pair data (filtering now handled in DashboardBoxStructure)
@@ -155,56 +153,102 @@ const PairIndicator = memo(
 
 PairIndicator.displayName = "PairIndicator";
 
+// Simple static camera component - no animations
+const StaticCamera = memo(
+  ({ isVisible, viewMode }: { isVisible: boolean; viewMode: string }) => {
+    const { camera } = useThree();
+
+    useEffect(() => {
+      if (!isVisible) return;
+
+      // Always reset to fixed camera position without any animation when becoming visible
+      // This prevents any residual camera state from previous sessions
+      camera.position.set(0, 0, 70);
+      camera.lookAt(0, 0, 0);
+      camera.updateProjectionMatrix();
+    }, [camera, isVisible, viewMode]); // Reset when visibility or view mode changes
+
+    return null;
+  }
+);
+
+StaticCamera.displayName = "StaticCamera";
+
 export const ZenMode = memo(
-  ({ pairData, orderedPairs, boxColors, isLoading }: ZenModeProps) => {
+  ({
+    pairData,
+    orderedPairs,
+    boxColors,
+    isLoading,
+    isVisible = true,
+  }: ZenModeProps) => {
     const { isClient } = useCanvasSetup();
     const [focusedIndex, setFocusedIndex] = useState(0);
     const [viewMode, setViewMode] = useState<"scene" | "focus">("scene");
-    // Zen Mode is full screen immersive - no complex positioning needed
+    const [internallyEntering, setInternallyEntering] = useState(false);
 
-    // Generate scattered positions for intro animation (similar to demo)
-    const scatteredPositions = useMemo(() => {
-      const positions = new Map<number, [number, number, number]>();
-      for (let i = 0; i < 12; i++) {
-        positions.set(i, generateScatteredPosition());
+    // Handle entering transition internally
+    useEffect(() => {
+      if (isVisible) {
+        setInternallyEntering(true);
+        // Auto-hide loading after 300ms
+        const timer = setTimeout(() => {
+          setInternallyEntering(false);
+        }, 300);
+        return () => clearTimeout(timer);
+      } else {
+        setInternallyEntering(false);
       }
-      return positions;
-    }, []);
+    }, [isVisible]); // Remove internallyEntering from deps to prevent infinite loop
 
-    // Calculate structure positions and properties
-    const structures = useMemo(
-      () =>
-        orderedPairs.map((pair, index) => {
-          const circularPosition = calculateCircularPosition(
-            index,
-            focusedIndex,
-            orderedPairs.length
-          );
-          const isFocused = index === focusedIndex;
+    const shouldShowLoading = internallyEntering;
 
-          // In focus mode, bring the focused structure forward
-          const position =
+    // Calculate structure positions and properties - only recalculate when visible
+    const structures = useMemo(() => {
+      if (!isVisible) return []; // Skip expensive calculations when not visible
+
+      return orderedPairs.map((pair, index) => {
+        const circularPosition = calculateCircularPosition(
+          index,
+          focusedIndex,
+          orderedPairs.length
+        );
+        const isFocused = index === focusedIndex;
+
+        // In focus mode, bring the focused structure forward
+        const position =
+          viewMode === "focus" && isFocused
+            ? ([
+                circularPosition[0] * 0.5, // Reduced from 0.3 to keep it further from camera
+                circularPosition[1] * 0.5, // Reduced from 0.3
+                circularPosition[2] * 0.5 + 30, // Increased offset from 20 to 30
+              ] as [number, number, number])
+            : circularPosition;
+
+        return {
+          pair,
+          position,
+          scale: isFocused ? 1.2 : 0.8,
+          opacity: isFocused ? 1 : 0.7,
+          rotation:
             viewMode === "focus" && isFocused
-              ? ([
-                  circularPosition[0] * 0.3,
-                  circularPosition[1] * 0.3,
-                  circularPosition[2] * 0.3 + 20,
-                ] as [number, number, number])
-              : circularPosition;
+              ? ([0.05, -0.3, 0] as [number, number, number]) // Reduced rotation angles for better view
+              : undefined,
+        };
+      });
+    }, [orderedPairs, focusedIndex, viewMode, isVisible]);
 
-          return {
-            pair,
-            position,
-            scale: isFocused ? 1.2 : 0.8,
-            opacity: isFocused ? 1 : 0.7,
-            rotation:
-              viewMode === "focus" && isFocused
-                ? ([0.1, -0.75, 0] as [number, number, number])
-                : undefined,
-          };
-        }),
-      [orderedPairs, focusedIndex, viewMode]
-    );
+    // Reset focus when pairs change
+    useEffect(() => {
+      if (focusedIndex >= orderedPairs.length) {
+        setFocusedIndex(0);
+      }
+    }, [orderedPairs.length, focusedIndex]);
+
+    // Show loading screen during entering transition
+    if (shouldShowLoading) {
+      return <ZenModeLoading isVisible={true} />;
+    }
 
     if (!orderedPairs.length) {
       return (
@@ -225,76 +269,79 @@ export const ZenMode = memo(
 
     return (
       <div className="relative h-full w-full">
-        {/* Canvas - full screen immersive */}
         <Canvas
           camera={{ position: [0, 0, 70], fov: 50 }}
           className="absolute inset-0 w-screen h-screen z-0"
           dpr={[1, 2]}
-          gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
+          gl={{
+            antialias: true,
+            alpha: true,
+            preserveDrawingBuffer: false,
+            powerPreference: "high-performance",
+          }}
+          frameloop={isVisible ? "always" : "never"}
         >
           <ambientLight intensity={2} />
           <directionalLight position={[0, 60, 180]} intensity={1} />
-
-          <CameraController
-            viewMode={viewMode === "focus" ? "box" : "scene"}
-            scrollProgress={0}
-            introMode={false}
-            isClient={isClient}
-          />
-
+          <StaticCamera isVisible={isVisible} viewMode={viewMode} />
           <OrbitControls
-            enabled={viewMode === "focus"}
-            enableRotate={viewMode === "focus"}
-            maxDistance={40}
-            minDistance={5}
+            enabled={viewMode === "focus" && isVisible}
+            enableRotate={viewMode === "focus" && isVisible}
+            maxDistance={100}
+            minDistance={20}
             autoRotate={false}
             target={structures[focusedIndex]?.position || [0, 0, 0]}
+            enablePan={false}
+            enableZoom={true}
+            zoomSpeed={0.5}
           />
 
-          {/* Render all structures */}
-          {structures.map((structure, index) => {
-            // In focus mode, only show the focused structure
-            if (viewMode === "focus" && index !== focusedIndex) {
-              return null;
-            }
+          {/* Render all structures - only when visible */}
+          {isVisible &&
+            structures.map((structure, index) => {
+              // In focus mode, only show the focused structure
+              if (viewMode === "focus" && index !== focusedIndex) {
+                return null;
+              }
 
-            const currentSlice = createStructureFromPair(
-              structure.pair,
-              pairData[structure.pair]?.boxes?.[0]
-            );
+              const currentSlice = createStructureFromPair(
+                structure.pair,
+                pairData[structure.pair]?.boxes?.[0]
+              );
 
-            // Only show structures that should be visible based on opacity
-            if (structure.opacity <= 0.01) {
-              return null;
-            }
+              // Only show structures that should be visible based on opacity
+              if (structure.opacity <= 0.01) {
+                return null;
+              }
 
-            return (
-              <DashboardBoxStructure
-                key={structure.pair}
-                slice={currentSlice}
-                pair={structure.pair}
-                structure={{
-                  position: structure.position,
-                  scale: structure.scale,
-                  opacity: structure.opacity,
-                  rotation: structure.rotation,
-                }}
-                formationProgress={1}
-                isFocused={index === focusedIndex}
-                boxColors={boxColors}
-              />
-            );
-          })}
+              return (
+                <DashboardBoxStructure
+                  key={structure.pair}
+                  slice={currentSlice}
+                  pair={structure.pair}
+                  structure={{
+                    position: structure.position,
+                    scale: structure.scale,
+                    opacity: structure.opacity,
+                    rotation: structure.rotation,
+                  }}
+                  isFocused={index === focusedIndex}
+                  boxColors={boxColors}
+                  isVisible={isVisible}
+                  enableTransitions={true}
+                />
+              );
+            })}
         </Canvas>
-
-        {/* UI Controls */}
-        <ZenModeControls
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
-          focusedIndex={focusedIndex}
-          pairs={orderedPairs}
-          onFocusChange={setFocusedIndex}
-        />
+        {isVisible && (
+          <ZenModeControls
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            focusedIndex={focusedIndex}
+            pairs={orderedPairs}
+            onFocusChange={setFocusedIndex}
+          />
+        )}
       </div>
     );
   }
