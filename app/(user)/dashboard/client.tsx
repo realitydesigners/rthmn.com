@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
 import { ZenMode } from "@/components/Dashboard/ZenMode";
+import { useSignals } from "@/hooks/useSignals";
+import { SignalAlerts } from "@/components/Dashboard/SignalAlerts";
 
 // Extend window object for zen mode toggle
 declare global {
@@ -30,6 +32,29 @@ export default function Dashboard() {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [availableWidth, setAvailableWidth] = useState(0);
+
+  // Signal alerts
+  const { signals, newSignals, clearSignalAlert, clearAllAlerts } =
+    useSignals(10000); // Poll every 10 seconds
+
+  // Helper function to get active patterns for a specific pair
+  const getActivePatternsForPair = (pair: string): number[] => {
+    // Get the most recent signal for this pair (no time limits)
+    const pairSignals = signals
+      .filter((signal) => signal.pair === pair)
+      .sort((a, b) => {
+        const timeA = new Date(a.created_at || a.start_time).getTime();
+        const timeB = new Date(b.created_at || b.start_time).getTime();
+        return timeB - timeA; // Most recent first
+      });
+
+    // Get pattern from the most recent signal only
+    if (pairSignals.length > 0) {
+      return pairSignals[0].pattern_info || [];
+    }
+
+    return [];
+  };
 
   // Handle window resize and main element width changes
   useEffect(() => {
@@ -161,6 +186,13 @@ export default function Dashboard() {
           boxColors={boxColors}
           isLoading={isLoading}
         />
+
+        {/* Signal Alerts */}
+        <SignalAlerts
+          newSignals={newSignals}
+          onClearSignal={clearSignalAlert}
+          onClearAll={clearAllAlerts}
+        />
       </div>
     );
   }
@@ -174,6 +206,12 @@ export default function Dashboard() {
           gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
         }}
       >
+        {/* Signal Alerts */}
+        <SignalAlerts
+          newSignals={newSignals}
+          onClearSignal={clearSignalAlert}
+          onClearAll={clearAllAlerts}
+        />
         {isClient &&
           pairsToRender.map((pair) => {
             const data = pairData[pair];
@@ -209,6 +247,7 @@ export default function Dashboard() {
                     boxSlice={data?.boxes?.[0]}
                     boxColors={boxColors}
                     isLoading={isLoading}
+                    activePatterns={getActivePatternsForPair(pair)}
                   />
                 </div>
               </motion.div>
