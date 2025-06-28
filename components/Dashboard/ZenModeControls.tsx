@@ -16,6 +16,7 @@ import {
   LuX,
   LuLineChart,
   LuLock,
+  LuBox,
   LuChevronLeft,
   LuChevronRight,
   LuEye,
@@ -28,6 +29,32 @@ import { useColorStore } from "@/stores/colorStore";
 
 import { formatPrice } from "@/utils/instruments";
 import { cn } from "@/utils/cn";
+
+// Custom Square icon component
+const SquareIcon = ({
+  size = 24,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    role="img"
+    aria-label="Square box icon"
+  >
+    <title>Square box icon</title>
+    <rect x="6" y="6" width="12" height="12" rx="1" />
+  </svg>
+);
 
 interface ZenModeControlsProps {
   viewMode: "scene" | "focus";
@@ -234,6 +261,7 @@ export const ZenModeControls = memo(
     >(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const { priceData } = useWebSocket();
+    const boxColors = useColorStore((state) => state.boxColors);
 
     const togglePanel = useCallback(
       (panel: "pairs" | "timeframe" | "chartstyle") => {
@@ -241,6 +269,18 @@ export const ZenModeControls = memo(
       },
       []
     );
+
+    // Function to get the current chart style icon
+    const getCurrentChartStyleIcon = useCallback(() => {
+      const currentViewMode = boxColors.styles?.viewMode;
+
+      if (currentViewMode === "3d") {
+        return LuBox;
+      } else {
+        // Default view mode uses "box" style
+        return SquareIcon;
+      }
+    }, [boxColors.styles?.viewMode]);
 
     // Handle clicking outside to close panel
     useEffect(() => {
@@ -275,7 +315,7 @@ export const ZenModeControls = memo(
         {
           id: "chartstyle",
           position: "left" as const,
-          icon: LuLineChart,
+          icon: getCurrentChartStyleIcon(),
           onClick: () => togglePanel("chartstyle"),
           isActive: activePanel === "chartstyle",
           isVisible: !isZenMode, // Hide chart style button in zen mode since it only uses 3D
@@ -319,6 +359,7 @@ export const ZenModeControls = memo(
         onViewModeChange,
         togglePanel,
         isZenMode,
+        getCurrentChartStyleIcon,
       ]
     );
 
