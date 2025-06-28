@@ -199,23 +199,26 @@ const DynamicContainer = memo(
         return "M 2,0 L 98,0 Q 100,0 100,2 L 100,98 Q 100,100 98,100 L 2,100 Q 0,100 0,98 L 0,2 Q 0,0 2,0 Z";
       }
 
-      // Calculate approximate positions based on button widths and margins
-      // Left: pairs button (40px) + timeframe button (40px) + gaps (12px) + mr-6 (24px) ≈ 116px
-      // Convert to percentage of container width (assuming ~600px total width)
-      const leftButtonsWidth = 116;
-      const rightArrowsStart = 24; // ml-6 margin
-      const containerWidth = dimensions.width || 500;
+      // With the wider timeframe slider (minWidth 400px), we need to adjust the notch
+      // to properly frame the expanded slider area
+      const containerWidth = dimensions.width || 600;
+
+      // Calculate more accurate positions for the wider slider
+      // Left: px-1 padding (4px) + pairs button (40px) + gap (12px) + timeframe button (40px) + mr-6 (24px) + mx-2 margin (8px) ≈ 128px
+      // Right: mx-2 margin (8px) + ml-6 (24px) + left arrow (40px) + gap (12px) + right arrow (40px) + view button (40px) + px-1 padding (4px) ≈ 168px
+      const leftButtonsWidth = 128;
+      const rightButtonsWidth = 168;
 
       const notchStart = Math.max(
-        20,
+        15,
         (leftButtonsWidth / containerWidth) * 100
       );
       const notchEnd = Math.min(
-        65,
-        100 - (rightArrowsStart / containerWidth) * 100
+        85,
+        100 - (rightButtonsWidth / containerWidth) * 100
       );
 
-      return `M 2,25 L ${notchStart},25 Q ${notchStart},10 ${notchStart + 5},10 L ${notchEnd - 5},10 Q ${notchEnd},10 ${notchEnd},25 L 98,25 Q 100,25 100,27 L 100,73 Q 100,75 98,75 L ${notchEnd},75 Q ${notchEnd},90 ${notchEnd - 5},90 L ${notchStart + 5},90 Q ${notchStart},90 ${notchStart},75 L 2,75 Q 0,75 0,73 L 0,27 Q 0,25 2,25 Z`;
+      return `M 2,25 L ${notchStart - 2},25 C ${notchStart},25 ${notchStart},22 ${notchStart + 2},20 L ${notchEnd - 2},20 C ${notchEnd},22 ${notchEnd},25 ${notchEnd + 2},25 L 98,25 Q 100,25 100,27 L 100,73 Q 100,75 98,75 L ${notchEnd + 2},75 C ${notchEnd},75 ${notchEnd},78 ${notchEnd - 2},80 L ${notchStart + 2},80 C ${notchStart},78 ${notchStart},75 ${notchStart - 2},75 L 2,75 Q 0,75 0,73 L 0,27 Q 0,25 2,25 Z`;
     }, [activePanel, dimensions.width]);
 
     return (
@@ -239,14 +242,27 @@ const DynamicContainer = memo(
                 top: 0,
               }}
             >
+              <defs>
+                <linearGradient
+                  id="pathGradient"
+                  x1="0%"
+                  y1="0%"
+                  x2="100%"
+                  y2="100%"
+                >
+                  <stop offset="0%" stopColor="#1F2328" />
+                  <stop offset="50%" stopColor="#0F1114" />
+                  <stop offset="100%" stopColor="#070809" />
+                </linearGradient>
+              </defs>
               <motion.path
                 initial={false}
                 animate={{
                   d: getNotchPath(),
                 }}
-                fill="#333"
-                stroke="#1C1E23"
-                strokeWidth="0.5"
+                fill="url(#pathGradient)"
+                stroke="#32353C"
+                strokeWidth="1"
                 vectorEffect="non-scaling-stroke"
                 transition={{ duration: 0.3, ease: "easeOut" }}
               />
@@ -277,6 +293,168 @@ export const ZenModeControls = memo(
     const togglePanel = useCallback((panel: "pairs" | "timeframe") => {
       setActivePanel((current) => (current === panel ? null : panel));
     }, []);
+
+    // Button configuration array for easier management
+    const buttonsConfig = useMemo(
+      () => [
+        // Left buttons
+        {
+          id: "pairs",
+          position: "left" as const,
+          icon: LuPlus,
+          onClick: () => togglePanel("pairs"),
+          isActive: activePanel === "pairs",
+          isVisible: true,
+          extraClasses: "",
+        },
+        {
+          id: "timeframe",
+          position: "left" as const,
+          icon: LuBarChart3,
+          onClick: () => togglePanel("timeframe"),
+          isActive: activePanel === "timeframe",
+          isVisible: true,
+          extraClasses: activePanel === "timeframe" ? "mr-6" : "",
+        },
+        // Right buttons
+        {
+          id: "prev",
+          position: "right" as const,
+          icon: null,
+          content: "←",
+          onClick: () =>
+            onFocusChange((focusedIndex - 1 + pairs.length) % pairs.length),
+          isActive: false,
+          isVisible: viewMode === "scene",
+          extraClasses: activePanel === "timeframe" ? "ml-6" : "",
+        },
+        {
+          id: "next",
+          position: "right" as const,
+          icon: null,
+          content: "→",
+          onClick: () => onFocusChange((focusedIndex + 1) % pairs.length),
+          isActive: false,
+          isVisible: viewMode === "scene",
+          extraClasses: "",
+        },
+        {
+          id: "viewMode",
+          position: "right" as const,
+          icon: viewMode === "scene" ? LuLayoutDashboard : LuBarChart3,
+          onClick: () =>
+            onViewModeChange(viewMode === "scene" ? "focus" : "scene"),
+          isActive: viewMode === "focus",
+          isVisible: true,
+          extraClasses: "",
+          useOldStyle: true, // Temporary flag for the view mode button
+        },
+      ],
+      [
+        activePanel,
+        viewMode,
+        focusedIndex,
+        pairs,
+        onFocusChange,
+        onViewModeChange,
+        togglePanel,
+      ]
+    );
+
+    // Render button function
+    const renderButton = useCallback(
+      (buttonConfig: (typeof buttonsConfig)[0]) => {
+        const {
+          id,
+          icon: IconComponent,
+          content,
+          onClick,
+          isActive,
+          isVisible,
+          extraClasses,
+          useOldStyle,
+        } = buttonConfig;
+
+        if (!isVisible) return null;
+
+        // Old style for view mode button (temporarily)
+        if (useOldStyle) {
+          return (
+            <button
+              key={id}
+              onClick={onClick}
+              className={cn(
+                "group relative overflow-hidden w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
+                isActive
+                  ? "bg-[#24FF66] text-black"
+                  : "bg-[#1C1E23] hover:bg-[#32353C] text-white",
+                extraClasses
+              )}
+            >
+              {IconComponent && (
+                <IconComponent className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+              )}
+            </button>
+          );
+        }
+
+        // New circular style for all other buttons
+        return (
+          <button
+            key={id}
+            onClick={onClick}
+            className={cn(
+              "group relative overflow-hidden w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200",
+              isActive ? "text-[#24FF66]" : "text-[#B0B0B0] hover:text-white",
+              extraClasses
+            )}
+            style={{
+              background: isActive
+                ? "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)"
+                : undefined,
+              boxShadow: isActive
+                ? "0px 4px 4px 0px rgba(0, 0, 0, 0.25)"
+                : undefined,
+            }}
+          >
+            {/* Active indicator */}
+            {isActive && (
+              <div
+                className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#24FF66] z-10"
+                style={{
+                  width: "30px",
+                  height: "4px",
+                  transform: "translateY(-50%) rotate(-90deg)",
+                  filter: "blur(10px)",
+                  transformOrigin: "center",
+                }}
+              />
+            )}
+
+            {/* Hover background */}
+            {!isActive && (
+              <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
+                style={{
+                  background:
+                    "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                }}
+              />
+            )}
+
+            {/* Icon or content */}
+            {IconComponent ? (
+              <IconComponent className="relative z-10 w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
+            ) : (
+              <span className="relative z-10 text-lg font-medium">
+                {content}
+              </span>
+            )}
+          </button>
+        );
+      },
+      []
+    );
 
     return (
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
@@ -324,41 +502,20 @@ export const ZenModeControls = memo(
               className={cn(
                 "flex items-center relative z-10",
                 activePanel === "timeframe"
-                  ? "px-2 py-3 justify-between"
+                  ? "px-1 py-3 justify-between"
                   : "px-4 py-3 gap-3"
               )}
             >
               {/* Left buttons */}
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => togglePanel("pairs")}
-                  className={cn(
-                    "w-10 h-10 rounded-md flex items-center justify-center transition-all group",
-                    activePanel === "pairs"
-                      ? "bg-[#24FF66] text-black"
-                      : "bg-[#1C1E23] hover:bg-[#32353C] text-white"
-                  )}
-                >
-                  <LuPlus className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                </button>
-
-                <button
-                  onClick={() => togglePanel("timeframe")}
-                  className={cn(
-                    "w-10 h-10 rounded-md flex items-center justify-center transition-all group",
-                    activePanel === "timeframe"
-                      ? "bg-[#24FF66] text-black"
-                      : "bg-[#1C1E23] hover:bg-[#32353C] text-white",
-                    activePanel === "timeframe" && "mr-6"
-                  )}
-                >
-                  <LuBarChart3 className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                </button>
+                {buttonsConfig
+                  .filter((btn) => btn.position === "left")
+                  .map(renderButton)}
               </div>
 
               {/* Center area for timeframe slider when active */}
               {activePanel === "timeframe" && (
-                <div className="transform translate-y-6">
+                <div className="flex-1 transform translate-y-6 min-w-0 mx-2">
                   <AnimatePresence>
                     <motion.div
                       initial={{ opacity: 0, scale: 0.8 }}
@@ -366,6 +523,7 @@ export const ZenModeControls = memo(
                       exit={{ opacity: 0, scale: 0.8 }}
                       transition={{ delay: 0.1, duration: 0.2 }}
                       className="w-full"
+                      style={{ minWidth: "400px" }}
                     >
                       <TimeFrameSlider showPanel={false} global />
                     </motion.div>
@@ -375,53 +533,14 @@ export const ZenModeControls = memo(
 
               {/* Right buttons */}
               <div className="flex items-center gap-3">
-                {viewMode === "scene" && (
-                  <>
-                    <button
-                      onClick={() =>
-                        onFocusChange(
-                          (focusedIndex - 1 + pairs.length) % pairs.length
-                        )
-                      }
-                      className={cn(
-                        "w-10 h-10 bg-[#1C1E23] hover:bg-[#32353C] rounded-md flex items-center justify-center transition-colors",
-                        activePanel === "timeframe" && "ml-6"
-                      )}
-                    >
-                      <span className="text-white text-lg font-medium">←</span>
-                    </button>
-                    <button
-                      onClick={() =>
-                        onFocusChange((focusedIndex + 1) % pairs.length)
-                      }
-                      className="w-10 h-10 bg-[#1C1E23] hover:bg-[#32353C] rounded-md flex items-center justify-center transition-colors"
-                    >
-                      <span className="text-white text-lg font-medium">→</span>
-                    </button>
-                  </>
-                )}
                 {viewMode === "focus" && (
                   <span className="font-russo text-xs text-[#818181] uppercase tracking-wider">
                     Focus
                   </span>
                 )}
-                <button
-                  onClick={() =>
-                    onViewModeChange(viewMode === "scene" ? "focus" : "scene")
-                  }
-                  className={cn(
-                    "w-10 h-10 rounded-md flex items-center justify-center transition-all group",
-                    viewMode === "focus"
-                      ? "bg-[#24FF66] text-black"
-                      : "bg-[#1C1E23] hover:bg-[#32353C] text-white"
-                  )}
-                >
-                  {viewMode === "scene" ? (
-                    <LuLayoutDashboard className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                  ) : (
-                    <LuBarChart3 className="w-5 h-5 transition-transform duration-300 group-hover:scale-110" />
-                  )}
-                </button>
+                {buttonsConfig
+                  .filter((btn) => btn.position === "right")
+                  .map(renderButton)}
               </div>
             </div>
           </DynamicContainer>

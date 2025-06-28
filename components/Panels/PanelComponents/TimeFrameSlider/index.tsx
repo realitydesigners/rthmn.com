@@ -507,7 +507,7 @@ const TimeFrameSliderContent = memo(
         {/* Main slider container */}
         <div
           ref={barContainerRef}
-          className="group/bars relative flex h-8 items-center touch-none"
+          className="group/bars relative flex h-10 items-center touch-none"
         >
           {/* Base layer with diagonal lines pattern */}
           <div className="absolute inset-0 overflow-hidden opacity-10">
@@ -542,7 +542,7 @@ const TimeFrameSliderContent = memo(
 
           {/* Selection area with enhanced gradients */}
           <div
-            className="absolute h-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[inset_0_0_30px_rgba(255,255,255,0.05),0_0_15px_rgba(0,0,0,0.8)] will-change-transform"
+            className="absolute h-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[inset_0_0_30px_rgba(255,255,255,0.05),0_0_15px_rgba(0,0,0,0.8),0_8px_24px_-4px_rgba(0,0,0,0.4)] will-change-transform"
             style={selectionStyle}
           >
             {/* Enhanced inner glow effect */}
@@ -559,6 +559,9 @@ const TimeFrameSliderContent = memo(
 
             {/* Additional subtle inner shadow */}
             <div className="absolute inset-0 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.2)]" />
+
+            {/* Bleeding shadow effect extending downward */}
+            <div className="absolute inset-x-0 -bottom-6 h-8 bg-gradient-to-b from-black/20 via-black/10 to-transparent pointer-events-none" />
           </div>
 
           {/* Invisible click/touch handlers with larger touch targets */}
@@ -626,8 +629,16 @@ const TimeFrameSliderContent = memo(
         </div>
 
         {/* Dynamic time intervals scale */}
-        <div className="mt-2 w-full">
-          <div className="flex w-full justify-between px-0">
+        <div className="mt-2 w-full relative">
+          {/* Full-width gradient shadow overlay matching selection */}
+          <div
+            className="absolute inset-y-0 -top-2 bottom-0 bg-gradient-to-b from-black/30 via-black/20 to-black/5 pointer-events-none will-change-transform transition-all duration-200"
+            style={{
+              left: `${(reversedStartIndex / 38) * 100}%`,
+              width: `${(reversedMaxBoxCount / 38) * 100}%`,
+            }}
+          />
+          <div className="flex w-full justify-between px-0 relative z-10">
             {TIME_INTERVALS.map((interval, i) => {
               // Always show full range of labels
               const position = (i / (TIME_INTERVALS.length - 1)) * 37;
@@ -638,23 +649,30 @@ const TimeFrameSliderContent = memo(
               return (
                 <div
                   key={interval.label}
-                  className="flex flex-col items-center"
+                  className="flex flex-col items-center group/dash"
                 >
                   <div
                     className={cn(
-                      "h-3 w-[1px] will-change-transform transition-all duration-200",
+                      "h-5 w-0 -mt-2 will-change-transform transition-all duration-200 ease-out border-l-[1px] border-dashed",
                       isInRange
-                        ? "bg-gradient-to-b from-white/90 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.6)]"
-                        : "bg-gradient-to-b from-white/20 to-transparent"
+                        ? "border-white/80 shadow-[0_0_4px_rgba(255,255,255,0.3)]"
+                        : "border-white/30 group-hover/dash:border-white/50"
                     )}
+                    style={{
+                      borderLeftStyle: "dashed",
+                      borderImageSlice: "1",
+                      borderImageSource: isInRange
+                        ? "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, currentColor 2px, currentColor 3px, transparent 3px, transparent 6px)"
+                        : "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, currentColor 2px, currentColor 3px, transparent 3px, transparent 6px)",
+                    }}
                   />
                   <span
                     className={cn(
-                      "mt-1 font-kodemono text-[9px] tracking-wider transition-all duration-200",
+                      "mt-0.5 font-kodemono text-[9px] tracking-wider transition-all duration-200 ease-out",
                       isInRange
-                        ? "text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-                        : "text-white/30",
-                      "whitespace-nowrap"
+                        ? "text-white/90 font-medium"
+                        : "text-white/40 group-hover/dash:text-white/65",
+                      "whitespace-nowrap select-none"
                     )}
                   >
                     {interval.label}
