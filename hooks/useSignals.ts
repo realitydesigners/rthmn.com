@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 interface Signal {
   id: string;
   pair: string;
-  pattern_info: number[];
+  signal: number[];
   boxes: number[];
   start_time: string;
   created_at: string;
@@ -57,7 +57,7 @@ export function useSignals() {
         if (isInitial) {
           // On initial load, show last 3 as new
           if (data.length > 0) {
-            setNewSignals(data.slice(0, 3));
+            setNewSignals(data);
             lastCheckRef.current = data[0]?.created_at || null;
           }
         } else {

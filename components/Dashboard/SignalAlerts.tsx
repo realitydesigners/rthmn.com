@@ -5,7 +5,7 @@ import { FaTimes, FaArrowUp, FaClock, FaCrosshairs } from "react-icons/fa";
 interface Signal {
   id: string;
   pair: string;
-  pattern_info: number[];
+  signal: number[];
   boxes: number[];
   start_time: string;
   created_at: string;
@@ -37,13 +37,7 @@ export function SignalAlerts({
   };
 
   const formatPattern = (pattern: number[]) => {
-    if (pattern.length === 1) {
-      return pattern[0].toString();
-    }
-    if (pattern.length <= 3) {
-      return pattern.join(", ");
-    }
-    return `${pattern.slice(0, 3).join(", ")}...`;
+    return pattern.join(", ");
   };
 
   const getPatternType = (pattern: number[]) => {
@@ -150,7 +144,7 @@ export function SignalAlerts({
           <div className="max-h-48 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
             <AnimatePresence>
               {visibleSignals.map((signal, index) => {
-                const colors = getPatternColors(signal.pattern_info);
+                const colors = getPatternColors(signal.signal);
 
                 return (
                   <motion.div
@@ -190,7 +184,7 @@ export function SignalAlerts({
                               border: `1px solid ${colors.border}30`,
                             }}
                           >
-                            {getPatternType(signal.pattern_info)}
+                            {getPatternType(signal.signal)}
                           </div>
                         </div>
 
@@ -200,7 +194,7 @@ export function SignalAlerts({
                             Pattern:
                           </span>
                           <span className="font-kodemono text-xs text-white tracking-wider">
-                            [{formatPattern(signal.pattern_info)}]
+                            [{formatPattern(signal.signal)}]
                           </span>
                         </div>
                       </div>

@@ -7,6 +7,7 @@ import {
   setSidebarLocks,
   setSidebarState,
 } from "@/utils/localStorage";
+import { useZenModeStore } from "@/stores/zenModeStore";
 import { motion } from "framer-motion";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -69,6 +70,7 @@ export const SidebarWrapper = ({
   const [width, setWidth] = useState(initialWidth);
   const [mounted, setMounted] = useState(false);
   const initialLoadRef = useRef(true);
+  const { isZenMode } = useZenModeStore();
 
   useEffect(() => {
     setMounted(true);
@@ -134,10 +136,12 @@ export const SidebarWrapper = ({
         '[data-position="right"].sidebar-content'
       );
 
-      if (isMobile) {
+      if (isMobile || isZenMode) {
         main.style.paddingLeft = "";
         main.style.paddingRight = "";
         main.style.width = "100%";
+        main.style.marginLeft = "0";
+        main.style.marginRight = "0";
         return;
       }
 
@@ -204,7 +208,7 @@ export const SidebarWrapper = ({
       main.style.marginRight = "0";
       main.style.width = "100%";
     };
-  }, [isOpen, width, position, isLocked, mounted]);
+  }, [isOpen, width, position, isLocked, mounted, isZenMode]);
 
   if (!mounted) return null;
 
@@ -219,7 +223,7 @@ export const SidebarWrapper = ({
         ease: "easeInOut",
       }}
       className={cn(
-        "sidebar-content fixed top-14 z-0 bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809] ",
+        "sidebar-content fixed top-14 z-[10] bottom-0 hidden transform lg:flex bg-gradient-to-b from-[#0A0B0D] to-[#070809] ",
         position === "left" ? "left-0" : "right-0",
         isOpen ? "pointer-events-auto" : "pointer-events-none"
       )}

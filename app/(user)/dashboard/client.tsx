@@ -50,7 +50,7 @@ export default function Dashboard() {
 
     // Get pattern from the most recent signal only
     if (pairSignals.length > 0) {
-      return pairSignals[0].pattern_info || [];
+      return pairSignals[0].signal || [];
     }
 
     return [];

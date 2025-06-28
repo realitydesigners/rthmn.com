@@ -3,7 +3,7 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { motion } from "framer-motion";
-import React, { memo, useMemo, useState, useCallback } from "react";
+import React, { memo, useMemo, useState, useCallback, useEffect } from "react";
 import { LuEye, LuLayoutDashboard, LuBarChart3 } from "react-icons/lu";
 import type { BoxColors } from "@/stores/colorStore";
 import type { BoxSlice } from "@/types/types";
@@ -160,6 +160,7 @@ export const ZenMode = memo(
     const { isClient } = useCanvasSetup();
     const [focusedIndex, setFocusedIndex] = useState(0);
     const [viewMode, setViewMode] = useState<"scene" | "focus">("scene");
+    // Zen Mode is full screen immersive - no complex positioning needed
 
     // Generate scattered positions for intro animation (similar to demo)
     const scatteredPositions = useMemo(() => {
@@ -224,10 +225,10 @@ export const ZenMode = memo(
 
     return (
       <div className="relative h-full w-full">
-        {/* Canvas */}
+        {/* Canvas - full screen immersive */}
         <Canvas
           camera={{ position: [0, 0, 70], fov: 50 }}
-          className="absolute inset-0 z-0"
+          className="absolute inset-0 w-screen h-screen z-0"
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
         >
