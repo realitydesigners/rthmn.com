@@ -4,16 +4,7 @@ import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
 import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { memo, useEffect, useState } from "react";
-import {
-  LuGraduationCap,
-  LuSettings,
-  LuUser,
-  LuPalette,
-  LuBox,
-  LuSliders,
-  LuBell,
-  LuShield,
-} from "react-icons/lu";
+import { LuSettings } from "react-icons/lu";
 import { cn } from "@/utils/cn";
 import { DemoSettingsPanel } from "../DemoPanelContent/DemoSettingsPanel";
 
@@ -24,18 +15,17 @@ interface DemoSidebarRightProps {
   shouldOpen?: boolean;
 }
 
-// Enhanced button component matching the real FeatureTour design
 const DemoSidebarButton = ({
   icon: Icon,
   onClick,
   isActive,
-  isOpen,
+
   label,
 }: {
   icon: React.ComponentType<{ size: number; className?: string }>;
   onClick: () => void;
   isActive: boolean;
-  isOpen: boolean;
+
   label: string;
 }) => {
   return (
@@ -87,7 +77,6 @@ const DemoSidebarButton = ({
           )}
         />
 
-        {/* Compact balanced indicator - shows when button is active */}
         {isActive && (
           <div
             className="absolute -right-4 top-1/2 -translate-y-1/2 bg-[#B0B0B0] z-10"
@@ -105,7 +94,6 @@ const DemoSidebarButton = ({
   );
 };
 
-// Mock Demo Sidebar Right Component - matching the real Sidebar design
 export const DemoSidebarRight = memo(
   ({
     x,
@@ -120,30 +108,24 @@ export const DemoSidebarRight = memo(
       setMounted(true);
     }, []);
 
-    // Auto-open the settings panel when shouldOpen becomes true
     useEffect(() => {
       if (shouldOpen && !activePanel) {
-        setActivePanel("settings"); // Open the settings panel
+        setActivePanel("settings");
       } else if (!shouldOpen && activePanel) {
-        setActivePanel(null); // Close when shouldOpen becomes false
+        setActivePanel(null);
       }
     }, [shouldOpen, activePanel]);
 
-    // Auto-close panel when scrolling significantly back up (only when not controlled by parent)
     useEffect(() => {
-      if (!scrollYProgress || !activePanel || shouldOpen) return; // Don't auto-close when controlled by parent
+      if (!scrollYProgress || !activePanel || shouldOpen) return;
 
       let lastScrollValue = scrollYProgress.get();
       let scrollStartPosition = lastScrollValue;
 
       const unsubscribe = scrollYProgress.onChange((currentValue) => {
-        // If scrolling back up (decreasing scroll value) and panel is open
         if (currentValue < lastScrollValue && activePanel) {
-          // Calculate how much we've scrolled back up
           const scrollDistance = scrollStartPosition - currentValue;
 
-          // Close panel after scrolling back up a significant amount (equivalent to ~60px)
-          // Mobile-optimized threshold - more responsive on touch devices
           const isMobile =
             typeof window !== "undefined" &&
             (window.innerWidth < 1024 || "ontouchstart" in window);
@@ -153,7 +135,6 @@ export const DemoSidebarRight = memo(
             setActivePanel(null);
           }
         } else if (currentValue > lastScrollValue) {
-          // Reset start position when scrolling down
           scrollStartPosition = currentValue;
         }
 
@@ -194,11 +175,9 @@ export const DemoSidebarRight = memo(
           style={{
             x,
             opacity,
-            // Subtle glow effect when no panels are active
             filter: !isOpen
               ? "drop-shadow(0 0 10px rgba(255, 255, 255, 0.02))"
               : "none",
-            // Use marginRight to move icons to panel edge without conflicting with x motion value
             marginRight: isOpen && activePanel ? "280px" : "0px",
             transition: "margin-right 0.4s cubic-bezier(0.23, 1, 0.280, 1)",
           }}
@@ -206,12 +185,6 @@ export const DemoSidebarRight = memo(
             "absolute right-0 top-14 bottom-0 z-[150] flex w-16 flex-col items-center justify-between py-4 transition-all duration-200 pointer-events-auto"
           )}
         >
-          {/* Top buttons */}
-          <div className="relative flex flex-col gap-2">
-            {/* Empty top section for now */}
-          </div>
-
-          {/* Bottom buttons - Settings */}
           <div className="mb-2 flex flex-col gap-2">
             {mockButtons.map((button) => (
               <DemoSidebarButton
@@ -219,14 +192,12 @@ export const DemoSidebarRight = memo(
                 icon={button.icon}
                 onClick={() => handleButtonClick(button.id)}
                 isActive={activePanel === button.id}
-                isOpen={isOpen}
                 label={button.label}
               />
             ))}
           </div>
         </motion.div>
 
-        {/* Demo Panel Wrapper */}
         {activePanelData && (
           <DemoSidebarWrapper
             isOpen={!!activePanel}

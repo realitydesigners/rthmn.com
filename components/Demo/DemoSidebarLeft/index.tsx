@@ -1,17 +1,11 @@
 "use client";
 
 import { DemoInstrumentsPanel } from "@/components/Demo/DemoPanelContent/DemoInstrumentsPanel";
-import { DemoVisualizerPanel } from "@/components/Demo/DemoPanelContent/DemoVisualizerPanel";
 import { DemoSidebarWrapper } from "@/components/Demo/DemoSidebarPanelWrapper";
 import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import { memo, useEffect, useState } from "react";
-import {
-  LuBarChart3,
-  LuLayoutGrid,
-  LuLineChart,
-  LuTrendingUp,
-} from "react-icons/lu";
+import { LuLineChart } from "react-icons/lu";
 import { cn } from "@/utils/cn";
 
 interface DemoSidebarLeftProps {
@@ -26,13 +20,13 @@ const DemoSidebarButton = ({
   icon: Icon,
   onClick,
   isActive,
-  isOpen,
+
   label,
 }: {
   icon: React.ComponentType<{ size: number; className?: string }>;
   onClick: () => void;
   isActive: boolean;
-  isOpen: boolean;
+
   label: string;
 }) => {
   return (
@@ -117,30 +111,24 @@ export const DemoSidebarLeft = memo(
       setMounted(true);
     }, []);
 
-    // Auto-open the instruments panel when shouldOpen becomes true
     useEffect(() => {
       if (shouldOpen && !activePanel) {
-        setActivePanel("instruments"); // Open the instruments panel
+        setActivePanel("instruments");
       } else if (!shouldOpen && activePanel) {
-        setActivePanel(null); // Close when shouldOpen becomes false
+        setActivePanel(null);
       }
     }, [shouldOpen, activePanel]);
 
-    // Auto-close panel when scrolling significantly back up (only when not controlled by parent)
     useEffect(() => {
-      if (!scrollYProgress || !activePanel || shouldOpen) return; // Don't auto-close when controlled by parent
+      if (!scrollYProgress || !activePanel || shouldOpen) return;
 
       let lastScrollValue = scrollYProgress.get();
       let scrollStartPosition = lastScrollValue;
 
       const unsubscribe = scrollYProgress.onChange((currentValue) => {
-        // If scrolling back up (decreasing scroll value) and panel is open
         if (currentValue < lastScrollValue && activePanel) {
-          // Calculate how much we've scrolled back up
           const scrollDistance = scrollStartPosition - currentValue;
 
-          // Close panel after scrolling back up a significant amount (equivalent to ~60px)
-          // Mobile-optimized threshold - more responsive on touch devices
           const isMobile =
             typeof window !== "undefined" &&
             (window.innerWidth < 1024 || "ontouchstart" in window);
@@ -150,7 +138,6 @@ export const DemoSidebarLeft = memo(
             setActivePanel(null);
           }
         } else if (currentValue > lastScrollValue) {
-          // Reset start position when scrolling down
           scrollStartPosition = currentValue;
         }
 
@@ -167,12 +154,6 @@ export const DemoSidebarLeft = memo(
         label: "Instruments",
         panelContent: <DemoInstrumentsPanel />,
       },
-      // {
-      //   id: "visualizer",
-      //   icon: LuLayoutGrid,
-      //   label: "Visualizer",
-      //   panelContent: <DemoVisualizerPanel />,
-      // },
     ];
 
     const handleButtonClick = (buttonId: string) => {
@@ -197,11 +178,9 @@ export const DemoSidebarLeft = memo(
           style={{
             x,
             opacity,
-            // Subtle glow effect when no panels are active
             filter: !isOpen
               ? "drop-shadow(0 0 10px rgba(255, 255, 255, 0.02))"
               : "none",
-            // Use marginLeft to move icons to panel edge without conflicting with x motion value
             marginLeft: isOpen && activePanel ? "280px" : "0px",
             transition: "margin-left 0.4s cubic-bezier(0.23, 1, 0.280, 1)",
           }}
@@ -209,7 +188,6 @@ export const DemoSidebarLeft = memo(
             "absolute left-0 top-14 bottom-0 z-[150] flex w-16 flex-col items-center justify-between py-4 transition-all duration-200 pointer-events-auto"
           )}
         >
-          {/* Top buttons */}
           <div className="relative flex flex-col gap-2">
             {mockButtons.map((button, index) => (
               <DemoSidebarButton
@@ -217,14 +195,12 @@ export const DemoSidebarLeft = memo(
                 icon={button.icon}
                 onClick={() => handleButtonClick(button.id)}
                 isActive={activePanel === button.id}
-                isOpen={isOpen}
                 label={button.label}
               />
             ))}
           </div>
         </motion.div>
 
-        {/* Demo Panel Wrapper */}
         {activePanelData && (
           <DemoSidebarWrapper
             isOpen={!!activePanel}
