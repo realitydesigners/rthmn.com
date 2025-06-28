@@ -66,6 +66,7 @@ export function useSignals() {
             const newSignalsSinceLastCheck = data.filter(
               (signal: Signal) => signal.created_at > lastCheckRef.current!
             );
+            s;
 
             if (newSignalsSinceLastCheck.length > 0) {
               setNewSignals((prev) => [...newSignalsSinceLastCheck, ...prev]);

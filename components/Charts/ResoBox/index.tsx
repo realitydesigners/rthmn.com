@@ -78,80 +78,26 @@ const styles = create({
   },
 });
 
-// Helper function to convert hex to RGB
-const hexToRgb = (hex: string) => {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? {
-        r: parseInt(result[1], 16),
-        g: parseInt(result[2], 16),
-        b: parseInt(result[3], 16),
-      }
-    : null;
-};
-
-// Helper function to brighten a color (hex or rgb)
-const brightenColor = (color: string, factor: number = 2.0) => {
-  // Handle hex colors
-  if (color.startsWith("#")) {
-    const rgb = hexToRgb(color);
-    if (rgb) {
-      const newR = Math.min(255, Math.floor(rgb.r * factor));
-      const newG = Math.min(255, Math.floor(rgb.g * factor));
-      const newB = Math.min(255, Math.floor(rgb.b * factor));
-      return `rgb(${newR}, ${newG}, ${newB})`;
-    }
-  }
-
-  // Handle rgb colors
-  const rgbMatch = color.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-  if (rgbMatch) {
-    const newR = Math.min(255, Math.floor(parseInt(rgbMatch[1]) * factor));
-    const newG = Math.min(255, Math.floor(parseInt(rgbMatch[2]) * factor));
-    const newB = Math.min(255, Math.floor(parseInt(rgbMatch[3]) * factor));
-    return `rgb(${newR}, ${newG}, ${newB})`;
-  }
-
-  return color; // Return original if can't parse
-};
-
-// Optimized color computation with pattern highlighting
-const useBoxColors = (
-  box: Box,
-  boxColors: BoxColors,
-  activePatterns: number[] = []
-) => {
+// Optimized color computation
+const useBoxColors = (box: Box, boxColors: BoxColors) => {
   return useMemo(() => {
     const baseColor = box.value > 0 ? boxColors.positive : boxColors.negative;
-    const isInPattern = activePatterns.includes(box.value);
 
-    // Use bright red for pattern boxes to make them obvious
-    const finalColor = isInPattern
-      ? "rgb(255, 50, 50)" // Bright red for pattern boxes
-      : baseColor;
-
-    const opacity =
-      (boxColors.styles?.opacity ?? 0.2) * (isInPattern ? 3.0 : 1); // Triple opacity for patterns
-    const shadowIntensity =
-      (boxColors.styles?.shadowIntensity ?? 0.25) * (isInPattern ? 3.0 : 1); // Much stronger shadow
+    const opacity = boxColors.styles?.opacity ?? 0.2;
+    const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
     const shadowY = Math.floor(shadowIntensity);
     const shadowBlur = Math.floor(shadowIntensity * 50);
     const shadowColor = (alpha: number) => {
-      // For pattern boxes, use red shadows
-      if (isInPattern) {
-        return `rgba(255, 50, 50, ${alpha})`;
-      }
-      return finalColor.replace(")", `, ${alpha})`);
+      return baseColor.replace(")", `, ${alpha})`);
     };
 
     return {
-      baseColor: finalColor,
-      opacity: Math.min(1, opacity), // Cap at 1
+      baseColor,
+      opacity,
       shadowIntensity,
       shadowY,
       shadowBlur,
       shadowColor,
-      isInPattern,
     };
   }, [
     box.value,
@@ -159,7 +105,6 @@ const useBoxColors = (
     boxColors.negative,
     boxColors.styles?.opacity,
     boxColors.styles?.shadowIntensity,
-    activePatterns,
   ]);
 };
 
@@ -211,7 +156,6 @@ interface BoxProps {
   sortedBoxes: Box[];
   pair?: string;
   showPriceLines?: boolean;
-  activePatterns?: number[];
 }
 
 // Recursive component for nested boxes with atomic CSS
@@ -226,9 +170,8 @@ const ResoBoxRecursive = memo(
     sortedBoxes,
     pair,
     showPriceLines = true,
-    activePatterns = [],
   }: BoxProps) => {
-    const colors = useBoxColors(box, boxColors, activePatterns);
+    const colors = useBoxColors(box, boxColors);
     const { baseStyles, isFirstDifferent } = useBoxStyles(
       box,
       prevBox,
@@ -320,7 +263,6 @@ const ResoBoxRecursive = memo(
             sortedBoxes={sortedBoxes}
             pair={pair}
             showPriceLines={showPriceLines}
-            activePatterns={activePatterns}
           />
         )}
       </div>
@@ -336,7 +278,6 @@ interface ResoBoxProps {
   pair?: string;
   boxColors?: BoxColors;
   showPriceLines?: boolean;
-  activePatterns?: number[];
 }
 
 // Main ResoBox component with atomic CSS
@@ -347,7 +288,6 @@ export const ResoBox = memo(
     pair = "",
     boxColors: propBoxColors,
     showPriceLines = true,
-    activePatterns = [],
   }: ResoBoxProps) => {
     const boxRef = useRef<HTMLDivElement>(null);
     const [containerSize, setContainerSize] = useState(0);
@@ -409,7 +349,6 @@ export const ResoBox = memo(
               sortedBoxes={sortedBoxes}
               pair={pair}
               showPriceLines={showPriceLines}
-              activePatterns={activePatterns}
             />
           )}
         </div>
