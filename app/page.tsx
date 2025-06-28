@@ -68,7 +68,7 @@ export default async function Homepage() {
   return (
     <div className="h-full relative">
       {/* Dynamic background that changes with scroll */}
-      <Background />
+      {/* <Background /> */}
 
       <SectionBoxes3D />
       {/* <LineChart3D /> */}

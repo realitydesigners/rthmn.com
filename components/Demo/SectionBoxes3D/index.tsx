@@ -582,6 +582,12 @@ export const SectionBoxes3D = memo(() => {
     ? { start: 0.12, end: 0.22 } // Slightly earlier on mobile for better touch response
     : { start: 0.15, end: 0.25 };
 
+  // Progressive reveal thresholds - start after screen is fully loaded (stable values)
+  const leftSidebarThreshold = 0.28;
+  const rightSidebarThreshold = 0.36;
+  const focusModeThreshold = 0.42; // Focus mode happens shortly after right sidebar
+  const finalFadeThreshold = 0.9;
+
   // Only show intro text during formation, then allow scroll-based fade
   const introTextOpacity = useTransform(
     scrollYProgress,
@@ -611,14 +617,63 @@ export const SectionBoxes3D = memo(() => {
   );
   const sidebarOpacity = useTransform(
     scrollYProgress,
-    [scrollThresholds.start, scrollThresholds.end],
-    [0, 1]
+    [
+      scrollThresholds.start,
+      scrollThresholds.end,
+      finalFadeThreshold - 0.05,
+      finalFadeThreshold,
+    ],
+    [0, 1, 1, 0]
   );
   const navbarY = useTransform(
     scrollYProgress,
     [scrollThresholds.start, scrollThresholds.end],
     [-56, 0]
   );
+
+  // Progressive reveal state management
+  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
+  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
+  const [autoFocusMode, setAutoFocusMode] = useState(false);
+
+  // Handle progressive reveal after screen is loaded
+  useEffect(() => {
+    if (!isFormationComplete) return;
+
+    const progress = currentScrollProgress;
+
+    // Left sidebar opens at 0.30
+    if (progress >= leftSidebarThreshold && !leftSidebarOpen) {
+      setLeftSidebarOpen(true);
+    } else if (progress < leftSidebarThreshold && leftSidebarOpen) {
+      setLeftSidebarOpen(false);
+    }
+
+    // Right sidebar opens at 0.40
+    if (progress >= rightSidebarThreshold && !rightSidebarOpen) {
+      setRightSidebarOpen(true);
+    } else if (progress < rightSidebarThreshold && rightSidebarOpen) {
+      setRightSidebarOpen(false);
+    }
+
+    // Focus mode activates at 0.50
+    if (progress >= focusModeThreshold && !autoFocusMode) {
+      setAutoFocusMode(true);
+      setViewMode("box"); // Switch to focus mode
+    } else if (progress < focusModeThreshold && autoFocusMode) {
+      setAutoFocusMode(false);
+      setViewMode("scene"); // Switch back to scene mode
+    }
+  }, [
+    currentScrollProgress,
+    isFormationComplete,
+    leftSidebarOpen,
+    rightSidebarOpen,
+    autoFocusMode,
+    leftSidebarThreshold,
+    rightSidebarThreshold,
+    focusModeThreshold,
+  ]);
 
   // Navigation functions for the UI controls
   const navigation = {
@@ -640,7 +695,7 @@ export const SectionBoxes3D = memo(() => {
         overscrollBehavior: "contain", // Prevent scroll chaining
       }}
     >
-      <div className="h-[300vh] relative">
+      <div className="h-[350vh] relative">
         <div className="sticky top-0 h-screen w-full flex items-center justify-center relative">
           {structureSlice && structureSlice.boxes.length > 0 && (
             <ResoBox3DCircular
@@ -666,14 +721,16 @@ export const SectionBoxes3D = memo(() => {
               x={leftSidebarX}
               opacity={sidebarOpacity}
               scrollYProgress={scrollYProgress}
+              shouldOpen={leftSidebarOpen}
             />
             <DemoSidebarRight
               x={rightSidebarX}
               opacity={sidebarOpacity}
               scrollYProgress={scrollYProgress}
+              shouldOpen={rightSidebarOpen}
             />
 
-            {/* UI Controls - animate in with same opacity as other UI elements */}
+            {/* UI Controls - animate in and fade out at the end */}
             {isFormationComplete && (
               <>
                 <motion.div style={{ opacity: sidebarOpacity }}>

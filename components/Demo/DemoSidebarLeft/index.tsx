@@ -18,6 +18,7 @@ interface DemoSidebarLeftProps {
   x?: MotionValue<number>;
   opacity?: MotionValue<number>;
   scrollYProgress?: MotionValue<number>;
+  shouldOpen?: boolean;
 }
 
 // Enhanced button component matching the real FeatureTour design
@@ -103,7 +104,12 @@ const DemoSidebarButton = ({
 
 // Mock Demo Sidebar Left Component - matching the real Sidebar design
 export const DemoSidebarLeft = memo(
-  ({ x, opacity, scrollYProgress }: DemoSidebarLeftProps) => {
+  ({
+    x,
+    opacity,
+    scrollYProgress,
+    shouldOpen = false,
+  }: DemoSidebarLeftProps) => {
     const [activePanel, setActivePanel] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -111,9 +117,18 @@ export const DemoSidebarLeft = memo(
       setMounted(true);
     }, []);
 
-    // Auto-close panel when scrolling significantly back up
+    // Auto-open the instruments panel when shouldOpen becomes true
     useEffect(() => {
-      if (!scrollYProgress || !activePanel) return;
+      if (shouldOpen && !activePanel) {
+        setActivePanel("instruments"); // Open the instruments panel
+      } else if (!shouldOpen && activePanel) {
+        setActivePanel(null); // Close when shouldOpen becomes false
+      }
+    }, [shouldOpen, activePanel]);
+
+    // Auto-close panel when scrolling significantly back up (only when not controlled by parent)
+    useEffect(() => {
+      if (!scrollYProgress || !activePanel || shouldOpen) return; // Don't auto-close when controlled by parent
 
       let lastScrollValue = scrollYProgress.get();
       let scrollStartPosition = lastScrollValue;
@@ -143,7 +158,7 @@ export const DemoSidebarLeft = memo(
       });
 
       return unsubscribe;
-    }, [scrollYProgress, activePanel]);
+    }, [scrollYProgress, activePanel, shouldOpen]);
 
     const mockButtons = [
       {
@@ -152,12 +167,12 @@ export const DemoSidebarLeft = memo(
         label: "Instruments",
         panelContent: <DemoInstrumentsPanel />,
       },
-      {
-        id: "visualizer",
-        icon: LuLayoutGrid,
-        label: "Visualizer",
-        panelContent: <DemoVisualizerPanel />,
-      },
+      // {
+      //   id: "visualizer",
+      //   icon: LuLayoutGrid,
+      //   label: "Visualizer",
+      //   panelContent: <DemoVisualizerPanel />,
+      // },
     ];
 
     const handleButtonClick = (buttonId: string) => {

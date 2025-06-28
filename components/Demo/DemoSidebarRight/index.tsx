@@ -21,6 +21,7 @@ interface DemoSidebarRightProps {
   x?: MotionValue<number>;
   opacity?: MotionValue<number>;
   scrollYProgress?: MotionValue<number>;
+  shouldOpen?: boolean;
 }
 
 // Enhanced button component matching the real FeatureTour design
@@ -106,7 +107,12 @@ const DemoSidebarButton = ({
 
 // Mock Demo Sidebar Right Component - matching the real Sidebar design
 export const DemoSidebarRight = memo(
-  ({ x, opacity, scrollYProgress }: DemoSidebarRightProps) => {
+  ({
+    x,
+    opacity,
+    scrollYProgress,
+    shouldOpen = false,
+  }: DemoSidebarRightProps) => {
     const [activePanel, setActivePanel] = useState<string | null>(null);
     const [mounted, setMounted] = useState(false);
 
@@ -114,9 +120,18 @@ export const DemoSidebarRight = memo(
       setMounted(true);
     }, []);
 
-    // Auto-close panel when scrolling significantly back up
+    // Auto-open the settings panel when shouldOpen becomes true
     useEffect(() => {
-      if (!scrollYProgress || !activePanel) return;
+      if (shouldOpen && !activePanel) {
+        setActivePanel("settings"); // Open the settings panel
+      } else if (!shouldOpen && activePanel) {
+        setActivePanel(null); // Close when shouldOpen becomes false
+      }
+    }, [shouldOpen, activePanel]);
+
+    // Auto-close panel when scrolling significantly back up (only when not controlled by parent)
+    useEffect(() => {
+      if (!scrollYProgress || !activePanel || shouldOpen) return; // Don't auto-close when controlled by parent
 
       let lastScrollValue = scrollYProgress.get();
       let scrollStartPosition = lastScrollValue;
@@ -146,7 +161,7 @@ export const DemoSidebarRight = memo(
       });
 
       return unsubscribe;
-    }, [scrollYProgress, activePanel]);
+    }, [scrollYProgress, activePanel, shouldOpen]);
 
     const mockButtons = [
       {
