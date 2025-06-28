@@ -231,6 +231,11 @@ export default function Dashboard() {
         </div>
       )}
 
+      <SignalAlerts
+        newSignals={newSignals}
+        onClearSignal={clearSignalAlert}
+        onClearAll={clearAllAlerts}
+      />
       {/* Grid View - Only visible when not in zen mode */}
       {!isZenMode && (
         <div className="w-full px-2 pb-24 lg:pb-2 pt-16 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -240,11 +245,6 @@ export default function Dashboard() {
               gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
             }}
           >
-            {/* <SignalAlerts
-              newSignals={newSignals}
-              onClearSignal={clearSignalAlert}
-              onClearAll={clearAllAlerts}
-            /> */}
             {isClient &&
               pairsToRender.map((pair) => {
                 const data = pairData[pair];

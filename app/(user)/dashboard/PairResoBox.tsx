@@ -10,6 +10,8 @@ import type { BoxSlice } from "@/types/types";
 import { formatPrice } from "@/utils/instruments";
 import { create, props, keyframes } from "@/lib/styles/atomic";
 import React, { useCallback, useMemo } from "react";
+import { FaBell } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 // Atomic CSS styles using our custom system
 const pulse = keyframes({
@@ -20,6 +22,11 @@ const pulse = keyframes({
 const glowPulse = keyframes({
   "0%, 100%": { opacity: 0.6, transform: "scale(1)" },
   "50%": { opacity: 0.8, transform: "scale(1.02)" },
+});
+
+const shimmer = keyframes({
+  "0%": { transform: "translateX(-100%)" },
+  "100%": { transform: "translateX(100%)" },
 });
 
 const styles = create({
@@ -192,6 +199,46 @@ export const PairResoBox = ({
 
   const currentPrice = pair ? priceData[pair]?.price : null;
 
+  // Pattern type and colors logic (similar to SignalAlerts)
+  const getPatternType = (pattern: number[]) => {
+    if (pattern.length === 1) {
+      return pattern[0] > 0 ? "Buy" : "Sell";
+    }
+    const positive = pattern.filter((p) => p > 0).length;
+    const negative = pattern.filter((p) => p < 0).length;
+
+    if (positive > negative) return "Buy";
+    if (negative > positive) return "Sell";
+    return "Mixed";
+  };
+
+  const getPatternColors = (pattern: number[]) => {
+    const type = getPatternType(pattern);
+    switch (type) {
+      case "Buy":
+        return {
+          background: "linear-gradient(180deg, #1A2B1A -10.71%, #0F1514 100%)",
+          border: "#4EFF6E",
+          glow: "rgba(78, 255, 110, 0.2)",
+        };
+      case "Sell":
+        return {
+          background: "linear-gradient(180deg, #2B1A1A -10.71%, #15100F 100%)",
+          border: "#FF6E4E",
+          glow: "rgba(255, 110, 78, 0.2)",
+        };
+      default:
+        return {
+          background: "linear-gradient(180deg, #2B2A1A -10.71%, #15140F 100%)",
+          border: "#FFE64E",
+          glow: "rgba(255, 230, 78, 0.2)",
+        };
+    }
+  };
+
+  const patternColors =
+    activePatterns.length > 0 ? getPatternColors(activePatterns) : null;
+
   // Memoize the filtered boxes based on timeframe settings
   const filteredBoxSlice = useMemo(() => {
     if (!boxSlice?.boxes) return undefined;
@@ -211,17 +258,59 @@ export const PairResoBox = ({
 
   return (
     <div {...props(styles.container)}>
-      {/* Green inner glow effect when there are active patterns */}
+      {/* Dynamic gradient effect when there are active patterns */}
+      {activePatterns.length > 0 && patternColors && (
+        <>
+          {/* Background gradient overlay */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0 "
+            style={{
+              background: patternColors.background,
+              opacity: 0.6,
+            }}
+          />
+
+          {/* Border glow effect */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0 "
+            style={{
+              boxShadow: `inset 0 0 50px ${patternColors.glow}, 0 0 20px ${patternColors.glow}`,
+              border: `1px solid ${patternColors.border}40`,
+            }}
+          />
+
+          {/* Shimmer effect */}
+          <div
+            className="absolute inset-0 pointer-events-none z-0 opacity-30"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${patternColors.border}40, transparent)`,
+              animationName: shimmer,
+              animationDuration: "2s",
+              animationIterationCount: "infinite",
+            }}
+          />
+        </>
+      )}
+
+      {/* Signal Bell Icon Emblem */}
       {activePatterns.length > 0 && (
-        <div
-          className="absolute inset-0 pointer-events-none z-0"
-          style={{
-            background:
-              "radial-gradient(ellipse, #4EFF6E60, #4EFF6E40 40%, #4EFF6E20 70%, transparent 90%)",
-            borderRadius: "12px",
-            boxShadow: "inset 0 0 50px #4EFF6E30",
-          }}
-        />
+        <div className="absolute top-4 right-4 z-10">
+          <div className="relative flex h-6 w-6 items-center justify-center rounded-full backdrop-blur-md border border-[#32353C] bg-[#1A1D22] shadow-lg">
+            <motion.div
+              animate={{
+                scale: [1, 1.1, 1],
+                rotate: [0, 5, -5, 0],
+              }}
+              transition={{
+                duration: 0.6,
+                repeat: Infinity,
+                repeatDelay: 2,
+              }}
+            >
+              <FaBell className="w-3 h-3 text-white" />
+            </motion.div>
+          </div>
+        </div>
       )}
 
       <div {...props(styles.contentWrapper)}>

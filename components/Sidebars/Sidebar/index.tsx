@@ -258,7 +258,7 @@ export const Sidebar = ({
         </div>
 
         {/* Bottom buttons */}
-        <div className="mb-2 flex flex-col gap-2">
+        <div className="mb-2 flex flex-col gap-4">
           {/* Link buttons (like Help) */}
           {linkButtons.map((linkButton) => (
             <Link
