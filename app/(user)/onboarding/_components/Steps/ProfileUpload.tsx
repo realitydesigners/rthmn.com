@@ -143,7 +143,7 @@ export default function ProfileUpload({ onPhotoUpload }: Props) {
 						>
 							{/* Top highlight */}
 							<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-							
+
 							<AnimatePresence mode="wait">
 								{preview ? (
 									<motion.div

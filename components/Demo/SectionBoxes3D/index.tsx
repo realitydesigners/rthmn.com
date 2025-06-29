@@ -1,5 +1,6 @@
 "use client";
 
+import { CHART_STYLES } from "@/components/Charts/ChartStyleOptions";
 import {
   BASE_VALUES,
   createDemoStep,
@@ -8,44 +9,24 @@ import {
 } from "@/components/Constants/constants";
 import { DemoSidebarLeft } from "@/components/Demo/DemoSidebarLeft";
 import { DemoSidebarRight } from "@/components/Demo/DemoSidebarRight";
-import { ResoBox3DCircular } from "@/components/Demo/ResoBox3DDemo";
-import {
-  TradingInfoPanel,
-  mockTradingData,
-} from "@/components/Demo/TradingPanel";
 import { DemoNavbar } from "@/components/Navbars/DemoNavbar";
+import { useColorStore } from "@/stores/colorStore";
 import type { BoxSlice } from "@/types/types";
-import {
-  motion,
-  useScroll,
-  useTransform,
-  AnimatePresence,
-} from "framer-motion";
+import { cn } from "@/utils/cn";
+import { OrbitControls } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { motion, useScroll, useTransform } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import type React from "react";
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  LuBarChart3,
-  LuLayoutDashboard,
-  LuTrendingUp,
-  LuBox,
-  LuChevronLeft,
-  LuChevronRight,
-  LuEye,
-} from "react-icons/lu";
-import { NavButton } from "./Displays";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
+import { DemoBottomNavbar } from "../DemoBottomNavbar";
+import { BoxStructure } from "./BoxStructure";
+import { CameraController } from "./CameraController";
 import { HeroText } from "./HeroText";
 import { TradingAdvantage } from "./TradingAdvantage";
+import { calculateCircularPosition } from "./mathUtils";
 import { useAnimatedStructures } from "./useAnimatedStructures";
-import { TimeFrameSlider } from "@/components/Panels/PanelComponents/TimeFrameSlider";
-import { CHART_STYLES } from "@/components/Charts/ChartStyleOptions";
-import { useColorStore } from "@/stores/colorStore";
-import { cn } from "@/utils/cn";
-
-type CryptoStructure = {
-  pair: string;
-  name: string;
-};
+import { useCanvasSetup } from "./useCanvasSetup";
 
 interface ScreenProps {
   scale: MotionValue<number>;
@@ -57,17 +38,11 @@ interface ScreenProps {
 
 // Screen component that wraps the entire demo with animated border and scaling
 const Screen = memo(
-  ({
-    scale,
-    scrollYProgress,
-    children,
-    showScreen,
-    focusedIndex,
-  }: ScreenProps) => {
+  ({ scale, scrollYProgress, children, showScreen }: ScreenProps) => {
     // Border animation - appears after all UI elements are loaded
     const borderOpacity = useTransform(
       scrollYProgress,
-      [0.22, 0.25], // Start after sidebars finish and complete quickly
+      [0.18, 0.2], // Start after sidebars finish and complete quickly
       [0, 1]
     );
 
@@ -80,12 +55,10 @@ const Screen = memo(
         }}
         className="absolute inset-0 w-full h-full lg:flex hidden pointer-events-none z-[1000]"
       >
-        {/* Animated border that appears when UI is loaded */}
         <motion.div
           style={{ opacity: borderOpacity }}
           className="absolute inset-0 border-2 border-[#1C1E23] rounded-lg pointer-events-none z-[110]"
         />
-
         {children}
       </motion.div>
     );
@@ -93,61 +66,6 @@ const Screen = memo(
 );
 
 Screen.displayName = "Screen";
-
-// Custom Square icon component for demo chart styles
-const SquareIcon = ({
-  size = 24,
-  className,
-}: {
-  size?: number;
-  className?: string;
-}) => (
-  <svg
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-    role="img"
-    aria-label="Square box icon"
-  >
-    <title>Square box icon</title>
-    <rect x="6" y="6" width="12" height="12" rx="1" />
-  </svg>
-);
-
-// Structure Indicator Component - matching ZenModeControls style
-const StructureIndicator = memo(
-  ({
-    structures,
-    activeIndex,
-    onSelect,
-  }: {
-    structures: Array<{ pair: string; name: string }>;
-    activeIndex: number;
-    onSelect: (index: number) => void;
-  }) => (
-    <div className="flex items-center gap-3 px-4 py-2 rounded-full border bg-[#0A0B0D]/90 border-[#1C1E23]/60 backdrop-blur-sm shadow-[0_6px_24px_rgba(0,0,0,0.2)]">
-      {/* Current structure info */}
-      <div className="flex items-center gap-2">
-        <div className="w-auto h-8 rounded-lg px-2 bg-gradient-to-b from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30 flex items-center justify-center">
-          <span className="font-russo text-sm font-bold text-[#24FF66]">
-            {structures[activeIndex]?.pair}
-          </span>
-        </div>
-        <span className="font-russo text-sm font-medium text-white">
-          {structures[activeIndex]?.name}
-        </span>
-      </div>
-    </div>
-  )
-);
-
-StructureIndicator.displayName = "StructureIndicator";
 
 // Compact Chart Style Selector for demo
 const CompactChartStyleSelector = memo(() => {
@@ -231,269 +149,6 @@ const CompactChartStyleSelector = memo(() => {
 
 CompactChartStyleSelector.displayName = "CompactChartStyleSelector";
 
-// DemoBottomNavbar component for the UI controls - matching ZenModeControls design
-const DemoBottomNavbar = memo(
-  ({
-    cryptoStructures,
-    focusedIndex,
-    setFocusedIndex,
-    viewMode,
-    setViewMode,
-    isTradingPanelOpen,
-    setIsTradingPanelOpen,
-    navigation,
-  }: {
-    cryptoStructures: CryptoStructure[];
-    focusedIndex: number;
-    setFocusedIndex: (index: number) => void;
-    viewMode: "scene" | "box";
-    setViewMode: (mode: "scene" | "box") => void;
-    isTradingPanelOpen: boolean;
-    setIsTradingPanelOpen: (open: boolean) => void;
-    navigation: {
-      next: () => void;
-      previous: () => void;
-    };
-  }) => {
-    const [activePanel, setActivePanel] = useState<
-      "timeframe" | "chartstyle" | null
-    >(null);
-    const containerRef = useRef<HTMLDivElement>(null);
-    const boxColors = useColorStore((state) => state.boxColors);
-
-    const togglePanel = useCallback((panel: "timeframe" | "chartstyle") => {
-      setActivePanel((current) => (current === panel ? null : panel));
-    }, []);
-
-    // Function to get the current chart style icon
-    const getCurrentChartStyleIcon = useCallback(() => {
-      const currentViewMode = boxColors.styles?.viewMode;
-
-      if (currentViewMode === "3d") {
-        return LuBox;
-      } else {
-        return SquareIcon;
-      }
-    }, [boxColors.styles?.viewMode]);
-
-    // Handle clicking outside to close panel
-    useEffect(() => {
-      const handleClickOutside = (event: MouseEvent) => {
-        if (
-          containerRef.current &&
-          !containerRef.current.contains(event.target as Node)
-        ) {
-          setActivePanel(null);
-        }
-      };
-
-      if (activePanel) {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-          document.removeEventListener("mousedown", handleClickOutside);
-        };
-      }
-    }, [activePanel]);
-
-    // Render button function matching ZenModeControls
-    const renderButton = useCallback(
-      (buttonConfig: {
-        id: string;
-        icon?: React.ComponentType<any>;
-        onClick: () => void;
-        isActive: boolean;
-        isVisible: boolean;
-      }) => {
-        const {
-          id,
-          icon: IconComponent,
-          onClick,
-          isActive,
-          isVisible,
-        } = buttonConfig;
-
-        if (!isVisible) return null;
-
-        return (
-          <button
-            key={id}
-            onClick={onClick}
-            className={cn(
-              "group relative overflow-hidden w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200",
-              !isActive && "text-[#B0B0B0] hover:text-white"
-            )}
-            style={{
-              background: isActive
-                ? "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)"
-                : undefined,
-              boxShadow: isActive
-                ? "0px 4px 4px 0px rgba(0, 0, 0, 0.25)"
-                : undefined,
-            }}
-          >
-            {/* Hover background for non-active buttons */}
-            {!isActive && (
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"
-                style={{
-                  background:
-                    "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-                }}
-              />
-            )}
-            {IconComponent && (
-              <IconComponent
-                className={cn(
-                  "w-6 h-6 relative z-10 transition-colors duration-200",
-                  isActive ? "text-white" : ""
-                )}
-              />
-            )}
-          </button>
-        );
-      },
-      []
-    );
-
-    return (
-      <>
-        <div className="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
-          <div
-            ref={containerRef}
-            className="relative flex flex-col items-center gap-1"
-          >
-            {/* Content panel - shows above buttons */}
-            <AnimatePresence>
-              {activePanel && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                  animate={{
-                    opacity: 1,
-                    y: 0,
-                    scale: 1,
-                    width: "auto",
-                  }}
-                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                  transition={{
-                    duration: 0.2,
-                    ease: "easeOut",
-                    width: { duration: 0.3, ease: "easeInOut" },
-                  }}
-                  className="p-3 rounded-xl border border-[#1C1E23]/40 bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
-                >
-                  {activePanel === "timeframe" && (
-                    <div className="w-full min-w-[320px]">
-                      <TimeFrameSlider showPanel={false} global />
-                    </div>
-                  )}
-                  {activePanel === "chartstyle" && (
-                    <div className="w-full min-w-[250px]">
-                      <CompactChartStyleSelector />
-                    </div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Button container - clean and simple */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-full border bg-[#0A0B0D]/90 border-[#1C1E23]/60 backdrop-blur-sm shadow-[0_6px_24px_rgba(0,0,0,0.2)]">
-              {/* Left buttons - timeframe and chart style */}
-              {renderButton({
-                id: "timeframe",
-                icon: LuBarChart3,
-                onClick: () => togglePanel("timeframe"),
-                isActive: activePanel === "timeframe",
-                isVisible: true,
-              })}
-
-              {renderButton({
-                id: "chartstyle",
-                icon: getCurrentChartStyleIcon(),
-                onClick: () => togglePanel("chartstyle"),
-                isActive: activePanel === "chartstyle",
-                isVisible: viewMode === "box", // Only show in box mode like ZenModeControls
-              })}
-
-              {/* Scene navigation when in scene mode */}
-              {viewMode === "scene" && (
-                <>
-                  {renderButton({
-                    id: "prev",
-                    icon: LuChevronLeft,
-                    onClick: navigation.previous,
-                    isActive: false,
-                    isVisible: true,
-                  })}
-
-                  {/* Current structure display - between nav buttons */}
-                  <div className="flex items-center gap-3 px-4 w-[160px] justify-center">
-                    <span className="font-russo text-xs font-medium text-white uppercase tracking-wide">
-                      {cryptoStructures[focusedIndex]?.pair}
-                    </span>
-                    <span className="font-russo text-xs text-[#818181] uppercase tracking-wide">
-                      {cryptoStructures[focusedIndex]?.name}
-                    </span>
-                  </div>
-
-                  {renderButton({
-                    id: "next",
-                    icon: LuChevronRight,
-                    onClick: navigation.next,
-                    isActive: false,
-                    isVisible: true,
-                  })}
-                </>
-              )}
-
-              {/* Focus mode label when in box mode */}
-              {viewMode === "box" && (
-                <div className="flex items-center gap-3 px-4 w-[160px] justify-center">
-                  <span className="font-russo text-xs text-[#818181] uppercase tracking-wide">
-                    Focus Mode
-                  </span>
-                  <span className="font-russo text-xs font-medium text-white uppercase tracking-wide">
-                    {cryptoStructures[focusedIndex]?.pair}
-                  </span>
-                </div>
-              )}
-
-              {/* Mode toggle button */}
-              {renderButton({
-                id: "viewMode",
-                icon: viewMode === "scene" ? LuEye : LuEye,
-                onClick: () =>
-                  setViewMode(viewMode === "scene" ? "box" : "scene"),
-                isActive: viewMode === "box",
-                isVisible: true,
-              })}
-            </div>
-
-            {/* Floating title below buttons */}
-            <AnimatePresence>
-              {activePanel && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -5 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 pointer-events-none"
-                >
-                  <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
-                    {activePanel === "timeframe" && "TIMEFRAME"}
-                    {activePanel === "chartstyle" && "STYLE"}
-                  </span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </>
-    );
-  }
-);
-
-DemoBottomNavbar.displayName = "DemoBottomNavbar";
-
 export const SectionBoxes3D = memo(() => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -518,12 +173,8 @@ export const SectionBoxes3D = memo(() => {
   const [currentStructureSlice, setCurrentStructureSlice] =
     useState<BoxSlice | null>(null);
 
-  // UI state for the 3D controls
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
-  const [isTradingPanelOpen, setIsTradingPanelOpen] = useState(false);
-
-  // Get crypto structures for UI
   const { cryptoStructures } = useAnimatedStructures();
 
   // Create initial structure slice for the intro (will be updated by ResoBox3DCircular)
@@ -577,15 +228,21 @@ export const SectionBoxes3D = memo(() => {
     });
     return unsubscribe;
   }, [scrollYProgress]);
-  // Mobile-optimized scroll thresholds - slightly different for touch devices
-  const scrollThresholds = isMobile
-    ? { start: 0.12, end: 0.22 } // Slightly earlier on mobile for better touch response
-    : { start: 0.15, end: 0.25 };
+  // Structure movement thresholds - structure moves from right to center first (matching ResoBox3DDemo)
+  const structureMoveThreshold = isMobile ? 0.18 : 0.1;
+  const structureMoveRange = 0.03;
+  const uiAppearThreshold = structureMoveThreshold + structureMoveRange; // UI appears after structure is centered
 
-  // Progressive reveal thresholds - start after screen is fully loaded (stable values)
-  const leftSidebarThreshold = 0.28;
-  const rightSidebarThreshold = 0.36;
-  const focusModeThreshold = 0.42; // Focus mode happens shortly after right sidebar
+  // Screen scaling and positioning thresholds
+  const scrollThresholds = {
+    start: uiAppearThreshold,
+    end: uiAppearThreshold + 0.05,
+  };
+
+  // Progressive reveal thresholds - start after screen is fully loaded
+  const leftSidebarThreshold = scrollThresholds.end + 0.03;
+  const rightSidebarThreshold = leftSidebarThreshold + 0.08;
+  const focusModeThreshold = rightSidebarThreshold + 0.06;
   const finalFadeThreshold = 0.9;
 
   // Only show intro text during formation, then allow scroll-based fade
@@ -737,11 +394,8 @@ export const SectionBoxes3D = memo(() => {
                   <DemoBottomNavbar
                     cryptoStructures={cryptoStructures}
                     focusedIndex={focusedIndex}
-                    setFocusedIndex={setFocusedIndex}
                     viewMode={viewMode}
                     setViewMode={setViewMode}
-                    isTradingPanelOpen={isTradingPanelOpen}
-                    setIsTradingPanelOpen={setIsTradingPanelOpen}
                     navigation={navigation}
                   />
                 </motion.div>
@@ -757,3 +411,249 @@ export const SectionBoxes3D = memo(() => {
 });
 
 SectionBoxes3D.displayName = "SectionBoxes3D";
+
+export const ResoBox3DCircular = memo(
+  ({
+    slice,
+    className = "",
+    onCurrentSliceChange,
+    focusedIndex: externalFocusedIndex,
+    viewMode: externalViewMode,
+    introMode = false,
+    formationProgress = 1,
+    scrollProgress = 0,
+    cameraDistance,
+  }: {
+    slice: BoxSlice;
+    className?: string;
+    onCurrentSliceChange?: (slice: BoxSlice) => void;
+    focusedIndex?: number;
+    viewMode?: "scene" | "box";
+    introMode?: boolean;
+    formationProgress?: number;
+    scrollProgress?: number;
+    cameraDistance?: MotionValue<number>;
+  }) => {
+    const { isClient, canvasDimensions } = useCanvasSetup();
+    const { cryptoStructures, structureSlices } = useAnimatedStructures();
+    const [internalFocusedIndex, setInternalFocusedIndex] = useState(0);
+    const focusedIndex = externalFocusedIndex ?? internalFocusedIndex;
+    const [internalViewMode, setInternalViewMode] = useState<"scene" | "box">(
+      "scene"
+    );
+    const viewMode = externalViewMode ?? internalViewMode;
+
+    if (!slice?.boxes?.length) return null;
+
+    // Mobile-responsive scroll thresholds
+    const isMobile =
+      typeof window !== "undefined" &&
+      (window.innerWidth < 1024 || "ontouchstart" in window);
+
+    // Structure movement thresholds - structure moves from right to center first
+    const structureMoveThreshold = isMobile ? 0.18 : 0.1; // When structure starts moving to center (earlier)
+    const structureMoveRange = 0.03; // Quick movement to center
+    const uiAppearThreshold = structureMoveThreshold + structureMoveRange; // UI appears after structure is centered
+    const circularAppearThreshold = uiAppearThreshold + 0.05; // Circular structures appear after UI
+
+    // Calculate structure position transition (right to center)
+    const structureMoveProgress = Math.min(
+      1,
+      Math.max(
+        0,
+        (scrollProgress - structureMoveThreshold) / structureMoveRange
+      )
+    );
+
+    // Determine what to show based on intro mode and scroll progress
+    const showOnlyFirstStructure = scrollProgress < circularAppearThreshold;
+    const showCircularArrangement = scrollProgress >= circularAppearThreshold;
+
+    // Calculate transition progress for other structures appearing
+    const circularAppearanceProgress = showCircularArrangement
+      ? Math.min(1, (scrollProgress - circularAppearThreshold) / 0.05)
+      : 0;
+
+    // Calculate structure positions and properties
+    const structures = useMemo(
+      () =>
+        cryptoStructures.map((crypto, index) => {
+          const circularPosition = calculateCircularPosition(
+            index,
+            focusedIndex,
+            cryptoStructures.length
+          );
+          const isFocused = index === focusedIndex;
+
+          // For the first structure, smoothly transition from right to center to circular position
+          let basePosition = circularPosition;
+          if (index === 0) {
+            // Define positions: right -> center -> circular
+            const rightPosition: [number, number, number] = [12, 0, 30]; // Start less to the right
+            const centerPosition: [number, number, number] = [0, 0, 40]; // Move to center
+
+            if (showOnlyFirstStructure) {
+              // Interpolate from right to center based on scroll
+              basePosition = [
+                rightPosition[0] +
+                  (centerPosition[0] - rightPosition[0]) *
+                    structureMoveProgress,
+                rightPosition[1] +
+                  (centerPosition[1] - rightPosition[1]) *
+                    structureMoveProgress,
+                rightPosition[2] +
+                  (centerPosition[2] - rightPosition[2]) *
+                    structureMoveProgress,
+              ];
+            } else {
+              // After UI appears, move from center to circular position
+              basePosition = [
+                centerPosition[0] +
+                  (circularPosition[0] - centerPosition[0]) *
+                    circularAppearanceProgress,
+                centerPosition[1] +
+                  (circularPosition[1] - centerPosition[1]) *
+                    circularAppearanceProgress,
+                centerPosition[2] +
+                  (circularPosition[2] - centerPosition[2]) *
+                    circularAppearanceProgress,
+              ];
+            }
+          }
+
+          // In box mode, center and bring forward the focused structure (matching ZenMode)
+          const position: [number, number, number] =
+            viewMode === "box" && isFocused
+              ? [0, 0, 25] // Match ZenMode focus positioning exactly
+              : basePosition;
+
+          return {
+            ...crypto,
+            position,
+            scale:
+              viewMode === "box" && isFocused
+                ? 1.5 // Match ZenMode focus scale
+                : index === 0 && showOnlyFirstStructure
+                  ? 1.4 // Larger initial scale for first structure
+                  : isFocused
+                    ? 1.2 // Normal focused size in scene mode
+                    : 0.8, // Normal unfocused size
+            opacity:
+              index === 0
+                ? isFocused
+                  ? 1
+                  : 0.7 // First structure always visible after formation
+                : circularAppearanceProgress * (isFocused ? 1 : 0.7), // Others fade in on scroll
+            rotation:
+              viewMode === "box" && isFocused
+                ? ([0, -Math.PI / 4, 0] as [number, number, number]) // Match ZenMode focus rotation
+                : index === 0 && showOnlyFirstStructure
+                  ? ([0, -Math.PI / 4, 0] as [number, number, number]) // More rotation when on the right
+                  : undefined,
+          };
+        }),
+      [
+        cryptoStructures,
+        focusedIndex,
+        viewMode,
+        showOnlyFirstStructure,
+        showCircularArrangement,
+        structureMoveProgress,
+        circularAppearanceProgress,
+      ]
+    );
+
+    // Calculate which structure to focus on
+    const actualFocusedIndex = showOnlyFirstStructure
+      ? 0
+      : structures.reduce((closest, struct, index) => {
+          const currentDistance =
+            struct.position[0] ** 2 + struct.position[2] ** 2;
+          const closestDistance =
+            structures[closest].position[0] ** 2 +
+            structures[closest].position[2] ** 2;
+          return currentDistance < closestDistance && struct.position[2] > 0
+            ? index
+            : closest;
+        }, 0);
+
+    const currentSlice = structureSlices[actualFocusedIndex];
+
+    useEffect(
+      () => onCurrentSliceChange?.(currentSlice),
+      [currentSlice, onCurrentSliceChange]
+    );
+
+    return (
+      <div className={`relative h-full w-full ${className}`}>
+        <Canvas
+          camera={{ position: [0, 0, 70], fov: 50 }}
+          resize={{ scroll: true, debounce: { scroll: 0, resize: 0 } }}
+          className="absolute inset-0 z-0 left-0 top-0 w-[100vw] h-[100vh]"
+          dpr={[1, 2]}
+          gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
+        >
+          <ambientLight intensity={2} />
+          <directionalLight position={[0, 60, 180]} intensity={1} />
+
+          <CameraController
+            viewMode={viewMode}
+            scrollProgress={scrollProgress}
+            introMode={introMode}
+            isClient={isClient}
+            cameraDistance={cameraDistance}
+          />
+
+          <OrbitControls
+            enabled={viewMode === "box"}
+            enableRotate={viewMode === "box"}
+            maxDistance={100}
+            minDistance={20}
+            autoRotate={false}
+            target={
+              viewMode === "box"
+                ? [0, 0, 30] // Match ZenMode focus target
+                : structures[actualFocusedIndex]?.position || [0, 0, 0]
+            }
+            enablePan={false}
+            enableZoom={false}
+            zoomSpeed={0.5}
+          />
+
+          {/* Always show all structures with seamless transitions */}
+          {structures.map((structure, index) => {
+            // In box mode, only show the focused structure
+            if (viewMode === "box" && index !== actualFocusedIndex) {
+              return null;
+            }
+
+            const currentSlice = structureSlices[index];
+
+            if (structure.opacity <= 0.01) {
+              return null;
+            }
+
+            return (
+              <BoxStructure
+                key={structure.pair}
+                slice={currentSlice}
+                pair={structure.pair}
+                structure={{
+                  position: structure.position,
+                  scale: structure.scale,
+                  opacity: structure.opacity,
+                  rotation: structure.rotation,
+                }}
+                scatteredPositions={undefined} // No more scattered animation
+                formationProgress={1} // Always fully formed
+                isFocused={index === actualFocusedIndex}
+              />
+            );
+          })}
+        </Canvas>
+      </div>
+    );
+  }
+);
+
+ResoBox3DCircular.displayName = "ResoBox3DCircular";

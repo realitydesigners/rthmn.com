@@ -5,7 +5,9 @@ export const ChangelogTemplate: PortableTextComponents = {
 	block: {
 		normal: ({ children }) => (
 			<div className="mb-4">
-				<p className="font-kodemono leading-relaxed text-white/70">{children}</p>
+				<p className="font-kodemono leading-relaxed text-white/70">
+					{children}
+				</p>
 			</div>
 		),
 		h1: ({ children }) => (

@@ -156,13 +156,17 @@ export const StartButton: FC<StartButtonProps> = ({
 						disabled={disabled || isLoading}
 						className={buttonClasses}
 					>
-						<span className={`relative flex w-full items-center rounded-full ${styles.inner}`}>
+						<span
+							className={`relative flex w-full items-center rounded-full ${styles.inner}`}
+						>
 							<ButtonContent />
 						</span>
 					</button>
 				) : (
 					<Link href={href} className={buttonClasses}>
-						<span className={`relative flex w-full items-center rounded-full ${styles.inner}`}>
+						<span
+							className={`relative flex w-full items-center rounded-full ${styles.inner}`}
+						>
 							<ButtonContent />
 						</span>
 					</Link>

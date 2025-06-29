@@ -9,9 +9,7 @@ export function TourOnboarding({ onComplete }: OnboardingContentProps) {
 	return (
 		<TourContentWrapper className="w-[350px]" onComplete={onComplete}>
 			<div className="w-full p-2">
-				<h3 className="font-russo text-2xl font-bold text-white">
-					Learn
-				</h3>
+				<h3 className="font-russo text-2xl font-bold text-white">Learn</h3>
 				<p className="font-kodemono text-[13px] leading-relaxed text-white/60">
 					Your personal trading education and onboarding center.
 				</p>

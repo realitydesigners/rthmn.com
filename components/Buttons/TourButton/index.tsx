@@ -19,20 +19,23 @@ export function TourButton({
 	const getVariantStyles = () => {
 		if (isGreen) {
 			return {
-				wrapper: "bg-[#24FF66] text-black hover:bg-[#1ECC52] border border-[#24FF66]/50 shadow-[0_0_20px_rgba(36,255,102,0.3)] hover:shadow-[0_0_30px_rgba(36,255,102,0.5)] before:absolute before:inset-0 before:bg-[linear-gradient(45deg,transparent_30%,rgba(255,255,255,0.3)_50%,transparent_70%)] before:bg-[length:200%_200%] before:animate-[shimmer_3s_ease-in-out_infinite]",
+				wrapper:
+					"bg-[#24FF66] text-black hover:bg-[#1ECC52] border border-[#24FF66]/50 shadow-[0_0_20px_rgba(36,255,102,0.3)] hover:shadow-[0_0_30px_rgba(36,255,102,0.5)] before:absolute before:inset-0 before:bg-[linear-gradient(45deg,transparent_30%,rgba(255,255,255,0.3)_50%,transparent_70%)] before:bg-[length:200%_200%] before:animate-[shimmer_3s_ease-in-out_infinite]",
 				glow: "",
 				highlight: "",
 			};
 		}
 		if (isBlue) {
 			return {
-				wrapper: "border-blue-400/20 bg-gradient-to-b from-blue-400/10 via-blue-400/5 to-transparent text-blue-400 hover:border-blue-400/30 hover:text-blue-400",
+				wrapper:
+					"border-blue-400/20 bg-gradient-to-b from-blue-400/10 via-blue-400/5 to-transparent text-blue-400 hover:border-blue-400/30 hover:text-blue-400",
 				glow: "bg-blue-400/[0.03]",
 				highlight: "via-blue-400/20",
 			};
 		}
 		return {
-			wrapper: "border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] text-white/90 hover:border-[#32353C] hover:from-[#0A0B0D] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20",
+			wrapper:
+				"border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] text-white/90 hover:border-[#32353C] hover:from-[#0A0B0D] hover:to-[#141414] hover:text-white hover:shadow-lg hover:shadow-black/20",
 			glow: "bg-gradient-to-b from-white/[0.03] to-transparent",
 			highlight: "via-white/10",
 		};
@@ -77,8 +80,10 @@ export function TourButton({
 						/>
 					</>
 				)}
-				
-				<span className={`font-russo relative flex items-center gap-2 ${isGreen ? "font-kodemono uppercase font-semibold tracking-wide group-hover:tracking-wider" : ""}`}>
+
+				<span
+					className={`font-russo relative flex items-center gap-2 ${isGreen ? "font-kodemono uppercase font-semibold tracking-wide group-hover:tracking-wider" : ""}`}
+				>
 					{children}
 					{isGreen && (
 						<FaArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />

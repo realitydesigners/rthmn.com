@@ -122,7 +122,7 @@ const StarField = () => {
 };
 const BASE_ANIMATIONS = {
 	transition: {
-		duration: .8,
+		duration: 0.8,
 		ease: [0.19, 1, 0.22, 1],
 	},
 	fade: {
@@ -505,7 +505,6 @@ export default function IntroSequence({ onComplete }: Props) {
 							key={member.slug}
 							src={member.image.url}
 							alt=""
-				
 							width={56}
 							height={56}
 							priority

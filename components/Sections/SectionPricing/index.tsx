@@ -152,13 +152,13 @@ const BenefitsList = memo(
 					className="group relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-4 transition-all duration-300 hover:border-[#24FF66]/30 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)]"
 				>
 					<div className="pointer-events-none absolute inset-px rounded-xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-					
+
 					{/* Top highlight */}
 					<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-					
+
 					{/* Hover glow effect */}
 					<div className="absolute inset-0 rounded-xl bg-gradient-to-b from-[#24FF66]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-					
+
 					<div className="relative flex gap-3">
 						<div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-r from-[#24FF66]/20 to-[#24FF66]/10 border border-[#24FF66]/30 shadow-lg shadow-[#24FF66]/[0.15]">
 							<FaCheck className="h-3.5 w-3.5 text-[#24FF66]" />
@@ -172,7 +172,7 @@ const BenefitsList = memo(
 							</p>
 						</div>
 					</div>
-					
+
 					{/* Bottom accent line */}
 					<div className="absolute bottom-0 left-0 h-px w-0 bg-gradient-to-r from-[#24FF66] to-transparent group-hover:w-full transition-all duration-500" />
 				</div>
@@ -270,7 +270,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 										PREMIUM ACCESS
 									</span>
 								</div>
-								
+
 								<h2 className="font-russo text-white text-xl font-medium tracking-tight lg:text-2xl">
 									Box Seat
 								</h2>
@@ -311,10 +311,10 @@ export function SectionPricing({ user, products, subscription }: Props) {
 						<div className="relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-b from-[#0A0B0D]/95 via-[#070809]/90 to-[#050506]/85 backdrop-blur-sm shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-6 sm:p-8">
 							{/* Background glow */}
 							<div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-b from-white/[0.02] via-transparent to-black/10 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-							
+
 							{/* Top highlight */}
 							<div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-							
+
 							{/* Header */}
 							<div className="mb-6 text-center">
 								<h3 className="font-russo text-lg font-bold text-white uppercase tracking-tight mb-2">
@@ -322,7 +322,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 								</h3>
 								<div className="w-12 h-px bg-gradient-to-r from-transparent via-[#24FF66] to-transparent mx-auto" />
 							</div>
-							
+
 							<BenefitsList benefits={PricingBenefits} />
 						</div>
 					</div>

@@ -19,31 +19,37 @@ export const SectionCTA = () => {
 					<h2 className="font-russo mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl uppercase">
 						Ready to Elevate Your Trading?
 					</h2>
-					
+
 					{/* Subheading */}
 					<p className="font-kodemono mx-auto mt-6 max-w-2xl text-lg text-white/60 leading-relaxed">
 						Join RTHMN today and start identifying high-probability patterns
 						with confidence. Gain your edge.
 					</p>
-					
+
 					{/* Features list */}
 					<div className="mx-auto mt-8 mb-12 max-w-2xl">
 						<div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
 							<div className="flex items-center justify-center gap-2">
 								<div className="h-2 w-2 rounded-full bg-[#24FF66]"></div>
-								<span className="text-sm text-white/80 font-kodemono">Real-time Analysis</span>
+								<span className="text-sm text-white/80 font-kodemono">
+									Real-time Analysis
+								</span>
 							</div>
 							<div className="flex items-center justify-center gap-2">
 								<div className="h-2 w-2 rounded-full bg-[#24FF66]"></div>
-								<span className="text-sm text-white/80 font-kodemono">Advanced Patterns</span>
+								<span className="text-sm text-white/80 font-kodemono">
+									Advanced Patterns
+								</span>
 							</div>
 							<div className="flex items-center justify-center gap-2">
 								<div className="h-2 w-2 rounded-full bg-[#24FF66]"></div>
-								<span className="text-sm text-white/80 font-kodemono">Expert Insights</span>
+								<span className="text-sm text-white/80 font-kodemono">
+									Expert Insights
+								</span>
 							</div>
 						</div>
 					</div>
-					
+
 					{/* Button */}
 					<div className="flex justify-center">
 						<StartButton href="/pricing" variant="shimmer">

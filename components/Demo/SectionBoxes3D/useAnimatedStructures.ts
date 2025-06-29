@@ -12,7 +12,6 @@ const cryptoStructures = [
 	{ pair: "GBPUSD", name: "GBPUSD", startOffset: 18, speed: 0.7 },
 	{ pair: "EURUSD", name: "EURUSD", startOffset: 8, speed: 0.6 },
 	{ pair: "USDCAD", name: "USDCAD", startOffset: 8, speed: 0.9 },
-
 ];
 
 export const useAnimatedStructures = () => {
