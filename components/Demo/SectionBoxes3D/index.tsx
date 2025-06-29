@@ -27,6 +27,7 @@ import { TradingAdvantage } from "./TradingAdvantage";
 import { calculateCircularPosition } from "./mathUtils";
 import { useAnimatedStructures } from "./useAnimatedStructures";
 import { useCanvasSetup } from "./useCanvasSetup";
+import { useAnimationConfig } from "./useAnimationConfig";
 
 interface ScreenProps {
   scale: MotionValue<number>;
@@ -42,7 +43,7 @@ const Screen = memo(
     // Border animation - appears after all UI elements are loaded
     const borderOpacity = useTransform(
       scrollYProgress,
-      [0.18, 0.2], // Start after sidebars finish and complete quickly
+      [0.16, 0.18], // Start after sidebars finish and complete quickly
       [0, 1]
     );
 
@@ -156,18 +157,8 @@ export const SectionBoxes3D = memo(() => {
     offset: ["start start", "end start"],
   });
 
-  // Mobile detection and touch handling
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024 || "ontouchstart" in window);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
+  // Animation configuration hook
+  const { isMobile, timing, getRevealStates, isClient } = useAnimationConfig();
 
   // State to track the current structure slice from ResoBox3DCircular (first structure)
   const [currentStructureSlice, setCurrentStructureSlice] =
@@ -201,7 +192,7 @@ export const SectionBoxes3D = memo(() => {
   // Start formation animation immediately on mount
   useEffect(() => {
     const startTime = Date.now();
-    const duration = 2000; // 2 seconds for formation animation
+    const duration = 1200; // 1.2 seconds for formation animation (faster)
 
     const animateFormation = () => {
       const elapsed = Date.now() - startTime;
@@ -228,27 +219,12 @@ export const SectionBoxes3D = memo(() => {
     });
     return unsubscribe;
   }, [scrollYProgress]);
-  // Structure movement thresholds - structure moves from right to center first (matching ResoBox3DDemo)
-  const structureMoveThreshold = isMobile ? 0.18 : 0.1;
-  const structureMoveRange = 0.03;
-  const uiAppearThreshold = structureMoveThreshold + structureMoveRange; // UI appears after structure is centered
-
-  // Screen scaling and positioning thresholds
-  const scrollThresholds = {
-    start: uiAppearThreshold,
-    end: uiAppearThreshold + 0.05,
-  };
-
-  // Progressive reveal thresholds - start after screen is fully loaded
-  const leftSidebarThreshold = scrollThresholds.end + 0.03;
-  const rightSidebarThreshold = leftSidebarThreshold + 0.08;
-  const focusModeThreshold = rightSidebarThreshold + 0.06;
-  const finalFadeThreshold = 0.9;
+  // Timing now available from the hook above
 
   // Only show intro text during formation, then allow scroll-based fade
   const introTextOpacity = useTransform(
     scrollYProgress,
-    [0, 0.05, scrollThresholds.start, scrollThresholds.end],
+    [0, 0.05, timing.uiAppearance.start, timing.uiAppearance.end],
     isFormationComplete ? [1, 1, 1, 0] : [1, 1, 1, 1] // Keep visible until formation complete
   );
 
@@ -259,32 +235,32 @@ export const SectionBoxes3D = memo(() => {
 
   const scale = useTransform(
     scrollYProgress,
-    [scrollThresholds.start, scrollThresholds.end],
+    [timing.uiAppearance.start, timing.uiAppearance.end],
     [1.0, 0.8]
   );
   const leftSidebarX = useTransform(
     scrollYProgress,
-    [scrollThresholds.start, scrollThresholds.end],
+    [timing.uiAppearance.start, timing.uiAppearance.end],
     [-64, 0]
   );
   const rightSidebarX = useTransform(
     scrollYProgress,
-    [scrollThresholds.start, scrollThresholds.end],
+    [timing.uiAppearance.start, timing.uiAppearance.end],
     [64, 0]
   );
   const sidebarOpacity = useTransform(
     scrollYProgress,
     [
-      scrollThresholds.start,
-      scrollThresholds.end,
-      finalFadeThreshold - 0.05,
-      finalFadeThreshold,
+      timing.uiAppearance.start,
+      timing.uiAppearance.end,
+      timing.finalFade - 0.05,
+      timing.finalFade,
     ],
     [0, 1, 1, 0]
   );
   const navbarY = useTransform(
     scrollYProgress,
-    [scrollThresholds.start, scrollThresholds.end],
+    [timing.uiAppearance.start, timing.uiAppearance.end],
     [-56, 0]
   );
 
@@ -295,41 +271,51 @@ export const SectionBoxes3D = memo(() => {
 
   // Handle progressive reveal after screen is loaded
   useEffect(() => {
-    if (!isFormationComplete) return;
+    if (!isFormationComplete || !isClient) return; // Wait for client-side hydration
 
     const progress = currentScrollProgress;
 
-    // Left sidebar opens at 0.30
-    if (progress >= leftSidebarThreshold && !leftSidebarOpen) {
+    // Left sidebar opens
+    if (progress >= timing.progressiveReveal.leftSidebar && !leftSidebarOpen) {
       setLeftSidebarOpen(true);
-    } else if (progress < leftSidebarThreshold && leftSidebarOpen) {
+    } else if (
+      progress < timing.progressiveReveal.leftSidebar &&
+      leftSidebarOpen
+    ) {
       setLeftSidebarOpen(false);
     }
 
-    // Right sidebar opens at 0.40
-    if (progress >= rightSidebarThreshold && !rightSidebarOpen) {
+    // Right sidebar opens
+    if (
+      progress >= timing.progressiveReveal.rightSidebar &&
+      !rightSidebarOpen
+    ) {
       setRightSidebarOpen(true);
-    } else if (progress < rightSidebarThreshold && rightSidebarOpen) {
+    } else if (
+      progress < timing.progressiveReveal.rightSidebar &&
+      rightSidebarOpen
+    ) {
       setRightSidebarOpen(false);
     }
 
-    // Focus mode activates at 0.50
-    if (progress >= focusModeThreshold && !autoFocusMode) {
+    // Focus mode activates
+    if (progress >= timing.progressiveReveal.focusMode && !autoFocusMode) {
       setAutoFocusMode(true);
       setViewMode("box"); // Switch to focus mode
-    } else if (progress < focusModeThreshold && autoFocusMode) {
+    } else if (progress < timing.progressiveReveal.focusMode && autoFocusMode) {
       setAutoFocusMode(false);
       setViewMode("scene"); // Switch back to scene mode
     }
   }, [
     currentScrollProgress,
     isFormationComplete,
+    isClient,
     leftSidebarOpen,
     rightSidebarOpen,
     autoFocusMode,
-    leftSidebarThreshold,
-    rightSidebarThreshold,
-    focusModeThreshold,
+    timing.progressiveReveal.leftSidebar,
+    timing.progressiveReveal.rightSidebar,
+    timing.progressiveReveal.focusMode,
   ]);
 
   // Navigation functions for the UI controls
@@ -445,33 +431,36 @@ export const ResoBox3DCircular = memo(
 
     if (!slice?.boxes?.length) return null;
 
-    // Mobile-responsive scroll thresholds
-    const isMobile =
-      typeof window !== "undefined" &&
-      (window.innerWidth < 1024 || "ontouchstart" in window);
+    // Get animation config for current device
+    const {
+      config,
+      getProgress,
+      interpolate,
+      isClient: isClientReady,
+    } = useAnimationConfig();
 
-    // Structure movement thresholds - structure moves from right to center first
-    const structureMoveThreshold = isMobile ? 0.18 : 0.1; // When structure starts moving to center (earlier)
-    const structureMoveRange = 0.03; // Quick movement to center
-    const uiAppearThreshold = structureMoveThreshold + structureMoveRange; // UI appears after structure is centered
-    const circularAppearThreshold = uiAppearThreshold + 0.05; // Circular structures appear after UI
+    // Calculate structure position transition (right to center) - only on client
+    const structureMoveProgress = isClientReady
+      ? getProgress(
+          scrollProgress,
+          config.timing.structureMovement.start,
+          config.timing.structureMovement.end
+        )
+      : 0;
 
-    // Calculate structure position transition (right to center)
-    const structureMoveProgress = Math.min(
-      1,
-      Math.max(
-        0,
-        (scrollProgress - structureMoveThreshold) / structureMoveRange
-      )
-    );
-
-    // Determine what to show based on intro mode and scroll progress
+    // Determine what to show based on scroll progress
+    // Circular structures appear right after the main structure moves from right to center
+    const circularAppearThreshold = config.timing.structureMovement.end + 0.005; // Small delay after structure reaches center
     const showOnlyFirstStructure = scrollProgress < circularAppearThreshold;
     const showCircularArrangement = scrollProgress >= circularAppearThreshold;
 
-    // Calculate transition progress for other structures appearing
-    const circularAppearanceProgress = showCircularArrangement
-      ? Math.min(1, (scrollProgress - circularAppearThreshold) / 0.05)
+    // Calculate transition progress for other structures appearing - only on client
+    const circularAppearanceProgress = isClientReady
+      ? getProgress(
+          scrollProgress,
+          circularAppearThreshold,
+          circularAppearThreshold + config.ranges.circularAppearance
+        )
       : 0;
 
     // Calculate structure positions and properties
@@ -488,43 +477,27 @@ export const ResoBox3DCircular = memo(
           // For the first structure, smoothly transition from right to center to circular position
           let basePosition = circularPosition;
           if (index === 0) {
-            // Define positions: right -> center -> circular
-            const rightPosition: [number, number, number] = [12, 0, 30]; // Start less to the right
-            const centerPosition: [number, number, number] = [0, 0, 40]; // Move to center
-
             if (showOnlyFirstStructure) {
-              // Interpolate from right to center based on scroll
-              basePosition = [
-                rightPosition[0] +
-                  (centerPosition[0] - rightPosition[0]) *
-                    structureMoveProgress,
-                rightPosition[1] +
-                  (centerPosition[1] - rightPosition[1]) *
-                    structureMoveProgress,
-                rightPosition[2] +
-                  (centerPosition[2] - rightPosition[2]) *
-                    structureMoveProgress,
-              ];
+              // Interpolate from initial to center position based on scroll
+              basePosition = interpolate(
+                config.positions.initial,
+                config.positions.center,
+                structureMoveProgress
+              );
             } else {
               // After UI appears, move from center to circular position
-              basePosition = [
-                centerPosition[0] +
-                  (circularPosition[0] - centerPosition[0]) *
-                    circularAppearanceProgress,
-                centerPosition[1] +
-                  (circularPosition[1] - centerPosition[1]) *
-                    circularAppearanceProgress,
-                centerPosition[2] +
-                  (circularPosition[2] - centerPosition[2]) *
-                    circularAppearanceProgress,
-              ];
+              basePosition = interpolate(
+                config.positions.center,
+                circularPosition,
+                circularAppearanceProgress
+              );
             }
           }
 
           // In box mode, center and bring forward the focused structure (matching ZenMode)
           const position: [number, number, number] =
             viewMode === "box" && isFocused
-              ? [0, 0, 25] // Match ZenMode focus positioning exactly
+              ? config.positions.focus
               : basePosition;
 
           return {
@@ -532,12 +505,12 @@ export const ResoBox3DCircular = memo(
             position,
             scale:
               viewMode === "box" && isFocused
-                ? 1.5 // Match ZenMode focus scale
+                ? config.structure.focusScale
                 : index === 0 && showOnlyFirstStructure
-                  ? 1.4 // Larger initial scale for first structure
+                  ? config.structure.initialScale
                   : isFocused
-                    ? 1.2 // Normal focused size in scene mode
-                    : 0.8, // Normal unfocused size
+                    ? config.structure.normalScale
+                    : config.structure.unfocusedScale,
             opacity:
               index === 0
                 ? isFocused
@@ -546,9 +519,9 @@ export const ResoBox3DCircular = memo(
                 : circularAppearanceProgress * (isFocused ? 1 : 0.7), // Others fade in on scroll
             rotation:
               viewMode === "box" && isFocused
-                ? ([0, -Math.PI / 4, 0] as [number, number, number]) // Match ZenMode focus rotation
+                ? config.structure.focusRotation
                 : index === 0 && showOnlyFirstStructure
-                  ? ([0, -Math.PI / 4, 0] as [number, number, number]) // More rotation when on the right
+                  ? config.structure.initialRotation
                   : undefined,
           };
         }),
