@@ -27,7 +27,7 @@ import { TradingAdvantage } from "./TradingAdvantage";
 import { calculateCircularPosition } from "./mathUtils";
 import { useAnimatedStructures } from "./useAnimatedStructures";
 import { useCanvasSetup } from "./useCanvasSetup";
-import { useAnimationConfig } from "./useAnimationConfig";
+import { useAnimationConfig, type StructureData } from "./useAnimationConfig";
 
 interface ScreenProps {
   scale: MotionValue<number>;
@@ -157,8 +157,17 @@ export const SectionBoxes3D = memo(() => {
     offset: ["start start", "end start"],
   });
 
-  // Animation configuration hook
-  const { isMobile, timing, getRevealStates, isClient } = useAnimationConfig();
+  // Animation configuration hook - now centralized
+  const {
+    isMobile,
+    timing,
+    getRevealStates,
+    isClient,
+    createMotionValues,
+    useProgressiveReveal,
+    calculateStructures,
+    calculateFocusedIndex,
+  } = useAnimationConfig();
 
   // State to track the current structure slice from ResoBox3DCircular (first structure)
   const [currentStructureSlice, setCurrentStructureSlice] =
@@ -221,104 +230,29 @@ export const SectionBoxes3D = memo(() => {
   }, [scrollYProgress]);
   // Timing now available from the hook above
 
-  // Only show intro text during formation, then allow scroll-based fade
-  const introTextOpacity = useTransform(
-    scrollYProgress,
-    [0, 0.05, timing.uiAppearance.start, timing.uiAppearance.end],
-    isFormationComplete ? [1, 1, 1, 0] : [1, 1, 1, 1] // Keep visible until formation complete
-  );
+  // Create all motion values using centralized function
+  const motionValues = createMotionValues(scrollYProgress, isFormationComplete);
+  const {
+    scale,
+    leftSidebarX,
+    rightSidebarX,
+    sidebarOpacity,
+    navbarY,
+    introTextOpacity,
+  } = motionValues;
 
   // Scroll-based animations only start after formation is complete
   const effectiveScrollProgress = isFormationComplete
     ? currentScrollProgress
     : 0;
 
-  const scale = useTransform(
-    scrollYProgress,
-    [timing.uiAppearance.start, timing.uiAppearance.end],
-    [1.0, 0.8]
-  );
-  const leftSidebarX = useTransform(
-    scrollYProgress,
-    [timing.uiAppearance.start, timing.uiAppearance.end],
-    [-64, 0]
-  );
-  const rightSidebarX = useTransform(
-    scrollYProgress,
-    [timing.uiAppearance.start, timing.uiAppearance.end],
-    [64, 0]
-  );
-  const sidebarOpacity = useTransform(
-    scrollYProgress,
-    [
-      timing.uiAppearance.start,
-      timing.uiAppearance.end,
-      timing.finalFade - 0.05,
-      timing.finalFade,
-    ],
-    [0, 1, 1, 0]
-  );
-  const navbarY = useTransform(
-    scrollYProgress,
-    [timing.uiAppearance.start, timing.uiAppearance.end],
-    [-56, 0]
-  );
-
-  // Progressive reveal state management
-  const [leftSidebarOpen, setLeftSidebarOpen] = useState(false);
-  const [rightSidebarOpen, setRightSidebarOpen] = useState(false);
-  const [autoFocusMode, setAutoFocusMode] = useState(false);
-
-  // Handle progressive reveal after screen is loaded
-  useEffect(() => {
-    if (!isFormationComplete || !isClient) return; // Wait for client-side hydration
-
-    const progress = currentScrollProgress;
-
-    // Left sidebar opens
-    if (progress >= timing.progressiveReveal.leftSidebar && !leftSidebarOpen) {
-      setLeftSidebarOpen(true);
-    } else if (
-      progress < timing.progressiveReveal.leftSidebar &&
-      leftSidebarOpen
-    ) {
-      setLeftSidebarOpen(false);
-    }
-
-    // Right sidebar opens
-    if (
-      progress >= timing.progressiveReveal.rightSidebar &&
-      !rightSidebarOpen
-    ) {
-      setRightSidebarOpen(true);
-    } else if (
-      progress < timing.progressiveReveal.rightSidebar &&
-      rightSidebarOpen
-    ) {
-      setRightSidebarOpen(false);
-    }
-
-    // Focus mode activates
-    if (progress >= timing.progressiveReveal.focusMode && !autoFocusMode) {
-      setAutoFocusMode(true);
-      setViewMode("box"); // Switch to focus mode
-    } else if (progress < timing.progressiveReveal.focusMode && autoFocusMode) {
-      setAutoFocusMode(false);
-      setViewMode("scene"); // Switch back to scene mode
-    }
-  }, [
+  const { leftSidebarOpen, rightSidebarOpen } = useProgressiveReveal(
     currentScrollProgress,
     isFormationComplete,
     isClient,
-    leftSidebarOpen,
-    rightSidebarOpen,
-    autoFocusMode,
-    timing.progressiveReveal.leftSidebar,
-    timing.progressiveReveal.rightSidebar,
-    timing.progressiveReveal.focusMode,
-  ]);
+    setViewMode
+  );
 
-  // Navigation functions for the UI controls
   const navigation = {
     next: () => setFocusedIndex((prev) => (prev + 1) % cryptoStructures.length),
     previous: () =>
@@ -332,10 +266,8 @@ export const SectionBoxes3D = memo(() => {
       ref={containerRef}
       className="relative"
       style={{
-        // Mobile scroll optimizations
         WebkitOverflowScrolling: "touch",
-        touchAction: "pan-y", // Allow vertical scrolling but prevent horizontal
-        overscrollBehavior: "contain", // Prevent scroll chaining
+        touchAction: "pan-y",
       }}
     >
       <div className="h-[350vh] relative">
@@ -400,13 +332,11 @@ SectionBoxes3D.displayName = "SectionBoxes3D";
 
 export const ResoBox3DCircular = memo(
   ({
-    slice,
     className = "",
     onCurrentSliceChange,
     focusedIndex: externalFocusedIndex,
     viewMode: externalViewMode,
     introMode = false,
-    formationProgress = 1,
     scrollProgress = 0,
     cameraDistance,
   }: {
@@ -428,127 +358,30 @@ export const ResoBox3DCircular = memo(
       "scene"
     );
     const viewMode = externalViewMode ?? internalViewMode;
+    const { calculateStructures, calculateFocusedIndex } = useAnimationConfig();
 
-    if (!slice?.boxes?.length) return null;
-
-    // Get animation config for current device
-    const {
-      config,
-      getProgress,
-      interpolate,
-      isClient: isClientReady,
-    } = useAnimationConfig();
-
-    // Calculate structure position transition (right to center) - only on client
-    const structureMoveProgress = isClientReady
-      ? getProgress(
-          scrollProgress,
-          config.timing.structureMovement.start,
-          config.timing.structureMovement.end
-        )
-      : 0;
-
-    // Determine what to show based on scroll progress
-    // Circular structures appear right after the main structure moves from right to center
-    const circularAppearThreshold = config.timing.structureMovement.end + 0.005; // Small delay after structure reaches center
-    const showOnlyFirstStructure = scrollProgress < circularAppearThreshold;
-    const showCircularArrangement = scrollProgress >= circularAppearThreshold;
-
-    // Calculate transition progress for other structures appearing - only on client
-    const circularAppearanceProgress = isClientReady
-      ? getProgress(
-          scrollProgress,
-          circularAppearThreshold,
-          circularAppearThreshold + config.ranges.circularAppearance
-        )
-      : 0;
-
-    // Calculate structure positions and properties
     const structures = useMemo(
       () =>
-        cryptoStructures.map((crypto, index) => {
-          const circularPosition = calculateCircularPosition(
-            index,
-            focusedIndex,
-            cryptoStructures.length
-          );
-          const isFocused = index === focusedIndex;
-
-          // For the first structure, smoothly transition from right to center to circular position
-          let basePosition = circularPosition;
-          if (index === 0) {
-            if (showOnlyFirstStructure) {
-              // Interpolate from initial to center position based on scroll
-              basePosition = interpolate(
-                config.positions.initial,
-                config.positions.center,
-                structureMoveProgress
-              );
-            } else {
-              // After UI appears, move from center to circular position
-              basePosition = interpolate(
-                config.positions.center,
-                circularPosition,
-                circularAppearanceProgress
-              );
-            }
-          }
-
-          // In box mode, center and bring forward the focused structure (matching ZenMode)
-          const position: [number, number, number] =
-            viewMode === "box" && isFocused
-              ? config.positions.focus
-              : basePosition;
-
-          return {
-            ...crypto,
-            position,
-            scale:
-              viewMode === "box" && isFocused
-                ? config.structure.focusScale
-                : index === 0 && showOnlyFirstStructure
-                  ? config.structure.initialScale
-                  : isFocused
-                    ? config.structure.normalScale
-                    : config.structure.unfocusedScale,
-            opacity:
-              index === 0
-                ? isFocused
-                  ? 1
-                  : 0.7 // First structure always visible after formation
-                : circularAppearanceProgress * (isFocused ? 1 : 0.7), // Others fade in on scroll
-            rotation:
-              viewMode === "box" && isFocused
-                ? config.structure.focusRotation
-                : index === 0 && showOnlyFirstStructure
-                  ? config.structure.initialRotation
-                  : undefined,
-          };
-        }),
+        calculateStructures(
+          cryptoStructures,
+          focusedIndex,
+          viewMode,
+          scrollProgress
+        ),
       [
         cryptoStructures,
         focusedIndex,
         viewMode,
-        showOnlyFirstStructure,
-        showCircularArrangement,
-        structureMoveProgress,
-        circularAppearanceProgress,
+        scrollProgress,
+        calculateStructures,
       ]
     );
 
-    // Calculate which structure to focus on
-    const actualFocusedIndex = showOnlyFirstStructure
-      ? 0
-      : structures.reduce((closest, struct, index) => {
-          const currentDistance =
-            struct.position[0] ** 2 + struct.position[2] ** 2;
-          const closestDistance =
-            structures[closest].position[0] ** 2 +
-            structures[closest].position[2] ** 2;
-          return currentDistance < closestDistance && struct.position[2] > 0
-            ? index
-            : closest;
-        }, 0);
+    // Calculate which structure to focus on using centralized function
+    const actualFocusedIndex = calculateFocusedIndex(
+      structures,
+      scrollProgress
+    );
 
     const currentSlice = structureSlices[actualFocusedIndex];
 
@@ -568,7 +401,6 @@ export const ResoBox3DCircular = memo(
         >
           <ambientLight intensity={2} />
           <directionalLight position={[0, 60, 180]} intensity={1} />
-
           <CameraController
             viewMode={viewMode}
             scrollProgress={scrollProgress}
@@ -576,7 +408,6 @@ export const ResoBox3DCircular = memo(
             isClient={isClient}
             cameraDistance={cameraDistance}
           />
-
           <OrbitControls
             enabled={viewMode === "box"}
             enableRotate={viewMode === "box"}
@@ -593,19 +424,16 @@ export const ResoBox3DCircular = memo(
             zoomSpeed={0.5}
           />
 
-          {/* Always show all structures with seamless transitions */}
           {structures.map((structure, index) => {
             // In box mode, only show the focused structure
             if (viewMode === "box" && index !== actualFocusedIndex) {
               return null;
             }
-
             const currentSlice = structureSlices[index];
 
             if (structure.opacity <= 0.01) {
               return null;
             }
-
             return (
               <BoxStructure
                 key={structure.pair}

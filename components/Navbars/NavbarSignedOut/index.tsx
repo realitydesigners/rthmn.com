@@ -26,7 +26,7 @@ const SOCIAL_LINKS = [
 		icon: FaInstagram,
 		href: "https://www.instagram.com/rthmnapp/",
 	},
-	{ name: "GitHub", icon: FaGithub, href: "https://github.com/rthmnapp" },
+	{ name: "GitHub", icon: FaGithub, href: "https://github.com/realitydesigners" },
 	{
 		name: "Youtube",
 		icon: FaYoutube,
