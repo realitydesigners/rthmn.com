@@ -157,19 +157,12 @@ export const SectionBoxes3D = memo(() => {
     offset: ["start start", "end start"],
   });
 
-  // Animation configuration hook - now centralized
   const {
-    isMobile,
-    timing,
-    getRevealStates,
     isClient,
     createMotionValues,
     useProgressiveReveal,
-    calculateStructures,
-    calculateFocusedIndex,
+    useFormationAnimation,
   } = useAnimationConfig();
-
-  // State to track the current structure slice from ResoBox3DCircular (first structure)
   const [currentStructureSlice, setCurrentStructureSlice] =
     useState<BoxSlice | null>(null);
 
@@ -177,60 +170,50 @@ export const SectionBoxes3D = memo(() => {
   const [viewMode, setViewMode] = useState<"scene" | "box">("scene");
   const { cryptoStructures } = useAnimatedStructures();
 
-  // Create initial structure slice for the intro (will be updated by ResoBox3DCircular)
+  // Use consolidated formation animation
+  const { formationProgress, isFormationComplete } = useFormationAnimation();
+
   const initialStructureSlice = useMemo(() => {
-    const currentValues = createDemoStep(4, sequences, BASE_VALUES); // Use first structure's startOffset
+    const currentValues = createDemoStep(4, sequences, BASE_VALUES);
     const mockBoxData = createMockBoxData(currentValues);
     return { timestamp: new Date().toISOString(), boxes: mockBoxData };
   }, []);
 
-  // Use the current slice from ResoBox3DCircular if available, otherwise use initial
   const structureSlice = currentStructureSlice || initialStructureSlice;
-  const [currentScrollProgress, setCurrentScrollProgress] = useState(() => {
-    // Get initial scroll progress immediately to avoid intro animation on refresh
-    if (typeof window !== "undefined") {
-      return scrollYProgress.get();
-    }
-    return 0;
-  });
+  // Simplified scroll progress tracking
+  const [currentScrollProgress, setCurrentScrollProgress] = useState(0);
 
-  // State to track box formation animation (starts immediately on mount)
-  const [formationProgress, setFormationProgress] = useState(0);
-  const [isFormationComplete, setIsFormationComplete] = useState(false);
-
-  // Start formation animation immediately on mount
   useEffect(() => {
-    const startTime = Date.now();
-    const duration = 1200; // 1.2 seconds for formation animation (faster)
+    // Set initial value and subscribe to changes in one effect
+    setCurrentScrollProgress(scrollYProgress.get());
+    return scrollYProgress.onChange(setCurrentScrollProgress);
+  }, [scrollYProgress]);
 
-    const animateFormation = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
+  // Auto-scroll to top on page refresh if user is in this section
+  useEffect(() => {
+    const handlePageRefresh = () => {
+      // Check if we're in the SectionBoxes3D area (not at the very top)
+      const currentScroll = window.scrollY;
+      const sectionElement = containerRef.current;
 
-      setFormationProgress(progress);
+      if (sectionElement && currentScroll > 0) {
+        const sectionTop = sectionElement.offsetTop;
+        const sectionBottom = sectionTop + sectionElement.offsetHeight;
 
-      if (progress < 1) {
-        requestAnimationFrame(animateFormation);
-      } else {
-        setIsFormationComplete(true);
+        // If user is anywhere within this section, scroll to the section start
+        if (currentScroll >= sectionTop && currentScroll <= sectionBottom) {
+          window.scrollTo({
+            top: sectionTop,
+            behavior: "smooth",
+          });
+        }
       }
     };
 
-    animateFormation();
-  }, []);
+    // Run on mount (page refresh/load)
+    handlePageRefresh();
+  }, []); // Empty dependency array - only run once on mount
 
-  useEffect(() => {
-    // Set initial scroll progress immediately on mount
-    setCurrentScrollProgress(scrollYProgress.get());
-
-    const unsubscribe = scrollYProgress.onChange((value) => {
-      setCurrentScrollProgress(value);
-    });
-    return unsubscribe;
-  }, [scrollYProgress]);
-  // Timing now available from the hook above
-
-  // Create all motion values using centralized function
   const motionValues = createMotionValues(scrollYProgress, isFormationComplete);
   const {
     scale,
@@ -272,19 +255,18 @@ export const SectionBoxes3D = memo(() => {
     >
       <div className="h-[350vh] relative">
         <div className="sticky top-0 h-screen w-full flex items-center justify-center relative">
-          {structureSlice && structureSlice.boxes.length > 0 && (
-            <ResoBox3DCircular
-              slice={structureSlice}
-              className="h-full w-full absolute inset-0 z-0"
-              onCurrentSliceChange={setCurrentStructureSlice}
-              focusedIndex={focusedIndex}
-              viewMode={viewMode}
-              introMode={!isFormationComplete}
-              formationProgress={formationProgress}
-              scrollProgress={effectiveScrollProgress}
-              cameraDistance={scale}
-            />
-          )}
+          <ResoBox3DCircular
+            slice={structureSlice}
+            className="h-full w-full absolute inset-0 z-0"
+            onCurrentSliceChange={setCurrentStructureSlice}
+            focusedIndex={focusedIndex}
+            viewMode={viewMode}
+            introMode={!isFormationComplete}
+            formationProgress={formationProgress}
+            scrollProgress={effectiveScrollProgress}
+            cameraDistance={scale}
+          />
+
           <Screen
             scale={scale}
             scrollYProgress={scrollYProgress}
@@ -305,7 +287,6 @@ export const SectionBoxes3D = memo(() => {
               shouldOpen={rightSidebarOpen}
             />
 
-            {/* UI Controls - animate in and fade out at the end */}
             {isFormationComplete && (
               <>
                 <motion.div style={{ opacity: sidebarOpacity }}>
@@ -423,7 +404,6 @@ export const ResoBox3DCircular = memo(
             enableZoom={false}
             zoomSpeed={0.5}
           />
-
           {structures.map((structure, index) => {
             // In box mode, only show the focused structure
             if (viewMode === "box" && index !== actualFocusedIndex) {

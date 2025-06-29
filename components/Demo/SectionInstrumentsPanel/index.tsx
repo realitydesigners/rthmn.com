@@ -8,399 +8,649 @@ import {
   FOREX_PAIRS,
   formatPrice,
 } from "@/utils/instruments";
-import { Reorder, motion, useDragControls } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaSearch, FaStar, FaTimes } from "react-icons/fa";
+import {
+  LuActivity,
+  LuBarChart3,
+  LuBell,
+  LuBox,
+  LuLayoutGrid,
+  LuLineChart,
+  LuLock,
+  LuPalette,
+  LuPieChart,
+  LuSettings,
+  LuTrendingDown,
+  LuTrendingUp,
+  LuUser,
+} from "react-icons/lu";
 
-// Generate deterministic mock prices for demo (no Math.random for SSR compatibility)
-const generateMockPrice = (pair: string): { price: number; change: number } => {
-  // Use pair name to generate deterministic "random" values
-  const hash = pair.split("").reduce((a, b) => {
-    a = (a << 5) - a + b.charCodeAt(0);
-    return a & a;
-  }, 0);
+// Generate mock prices for instruments using real data
+const generateMockPrice = (symbol: string) => {
+  const hash = symbol
+    .split("")
+    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const random = ((hash * 9301 + 49297) % 233280) / 233280; // Deterministic "random"
 
-  const deterministicRandom1 = Math.abs(hash) / 2147483647;
-  const deterministicRandom2 = Math.abs(hash * 1.618) / 2147483647;
-
-  const basePrice = (() => {
-    if (pair.includes("JPY")) return 100 + deterministicRandom1 * 50;
-    if (pair.includes("USD") && pair.startsWith("USD"))
-      return 0.5 + deterministicRandom1 * 1.5;
-    if (pair.startsWith("BTC")) return 40000 + deterministicRandom1 * 10000;
-    if (pair.startsWith("ETH")) return 2000 + deterministicRandom1 * 1000;
-    if (pair.includes("USD") && !pair.startsWith("USD"))
-      return 0.5 + deterministicRandom1 * 1.5;
-    if (CRYPTO_PAIRS.includes(pair)) return deterministicRandom1 * 100;
-    if (EQUITY_PAIRS.includes(pair)) return 50 + deterministicRandom1 * 200;
-    if (ETF_PAIRS.includes(pair)) return 100 + deterministicRandom1 * 300;
-    return 1 + deterministicRandom1;
-  })();
-
-  const changePercent = (deterministicRandom2 - 0.5) * 0.1; // ±5% change
-  const change = basePrice * changePercent;
-
-  return { price: basePrice, change };
+  if (FOREX_PAIRS.includes(symbol)) {
+    if (symbol.includes("JPY")) return 100 + random * 50;
+    return 0.5 + random * 1.5;
+  } else if (CRYPTO_PAIRS.includes(symbol)) {
+    if (symbol === "BTCUSD") return 40000 + random * 20000;
+    if (symbol === "ETHUSD") return 2000 + random * 1500;
+    return random < 0.5 ? random * 2 : 10 + random * 100;
+  } else if (EQUITY_PAIRS.includes(symbol)) {
+    return 50 + random * 400;
+  } else if (ETF_PAIRS.includes(symbol)) {
+    return 100 + random * 300;
+  }
+  return random * 100;
 };
 
-// Create mock data for all instruments
-const createMockData = () => {
+// Create mock price data for all instruments
+const createMockPriceData = () => {
+  const mockData: Record<string, { price: number }> = {};
   const allPairs = [
     ...FOREX_PAIRS,
     ...CRYPTO_PAIRS,
     ...EQUITY_PAIRS,
     ...ETF_PAIRS,
   ];
-  const mockData: Record<string, { price: number; change: number }> = {};
 
   for (const pair of allPairs) {
-    mockData[pair] = generateMockPrice(pair);
+    mockData[pair] = { price: generateMockPrice(pair) };
   }
 
   return mockData;
 };
 
-const MOCK_PRICE_DATA = createMockData();
-const MOCK_SELECTED_PAIRS = ["EURUSD", "BTCUSD", "GBPUSD", "AAPL", "SPY"];
+// Instruments Panel Component - Realistic design matching DemoInstrumentsPanel
+const InstrumentsPanel = memo(() => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [activeFilter, setActiveFilter] = useState("selected");
+  const [favorites, setSelectedPairs] = useState([
+    "EURUSD",
+    "BTCUSD",
+    "ETHUSD",
+    "GBPUSD",
+    "AAPL",
+  ]);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
 
-// Draggable instrument item for selected pairs
-const DraggableInstrumentItem = memo(
-  ({ pair, onToggle }: { pair: string; onToggle: () => void }) => {
-    const dragControls = useDragControls();
-    const mockData = MOCK_PRICE_DATA[pair];
-    const isPositive = mockData?.change > 0;
+  // Use real instrument data
+  const mockPriceData = useMemo(() => createMockPriceData(), []);
 
-    return (
-      <Reorder.Item
-        value={pair}
-        id={pair}
-        dragListener={false}
-        dragControls={dragControls}
-        className="group/drag mb-1"
-        whileDrag={{ zIndex: 50 }}
-      >
-        <motion.div
-          className="relative flex w-full items-center rounded-lg"
-          layout="position"
-          transition={{ duration: 0.15 }}
-          whileDrag={{ zIndex: 50 }}
-        >
-          <div className="w-full">
-            {/* Drag Handle */}
-            <motion.button
-              type="button"
-              className="absolute top-1/2 left-0 z-[100] -translate-y-1/2 cursor-grab active:cursor-grabbing"
-              onPointerDown={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                dragControls.start(e);
-              }}
-            >
-              <div className="flex h-8 w-8 items-center justify-center opacity-0 transition-all duration-200 group-hover/drag:opacity-60">
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  role="img"
-                  aria-label="Drag handle"
-                >
-                  <title>Drag handle</title>
-                  <path d="M7 3H5V5H7V3Z" fill="#666" />
-                  <path d="M7 7H5V9H7V7Z" fill="#666" />
-                  <path d="M7 11H5V13H7V11Z" fill="#666" />
-                  <path d="M11 3H9V5H11V3Z" fill="#666" />
-                  <path d="M11 7H9V9H11V7Z" fill="#666" />
-                  <path d="M11 11H9V13H11V11Z" fill="#666" />
-                </svg>
-              </div>
-            </motion.button>
+  // Client-side hydration guard
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-            {/* Item Content */}
-            <div
-              className={cn(
-                "group/item relative flex h-12 w-full items-center rounded-lg transition-all duration-300 select-none",
-                "border border-[#111215] bg-gradient-to-b from-[#131518] to-[#0E0F11]",
-                "shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]",
-                "hover:shadow-[0_4px_8px_0_rgba(0,0,0,0.5)]",
-                "hover:border-[#1C1E23]"
-              )}
-            >
-              <div className="relative flex w-full items-center px-4">
-                {/* Instrument name */}
-                <span className="ml-4 font-russo flex-1 text-sm font-bold tracking-wide text-white transition-colors">
-                  {pair}
-                </span>
+  const isSearching = !!searchQuery;
 
-                {/* Price */}
-                <div className="flex items-center gap-3">
-                  <span className="font-kodemono w-[80px] text-right text-sm tracking-wider text-[#545963] transition-colors">
-                    {mockData ? formatPrice(mockData.price, pair) : "N/A"}
-                  </span>
+  // Toggle pair selection
+  const togglePair = (pair: string) => {
+    setSelectedPairs((prev) => {
+      if (prev.includes(pair)) {
+        return prev.filter((p) => p !== pair);
+      } else {
+        return [...prev, pair];
+      }
+    });
+  };
 
-                  {/* Toggle button */}
-                  <div className="ml-2 flex w-6 justify-center">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onToggle();
-                      }}
-                      className={cn(
-                        "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
-                        "opacity-0 group-hover/item:opacity-100",
-                        "border-[#111215] bg-[#111215] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
-                      )}
-                    >
-                      <FaTimes size={8} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </Reorder.Item>
-    );
-  }
-);
+  const scrollToSection = useCallback((filter: string) => {
+    setActiveFilter(filter);
 
-DraggableInstrumentItem.displayName = "DraggableInstrumentItem";
+    // Give time for the DOM to update
+    setTimeout(() => {
+      const element = document.querySelector(`[data-section="${filter}"]`);
+      if (element && contentRef.current) {
+        const headerHeight = 200; // Approximate height of search + filters
+        const elementPosition = element.getBoundingClientRect().top;
+        const offsetPosition = elementPosition - headerHeight;
 
-// Regular instrument item component
-const MockInstrumentItem = memo(
-  ({
-    pair,
-    isSelected = false,
-    onToggle,
-  }: {
-    pair: string;
-    isSelected?: boolean;
-    onToggle: () => void;
-  }) => {
-    const mockData = MOCK_PRICE_DATA[pair];
-    const isPositive = mockData?.change > 0;
+        contentRef.current.scrollTo({
+          top: contentRef.current.scrollTop + offsetPosition,
+          behavior: "smooth",
+        });
+      }
+    }, 100);
+  }, []);
+
+  // Memoized search results
+  const searchResults = useMemo(() => {
+    if (!isSearching) return [];
+
+    const allPairs = [
+      ...FOREX_PAIRS,
+      ...CRYPTO_PAIRS,
+      ...EQUITY_PAIRS,
+      ...ETF_PAIRS,
+    ];
+
+    return allPairs
+      .filter((pair) => pair.toLowerCase().includes(searchQuery.toLowerCase()))
+      .sort((a, b) => {
+        const aSelected = favorites.includes(a);
+        const bSelected = favorites.includes(b);
+        if (aSelected && !bSelected) return -1;
+        if (!aSelected && bSelected) return 1;
+        return a.localeCompare(b);
+      });
+  }, [searchQuery, favorites, isSearching]);
+
+  // Loading spinner component
+  const LoadingSpinner = ({ color = "#3b82f6" }: { color?: string }) => {
+    const [showFallback, setShowFallback] = useState(false);
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setShowFallback(true);
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }, []);
+
+    if (showFallback) {
+      return (
+        <span className="font-mono text-[11px] tracking-wider opacity-50">
+          N/A
+        </span>
+      );
+    }
 
     return (
-      <div
-        className={cn(
-          "group/item relative flex h-12 w-full items-center rounded-lg transition-all duration-300 select-none cursor-pointer",
-          isSelected
-            ? "border border-[#111215] bg-gradient-to-b from-[#131518] to-[#0E0F11] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]"
-            : "hover:bg-[#111215]/50"
-        )}
-        onClick={onToggle}
-      >
-        <div className="relative flex w-full items-center px-4">
-          {/* Instrument name */}
-          <span
-            className={cn(
-              "font-russo flex-1 text-sm font-bold tracking-wide transition-colors",
-              isSelected
-                ? "text-white"
-                : "text-[#32353C] group-hover/item:text-[#545963]"
-            )}
-          >
-            {pair}
-          </span>
-
-          {/* Price */}
-          <div className="flex items-center gap-3">
-            <span
-              className={cn(
-                "font-kodemono w-[80px] text-right text-sm tracking-wider transition-colors",
-                isSelected ? "text-[#545963]" : "text-[#32353C]"
-              )}
-            >
-              {mockData ? formatPrice(mockData.price, pair) : "N/A"}
-            </span>
-
-            {/* Toggle button */}
-            <div className="ml-2 flex w-6 justify-center">
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggle();
-                }}
-                className={cn(
-                  "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
-                  "opacity-0 group-hover/item:opacity-100",
-                  "border-[#111215] bg-[#111215] text-white/40 hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
-                )}
-              >
-                {isSelected ? (
-                  <FaTimes size={8} />
-                ) : (
-                  <span className="text-[9px] font-medium">+</span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+      <div className="relative h-3 w-3">
+        <div
+          className="absolute inset-0 rounded-full border-2"
+          style={{ borderColor: `${color}20` }}
+        />
+        <div
+          className="absolute inset-0 animate-spin rounded-full border-t-2"
+          style={{ borderColor: color }}
+        />
       </div>
     );
-  }
-);
+  };
 
-MockInstrumentItem.displayName = "MockInstrumentItem";
+  const PairItem = memo(
+    ({
+      item,
+      isSelected = false,
+      onToggle,
+    }: {
+      item: string;
+      isSelected?: boolean;
+      onToggle: () => void;
+    }) => {
+      const price = mockPriceData[item]?.price;
 
-// Mock search bar component
-const MockSearchBar = memo(
-  ({
-    searchQuery,
-    setSearchQuery,
-  }: {
-    searchQuery: string;
-    setSearchQuery: (query: string) => void;
-  }) => {
-    const [isFocused, setIsFocused] = useState(false);
-
-    return (
-      <div className="relative">
+      return (
         <div
           className={cn(
-            "group/search relative flex h-12 items-center overflow-hidden scrollbar-hide rounded-lg transition-all duration-300",
-            isFocused ? "ring-1 ring-[#1C1E23]" : ""
+            "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
+            isSelected
+              ? "bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+              : ""
           )}
+          style={{ borderRadius: "4px" }}
         >
-          <div className="absolute inset-0 rounded-lg border border-[#111215] bg-gradient-to-b from-[#0A0B0D] to-[#070809] transition-all duration-300" />
-
-          {/* Search Icon */}
-          <div
-            className={cn(
-              "relative ml-4 transition-colors duration-300",
-              isFocused ? "text-[#545963]" : "text-[#32353C]"
-            )}
-          >
-            <FaSearch size={14} />
-          </div>
-
-          {/* Input */}
-          <input
-            type="text"
-            placeholder="Search instruments..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setIsFocused(true)}
-            onBlur={() => setIsFocused(false)}
-            className="font-russo relative h-full flex-1 bg-transparent px-4 text-sm font-medium text-[#545963] placeholder-[#32353C] transition-colors outline-none"
-          />
-
-          {/* Clear Button */}
-          {searchQuery && (
-            <button
-              type="button"
-              onClick={() => setSearchQuery("")}
-              className="relative mr-4 flex h-6 w-6 items-center justify-center rounded-md border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
-            >
-              <FaTimes size={8} />
-            </button>
+          {/* Hover background for non-selected items */}
+          {!isSelected && (
+            <div
+              className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
+                boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
+              }}
+            />
           )}
+          <div className="relative flex w-full items-center px-3">
+            {/* Instrument name */}
+            <span
+              className={cn(
+                "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
+                isSelected
+                  ? "text-white"
+                  : "text-[#32353C] group-hover/item:text-[#545963]"
+              )}
+            >
+              {item}
+            </span>
+
+            {/* Price */}
+            <div className="flex items-center">
+              <span
+                className={cn(
+                  "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+                  isSelected
+                    ? "text-[#545963]"
+                    : "text-[#32353C] group-hover/item:text-[#32353C]"
+                )}
+              >
+                {price && isClient ? (
+                  formatPrice(price, item)
+                ) : (
+                  <LoadingSpinner color={isSelected ? "#4EFF6E" : "#444"} />
+                )}
+              </span>
+              <div className="z-90 ml-2 flex w-6 justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  className={cn(
+                    "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
+                    "opacity-0 group-hover/item:opacity-100",
+                    isSelected
+                      ? [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                      : [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                  )}
+                >
+                  {isSelected ? (
+                    <FaTimes size={8} />
+                  ) : (
+                    <span className="text-[9px] font-medium">+</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    );
-  }
-);
+      );
+    }
+  );
 
-MockSearchBar.displayName = "MockSearchBar";
+  const PairGroup = memo(
+    ({
+      label,
+      items,
+      count,
+    }: {
+      label: string;
+      items: React.ReactNode;
+      count: number;
+    }) => {
+      return (
+        <div className="mb-8">
+          <div className="space-y-1 animate-in fade-in duration-300">
+            {items}
+          </div>
+        </div>
+      );
+    }
+  );
 
-// Filter button component
-const FilterButton = memo(
-  ({
+  // Search result item with highlighting
+  const SearchPairItem = memo(
+    ({
+      item,
+      searchQuery: query,
+      isSelected = false,
+      onToggle,
+    }: {
+      item: string;
+      searchQuery: string;
+      isSelected?: boolean;
+      onToggle: () => void;
+    }) => {
+      const price = mockPriceData[item]?.price;
+
+      // Highlight component
+      const HighlightedText = ({
+        text,
+        highlight,
+      }: {
+        text: string;
+        highlight: string;
+      }) => {
+        if (!highlight.trim()) {
+          return <span>{text}</span>;
+        }
+
+        const regex = new RegExp(`(${highlight})`, "gi");
+        const parts = text.split(regex);
+
+        return (
+          <span>
+            {parts.map((part, index) =>
+              regex.test(part) ? (
+                <span
+                  key={index}
+                  className="bg-[#4EFF6E] text-[#111316] px-1 rounded-sm font-medium"
+                >
+                  {part}
+                </span>
+              ) : (
+                <span key={index}>{part}</span>
+              )
+            )}
+          </span>
+        );
+      };
+
+      return (
+        <div
+          className={cn(
+            "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
+            isSelected
+              ? "rounded bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
+              : "rounded-lg"
+          )}
+          style={isSelected ? { borderRadius: "4px" } : {}}
+        >
+          {/* Hover background for non-selected items */}
+          {!isSelected && (
+            <div
+              className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
+                boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
+              }}
+            />
+          )}
+          <div className="relative flex w-full items-center px-3">
+            {/* Instrument name with highlighting */}
+            <span
+              className={cn(
+                "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
+                isSelected
+                  ? "text-white"
+                  : "text-[#32353C] group-hover/item:text-[#545963]"
+              )}
+            >
+              <HighlightedText text={item} highlight={query} />
+            </span>
+
+            {/* Price */}
+            <div className="flex items-center">
+              <span
+                className={cn(
+                  "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+                  isSelected
+                    ? "text-[#545963]"
+                    : "text-[#32353C] group-hover/item:text-[#32353C]"
+                )}
+              >
+                {price && isClient ? (
+                  formatPrice(price, item)
+                ) : (
+                  <LoadingSpinner color={isSelected ? "#4EFF6E" : "#444"} />
+                )}
+              </span>
+              <div className="z-90 ml-2 flex w-6 justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  className={cn(
+                    "relative inline-flex h-6 w-6 items-center justify-center rounded-md border transition-all duration-200",
+                    "opacity-0 group-hover/item:opacity-100",
+                    isSelected
+                      ? [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                      : [
+                          "border-[#111215] bg-[#111215] text-white/40",
+                          "hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60",
+                        ]
+                  )}
+                >
+                  {isSelected ? (
+                    <FaTimes size={8} />
+                  ) : (
+                    <span className="text-[9px] font-medium">+</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  );
+
+  const SearchBar = memo(
+    ({
+      searchQuery: query,
+      onSearchChange,
+      onFocus,
+      onBlur,
+      isFocused,
+    }: {
+      searchQuery: string;
+      onSearchChange: (query: string) => void;
+      onFocus: () => void;
+      onBlur: () => void;
+      isFocused: boolean;
+    }) => {
+      const inputRef = useRef<HTMLInputElement>(null);
+
+      // Keyboard shortcut to focus search
+      useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+          if (e.key === "/" && !isFocused) {
+            e.preventDefault();
+            inputRef.current?.focus();
+          }
+          if (e.key === "Escape" && isFocused) {
+            inputRef.current?.blur();
+            onSearchChange("");
+          }
+        };
+
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+      }, [isFocused, onSearchChange]);
+
+      return (
+        <div className="relative">
+          {/* Search Input */}
+          <div
+            className="group/search relative flex h-10 items-center overflow-hidden transition-all duration-300"
+            style={{
+              borderRadius: "4px",
+              background:
+                "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
+              boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+            }}
+          >
+            {/* Search Icon */}
+            <div
+              className={cn(
+                "relative ml-3 transition-colors duration-300",
+                isFocused ? "text-[#4EFF6E]" : "text-[#32353C]"
+              )}
+            >
+              <FaSearch size={12} />
+            </div>
+
+            {/* Input */}
+            <input
+              ref={inputRef}
+              type="text"
+              spellCheck={false}
+              placeholder="Search instruments..."
+              value={query}
+              onChange={(e) => {
+                const value = e.target.value.toUpperCase().replace(/\s/g, "");
+                onSearchChange(value);
+              }}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#545963] transition-colors outline-none"
+            />
+
+            {/* Clear Button */}
+            {query && (
+              <button
+                type="button"
+                onClick={() => onSearchChange("")}
+                className="relative mr-3 flex h-5 w-5 items-center justify-center rounded-md border border-[#111215] bg-[#111215] text-white/40 transition-all hover:border-[#1C1E23] hover:bg-[#1C1E23] hover:text-white/60"
+              >
+                <FaTimes size={8} />
+              </button>
+            )}
+
+            {/* Keyboard hint */}
+            {!isFocused && !query && (
+              <div className="absolute right-3 text-[10px] text-[#32353C] font-outfit">
+                /
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+  );
+
+  const FilterButton = ({
     isActive,
-    label,
-    icon,
     onClick,
+    label,
   }: {
     isActive: boolean;
-    label: string;
-    icon?: React.ReactNode;
-    onClick?: () => void;
+    onClick: () => void;
+    label: React.ReactNode;
   }) => {
     return (
       <button
         type="button"
         onClick={onClick}
         className={cn(
-          "group relative flex h-8 items-center justify-center px-3 transition-all duration-300 ease-in-out rounded-lg",
-          isActive &&
-            "border border-[#111215] bg-gradient-to-b from-[#131518] to-[#0E0F11] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)]"
+          "group rounded-full px-4 relative w-auto flex flex h-7 min-w-7 justify-center items-center px-2",
+          "transition-all duration-300 ease-in-out overflow-hidden"
         )}
       >
-        {!isActive && (
-          <div className="absolute inset-0 rounded-lg bg-[#111215] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {/* Active indicator */}
+        {isActive && (
+          <>
+            <div
+              className="absolute inset-0"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
+            />
+            <div
+              className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
+              style={{
+                width: "30px",
+                height: "4px",
+                transform: "translateY(-50%) rotate(-90deg)",
+                filter: "blur(10px)",
+                transformOrigin: "center",
+              }}
+            />
+          </>
         )}
 
+        {/* Inactive background */}
+        {!isActive && (
+          <>
+            <div
+              className="absolute inset-0 opacity-100 group-hover:opacity-0 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
+            />
+            <div
+              className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                boxShadow: "0px 4px 4px 0px rgba(0, 0, 0, 0.25)",
+              }}
+            />
+          </>
+        )}
+
+        {/* Label */}
         <span
           className={cn(
-            "relative z-10 font-russo text-xs font-medium tracking-wide whitespace-nowrap flex items-center gap-2",
+            "relative z-10 font-outfit text-[12px] font-medium tracking-wide whitespace-nowrap flex items-center justify-center",
             "transition-colors duration-300 ease-in-out",
-            isActive
-              ? "text-white"
-              : "text-[#32353C] group-hover:text-[#545963]"
+            "text-white"
           )}
         >
-          {icon}
           {label}
         </span>
       </button>
     );
+  };
+
+  // Memoized available pairs groups - defined after all components to avoid lexical declaration issues
+  const availablePairsGroups = useMemo(() => {
+    if (isSearching) return [];
+
+    return [
+      { label: "FX", items: FOREX_PAIRS },
+      { label: "CRYPTO", items: CRYPTO_PAIRS },
+      { label: "STOCKS", items: EQUITY_PAIRS },
+      { label: "ETF", items: ETF_PAIRS },
+    ]
+      .map((group) => {
+        const availablePairs = group.items.filter(
+          (item) => !favorites.includes(item)
+        );
+        if (availablePairs.length === 0) return null;
+
+        const items = availablePairs.map((item) => (
+          <PairItem
+            key={item}
+            item={item}
+            isSelected={false}
+            onToggle={() => togglePair(item)}
+          />
+        ));
+
+        return (
+          <PairGroup
+            key={group.label}
+            label={group.label}
+            items={items}
+            count={availablePairs.length}
+          />
+        );
+      })
+      .filter(Boolean);
+  }, [favorites, isSearching, isClient]);
+
+  if (!isClient) {
+    // Show loading state during SSR/hydration
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-[#545963] text-sm">Loading instruments...</div>
+      </div>
+    );
   }
-);
-
-FilterButton.displayName = "FilterButton";
-
-// Main mock instruments panel
-const MockInstrumentsPanel = memo(() => {
-  const [activeFilter, setActiveFilter] = useState("selected");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [favorites, setSelectedPairs] = useState(MOCK_SELECTED_PAIRS);
-
-  // Filter instruments based on search and category
-  const filteredInstruments = useMemo(() => {
-    let instruments: string[] = [];
-
-    switch (activeFilter) {
-      case "selected":
-        instruments = favorites;
-        break;
-      case "fx":
-        instruments = FOREX_PAIRS;
-        break;
-      case "crypto":
-        instruments = CRYPTO_PAIRS;
-        break;
-      case "stocks":
-        instruments = EQUITY_PAIRS;
-        break;
-      case "etf":
-        instruments = ETF_PAIRS;
-        break;
-    }
-
-    if (searchQuery) {
-      instruments = instruments.filter((pair) =>
-        pair.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    return instruments.slice(0, 20); // Limit to 20 items for demo
-  }, [activeFilter, searchQuery, favorites]);
-
-  const togglePairSelection = useCallback((pair: string) => {
-    setSelectedPairs((prev) => {
-      if (prev.includes(pair)) {
-        return prev.filter((p) => p !== pair);
-      }
-      return [...prev, pair];
-    });
-  }, []);
 
   return (
-    <div className="w-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] border border-[#1C1E23]/60 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden">
-      {/* Header */}
-
+    <div className="w-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] border border-[#1C1E23]/60 rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden relative">
       {/* Subtle glow effect */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.02),transparent_50%)] rounded-xl" />
 
@@ -412,143 +662,150 @@ const MockInstrumentsPanel = memo(() => {
           Instruments
         </h3>
 
-        {/* Search Bar */}
-        <MockSearchBar
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
+        <div className="h-full flex flex-col overflow-hidden">
+          <div className="w-full flex gap-2 w-auto ">
+            <div className="w-auto overflow-x-auto flex flex-wrap gap-2 py-2">
+              <FilterButton
+                isActive={activeFilter === "selected"}
+                onClick={() => scrollToSection("selected")}
+                label={<FaStar size={10} />}
+              />
+              <FilterButton
+                isActive={activeFilter === "fx"}
+                onClick={() => scrollToSection("fx")}
+                label="FX"
+              />
+              <FilterButton
+                isActive={activeFilter === "crypto"}
+                onClick={() => scrollToSection("crypto")}
+                label="Crypto"
+              />
+              <FilterButton
+                isActive={activeFilter === "stocks"}
+                onClick={() => scrollToSection("stocks")}
+                label="Stocks"
+              />
+              <FilterButton
+                isActive={activeFilter === "etf"}
+                onClick={() => scrollToSection("etf")}
+                label="ETF"
+              />
+            </div>
+          </div>
+          <div className="flex-none overflow-hidden w-full mb-2">
+            <SearchBar
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              onFocus={() => setIsSearchFocused(true)}
+              onBlur={() => setIsSearchFocused(false)}
+              isFocused={isSearchFocused}
+            />
+          </div>
 
-        {/* Filter Buttons */}
-        <div className="flex gap-2 mt-4 overflow-x-auto">
-          <FilterButton
-            isActive={activeFilter === "selected"}
-            label="Favorites"
-            onClick={() => setActiveFilter("selected")}
-          />
-          <FilterButton
-            isActive={activeFilter === "fx"}
-            label="FX"
-            onClick={() => setActiveFilter("fx")}
-          />
-          <FilterButton
-            isActive={activeFilter === "crypto"}
-            label="Crypto"
-            onClick={() => setActiveFilter("crypto")}
-          />
-          <FilterButton
-            isActive={activeFilter === "stocks"}
-            label="Stocks"
-            onClick={() => setActiveFilter("stocks")}
-          />
-          <FilterButton
-            isActive={activeFilter === "etf"}
-            label="ETF"
-            onClick={() => setActiveFilter("etf")}
-          />
+          {/* Scrollable content section */}
+          <div
+            ref={contentRef}
+            className="flex-1 overflow-y-auto min-h-0 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] max-h-96"
+          >
+            <div className="space-y-4">
+              {/* Search Results */}
+              {isSearching && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="pl-1 flex items-center gap-2">
+                      <h3 className="font-outfit text-xs font-medium text-white">
+                        Search Results
+                      </h3>
+                    </div>
+                    <div
+                      className="px-2 py-1 text-xs font-outfit font-medium text-white rounded-full"
+                      style={{
+                        background:
+                          "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                        boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
+                      }}
+                    >
+                      {searchResults.length} found
+                    </div>
+                  </div>
+
+                  {searchResults.length > 0 ? (
+                    <div className="space-y-1">
+                      {searchResults.map((pair) => (
+                        <SearchPairItem
+                          key={pair}
+                          item={pair}
+                          searchQuery={searchQuery}
+                          isSelected={favorites.includes(pair)}
+                          onToggle={() => togglePair(pair)}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-16 text-center">
+                      <div className="mb-4 text-3xl opacity-50">🔍</div>
+                      <div className="font-outfit text-sm text-[#545963] mb-2">
+                        No instruments found matching
+                      </div>
+                      <div
+                        className="font-outfit text-sm font-medium px-3 py-1 rounded-lg"
+                        style={{
+                          background:
+                            "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
+                          color: "#4EFF6E",
+                        }}
+                      >
+                        "{searchQuery}"
+                      </div>
+                      <div className="font-outfit text-xs text-[#32353C] mt-3">
+                        Try searching for forex pairs, crypto, stocks, or ETFs
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Regular Content */}
+              {!isSearching && (
+                <>
+                  {favorites.length > 0 && (
+                    <div data-section="selected">
+                      <PairGroup
+                        label="Selected Pairs"
+                        items={favorites.map((item) => (
+                          <PairItem
+                            key={item}
+                            item={item}
+                            isSelected={true}
+                            onToggle={() => togglePair(item)}
+                          />
+                        ))}
+                        count={favorites.length}
+                      />
+                    </div>
+                  )}
+                  {availablePairsGroups.map((group) => (
+                    <div
+                      key={group.props.label}
+                      data-section={group.props.label.toLowerCase()}
+                    >
+                      {group}
+                    </div>
+                  ))}
+                </>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Content */}
-      <div className="p-4 space-y-6 max-h-96 overflow-y-auto">
-        {/* Selected Pairs with Drag & Drop */}
-        {activeFilter === "selected" && (
-          <div className="space-y-2">
-            <Reorder.Group
-              axis="y"
-              values={favorites}
-              onReorder={setSelectedPairs}
-              className="space-y-1"
-            >
-              {favorites.map((pair) => (
-                <DraggableInstrumentItem
-                  key={pair}
-                  pair={pair}
-                  onToggle={() => togglePairSelection(pair)}
-                />
-              ))}
-            </Reorder.Group>
-          </div>
-        )}
-
-        {/* Other Categories */}
-        {activeFilter !== "selected" && (
-          <div className="space-y-2">
-            <span className="font-russo text-xs font-medium text-[#545963] uppercase tracking-wider block mb-3">
-              {activeFilter === "fx" && "Foreign Exchange"}
-              {activeFilter === "crypto" && "Cryptocurrency"}
-              {activeFilter === "stocks" && "Stocks"}
-              {activeFilter === "etf" && "ETFs"}
-              {searchQuery && ` (${filteredInstruments.length} results)`}
-            </span>
-            {filteredInstruments.map((pair, index) => (
-              <div key={pair}>
-                <MockInstrumentItem
-                  pair={pair}
-                  isSelected={favorites.includes(pair)}
-                  onToggle={() => togglePairSelection(pair)}
-                />
-              </div>
-            ))}
-            {filteredInstruments.length === 0 && searchQuery && (
-              <div className="text-center py-8">
-                <span className="font-russo text-sm text-[#32353C]">
-                  No instruments found for "{searchQuery}"
-                </span>
-              </div>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
 });
 
-MockInstrumentsPanel.displayName = "MockInstrumentsPanel";
+InstrumentsPanel.displayName = "InstrumentsPanel";
 
 export const SectionInstrumentsPanel = memo(() => {
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Add client-side check to prevent hydration issues
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Don't render dynamic content until client-side
-  if (!isClient) {
-    return (
-      <section
-        ref={containerRef}
-        className="relative min-h-screen w-full py-16 sm:py-24"
-      >
-        <div className="container mx-auto px-4 sm:px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-20 items-start">
-              {/* Static content placeholder */}
-              <div className="space-y-8 sm:space-y-12 order-2 lg:order-1">
-                <div className="space-y-8">
-                  <div className="space-y-4">
-                    <h2 className="font-russo text-5xl lg:text-6xl xl:text-7xl font-black text-white tracking-tighter leading-[0.8] uppercase">
-                      MASTER EVERY
-                      <span className="block text-white mt-2 relative">
-                        MARKET INSTANTLY
-                        <div className="absolute -bottom-2 left-0 h-1 w-full bg-gradient-to-r from-white via-white/60 to-transparent" />
-                      </span>
-                    </h2>
-                  </div>
-                </div>
-              </div>
-              {/* Empty placeholder for instruments panel */}
-              <div className="order-1 lg:order-2">
-                <div className="h-96 bg-[#0A0B0D] rounded-lg animate-pulse" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section
@@ -558,7 +815,7 @@ export const SectionInstrumentsPanel = memo(() => {
       <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-12 lg:gap-20 items-start">
-            {/* Left side - Enhanced Content */}
+            {/* Left side - Enhanced Marketing Content */}
             <div className="space-y-8 sm:space-y-12 order-2 lg:order-1">
               {/* Header Section */}
               <div className="space-y-8">
@@ -567,7 +824,6 @@ export const SectionInstrumentsPanel = memo(() => {
                     MASTER EVERY
                     <span className="block text-white mt-2 relative">
                       MARKET INSTANTLY
-                      {/* Static underline */}
                       <div className="absolute -bottom-2 left-0 h-1 w-full bg-gradient-to-r from-white via-white/60 to-transparent" />
                     </span>
                   </h2>
@@ -593,12 +849,10 @@ export const SectionInstrumentsPanel = memo(() => {
 
               {/* Key Features Grid */}
               <div className="grid md:grid-cols-2 gap-8">
-                {/* Feature 1 - Search */}
+                {/* Feature 1 - Lightning Search */}
                 <div className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500">
-                  {/* Background glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                  {/* Icon */}
                   <div className="relative z-10 mb-6">
                     <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <FaSearch className="w-7 h-7 text-white" />
@@ -627,7 +881,6 @@ export const SectionInstrumentsPanel = memo(() => {
                       milliseconds.
                     </p>
 
-                    {/* Performance indicator */}
                     <div className="flex items-center gap-3 pt-2">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
@@ -642,12 +895,10 @@ export const SectionInstrumentsPanel = memo(() => {
                   </div>
                 </div>
 
-                {/* Feature 2 - Organization */}
+                {/* Feature 2 - Smart Organization */}
                 <div className="group relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050506] p-8 hover:border-white/20 transition-all duration-500">
-                  {/* Background glow */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-                  {/* Icon */}
                   <div className="relative z-10 mb-6">
                     <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                       <FaStar className="w-7 h-7 text-white" />
@@ -672,85 +923,70 @@ export const SectionInstrumentsPanel = memo(() => {
                       <span className="text-white font-semibold">
                         favorites, crypto, forex, stocks, and ETFs
                       </span>
-                      . Drag and drop to reorder. Your most profitable trades,
-                      always within reach.
+                      . Your most profitable trades, always within reach.
                     </p>
 
-                    {/* Category indicators */}
-                    <div className="flex items-center gap-2 pt-2">
-                      {["Favorites", "Crypto", "Forex", "Stocks"].map(
-                        (category, i) => (
-                          <div
-                            key={category}
-                            className="px-2 py-1 rounded bg-white/10 border border-white/20"
-                          >
-                            <span className="font-russo text-xs font-medium text-white/80">
-                              {category}
-                            </span>
-                          </div>
-                        )
-                      )}
+                    <div className="flex items-center gap-2 pt-2 flex-wrap">
+                      {["★", "₿", "€", "$"].map((icon, i) => (
+                        <div
+                          key={icon}
+                          className="px-2 py-1 rounded bg-white/10 border border-white/20"
+                        >
+                          <span className="font-russo text-xs font-medium text-white/80">
+                            {icon}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Drag & Drop Showcase */}
+              {/* Real-Time Performance Showcase */}
               <div className="relative overflow-hidden rounded-2xl border border-[#1C1E23]/60 bg-gradient-to-r from-[#0A0B0D] via-[#070809] to-[#050506] p-8">
                 <div className="relative z-10 flex items-center gap-8">
                   <div className="flex-1 space-y-4">
                     <div className="space-y-2">
                       <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20">
                         <span className="font-russo text-xs font-bold text-white uppercase tracking-wider">
-                          INTUITIVE
+                          LIVE DATA
                         </span>
                       </div>
                       <h3 className="font-russo text-2xl font-black text-white uppercase tracking-tight">
-                        Drag & Drop
+                        Real-Time Prices
                       </h3>
                     </div>
 
                     <p className="font-russo text-white/70 leading-relaxed">
-                      Reorder your favorites instantly with professional
-                      drag-and-drop controls. Build the perfect watchlist for
-                      your trading style. Your most important instruments,
-                      exactly where you need them.
+                      Every price updates in real-time. See live market data for
+                      Bitcoin at $45,000, Apple at $175, EUR/USD at 1.0850. No
+                      delays, no stale data. Make decisions with{" "}
+                      <span className="text-white font-semibold">
+                        the freshest market information
+                      </span>
+                      .
                     </p>
 
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-white" />
+                        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                         <span className="font-russo text-sm text-white/60">
-                          Instant reordering
+                          Live streaming data
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-white" />
+                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
                         <span className="font-russo text-sm text-white/60">
-                          Smooth animations
+                          300+ instruments
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Visual drag indicator */}
                   <div className="hidden lg:block">
                     <div className="relative">
                       <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-white/10 to-white/5 border border-white/20 flex items-center justify-center">
-                        <svg
-                          className="w-6 h-6 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <title>Drag and Drop Icon</title>
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4"
-                          />
-                        </svg>
+                        <LuActivity className="w-6 h-6 text-white" />
                       </div>
                     </div>
                   </div>
@@ -767,13 +1003,13 @@ export const SectionInstrumentsPanel = memo(() => {
                   },
                   {
                     value: "< 50ms",
-                    label: "Live Data",
-                    sublabel: "Calculating incoming data in real-time",
+                    label: "Search Speed",
+                    sublabel: "Lightning-fast instrument discovery",
                   },
                   {
                     value: "100%",
-                    label: "Customizable",
-                    sublabel: "Build your perfect setup (BETA)",
+                    label: "Live Data",
+                    sublabel: "Real-time price streaming",
                   },
                 ].map((stat, index) => (
                   <div key={stat.label} className="text-center group">
@@ -795,10 +1031,10 @@ export const SectionInstrumentsPanel = memo(() => {
               </div>
             </div>
 
-            {/* Right side - Mock Panel */}
+            {/* Right side - Instruments Panel */}
             <div className="flex justify-center lg:justify-end lg:sticky top-24 order-1 lg:order-2">
               <div className="w-full max-w-sm lg:max-w-sm">
-                <MockInstrumentsPanel />
+                <InstrumentsPanel />
               </div>
             </div>
           </div>
