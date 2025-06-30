@@ -67,7 +67,9 @@ export const BoxStructure = memo(
                 : prevBox.value > 0
             );
 
-            const epsilon = isFocused ? 0.005 : 0.005;
+            // Use different epsilon values based on focus state
+            // When focused: tight spacing (0.005), when not focused: spread out (0.1)
+            const epsilon = isFocused ? 0.005 : 0.03;
             const magnitude = Math.sqrt(
               offsetX ** 2 + offsetY ** 2 + offsetZ ** 2
             );
@@ -197,15 +199,7 @@ const BoxMesh = memo(
       >
         <mesh scale={dimensions.size} castShadow receiveShadow>
           <boxGeometry />
-          <meshPhysicalMaterial
-            color={color}
-            metalness={0.4}
-            roughness={0.1}
-            clearcoat={1}
-            thickness={0.5}
-            ior={1.5}
-            envMapIntensity={1.5}
-          />
+          <meshPhysicalMaterial color={color} metalness={0.4} />
           <Edges
             threshold={15}
             color={new THREE.Color(color).multiplyScalar(0.1)}
