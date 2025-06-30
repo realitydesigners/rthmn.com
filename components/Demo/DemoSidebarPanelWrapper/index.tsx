@@ -5,133 +5,95 @@ import { motion } from "framer-motion";
 import type { MotionValue } from "framer-motion";
 import type React from "react";
 import { useCallback, useEffect, useState } from "react";
-import { LuLock, LuUnlock, LuX } from "react-icons/lu";
-
-const LockButton = ({
-  isLocked,
-  onClick,
-}: {
-  isLocked: boolean;
-  onClick: () => void;
-}) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className={cn(
-      "group relative z-[120] flex h-7 w-7 items-center justify-center rounded border transition-all duration-200",
-      isLocked
-        ? "border-[#32353C] bg-[#1C1E23] text-white"
-        : "border-transparent bg-transparent text-[#32353C] hover:border-[#32353C] hover:bg-[#1C1E23] hover:text-white"
-    )}
-  >
-    {isLocked ? (
-      <LuLock size={11} className="transition-transform duration-200" />
-    ) : (
-      <LuUnlock size={11} className="transition-transform duration-200" />
-    )}
-  </button>
-);
-
-const CloseButton = ({ onClick }: { onClick: () => void }) => (
-  <button
-    type="button"
-    onClick={onClick}
-    className="group relative z-[120] flex h-7 w-7 items-center justify-center rounded border border-transparent bg-transparent text-[#32353C] transition-all duration-200 hover:border-[#32353C] hover:bg-[#1C1E23] hover:text-white"
-  >
-    <LuX size={11} className="transition-transform duration-200" />
-  </button>
-);
 
 export const DemoSidebarWrapper = ({
-  isOpen,
-  children,
-  title,
-  position,
-  initialWidth = 350,
-  onClose,
-  opacity,
+	isOpen,
+	children,
+	title,
+	position,
+	initialWidth = 280,
+	onClose,
+	opacity,
 }: {
-  isOpen: boolean;
-  children: React.ReactNode;
-  title: string;
-  position: "left" | "right";
-  initialWidth?: number;
-  onClose: () => void;
-  opacity?: MotionValue<number>;
+	isOpen: boolean;
+	children: React.ReactNode;
+	title: string;
+	position: "left" | "right";
+	initialWidth?: number;
+	onClose: () => void;
+	opacity?: MotionValue<number>;
 }) => {
-  const [width, setWidth] = useState(initialWidth);
-  const [isLocked, setIsLocked] = useState(false);
+	const [width, setWidth] = useState(initialWidth);
+	const [mounted, setMounted] = useState(false);
+	const [isLocked, setIsLocked] = useState(false);
 
-  const handleLockToggle = useCallback(() => {
-    setIsLocked(!isLocked);
-  }, [isLocked]);
+	useEffect(() => {
+		setMounted(true);
+	}, []);
 
-  return (
-    <motion.div
-      initial={false}
-      animate={{
-        x: isOpen ? 0 : position === "left" ? -width : width,
-      }}
-      transition={{
-        duration: 0.15,
-        ease: "easeInOut",
-      }}
-      className={cn(
-        "fixed top-14 z-[100] bottom-0 transform bg-gradient-to-b from-[#0A0B0D] to-[#070809]",
-        position === "left" ? "left-16" : "right-16", // Account for demo sidebar width
-        isOpen ? "pointer-events-auto" : "pointer-events-none"
-      )}
-      style={{
-        width: `${width}px`,
-        opacity: opacity,
-        boxShadow: isOpen
-          ? position === "left"
-            ? "4px 0 16px rgba(0,0,0,0.3)"
-            : "-4px 0 16px rgba(0,0,0,0.3)"
-          : "none",
-      }}
-    >
-      <div className="relative flex h-full w-full">
-        <div
-          className={cn(
-            "relative flex h-full w-full flex-col",
-            position === "left"
-              ? "border-r border-[#1C1E23]"
-              : "border-l border-[#1C1E23]"
-          )}
-        >
-          {/* Header */}
-          <div className="relative z-10 flex h-12 items-center justify-between px-3 bg-gradient-to-b from-[#0A0B0D] to-[#070809] border-b border-[#1C1E23]">
-            {position === "right" && (
-              <div className="flex items-center gap-2">
-                <LockButton isLocked={isLocked} onClick={handleLockToggle} />
-                <CloseButton onClick={onClose} />
-              </div>
-            )}
-            <div
-              className={cn(
-                "flex items-center justify-center",
-                position === "right" && "flex-1 justify-end"
-              )}
-            >
-              <h2 className="font-russo text-[10px] font-medium tracking-wide text-[#32353C] uppercase">
-                {title}
-              </h2>
-            </div>
-            {position === "left" && (
-              <div className="flex items-center gap-2">
-                <CloseButton onClick={onClose} />
-                <LockButton isLocked={isLocked} onClick={handleLockToggle} />
-              </div>
-            )}
-          </div>
+	const handleResize = useCallback((newWidth: number) => {
+		setWidth(Math.max(280, Math.min(600, newWidth)));
+	}, []);
 
-          {/* Content */}
-          <div className="relative flex-1 overflow-y-auto px-2 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {children}
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
+	if (!mounted) return null;
+
+	return (
+		<motion.div
+			initial={false}
+			animate={{
+				x: 0,
+				opacity: isOpen ? 1 : 0,
+				scale: isOpen ? 1 : 0.98,
+			}}
+			transition={{
+				duration: 0.4,
+				ease: [0.23, 1, 0.32, 1],
+				opacity: { duration: 0.25 },
+				scale: { duration: 0.4 },
+			}}
+			className={cn(
+				"sidebar-content fixed top-0 z-[25] bottom-0 hidden transform lg:flex",
+				position === "left" ? "left-0" : "right-0",
+				isOpen ? "pointer-events-auto" : "pointer-events-none",
+			)}
+			data-position={position}
+			data-locked={isLocked}
+			data-open={isOpen}
+			data-width={width}
+			style={{
+				width: `${width}px`,
+				// Simple dark background with barely visible content behind
+				background: "rgba(0, 0, 0, 0.96)",
+				backdropFilter: "blur(24px) saturate(140%) brightness(1.1)",
+				// Remove hard border
+				border: "none",
+				borderRadius: "0",
+				// Softer, more organic shadow
+				boxShadow: isOpen
+					? `
+            ${position === "left" ? "4px" : "-4px"} 0 24px rgba(0, 0, 0, 0.2),
+            ${position === "left" ? "8px" : "-8px"} 0 48px rgba(0, 0, 0, 0.1),
+            ${position === "left" ? "1px" : "-12px"} 0 72px rgba(0, 0, 0, 0.05)
+          `
+					: "none",
+				// Very subtle glow for locked panels
+				...(isLocked &&
+					isOpen && {
+						filter: "drop-shadow(0 0 16px rgba(36, 255, 102, 0.04))",
+					}),
+				// Apply opacity from motion value if provided
+				opacity: opacity ? undefined : 1,
+			}}
+		>
+			<div className="relative flex h-full w-full">
+				<div className={cn("relative flex h-full w-full flex-col")}>
+					{/* Minimal header - just spacing for navbar */}
+					<div className="relative z-10 h-4 mt-12" />
+					<div className="relative flex-1 overflow-y-auto px-2 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+						{children}
+					</div>
+				</div>
+			</div>
+		</motion.div>
+	);
 };

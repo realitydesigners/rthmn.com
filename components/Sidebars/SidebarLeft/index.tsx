@@ -1,7 +1,6 @@
 "use client";
 
 import { TourInstruments } from "@/app/(user)/onboarding/_components/Tours/TourInstruments";
-import { TourVisualizers } from "@/app/(user)/onboarding/_components/Tours/TourVisualizers";
 import { ChartStyleOptions } from "@/components/Charts/ChartStyleOptions";
 import { InstrumentsPanel } from "@/components/Panels/InstrumentsPanel";
 import { TimeFrameSlider } from "@/components/Panels/PanelComponents/TimeFrameSlider";
@@ -15,17 +14,6 @@ export const SidebarLeft = () => {
 			icon: LuLineChart,
 			tourContent: <TourInstruments />,
 			panelContent: <InstrumentsPanel />,
-		},
-		{
-			id: "visualizer",
-			icon: LuLayoutGrid,
-			tourContent: <TourVisualizers />,
-			panelContent: (
-				<>
-					<ChartStyleOptions />
-					<TimeFrameSlider global />
-				</>
-			),
 		},
 	];
 

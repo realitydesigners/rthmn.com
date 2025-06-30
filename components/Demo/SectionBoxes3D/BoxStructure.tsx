@@ -67,7 +67,7 @@ export const BoxStructure = memo(
                 : prevBox.value > 0
             );
 
-            const epsilon = isFocused ? 0.005 : 0.01;
+            const epsilon = isFocused ? 0.005 : 0.005;
             const magnitude = Math.sqrt(
               offsetX ** 2 + offsetY ** 2 + offsetZ ** 2
             );
@@ -151,7 +151,6 @@ export const BoxStructure = memo(
   }
 );
 
-// Individual box mesh component (inlined)
 const BoxMesh = memo(
   ({
     box,
@@ -203,8 +202,6 @@ const BoxMesh = memo(
             metalness={0.4}
             roughness={0.1}
             clearcoat={1}
-            clearcoatRoughness={0.1}
-            transmission={0.1}
             thickness={0.5}
             ior={1.5}
             envMapIntensity={1.5}

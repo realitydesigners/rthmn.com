@@ -51,7 +51,11 @@ export function SectionFooter() {
 			icon: FaInstagram,
 			href: "https://www.instagram.com/rthmnapp/",
 		},
-		{ name: "GitHub", icon: FaGithub, href: "https://github.com/realitydesigners/" },
+		{
+			name: "GitHub",
+			icon: FaGithub,
+			href: "https://github.com/realitydesigners/",
+		},
 		{
 			name: "Youtube",
 			icon: FaYoutube,

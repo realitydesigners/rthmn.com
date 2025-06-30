@@ -1,10 +1,10 @@
 "use client";
 
+import { create, props } from "@/lib/styles/atomic";
 import { useUser } from "@/providers/UserProvider";
 import type { BoxColors } from "@/stores/colorStore";
 import type { Box, BoxSlice } from "@/types/types";
 import { INSTRUMENTS, formatPrice } from "@/utils/instruments";
-import { create, props } from "@/lib/styles/atomic";
 import type React from "react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 
@@ -12,69 +12,69 @@ import { memo, useEffect, useMemo, useRef, useState } from "react";
 const styles = create({
 	// Main container styles
 	container: {
-		position: 'relative',
-		aspectRatio: '1',
-		height: '100%',
-		width: '100%',
+		position: "relative",
+		aspectRatio: "1",
+		height: "100%",
+		width: "100%",
 	},
-	
+
 	innerContainer: {
-		position: 'relative',
-		height: '100%',
-		width: '100%',
+		position: "relative",
+		height: "100%",
+		width: "100%",
 	},
-	
+
 	// Box styles
 	boxContainer: {
-		position: 'absolute',
-		borderWidth: '1px',
-		borderStyle: 'solid',
-		borderColor: '#000000',
+		position: "absolute",
+		borderWidth: "1px",
+		borderStyle: "solid",
+		borderColor: "#000000",
 	},
-	
+
 	backgroundLayer: {
-		position: 'absolute',
+		position: "absolute",
 		inset: 0,
-		backgroundColor: '#000000',
+		backgroundColor: "#000000",
 	},
-	
+
 	shadowLayer: {
-		position: 'absolute',
+		position: "absolute",
 		inset: 0,
 	},
-	
+
 	gradientLayer: {
-		position: 'absolute',
+		position: "absolute",
 		inset: 0,
 	},
-	
+
 	// Price line styles
 	priceLineTop: {
-		position: 'absolute',
+		position: "absolute",
 		top: 0,
-		right: '-3rem',
-		borderStyle: 'dashed',
+		right: "-3rem",
+		borderStyle: "dashed",
 		opacity: 0.9,
 	},
-	
+
 	priceLineBottom: {
-		position: 'absolute',
-		right: '-3rem',
+		position: "absolute",
+		right: "-3rem",
 		bottom: 0,
 		opacity: 0.9,
 	},
-	
+
 	priceLabel: {
-		position: 'absolute',
-		top: '-0.875rem',
+		position: "absolute",
+		top: "-0.875rem",
 		right: 0,
 	},
-	
+
 	priceText: {
-		fontFamily: 'Kodemono, monospace',
-		fontSize: '8px',
-		color: '#ffffff',
-		letterSpacing: '0.05em',
+		fontFamily: "Kodemono, monospace",
+		fontSize: "8px",
+		color: "#ffffff",
+		letterSpacing: "0.05em",
 	},
 });
 
@@ -82,15 +82,14 @@ const styles = create({
 const useBoxColors = (box: Box, boxColors: BoxColors) => {
 	return useMemo(() => {
 		const baseColor = box.value > 0 ? boxColors.positive : boxColors.negative;
+
 		const opacity = boxColors.styles?.opacity ?? 0.2;
 		const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
 		const shadowY = Math.floor(shadowIntensity);
 		const shadowBlur = Math.floor(shadowIntensity * 50);
-		const shadowColor = (alpha: number) =>
-			(box.value > 0 ? boxColors.positive : boxColors.negative).replace(
-				")",
-				`, ${alpha})`,
-			);
+		const shadowColor = (alpha: number) => {
+			return baseColor.replace(")", `, ${alpha})`);
+		};
 
 		return {
 			baseColor,
@@ -333,9 +332,9 @@ export const ResoBox = memo(
 			<div
 				ref={boxRef}
 				{...props(styles.container)}
-				style={{ 
+				style={{
 					// Merge any additional className styles if needed
-					...(className ? {} : {})
+					...(className ? {} : {}),
 				}}
 			>
 				<div {...props(styles.innerContainer)}>

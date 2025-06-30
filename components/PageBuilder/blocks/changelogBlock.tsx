@@ -165,12 +165,24 @@ export function ChangelogBlock({
 												: "Click to read more"}
 										</span>
 										<motion.div
-											animate={{ rotate: expandedEntries.has(entry._id) ? 180 : 0 }}
+											animate={{
+												rotate: expandedEntries.has(entry._id) ? 180 : 0,
+											}}
 											transition={{ duration: 0.3 }}
 											className="text-white/70 group-hover:text-[#24FF66] transition-colors duration-300"
 										>
-											<svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-												<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+											<svg
+												className="w-4 h-4"
+												fill="none"
+												stroke="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path
+													strokeLinecap="round"
+													strokeLinejoin="round"
+													strokeWidth={2}
+													d="M19 9l-7 7-7-7"
+												/>
 											</svg>
 										</motion.div>
 									</div>

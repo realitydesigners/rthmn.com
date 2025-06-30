@@ -75,7 +75,6 @@ const createStore = () => {
 				initialized: false,
 
 				setLayout: (layout: LayoutPreset) => {
-					console.log("Store - Setting layout to:", layout);
 					set({ currentLayout: layout });
 					saveLayoutToStorage(layout);
 				},

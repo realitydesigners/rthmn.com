@@ -1,6 +1,6 @@
 import { Background } from "@/components/Background";
-import { SectionBoxes3D } from "@/components/Demo/SectionBoxes3D";
 import { LineChart3D } from "@/components/Demo/LineChart3D";
+import { SectionBoxes3D } from "@/components/Demo/SectionBoxes3D";
 import { SectionInstrumentsPanel } from "@/components/Demo/SectionInstrumentsPanel";
 import { FAQBlock } from "@/components/PageBuilder/blocks/faqBlock";
 import { SectionBoxes } from "@/components/Sections/SectionBoxes";
@@ -35,10 +35,8 @@ async function getPageData(): Promise<any> {
         }
     `;
 
-  // Initialize Supabase server client
   const supabase = await createClient();
 
-  // Fetch user session and products concurrently with Sanity data
   const [
     marketData,
     faqItems,
@@ -49,15 +47,14 @@ async function getPageData(): Promise<any> {
   ] = await Promise.all([
     sanityFetch({ query: marketDataQuery, tags: ["marketData"] }),
     sanityFetch({ query: faqItemsQuery, tags: ["faqItem"] }),
-    getProducts(supabase), // Fetch products
-    supabase.auth.getUser(), // Fetch user session
+    getProducts(supabase),
+    supabase.auth.getUser(),
   ]);
 
   return { marketData, faqItems, products, user };
 }
 
 export default async function Homepage() {
-  // Fetch all page data including user and products
   const { marketData, faqItems, products, user } = await getPageData();
 
   // Remove mock data definitions

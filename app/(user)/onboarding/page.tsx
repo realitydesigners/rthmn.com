@@ -57,7 +57,7 @@ export default function OnboardingPage() {
 				experience: userData.experience,
 			}),
 			...(currentStep.id === "pairs" && {
-				selectedPairs: userData.selectedPairs,
+				favorites: userData.favorites,
 			}),
 		};
 
@@ -118,9 +118,9 @@ export default function OnboardingPage() {
 			case "PairsStep":
 				return (
 					<PairsStep
-						selectedPairs={userData.selectedPairs}
+						favorites={userData.favorites}
 						setSelectedPairs={(pairs: string[]) =>
-							updateUserData({ selectedPairs: pairs })
+							updateUserData({ favorites: pairs })
 						}
 					/>
 				);
@@ -197,8 +197,7 @@ export default function OnboardingPage() {
 							onClick={handleNext}
 							disabled={
 								(currentStep.id === "experience" && !userData.experience) ||
-								(currentStep.id === "pairs" &&
-									userData.selectedPairs.length < 4)
+								(currentStep.id === "pairs" && userData.favorites.length < 4)
 							}
 							variant="green"
 						>

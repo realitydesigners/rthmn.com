@@ -183,19 +183,18 @@ export interface ColorState {
 }
 
 const DEFAULT_BOX_COLORS: BoxColors = {
+	positive: "#24FF66", // Matrix blue
+	negative: "#303238",
+	styles: {
+		borderRadius: 4,
+		shadowIntensity: 0.4,
+		opacity: 0.61,
+		showBorder: true,
+		globalTimeframeControl: false,
+		showLineChart: false,
 
-		positive: "#24FF66", // Matrix blue
-		negative: "#303238",
-		styles: {
-			borderRadius: 4,
-			shadowIntensity: 0.4,
-			opacity: 0.61,
-			showBorder: true,
-			globalTimeframeControl: false,
-			showLineChart: false,
-
-			viewMode: "default",
-		},
+		viewMode: "default",
+	},
 };
 
 export const useColorStore = create<ColorState>()(

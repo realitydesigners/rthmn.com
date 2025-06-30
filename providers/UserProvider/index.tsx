@@ -16,7 +16,7 @@ import {
 } from "react";
 
 interface UserContextType {
-	selectedPairs: string[];
+	favorites: string[];
 	boxColors: BoxColors;
 	isSidebarInitialized: boolean;
 	togglePair: (pair: string) => void;
@@ -100,7 +100,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
 	const value = useMemo(
 		() => ({
-			selectedPairs: orderedPairs,
+			favorites: orderedPairs,
 			boxColors,
 			isSidebarInitialized,
 			togglePair,

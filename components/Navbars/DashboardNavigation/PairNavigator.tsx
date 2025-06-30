@@ -83,7 +83,7 @@ const FilterButton = ({
 
 export const PairNavigator = () => {
 	const { pairData } = useDashboard();
-	const { selectedPairs, togglePair } = useUser();
+	const { favorites, togglePair } = useUser();
 	const [activeIndex, setActiveIndex] = useState(0);
 	const [viewMode, setViewMode] = useState<string>("all");
 	const scrollRef = useRef<HTMLDivElement>(null);
@@ -96,7 +96,7 @@ export const PairNavigator = () => {
 
 	const handlePairClick = useCallback(
 		(pair: string) => {
-			if (!selectedPairs.includes(pair)) {
+			if (!favorites.includes(pair)) {
 				return; // Do nothing if not a favorite
 			}
 
@@ -109,7 +109,7 @@ export const PairNavigator = () => {
 				});
 			}
 		},
-		[selectedPairs],
+		[favorites],
 	);
 
 	// Add scroll handler to cancel actions
@@ -142,7 +142,7 @@ export const PairNavigator = () => {
 
 	const currentPairs =
 		viewMode === "favorites"
-			? selectedPairs
+			? favorites
 			: viewMode === "fx"
 				? [...FOREX_PAIRS]
 				: viewMode === "crypto"
@@ -228,7 +228,7 @@ export const PairNavigator = () => {
 							pair={pair}
 							index={index}
 							isActive={activeIndex === index}
-							isFavorite={selectedPairs.includes(pair)}
+							isFavorite={favorites.includes(pair)}
 							currentPrice={pairData[pair]?.currentOHLC?.close}
 							showRemove={showRemoveForPair === pair}
 							showAdd={showAddForPair === pair}
@@ -249,7 +249,7 @@ export const PairNavigator = () => {
 								opacity: activeIndex === index ? 1 : 0.3,
 								transform: `scale(${activeIndex === index ? 1 : 0.95})`,
 								transition: "all 0.2s ease-out",
-								cursor: selectedPairs.includes(pair) ? "pointer" : "default",
+								cursor: favorites.includes(pair) ? "pointer" : "default",
 							}}
 						/>
 					</div>

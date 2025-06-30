@@ -22,7 +22,7 @@ export function TourContentWrapper({
 		>
 			{/* Top highlight */}
 			<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-			
+
 			<div className="relative flex h-full flex-col items-end justify-end space-y-2">
 				{children}
 				<TourButton onClick={onComplete} variant="green" />

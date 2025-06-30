@@ -48,25 +48,18 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
 		order: 4,
 	},
 	{
-		id: "visualizer",
-		title: "Visualizer",
-		description: "Customize your chart visualization settings",
-		type: "feature-tour",
-		order: 5,
-	},
-	{
 		id: "onboarding",
 		title: "Learning Center",
 		description: "Access your selected trading pairs and available markets",
 		type: "feature-tour",
-		order: 6,
+		order: 5,
 	},
 	{
 		id: "settings",
 		title: "Settings",
 		description: "View detailed market analysis and trading insights",
 		type: "feature-tour",
-		order: 7,
+		order: 6,
 	},
 ];
 
@@ -76,7 +69,7 @@ interface OnboardingState {
 	userData: {
 		photoUrl: string | null;
 		experience: string;
-		selectedPairs: string[];
+		favorites: string[];
 	};
 	// Actions
 	completeStep: (
@@ -104,7 +97,7 @@ export const useOnboardingStore = create<OnboardingState>()(
 			userData: {
 				photoUrl: null,
 				experience: "",
-				selectedPairs: [],
+				favorites: [],
 			},
 
 			completeStep: (stepId, data) => {
@@ -172,7 +165,7 @@ export const useOnboardingStore = create<OnboardingState>()(
 					userData: {
 						photoUrl: null,
 						experience: "",
-						selectedPairs: [],
+						favorites: [],
 					},
 				});
 			},

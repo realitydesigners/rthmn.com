@@ -82,7 +82,7 @@ const createOHLC = (price: number): OHLC => ({
 });
 
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-	const { selectedPairs, isSidebarInitialized } = useUser();
+	const { favorites, isSidebarInitialized } = useUser();
 	const [pairData, setPairData] = useState<Record<string, PairData>>({});
 	const boxMapRef = useRef<Map<string, Box[]>>(new Map());
 	const lastPricesRef = useRef<Map<string, number>>(new Map());
@@ -107,10 +107,10 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 	// WebSocket subscription effect
 	useEffect(() => {
-		if (!isConnected || !isAuthenticated || selectedPairs.length === 0) return;
+		if (!isConnected || !isAuthenticated || favorites.length === 0) return;
 
 		// Clean up any stale data for pairs that are no longer selected
-		const currentPairs = new Set(selectedPairs);
+		const currentPairs = new Set(favorites);
 		Array.from(boxMapRef.current.keys()).forEach((pair) => {
 			if (!currentPairs.has(pair)) {
 				unsubscribeFromBoxSlices(pair);
@@ -125,7 +125,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 		});
 
 		// Subscribe to all selected pairs, including re-added ones
-		selectedPairs.forEach((pair) => {
+		favorites.forEach((pair) => {
 			// Always resubscribe to ensure fresh data
 			unsubscribeFromBoxSlices(pair);
 			subscribeToBoxSlices(pair, (wsData: BoxSlice) => {
@@ -158,13 +158,13 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 		});
 
 		return () => {
-			selectedPairs.forEach((pair) => {
+			favorites.forEach((pair) => {
 				unsubscribeFromBoxSlices(pair);
 			});
 		};
 	}, [
 		isConnected,
-		selectedPairs,
+		favorites,
 		isAuthenticated,
 		subscribeToBoxSlices,
 		unsubscribeFromBoxSlices,
@@ -175,7 +175,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 		if (
 			!priceData ||
 			Object.keys(priceData).length === 0 ||
-			selectedPairs.length === 0
+			favorites.length === 0
 		)
 			return;
 
@@ -197,7 +197,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 			>();
 
 			// Batch process updates
-			for (const pair of selectedPairs) {
+			for (const pair of favorites) {
 				const data = priceData[pair];
 				if (!data?.price) continue;
 
@@ -252,7 +252,7 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
 
 		frameId = requestAnimationFrame(processUpdates);
 		return () => cancelAnimationFrame(frameId);
-	}, [priceData, selectedPairs, updateBoxesWithPrice]);
+	}, [priceData, favorites, updateBoxesWithPrice]);
 
 	// Memoized context value
 	const value = useMemo(

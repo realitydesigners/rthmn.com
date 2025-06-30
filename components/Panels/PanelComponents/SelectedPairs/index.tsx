@@ -7,7 +7,7 @@ import { FaChevronDown, FaTimes } from "react-icons/fa";
 
 export const SelectedPairs = () => {
 	const { pairData } = useDashboard();
-	const { selectedPairs, togglePair } = useUser();
+	const { favorites, togglePair } = useUser();
 	const [activeRow, setActiveRow] = useState<string | null>(null);
 	const containerRef = useRef<HTMLDivElement>(null);
 
@@ -34,7 +34,7 @@ export const SelectedPairs = () => {
 		setActiveRow(activeRow === pair ? null : pair);
 	};
 
-	if (selectedPairs.length === 0) {
+	if (favorites.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center py-8 text-sm text-[#818181]">
 				<span>No instruments added to watchlist</span>
@@ -54,7 +54,7 @@ export const SelectedPairs = () => {
 			</div>
 
 			<div className="custom-scrollbar flex flex-col gap-1 overflow-y-auto p-2">
-				{selectedPairs.map((pair) => {
+				{favorites.map((pair) => {
 					const currentPrice = pairData[pair]?.currentOHLC?.close;
 					const isActive = activeRow === pair;
 

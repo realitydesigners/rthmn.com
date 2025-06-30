@@ -503,11 +503,11 @@ const TimeFrameSliderContent = memo(
 		}, [handleMouseDown, handleTouchStart]);
 
 		return (
-			<div className="relative h-full px-[7px] pb-6">
+			<div className="relative h-full px-[7px] ">
 				{/* Main slider container */}
 				<div
 					ref={barContainerRef}
-					className="group/bars relative flex h-12 items-center touch-none"
+					className="group/bars relative flex h-10 items-center touch-none z-20"
 				>
 					{/* Base layer with diagonal lines pattern */}
 					<div className="absolute inset-0 overflow-hidden opacity-10">
@@ -542,7 +542,7 @@ const TimeFrameSliderContent = memo(
 
 					{/* Selection area with enhanced gradients */}
 					<div
-						className="absolute h-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[inset_0_0_30px_rgba(255,255,255,0.05),0_0_15px_rgba(0,0,0,0.8)] will-change-transform"
+						className="absolute h-full bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[inset_0_0_30px_rgba(255,255,255,0.05),0_0_15px_rgba(0,0,0,0.8),0_8px_24px_-4px_rgba(0,0,0,0.4)] will-change-transform z-30"
 						style={selectionStyle}
 					>
 						{/* Enhanced inner glow effect */}
@@ -559,10 +559,13 @@ const TimeFrameSliderContent = memo(
 
 						{/* Additional subtle inner shadow */}
 						<div className="absolute inset-0 shadow-[inset_0_1px_2px_rgba(255,255,255,0.1),inset_0_-1px_2px_rgba(0,0,0,0.2)]" />
+
+						{/* Bleeding shadow effect extending downward */}
+						<div className="absolute inset-x-0 -bottom-6 h-8 bg-gradient-to-b from-black/20 via-black/10 to-transparent pointer-events-none" />
 					</div>
 
 					{/* Invisible click/touch handlers with larger touch targets */}
-					<div className="relative flex h-full w-full">
+					<div className="relative flex h-full w-full z-50">
 						{Array.from({ length: 38 }).map((_, i) => {
 							const timeInfo = getTimeLabel(i);
 							return (
@@ -618,7 +621,7 @@ const TimeFrameSliderContent = memo(
 
 					{/* Edge handles container with enhanced active state */}
 					<div
-						className="pointer-events-none absolute inset-y-0 z-0 will-change-transform transition-[filter] duration-200 [&:has(*:active)]:brightness-110"
+						className="pointer-events-none absolute inset-y-0 z-60 will-change-transform transition-[filter] duration-200 [&:has(*:active)]:brightness-110"
 						style={selectionStyle}
 					>
 						{renderEdgeHandles}
@@ -626,42 +629,63 @@ const TimeFrameSliderContent = memo(
 				</div>
 
 				{/* Dynamic time intervals scale */}
-				<div className="mt-2 w-full">
-					<div className="flex w-full justify-between px-[7px]">
-						{TIME_INTERVALS.map((interval, i) => {
-							// Always show full range of labels
-							const position = (i / (TIME_INTERVALS.length - 1)) * 37;
-							const isInRange =
-								position >= reversedStartIndex &&
-								position <= reversedStartIndex + reversedMaxBoxCount;
+				<div className="mt-0.5 w-full relative">
+					{/* Full-width gradient shadow overlay matching selection */}
+					<div
+						className="absolute inset-y-0 -top-0.5 bottom-0 bg-gradient-to-b from-black/30 via-black/20 to-black/5 pointer-events-none will-change-transform transition-all duration-200"
+						style={{
+							left: `${(reversedStartIndex / 38) * 100}%`,
+							width: `${(reversedMaxBoxCount / 38) * 100}%`,
+						}}
+					/>
+					<div className="flex w-full justify-between px-0 relative z-10">
+						{TIME_INTERVALS.filter((_, i) => i % 3 !== 1).map(
+							(interval, filteredIndex) => {
+								// Show most intervals but skip every third one (fewer dots but not too many removed)
+								const originalIndex = TIME_INTERVALS.findIndex(
+									(int) => int.label === interval.label,
+								);
+								const position =
+									(originalIndex / (TIME_INTERVALS.length - 1)) * 37;
+								const isInRange =
+									position >= reversedStartIndex &&
+									position <= reversedStartIndex + reversedMaxBoxCount;
 
-							return (
-								<div
-									key={interval.label}
-									className="flex flex-col items-center"
-								>
+								return (
 									<div
-										className={cn(
-											"h-3 w-[1px] will-change-transform transition-all duration-200",
-											isInRange
-												? "bg-gradient-to-b from-white/90 to-transparent shadow-[0_0_12px_rgba(255,255,255,0.6)]"
-												: "bg-gradient-to-b from-white/20 to-transparent",
-										)}
-									/>
-									<span
-										className={cn(
-											"mt-1 font-kodemono text-[9px] tracking-wider transition-all duration-200",
-											isInRange
-												? "text-white/90 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]"
-												: "text-white/30",
-											"whitespace-nowrap",
-										)}
+										key={interval.label}
+										className="flex flex-col items-center group/dash"
 									>
-										{interval.label}
-									</span>
-								</div>
-							);
-						})}
+										<div
+											className={cn(
+												"h-3 w-0 -mt-1 will-change-transform transition-all duration-200 ease-out border-l-[1px] border-dashed",
+												isInRange
+													? "border-white/80 shadow-[0_0_4px_rgba(255,255,255,0.3)]"
+													: "border-white/30 group-hover/dash:border-white/50",
+											)}
+											style={{
+												borderLeftStyle: "dashed",
+												borderImageSlice: "1",
+												borderImageSource: isInRange
+													? "repeating-linear-gradient(to bottom, transparent 0px, transparent 1px, currentColor 1px, currentColor 2px, transparent 2px, transparent 4px)"
+													: "repeating-linear-gradient(to bottom, transparent 0px, transparent 1px, currentColor 1px, currentColor 2px, transparent 2px, transparent 4px)",
+											}}
+										/>
+										<span
+											className={cn(
+												"mt-0 font-kodemono text-[9px] tracking-wider transition-all duration-200 ease-out",
+												isInRange
+													? "text-white/90 font-medium"
+													: "text-white/40 group-hover/dash:text-white/65",
+												"whitespace-nowrap select-none",
+											)}
+										>
+											{interval.label}
+										</span>
+									</div>
+								);
+							},
+						)}
 					</div>
 				</div>
 			</div>

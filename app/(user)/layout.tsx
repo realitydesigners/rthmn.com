@@ -1,3 +1,4 @@
+import { ZenModeControlsWrapper } from "@/components/Dashboard/ZenModeControlsWrapper";
 import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 import { NavbarSignedIn } from "@/components/Navbars/NavbarSignedIn";
 import { SidebarLeft } from "@/components/Sidebars/SidebarLeft";
@@ -62,6 +63,7 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
 						<SidebarLeft />
 						<SidebarRight />
 						<MobileNavbar />
+						<ZenModeControlsWrapper />
 						{modal}
 					</div>
 				</DashboardProvider>

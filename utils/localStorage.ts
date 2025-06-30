@@ -1,4 +1,4 @@
-const SELECTED_PAIRS_KEY = "selectedPairs";
+const SELECTED_PAIRS_KEY = "favorites";
 const SIDEBAR_LOCKS_KEY = "sidebarLocks";
 const SIDEBAR_STATE_KEY = "sidebarState";
 

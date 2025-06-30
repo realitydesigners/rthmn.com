@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
 interface Props {
-	selectedPairs: string[];
+	favorites: string[];
 	setSelectedPairs: (pairs: string[]) => void;
 	onValidationChange?: (isValid: boolean) => void;
 }
@@ -34,7 +34,7 @@ const formatPrice = (price: number, instrument: string) => {
 };
 
 export default function PairsStep({
-	selectedPairs,
+	favorites,
 	setSelectedPairs,
 	onValidationChange,
 }: Props) {
@@ -44,13 +44,13 @@ export default function PairsStep({
 
 	// Update validation whenever selected pairs change
 	useEffect(() => {
-		onValidationChange?.(selectedPairs.length >= MIN_PAIRS_REQUIRED);
-	}, [selectedPairs, onValidationChange]);
+		onValidationChange?.(favorites.length >= MIN_PAIRS_REQUIRED);
+	}, [favorites, onValidationChange]);
 
 	const handlePairClick = (pair: string) => {
-		const newSelectedPairs = selectedPairs.includes(pair)
-			? selectedPairs.filter((p) => p !== pair)
-			: [...selectedPairs, pair];
+		const newSelectedPairs = favorites.includes(pair)
+			? favorites.filter((p) => p !== pair)
+			: [...favorites, pair];
 
 		setSelectedPairs(newSelectedPairs);
 		saveToLocalStorage(newSelectedPairs);
@@ -108,18 +108,18 @@ export default function PairsStep({
 								{[...Array(MIN_PAIRS_REQUIRED)].map((_, i) => (
 									<motion.div
 										key={i}
-										className={`h-1 w-4 sm:w-6 rounded-full transition-all duration-300 ${i < selectedPairs.length ? "bg-[#24FF66]" : "bg-[#32353C]"}`}
+										className={`h-1 w-4 sm:w-6 rounded-full transition-all duration-300 ${i < favorites.length ? "bg-[#24FF66]" : "bg-[#32353C]"}`}
 										initial={false}
 										animate={{
-											scale: i < selectedPairs.length ? 1 : 0.95,
+											scale: i < favorites.length ? 1 : 0.95,
 										}}
 									/>
 								))}
 							</div>
 							<span
-								className={`text-[10px] sm:text-xs font-medium transition-all duration-300 ${selectedPairs.length >= MIN_PAIRS_REQUIRED ? "text-[#24FF66]" : "text-[#32353C]"}`}
+								className={`text-[10px] sm:text-xs font-medium transition-all duration-300 ${favorites.length >= MIN_PAIRS_REQUIRED ? "text-[#24FF66]" : "text-[#32353C]"}`}
 							>
-								{selectedPairs.length}/{MIN_PAIRS_REQUIRED}
+								{favorites.length}/{MIN_PAIRS_REQUIRED}
 							</span>
 						</motion.div>
 					</div>
@@ -135,7 +135,7 @@ export default function PairsStep({
 					<div className="relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 focus-within:border-[#24FF66]/50 focus-within:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
 						{/* Top highlight */}
 						<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-						
+
 						<div className="flex h-8 sm:h-10 w-full items-center">
 							<FaSearch className="ml-3 sm:ml-4 text-sm sm:text-base text-white/60" />
 							<input
@@ -164,17 +164,17 @@ export default function PairsStep({
 			>
 				{/* Scrollbar Styles */}
 				<style jsx global>{`
-                    .overflow-y-auto::-webkit-scrollbar {
-                        width: 4px;
-                    }
-                    .overflow-y-auto::-webkit-scrollbar-track {
-                        background: transparent;
-                    }
-                    .overflow-y-auto::-webkit-scrollbar-thumb {
-                        background-color: #333;
-                        border-radius: 20px;
-                    }
-                `}</style>
+          .overflow-y-auto::-webkit-scrollbar {
+            width: 4px;
+          }
+          .overflow-y-auto::-webkit-scrollbar-track {
+            background: transparent;
+          }
+          .overflow-y-auto::-webkit-scrollbar-thumb {
+            background-color: #333;
+            border-radius: 20px;
+          }
+        `}</style>
 
 				{getFilteredGroups().map((group, groupIndex) => {
 					const pairs = group.items;
@@ -187,7 +187,7 @@ export default function PairsStep({
 							</h3>
 							<div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
 								{pairs.map((item, index) => {
-									const isSelected = selectedPairs.includes(item);
+									const isSelected = favorites.includes(item);
 
 									return (
 										<button
@@ -209,12 +209,16 @@ export default function PairsStep({
 
 											<div className="relative flex items-center justify-between rounded-xl p-2.5 sm:p-4">
 												<div className="flex items-center">
-													<span className={`font-russo text-xs sm:text-[13px] font-bold tracking-wider ${isSelected ? "text-white" : "text-white/80"}`}>
+													<span
+														className={`font-russo text-xs sm:text-[13px] font-bold tracking-wider ${isSelected ? "text-white" : "text-white/80"}`}
+													>
 														{item}
 													</span>
 												</div>
 												<div className="flex items-center">
-													<span className={`font-kodemono mr-2 sm:mr-3 text-xs sm:text-[13px] font-medium tracking-wider group-hover:mr-3 sm:group-hover:mr-4 ${isSelected ? "text-[#24FF66]" : "text-white/50"}`}>
+													<span
+														className={`font-kodemono mr-2 sm:mr-3 text-xs sm:text-[13px] font-medium tracking-wider group-hover:mr-3 sm:group-hover:mr-4 ${isSelected ? "text-[#24FF66]" : "text-white/50"}`}
+													>
 														{priceData[item]?.price
 															? formatPrice(priceData[item].price, item)
 															: "N/A"}

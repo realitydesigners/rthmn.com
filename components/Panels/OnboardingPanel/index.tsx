@@ -3,16 +3,16 @@
 import { ONBOARDING_STEPS, useOnboardingStore } from "@/stores/onboardingStore";
 import { cn } from "@/utils/cn";
 import { useState } from "react";
-import { 
-	LuCheck, 
-	LuChevronRight, 
-	LuLock, 
-	LuPlay, 
-	LuBookOpen, 
-	LuGraduationCap, 
-	LuTrophy,
+import {
+	LuBookOpen,
+	LuCheck,
+	LuChevronRight,
+	LuGraduationCap,
+	LuLock,
+	LuPlay,
 	LuSettings,
-	LuZap
+	LuTrophy,
+	LuZap,
 } from "react-icons/lu";
 
 // Future learning materials with lock mechanism
@@ -27,7 +27,7 @@ const FUTURE_LEARNING_MATERIALS = [
 	},
 	{
 		id: "risk-management",
-		title: "Risk Management Strategies", 
+		title: "Risk Management Strategies",
 		description: "Learn professional risk management techniques",
 		icon: LuSettings,
 		category: "Advanced",
@@ -59,13 +59,13 @@ const OnboardingCard = ({
 				isCompleted
 					? "border-[#24FF66]/30 bg-black shadow-[0_0_20px_rgba(36,255,102,0.1)]"
 					: isCurrent
-					? "border-[#24FF66]/50 bg-black shadow-[0_0_20px_rgba(36,255,102,0.2)]"
-					: "border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-[#24FF66]/20"
+						? "border-[#24FF66]/50 bg-black shadow-[0_0_20px_rgba(36,255,102,0.2)]"
+						: "border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] hover:border-[#24FF66]/20",
 			)}
 		>
 			{/* Top highlight */}
 			<div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
-			
+
 			{/* Success glow for completed */}
 			{isCompleted && (
 				<div className="absolute inset-0 bg-gradient-to-b from-[#24FF66]/5 to-transparent" />
@@ -80,8 +80,8 @@ const OnboardingCard = ({
 						isCompleted
 							? "border-[#24FF66]/50 bg-[#24FF66]/10 text-[#24FF66]"
 							: isCurrent
-							? "border-[#24FF66]/30 bg-[#24FF66]/5 text-[#24FF66]/80"
-							: "border-[#32353C] bg-[#1C1E23] text-[#32353C] group-hover:border-[#24FF66]/20 group-hover:text-[#24FF66]/40"
+								? "border-[#24FF66]/30 bg-[#24FF66]/5 text-[#24FF66]/80"
+								: "border-[#32353C] bg-[#1C1E23] text-[#32353C] group-hover:border-[#24FF66]/20 group-hover:text-[#24FF66]/40",
 					)}
 				>
 					{isCompleted ? (
@@ -108,9 +108,9 @@ const OnboardingCard = ({
 					{isCurrent && !isCompleted && (
 						<div className="flex items-center gap-2">
 							<div className="h-2 w-2 rounded-full bg-[#24FF66] animate-pulse" />
-							<LuChevronRight 
-								size={16} 
-								className="text-[#24FF66] transition-transform duration-300 group-hover:translate-x-1" 
+							<LuChevronRight
+								size={16}
+								className="text-[#24FF66] transition-transform duration-300 group-hover:translate-x-1"
 							/>
 						</div>
 					)}
@@ -123,10 +123,10 @@ const OnboardingCard = ({
 const FutureLearningCard = ({
 	material,
 }: {
-	material: typeof FUTURE_LEARNING_MATERIALS[0];
+	material: (typeof FUTURE_LEARNING_MATERIALS)[0];
 }) => {
 	const Icon = material.icon;
-	
+
 	return (
 		<div className="group relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all duration-300 hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)]">
 			{/* Top highlight */}
@@ -145,7 +145,7 @@ const FutureLearningCard = ({
 					)`,
 				}}
 			/>
-			
+
 			{/* Lock icon */}
 			<div className="pointer-events-none absolute -top-1 -right-1">
 				<div className="flex h-6 w-6 items-center justify-center rounded-full border border-[#1C1E23] bg-gradient-to-b from-black/90 to-black/95 shadow-[0_2px_4px_rgba(0,0,0,0.4)]">
@@ -181,7 +181,8 @@ const FutureLearningCard = ({
 
 export const Onboarding = () => {
 	const { currentStepId, completedSteps } = useOnboardingStore();
-	const progressPercentage = (completedSteps.length / ONBOARDING_STEPS.length) * 100;
+	const progressPercentage =
+		(completedSteps.length / ONBOARDING_STEPS.length) * 100;
 
 	const handleClearOnboarding = () => {
 		localStorage.removeItem("avatar_url");
@@ -200,7 +201,7 @@ export const Onboarding = () => {
 						{completedSteps.length}/{ONBOARDING_STEPS.length}
 					</span>
 				</div>
-				
+
 				{/* Progress bar */}
 				<div className="relative h-2 overflow-hidden rounded-full bg-[#1C1E23]">
 					<div
@@ -216,15 +217,16 @@ export const Onboarding = () => {
 
 				{/* Progress status */}
 				<div className="flex items-center gap-2">
-					<div className={cn(
-						"h-2 w-2 rounded-full transition-all duration-300",
-						progressPercentage === 100 ? "bg-[#24FF66]" : "bg-[#24FF66]/60"
-					)} />
+					<div
+						className={cn(
+							"h-2 w-2 rounded-full transition-all duration-300",
+							progressPercentage === 100 ? "bg-[#24FF66]" : "bg-[#24FF66]/60",
+						)}
+					/>
 					<span className="font-kodemono text-xs text-white/50">
-						{progressPercentage === 100 
-							? "Onboarding Complete! 🎉" 
-							: `${Math.round(progressPercentage)}% Complete`
-						}
+						{progressPercentage === 100
+							? "Onboarding Complete! 🎉"
+							: `${Math.round(progressPercentage)}% Complete`}
 					</span>
 				</div>
 			</div>
@@ -256,10 +258,7 @@ export const Onboarding = () => {
 				</div>
 				<div className="space-y-2">
 					{FUTURE_LEARNING_MATERIALS.map((material) => (
-						<FutureLearningCard
-							key={material.id}
-							material={material}
-						/>
+						<FutureLearningCard key={material.id} material={material} />
 					))}
 				</div>
 			</div>
