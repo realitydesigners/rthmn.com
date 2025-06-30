@@ -358,11 +358,9 @@ export const ResoBox3DCircular = memo(
       ]
     );
 
-    // Calculate which structure to focus on using centralized function
-    const actualFocusedIndex = calculateFocusedIndex(
-      structures,
-      scrollProgress
-    );
+    // Use the intended focusedIndex directly instead of position-based calculation
+    // This ensures the epsilon spacing is applied to the correct structure
+    const actualFocusedIndex = focusedIndex;
 
     const currentSlice = structureSlices[actualFocusedIndex];
 
@@ -380,6 +378,7 @@ export const ResoBox3DCircular = memo(
           dpr={[1, 2]}
           gl={{ antialias: true, alpha: true, preserveDrawingBuffer: false }}
         >
+          <fog attach="fog" args={["#000000", 20, 200]} />
           <ambientLight intensity={2} />
           <directionalLight position={[0, 60, 180]} intensity={1} />
           <CameraController
