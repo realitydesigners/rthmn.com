@@ -261,7 +261,7 @@ export const Sidebar = ({
                 </FeatureTour>
 
                 {/* Panel title next to icon */}
-                {isOpen && activePanel === button.id && (
+                {isOpen && !isLocked && activePanel === button.id && (
                   <div
                     className={cn(
                       "absolute top-1/2 -translate-y-1/2 z-[200] whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-300",
@@ -328,7 +328,7 @@ export const Sidebar = ({
                 </FeatureTour>
 
                 {/* Panel title next to icon */}
-                {isOpen && activePanel === button.id && (
+                {isOpen && !isLocked && activePanel === button.id && (
                   <div
                     className={cn(
                       "absolute top-1/2 -translate-y-1/2 z-[200] whitespace-nowrap px-3 py-1.5 rounded-md transition-all duration-300",
