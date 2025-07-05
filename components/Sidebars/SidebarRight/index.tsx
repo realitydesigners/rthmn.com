@@ -12,42 +12,45 @@ import Link from "next/link";
 import { LuGraduationCap, LuHelpCircle, LuSettings } from "react-icons/lu";
 
 export const SidebarRight = () => {
-	const buttons = [
-		{
-			id: "onboarding",
-			icon: LuGraduationCap,
-			tourContent: <TourOnboarding />,
-			panelContent: <Onboarding />,
-		},
-		{
-			id: "settings",
-			icon: LuSettings,
-			tourContent: <TourSettings />,
-			panelContent: (
-				<>
-					<ColorStyleOptions />
-					<BoxVisualizer />
-				</>
-			),
-		},
-		{
-			id: "account",
-			icon: ProfileIcon,
-			tourContent: <></>,
-			panelContent: <AccountPanel />,
-		},
-	];
+  const buttons = [
+    {
+      id: "onboarding",
+      title: "Onboarding",
+      icon: LuGraduationCap,
+      tourContent: <TourOnboarding />,
+      panelContent: <Onboarding />,
+    },
+    {
+      id: "settings",
+      title: "Settings",
+      icon: LuSettings,
+      tourContent: <TourSettings />,
+      panelContent: (
+        <>
+          <ColorStyleOptions />
+          <BoxVisualizer />
+        </>
+      ),
+    },
+    {
+      id: "account",
+      title: "Account",
+      icon: ProfileIcon,
+      tourContent: <></>,
+      panelContent: <AccountPanel />,
+    },
+  ];
 
-	const linkButtons = [
-		{
-			id: "help",
-			icon: LuHelpCircle,
-			href: "/support",
-			title: "Help & Support",
-		},
-	];
+  const linkButtons = [
+    {
+      id: "help",
+      icon: LuHelpCircle,
+      href: "/support",
+      title: "Help & Support",
+    },
+  ];
 
-	return (
-		<Sidebar position="right" buttons={buttons} linkButtons={linkButtons} />
-	);
+  return (
+    <Sidebar position="right" buttons={buttons} linkButtons={linkButtons} />
+  );
 };

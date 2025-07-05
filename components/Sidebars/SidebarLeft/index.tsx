@@ -8,16 +8,17 @@ import { Sidebar } from "@/components/Sidebars/Sidebar";
 import { LuLayoutGrid, LuLineChart } from "react-icons/lu";
 
 export const SidebarLeft = () => {
-	const buttons = [
-		{
-			id: "instruments",
-			icon: LuLineChart,
-			tourContent: <TourInstruments />,
-			panelContent: <InstrumentsPanel />,
-		},
-	];
+  const buttons = [
+    {
+      id: "instruments",
+      title: "Instruments",
+      icon: LuLineChart,
+      tourContent: <TourInstruments />,
+      panelContent: <InstrumentsPanel />,
+    },
+  ];
 
-	return (
-		<Sidebar position="left" buttons={buttons} defaultPanel="instruments" />
-	);
+  return (
+    <Sidebar position="left" buttons={buttons} defaultPanel="instruments" />
+  );
 };
