@@ -570,8 +570,9 @@ export const ZenModeControls = memo(
             key={id}
             onClick={onClick}
             className={cn(
-              "group relative overflow-hidden w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200",
-              !isActive && "text-[#B0B0B0] hover:text-white"
+              "group relative overflow-hidden w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ease-out",
+              !isActive && "text-[#B0B0B0] hover:text-white",
+              isActive && "scale-105"
             )}
             style={{
               background: isActive
@@ -619,9 +620,9 @@ export const ZenModeControls = memo(
 
     return (
       <>
-        {/* Background gradient overlay - shows when any panel is active */}
+        {/* Background gradient overlay - shows when any panel is active (except timeframe which is inline) */}
         <AnimatePresence>
-          {activePanel && (
+          {activePanel && activePanel !== "timeframe" && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -642,9 +643,9 @@ export const ZenModeControls = memo(
             ref={containerRef}
             className="relative flex flex-col items-center gap-1"
           >
-            {/* Content panel - shows above buttons */}
+            {/* Content panel - shows above buttons for non-timeframe panels */}
             <AnimatePresence>
-              {activePanel && (
+              {activePanel && activePanel !== "timeframe" && (
                 <motion.div
                   initial={{ opacity: 0, y: 8, scale: 0.98 }}
                   animate={{
@@ -661,11 +662,6 @@ export const ZenModeControls = memo(
                   }}
                   className="p-3 rounded-xl border border-[#1C1E23]/40 bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
                 >
-                  {activePanel === "timeframe" && (
-                    <div className="w-full min-w-[320px]">
-                      <TimeFrameSlider showPanel={false} global />
-                    </div>
-                  )}
                   {activePanel === "chartstyle" && (
                     <div className="w-full min-w-[250px]">
                       <CompactChartStyleSelector />
@@ -680,7 +676,7 @@ export const ZenModeControls = memo(
               )}
             </AnimatePresence>
 
-            {/* Button container - enhanced visibility with FeatureTour styling */}
+            {/* Button container - simplified with fixed positioning */}
             <div
               className="flex items-center gap-2 px-3 py-2 rounded-full border border-[#1C1E23]/60 backdrop-blur-md shadow-lg shadow-black/40"
               style={{
@@ -690,9 +686,44 @@ export const ZenModeControls = memo(
                   "0px 4px 8px 0px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
               }}
             >
-              {/* Left buttons */}
+              {/* Timeframe button */}
               {buttonsConfig
-                .filter((btn) => btn.position === "left")
+                .filter(
+                  (btn) => btn.position === "left" && btn.id === "timeframe"
+                )
+                .map(renderButton)}
+
+              {/* Inline timeframe slider - appears when timeframe is active */}
+              <AnimatePresence>
+                {activePanel === "timeframe" && (
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 240, opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{
+                      duration: 0.4,
+                      ease: [0.4, 0, 0.2, 1],
+                      width: { duration: 0.4, ease: [0.4, 0, 0.2, 1] },
+                      opacity: { duration: 0.3, ease: "easeOut" },
+                    }}
+                    className="overflow-hidden"
+                  >
+                    <div className="w-60 px-2">
+                      <TimeFrameSlider
+                        showPanel={false}
+                        global
+                        hideLabels={true}
+                      />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Other left buttons (chart style, layout) */}
+              {buttonsConfig
+                .filter(
+                  (btn) => btn.position === "left" && btn.id !== "timeframe"
+                )
                 .map(renderButton)}
 
               {/* Right buttons - only render container if there are visible right buttons or focus label */}
@@ -745,9 +776,9 @@ export const ZenModeControls = memo(
               )}
             </div>
 
-            {/* Floating title below buttons - positioned absolutely */}
+            {/* Floating title below buttons - positioned absolutely (only for non-timeframe panels) */}
             <AnimatePresence>
-              {activePanel && (
+              {activePanel && activePanel !== "timeframe" && (
                 <motion.div
                   initial={{ opacity: 0, y: -5 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -756,7 +787,6 @@ export const ZenModeControls = memo(
                   className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 pointer-events-none"
                 >
                   <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
-                    {activePanel === "timeframe" && "TIMEFRAME"}
                     {activePanel === "chartstyle" && "STYLE"}
                     {activePanel === "layout" && "LAYOUT"}
                   </span>
