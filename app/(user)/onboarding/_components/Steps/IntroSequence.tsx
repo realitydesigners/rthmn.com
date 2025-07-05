@@ -123,7 +123,7 @@ const StarField = () => {
 const BASE_ANIMATIONS = {
   transition: {
     duration: 0.8,
-    ease: [0.19, 1, 0.22, 1] as any,
+    ease: [0.19, 1, 0.22, 1],
   },
   fade: {
     initial: {
@@ -145,7 +145,7 @@ const BASE_ANIMATIONS = {
       y: -20,
       transition: {
         duration: 0.8,
-        ease: [0.19, 1, 0.22, 1] as any,
+        ease: [0.19, 1, 0.22, 1],
       },
     },
   },
