@@ -8,7 +8,7 @@ import {
   FOREX_PAIRS,
   formatPrice,
 } from "@/utils/instruments";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FaSearch, FaStar, FaTimes } from "react-icons/fa";
 import {
@@ -261,54 +261,12 @@ const InstrumentsPanel = memo(
           <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#32353C] text-sm" />
           <input
             type="text"
-            placeholder={showSuggestions ? "" : "Search instruments..."}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setIsSearchFocused(true)}
-            onBlur={() => setIsSearchFocused(false)}
-            className="w-full h-10 pl-10 pr-4 bg-[#0A0B0D] border border-[#111215] rounded-lg text-white placeholder-[#32353C] font-outfit text-sm focus:outline-none focus:border-[#1C1E23] transition-colors"
+            placeholder="Search instruments..."
+            value=""
+            readOnly
+            className="w-full h-10 pl-10 pr-4 bg-[#0A0B0D] border border-[#111215] rounded-lg text-white placeholder-[#32353C] font-outfit text-sm cursor-pointer"
           />
-          {/* Typing animation */}
-          {showSuggestions && !searchQuery && (
-            <motion.div
-              className="absolute left-10 top-1/2 -translate-y-1/2 text-white font-outfit text-sm"
-              key={currentSuggestion}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              {currentSuggestion}
-              <motion.span
-                animate={{ opacity: [1, 0] }}
-                transition={{ duration: 0.8, repeat: Infinity }}
-                className="ml-1"
-              >
-                |
-              </motion.span>
-            </motion.div>
-          )}
         </div>
-
-        {/* Search suggestions dropdown */}
-        {showSuggestions && (
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="absolute top-full left-0 right-0 mt-2 bg-[#0A0B0D] border border-[#111215] rounded-lg shadow-lg z-10"
-          >
-            <div className="p-2 space-y-1">
-              {searchSuggestions.slice(0, 4).map((suggestion) => (
-                <div
-                  key={suggestion}
-                  className="px-3 py-2 hover:bg-[#111215] rounded text-sm font-outfit text-white cursor-pointer transition-colors"
-                  onClick={() => setSearchQuery(suggestion)}
-                >
-                  {suggestion}USD
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        )}
       </div>
     );
 
@@ -345,16 +303,9 @@ const InstrumentsPanel = memo(
     return (
       <div
         className="w-full max-w-sm bg-gradient-to-b from-[#0A0B0D] to-[#070809] rounded-2xl border border-[#111215] shadow-[0_8px_32px_rgba(0,0,0,0.4)] overflow-hidden"
-        style={{ height: "600px" }}
+        style={{ height: "375px" }}
       >
         <div className="p-6 h-full flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="font-russo text-lg font-bold text-white uppercase tracking-wider">
-              Instruments
-            </h3>
-          </div>
-
           {/* Search Bar */}
           <SearchBar />
 
@@ -412,303 +363,57 @@ const InstrumentsPanel = memo(
 );
 
 export const SectionInstrumentsPanel = memo(() => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isLargeScreen, setIsLargeScreen] = useState(false);
+  // Always show the outro state
+  const highlightedFeature = "outro";
 
-  // Check screen size
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsLargeScreen(window.innerWidth >= 1024); // lg breakpoint
-    };
+  // Simplified to only show the outro content
+  const currentDescription = {
+    title: "Start Seeing The Future",
 
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start center", "end center"],
-  });
-
-  // Create scroll-based feature highlighting only on large screens
-  const currentFeature = useTransform(
-    scrollYProgress,
-    [0, 0.2, 0.4, 0.6, 0.8, 1.0],
-    ["intro", "search", "categories", "realtime", "performance", "outro"]
-  );
-
-  const [highlightedFeature, setHighlightedFeature] = useState("intro");
-
-  useEffect(() => {
-    if (isLargeScreen) {
-      return currentFeature.onChange(setHighlightedFeature);
-    } else {
-      // On mobile, just show the intro state
-      setHighlightedFeature("intro");
-    }
-  }, [currentFeature, isLargeScreen]);
-
-  // Better organized feature descriptions
-  const featureDescriptions = {
-    intro: {
-      title: "Master Every Market",
-      subtitle: "Your gateway to 300+ trading instruments",
-      description:
-        "Access crypto, forex, stocks, and ETFs with professional-grade tools designed for serious traders.",
-      stats: null,
-    },
-    search: {
-      title: "Lightning Search",
-      subtitle: "Find any instrument instantly",
-      description:
-        "Type any symbol and watch results appear in milliseconds. Our advanced search engine scans through hundreds of instruments faster than you can blink.",
-      stats: {
-        icon: FaSearch,
-        title: "Search Performance",
-        metrics: [
-          { value: "< 50ms", label: "Response Time" },
-          { value: "300+", label: "Instruments" },
-        ],
-      },
-    },
-    categories: {
-      title: "Smart Organization",
-      subtitle: "Organize by asset class",
-      description:
-        "Filter by favorites, forex, crypto, stocks, and ETFs. Create custom watchlists and organize your trading universe exactly how you want it.",
-      stats: {
-        icon: LuLayoutGrid,
-        title: "Asset Coverage",
-        metrics: [
-          { value: "50+", label: "Forex Pairs" },
-          { value: "100+", label: "Crypto Assets" },
-        ],
-      },
-    },
-    realtime: {
-      title: "Real-Time Data",
-      subtitle: "Live market information",
-      description:
-        "Every price updates in real-time with sub-second latency. Make informed decisions with the freshest market data available.",
-      stats: {
-        icon: LuActivity,
-        title: "Data Feed",
-        metrics: [
-          { value: "< 100ms", label: "Update Latency" },
-          { value: "24/7", label: "Market Coverage" },
-        ],
-      },
-    },
+    description:
+      "Get access to our dashboard where you can customize your trading experience, and start seeing the future of trading",
+    stats: null,
   };
 
-  const currentDescription =
-    featureDescriptions[
-      highlightedFeature as keyof typeof featureDescriptions
-    ] || featureDescriptions.intro;
-
   return (
-    <div className="relative">
-      {/* Conditional rendering based on screen size */}
-      {isLargeScreen ? (
-        // Large screen: scroll-based animations
-        <div ref={containerRef} className="h-[600vh] relative">
-          {/* Sticky container that holds both left and right content */}
-          <div className="sticky top-0 h-screen w-full">
-            <div className="container mx-auto px-4 sm:px-6 h-full">
-              <div className="max-w-7xl mx-auto h-full">
-                <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-12 lg:gap-16 h-full items-center">
-                {/* Left side - Content that changes based on scroll */}
-                <div className="flex items-center justify-center">
-                  <motion.div
-                    key={highlightedFeature}
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="space-y-8 max-w-2xl"
-                  >
-                    {/* Main heading section */}
-                    <div className="space-y-6">
-                      <motion.h2
-                        className="font-russo text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-[0.85] uppercase"
-                        animate={{
-                          color:
-                            highlightedFeature === "search"
-                              ? "#ffff"
-                              : "#FFFFFF",
-                        }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        {currentDescription.title}
-                      </motion.h2>
-
-                      <motion.p
-                        className="font-russo text-lg sm:text-xl lg:text-2xl font-light leading-relaxed text-white/90"
-                        animate={{
-                          color:
-                            highlightedFeature === "search"
-                              ? "#ffff"
-                              : "#FFFFFF",
-                        }}
-                        transition={{ duration: 0.5 }}
-                      >
-                        {currentDescription.subtitle}
-                      </motion.p>
-                    </div>
-
-                    {/* Description */}
-                    <motion.p
-                      className="font-outfit text-base sm:text-lg text-white/70 leading-relaxed"
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.6, delay: 0.2 }}
-                    >
-                      {currentDescription.description}
-                    </motion.p>
-
-                    {/* Stats card - only show when relevant */}
-                    {currentDescription.stats && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                        className="bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050607] p-6 sm:p-8 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
-                      >
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className="p-3 bg-white/5 rounded-xl">
-                            <currentDescription.stats.icon className="text-white text-xl" />
-                          </div>
-                          <span className="font-russo text-sm font-bold text-white uppercase tracking-wider">
-                            {currentDescription.stats.title}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-8">
-                          {currentDescription.stats.metrics.map(
-                            (metric, index) => (
-                              <div key={index} className="text-center">
-                                <div className="font-russo text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight">
-                                  {metric.value}
-                                </div>
-                                <div className="font-russo text-xs sm:text-sm text-white/60 uppercase tracking-wider font-medium">
-                                  {metric.label}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Call to action for outro */}
-                    {highlightedFeature === "outro" && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.4 }}
-                        className="pt-8"
-                      >
-                        <button className="group relative px-8 py-4 bg-gradient-to-r from-[#4EFF6E] to-[#3DE55C] text-black font-russo font-bold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_32px_rgba(78,255,110,0.4)]">
-                          <span className="relative z-10">
-                            Start Trading Now
-                          </span>
-                          <div className="absolute inset-0 bg-gradient-to-r from-[#3DE55C] to-[#2DD14A] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
-                        </button>
-                      </motion.div>
-                    )}
-                  </motion.div>
+    <div className="relative py-20">
+      <div className="container mx-auto px-4 sm:px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-12 lg:gap-16 items-center">
+            {/* Left side - Content */}
+            <div className="flex items-center justify-center">
+              <div className="space-y-8 max-w-2xl">
+                {/* Main heading section */}
+                <div className="space-y-6">
+                  <h2 className="font-russo text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-[1] uppercase text-white">
+                    {currentDescription.title}
+                  </h2>
                 </div>
 
-                {/* Right side - Instruments panel that stays sticky with the container */}
-                <div className="flex items-center justify-center lg:justify-start">
-                  <motion.div
-                    animate={{
-                      scale: ["search", "categories", "realtime"].includes(
-                        highlightedFeature
-                      )
-                        ? 1.02
-                        : 1,
-                      boxShadow: ["search", "categories", "realtime"].includes(
-                        highlightedFeature
-                      )
-                        ? "0 0 40px rgba(78, 255, 110, 0.2)"
-                        : "0 0 0px rgba(78, 255, 110, 0)",
-                    }}
-                    transition={{ duration: 0.8, ease: "easeOut" }}
-                    className="w-full max-w-sm"
-                  >
-                    <InstrumentsPanel highlightedFeature={highlightedFeature} />
-                  </motion.div>
+                {/* Description */}
+                <p className="font-outfit text-base sm:text-lg text-white/70 leading-relaxed">
+                  {currentDescription.description}
+                </p>
+
+                {/* Call to action */}
+                <div className="pt-8">
+                  <button className="group relative px-8 py-4 bg-gradient-to-r from-[#4EFF6E] to-[#3DE55C] text-black font-russo font-bold text-sm uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-105 hover:shadow-[0_8px_32px_rgba(78,255,110,0.4)]">
+                    <span className="relative z-10">Start Trading Now</span>
+                    <div className="absolute inset-0 bg-gradient-to-r from-[#3DE55C] to-[#2DD14A] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
+                  </button>
                 </div>
+              </div>
+            </div>
+
+            {/* Right side - Instruments panel */}
+            <div className="flex items-center justify-center lg:justify-start">
+              <div className="w-full max-w-sm">
+                <InstrumentsPanel highlightedFeature={highlightedFeature} />
               </div>
             </div>
           </div>
         </div>
-      ) : (
-        // Mobile: static layout without scroll effects
-        <div className="py-20">
-          <div className="container mx-auto px-4 sm:px-6">
-            <div className="max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 gap-12 items-center">
-                {/* Content */}
-                <div className="flex items-center justify-center">
-                  <div className="space-y-8 max-w-2xl text-center">
-                    {/* Main heading section */}
-                    <div className="space-y-6">
-                      <h2 className="font-russo text-4xl sm:text-5xl font-black tracking-tighter leading-[0.85] uppercase text-white">
-                        {currentDescription.title}
-                      </h2>
-
-                      <p className="font-russo text-lg sm:text-xl font-light leading-relaxed text-white/90">
-                        {currentDescription.subtitle}
-                      </p>
-                    </div>
-
-                    {/* Description */}
-                    <p className="font-outfit text-base sm:text-lg text-white/70 leading-relaxed">
-                      {currentDescription.description}
-                    </p>
-
-                    {/* Stats card - only show when relevant */}
-                    {currentDescription.stats && (
-                      <div className="bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050607] p-6 sm:p-8 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
-                        <div className="flex items-center gap-3 mb-6 justify-center">
-                          <div className="p-3 bg-white/5 rounded-xl">
-                            <currentDescription.stats.icon className="text-white text-xl" />
-                          </div>
-                          <span className="font-russo text-sm font-bold text-white uppercase tracking-wider">
-                            {currentDescription.stats.title}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-8">
-                          {currentDescription.stats.metrics.map(
-                            (metric, index) => (
-                              <div key={index} className="text-center">
-                                <div className="font-russo text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight">
-                                  {metric.value}
-                                </div>
-                                <div className="font-russo text-xs sm:text-sm text-white/60 uppercase tracking-wider font-medium">
-                                  {metric.label}
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Instruments panel */}
-                <div className="flex items-center justify-center">
-                  <div className="w-full max-w-sm">
-                    <InstrumentsPanel highlightedFeature={highlightedFeature} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 });

@@ -69,7 +69,7 @@ export default async function Homepage() {
 
       <SectionBoxes3D />
       {/* <LineChart3D /> */}
-      {/* <SectionInstrumentsPanel /> */}
+      <SectionInstrumentsPanel />
       {/* <SectionMarketDisplay marketData={marketData} />*/}
       {/* <SectionRthmnDemo marketData={marketData} />
 			<SectionMarketTicker marketData={marketData} />
