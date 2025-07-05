@@ -413,12 +413,26 @@ const InstrumentsPanel = memo(
 
 export const SectionInstrumentsPanel = memo(() => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isLargeScreen, setIsLargeScreen] = useState(false);
+
+  // Check screen size
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsLargeScreen(window.innerWidth >= 1024); // lg breakpoint
+    };
+
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start center", "end center"],
   });
 
-  // Create scroll-based feature highlighting
+  // Create scroll-based feature highlighting only on large screens
   const currentFeature = useTransform(
     scrollYProgress,
     [0, 0.2, 0.4, 0.6, 0.8, 1.0],
@@ -428,8 +442,13 @@ export const SectionInstrumentsPanel = memo(() => {
   const [highlightedFeature, setHighlightedFeature] = useState("intro");
 
   useEffect(() => {
-    return currentFeature.onChange(setHighlightedFeature);
-  }, [currentFeature]);
+    if (isLargeScreen) {
+      return currentFeature.onChange(setHighlightedFeature);
+    } else {
+      // On mobile, just show the intro state
+      setHighlightedFeature("intro");
+    }
+  }, [currentFeature, isLargeScreen]);
 
   // Better organized feature descriptions
   const featureDescriptions = {
@@ -482,41 +501,24 @@ export const SectionInstrumentsPanel = memo(() => {
         ],
       },
     },
-    performance: {
-      title: "Built for Speed",
-      subtitle: "Enterprise-grade performance",
-      description:
-        "Our platform handles millions of price updates daily while maintaining lightning-fast response times and zero downtime.",
-      stats: {
-        icon: LuTrendingUp,
-        title: "Platform Stats",
-        metrics: [
-          { value: "99.9%", label: "Uptime" },
-          { value: "1M+", label: "Daily Updates" },
-        ],
-      },
-    },
-    outro: {
-      title: "Trade Smarter",
-      subtitle: "Everything you need in one place",
-      description:
-        "Professional tools, real-time data, and lightning-fast execution. Join thousands of traders who've made the switch to smarter trading.",
-      stats: null,
-    },
   };
 
   const currentDescription =
-    featureDescriptions[highlightedFeature as keyof typeof featureDescriptions];
+    featureDescriptions[
+      highlightedFeature as keyof typeof featureDescriptions
+    ] || featureDescriptions.intro;
 
   return (
     <div className="relative">
-      {/* Tall scroll container that creates the scroll distance */}
-      <div ref={containerRef} className="h-[600vh] relative">
-        {/* Sticky container that holds both left and right content */}
-        <div className="sticky top-0 h-screen w-full">
-          <div className="container mx-auto px-4 sm:px-6 h-full">
-            <div className="max-w-7xl mx-auto h-full">
-              <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-12 lg:gap-16 h-full items-center">
+      {/* Conditional rendering based on screen size */}
+      {isLargeScreen ? (
+        // Large screen: scroll-based animations
+        <div ref={containerRef} className="h-[600vh] relative">
+          {/* Sticky container that holds both left and right content */}
+          <div className="sticky top-0 h-screen w-full">
+            <div className="container mx-auto px-4 sm:px-6 h-full">
+              <div className="max-w-7xl mx-auto h-full">
+                <div className="grid grid-cols-1 lg:grid-cols-[1.3fr_0.7fr] gap-12 lg:gap-16 h-full items-center">
                 {/* Left side - Content that changes based on scroll */}
                 <div className="flex items-center justify-center">
                   <motion.div
@@ -641,7 +643,72 @@ export const SectionInstrumentsPanel = memo(() => {
             </div>
           </div>
         </div>
-      </div>
+      ) : (
+        // Mobile: static layout without scroll effects
+        <div className="py-20">
+          <div className="container mx-auto px-4 sm:px-6">
+            <div className="max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 gap-12 items-center">
+                {/* Content */}
+                <div className="flex items-center justify-center">
+                  <div className="space-y-8 max-w-2xl text-center">
+                    {/* Main heading section */}
+                    <div className="space-y-6">
+                      <h2 className="font-russo text-4xl sm:text-5xl font-black tracking-tighter leading-[0.85] uppercase text-white">
+                        {currentDescription.title}
+                      </h2>
+
+                      <p className="font-russo text-lg sm:text-xl font-light leading-relaxed text-white/90">
+                        {currentDescription.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    <p className="font-outfit text-base sm:text-lg text-white/70 leading-relaxed">
+                      {currentDescription.description}
+                    </p>
+
+                    {/* Stats card - only show when relevant */}
+                    {currentDescription.stats && (
+                      <div className="bg-gradient-to-br from-[#0A0B0D] via-[#070809] to-[#050607] p-6 sm:p-8 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
+                        <div className="flex items-center gap-3 mb-6 justify-center">
+                          <div className="p-3 bg-white/5 rounded-xl">
+                            <currentDescription.stats.icon className="text-white text-xl" />
+                          </div>
+                          <span className="font-russo text-sm font-bold text-white uppercase tracking-wider">
+                            {currentDescription.stats.title}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-8">
+                          {currentDescription.stats.metrics.map(
+                            (metric, index) => (
+                              <div key={index} className="text-center">
+                                <div className="font-russo text-3xl sm:text-4xl font-black text-white mb-2 tracking-tight">
+                                  {metric.value}
+                                </div>
+                                <div className="font-russo text-xs sm:text-sm text-white/60 uppercase tracking-wider font-medium">
+                                  {metric.label}
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Instruments panel */}
+                <div className="flex items-center justify-center">
+                  <div className="w-full max-w-sm">
+                    <InstrumentsPanel highlightedFeature={highlightedFeature} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 });

@@ -232,7 +232,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
     >
       <StarField />
 
-      <div className="relative z-10 mx-auto max-w-7xl">
+      <div className="relative z-10 pt-12 mx-auto max-w-7xl">
         <div className="grid grid-cols-1 items-center gap-8 sm:gap-12 lg:grid-cols-2 lg:gap-20 xl:gap-32">
           {/* Left Content */}
           <div className="flex flex-col justify-center order-1 lg:order-1">
@@ -263,7 +263,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
 
               {/* Sign-in requirement notice for non-authenticated users */}
               {!user && (
-                <div className="my-4 rounded-lg bg-gradient-to-r from-[#24FF66]/10 to-[#24FF66]/5 border border-[#24FF66]/20 p-3 sm:p-4">
+                <div className="my-4  lg:inline-block pr-2 rounded-lg bg-gradient-to-r from-[#24FF66]/10 to-[#24FF66]/5 border border-[#24FF66]/20 p-3 sm:p-4">
                   <div className="flex items-center gap-2 sm:gap-3">
                     <div className="flex h-6 w-6 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-[#24FF66]/20 border border-[#24FF66]/30">
                       <span className="text-[#24FF66] font-bold text-xs sm:text-sm">
