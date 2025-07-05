@@ -5,6 +5,7 @@ import { TimeFrameSlider } from "@/components/Panels/PanelComponents/TimeFrameSl
 import { useUser } from "@/providers/UserProvider";
 import { useWebSocket } from "@/providers/WebsocketProvider";
 import { useColorStore } from "@/stores/colorStore";
+import { useGridStore } from "@/stores/gridStore";
 import { AnimatePresence, motion } from "framer-motion";
 import React, {
   memo,
@@ -53,6 +54,65 @@ const SquareIcon = ({
   >
     <title>Square box icon</title>
     <rect x="6" y="6" width="12" height="12" rx="1" />
+  </svg>
+);
+
+// Compact layout icon - filled dots in tight grid
+const CompactIcon = ({
+  size = 24,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    stroke="none"
+    className={className}
+    role="img"
+    aria-label="Compact layout"
+  >
+    <title>Compact layout</title>
+    {/* 3x3 grid with filled circles for better visual weight */}
+    <circle cx="6" cy="6" r="2" />
+    <circle cx="12" cy="6" r="2" />
+    <circle cx="18" cy="6" r="2" />
+    <circle cx="6" cy="12" r="2" />
+    <circle cx="12" cy="12" r="2" />
+    <circle cx="18" cy="12" r="2" />
+    <circle cx="6" cy="18" r="2" />
+    <circle cx="12" cy="18" r="2" />
+    <circle cx="18" cy="18" r="2" />
+  </svg>
+);
+
+// Balanced layout icon - 2x2 spaced dots
+const BalancedIcon = ({
+  size = 24,
+  className,
+}: {
+  size?: number;
+  className?: string;
+}) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    stroke="none"
+    className={className}
+    role="img"
+    aria-label="Balanced layout"
+  >
+    <title>Balanced layout</title>
+    {/* 2x2 grid with filled circles and generous spacing */}
+    <circle cx="8" cy="8" r="3" />
+    <circle cx="16" cy="8" r="3" />
+    <circle cx="8" cy="16" r="3" />
+    <circle cx="16" cy="16" r="3" />
   </svg>
 );
 
@@ -247,6 +307,117 @@ const CompactChartStyleSelector = memo(() => {
 
 CompactChartStyleSelector.displayName = "CompactChartStyleSelector";
 
+// Layout selector component
+const CompactLayoutSelector = memo(() => {
+  const { currentLayout, setLayout } = useGridStore();
+
+  const layouts = [
+    { id: "compact" as const, label: "Compact", icon: CompactIcon },
+    { id: "balanced" as const, label: "Balanced", icon: BalancedIcon },
+  ];
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {layouts.map((layout) => {
+        const Icon = layout.icon;
+        const isActive = currentLayout === layout.id;
+
+        return (
+          <button
+            key={layout.id}
+            type="button"
+            onClick={() => setLayout(layout.id)}
+            className={cn(
+              "group relative flex h-20 flex-col items-center justify-center gap-2 rounded-xl border transition-all duration-300 overflow-hidden cursor-pointer",
+              isActive
+                ? "border-[#545963]/40 bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)] ring-1 ring-white/10"
+                : "border-[#111215] bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/80 hover:border-[#1C1E23]"
+            )}
+            style={{
+              boxShadow: isActive
+                ? "0px 4px 4px 0px rgba(0, 0, 0, 0.25), 0 0 20px rgba(255, 255, 255, 0.05)"
+                : undefined,
+            }}
+          >
+            {/* Compact balanced indicator - shows when active */}
+            {isActive && (
+              <div
+                className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#B0B0B0] z-10"
+                style={{
+                  width: "20px",
+                  height: "3px",
+                  transform: "translateY(-50%) rotate(-90deg)",
+                  filter: "blur(6px)",
+                  transformOrigin: "center",
+                }}
+              />
+            )}
+
+            {/* Active state background effects */}
+            {isActive && (
+              <>
+                <div className="absolute inset-0 opacity-30">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-white/5" />
+                </div>
+                <div className="absolute inset-0 animate-pulse">
+                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.08),transparent_60%)]" />
+                </div>
+              </>
+            )}
+
+            {/* Hover effects for inactive buttons */}
+            {!isActive && (
+              <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#2C3137]/50 via-[#16191D]/30 to-[#0A0B0D]/50" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.03),transparent_70%)]" />
+              </div>
+            )}
+
+            {/* Enhanced icon container */}
+            <div
+              className={cn(
+                "relative flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300",
+                isActive
+                  ? "bg-gradient-to-b from-[#343A42] to-[#1F2328] shadow-[0_4px_8px_rgba(0,0,0,0.4)] ring-1 ring-white/20"
+                  : "bg-gradient-to-b from-[#16191D] to-[#0A0B0D] group-hover:from-[#1C1E23] group-hover:to-[#0F1114]"
+              )}
+            >
+              <Icon
+                size={20}
+                className={cn(
+                  "transition-all duration-300",
+                  isActive
+                    ? "text-white"
+                    : "text-[#545963] group-hover:text-white"
+                )}
+              />
+            </div>
+
+            {/* Enhanced title */}
+            <span
+              className={cn(
+                "font-russo text-[11px] font-medium tracking-wide transition-all duration-300",
+                isActive
+                  ? "text-white drop-shadow-[0_1px_2px_rgba(255,255,255,0.3)]"
+                  : "text-[#545963] group-hover:text-white"
+              )}
+            >
+              {layout.label}
+            </span>
+
+            {/* Subtle border animation for active state */}
+            {isActive && (
+              <div className="absolute inset-0 rounded-xl border border-white/20 animate-pulse" />
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+});
+
+CompactLayoutSelector.displayName = "CompactLayoutSelector";
+
 export const ZenModeControls = memo(
   ({
     viewMode,
@@ -257,18 +428,24 @@ export const ZenModeControls = memo(
     isZenMode,
   }: ZenModeControlsProps) => {
     const [activePanel, setActivePanel] = useState<
-      "pairs" | "timeframe" | "chartstyle" | null
+      "pairs" | "timeframe" | "chartstyle" | "layout" | null
     >(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const { priceData } = useWebSocket();
     const boxColors = useColorStore((state) => state.boxColors);
+    const { currentLayout, setLayout } = useGridStore();
 
     const togglePanel = useCallback(
-      (panel: "pairs" | "timeframe" | "chartstyle") => {
+      (panel: "pairs" | "timeframe" | "chartstyle" | "layout") => {
         setActivePanel((current) => (current === panel ? null : panel));
       },
       []
     );
+
+    // Function to get the current layout icon
+    const getCurrentLayoutIcon = useCallback(() => {
+      return currentLayout === "compact" ? CompactIcon : BalancedIcon;
+    }, [currentLayout]);
 
     // Function to get the current chart style icon
     const getCurrentChartStyleIcon = useCallback(() => {
@@ -320,6 +497,14 @@ export const ZenModeControls = memo(
           isActive: activePanel === "chartstyle",
           isVisible: !isZenMode, // Hide chart style button in zen mode since it only uses 3D
         },
+        {
+          id: "layout",
+          position: "left" as const,
+          icon: getCurrentLayoutIcon(),
+          onClick: () => togglePanel("layout"),
+          isActive: activePanel === "layout",
+          isVisible: !isZenMode, // Only show layout controls when NOT in zen mode
+        },
         // Right buttons
         {
           id: "prev",
@@ -360,6 +545,7 @@ export const ZenModeControls = memo(
         togglePanel,
         isZenMode,
         getCurrentChartStyleIcon,
+        getCurrentLayoutIcon,
       ]
     );
 
@@ -432,128 +618,154 @@ export const ZenModeControls = memo(
     );
 
     return (
-      <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
-        <div
-          ref={containerRef}
-          className="relative flex flex-col items-center gap-1"
-        >
-          {/* Content panel - shows above buttons */}
-          <AnimatePresence>
-            {activePanel && (
-              <motion.div
-                initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  scale: 1,
-                  width: "auto",
-                }}
-                exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                transition={{
-                  duration: 0.2,
-                  ease: "easeOut",
-                  width: { duration: 0.3, ease: "easeInOut" },
-                }}
-                className="p-3 rounded-xl border border-[#1C1E23]/40 bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
-              >
-                {activePanel === "timeframe" && (
-                  <div className="w-full min-w-[320px]">
-                    <TimeFrameSlider showPanel={false} global />
-                  </div>
-                )}
-                {activePanel === "chartstyle" && (
-                  <div className="w-full min-w-[250px]">
-                    <CompactChartStyleSelector />
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+      <>
+        {/* Background gradient overlay - shows when any panel is active */}
+        <AnimatePresence>
+          {activePanel && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed bottom-0 left-0 right-0 pointer-events-none z-20"
+              style={{
+                height: "400px",
+                background:
+                  "linear-gradient(to top, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.8) 20%, rgba(0, 0, 0, 0.6) 40%, rgba(0, 0, 0, 0.3) 70%, transparent 100%)",
+              }}
+            />
+          )}
+        </AnimatePresence>
 
-          {/* Button container - enhanced visibility with FeatureTour styling */}
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
           <div
-            className="flex items-center gap-2 px-3 py-2 rounded-full border border-[#1C1E23]/60 backdrop-blur-md shadow-lg shadow-black/40"
-            style={{
-              background:
-                "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-              boxShadow:
-                "0px 4px 8px 0px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-            }}
+            ref={containerRef}
+            className="relative flex flex-col items-center gap-1"
           >
-            {/* Left buttons */}
-            {buttonsConfig
-              .filter((btn) => btn.position === "left")
-              .map(renderButton)}
+            {/* Content panel - shows above buttons */}
+            <AnimatePresence>
+              {activePanel && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    width: "auto",
+                  }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                  transition={{
+                    duration: 0.2,
+                    ease: "easeOut",
+                    width: { duration: 0.3, ease: "easeInOut" },
+                  }}
+                  className="p-3 rounded-xl border border-[#1C1E23]/40 bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
+                >
+                  {activePanel === "timeframe" && (
+                    <div className="w-full min-w-[320px]">
+                      <TimeFrameSlider showPanel={false} global />
+                    </div>
+                  )}
+                  {activePanel === "chartstyle" && (
+                    <div className="w-full min-w-[250px]">
+                      <CompactChartStyleSelector />
+                    </div>
+                  )}
+                  {activePanel === "layout" && (
+                    <div className="w-full min-w-[200px]">
+                      <CompactLayoutSelector />
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
-            {/* Right buttons - only render container if there are visible right buttons or focus label */}
-            {(buttonsConfig.some(
-              (btn) => btn.position === "right" && btn.isVisible
-            ) ||
-              (isZenMode && viewMode === "focus")) && (
-              <>
-                {/* Prev button */}
-                {buttonsConfig
-                  .filter(
-                    (btn) => btn.position === "right" && btn.id === "prev"
-                  )
-                  .map(renderButton)}
+            {/* Button container - enhanced visibility with FeatureTour styling */}
+            <div
+              className="flex items-center gap-2 px-3 py-2 rounded-full border border-[#1C1E23]/60 backdrop-blur-md shadow-lg shadow-black/40"
+              style={{
+                background:
+                  "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                boxShadow:
+                  "0px 4px 8px 0px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+              }}
+            >
+              {/* Left buttons */}
+              {buttonsConfig
+                .filter((btn) => btn.position === "left")
+                .map(renderButton)}
 
-                {/* Current pair price display in zen mode - between nav buttons */}
-                {isZenMode && pairs.length > 0 && viewMode === "scene" && (
-                  <div className="flex items-center gap-3 px-4 w-[160px] justify-center">
-                    <span className="font-russo text-xs font-medium text-white uppercase tracking-wide">
-                      {pairs[focusedIndex]}
-                    </span>
-                    <span className="font-kodemono text-sm text-white tabular-nums">
-                      {priceData[pairs[focusedIndex]]?.price
-                        ? formatPrice(
-                            priceData[pairs[focusedIndex]].price,
-                            pairs[focusedIndex]
-                          )
-                        : "—"}
-                    </span>
-                  </div>
-                )}
+              {/* Right buttons - only render container if there are visible right buttons or focus label */}
+              {(buttonsConfig.some(
+                (btn) => btn.position === "right" && btn.isVisible
+              ) ||
+                (isZenMode && viewMode === "focus")) && (
+                <>
+                  {/* Prev button */}
+                  {buttonsConfig
+                    .filter(
+                      (btn) => btn.position === "right" && btn.id === "prev"
+                    )
+                    .map(renderButton)}
 
-                {/* Next button */}
-                {buttonsConfig
-                  .filter(
-                    (btn) => btn.position === "right" && btn.id === "next"
-                  )
-                  .map(renderButton)}
+                  {/* Current pair price display in zen mode - between nav buttons */}
+                  {isZenMode && pairs.length > 0 && viewMode === "scene" && (
+                    <div className="flex items-center gap-3 px-4 w-[160px] justify-center">
+                      <span className="font-russo text-xs font-medium text-white uppercase tracking-wide">
+                        {pairs[focusedIndex]}
+                      </span>
+                      <span className="font-kodemono text-sm text-white tabular-nums">
+                        {priceData[pairs[focusedIndex]]?.price
+                          ? formatPrice(
+                              priceData[pairs[focusedIndex]].price,
+                              pairs[focusedIndex]
+                            )
+                          : "—"}
+                      </span>
+                    </div>
+                  )}
 
-                {/* Other right buttons (like viewMode) */}
-                {buttonsConfig
-                  .filter(
-                    (btn) =>
-                      btn.position === "right" &&
-                      btn.id !== "prev" &&
-                      btn.id !== "next"
-                  )
-                  .map(renderButton)}
-              </>
-            )}
+                  {/* Next button */}
+                  {buttonsConfig
+                    .filter(
+                      (btn) => btn.position === "right" && btn.id === "next"
+                    )
+                    .map(renderButton)}
+
+                  {/* Other right buttons (like viewMode) */}
+                  {buttonsConfig
+                    .filter(
+                      (btn) =>
+                        btn.position === "right" &&
+                        btn.id !== "prev" &&
+                        btn.id !== "next"
+                    )
+                    .map(renderButton)}
+                </>
+              )}
+            </div>
+
+            {/* Floating title below buttons - positioned absolutely */}
+            <AnimatePresence>
+              {activePanel && (
+                <motion.div
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -5 }}
+                  transition={{ duration: 0.15 }}
+                  className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 pointer-events-none"
+                >
+                  <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
+                    {activePanel === "timeframe" && "TIMEFRAME"}
+                    {activePanel === "chartstyle" && "STYLE"}
+                    {activePanel === "layout" && "LAYOUT"}
+                  </span>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-
-          {/* Floating title below buttons - positioned absolutely */}
-          <AnimatePresence>
-            {activePanel && (
-              <motion.div
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -5 }}
-                transition={{ duration: 0.15 }}
-                className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 pointer-events-none"
-              >
-                <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
-                  {activePanel === "timeframe" && "TIMEFRAME"}
-                  {activePanel === "chartstyle" && "STYLE"}
-                </span>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
-      </div>
+      </>
     );
   }
 );
