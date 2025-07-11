@@ -7,127 +7,144 @@ import { getSelectedPairs, setSelectedPairs } from "@/utils/localStorage";
 import { usePathname, useRouter } from "next/navigation";
 import type React from "react";
 import {
-	createContext,
-	use,
-	useCallback,
-	useEffect,
-	useMemo,
-	useState,
+  createContext,
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 
 interface UserContextType {
-	favorites: string[];
-	boxColors: BoxColors;
-	isSidebarInitialized: boolean;
-	togglePair: (pair: string) => void;
-	updateBoxColors: (colors: Partial<BoxColors>) => void;
-	handleSidebarClick: (e: React.MouseEvent) => void;
+  favorites: string[];
+  boxColors: BoxColors;
+  isSidebarInitialized: boolean;
+  subscription: any;
+  hasActiveSubscription: boolean;
+  togglePair: (pair: string) => void;
+  updateBoxColors: (colors: Partial<BoxColors>) => void;
+  handleSidebarClick: (e: React.MouseEvent) => void;
 }
 
 const UserContext = createContext<UserContextType | null>(null);
 
-export function UserProvider({ children }: { children: React.ReactNode }) {
-	const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
-	const router = useRouter();
-	const pathname = usePathname();
-	const { hasCompletedInitialOnboarding } = useOnboardingStore();
+export function UserProvider({
+  children,
+  subscription,
+}: {
+  children: React.ReactNode;
+  subscription?: any;
+}) {
+  const [isSidebarInitialized, setIsSidebarInitialized] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const { hasCompletedInitialOnboarding } = useOnboardingStore();
 
-	// Get box colors from the store
-	const boxColors = useColorStore((state) => state.boxColors);
-	const updateBoxColors = useColorStore((state) => state.updateBoxColors);
+  // Get box colors from the store
+  const boxColors = useColorStore((state) => state.boxColors);
+  const updateBoxColors = useColorStore((state) => state.updateBoxColors);
 
-	// Get grid store functions
-	const orderedPairs = useGridStore((state) => state.orderedPairs);
-	const setInitialPairs = useGridStore((state) => state.setInitialPairs);
-	const reorderPairs = useGridStore((state) => state.reorderPairs);
+  // Get grid store functions
+  const orderedPairs = useGridStore((state) => state.orderedPairs);
+  const setInitialPairs = useGridStore((state) => state.setInitialPairs);
+  const reorderPairs = useGridStore((state) => state.reorderPairs);
 
-	// Onboarding check
-	useEffect(() => {
-		if (!pathname || pathname.includes("/onboarding")) return;
-		if (
-			pathname === "/signin" ||
-			pathname === "/signup" ||
-			pathname === "/pricing"
-		)
-			return;
-		if (!hasCompletedInitialOnboarding()) {
-			router.replace("/onboarding");
-		}
-	}, [pathname, router, hasCompletedInitialOnboarding]);
+  // Determine if user has active subscription
+  const hasActiveSubscription = useMemo(() => {
+    return subscription && ["active", "trialing"].includes(subscription.status);
+  }, [subscription]);
 
-	// Initialize state and fetch all initial data
-	useEffect(() => {
-		const initializeData = async () => {
-			const storedPairs = getSelectedPairs();
-			setInitialPairs(storedPairs);
-			setIsSidebarInitialized(true);
-		};
+  // Onboarding check
+  useEffect(() => {
+    if (!pathname || pathname.includes("/onboarding")) return;
+    if (
+      pathname === "/signin" ||
+      pathname === "/signup" ||
+      pathname === "/pricing"
+    )
+      return;
+    if (!hasCompletedInitialOnboarding()) {
+      router.replace("/onboarding");
+    }
+  }, [pathname, router, hasCompletedInitialOnboarding]);
 
-		initializeData();
-	}, [setInitialPairs]);
+  // Initialize state and fetch all initial data
+  useEffect(() => {
+    const initializeData = async () => {
+      const storedPairs = getSelectedPairs();
+      setInitialPairs(storedPairs);
+      setIsSidebarInitialized(true);
+    };
 
-	const togglePair = useCallback(
-		(pair: string) => {
-			const currentPairs = orderedPairs;
-			let newPairs;
+    initializeData();
+  }, [setInitialPairs]);
 
-			if (currentPairs.includes(pair)) {
-				// Remove the pair
-				newPairs = currentPairs.filter((p) => p !== pair);
-			} else {
-				// Add the pair
-				newPairs = [...currentPairs, pair];
-			}
+  const togglePair = useCallback(
+    (pair: string) => {
+      const currentPairs = orderedPairs;
+      let newPairs;
 
-			// Update both local storage and grid store
-			setSelectedPairs(newPairs);
-			reorderPairs(newPairs);
-		},
-		[orderedPairs, reorderPairs],
-	);
+      if (currentPairs.includes(pair)) {
+        // Remove the pair
+        newPairs = currentPairs.filter((p) => p !== pair);
+      } else {
+        // Add the pair
+        newPairs = [...currentPairs, pair];
+      }
 
-	const handleSidebarClick = useCallback((e: React.MouseEvent) => {
-		const target = e.target as HTMLElement;
-		if (
-			target.closest(".sidebar-toggle") ||
-			target.closest(".sidebar-content") ||
-			target.closest(".fixed-sidebar")
-		) {
-			return;
-		}
-		window.dispatchEvent(new Event("closeSidebars"));
-	}, []);
+      // Update both local storage and grid store
+      setSelectedPairs(newPairs);
+      reorderPairs(newPairs);
+    },
+    [orderedPairs, reorderPairs]
+  );
 
-	const value = useMemo(
-		() => ({
-			favorites: orderedPairs,
-			boxColors,
-			isSidebarInitialized,
-			togglePair,
-			updateBoxColors,
-			handleSidebarClick,
-		}),
-		[
-			orderedPairs,
-			boxColors,
-			isSidebarInitialized,
-			togglePair,
-			updateBoxColors,
-			handleSidebarClick,
-		],
-	);
+  const handleSidebarClick = useCallback((e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest(".sidebar-toggle") ||
+      target.closest(".sidebar-content") ||
+      target.closest(".fixed-sidebar")
+    ) {
+      return;
+    }
+    window.dispatchEvent(new Event("closeSidebars"));
+  }, []);
 
-	return (
-		<UserContext.Provider value={value}>
-			<div onClick={handleSidebarClick}>{children}</div>
-		</UserContext.Provider>
-	);
+  const value = useMemo(
+    () => ({
+      favorites: orderedPairs,
+      boxColors,
+      isSidebarInitialized,
+      subscription,
+      hasActiveSubscription,
+      togglePair,
+      updateBoxColors,
+      handleSidebarClick,
+    }),
+    [
+      orderedPairs,
+      boxColors,
+      isSidebarInitialized,
+      subscription,
+      hasActiveSubscription,
+      togglePair,
+      updateBoxColors,
+      handleSidebarClick,
+    ]
+  );
+
+  return (
+    <UserContext.Provider value={value}>
+      <div onClick={handleSidebarClick}>{children}</div>
+    </UserContext.Provider>
+  );
 }
 
 export function useUser() {
-	const context = use(UserContext);
-	if (!context) {
-		throw new Error("useUser must be used within a UserProvider");
-	}
-	return context;
+  const context = use(UserContext);
+  if (!context) {
+    throw new Error("useUser must be used within a UserProvider");
+  }
+  return context;
 }
