@@ -224,12 +224,9 @@ const SearchBar = memo(
         <div
           className={cn(
             "group/search relative flex h-10 items-center rounded-lg border transition-all duration-300",
-            isFocused
-              ? "bg-[#0A0B0D] border-[#32353C]/60"
-              : "bg-[#0F1114] border-[#1C1E23]/40 hover:border-[#32353C]/60"
+            isFocused ? "border-[#1C1E23]" : "border-[#1C1E23]"
           )}
         >
-          {/* Search Icon */}
           <div
             className={cn(
               "relative ml-3 transition-colors duration-300",
@@ -239,7 +236,6 @@ const SearchBar = memo(
             <FaSearch size={12} />
           </div>
 
-          {/* Input */}
           <input
             ref={inputRef}
             type="text"
@@ -252,10 +248,8 @@ const SearchBar = memo(
             }}
             onFocus={onFocus}
             onBlur={onBlur}
-            className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white placeholder-[#818181] transition-colors outline-none"
+            className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white transition-colors outline-none"
           />
-
-          {/* Clear Button */}
           {searchQuery && (
             <button
               type="button"
@@ -271,7 +265,6 @@ const SearchBar = memo(
   }
 );
 
-// DraggableItem component to handle individual drag controls
 const DraggableItem = memo(
   ({ item, onToggle }: { item: string; onToggle: () => void }) => {
     const { boxColors } = useUser();
@@ -289,11 +282,10 @@ const DraggableItem = memo(
         style={{ position: "relative", zIndex: 0 }}
       >
         <motion.div
-          className="relative flex w-full items-center overflow-hidden cursor-grab active:cursor-grabbing"
+          className="relative flex w-full items-center overflow-hidden cursor-grab active:cursor-grabbing rounded-lg"
           layout="position"
           transition={{ duration: 0.15 }}
           whileDrag={{ zIndex: 50 }}
-          style={{ borderRadius: "4px" }}
           onPointerDown={(e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -680,7 +672,6 @@ export const InstrumentsPanel = () => {
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
-                  <div className="mb-4 text-3xl opacity-50">🔍</div>
                   <div className="font-outfit text-sm text-[#545963] mb-2">
                     No instruments found matching
                   </div>
@@ -689,13 +680,9 @@ export const InstrumentsPanel = () => {
                     style={{
                       background:
                         "linear-gradient(180deg, #24282D -10.71%, #111316 100%)",
-                      color: "#4EFF6E",
                     }}
                   >
                     "{searchQuery}"
-                  </div>
-                  <div className="font-outfit text-xs text-[#32353C] mt-3">
-                    Try searching for forex pairs, crypto, stocks, or ETFs
                   </div>
                 </div>
               )}
