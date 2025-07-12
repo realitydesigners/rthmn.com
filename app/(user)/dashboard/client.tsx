@@ -1,8 +1,10 @@
 "use client";
 
 import { SignalAlerts } from "@/components/Dashboard/SignalAlerts";
+import { OnboardingUpgradeBanner } from "@/components/Dashboard/OnboardingUpgradeBanner";
 import { ZenMode } from "@/components/Dashboard/ZenMode";
 import { useSignals } from "@/hooks/useSignals";
+import { useSubscription } from "@/hooks/useSubscription";
 import { useDashboard } from "@/providers/DashboardProvider/client";
 import { useUser } from "@/providers/UserProvider";
 import { useGridStore } from "@/stores/gridStore";
@@ -12,6 +14,9 @@ import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
+
+// Mock data for non-subscribers to show dashboard structure
+const MOCK_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"];
 
 // Extend window object for zen mode toggle
 declare global {
@@ -23,6 +28,7 @@ declare global {
 export default function Dashboard() {
   const { pairData, isLoading } = useDashboard();
   const { favorites, boxColors } = useUser();
+  const { isSubscribed, requireSubscription } = useSubscription();
   const getGridColumns = useGridStore((state) => state.getGridColumns);
   const currentLayout = useGridStore((state) => state.currentLayout);
   const orderedPairs = useGridStore((state) => state.orderedPairs);
@@ -36,6 +42,7 @@ export default function Dashboard() {
   const [draggedItem, setDraggedItem] = useState<string | null>(null);
   const [windowWidth, setWindowWidth] = useState(0);
   const [availableWidth, setAvailableWidth] = useState(0);
+  const [showUpgradeBanner, setShowUpgradeBanner] = useState(true);
 
   // Signal alerts - now using real-time subscriptions
   const { signals, newSignals, clearSignalAlert, clearAllAlerts, isConnected } =
@@ -43,6 +50,9 @@ export default function Dashboard() {
 
   // Helper function to get active patterns for a specific pair
   const getActivePatternsForPair = (pair: string): number[] => {
+    // Only show patterns for subscribers
+    if (!isSubscribed) return [];
+
     // Get the most recent signal for this pair (no time limits)
     const pairSignals = signals
       .filter((signal) => signal.pair === pair)
@@ -165,8 +175,14 @@ export default function Dashboard() {
 
   // Create stable reference for pairs to prevent unnecessary re-renders
   const pairsToRender = useMemo(() => {
+    // For non-subscribers, show mock pairs to demonstrate the layout
+    if (!isSubscribed) {
+      return MOCK_PAIRS;
+    }
+
+    // For subscribers, use their selected pairs
     return orderedPairs.length > 0 ? orderedPairs : favorites;
-  }, [orderedPairs, favorites]);
+  }, [orderedPairs, favorites, isSubscribed]);
 
   // Calculate grid columns based on current layout and available width
   const gridCols = useMemo(() => {
@@ -211,6 +227,18 @@ export default function Dashboard() {
     }
   }, [hasBeenAccessed, isClient, markAsAccessed]);
 
+  // Handle upgrade banner actions
+  const handleUpgrade = () => {
+    setShowUpgradeBanner(false);
+    setTimeout(() => {
+      requireSubscription();
+    }, 300);
+  };
+
+  const handleSkipUpgrade = () => {
+    setShowUpgradeBanner(false);
+  };
+
   return (
     <>
       {isZenMode && (
@@ -229,14 +257,24 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* <SignalAlerts
-        newSignals={newSignals}
-        onClearSignal={clearSignalAlert}
-        onClearAll={clearAllAlerts}
-      /> */}
+      {/* COMMENT OUT FOR NOW */}
+      {/* {isSubscribed && (
+        <SignalAlerts
+          newSignals={newSignals}
+          onClearSignal={clearSignalAlert}
+          onClearAll={clearAllAlerts}
+        />
+      )} */}
 
       {!isZenMode && (
         <div className="w-full px-2 pb-24 lg:pb-2 pt-14 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          {/* Upgrade banner for non-subscribers who completed all onboarding */}
+          <OnboardingUpgradeBanner
+            isVisible={showUpgradeBanner}
+            onUpgrade={handleUpgrade}
+            onSkip={handleSkipUpgrade}
+          />
+
           <div
             className="grid w-full gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             style={{

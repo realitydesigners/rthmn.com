@@ -70,6 +70,8 @@ export default async function Homepage() {
       <SectionBoxes3D />
       {/* <LineChart3D /> */}
       <SectionInstrumentsPanel />
+      <SectionBoxes />
+      {/* <SectionRthmnDemo marketData={marketData} /> */}
       {/* <SectionMarketDisplay marketData={marketData} />*/}
       {/* <SectionRthmnDemo marketData={marketData} />
 			<SectionMarketTicker marketData={marketData} />

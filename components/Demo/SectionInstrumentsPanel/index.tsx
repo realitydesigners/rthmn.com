@@ -159,7 +159,7 @@ const InstrumentsPanel = memo(
               }}
             />
             <div
-              className="absolute -left-4 top-1/2 -translate-y-1/2 bg-white z-10"
+              className="absolute -left-4 top-1/2 -translate-y-1/2 bg-[#4EFF6E] z-10"
               style={{
                 width: "30px",
                 height: "4px",
@@ -220,51 +220,71 @@ const InstrumentsPanel = memo(
       return (
         <motion.div
           className={cn(
-            "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden px-3",
+            "group/item relative flex h-10 w-full items-center transition-all duration-300 select-none overflow-hidden",
             isSelected
               ? "bg-gradient-to-b from-[#191B1F] to-[#131618] shadow-[0px_4px_4px_0px_rgba(0,0,0,0.25)]"
-              : "hover:bg-[#111215]/50"
+              : ""
           )}
           style={{ borderRadius: "4px" }}
         >
-          <span
-            className={cn(
-              "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
-              isSelected ? "text-white" : "text-[#32353C]"
-            )}
-          >
-            {item}
-          </span>
-          <motion.span
-            className={cn(
-              "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
-              isSelected ? "text-[#545963]" : "text-[#32353C]",
-              highlightedFeature === "realtime" && "text-white"
-            )}
-            animate={{
-              color:
-                highlightedFeature === "realtime" && isSelected
-                  ? "#FFFFFF"
-                  : undefined,
-            }}
-            key={price} // This will trigger re-animation when price changes
-          >
-            {price && isClient ? formatPrice(price, item) : "---"}
-          </motion.span>
+          {/* Hover background for non-selected items */}
+          {!isSelected && (
+            <div
+              className="absolute inset-0 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300"
+              style={{
+                borderRadius: "4px",
+                background:
+                  "linear-gradient(180deg, #1A1D22 -10.71%, #0F1114 100%)",
+                boxShadow: "0px 2px 4px 0px rgba(0, 0, 0, 0.15)",
+              }}
+            />
+          )}
+          <div className="relative flex w-full items-center px-3">
+            <span
+              className={cn(
+                "font-outfit flex-1 text-sm font-bold tracking-wide transition-colors",
+                isSelected
+                  ? "text-white"
+                  : "text-[#818181] group-hover/item:text-[#B0B0B0]"
+              )}
+            >
+              {item}
+            </span>
+            <motion.span
+              className={cn(
+                "font-kodemono w-[70px] text-right text-sm tracking-wider transition-colors",
+                isSelected
+                  ? "text-[#545963]"
+                  : "text-[#818181] group-hover/item:text-[#B0B0B0]",
+                highlightedFeature === "realtime" && isSelected && "text-white"
+              )}
+              animate={{
+                color:
+                  highlightedFeature === "realtime" && isSelected
+                    ? "#FFFFFF"
+                    : undefined,
+              }}
+              key={price} // This will trigger re-animation when price changes
+            >
+              {price && isClient ? formatPrice(price, item) : "---"}
+            </motion.span>
+          </div>
         </motion.div>
       );
     };
 
     const SearchBar = () => (
       <div className="relative mb-4">
-        <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-[#32353C] text-sm" />
+        <div className="group/search relative flex h-10 items-center rounded-lg border border-[#1C1E23] transition-all duration-300">
+          <div className="relative ml-3 text-[#818181] transition-colors duration-300">
+            <FaSearch size={12} />
+          </div>
           <input
             type="text"
             placeholder="Search instruments..."
             value=""
             readOnly
-            className="w-full h-10 pl-10 pr-4 bg-[#0A0B0D] border border-[#111215] rounded-lg text-white placeholder-[#32353C] font-outfit text-sm cursor-pointer"
+            className="font-outfit relative h-full flex-1 bg-transparent px-3 text-[13px] font-medium text-white transition-colors outline-none cursor-pointer"
           />
         </div>
       </div>
@@ -272,11 +292,6 @@ const InstrumentsPanel = memo(
 
     const FilterButtons = () => (
       <div className="flex gap-2 mb-4 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        <FilterButton
-          isActive={activeFilter === "selected"}
-          onClick={() => setActiveFilter("selected")}
-          label="★"
-        />
         <FilterButton
           isActive={activeFilter === "fx"}
           onClick={() => setActiveFilter("fx")}
@@ -385,7 +400,7 @@ export const SectionInstrumentsPanel = memo(() => {
               <div className="space-y-8 max-w-2xl">
                 {/* Main heading section */}
                 <div className="space-y-6">
-                  <h2 className="font-russo text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black tracking-tighter leading-[1] uppercase text-white">
+                  <h2 className="font-russo text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black  leading-[1] uppercase text-white">
                     {currentDescription.title}
                   </h2>
                 </div>

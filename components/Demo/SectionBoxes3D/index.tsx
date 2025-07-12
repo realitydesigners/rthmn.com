@@ -23,11 +23,9 @@ import { DemoBottomNavbar } from "../DemoBottomNavbar";
 import { BoxStructure } from "./BoxStructure";
 import { CameraController } from "./CameraController";
 import { HeroText } from "./HeroText";
-import { TradingAdvantage } from "./TradingAdvantage";
-import { calculateCircularPosition } from "./mathUtils";
 import { useAnimatedStructures } from "./useAnimatedStructures";
 import { useCanvasSetup } from "./useCanvasSetup";
-import { useAnimationConfig, type StructureData } from "./useAnimationConfig";
+import { useAnimationConfig } from "./useAnimationConfig";
 
 interface ScreenProps {
   scale: MotionValue<number>;
@@ -304,7 +302,6 @@ export const SectionBoxes3D = memo(() => {
           <HeroText opacity={introTextOpacity} />
         </div>
       </div>
-      <TradingAdvantage />
     </div>
   );
 });

@@ -1,5 +1,4 @@
 "use client";
-import { useWebSocket } from "@/providers/WebsocketProvider";
 import { useZenModeStore } from "@/stores/zenModeStore";
 import { cn } from "@/utils/cn";
 import type { User } from "@supabase/supabase-js";
@@ -7,13 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LuChevronRight, LuLayoutDashboard, LuOrbit } from "react-icons/lu";
-import { ConnectionBadge } from "../../Badges/ConnectionBadge";
 
-interface NavbarSignedInProps {
-  user: User | null;
-}
-
-// Enhanced Zen Mode Toggle component with indicator
 const ZenModeToggle = ({
   isZenMode,
   hasBeenAccessed,
@@ -24,10 +17,9 @@ const ZenModeToggle = ({
   onToggle: () => void;
 }) => (
   <div className="group relative flex items-center ">
-    {/* Compact balanced indicator - shows when zen mode is active */}
     {isZenMode && (
       <div
-        className="absolute  top-1/2 -translate-y-1/2 bg-[#B0B0B0] z-10"
+        className="absolute  top-1/2 -translate-y-1/2 z-10"
         style={{
           width: "18px",
           height: "2px",
@@ -38,19 +30,10 @@ const ZenModeToggle = ({
         }}
       />
     )}
-
-    <span className="font-russo text-[10px] font-medium text-[#818181] uppercase tracking-wide">
+    <span className="font-russo text-[10px] font-medium text-[#818181] uppercase tracking-wide mr-2">
       ZEN MODE
     </span>
-    <div
-      className="relative px-1 py-0.5 transition-all duration-300 overflow-hidden"
-      style={{
-        borderRadius: "6px",
-        background: "rgba(0, 0, 0, 0.6)",
-        border: "1px solid rgba(28, 30, 35, 0.4)",
-      }}
-    >
-      {/* Very subtle first-time user hint */}
+    <div className="relative transition-all duration-300 overflow-hidden">
       {!hasBeenAccessed && !isZenMode && (
         <div className="absolute inset-0 bg-white/5 rounded-full blur-sm animate-pulse" />
       )}
@@ -58,8 +41,10 @@ const ZenModeToggle = ({
       <button
         onClick={onToggle}
         className={cn(
-          "relative flex h-5 w-9 items-center rounded-full border transition-all duration-300 overflow-hidden",
-          isZenMode ? "border-[#32353C]/80" : "border-[#1C1E23]/60"
+          "group relative flex h-5 w-10 items-center rounded-full transition-all duration-500 overflow-hidden",
+          isZenMode
+            ? "bg-gradient-to-r from-slate-300/25 via-gray-200/30 via-slate-100/35 to-slate-300/25 border border-slate-200/50 shadow-lg shadow-slate-500/20"
+            : "bg-transparent border border-white/10"
         )}
         title={
           !hasBeenAccessed
@@ -68,20 +53,49 @@ const ZenModeToggle = ({
               ? "Exit Zen Mode"
               : "Enter Zen Mode"
         }
-        style={{
-          background: isZenMode
-            ? "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)"
-            : "#000000",
-          boxShadow: isZenMode ? "0px 2px 4px 0px rgba(0, 0, 0, 0.25)" : "none",
-        }}
       >
-        {/* Toggle handle */}
         <div
           className={cn(
-            "relative h-3 w-3 rounded-full border transition-all duration-300 transform shadow-sm",
+            "absolute inset-0 rounded-full transition-all duration-500",
             isZenMode
-              ? "translate-x-5 border-[#32353C]/60 bg-[#B0B0B0]"
-              : "translate-x-1 border-[#32353C]/60 bg-white"
+              ? "bg-gradient-to-r from-slate-300/15 via-gray-200/20 to-slate-300/15 opacity-100"
+              : "opacity-0"
+          )}
+        />
+
+        <div className="absolute inset-0 rounded-full overflow-hidden">
+          {isZenMode && (
+            <>
+              <div className="absolute top-1 left-1.5 w-0.5 h-0.5 bg-slate-200/80 rounded-full animate-pulse" />
+              <div className="absolute top-2.5 left-3 w-0.5 h-0.5 bg-gray-100/80 rounded-full animate-pulse delay-300" />
+              <div className="absolute top-1.5 right-2.5 w-0.5 h-0.5 bg-slate-200/80 rounded-full animate-pulse delay-700" />
+            </>
+          )}
+        </div>
+
+        <div
+          className={cn(
+            "relative z-10 h-3.5 w-3.5 rounded-full transition-all duration-500 transform shadow-lg border backdrop-blur-sm",
+            "flex items-center justify-center",
+            isZenMode
+              ? "translate-x-5.5 bg-gradient-to-br from-white via-slate-50 to-slate-100 border-slate-200/70 shadow-slate-400/30"
+              : "translate-x-0.5 bg-gradient-to-br from-white to-gray-100 border-gray-300/60 shadow-gray-500/20"
+          )}
+        >
+          <div
+            className={cn(
+              "w-1.5 h-1.5 rounded-full transition-all duration-300",
+              isZenMode
+                ? "bg-gradient-to-br from-slate-400 via-gray-400 to-slate-500 animate-pulse"
+                : "bg-gradient-to-br from-gray-400 to-gray-500"
+            )}
+          />
+        </div>
+
+        <div
+          className={cn(
+            "absolute inset-0 rounded-full bg-gradient-to-r from-transparent via-white/5 to-transparent",
+            "transform translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700 ease-in-out"
           )}
         />
       </button>
@@ -89,9 +103,8 @@ const ZenModeToggle = ({
   </div>
 );
 
-export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
+export const NavbarSignedIn = () => {
   const pathname = usePathname();
-  const { isConnected } = useWebSocket();
   const { isZenMode, toggleZenMode, hasBeenAccessed } = useZenModeStore();
 
   if (pathname === "/account" || pathname === "/pricing") return null;
@@ -136,10 +149,10 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
       <div className="group relative h-full w-full">
         <div className="relative flex h-full w-full items-center justify-between rounded-lg pr-2">
           {/* Left section */}
-          <div className="relative flex items-center lg:gap-2">
+          <div className="relative flex items-center ">
             <div className="flex items-center justify-center lg:w-16">
               <Link href="/dashboard" className="relative flex items-center">
-                <div className="flex h-14 w-14 items-center p-2">
+                <div className="flex h-14 w-14 items-center p-2 mr-2">
                   <Image
                     src="/rthmn-onboarding-logo.png"
                     alt="Rthmn Logo"
@@ -181,7 +194,7 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
           </div>
 
           <div className="relative flex items-center ">
-            <div className="relative flex items-center gap-2">
+            <div className="relative flex items-center mr-2">
               {isDashboard && (
                 <ZenModeToggle
                   isZenMode={isZenMode}
@@ -189,7 +202,6 @@ export const NavbarSignedIn: React.FC<NavbarSignedInProps> = ({ user }) => {
                   onToggle={handleZenModeToggle}
                 />
               )}
-              <ConnectionBadge isConnected={isConnected} />
             </div>
           </div>
         </div>

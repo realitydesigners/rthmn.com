@@ -202,10 +202,10 @@ export const Sidebar = ({
       {currentStepId &&
         isSidebarStep(currentStepId) &&
         !isStepCompleted(currentStepId) && (
-          <div className="fixed inset-0 bg-black/60 z-[1] pointer-events-none" />
+          <div className="fixed inset-0 z-[1] pointer-events-none" />
         )}
 
-      {/* Background overlay when panel is open but unlocked */}
+      {/* TODO */}
       {isOpen && activePanel && !isLocked && (
         <div className="fixed inset-0 bg-black/40 z-[10] pointer-events-none transition-opacity duration-300" />
       )}

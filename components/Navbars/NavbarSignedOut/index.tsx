@@ -179,7 +179,6 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     "/account",
     "/studio",
     "/signals",
-    "/support",
   ];
   const isUserRoute =
     pathname.startsWith("/(user)") ||
@@ -187,7 +186,8 @@ export function NavbarSignedOut({ user }: NavbarSignedOutProps) {
     pathname.startsWith("/studio/") ||
     pathname.startsWith("/admin") ||
     protectedRoutes.includes(pathname);
-  if (isUserRoute) {
+  // Allow NavbarSignedOut to show on support page even when user is authenticated
+  if (isUserRoute && pathname !== "/support") {
     return null;
   }
 

@@ -210,43 +210,7 @@ export const DemoSettingsPanel = memo(() => {
         >
           <div className="flex flex-col gap-2">
             {/* Preview Container */}
-            <div className="group relative flex flex-col overflow-hidden rounded-lg transition-all duration-300">
-              <div className="relative flex flex-col rounded-lg">
-                {/* Grid background */}
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:16px_16px]" />
-
-                <div className="relative flex h-full items-center justify-center p-8">
-                  {/* Preview Box */}
-                  <div
-                    className={cn(
-                      "relative h-24 w-24 transition-all duration-300",
-                      boxColors.styles?.showBorder && "border border-[#111215]"
-                    )}
-                    style={{
-                      borderRadius: `${boxColors.styles?.borderRadius || 4}px`,
-                      boxShadow: `
-                        inset 0 0 ${(boxColors.styles?.shadowIntensity || 0.4) * 50}px rgba(255, 255, 255, ${(boxColors.styles?.shadowIntensity || 0.4) * 0.3}),
-                        0 0 20px rgba(255, 255, 255, 0.05)
-                      `,
-                      backgroundColor: `rgba(255, 255, 255, ${(boxColors.styles?.opacity || 0.71) * 0.1})`,
-                    }}
-                  >
-                    <div
-                      className="absolute inset-0 transition-all duration-300"
-                      style={{
-                        borderRadius: `${boxColors.styles?.borderRadius || 4}px`,
-                        background: `
-                          radial-gradient(circle at center, 
-                            rgba(255, 255, 255, ${(boxColors.styles?.opacity || 0.71) * 0.05}),
-                            transparent 70%
-                          )
-                        `,
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <div className="group relative flex flex-col overflow-hidden rounded-lg transition-all duration-300"></div>
 
             {/* Controls Container */}
             <div className="flex flex-col gap-2 p-4">
@@ -289,13 +253,7 @@ export const DemoSettingsPanel = memo(() => {
                         borderRadius: Number.parseInt(e.target.value),
                       })
                     }
-                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing"
-                    style={
-                      {
-                        "--thumb-size": "12px",
-                        "--thumb-color": "#fff",
-                      } as React.CSSProperties
-                    }
+                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
@@ -335,13 +293,7 @@ export const DemoSettingsPanel = memo(() => {
                         shadowIntensity: Number.parseFloat(e.target.value),
                       })
                     }
-                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing"
-                    style={
-                      {
-                        "--thumb-size": "12px",
-                        "--thumb-color": "#fff",
-                      } as React.CSSProperties
-                    }
+                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
@@ -381,13 +333,7 @@ export const DemoSettingsPanel = memo(() => {
                         opacity: Number.parseFloat(e.target.value),
                       })
                     }
-                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing"
-                    style={
-                      {
-                        "--thumb-size": "12px",
-                        "--thumb-color": "#fff",
-                      } as React.CSSProperties
-                    }
+                    className="relative h-6 w-full cursor-pointer appearance-none rounded-md bg-transparent transition-all hover:cursor-grab active:cursor-grabbing [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow-sm [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:cursor-pointer [&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:h-3 [&::-moz-range-thumb]:w-3 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:shadow-sm [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:cursor-pointer"
                   />
                 </div>
               </div>
