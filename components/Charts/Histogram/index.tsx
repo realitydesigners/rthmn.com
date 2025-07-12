@@ -25,14 +25,14 @@ interface BoxTimelineProps {
   className?: string;
   hoveredTimestamp?: number | null;
   showLine?: boolean;
-  pair?: string; // Add pair prop for instrument precision
 }
 
 const MAX_FRAMES = 1000;
 
 /**
- * Simplified Histogram component - now uses pre-repositioned data from boxDataProcessor
- * Client-side sorting logic has been removed in favor of server-side repositioning
+ * Simplified Histogram component that consumes pre-repositioned data from boxDataProcessor.
+ * All complex sorting, repositioning, and calculations are handled in boxDataProcessor.
+ * This component simply renders the data "as-is" like BoxDataTable does.
  */
 const Histogram: React.FC<BoxTimelineProps> = ({
   data,
@@ -43,7 +43,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
   className = "",
   hoveredTimestamp,
   showLine = true,
-  pair = "USDJPY", // Default to USDJPY for shifted Renko calculations
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -172,23 +171,24 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         ctx.fillRect(x, 0, boxSize, totalHeight);
       }
 
-      // Use pre-repositioned boxes directly from server
-      const orderedBoxes = frame.progressiveValues.slice(
+      // Use pre-repositioned boxes directly (boxDataProcessor already handled the complex sorting)
+      const visibleBoxes = frame.progressiveValues.slice(
         boxOffset,
         boxOffset + visibleBoxesCount
       );
 
-      const largestBox = orderedBoxes.reduce(
-        (max, box) => (Math.abs(box.value) > Math.abs(max.value) ? box : max),
-        orderedBoxes[0] || { value: 0 }
+      // Find largest box for trend (boxDataProcessor already optimized the order)
+      const largestBox = visibleBoxes.reduce((max, box) =>
+        Math.abs(box.value) > Math.abs(max.value) ? box : max
       );
       const isLargestPositive = largestBox.value >= 0;
 
-      // Draw boxes with proper spacing
-      orderedBoxes.forEach((box, boxIndex) => {
+      // Draw boxes in their already-repositioned order
+      visibleBoxes.forEach((box, boxIndex) => {
         const y = boxIndex * boxSize;
         const isPositiveBox = box.value >= 0;
 
+        // Simple coloring based on trend
         if (isLargestPositive) {
           ctx.fillStyle = isPositiveBox
             ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
@@ -199,43 +199,18 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
         }
 
-        ctx.fillRect(
-          x,
-          y,
-          boxSize,
-          boxSize + (boxIndex === orderedBoxes.length - 1 ? 1 : 0)
-        );
+        ctx.fillRect(x, y, boxSize, boxSize);
       });
 
-      const smallestBoxData = orderedBoxes.reduce(
-        (minData, box) => {
-          const absValue = Math.abs(box.value);
-          if (absValue < minData.minAbsValue) {
-            return { minAbsValue: absValue, box: box };
-          }
-          return minData;
-        },
-        { minAbsValue: Number.POSITIVE_INFINITY, box: null as Box | null }
+      // Find smallest box for line positioning (boxDataProcessor positioned it correctly)
+      const smallestBox = visibleBoxes.reduce((min, box) =>
+        Math.abs(box.value) < Math.abs(min.value) ? box : min
       );
-      const smallestBox = smallestBoxData.box;
 
       if (smallestBox) {
         const isPositive = smallestBox.value >= 0;
-        const boxIndex = orderedBoxes.findIndex((box) => box === smallestBox);
+        const boxIndex = visibleBoxes.findIndex((box) => box === smallestBox);
         const y = (boxIndex + (isPositive ? 0 : 1)) * boxSize;
-
-        // Debug logging
-        if (frameIndex < 5 || frameIndex % 50 === 0) {
-          console.log(`Frame ${frameIndex}:`, {
-            smallestValue: smallestBox.value,
-            boxIndex,
-            isPositive,
-            y,
-            totalBoxes: orderedBoxes.length,
-            allValues: orderedBoxes.map((b) => b.value),
-          });
-        }
-
         linePoints.push({ x, y, isPositive, isLargestPositive });
       }
 
@@ -253,16 +228,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     });
 
     if (showLine && linePoints.length > 0) {
-      // Debug line points
-      console.log(
-        "Line Points Sample:",
-        linePoints.slice(0, 10).map((p) => ({
-          x: p.x,
-          y: p.y,
-          isPositive: p.isPositive,
-        }))
-      );
-
       // Draw fill areas
       for (let i = 0; i < linePoints.length - 1; i++) {
         const currentPoint = linePoints[i];
