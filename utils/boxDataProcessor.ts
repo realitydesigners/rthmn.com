@@ -9,7 +9,6 @@ interface ExtendedBoxSlice {
   progressiveValues: {
     high: number;
     low: number;
-    d;
     value: number;
   }[];
   currentOHLC: {
@@ -20,40 +19,120 @@ interface ExtendedBoxSlice {
   };
 }
 
+/**
+ * Core repositioning logic from auto system - separates negative/positive boxes
+ * This is the same proven logic used in boxUpdaterService.ts
+ */
+export function repositionBoxValues(
+  boxes: Array<{ value: number; high: number; low: number }>
+): {
+  values: number[];
+  highs: number[];
+  lows: number[];
+  fullBoxes: Array<{ value: number; high: number; low: number }>;
+} {
+  const negativeBoxes = boxes.filter((box) => box.value < 0);
+  const positiveBoxes = boxes.filter((box) => box.value > 0);
+  const zeroBoxes = boxes.filter((box) => box.value === 0);
+
+  // Sort negatives by value (most negative first: -100, -50, -20, -10)
+  negativeBoxes.sort((a, b) => a.value - b.value);
+
+  // Sort positives by value (smallest first: 10, 20, 50, 100)
+  positiveBoxes.sort((a, b) => a.value - b.value);
+
+  // Combine: negatives first, then zeros, then positives
+  const repositionedBoxes = [...negativeBoxes, ...zeroBoxes, ...positiveBoxes];
+
+  return {
+    values: repositionedBoxes.map((box) => box.value),
+    highs: repositionedBoxes.map((box) => box.high),
+    lows: repositionedBoxes.map((box) => box.low),
+    fullBoxes: repositionedBoxes,
+  };
+}
+
+/**
+ * Get repositioned boxes for rendering - same logic as auto system
+ */
+export function getRepositionedBoxes(
+  boxes: Array<{
+    value: number;
+    high: number;
+    low: number;
+    isActive?: boolean;
+    [key: string]: any;
+  }>
+): Array<{ value: number; high: number; low: number }> {
+  const negativeBoxes: Array<{
+    value: number;
+    high: number;
+    low: number;
+  }> = [];
+  const positiveBoxes: Array<{
+    value: number;
+    high: number;
+    low: number;
+  }> = [];
+
+  boxes.forEach((box) => {
+    const cleanBox = {
+      value: box.value,
+      high: box.high,
+      low: box.low,
+    };
+
+    if (box.value < 0) {
+      negativeBoxes.push(cleanBox);
+    } else {
+      positiveBoxes.push(cleanBox);
+    }
+  });
+
+  negativeBoxes.sort((a, b) => a.value - b.value);
+  positiveBoxes.sort((a, b) => a.value - b.value);
+
+  return [...negativeBoxes, ...positiveBoxes];
+}
+
+/**
+ * Get box values in repositioned order for pattern matching
+ */
+export function getRepositionedBoxValues(
+  boxes: Array<{ value: number; [key: string]: any }>
+): number[] {
+  const negativeValues: number[] = [];
+  const positiveValues: number[] = [];
+
+  boxes.forEach((box) => {
+    if (box.value < 0) {
+      negativeValues.push(box.value);
+    } else {
+      positiveValues.push(box.value);
+    }
+  });
+
+  negativeValues.sort((a, b) => a - b);
+  positiveValues.sort((a, b) => a - b);
+
+  return [...negativeValues, ...positiveValues];
+}
+
+/**
+ * Clean floating point precision errors - from auto system
+ */
+export function cleanBoxPrecision(value: number): number {
+  return Math.round(value * 100000000) / 100000000;
+}
+
+/**
+ * Process and reposition box values using proven auto system logic
+ * This ensures consistent ordering across all components
+ */
 export const processProgressiveBoxValues = (
   boxes: BoxSlice["boxes"]
 ): BoxSlice["boxes"] => {
-  // Sort boxes purely by ASCENDING absolute value to match ResoBox apparent order
-  const sortedBoxes = [...boxes].sort(
-    (a, b) => Math.abs(a.value) - Math.abs(b.value)
-  );
-
-  // Return the boxes sorted by absolute value, WITHOUT snapping
-  return sortedBoxes;
-
-  /* Remove value snapping logic:
-    const findNearestBoxSize = (value: number): number => {
-        const absValue = Math.abs(value);
-        let nearest = BoxSizes[0];
-        let minDiff = Math.abs(absValue - BoxSizes[0]);
-
-        for (const size of BoxSizes) {
-            const diff = Math.abs(absValue - size);
-            if (diff < minDiff) {
-                minDiff = diff;
-                nearest = size;
-            }
-        }
-        return value >= 0 ? nearest : -nearest;
-    };
-
-    // Apply size snapping if needed, but maintain the absolute value sort order
-    // Note: We map directly over the abs-sorted list now.
-    return sortedBoxes.map((box) => ({
-        ...box,
-        value: findNearestBoxSize(box.value), // Snap value if needed
-    }));
-    */
+  return repositionBoxValues(boxes).fullBoxes;
 };
 
 export function processInitialBoxData(
