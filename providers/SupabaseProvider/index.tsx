@@ -8,155 +8,171 @@ import { createContext, use, useEffect, useState } from "react";
 
 type UserDetails = Database["public"]["Tables"]["users"]["Row"];
 type DiscordConnection =
-	Database["public"]["Tables"]["discord_connections"]["Row"];
+  Database["public"]["Tables"]["discord_connections"]["Row"];
 type Subscription = any; // Replace with your subscription type
 
 type AuthContextType = {
-	session: Session | null;
-	user: User | null;
-	userDetails: UserDetails | null;
-	subscription: Subscription | null;
-	discordConnection: DiscordConnection | null;
-	isLoading: boolean;
-	signOut: () => Promise<void>;
+  session: Session | null;
+  user: User | null;
+  userDetails: UserDetails | null;
+  subscription: Subscription | null;
+  discordConnection: DiscordConnection | null;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const useAuth = () => {
-	const context = use(AuthContext);
-	if (context === undefined) {
-		throw new Error("useAuth must be used within an AuthProvider");
-	}
-	return context;
+  const context = use(AuthContext);
+  if (context === undefined) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
 
 export default function SupabaseProvider({
-	children,
-	initialUser,
-}: { children: React.ReactNode; initialUser: User | null }) {
-	const [supabaseClient] = useState(() => createClient());
-	const [session, setSession] = useState<Session | null>(null);
-	const [user, setUser] = useState<User | null>(initialUser);
-	const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
-	const [subscription, setSubscription] = useState<Subscription | null>(null);
-	const [discordConnection, setDiscordConnection] =
-		useState<DiscordConnection | null>(null);
-	const [isLoading, setIsLoading] = useState(!initialUser);
-	const router = useRouter();
+  children,
+  initialUser,
+}: {
+  children: React.ReactNode;
+  initialUser: User | null;
+}) {
+  const [supabaseClient] = useState(() => createClient());
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(initialUser);
+  const [userDetails, setUserDetails] = useState<UserDetails | null>(null);
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [discordConnection, setDiscordConnection] =
+    useState<DiscordConnection | null>(null);
+  const [isLoading, setIsLoading] = useState(!initialUser);
+  const router = useRouter();
 
-	const signOut = async () => {
-		try {
-			const { error } = await supabaseClient.auth.signOut();
+  const signOut = async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
 
-			if (error) {
-				console.error("Error during sign out:", error);
-				return;
-			}
-		} catch (error) {
-			console.error("Unexpected error during sign out:", error);
-		}
-	};
+      if (error) {
+        console.error("Error during sign out:", error);
+        return;
+      }
+    } catch (error) {
+      console.error("Unexpected error during sign out:", error);
+    }
+  };
 
-	// Fetch user data when user changes
-	useEffect(() => {
-		const fetchUserData = async () => {
-			if (!user) {
-				setUserDetails(null);
-				setSubscription(null);
-				setDiscordConnection(null);
-				return;
-			}
+  // Fetch user data when user changes
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user) {
+        setUserDetails(null);
+        setSubscription(null);
+        setDiscordConnection(null);
+        return;
+      }
 
-			try {
-				const { data: details } = await supabaseClient
-					.from("users")
-					.select("*")
-					.eq("id", user.id)
-					.single();
-				// console.log('User details fetched:', details);
+      try {
+        const { data: details } = await supabaseClient
+          .from("users")
+          .select("*")
+          .eq("id", user.id)
+          .single();
+        // console.log('User details fetched:', details);
 
-				// Fetch subscription using the same query as queries.ts
-				const { data: sub, error: subError } = await supabaseClient
-					.from("subscriptions")
-					.select("*, prices(*)")
-					.in("status", ["trialing", "active"])
-					.maybeSingle();
+        // Fetch subscription using the same query as queries.ts
+        const { data: sub, error: subError } = await supabaseClient
+          .from("subscriptions")
+          .select("*, prices(*)")
+          .in("status", ["trialing", "active"])
+          .maybeSingle();
 
-				// console.log('Subscription query:', {
-				//     userId: user.id,
-				//     subscription: sub,
-				//     error: subError?.message,
-				// });
+        // console.log('Subscription query:', {
+        //     userId: user.id,
+        //     subscription: sub,
+        //     error: subError?.message,
+        // });
 
-				setSubscription(sub);
+        setSubscription(sub);
 
-				// Fetch discord connection
-				const { data: discord } = await supabaseClient
-					.from("discord_connections")
-					.select("*")
-					.eq("user_id", user.id)
-					.single();
+        // Fetch discord connection only if user has active subscription
+        let discord = null;
+        if (sub && ["trialing", "active"].includes(sub.status)) {
+          try {
+            const { data: discordData, error: discordError } =
+              await supabaseClient
+                .from("discord_connections")
+                .select("*")
+                .eq("user_id", user.id)
+                .maybeSingle();
 
-				setUserDetails(details);
-				setDiscordConnection(discord);
-			} catch (error) {
-				// console.error('Error in fetchUserData:', error);
-				setSubscription(null);
-				setUserDetails(null);
-				setDiscordConnection(null);
-			}
-		};
+            if (!discordError) {
+              discord = discordData;
+            }
+          } catch (error) {
+            // Silently handle discord connection errors for non-subscribers
+            console.log("Discord connection not available");
+          }
+        }
 
-		// console.log('useEffect triggered with user:', user?.id);
-		fetchUserData();
-	}, [user, supabaseClient]);
+        setUserDetails(details);
+        setDiscordConnection(discord);
+      } catch (error) {
+        // console.error('Error in fetchUserData:', error);
+        setSubscription(null);
+        setUserDetails(null);
+        setDiscordConnection(null);
+      }
+    };
 
-	useEffect(() => {
-		if (initialUser) {
-			setSession({ user: initialUser } as Session);
-			setIsLoading(false);
-		}
+    // console.log('useEffect triggered with user:', user?.id);
+    fetchUserData();
+  }, [user, supabaseClient]);
 
-		const { data: authListener } = supabaseClient.auth.onAuthStateChange(
-			async (event, currentSession) => {
-				setSession(currentSession);
-				setUser(currentSession?.user ?? null);
-				setIsLoading(false);
+  useEffect(() => {
+    if (initialUser) {
+      setSession({ user: initialUser } as Session);
+      setIsLoading(false);
+    }
 
-				if (event === "SIGNED_OUT") {
-					router.push("/");
-					router.refresh();
-				}
-			},
-		);
+    const { data: authListener } = supabaseClient.auth.onAuthStateChange(
+      async (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        setIsLoading(false);
 
-		if (!initialUser) {
-			supabaseClient.auth.getSession().then(({ data: { session } }) => {
-				setSession(session);
-				setUser(session?.user ?? null);
-				setIsLoading(false);
-			});
-		}
+        if (event === "SIGNED_OUT") {
+          router.push("/");
+          router.refresh();
+        }
+      }
+    );
 
-		return () => {
-			authListener.subscription.unsubscribe();
-		};
-	}, [supabaseClient, router, initialUser]);
+    if (!initialUser) {
+      supabaseClient.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      });
+    }
 
-	return (
-		<AuthContext.Provider
-			value={{
-				session,
-				user,
-				userDetails,
-				subscription,
-				discordConnection,
-				isLoading,
-				signOut,
-			}}
-		>
-			{children}
-		</AuthContext.Provider>
-	);
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [supabaseClient, router, initialUser]);
+
+  return (
+    <AuthContext.Provider
+      value={{
+        session,
+        user,
+        userDetails,
+        subscription,
+        discordConnection,
+        isLoading,
+        signOut,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
