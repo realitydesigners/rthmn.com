@@ -7,8 +7,6 @@ import { LuSparkles, LuTrendingUp, LuZap, LuCheck } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import { checkoutWithStripe } from "@/lib/stripe/server";
 import { getStripe } from "@/lib/stripe/client";
-import { getErrorRedirect } from "@/utils/helpers";
-import { useUser } from "@/providers/UserProvider";
 import { createClient } from "@/lib/supabase/client";
 import { usePathname } from "next/navigation";
 
@@ -29,7 +27,7 @@ const BANNER_MESSAGES = [
     subtitle: "Access professional trading tools",
   },
   {
-    title: "Upgrade Available",
+    title: "Upgrade Required",
     subtitle: "Unlock live market insights",
   },
   {

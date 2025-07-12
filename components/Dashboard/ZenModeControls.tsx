@@ -189,8 +189,8 @@ const CompactChartStyleSelector = memo(() => {
             className={cn(
               "group relative flex h-20 flex-col items-center justify-center gap-2 rounded-xl border transition-all duration-300 overflow-hidden",
               isActive
-                ? "border-[#545963]/40 bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)] ring-1 ring-white/10"
-                : "border-[#111215] bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/80 hover:border-[#1C1E23]",
+                ? "border-[#32353C] bg-gradient-to-b from-[#1A1D22] to-[#0D0F12] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)] ring-1 ring-white/10"
+                : "border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] hover:border-[#32353C]",
               style.locked ? "pointer-events-none opacity-60" : "cursor-pointer"
             )}
             style={{
@@ -257,8 +257,8 @@ const CompactChartStyleSelector = memo(() => {
                 style.locked
                   ? "bg-gradient-to-b from-[#0A0B0D]/50 to-[#070809]/50"
                   : isActive
-                    ? "bg-gradient-to-b from-[#343A42] to-[#1F2328] shadow-[0_4px_8px_rgba(0,0,0,0.4)] ring-1 ring-white/20"
-                    : "bg-gradient-to-b from-[#0A0B0D] to-[#070809] group-hover:from-[#2C3137] group-hover:to-[#16191D] shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
+                    ? "bg-gradient-to-b from-[#1A1D22] to-[#0D0F12] shadow-[0_4px_8px_rgba(0,0,0,0.4)] ring-1 ring-white/20"
+                    : "bg-gradient-to-b from-[#0A0B0D] to-[#070809] group-hover:from-[#16181C] group-hover:to-[#1C1E23] shadow-[0_2px_4px_rgba(0,0,0,0.3)]"
               )}
             >
               {/* Active state inner glow */}
@@ -330,8 +330,8 @@ const CompactLayoutSelector = memo(() => {
             className={cn(
               "group relative flex h-20 flex-col items-center justify-center gap-2 rounded-xl border transition-all duration-300 overflow-hidden cursor-pointer",
               isActive
-                ? "border-[#545963]/40 bg-gradient-to-b from-[#0A0B0D] to-[#070809] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)] ring-1 ring-white/10"
-                : "border-[#111215] bg-gradient-to-b from-[#0A0B0D]/80 to-[#070809]/80 hover:border-[#1C1E23]"
+                ? "border-[#32353C] bg-gradient-to-b from-[#1A1D22] to-[#0D0F12] shadow-[0_2px_4px_0_rgba(0,0,0,0.4)] ring-1 ring-white/10"
+                : "border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] hover:border-[#32353C]"
             )}
             style={{
               boxShadow: isActive
@@ -572,29 +572,29 @@ export const ZenModeControls = memo(
             className={cn(
               "group relative overflow-hidden w-12 h-12 rounded-full flex items-center justify-center transition-all duration-200 ease-out",
               !isActive && "text-[#B0B0B0] hover:text-white",
-              isActive && "scale-105"
+              isActive && ""
             )}
             style={{
               background: isActive
-                ? "linear-gradient(180deg, #343A42 -10.71%, #1F2328 100%)"
-                : "linear-gradient(180deg, #1A1D22 0%, #111316 100%)",
+                ? "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)"
+                : "linear-gradient(180deg, #0A0B0D 0%, #070809 100%)",
               boxShadow: isActive
-                ? "0px 4px 4px 0px rgba(0, 0, 0, 0.25)"
+                ? "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)"
                 : "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
             }}
           >
-            {/* Enhanced hover background with inset shadow */}
-            {!isActive && (
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-full"
-                style={{
-                  background:
-                    "linear-gradient(180deg, #0A0B0D 0%, #070809 100%)",
-                  boxShadow:
-                    "inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.1)",
-                }}
-              />
-            )}
+            {/* Enhanced hover/active background with inset shadow */}
+            <div
+              className={cn(
+                "absolute inset-0 transition-all duration-300 rounded-full",
+                isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+              )}
+              style={{
+                background: "linear-gradient(180deg, #16181C 0%, #1C1E23 100%)",
+                boxShadow:
+                  "inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.1)",
+              }}
+            />
             {IconComponent ? (
               <IconComponent
                 className={cn(
@@ -660,7 +660,14 @@ export const ZenModeControls = memo(
                     ease: "easeOut",
                     width: { duration: 0.3, ease: "easeInOut" },
                   }}
-                  className="p-3 rounded-xl border border-[#1C1E23]/40 bg-gradient-to-b from-[#0A0B0D]/98 via-[#070809]/95 to-[#050506]/90 backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
+                  className="p-3 rounded-xl border backdrop-blur-md shadow-[0_8px_32px_rgba(0,0,0,0.4)] ring-1 ring-white/5 max-w-[90vw]"
+                  style={{
+                    background:
+                      "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)",
+                    border: "1px solid #16181C",
+                    boxShadow:
+                      "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)",
+                  }}
                 >
                   {activePanel === "chartstyle" && (
                     <div className="w-full min-w-[250px]">
@@ -678,12 +685,13 @@ export const ZenModeControls = memo(
 
             {/* Button container - simplified with fixed positioning */}
             <div
-              className="flex items-center gap-2 px-3 py-2 rounded-full border border-[#1C1E23]/60 backdrop-blur-md shadow-lg shadow-black/40"
+              className="flex items-center gap-2 px-3 py-2 rounded-full border backdrop-blur-md shadow-lg shadow-black/40"
               style={{
                 background:
-                  "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
+                  "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)",
+                border: "1px solid #16181C",
                 boxShadow:
-                  "0px 4px 8px 0px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
+                  "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)",
               }}
             >
               {/* Timeframe button */}
@@ -776,7 +784,6 @@ export const ZenModeControls = memo(
               )}
             </div>
 
-            {/* Floating title below buttons - positioned absolutely (only for non-timeframe panels) */}
             <AnimatePresence>
               {activePanel && activePanel !== "timeframe" && (
                 <motion.div
@@ -786,10 +793,10 @@ export const ZenModeControls = memo(
                   transition={{ duration: 0.15 }}
                   className="absolute -bottom-5 left-1/2 transform -translate-x-1/2 pointer-events-none"
                 >
-                  <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
+                  {/* <span className="font-russo text-[9px] font-normal uppercase tracking-wide text-gray-400">
                     {activePanel === "chartstyle" && "STYLE"}
                     {activePanel === "layout" && "LAYOUT"}
-                  </span>
+                  </span> */}
                 </motion.div>
               )}
             </AnimatePresence>

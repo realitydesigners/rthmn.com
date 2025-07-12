@@ -359,74 +359,116 @@ const LegalStep = ({ delay, onComplete }: Omit<StepProps, "duration">) => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="relative overflow-hidden rounded-xl border border-[#1C1E23]/60 bg-black shadow-[0_8px_32px_rgba(0,0,0,0.4)] p-6"
+        className="relative overflow-hidden group"
+        style={{
+          borderRadius: "8px",
+          background: "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)",
+          boxShadow:
+            "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)",
+          border: "1px solid #16181C",
+        }}
       >
-        {/* Top highlight */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent" />
+        {/* Outer glow ring */}
+        <div
+          className="absolute -inset-px rounded-lg opacity-30"
+          style={{
+            background:
+              "linear-gradient(180deg, #32353C/20 0%, transparent 50%)",
+            filter: "blur(0.5px)",
+          }}
+        />
 
-        <div className="space-y-6">
-          <p className="font-kodemono text-sm leading-relaxed text-white/60">
-            By checking this box, I acknowledge that I have read and agree to
-            Rthmn's{" "}
-            <a
-              href="/terms-of-service"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#24FF66] font-bold transition-colors hover:text-[#1ECC52]"
-            >
-              Terms of Service
-            </a>{" "}
-            and{" "}
-            <a
-              href="/privacy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#24FF66] font-bold transition-colors hover:text-[#1ECC52]"
-            >
-              Privacy Policy
-            </a>
-            . I understand that my use of the platform is subject to these
-            agreements.
-          </p>
+        {/* Top highlight gradient - more subtle */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4EFF6E]/15 to-transparent" />
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setAccepted(!accepted)}
-              className={`group relative h-6 w-6 overflow-hidden rounded-lg border transition-all duration-300 ${
-                accepted
-                  ? "border-[#24FF66]/50 bg-[#24FF66]/10"
-                  : "border-[#32353C] bg-[#0A0B0D] hover:border-[#24FF66]/30 hover:bg-[#24FF66]/5"
-              }`}
-            >
-              <motion.div
-                initial={false}
-                animate={{
-                  opacity: accepted ? 1 : 0,
-                  scale: accepted ? 1 : 0.8,
-                }}
-                transition={{ duration: 0.2 }}
-                className="absolute inset-0 flex items-center justify-center text-[#24FF66]"
+        {/* Bottom subtle shadow line */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-black/20 to-transparent" />
+
+        {/* Subtle inner glow - reduced */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-10"
+          style={{
+            borderRadius: "8px",
+            background:
+              "linear-gradient(180deg, #32353C/15 0%, transparent 50%)",
+          }}
+        />
+
+        {/* Inner border for depth */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-lg"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.1) 100%)",
+          }}
+        />
+
+        {/* Content wrapper */}
+        <div className="relative p-6">
+          <div className="space-y-6">
+            <p className="font-kodemono text-sm leading-relaxed text-white/60">
+              By checking this box, I acknowledge that I have read and agree to
+              Rthmn's{" "}
+              <a
+                href="/terms-of-service"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#24FF66] font-bold transition-colors hover:text-[#1ECC52]"
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
+                Terms of Service
+              </a>{" "}
+              and{" "}
+              <a
+                href="/privacy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#24FF66] font-bold transition-colors hover:text-[#1ECC52]"
+              >
+                Privacy Policy
+              </a>
+              . I understand that my use of the platform is subject to these
+              agreements.
+            </p>
+
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setAccepted(!accepted)}
+                className={`group relative h-6 w-6 overflow-hidden rounded-lg border transition-all duration-300 ${
+                  accepted
+                    ? "border-[#24FF66]/50 bg-[#24FF66]/10"
+                    : "border-[#32353C] bg-[#0A0B0D] hover:border-[#24FF66]/30 hover:bg-[#24FF66]/5"
+                }`}
+              >
+                <motion.div
+                  initial={false}
+                  animate={{
+                    opacity: accepted ? 1 : 0,
+                    scale: accepted ? 1 : 0.8,
+                  }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 flex items-center justify-center text-[#24FF66]"
                 >
-                  <path
-                    d="M20 6L9 17L4 12"
-                    stroke="currentColor"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </motion.div>
-            </button>
-            <label className="cursor-pointer font-kodemono text-sm text-white/60 select-none">
-              I agree to the terms and conditions
-            </label>
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M20 6L9 17L4 12"
+                      stroke="currentColor"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </motion.div>
+              </button>
+              <label className="cursor-pointer font-kodemono text-sm text-white/60 select-none">
+                I agree to the terms and conditions
+              </label>
+            </div>
           </div>
         </div>
       </motion.div>

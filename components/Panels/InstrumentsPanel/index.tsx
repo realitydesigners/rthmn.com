@@ -73,7 +73,7 @@ const PairItem = memo(
   ({ item, isSelected = false, onToggle }: Omit<PairItemProps, "price">) => {
     const { currentStepId } = useOnboardingStore();
     const { boxColors } = useUser();
-    const { priceData } = useWebSocket();
+    const { priceData, isRealTimeData } = useWebSocket();
     const isOnboardingActive = currentStepId === "instruments"; // ??
     const price = priceData[item]?.price;
 
@@ -113,7 +113,7 @@ const PairItem = memo(
           </span>
 
           {/* Price */}
-          <div className="flex items-center">
+          <div className="flex items-center gap-1">
             <span
               className={cn(
                 "font-kodemono  w-[70px] text-right text-sm tracking-wider transition-colors",
@@ -132,6 +132,7 @@ const PairItem = memo(
                 />
               )}
             </span>
+
             <div className="z-90 ml-2 flex w-6 justify-center">
               <button
                 type="button"
@@ -478,6 +479,7 @@ const FilterButton = ({
 
 export const InstrumentsPanel = () => {
   const { favorites, togglePair } = useUser();
+  const { isRealTimeData } = useWebSocket();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeFilter, setActiveFilter] = useState("selected");

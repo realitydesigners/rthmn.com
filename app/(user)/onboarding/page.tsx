@@ -33,7 +33,7 @@ export default function OnboardingPage() {
     updateUserData,
     setCurrentStep,
   } = useOnboardingStore();
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(false);
   const [isCompleting, setIsCompleting] = useState(false);
 
   const currentStep = ONBOARDING_STEPS.find(
@@ -161,69 +161,115 @@ export default function OnboardingPage() {
             maxWidth: currentStep?.id === "pairs" ? "48rem" : "28rem",
           }}
           transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-          className={`relative w-full rounded-2xl border border-[#0A0B0D] bg-gradient-to-b from-[#0A0B0D] to-[#070809] p-4 sm:p-8 shadow-2xl before:pointer-events-none before:absolute before:inset-0 before:rounded-2xl before:bg-[radial-gradient(circle_at_50%_-20%,rgba(255,255,255,0.05),rgba(255,255,255,0))]`}
+          className="relative w-full overflow- group"
+          style={{
+            borderRadius: "16px",
+            background:
+              "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)",
+            boxShadow:
+              "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)",
+            border: "1px solid #16181C",
+          }}
         >
-          {/* Progress indicator */}
-          <div className="no-select absolute -top-3 left-1/2 -translate-x-1/2">
-            <div className="flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-medium shadow-xl">
-              <div className="flex h-1.5 w-8 sm:w-12 items-center rounded-full bg-[#0A0B0D]">
-                <motion.div
-                  className="h-full rounded-full bg-gradient-to-r from-[#24FF66] to-[#1ECC52]"
-                  initial={false}
-                  animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
-                  transition={{ duration: 0.5, ease: "easeInOut" }}
-                />
+          {/* Outer glow ring */}
+          <div
+            className="absolute -inset-px rounded-2xl opacity-30"
+            style={{
+              background:
+                "linear-gradient(180deg, #32353C/20 0%, transparent 50%)",
+              filter: "blur(0.5px)",
+            }}
+          />
+
+          {/* Top highlight gradient - more subtle */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#4EFF6E]/15 to-transparent" />
+
+          {/* Bottom subtle shadow line */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-black/20 to-transparent" />
+
+          {/* Subtle inner glow - reduced */}
+          <div
+            className="pointer-events-none absolute inset-0 opacity-10"
+            style={{
+              borderRadius: "16px",
+              background:
+                "linear-gradient(180deg, #32353C/15 0%, transparent 50%)",
+            }}
+          />
+
+          {/* Inner border for depth */}
+          <div
+            className="pointer-events-none absolute inset-0 rounded-2xl"
+            style={{
+              background:
+                "linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.1) 100%)",
+            }}
+          />
+
+          {/* Content wrapper */}
+          <div className="relative p-4 sm:p-8">
+            {/* Progress indicator */}
+            <div className="no-select absolute -top-3 left-1/2 -translate-x-1/2">
+              <div className="flex items-center gap-2 rounded-full border border-[#1C1E23] bg-gradient-to-b from-[#0A0B0D] to-[#070809] px-3 sm:px-4 py-1.5 text-[10px] sm:text-xs font-medium shadow-xl">
+                <div className="flex h-1.5 w-8 sm:w-12 items-center rounded-full bg-[#0A0B0D]">
+                  <motion.div
+                    className="h-full rounded-full bg-gradient-to-r from-[#24FF66] to-[#1ECC52]"
+                    initial={false}
+                    animate={{ width: `${(stepNumber / totalSteps) * 100}%` }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  />
+                </div>
+                <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent whitespace-nowrap">
+                  Step {stepNumber} of {totalSteps}
+                </span>
               </div>
-              <span className="bg-gradient-to-b from-white to-white/60 bg-clip-text text-transparent whitespace-nowrap">
-                Step {stepNumber} of {totalSteps}
-              </span>
             </div>
-          </div>
 
-          {/* Step content */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentStepId}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="no-select relative py-4"
-            >
-              {renderStep()}
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Navigation */}
-          <div className="font-russo flex justify-end space-x-3 mt-6">
-            {stepNumber > 1 && (
-              <TourButton
-                onClick={handleBack}
-                variant="black"
-                disabled={isCompleting}
+            {/* Step content */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentStepId}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="no-select relative py-4"
               >
-                Back
-              </TourButton>
-            )}
-            <TourButton
-              onClick={handleNext}
-              disabled={
-                isCompleting ||
-                (currentStep.id === "experience" && !userData.experience) ||
-                (currentStep.id === "pairs" && userData.favorites.length < 4)
-              }
-              variant="green"
-            >
-              {isCompleting
-                ? "Completing..."
-                : isLastStep
-                  ? "Complete"
-                  : "Next"}
-            </TourButton>
-          </div>
+                {renderStep()}
+              </motion.div>
+            </AnimatePresence>
 
-          {/* Bottom pattern */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent opacity-50" />
+            {/* Navigation */}
+            <div className="font-russo flex justify-end space-x-3 mt-6">
+              {stepNumber > 1 && (
+                <TourButton
+                  onClick={handleBack}
+                  variant="black"
+                  disabled={isCompleting}
+                >
+                  Back
+                </TourButton>
+              )}
+              <TourButton
+                onClick={handleNext}
+                disabled={
+                  isCompleting ||
+                  (currentStep.id === "experience" && !userData.experience) ||
+                  (currentStep.id === "pairs" && userData.favorites.length < 3)
+                }
+                variant="green"
+              >
+                {isCompleting
+                  ? "Completing..."
+                  : isLastStep
+                    ? "Complete"
+                    : "Next"}
+              </TourButton>
+            </div>
+
+            {/* Bottom pattern */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#32353C] to-transparent opacity-50" />
+          </div>
         </motion.div>
       </motion.div>
 

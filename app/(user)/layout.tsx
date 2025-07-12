@@ -1,6 +1,7 @@
 import { ZenModeControlsWrapper } from "@/components/Dashboard/ZenModeControlsWrapper";
 import { MobileNavbar } from "@/components/Navbars/MobileNavbar";
 import { NavbarSignedIn } from "@/components/Navbars/NavbarSignedIn";
+import { NavbarSignedOut } from "@/components/Navbars/NavbarSignedOut";
 import { SidebarLeft } from "@/components/Sidebars/SidebarLeft";
 import { SidebarRight } from "@/components/Sidebars/SidebarRight";
 import { getSubscription, getUser } from "@/lib/supabase/queries";
@@ -46,6 +47,9 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
   // Get subscription status but don't redirect - pass it through context
   const subscription = await getSubscription(supabase);
 
+  // Check if we're on the support page
+  const isSupportPage = pathname === "/support";
+
   return (
     <UserProvider subscription={subscription}>
       <WebSocketProvider>
@@ -54,12 +58,16 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
             id="app-container"
             className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
           >
-            <NavbarSignedIn user={user} />
+            {isSupportPage ? (
+              <NavbarSignedOut user={user} />
+            ) : (
+              <NavbarSignedIn />
+            )}
             <main className="w-full bg-black transition-all duration-300 ease-in-out pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               {children}
             </main>
-            <SidebarLeft />
-            <SidebarRight />
+            {!isSupportPage && <SidebarLeft />}
+            {!isSupportPage && <SidebarRight />}
             <MobileNavbar />
             <ZenModeControlsWrapper />
             {modal}
