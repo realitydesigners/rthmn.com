@@ -25,10 +25,15 @@ interface BoxTimelineProps {
   className?: string;
   hoveredTimestamp?: number | null;
   showLine?: boolean;
+  pair?: string; // Add pair prop for instrument precision
 }
 
 const MAX_FRAMES = 1000;
 
+/**
+ * Simplified Histogram component - now uses pre-repositioned data from boxDataProcessor
+ * Client-side sorting logic has been removed in favor of server-side repositioning
+ */
 const Histogram: React.FC<BoxTimelineProps> = ({
   data,
   boxOffset,
@@ -38,6 +43,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
   className = "",
   hoveredTimestamp,
   showLine = true,
+  pair = "USDJPY", // Default to USDJPY for shifted Renko calculations
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -77,7 +83,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     if (!container) return;
     const rect = container.getBoundingClientRect();
 
-    // Since data is now pre-repositioned on server-side, we can use it directly
+    // Since data is now pre-repositioned, we can use it directly
     const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
     framesToDrawRef.current = framesToDraw;
 
@@ -167,7 +173,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       }
 
       // Use pre-repositioned boxes directly from server
-      // No need to sort here since data is already repositioned in boxDataProcessor
       const orderedBoxes = frame.progressiveValues.slice(
         boxOffset,
         boxOffset + visibleBoxesCount
@@ -186,12 +191,12 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
         if (isLargestPositive) {
           ctx.fillStyle = isPositiveBox
-            ? `rgba(${Number.parseInt(boxColors.positive.slice(1, 3), 16)}, ${Number.parseInt(boxColors.positive.slice(3, 5), 16)}, ${Number.parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
-            : `rgba(${Number.parseInt(boxColors.positive.slice(1, 3), 16)}, ${Number.parseInt(boxColors.positive.slice(3, 5), 16)}, ${Number.parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
+            ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
+            : `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
         } else {
           ctx.fillStyle = isPositiveBox
-            ? `rgba(${Number.parseInt(boxColors.negative.slice(1, 3), 16)}, ${Number.parseInt(boxColors.negative.slice(3, 5), 16)}, ${Number.parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
-            : `rgba(${Number.parseInt(boxColors.negative.slice(1, 3), 16)}, ${Number.parseInt(boxColors.negative.slice(3, 5), 16)}, ${Number.parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+            ? `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
+            : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
         }
 
         ctx.fillRect(
@@ -218,6 +223,19 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         const isPositive = smallestBox.value >= 0;
         const boxIndex = orderedBoxes.findIndex((box) => box === smallestBox);
         const y = (boxIndex + (isPositive ? 0 : 1)) * boxSize;
+
+        // Debug logging
+        if (frameIndex < 5 || frameIndex % 50 === 0) {
+          console.log(`Frame ${frameIndex}:`, {
+            smallestValue: smallestBox.value,
+            boxIndex,
+            isPositive,
+            y,
+            totalBoxes: orderedBoxes.length,
+            allValues: orderedBoxes.map((b) => b.value),
+          });
+        }
+
         linePoints.push({ x, y, isPositive, isLargestPositive });
       }
 
@@ -235,6 +253,16 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     });
 
     if (showLine && linePoints.length > 0) {
+      // Debug line points
+      console.log(
+        "Line Points Sample:",
+        linePoints.slice(0, 10).map((p) => ({
+          x: p.x,
+          y: p.y,
+          isPositive: p.isPositive,
+        }))
+      );
+
       // Draw fill areas
       for (let i = 0; i < linePoints.length - 1; i++) {
         const currentPoint = linePoints[i];
@@ -264,9 +292,9 @@ const Histogram: React.FC<BoxTimelineProps> = ({
           0
         );
         try {
-          const r = Number.parseInt(fillColor.slice(1, 3), 16) || 0;
-          const g = Number.parseInt(fillColor.slice(3, 5), 16) || 0;
-          const b = Number.parseInt(fillColor.slice(5, 7), 16) || 0;
+          const r = parseInt(fillColor.slice(1, 3), 16) || 0;
+          const g = parseInt(fillColor.slice(3, 5), 16) || 0;
+          const b = parseInt(fillColor.slice(5, 7), 16) || 0;
           gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
           gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
           ctx.fillStyle = gradient;
@@ -303,9 +331,9 @@ const Histogram: React.FC<BoxTimelineProps> = ({
           0
         );
         try {
-          const r = Number.parseInt(fillColor.slice(1, 3), 16) || 0;
-          const g = Number.parseInt(fillColor.slice(3, 5), 16) || 0;
-          const b = Number.parseInt(fillColor.slice(5, 7), 16) || 0;
+          const r = parseInt(fillColor.slice(1, 3), 16) || 0;
+          const g = parseInt(fillColor.slice(3, 5), 16) || 0;
+          const b = parseInt(fillColor.slice(5, 7), 16) || 0;
           gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
           gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
           ctx.fillStyle = gradient;

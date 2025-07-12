@@ -107,35 +107,10 @@ const BoxLevels = memo(
       })
       .filter(Boolean);
 
-    // Create a map to track seen levels
-    const seenLevels = new Map();
-
-    // Filter out duplicates across all frames
-    const uniqueProcessedBoxes = processedBoxes
-      .map((boxFrame) => {
-        const uniqueBoxes = boxFrame.boxes.filter((level) => {
-          const key = `${level.high}-${level.low}-${level.value > 0}`;
-
-          if (seenLevels.has(key)) {
-            const existingLevel = seenLevels.get(key);
-            // Keep the level if it's from a more recent timestamp
-            if (level.timestamp > existingLevel.timestamp) {
-              seenLevels.set(key, level);
-              return true;
-            }
-            return false;
-          }
-
-          seenLevels.set(key, level);
-          return true;
-        });
-
-        return {
-          ...boxFrame,
-          boxes: uniqueBoxes,
-        };
-      })
-      .filter((boxFrame) => boxFrame.boxes.length > 0);
+    // Use processed boxes as-is - no complex filtering needed
+    const uniqueProcessedBoxes = processedBoxes.filter(
+      (boxFrame) => boxFrame && boxFrame.boxes.length > 0
+    );
 
     // Find the largest box in the current frame
     const currentFrame = histogramBoxes[histogramBoxes.length - 1];

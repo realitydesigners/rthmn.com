@@ -58,6 +58,16 @@ const PairClient = ({
     chartData.histogramBoxes
   );
 
+  // Debug what data we're receiving
+  console.log("🔍 PairClient Debug:", {
+    processedCandlesCount: chartData.processedCandles?.length || 0,
+    histogramBoxesCount: chartData.histogramBoxes?.length || 0,
+    candleDataCount: candleData?.length || 0,
+    histogramDataCount: histogramData?.length || 0,
+    firstCandle: chartData.processedCandles?.[0],
+    firstHistogram: chartData.histogramBoxes?.[0],
+  });
+
   // Add refs for box management
   const boxMapRef = useRef<Map<string, Box[]>>(new Map());
   const lastPriceRef = useRef<number | null>(null);
@@ -150,21 +160,6 @@ const PairClient = ({
     });
   }, [currentPrice, boxSlice?.currentOHLC, boxSlice?.boxes]);
 
-  const filteredBoxSlice = useMemo(() => {
-    if (!boxSlice?.boxes) {
-      return undefined;
-    }
-    const sliced = {
-      ...boxSlice,
-      boxes:
-        boxSlice.boxes.slice(
-          settings.startIndex,
-          settings.startIndex + settings.maxBoxCount
-        ) || [],
-    };
-    return sliced;
-  }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
-
   useEffect(() => {
     if (chartData.processedCandles.length > 0) {
       setCandleData(chartData.processedCandles);
@@ -172,11 +167,9 @@ const PairClient = ({
     }
   }, [chartData]);
 
-  console.log(histogramData);
-
   return (
     <div className="flex h-screen w-screen flex-col -ml-16">
-      {/* Candle Chart Section - 90vh */}
+      {/* Candle Chart Section - 80vh */}
       <div className="relative flex h-[80vh] w-full flex-col">
         <div className="flex h-full w-full flex-1">
           <div className="h-full w-full">
@@ -213,8 +206,17 @@ const PairClient = ({
                     />
                   </>
                 ) : (
-                  <div className="flex h-full items-center justify-center">
-                    Loading Chart...
+                  <div className="flex h-full items-center justify-center text-white">
+                    <div className="text-center">
+                      <div>No Chart Data Available</div>
+                      <div className="text-sm text-gray-400 mt-2">
+                        Processed: {chartData.processedCandles?.length || 0}{" "}
+                        candles
+                      </div>
+                      <div className="text-sm text-gray-400">
+                        Current: {candleData?.length || 0} candles
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -223,7 +225,7 @@ const PairClient = ({
         </div>
       </div>
 
-      {/* <div className="relative flex h-[10vh] w-full border-t border-[#222] bg-black">
+      <div className="relative flex h-[10vh] w-full border-t border-[#222] bg-black">
         <div className="h-full w-full">
           {histogramData && histogramData.length > 0 ? (
             <Histogram
@@ -241,7 +243,7 @@ const PairClient = ({
             </div>
           )}
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

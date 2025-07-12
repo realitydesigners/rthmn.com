@@ -188,17 +188,17 @@ export function processInitialChartData(
     };
   }
 
-  // 1. Pre-process all candles once (this can be done on server)
+  // 1. Process candles with proper timestamp handling
   const processedCandles = rawCandles.map((candle) => ({
     timestamp:
       typeof candle.timestamp === "string"
         ? new Date(candle.timestamp).getTime()
-        : candle.timestamp,
+        : Number(candle.timestamp),
     open: Number(candle.open),
     high: Number(candle.high),
     low: Number(candle.low),
     close: Number(candle.close),
-    volume: Number(candle.volume),
+    volume: Number(candle.volume || 0),
     scaledX: 0,
     scaledY: 0,
     scaledOpen: 0,
@@ -206,6 +206,22 @@ export function processInitialChartData(
     scaledLow: 0,
     scaledClose: 0,
   }));
+
+  // Sort candles by timestamp - charts expect chronological order
+  processedCandles.sort((a, b) => a.timestamp - b.timestamp);
+
+  console.log("🔍 Chart Data Processing Debug:", {
+    rawCandlesCount: rawCandles.length,
+    processedCandlesCount: processedCandles.length,
+    firstRawCandle: rawCandles[0],
+    firstProcessedCandle: processedCandles[0],
+    lastProcessedCandle: processedCandles[processedCandles.length - 1],
+    isChronological:
+      processedCandles.length > 1
+        ? processedCandles[0].timestamp <
+          processedCandles[processedCandles.length - 1].timestamp
+        : true,
+  });
 
   // 2. Calculate initial visible range
   const visibleCount = Math.min(processedCandles.length, initialVisiblePoints);

@@ -37,34 +37,15 @@ export const useChartData = (
       return { visibleData: [], minY: 0, maxY: 0 };
     }
 
-    // Calculate how many points can fit in the visible area
-    const pointWidth = Math.max(2, chartWidth / visiblePoints); // Ensure minimum width of 2px per point
-
-    const RIGHT_MARGIN = chartWidth * 0.1;
-    const totalWidth = chartWidth + RIGHT_MARGIN;
-
-    // Calculate visible range based on scroll position
-    const startIndex = Math.max(0, Math.floor(scrollLeft / pointWidth));
-    const endIndex = Math.min(
-      data.length,
-      Math.ceil((scrollLeft + totalWidth) / pointWidth)
-    );
-    const visibleData = data.slice(startIndex, endIndex);
+    // Show all data instead of limiting by scroll position
+    const visibleData = data;
 
     if (!visibleData.length) {
       return { visibleData: [], minY: 0, maxY: 0 };
     }
 
     // Find min/max prices in visible range with a small context buffer
-    const contextStartIndex = Math.max(
-      0,
-      startIndex - Math.floor(visiblePoints * 0.1)
-    );
-    const contextEndIndex = Math.min(
-      data.length,
-      endIndex + Math.floor(visiblePoints * 0.1)
-    );
-    const contextData = data.slice(contextStartIndex, contextEndIndex);
+    const contextData = visibleData;
 
     let minPrice = Number.POSITIVE_INFINITY;
     let maxPrice = Number.NEGATIVE_INFINITY;
@@ -113,7 +94,7 @@ export const useChartData = (
 };
 
 export const CHART_CONFIG = {
-  VISIBLE_POINTS: 1000,
+  VISIBLE_POINTS: 5000, // Increased from 1000 to show more candles
   MIN_ZOOM: 0.1,
   MAX_ZOOM: 2,
   PADDING: { top: 20, right: 50, bottom: 30, left: 0 },
@@ -555,12 +536,12 @@ const CandleChart = ({
                 rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
               />
             )}
-            {/* <CandleSticks
+            <CandleSticks
               data={visibleData}
               width={chartWidth}
               height={chartHeight}
               rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
-            /> */}
+            />
             <XAxis
               data={visibleData}
               chartWidth={chartWidth}
@@ -582,14 +563,14 @@ const CandleChart = ({
               lastPrice={visibleData[visibleData.length - 1].close}
               lastPriceY={visibleData[visibleData.length - 1].scaledClose}
             />
-            {/* {displayedHoverInfo && (
+            {displayedHoverInfo && (
               <HoverInfoComponent
                 x={displayedHoverInfo.x}
                 y={displayedHoverInfo.y}
                 chartHeight={chartHeight}
                 chartWidth={chartWidth}
               />
-            )} */}
+            )}
           </g>
         </svg>
       ) : (
