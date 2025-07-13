@@ -60,7 +60,7 @@ const PairClient = ({
   >("all");
   const [showBoxLevels, setShowBoxLevels] = useState(true); // Set to true by default
   const [chartType, setChartType] = useState<"candle" | "line">("candle");
-  const [zoomLevel, setZoomLevel] = useState(50); // Default to 50 candles
+  const [zoomLevel, setZoomLevel] = useState(300); // Default to 50 candles
   const [scrollOffset, setScrollOffset] = useState(0); // For horizontal scrolling
   const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);

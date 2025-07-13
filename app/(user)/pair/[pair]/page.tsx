@@ -20,20 +20,23 @@ async function testBothEndpoints(pair: string, token: string) {
 async function fetchApiData(
   pair: string,
   token: string,
-  hasSubscription: boolean
+  hasSubscription: boolean,
+  interval: string = "1min" // Add interval parameter
 ) {
-  const CANDLE_LIMIT = 200; // Increased limit to ensure we get enough recent data
+  const CANDLE_LIMIT = 300; // Increased limit to ensure we get enough recent data
 
   // Run test comparison (temporary)
-  await testBothEndpoints(pair, token);
+  if (interval === "1min") {
+    await testBothEndpoints(pair, token);
+  }
 
   try {
     // Use public route for non-subscribers, protected route for subscribers
     // Add timestamp to prevent caching and ensure fresh data
     const timestamp = Date.now();
     const endpoint = hasSubscription
-      ? `/candles/${pair}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`
-      : `/public/candles/${pair}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`;
+      ? `/candles/${pair}?limit=${CANDLE_LIMIT}&interval=${interval}&recent=true&_t=${timestamp}`
+      : `/public/candles/${pair}?limit=${CANDLE_LIMIT}&interval=${interval}&recent=true&_t=${timestamp}`;
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}${endpoint}`,
@@ -55,7 +58,10 @@ async function fetchApiData(
     const { data } = responseBody;
 
     if (!data || !Array.isArray(data)) {
-      console.error("Invalid data format received:", data);
+      console.error(
+        `Invalid data format received for ${pair} (${interval}):`,
+        data
+      );
       return [];
     }
 
@@ -94,7 +100,7 @@ async function fetchApiData(
     // Early exit if no valid data remained after processing
     if (!processedData.length) {
       console.error(
-        "No valid candle data remained after processing timestamps and OHLC."
+        `No valid candle data remained after processing timestamps and OHLC for ${pair} (${interval}).`
       );
       return [];
     }
@@ -104,7 +110,7 @@ async function fetchApiData(
 
     return sortedData;
   } catch (error) {
-    console.error("Error fetching candle data:", error);
+    console.error(`Error fetching ${interval} candle data for ${pair}:`, error);
     return [];
   } // Correctly closes the try...catch block
 } // Correctly closes the fetchApiData function
@@ -121,31 +127,45 @@ export default async function PairPage(props: PageProps) {
     throw new Error("No access token available");
   }
 
-  const rawCandleData = await fetchApiData(
-    pair,
-    session.data.session.access_token,
-    hasSubscription
-  );
+  // Fetch both 1min and 5min data in parallel
+  const [candleData, boxData] = await Promise.all([
+    fetchApiData(
+      pair,
+      session.data.session.access_token,
+      hasSubscription,
+      "1min"
+    ),
+    fetchApiData(
+      pair,
+      session.data.session.access_token,
+      hasSubscription,
+      "5min"
+    ),
+  ]);
 
   // Return early if no data
-  if (!rawCandleData.length) {
-    console.error("No candle data available");
+  if (!candleData.length && !boxData.length) {
+    console.error("No candle or box data available");
     return null;
   }
 
-  // Process chart data only if needed for charting
+  // Process chart data using 1min data for candle display
   const { processedCandles, initialVisibleData } = processInitialChartData(
-    rawCandleData,
+    candleData,
     1000,
     undefined,
     undefined,
     pair
   );
 
-  // Use raw candle data directly for box calculations
+  // Process box data using 5min data for box calculations
   const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(
-    rawCandleData,
+    boxData,
     pair
+  );
+
+  console.log(
+    `📊 Pair ${pair}: Processed ${candleData.length} 1min candles and ${boxData.length} 5min candles`
   );
 
   const chartData = {

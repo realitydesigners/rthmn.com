@@ -7,18 +7,22 @@ import DashboardClient from "./client";
 
 const DASHBOARD_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "EURJPY", "AUDUSD"];
 
+// Optimized: Reduce data for dashboard - we don't need 500 candles for preview
+const DASHBOARD_CANDLE_LIMIT = 200; // Reduced from 500 for faster processing
+
 async function fetchApiData(
   pair: string,
   token: string,
-  hasSubscription: boolean
+  hasSubscription: boolean,
+  interval: string = "1min" // Add interval parameter
 ) {
-  const CANDLE_LIMIT = 500; // Same as pair page
+  const CANDLE_LIMIT = DASHBOARD_CANDLE_LIMIT;
 
   try {
     const timestamp = Date.now();
     const endpoint = hasSubscription
-      ? `/candles/${pair}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`
-      : `/public/candles/${pair}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`;
+      ? `/candles/${pair}?limit=${CANDLE_LIMIT}&interval=${interval}&recent=true&_t=${timestamp}`
+      : `/public/candles/${pair}?limit=${CANDLE_LIMIT}&interval=${interval}&recent=true&_t=${timestamp}`;
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}${endpoint}`,
@@ -49,30 +53,10 @@ async function fetchApiData(
         const timestamp = getUnixTimestamp(candle.timestamp);
         // --- End Correction ---
 
-        // Simple validation - skip invalid candles
-        if (
-          isNaN(timestamp) ||
-          candle.open == null ||
-          candle.high == null ||
-          candle.low == null ||
-          candle.close == null
-        ) {
-          return null;
-        }
-
         const candleOpen = Number(candle.open);
         const candleHigh = Number(candle.high);
         const candleLow = Number(candle.low);
         const candleClose = Number(candle.close);
-
-        if (
-          isNaN(candleOpen) ||
-          isNaN(candleHigh) ||
-          isNaN(candleLow) ||
-          isNaN(candleClose)
-        ) {
-          return null;
-        }
 
         return {
           timestamp: timestamp,
@@ -106,7 +90,7 @@ async function fetchApiData(
 
     return sortedData;
   } catch (error) {
-    console.error(`Error fetching data for ${pair}:`, error);
+    console.error(`Error fetching ${interval} candle data for ${pair}:`, error);
     return [];
   }
 }
@@ -121,25 +105,43 @@ export default async function DashboardPage() {
     throw new Error("No access token available");
   }
 
-  // Fetch historical data for all pairs
+  // Fetch historical data for all pairs with performance monitoring
+  const dashboardStartTime = performance.now();
   const pairHistoricalData: Record<string, any[]> = {};
 
+  // Parallel data fetching and processing
   await Promise.all(
     DASHBOARD_PAIRS.map(async (pair) => {
-      const rawCandleData = await fetchApiData(
-        pair,
-        session.data.session.access_token,
-        hasSubscription
-      );
+      const pairStartTime = performance.now();
 
-      if (rawCandleData.length > 0) {
-        // Process box data exactly like pair page
-        const { histogramBoxes } = processInitialBoxData(rawCandleData, pair);
-        pairHistoricalData[pair] = histogramBoxes || [];
-      } else {
-        pairHistoricalData[pair] = [];
+      try {
+        // Fetch 5min data for box processing
+        const boxCandleData = await fetchApiData(
+          pair,
+          session.data.session.access_token,
+          hasSubscription,
+          "5min"
+        );
+
+        if (boxCandleData.length > 0) {
+          // Process box data with 5min data
+          const { histogramBoxes } = processInitialBoxData(boxCandleData, pair);
+          pairHistoricalData[pair] = histogramBoxes;
+
+          const pairEndTime = performance.now();
+          const pairDuration = pairEndTime - pairStartTime;
+        } else {
+          console.warn(`❌ ${pair}: No 5min candle data available`);
+        }
+      } catch (error) {
+        console.error(`❌ ${pair}: Error processing data:`, error);
       }
     })
+  );
+
+  const totalDashboardTime = performance.now() - dashboardStartTime;
+  console.log(
+    `🏁 Dashboard loading completed: ${totalDashboardTime.toFixed(2)}ms for ${DASHBOARD_PAIRS.length} pairs`
   );
 
   return <DashboardClient pairHistoricalData={pairHistoricalData} />;
