@@ -4,13 +4,11 @@ import { create, props } from "@/lib/styles/atomic";
 import { useUser } from "@/providers/UserProvider";
 import type { BoxColors } from "@/stores/colorStore";
 import type { Box, BoxSlice } from "@/types/types";
-import { INSTRUMENTS, formatPrice } from "@/utils/instruments";
+import { formatPrice } from "@/utils/instruments";
 import type React from "react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 
-// Atomic CSS styles
 const styles = create({
-  // Main container styles
   container: {
     position: "relative",
     aspectRatio: "1",
@@ -24,7 +22,6 @@ const styles = create({
     width: "100%",
   },
 
-  // Box styles
   boxContainer: {
     position: "absolute",
     borderWidth: "1px",
@@ -48,7 +45,6 @@ const styles = create({
     inset: 0,
   },
 
-  // Price line styles
   priceLineTop: {
     position: "absolute",
     top: 0,
@@ -60,29 +56,27 @@ const styles = create({
   priceLineBottom: {
     position: "absolute",
     right: "-3rem",
-    bottom: 0,
+    bottom: ".3rem",
     opacity: 0.9,
   },
 
   priceLabel: {
     position: "absolute",
-    top: "-0.875rem",
-    right: 0,
+    top: "-.8rem",
+    right: ".4rem",
   },
 
   priceText: {
-    fontFamily: "Kodemono, monospace",
-    fontSize: "8px",
+    fontFamily: "monospace",
+    fontSize: "7px",
     color: "#ffffff",
     letterSpacing: "0.05em",
   },
 });
 
-// Optimized color computation
 const useBoxColors = (box: Box, boxColors: BoxColors) => {
   return useMemo(() => {
     const baseColor = box.value > 0 ? boxColors.positive : boxColors.negative;
-
     const opacity = boxColors.styles?.opacity ?? 0.2;
     const shadowIntensity = boxColors.styles?.shadowIntensity ?? 0.25;
     const shadowY = Math.floor(shadowIntensity);
@@ -108,7 +102,6 @@ const useBoxColors = (box: Box, boxColors: BoxColors) => {
   ]);
 };
 
-// Optimized style computation
 const useBoxStyles = (
   box: Box,
   prevBox: Box | null,
@@ -146,18 +139,6 @@ const useBoxStyles = (
   }, [box, prevBox, boxColors.styles, containerSize, index]);
 };
 
-interface BoxProps {
-  box: Box;
-  index: number;
-  prevBox: Box | null;
-  boxColors: BoxColors;
-  containerSize: number;
-  slice: BoxSlice;
-  sortedBoxes: Box[];
-  pair?: string;
-  showPriceLines?: boolean;
-}
-
 // Recursive component for nested boxes with atomic CSS
 const ResoBoxRecursive = memo(
   ({
@@ -170,7 +151,17 @@ const ResoBoxRecursive = memo(
     sortedBoxes,
     pair,
     showPriceLines = true,
-  }: BoxProps) => {
+  }: {
+    box: Box;
+    index: number;
+    prevBox: Box | null;
+    boxColors: BoxColors;
+    containerSize: number;
+    slice: BoxSlice;
+    sortedBoxes: Box[];
+    pair?: string;
+    showPriceLines?: boolean;
+  }) => {
     const colors = useBoxColors(box, boxColors);
     const { baseStyles, isFirstDifferent } = useBoxStyles(
       box,
@@ -229,10 +220,7 @@ const ResoBoxRecursive = memo(
         {showPriceLines && shouldShowTopPrice && (
           <div {...props(styles.priceLineTop)}>
             <div {...props(styles.priceLabel)}>
-              <span
-                {...props(styles.priceText)}
-                style={{ color: colors.baseColor }}
-              >
+              <span {...props(styles.priceText)} style={{ color: "#797E86" }}>
                 {formatPrice(box.high, pair)}
               </span>
             </div>
@@ -242,10 +230,7 @@ const ResoBoxRecursive = memo(
         {showPriceLines && shouldShowBottomPrice && (
           <div {...props(styles.priceLineBottom)}>
             <div {...props(styles.priceLabel)}>
-              <span
-                {...props(styles.priceText)}
-                style={{ color: colors.baseColor }}
-              >
+              <span {...props(styles.priceText)} style={{ color: "#797E86" }}>
                 {formatPrice(box.low, pair)}
               </span>
             </div>
@@ -272,28 +257,22 @@ const ResoBoxRecursive = memo(
 
 ResoBoxRecursive.displayName = "ResoBoxRecursive";
 
-interface ResoBoxProps {
-  slice: BoxSlice;
-  className?: string;
-  pair?: string;
-  boxColors?: BoxColors;
-  showPriceLines?: boolean;
-}
-
-// Main ResoBox component with atomic CSS
 export const ResoBox = memo(
   ({
     slice,
-    className = "",
     pair = "",
     boxColors: propBoxColors,
     showPriceLines = true,
-  }: ResoBoxProps) => {
+  }: {
+    slice: BoxSlice;
+    pair?: string;
+    boxColors?: BoxColors;
+    showPriceLines?: boolean;
+  }) => {
     const boxRef = useRef<HTMLDivElement>(null);
     const [containerSize, setContainerSize] = useState(0);
     const { boxColors: userBoxColors } = useUser();
 
-    // Merge boxColors from props with userBoxColors, preferring props
     const mergedBoxColors = useMemo(() => {
       if (!propBoxColors) return userBoxColors;
       return {
@@ -320,36 +299,12 @@ export const ResoBox = memo(
       return () => observer.disconnect();
     }, []);
 
-    if (!slice?.boxes || slice.boxes.length === 0) {
-      return null;
-    }
-
     const sortedBoxes = slice.boxes.sort(
       (a, b) => Math.abs(b.value) - Math.abs(a.value)
     );
 
-    // Console log ResoBox data for comparison with histogram
-    console.log("📦 ResoBox Current Data:", {
-      timestamp: slice.timestamp,
-      totalBoxes: slice.boxes.length,
-      sortedBoxes: sortedBoxes.map((b) => ({
-        value: b.value,
-        high: b.high,
-        low: b.low,
-      })),
-      largestBox: sortedBoxes[0],
-      pair: pair,
-    });
-
     return (
-      <div
-        ref={boxRef}
-        {...props(styles.container)}
-        style={{
-          // Merge any additional className styles if needed
-          ...(className ? {} : {}),
-        }}
-      >
+      <div ref={boxRef} {...props(styles.container)}>
         <div {...props(styles.innerContainer)}>
           {sortedBoxes.length > 0 && (
             <ResoBoxRecursive

@@ -24,7 +24,7 @@ const styles = create({
     width: "100%",
     height: "100%",
     overflowX: "auto",
-    overflowY: "hidden",
+    overflowY: "auto",
     scrollbarWidth: "none",
     msOverflowStyle: "none",
   },
@@ -123,11 +123,6 @@ interface BoxTimelineProps {
   showLine?: boolean;
 }
 
-/**
- * Simplified Histogram component that consumes pre-repositioned data from boxDataProcessor.
- * All complex sorting, repositioning, and calculations are handled in boxDataProcessor.
- * This component simply renders the data "as-is" like BoxDataTable does.
- */
 const Histogram: React.FC<BoxTimelineProps> = ({
   data,
   boxOffset,
@@ -403,7 +398,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
             (box.value > 0 && prevBox.value < 0) ||
             (box.value < 0 && prevBox.value > 0);
           if (isFirstDifferent) {
-            currentY = prevBox.value > 0 ? 0 : currentSize - currentSize; // Note: use currentSize here? Wait, no - previous currentSize?
+            currentY = prevBox.value > 0 ? 0 : currentSize - currentSize;
           } else {
             currentY = box.value < 0 ? currentSize - currentSize : 0;
           }
@@ -673,50 +668,71 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       </div>
 
       {/* Price axis */}
-      {data.length > 0 &&
-        data[data.length - 1].progressiveValues.slice(
-          boxOffset,
-          boxOffset + visibleBoxesCount
-        ).length > 0 && (
-          <div {...props(styles.priceAxis)}>
-            {(() => {
-              const visibleBoxes = data[
-                data.length - 1
-              ].progressiveValues.slice(
-                boxOffset,
-                boxOffset + visibleBoxesCount
-              );
-              const largestBox = visibleBoxes.reduce((max, box) =>
-                Math.abs(box.value) > Math.abs(max.value) ? box : max
-              );
-              const color =
-                largestBox.value > 0 ? boxColors.positive : boxColors.negative;
+      {data.length > 0 && (
+        <div {...props(styles.priceAxis)}>
+          {(() => {
+            // Get the current/latest frame
+            const currentFrame = data[data.length - 1];
+            if (!currentFrame?.progressiveValues?.length) return null;
 
-              return (
-                <>
-                  <div {...props(styles.priceLine)}>
-                    <div
-                      {...props(styles.priceLineSeparator)}
-                      style={{ backgroundColor: color }}
-                    />
-                    <span {...props(styles.priceLabel)} style={{ color }}>
-                      {formatPrice(largestBox.high, "BTC/USD")}
-                    </span>
-                  </div>
-                  <div {...props(styles.priceLine)}>
-                    <div
-                      {...props(styles.priceLineSeparator)}
-                      style={{ backgroundColor: color }}
-                    />
-                    <span {...props(styles.priceLabel)} style={{ color }}>
-                      {formatPrice(largestBox.low, "BTC/USD")}
-                    </span>
-                  </div>
-                </>
-              );
-            })()}
-          </div>
-        )}
+            // Get visible boxes based on offset and count
+            const visibleBoxes = currentFrame.progressiveValues.slice(
+              boxOffset,
+              boxOffset + visibleBoxesCount
+            );
+
+            const color = "#797E86"; // Use consistent gray color
+
+            return (
+              <>
+                {/* Render price lines for each visible box */}
+                {visibleBoxes.map((box, index) => {
+                  const boxHeight = 100 / visibleBoxesCount; // Height percentage for each box
+                  const yPosition = index * boxHeight;
+
+                  return (
+                    <div key={`price-${index}`}>
+                      {/* Show high price for negative boxes */}
+                      {box.value < 0 && (
+                        <div
+                          {...props(styles.priceLine)}
+                          style={{
+                            position: "absolute",
+                            top: `${yPosition}%`,
+                          }}
+                        >
+                          <span {...props(styles.priceLabel)} style={{ color }}>
+                            {formatPrice(box.high, "EURUSD")}
+                          </span>
+                        </div>
+                      )}
+                      {/* Show low price for positive boxes */}
+                      {box.value >= 0 && (
+                        <div
+                          {...props(styles.priceLine)}
+                          style={{
+                            position: "absolute",
+                            top: `${yPosition + boxHeight}%`,
+                            transform: "translateY(-100%)",
+                          }}
+                        >
+                          <div
+                            {...props(styles.priceLineSeparator)}
+                            style={{ backgroundColor: color }}
+                          />
+                          <span {...props(styles.priceLabel)} style={{ color }}>
+                            {formatPrice(box.low, "EURUSD")}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </>
+            );
+          })()}
+        </div>
+      )}
     </div>
   );
 };

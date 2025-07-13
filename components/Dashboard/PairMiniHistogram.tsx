@@ -8,16 +8,14 @@ import { useTimeframeStore } from "@/stores/timeframeStore";
 import { useWebSocket } from "@/providers/WebsocketProvider";
 import { formatPrice } from "@/utils/instruments";
 
-interface PairMiniHistogramProps {
+const PairMiniHistogram: React.FC<{
   pair: string;
   boxSlice?: BoxSlice;
   boxColors: BoxColors;
   isLoading: boolean;
   histogramData: any[];
   className?: string;
-}
-
-const PairMiniHistogram: React.FC<PairMiniHistogramProps> = ({
+}> = ({
   pair,
   boxSlice,
   boxColors,
@@ -134,7 +132,6 @@ const PairMiniHistogram: React.FC<PairMiniHistogramProps> = ({
   }
 
   // Use the filtered historical data
-  const frameCount = filteredHistogramData.length;
   const latestFrame = filteredHistogramData[filteredHistogramData.length - 1];
 
   return (

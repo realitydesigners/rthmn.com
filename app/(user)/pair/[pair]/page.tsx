@@ -66,30 +66,10 @@ async function fetchApiData(
         const timestamp = getUnixTimestamp(candle.timestamp);
         // --- End Correction ---
 
-        // Simple validation - skip invalid candles
-        if (
-          isNaN(timestamp) ||
-          candle.open == null ||
-          candle.high == null ||
-          candle.low == null ||
-          candle.close == null
-        ) {
-          return null;
-        }
-
         const candleOpen = Number(candle.open);
         const candleHigh = Number(candle.high);
         const candleLow = Number(candle.low);
         const candleClose = Number(candle.close);
-
-        if (
-          isNaN(candleOpen) ||
-          isNaN(candleHigh) ||
-          isNaN(candleLow) ||
-          isNaN(candleClose)
-        ) {
-          return null;
-        }
 
         return {
           timestamp: timestamp,
@@ -121,18 +101,6 @@ async function fetchApiData(
 
     // Sort by timestamp to ensure chronological order (oldest to newest)
     const sortedData = processedData.sort((a, b) => a.timestamp - b.timestamp);
-
-    // Get current time for freshness check
-    const currentTime = Date.now();
-    const mostRecentCandle = sortedData[sortedData.length - 1];
-    const dataAge = currentTime - mostRecentCandle.timestamp;
-    const minutesOld = Math.floor(dataAge / (1000 * 60));
-
-    if (minutesOld > 60) {
-      console.warn(
-        `⚠️ DATA IS ${Math.floor(minutesOld / 60)} HOURS OLD! Last candle: ${new Date(mostRecentCandle.timestamp).toISOString()}`
-      );
-    }
 
     return sortedData;
   } catch (error) {
