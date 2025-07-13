@@ -53,8 +53,6 @@ const PairClient = ({
   const [candleData, setCandleData] = useState<ChartDataPoint[]>([]);
   const [histogramData, setHistogramData] = useState<ExtendedBoxSlice[]>([]);
   const currentCandleRef = useRef<ChartDataPoint | null>(null);
-
-  // Add state for ZenModeControls
   const [viewMode, setViewMode] = useState<"scene" | "focus">("scene");
   const [focusedIndex, setFocusedIndex] = useState(0);
   const [boxVisibilityFilter, setBoxVisibilityFilter] = useState<
@@ -75,9 +73,7 @@ const PairClient = ({
       [pair]
     )
   );
-  const updatePairSettings = useTimeframeStore(
-    (state) => state.updatePairSettings
-  );
+
   const initializePair = useTimeframeStore((state) => state.initializePair);
 
   // Initialize timeframe settings
@@ -173,40 +169,30 @@ const PairClient = ({
     <div className="flex h-screen w-screen px-2">
       <div className="flex w-[70%]  flex-col">
         <div className="relative flex h-[70vh] w-full flex-col">
-          <div className="flex h-full w-full flex-1">
-            <div className="h-full w-full">
-              <div className="relative flex h-full flex-col overflow-hidden bg-black">
-                <div className="h-full  w-full">
-                  {candleData && candleData.length > 0 ? (
-                    <CandleChart
-                      candles={candleData}
-                      initialVisibleData={candleData}
-                      pair={pair}
-                      histogramBoxes={histogramData.map((frame, index) => ({
-                        timestamp: frame.timestamp,
-                        boxes: frame.progressiveValues,
-                        key: `${frame.timestamp}-${index}`,
-                      }))}
-                      boxOffset={settings.startIndex}
-                      visibleBoxesCount={settings.maxBoxCount}
-                      boxVisibilityFilter={boxVisibilityFilter}
-                      hoveredTimestamp={hoveredTimestamp}
-                      onHoverChange={handleHoverChange}
-                      showBoxLevels={showBoxLevels}
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-white">
-                      <div className="text-center">
-                        <div className="text-sm text-gray-400">
-                          Loading {pair}...
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          {candleData && candleData.length > 0 ? (
+            <CandleChart
+              candles={candleData}
+              initialVisibleData={candleData}
+              pair={pair}
+              histogramBoxes={histogramData.map((frame, index) => ({
+                timestamp: frame.timestamp,
+                boxes: frame.progressiveValues,
+                key: `${frame.timestamp}-${index}`,
+              }))}
+              boxOffset={settings.startIndex}
+              visibleBoxesCount={settings.maxBoxCount}
+              boxVisibilityFilter={boxVisibilityFilter}
+              hoveredTimestamp={hoveredTimestamp}
+              onHoverChange={handleHoverChange}
+              showBoxLevels={showBoxLevels}
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-white">
+              <div className="text-center">
+                <div className="text-sm text-gray-400">Loading {pair}...</div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Histogram Section */}
@@ -247,7 +233,7 @@ const PairClient = ({
       </div>
 
       {/* Chart Controls - Now positioned on left side */}
-      <div className="fixed left-16 top-1/3 transform -translate-y-1/2 z-30 pointer-events-auto z-[10]">
+      <div className="fixed left-12 top-1/3 transform -translate-y-1/2 z-30 pointer-events-auto z-[10]">
         <ChartControls
           showBoxLevels={showBoxLevels}
           setShowBoxLevels={setShowBoxLevels}
@@ -258,7 +244,6 @@ const PairClient = ({
         />
       </div>
 
-      {/* Add ZenModeControls */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-30 pointer-events-auto">
         <ZenModeControls
           viewMode={viewMode}

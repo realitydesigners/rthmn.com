@@ -5,7 +5,6 @@ import { SidebarWrapper } from "@/components/Panels/SidebarPanelWrapper";
 import { ONBOARDING_STEPS, useOnboardingStore } from "@/stores/onboardingStore";
 import { cn } from "@/utils/cn";
 import { getSidebarState, setSidebarState } from "@/utils/localStorage";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -19,24 +18,17 @@ interface SidebarButton {
   panelContent: React.ReactNode;
 }
 
-interface SidebarLinkButton {
-  id: string;
-  icon: IconType;
-  href: string;
-  title: string;
-}
-
 interface SidebarProps {
   position: "left" | "right";
   buttons: SidebarButton[];
-  linkButtons?: SidebarLinkButton[];
+
   defaultPanel?: string;
 }
 
 export const Sidebar = ({
   position,
   buttons,
-  linkButtons = [],
+
   defaultPanel,
 }: SidebarProps) => {
   const pathname = usePathname();
@@ -280,34 +272,6 @@ export const Sidebar = ({
 
         {/* Bottom buttons */}
         <div className="mb-2 flex flex-col gap-4">
-          {/* Link buttons (like Help) */}
-          {linkButtons.map((linkButton) => (
-            <Link
-              key={linkButton.id}
-              href={linkButton.href}
-              className="group relative z-[120] flex h-10 w-10 items-center justify-center transition-all duration-200 overflow-hidden"
-              style={{
-                borderRadius: "4px",
-              }}
-              title={linkButton.title}
-            >
-              {/* Hover background */}
-              <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-280"
-                style={{
-                  borderRadius: "4px",
-                  background:
-                    "linear-gradient(180deg, #2C3137 -10.71%, #16191D 100%)",
-                }}
-              />
-
-              <linkButton.icon
-                size={20}
-                className="relative z-10 text-[#818181] transition-colors group-hover:text-white"
-              />
-            </Link>
-          ))}
-
           {/* Regular panel buttons */}
           {buttons
             .filter((button) => ["settings", "account"].includes(button.id))

@@ -12,29 +12,17 @@ import { useZenModeControlsStore } from "@/stores/zenModeControlsStore";
 import { useZenModeStore } from "@/stores/zenModeStore";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
 import PairMiniHistogram from "@/components/Dashboard/PairMiniHistogram";
 
-// Mock data for non-subscribers to show dashboard structure
-const MOCK_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"];
-
-// Extend window object for zen mode toggle
-declare global {
-  interface Window {
-    toggleZenMode?: () => void;
-  }
-}
-
-interface DashboardProps {
+export default function Dashboard({
+  pairHistoricalData,
+}: {
   pairHistoricalData: Record<string, any[]>;
-}
-
-export default function Dashboard({ pairHistoricalData }: DashboardProps) {
+}) {
   const { pairData, isLoading } = useDashboard();
   const { favorites, boxColors } = useUser();
   const { isSubscribed, requireSubscription } = useSubscription();
-  const getGridColumns = useGridStore((state) => state.getGridColumns);
   const currentLayout = useGridStore((state) => state.currentLayout);
   const orderedPairs = useGridStore((state) => state.orderedPairs);
   const reorderPairs = useGridStore((state) => state.reorderPairs);
@@ -48,9 +36,6 @@ export default function Dashboard({ pairHistoricalData }: DashboardProps) {
   const [windowWidth, setWindowWidth] = useState(0);
   const [availableWidth, setAvailableWidth] = useState(0);
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(true);
-  const [dashboardViewMode, setDashboardViewMode] = useState<
-    "boxes" | "histograms"
-  >("boxes");
 
   // Signal alerts - now using real-time subscriptions
   const { signals, newSignals, clearSignalAlert, clearAllAlerts, isConnected } =
@@ -181,17 +166,6 @@ export default function Dashboard({ pairHistoricalData }: DashboardProps) {
     }
   };
 
-  // Create stable reference for pairs to prevent unnecessary re-renders
-  const pairsToRender = useMemo(() => {
-    // For non-subscribers, show mock pairs to demonstrate the layout
-    if (!isSubscribed) {
-      return MOCK_PAIRS;
-    }
-
-    // For subscribers, use their selected pairs
-    return orderedPairs.length > 0 ? orderedPairs : favorites;
-  }, [orderedPairs, favorites, isSubscribed]);
-
   // Calculate grid columns based on current layout, available width, and view mode
   const gridCols = useMemo(() => {
     if (!isClient) return 1;
@@ -258,7 +232,7 @@ export default function Dashboard({ pairHistoricalData }: DashboardProps) {
         <div className="fixed top-14 left-0 right-0 bottom-0 z-[0] bg-black">
           <ZenMode
             pairData={pairData}
-            orderedPairs={pairsToRender}
+            orderedPairs={orderedPairs}
             boxColors={boxColors}
             isLoading={isLoading}
             isVisible={isZenMode}
@@ -301,7 +275,7 @@ export default function Dashboard({ pairHistoricalData }: DashboardProps) {
             }}
           >
             {isClient &&
-              pairsToRender.map((pair) => {
+              orderedPairs.map((pair) => {
                 const data = pairData[pair];
                 const histogramData = pairHistoricalData[pair] || [];
 

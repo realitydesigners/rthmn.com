@@ -1,5 +1,4 @@
 "use client";
-
 import { TourOnboarding } from "@/app/(user)/onboarding/_components/Tours/TourOnboarding";
 import { TourSettings } from "@/app/(user)/onboarding/_components/Tours/TourSettings";
 import { ProfileIcon } from "@/components/Badges/ProfileIcon";
@@ -8,8 +7,7 @@ import { Onboarding } from "@/components/Panels/OnboardingPanel";
 import { BoxVisualizer } from "@/components/Panels/PanelComponents/BoxVisualizer";
 import { ColorStyleOptions } from "@/components/Panels/PanelComponents/ColorStyleOptions";
 import { Sidebar } from "@/components/Sidebars/Sidebar";
-import Link from "next/link";
-import { LuGraduationCap, LuHelpCircle, LuSettings } from "react-icons/lu";
+import { LuGraduationCap, LuSettings } from "react-icons/lu";
 
 export const SidebarRight = () => {
   const buttons = [
@@ -41,16 +39,5 @@ export const SidebarRight = () => {
     },
   ];
 
-  const linkButtons = [
-    {
-      id: "help",
-      icon: LuHelpCircle,
-      href: "/support",
-      title: "Help & Support",
-    },
-  ];
-
-  return (
-    <Sidebar position="right" buttons={buttons} linkButtons={linkButtons} />
-  );
+  return <Sidebar position="right" buttons={buttons} />;
 };
