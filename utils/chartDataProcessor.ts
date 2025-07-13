@@ -1,4 +1,5 @@
 import type { ChartDataPoint } from "@/components/Charts/CandleChart";
+import { INSTRUMENTS } from "@/utils/instruments";
 
 export interface ProcessedChartData {
   processedCandles: ChartDataPoint[];
@@ -179,7 +180,8 @@ export function processInitialChartData(
   rawCandles: any[],
   initialVisiblePoints = 1000,
   chartWidth?: number, // Optional for SSR
-  chartHeight?: number // Optional for SSR
+  chartHeight?: number, // Optional for SSR
+  pair?: string // For instrument-specific scaling
 ): ProcessedChartData {
   if (!rawCandles.length) {
     return {
@@ -210,22 +212,30 @@ export function processInitialChartData(
   // Sort candles by timestamp - charts expect chronological order
   processedCandles.sort((a, b) => a.timestamp - b.timestamp);
 
+  // Remove duplicates based on timestamp to prevent React key conflicts
+  const uniqueCandles = processedCandles.filter(
+    (candle, index, array) =>
+      index === 0 || candle.timestamp !== array[index - 1].timestamp
+  );
+
   console.log("🔍 Chart Data Processing Debug:", {
     rawCandlesCount: rawCandles.length,
     processedCandlesCount: processedCandles.length,
+    uniqueCandlesCount: uniqueCandles.length,
+    duplicatesRemoved: processedCandles.length - uniqueCandles.length,
     firstRawCandle: rawCandles[0],
     firstProcessedCandle: processedCandles[0],
     lastProcessedCandle: processedCandles[processedCandles.length - 1],
     isChronological:
-      processedCandles.length > 1
-        ? processedCandles[0].timestamp <
-          processedCandles[processedCandles.length - 1].timestamp
+      uniqueCandles.length > 1
+        ? uniqueCandles[0].timestamp <
+          uniqueCandles[uniqueCandles.length - 1].timestamp
         : true,
   });
 
   // 2. Calculate initial visible range
-  const visibleCount = Math.min(processedCandles.length, initialVisiblePoints);
-  const visibleCandles = processedCandles.slice(0, visibleCount);
+  const visibleCount = Math.min(uniqueCandles.length, initialVisiblePoints);
+  const visibleCandles = uniqueCandles.slice(0, visibleCount);
 
   // 3. Calculate initial scaled data (only if dimensions are provided)
   let initialVisibleData: ChartDataPoint[];
@@ -240,15 +250,38 @@ export function processInitialChartData(
       maxPrice = Math.max(maxPrice, candle.high);
     }
 
-    const padding = (maxPrice - minPrice) * 0.2;
-    const priceRange = maxPrice + padding - (minPrice - padding);
+    // Get instrument configuration for proper scaling
+    let instrumentPoint = 0.00001; // Default forex point size
+    if (pair) {
+      const upperPair = pair.toUpperCase();
+      // Search in all instrument categories
+      for (const category of Object.values(INSTRUMENTS)) {
+        if (upperPair in category) {
+          instrumentPoint = (category as any)[upperPair].point;
+          break;
+        }
+      }
+    }
+
+    // Ensure minimum range based on instrument precision for proper candle visibility
+    const minRangeMultiplier = 200; // Show at least 200 pips worth of range
+    const minRange = instrumentPoint * minRangeMultiplier;
+    const baseRange = maxPrice - minPrice;
+    const adjustedRange = Math.max(baseRange, minRange);
+
+    const padding = adjustedRange * 0.2;
+    const priceRange = adjustedRange + padding * 2;
+    const centerPrice = (minPrice + maxPrice) / 2;
+    const paddedMin = centerPrice - priceRange / 2;
+    const paddedMax = centerPrice + priceRange / 2;
+
     const xScaleFactor = chartWidth / (visibleCount - 1);
 
     // Calculate initial scaled data
     initialVisibleData = visibleCandles.map((candle, index) => {
       const scaledX = index * xScaleFactor;
       const scaleY = (price: number) => {
-        const normalized = (price - (minPrice - padding)) / priceRange;
+        const normalized = (price - paddedMin) / (paddedMax - paddedMin);
         return chartHeight * (1 - normalized);
       };
 
@@ -276,7 +309,7 @@ export function processInitialChartData(
   }
 
   return {
-    processedCandles,
+    processedCandles: uniqueCandles,
     initialVisibleData,
   };
 }

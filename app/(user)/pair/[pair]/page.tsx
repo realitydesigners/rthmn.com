@@ -35,14 +35,6 @@ async function fetchApiData(
       ? `/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`
       : `/public/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`;
 
-    console.log(
-      `🎯 Using ${hasSubscription ? "SUBSCRIPTION" : "PUBLIC"} endpoint:`,
-      endpoint
-    );
-    console.log(
-      `📅 Requesting most recent ${CANDLE_LIMIT} candles for ${pair.toUpperCase()}`
-    );
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}${endpoint}`,
       {
@@ -59,24 +51,6 @@ async function fetchApiData(
 
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     const responseBody = await response.json();
-
-    console.log("🔍 Raw API response:", {
-      url: `${process.env.NEXT_PUBLIC_SERVER_URL}${endpoint}`,
-      status: responseBody.status,
-      dataLength: responseBody.data?.length || 0,
-      firstDataItem: responseBody.data?.[0],
-      lastDataItem: responseBody.data?.[responseBody.data?.length - 1],
-      firstTimestamp: responseBody.data?.[0]?.timestamp
-        ? new Date(responseBody.data[0].timestamp).toISOString()
-        : "N/A",
-      lastTimestamp: responseBody.data?.[responseBody.data?.length - 1]
-        ?.timestamp
-        ? new Date(
-            responseBody.data[responseBody.data.length - 1].timestamp
-          ).toISOString()
-        : "N/A",
-      responseKeys: Object.keys(responseBody),
-    });
 
     const { data } = responseBody;
 
@@ -154,23 +128,6 @@ async function fetchApiData(
     const dataAge = currentTime - mostRecentCandle.timestamp;
     const minutesOld = Math.floor(dataAge / (1000 * 60));
 
-    console.log("🔍 API Data Processing Debug:", {
-      totalRawCandles: data.length,
-      totalProcessedCandles: processedData.length,
-      totalSortedCandles: sortedData.length,
-      firstProcessedCandle: processedData[0],
-      lastProcessedCandle: processedData[processedData.length - 1],
-      firstSortedCandle: sortedData[0],
-      lastSortedCandle: sortedData[sortedData.length - 1],
-      currentTime: new Date(currentTime).toISOString(),
-      mostRecentCandleTime: new Date(mostRecentCandle.timestamp).toISOString(),
-      dataAgeMinutes: minutesOld,
-      dataAgeHours: Math.floor(minutesOld / 60),
-      isFresh: minutesOld < 10, // Data is fresh if less than 10 minutes old
-      isStale: minutesOld > 60, // Data is stale if more than 1 hour old
-    });
-
-    // Add warning if data is old
     if (minutesOld > 60) {
       console.warn(
         `⚠️ DATA IS ${Math.floor(minutesOld / 60)} HOURS OLD! Last candle: ${new Date(mostRecentCandle.timestamp).toISOString()}`
@@ -208,40 +165,20 @@ export default async function PairPage(props: PageProps) {
     return null;
   }
 
-  console.log("📊 Raw candle data received:", {
-    candleCount: rawCandleData.length,
-    hasSubscription,
-    pair,
-    firstCandle: rawCandleData[0],
-    lastCandle: rawCandleData[rawCandleData.length - 1],
-  });
-
   // Process chart data only if needed for charting
-  const { processedCandles, initialVisibleData } =
-    processInitialChartData(rawCandleData);
+  const { processedCandles, initialVisibleData } = processInitialChartData(
+    rawCandleData,
+    1000,
+    undefined,
+    undefined,
+    pair
+  );
 
   // Use raw candle data directly for box calculations
   const { histogramBoxes, histogramPreProcessed } = processInitialBoxData(
     rawCandleData,
     pair
   );
-
-  console.log("📈 Processed chart data:", {
-    processedCandlesCount: processedCandles?.length,
-    initialVisibleDataCount: initialVisibleData?.length,
-    histogramBoxes: histogramBoxes ? "✅ Generated" : "❌ Missing",
-    histogramBoxesCount: histogramBoxes?.length || 0,
-    histogramPreProcessed: histogramPreProcessed
-      ? "✅ Generated"
-      : "❌ Missing",
-    firstHistogramFrame: histogramBoxes?.[0]?.timestamp,
-    lastHistogramFrame: histogramBoxes?.[histogramBoxes.length - 1]?.timestamp,
-    mostRecentCandleTime: rawCandleData[rawCandleData.length - 1]?.timestamp
-      ? new Date(
-          rawCandleData[rawCandleData.length - 1].timestamp
-        ).toISOString()
-      : "N/A",
-  });
 
   const chartData = {
     processedCandles,

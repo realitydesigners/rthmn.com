@@ -21,9 +21,6 @@ import {
   LuChevronLeft,
   LuChevronRight,
   LuEye,
-  LuLayoutDashboard,
-  LuLineChart,
-  LuLock,
   LuPlus,
   LuX,
 } from "react-icons/lu";
@@ -169,7 +166,10 @@ const CompactChartStyleSelector = memo(() => {
   const updateStyles = useColorStore((state) => state.updateStyles);
 
   const handleStyleChange = (id: string) => {
-    updateStyles({ viewMode: id === "3d" ? "3d" : "default" });
+    updateStyles({
+      viewMode:
+        id === "3d" ? "3d" : id === "histogram" ? "histogram" : "default",
+    });
   };
 
   return (
@@ -177,7 +177,12 @@ const CompactChartStyleSelector = memo(() => {
       {Object.values(CHART_STYLES).map((style) => {
         const Icon = style.icon;
         const isActive =
-          boxColors.styles?.viewMode === (style.id === "3d" ? "3d" : "default");
+          boxColors.styles?.viewMode ===
+          (style.id === "3d"
+            ? "3d"
+            : style.id === "histogram"
+              ? "histogram"
+              : "default");
 
         return (
           <button
@@ -219,34 +224,6 @@ const CompactChartStyleSelector = memo(() => {
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                 <div className="absolute inset-0 bg-gradient-to-b from-[#2C3137]/50 via-[#16191D]/30 to-[#0A0B0D]/50" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(255,255,255,0.03),transparent_70%)]" />
-              </div>
-            )}
-
-            {/* Diagonal stripes pattern for locked state */}
-            {style.locked && (
-              <>
-                <div
-                  className="absolute inset-0 opacity-[0.08]"
-                  style={{
-                    backgroundImage: `repeating-linear-gradient(
-                                      135deg,
-                                      #000,
-                                      #000 1px,
-                                      transparent 1.5px,
-                                      transparent 8px
-                                  )`,
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/10" />
-              </>
-            )}
-
-            {/* Enhanced lock icon */}
-            {style.locked && (
-              <div className="pointer-events-none absolute -top-1 -right-1 z-10">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-b from-[#343A42] to-[#1F2328] border border-[#32353C]/60 shadow-[0_4px_8px_rgba(0,0,0,0.4)]">
-                  <LuLock className="h-3 w-3 text-white/90" />
-                </div>
               </div>
             )}
 
@@ -453,6 +430,8 @@ export const ZenModeControls = memo(
 
       if (currentViewMode === "3d") {
         return LuBox;
+      } else if (currentViewMode === "histogram") {
+        return LuBarChart3;
       } else {
         // Default view mode uses "box" style
         return SquareIcon;

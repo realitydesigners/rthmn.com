@@ -1,11 +1,107 @@
 "use client";
 
+import { create, props } from "@/lib/styles/atomic";
 import type { BoxColors } from "@/stores/colorStore";
 import type { Box } from "@/types/types";
 import { BoxSizes } from "@/utils/instruments";
 import { formatPrice } from "@/utils/instruments";
 import type React from "react";
 import { memo, useEffect, useRef, useState } from "react";
+
+// Atomic CSS styles
+const styles = create({
+  // Main container
+  container: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    userSelect: "none",
+  },
+
+  // Scroll container
+  scrollContainer: {
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    overflowX: "auto",
+    overflowY: "hidden",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+  },
+
+  // Canvas wrapper
+  canvasWrapper: {
+    position: "relative",
+    height: "100%",
+
+    marginRight: "2rem",
+  },
+
+  // Canvas element
+  canvas: {
+    position: "relative",
+    display: "block",
+    height: "100%",
+    overflowY: "hidden",
+  },
+
+  // Price axis
+  priceAxis: {
+    position: "absolute",
+    top: "0.25rem", // Reduced from 0.75rem
+    right: "0",
+    bottom: "0",
+    width: "3rem",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    pointerEvents: "none",
+    userSelect: "none",
+  },
+
+  // Price line
+  priceLine: {
+    display: "flex",
+    alignItems: "center",
+    width: "100%",
+  },
+
+  // Price line separator
+  priceLineSeparator: {
+    height: "1px",
+    flexGrow: 1,
+  },
+
+  // Price label
+  priceLabel: {
+    marginLeft: "0.25rem",
+    fontFamily: "Kodemono, monospace",
+    fontSize: "8px",
+    letterSpacing: "0.05em",
+  },
+
+  // Hover tooltip
+  tooltip: {
+    position: "absolute",
+    bottom: "-4rem",
+    left: "50%",
+    transform: "translateX(-50%)",
+    padding: "0.5rem 0.75rem",
+    backgroundColor: "rgba(0, 0, 0, 0.95)",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "rgb(75, 75, 75)",
+    borderRadius: "0.375rem",
+    color: "rgb(255, 255, 255)",
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    boxShadow:
+      "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+    backdropFilter: "blur(4px)",
+    pointerEvents: "none",
+    zIndex: 30,
+  },
+});
 
 interface BoxTimelineProps {
   data: {
@@ -26,8 +122,6 @@ interface BoxTimelineProps {
   hoveredTimestamp?: number | null;
   showLine?: boolean;
 }
-
-const MAX_FRAMES = 1000;
 
 /**
  * Simplified Histogram component that consumes pre-repositioned data from boxDataProcessor.
@@ -53,15 +147,22 @@ const Histogram: React.FC<BoxTimelineProps> = ({
   const [effectiveBoxWidth, setEffectiveBoxWidth] = useState(0);
   const framesToDrawRef = useRef<BoxTimelineProps["data"]>([]);
   const frameToRealTimestampRef = useRef<Map<number, number>>(new Map());
+  const [hoveredFrame, setHoveredFrame] = useState<{
+    index: number;
+    timestamp: string;
+  } | null>(null);
+
+  // Constants for colors
+  const BACKGROUND_COLOR = "#0a0a0a";
+  const LINE_COLOR = "#FFFFFF";
 
   const calculateBoxDimensions = (
     containerHeight: number,
     frameCount: number
   ) => {
-    // Calculate box size to exactly fill the container height
-    const boxSize = containerHeight / visibleBoxesCount;
+    const boxHeight = containerHeight / visibleBoxesCount; // Use visible count from props
+    const boxSize = boxHeight; // Make square
     const totalHeight = containerHeight;
-    // Add padding to the right for the white line
     const RIGHT_PADDING = 60;
     const requiredWidth = boxSize * frameCount + RIGHT_PADDING;
     return { boxSize, requiredWidth, totalHeight };
@@ -83,10 +184,33 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     const rect = container.getBoundingClientRect();
 
     // Since data is now pre-repositioned, we can use it directly
-    const framesToDraw = data.slice(Math.max(0, data.length - MAX_FRAMES));
+    // Use all available data to support full timeframe slider functionality
+    const framesToDraw = data;
     framesToDrawRef.current = framesToDraw;
 
     if (framesToDraw.length === 0) return;
+
+    // Console log histogram's most current frame for comparison with ResoBox
+    const mostCurrentFrame = framesToDraw[framesToDraw.length - 1];
+    console.log("📊 Histogram Most Current Frame:", {
+      timestamp: mostCurrentFrame.timestamp,
+      totalFrames: framesToDraw.length,
+      currentFrameBoxes: mostCurrentFrame.progressiveValues.map((b) => ({
+        value: b.value,
+        high: b.high,
+        low: b.low,
+      })),
+      sortedByAbsValue: [...mostCurrentFrame.progressiveValues]
+        .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+        .map((b) => ({
+          value: b.value,
+          high: b.high,
+          low: b.low,
+        })),
+      largestBox: [...mostCurrentFrame.progressiveValues].sort(
+        (a, b) => Math.abs(b.value) - Math.abs(a.value)
+      )[0],
+    });
 
     // Build frame to timestamp mapping for hover functionality
     frameToRealTimestampRef.current.clear();
@@ -134,6 +258,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     );
     setEffectiveBoxWidth(boxSize);
 
+    // Setup canvas with padding compensation
     canvas.style.width = `${requiredWidth}px`;
     canvas.style.height = `${totalHeight}px`;
     const dpr = window.devicePixelRatio || 1;
@@ -141,7 +266,8 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     canvas.height = Math.floor(totalHeight * dpr);
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = "#0a0a0a";
+    // Clear background
+    ctx.fillStyle = BACKGROUND_COLOR;
     ctx.fillRect(0, 0, requiredWidth, totalHeight);
 
     const newTrendChanges: Array<{
@@ -165,9 +291,15 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       );
       if (boxes.length === 0) return;
 
-      // Draw highlight for hovered frame
+      // Draw highlight for hovered frame (from external hover)
       if (frameIndex === highlightIndex) {
         ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
+        ctx.fillRect(x, 0, boxSize, totalHeight);
+      }
+
+      // Draw highlight for local mouse hover
+      if (hoveredFrame && frameIndex === hoveredFrame.index) {
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
         ctx.fillRect(x, 0, boxSize, totalHeight);
       }
 
@@ -177,41 +309,70 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         boxOffset + visibleBoxesCount
       );
 
-      // Find largest box for trend (boxDataProcessor already optimized the order)
-      const largestBox = visibleBoxes.reduce((max, box) =>
-        Math.abs(box.value) > Math.abs(max.value) ? box : max
+      // FIXED: Use same sorting logic as ResoBox for consistent trend determination
+      // Sort by absolute value (largest first) to match ResoBox behavior
+      const sortedByAbsValue = [...visibleBoxes].sort(
+        (a, b) => Math.abs(b.value) - Math.abs(a.value)
       );
-      const isLargestPositive = largestBox.value >= 0;
 
-      // Draw boxes in their already-repositioned order
-      visibleBoxes.forEach((box, boxIndex) => {
-        const y = boxIndex * boxSize;
-        const isPositiveBox = box.value >= 0;
+      // Use the largest absolute value box for trend (matching ResoBox)
+      const largestBox = sortedByAbsValue[0];
+      const isLargestPositive = largestBox ? largestBox.value >= 0 : true;
 
-        // Simple coloring based on trend
-        if (isLargestPositive) {
-          ctx.fillStyle = isPositiveBox
-            ? `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.1)`
-            : `rgba(${parseInt(boxColors.positive.slice(1, 3), 16)}, ${parseInt(boxColors.positive.slice(3, 5), 16)}, ${parseInt(boxColors.positive.slice(5, 7), 16)}, 0.3)`;
-        } else {
-          ctx.fillStyle = isPositiveBox
-            ? `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.3)`
-            : `rgba(${parseInt(boxColors.negative.slice(1, 3), 16)}, ${parseInt(boxColors.negative.slice(3, 5), 16)}, ${parseInt(boxColors.negative.slice(5, 7), 16)}, 0.1)`;
+      // Skip drawing individual boxes - we only want smooth gradients and the white line
+
+      // Use previous index-based positioning for the white line
+      if (visibleBoxes.length > 0) {
+        // Process boxes as before for line positioning (keep existing logic)
+        const negativeBoxes = visibleBoxes
+          .filter((box) => box.value < 0)
+          .sort((a, b) => a.value - b.value);
+        const positiveBoxes = visibleBoxes
+          .filter((box) => box.value > 0)
+          .sort((a, b) => a.value - b.value);
+        const orderedBoxes = [...negativeBoxes, ...positiveBoxes];
+
+        // Find smallest absolute value box
+        const smallestBox = orderedBoxes.reduce(
+          (min, box) => (Math.abs(box.value) < Math.abs(min.value) ? box : min),
+          orderedBoxes[0]
+        );
+
+        const isPositive = smallestBox.value >= 0;
+        const boxIndex = orderedBoxes.findIndex(
+          (box) =>
+            Math.abs(box.value) === Math.abs(smallestBox.value) &&
+            Math.sign(box.value) === Math.sign(smallestBox.value)
+        );
+
+        // Use uniform box height for positioning
+        const boxHeight = totalHeight / visibleBoxes.length;
+        let lineY = (boxIndex + (isPositive ? 0 : 1)) * boxHeight;
+
+        // FIXED: Detect trend changes and set natural starting positions
+        const isTrendChange =
+          prevIsLargestPositive !== null &&
+          prevIsLargestPositive !== isLargestPositive;
+
+        if (isTrendChange) {
+          // FIXED: New uptrend starts from top, new downtrend starts from bottom
+          lineY = isLargestPositive ? 0 : totalHeight;
         }
 
-        ctx.fillRect(x, y, boxSize, boxSize);
-      });
+        linePoints.push({
+          x,
+          y: lineY,
+          isPositive: isPositive,
+          isLargestPositive,
+        });
 
-      // Find smallest box for line positioning (boxDataProcessor positioned it correctly)
-      const smallestBox = visibleBoxes.reduce((min, box) =>
-        Math.abs(box.value) < Math.abs(min.value) ? box : min
-      );
-
-      if (smallestBox) {
-        const isPositive = smallestBox.value >= 0;
-        const boxIndex = visibleBoxes.findIndex((box) => box === smallestBox);
-        const y = (boxIndex + (isPositive ? 0 : 1)) * boxSize;
-        linePoints.push({ x, y, isPositive, isLargestPositive });
+        // Draw box borders for visualization
+        orderedBoxes.forEach((box, boxIndex) => {
+          const y = boxIndex * boxSize;
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, boxSize, boxSize);
+        });
       }
 
       if (
@@ -225,6 +386,31 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         });
       }
       prevIsLargestPositive = isLargestPositive;
+
+      // Draw box borders using nested positions
+      let currentY = 0;
+      let currentSize = totalHeight;
+      for (let i = 0; i < visibleBoxes.length; i++) {
+        const box = visibleBoxes[i];
+        const prevBox = i > 0 ? visibleBoxes[i - 1] : null;
+
+        currentSize = totalHeight * 0.86 ** i;
+
+        if (!prevBox) {
+          currentY = 0;
+        } else {
+          const isFirstDifferent =
+            (box.value > 0 && prevBox.value < 0) ||
+            (box.value < 0 && prevBox.value > 0);
+          if (isFirstDifferent) {
+            currentY = prevBox.value > 0 ? 0 : currentSize - currentSize; // Note: use currentSize here? Wait, no - previous currentSize?
+          } else {
+            currentY = box.value < 0 ? currentSize - currentSize : 0;
+          }
+        }
+      }
+
+      // Line positioning is now handled above with trend change detection
     });
 
     if (showLine && linePoints.length > 0) {
@@ -233,79 +419,115 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         const currentPoint = linePoints[i];
         const nextPoint = linePoints[i + 1];
 
+        const fillColor = currentPoint.isLargestPositive
+          ? boxColors.positive
+          : boxColors.negative;
+
+        // Draw trend background
+        ctx.beginPath();
+        ctx.moveTo(currentPoint.x, 0);
+        ctx.lineTo(nextPoint.x, 0);
+        ctx.lineTo(nextPoint.x, totalHeight);
+        ctx.lineTo(currentPoint.x, totalHeight);
+        ctx.closePath();
+
+        // Base trend color
+        const baseColor = hexToRgba(fillColor, 0.1);
+        ctx.fillStyle = baseColor;
+        ctx.fill();
+
+        // Draw gradient overlay
         ctx.beginPath();
         if (currentPoint.isLargestPositive) {
-          ctx.moveTo(currentPoint.x, 0);
-          ctx.lineTo(nextPoint.x, 0);
-          ctx.lineTo(nextPoint.x, nextPoint.y);
-          ctx.lineTo(currentPoint.x, currentPoint.y);
-        } else {
           ctx.moveTo(currentPoint.x, currentPoint.y);
           ctx.lineTo(nextPoint.x, nextPoint.y);
           ctx.lineTo(nextPoint.x, totalHeight);
           ctx.lineTo(currentPoint.x, totalHeight);
+        } else {
+          ctx.moveTo(currentPoint.x, 0);
+          ctx.lineTo(nextPoint.x, 0);
+          ctx.lineTo(nextPoint.x, nextPoint.y);
+          ctx.lineTo(currentPoint.x, currentPoint.y);
         }
         ctx.closePath();
 
-        const fillColor = currentPoint.isLargestPositive
-          ? boxColors.positive
-          : boxColors.negative;
+        // Create gradient
         const gradient = ctx.createLinearGradient(
-          currentPoint.x,
           0,
-          nextPoint.x,
-          0
+          currentPoint.isLargestPositive ? currentPoint.y : 0,
+          0,
+          currentPoint.isLargestPositive ? totalHeight : currentPoint.y
         );
-        try {
-          const r = parseInt(fillColor.slice(1, 3), 16) || 0;
-          const g = parseInt(fillColor.slice(3, 5), 16) || 0;
-          const b = parseInt(fillColor.slice(5, 7), 16) || 0;
-          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
-          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-        } catch (e) {
-          console.error("Error parsing fill color:", fillColor, e);
+
+        const brightColor = hexToRgba(fillColor, 0.2);
+        const baseColorFade = hexToRgba(fillColor, 0.15);
+
+        if (currentPoint.isLargestPositive) {
+          gradient.addColorStop(0, brightColor);
+          gradient.addColorStop(1, baseColorFade);
+        } else {
+          gradient.addColorStop(0, baseColorFade);
+          gradient.addColorStop(1, brightColor);
         }
+
+        ctx.fillStyle = gradient;
+        ctx.fill();
       }
 
       // Draw last gradient fill
       if (linePoints.length > 0) {
         const lastPoint = linePoints[linePoints.length - 1];
+        const lastFillColor = lastPoint.isLargestPositive
+          ? boxColors.positive
+          : boxColors.negative;
+
+        // Draw trend background
+        ctx.beginPath();
+        ctx.moveTo(lastPoint.x, 0);
+        ctx.lineTo(lastPoint.x + boxSize, 0);
+        ctx.lineTo(lastPoint.x + boxSize, totalHeight);
+        ctx.lineTo(lastPoint.x, totalHeight);
+        ctx.closePath();
+
+        const baseColor = hexToRgba(lastFillColor, 0.1);
+        ctx.fillStyle = baseColor;
+        ctx.fill();
+
+        // Draw gradient overlay
         ctx.beginPath();
         if (lastPoint.isLargestPositive) {
-          ctx.moveTo(lastPoint.x, 0);
-          ctx.lineTo(lastPoint.x + boxSize, 0);
-          ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
-          ctx.lineTo(lastPoint.x, lastPoint.y);
-        } else {
           ctx.moveTo(lastPoint.x, lastPoint.y);
           ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
           ctx.lineTo(lastPoint.x + boxSize, totalHeight);
           ctx.lineTo(lastPoint.x, totalHeight);
+        } else {
+          ctx.moveTo(lastPoint.x, 0);
+          ctx.lineTo(lastPoint.x + boxSize, 0);
+          ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
+          ctx.lineTo(lastPoint.x, lastPoint.y);
         }
         ctx.closePath();
 
-        const fillColor = lastPoint.isLargestPositive
-          ? boxColors.positive
-          : boxColors.negative;
         const gradient = ctx.createLinearGradient(
-          lastPoint.x,
           0,
-          lastPoint.x + boxSize,
-          0
+          lastPoint.isLargestPositive ? lastPoint.y : 0,
+          0,
+          lastPoint.isLargestPositive ? totalHeight : lastPoint.y
         );
-        try {
-          const r = parseInt(fillColor.slice(1, 3), 16) || 0;
-          const g = parseInt(fillColor.slice(3, 5), 16) || 0;
-          const b = parseInt(fillColor.slice(5, 7), 16) || 0;
-          gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, 0.1)`);
-          gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, 0.1)`);
-          ctx.fillStyle = gradient;
-          ctx.fill();
-        } catch (e) {
-          console.error("Error parsing fill color:", fillColor, e);
+
+        const brightColor = hexToRgba(lastFillColor, 0.2);
+        const baseColorFade = hexToRgba(lastFillColor, 0.15);
+
+        if (lastPoint.isLargestPositive) {
+          gradient.addColorStop(0, brightColor);
+          gradient.addColorStop(1, baseColorFade);
+        } else {
+          gradient.addColorStop(0, baseColorFade);
+          gradient.addColorStop(1, brightColor);
         }
+
+        ctx.fillStyle = gradient;
+        ctx.fill();
       }
 
       // Draw white line
@@ -320,19 +542,18 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
       if (linePoints.length > 0) {
         const lastPoint = linePoints[linePoints.length - 1];
-        // Extend the line to include the padding
         ctx.lineTo(lastPoint.x + boxSize, lastPoint.y);
       }
       ctx.lineWidth = 2;
-      ctx.strokeStyle = "#FFFFFF";
+      ctx.strokeStyle = LINE_COLOR;
       ctx.stroke();
 
-      // Draw white circle at the end with padding
+      // Draw white circle at the end
       if (linePoints.length > 0) {
         const lastPoint = linePoints[linePoints.length - 1];
         ctx.beginPath();
         ctx.arc(lastPoint.x + boxSize, lastPoint.y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = "#FFFFFF";
+        ctx.fillStyle = LINE_COLOR;
         ctx.fill();
       }
     }
@@ -358,6 +579,13 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       });
     }
 
+    // After all drawing is done, scroll to the latest data point
+    if (scrollContainerRef.current) {
+      const scrollContainer = scrollContainerRef.current;
+      scrollContainer.scrollLeft =
+        scrollContainer.scrollWidth - scrollContainer.clientWidth;
+    }
+
     setTrendChanges(newTrendChanges);
   }, [
     isClient,
@@ -368,103 +596,127 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     showLine,
     boxVisibilityFilter,
     hoveredTimestamp,
+    hoveredFrame,
   ]);
 
-  return (
-    <div className={`relative ${className}`}>
-      <div className="mr-12">
-        <div
-          ref={scrollContainerRef}
-          className="[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] h-full w-full overflow-x-auto pr-12"
-        >
-          <div className="relative h-full pt-6">
-            <div className="pointer-events-none absolute -top-0 right-0 left-0 z-0 ml-[18px] h-6">
-              {trendChanges.map((change, index) => (
-                <div
-                  key={`${change.timestamp}-${index}-${change.x}`}
-                  className="absolute -translate-x-1/2 transform"
-                  style={{
-                    left: `${change.x}px`,
-                    color: change.isPositive
-                      ? boxColors.positive
-                      : boxColors.negative,
-                  }}
-                >
-                  ▼
-                </div>
-              ))}
-            </div>
+  // Handle mouse events for hover tooltip
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const scrollContainer = scrollContainerRef.current;
+    if (!canvas || !scrollContainer) return;
 
-            <div className="relative mr-8 h-full">
-              <canvas
-                ref={canvasRef}
-                className="block h-full overflow-y-hidden"
-                style={{ imageRendering: "pixelated" }}
-              />
-            </div>
-          </div>
+    const handleMouseMove = (event: MouseEvent) => {
+      if (!framesToDrawRef.current.length) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const scrollLeft = scrollContainer.scrollLeft;
+      const mouseXInCanvas = event.clientX - rect.left + scrollLeft;
+      const frameIndex = Math.floor(mouseXInCanvas / 5); // Fixed 5px frame width
+
+      if (frameIndex >= 0 && frameIndex < framesToDrawRef.current.length) {
+        const frame = framesToDrawRef.current[frameIndex];
+
+        setHoveredFrame({
+          index: frameIndex,
+          timestamp: frame.timestamp,
+        });
+      } else {
+        setHoveredFrame(null);
+      }
+    };
+
+    const handleMouseLeave = () => {
+      setHoveredFrame(null);
+    };
+
+    canvas.addEventListener("mousemove", handleMouseMove);
+    canvas.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("mouseleave", handleMouseLeave);
+    };
+  }, []); // No dependencies needed since we use fixed 5px frame width
+
+  // Helper function to convert hex to rgba
+  const hexToRgba = (hex: string, alpha: number) => {
+    try {
+      const r = parseInt(hex.slice(1, 3), 16);
+      const g = parseInt(hex.slice(3, 5), 16);
+      const b = parseInt(hex.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    } catch (e) {
+      console.error("Error parsing color:", hex, e);
+      return `rgba(0, 0, 0, ${alpha})`;
+    }
+  };
+
+  return (
+    <div {...props(styles.container, className)}>
+      {/* Hover tooltip */}
+      {hoveredFrame && (
+        <div {...props(styles.tooltip)}>
+          {new Date(hoveredFrame.timestamp).toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          })}
+        </div>
+      )}
+
+      <div {...props(styles.scrollContainer)} ref={scrollContainerRef}>
+        <div {...props(styles.canvasWrapper)}>
+          <canvas {...props(styles.canvas)} ref={canvasRef} />
         </div>
       </div>
-      <div>
-        {data.length > 0 && (
-          <div className="pointer-events-none absolute top-3 right-0 -bottom-0 flex w-12 flex-col justify-between shadow-2xl">
-            {data[data.length - 1].progressiveValues.slice(
-              boxOffset,
-              boxOffset + visibleBoxesCount
-            ).length > 0 && (
-              <>
-                {(() => {
-                  const visibleBoxes = data[
-                    data.length - 1
-                  ].progressiveValues.slice(
-                    boxOffset,
-                    boxOffset + visibleBoxesCount
-                  );
-                  const largestBox = visibleBoxes.reduce((max, box) =>
-                    Math.abs(box.value) > Math.abs(max.value) ? box : max
-                  );
-                  const color =
-                    largestBox.value > 0
-                      ? boxColors.positive
-                      : boxColors.negative;
-                  return (
-                    <>
-                      <div className="flex items-center">
-                        <div
-                          className="h-[1px] flex-1"
-                          style={{ backgroundColor: color }}
-                        />
-                        <div className="ml-1">
-                          <span
-                            className="font-kodemono  text-[8px] tracking-wider"
-                            style={{ color }}
-                          >
-                            {formatPrice(largestBox.high, "BTC/USD")}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="flex items-center">
-                        <div
-                          className="h-[1px] flex-1"
-                          style={{ backgroundColor: color }}
-                        />
-                        <div className="ml-1">
-                          <span
-                            className="font-kodemono  text-[8px] tracking-wider"
-                            style={{ color }}
-                          >
-                            {formatPrice(largestBox.low, "BTC/USD")}
-                          </span>
-                        </div>
-                      </div>
-                    </>
-                  );
-                })()}
-              </>
-            )}
+
+      {/* Price axis */}
+      {data.length > 0 &&
+        data[data.length - 1].progressiveValues.slice(
+          boxOffset,
+          boxOffset + visibleBoxesCount
+        ).length > 0 && (
+          <div {...props(styles.priceAxis)}>
+            {(() => {
+              const visibleBoxes = data[
+                data.length - 1
+              ].progressiveValues.slice(
+                boxOffset,
+                boxOffset + visibleBoxesCount
+              );
+              const largestBox = visibleBoxes.reduce((max, box) =>
+                Math.abs(box.value) > Math.abs(max.value) ? box : max
+              );
+              const color =
+                largestBox.value > 0 ? boxColors.positive : boxColors.negative;
+
+              return (
+                <>
+                  <div {...props(styles.priceLine)}>
+                    <div
+                      {...props(styles.priceLineSeparator)}
+                      style={{ backgroundColor: color }}
+                    />
+                    <span {...props(styles.priceLabel)} style={{ color }}>
+                      {formatPrice(largestBox.high, "BTC/USD")}
+                    </span>
+                  </div>
+                  <div {...props(styles.priceLine)}>
+                    <div
+                      {...props(styles.priceLineSeparator)}
+                      style={{ backgroundColor: color }}
+                    />
+                    <span {...props(styles.priceLabel)} style={{ color }}>
+                      {formatPrice(largestBox.low, "BTC/USD")}
+                    </span>
+                  </div>
+                </>
+              );
+            })()}
           </div>
         )}
-      </div>
     </div>
   );
 };

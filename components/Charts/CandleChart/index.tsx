@@ -30,7 +30,8 @@ export const useChartData = (
   chartWidth: number,
   chartHeight: number,
   yAxisScale: number,
-  visiblePoints: number
+  visiblePoints: number,
+  pair?: string
 ) => {
   return useMemo(() => {
     if (!data.length || !chartWidth || !chartHeight) {
@@ -59,7 +60,27 @@ export const useChartData = (
 
     // Calculate the price range based on the visible data and scale
     const baseRange = maxPrice - minPrice;
-    const scaledRange = baseRange / yAxisScale;
+
+    // Ensure minimum range based on instrument precision for proper candle visibility
+    const minRangeMultiplier = 200; // Show at least 200 pips worth of range
+
+    // Get instrument configuration
+    let instrumentPoint = 0.00001; // Default forex point size
+    if (pair) {
+      const upperPair = pair.toUpperCase();
+      // Search in all instrument categories
+      for (const category of Object.values(INSTRUMENTS)) {
+        if (upperPair in category) {
+          instrumentPoint = (category as any)[upperPair].point;
+          break;
+        }
+      }
+    }
+
+    const minRange = instrumentPoint * minRangeMultiplier;
+    const adjustedRange = Math.max(baseRange, minRange);
+
+    const scaledRange = adjustedRange / yAxisScale;
 
     // Add a small padding (5%) to prevent prices from touching the edges
     const padding = scaledRange * 0.05;
@@ -162,6 +183,46 @@ const CandleSticks = memo(
     );
     const halfCandleWidth = candleWidth / 2;
 
+    // Debug candle data to understand dots issue
+    if (data.length > 0) {
+      const sampleCandles = data.slice(0, 5);
+      console.log("🕯️ Candle Debug (first 5):", {
+        totalCandles: data.length,
+        candleWidth,
+        adjustedWidth,
+        sampleCandles: sampleCandles.map((candle) => ({
+          timestamp: new Date(candle.timestamp).toISOString(),
+          ohlc: {
+            open: candle.open,
+            high: candle.high,
+            low: candle.low,
+            close: candle.close,
+          },
+          scaled: {
+            open: candle.scaledOpen,
+            high: candle.scaledHigh,
+            low: candle.scaledLow,
+            close: candle.scaledClose,
+          },
+          rawBodyHeight: Math.abs(candle.scaledClose - candle.scaledOpen),
+          finalBodyHeight: Math.max(
+            6,
+            Math.abs(candle.scaledClose - candle.scaledOpen)
+          ),
+          wickHeight: Math.abs(candle.scaledHigh - candle.scaledLow),
+          priceRange: candle.high - candle.low,
+          bodyRange: Math.abs(candle.close - candle.open),
+          scalingDifference: {
+            priceRange: candle.high - candle.low,
+            scaledRange: Math.abs(candle.scaledHigh - candle.scaledLow),
+            scalingFactor:
+              Math.abs(candle.scaledHigh - candle.scaledLow) /
+              (candle.high - candle.low),
+          },
+        })),
+      });
+    }
+
     // Adjust x positions to account for right margin
     const adjustedData = data.map((point) => ({
       ...point,
@@ -184,7 +245,9 @@ const CandleSticks = memo(
 
           const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
           const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
-          const bodyHeight = Math.max(1, bodyBottom - bodyTop);
+          // Ensure minimum body height for visibility, especially for small forex movements
+          const rawBodyHeight = bodyBottom - bodyTop;
+          const bodyHeight = Math.max(6, rawBodyHeight); // Minimum 6px height
 
           return (
             <g
@@ -256,6 +319,17 @@ const CandleChart = ({
   const [dragStart, setDragStart] = useState(0);
   const [scrollStart, setScrollStart] = useState(0);
 
+  // Debug CandleChart rendering
+  console.log("📊 CandleChart Debug:", {
+    candlesCount: candles?.length || 0,
+    pair: pair,
+    dimensions: dimensions,
+    yAxisScale: yAxisScale,
+    firstCandle: candles?.[0],
+    lastCandle: candles?.[candles.length - 1],
+    containerExists: !!containerRef.current,
+  });
+
   const chartPadding = CHART_CONFIG.PADDING;
   const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
   const chartHeight =
@@ -268,7 +342,8 @@ const CandleChart = ({
     chartWidth,
     chartHeight,
     yAxisScale,
-    CHART_CONFIG.VISIBLE_POINTS
+    CHART_CONFIG.VISIBLE_POINTS,
+    pair
   );
 
   // Update dimension effect to use parent's full dimensions
@@ -490,6 +565,25 @@ const CandleChart = ({
     );
   };
 
+  // Debug rendering path
+  console.log("🎯 CandleChart Render Path:", {
+    chartWidth: chartWidth,
+    chartHeight: chartHeight,
+    initialVisibleDataLength: initialVisibleData?.length || 0,
+    visibleDataLength: visibleData?.length || 0,
+    path1:
+      (!chartWidth || !chartHeight) && initialVisibleData
+        ? "INITIAL_VISIBLE"
+        : "NO",
+    path2: visibleData.length > 0 ? "VISIBLE_DATA" : "NO_DATA",
+    finalPath:
+      (!chartWidth || !chartHeight) && initialVisibleData
+        ? "INITIAL_VISIBLE"
+        : visibleData.length > 0
+          ? "VISIBLE_DATA"
+          : "NO_DATA",
+  });
+
   return (
     <div
       ref={containerRef}
@@ -500,83 +594,88 @@ const CandleChart = ({
       onMouseLeave={dragHandlers.onMouseLeave}
     >
       {(!chartWidth || !chartHeight) && initialVisibleData ? (
-        <svg width="100%" height="100%" className="min-h-[500px]">
-          <g
-            transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}
-          >
-            <CandleSticks
-              data={initialVisibleData}
-              width={1000}
-              height={500}
-              rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
-            />
-          </g>
-        </svg>
-      ) : visibleData.length > 0 ? (
-        <svg
-          width="100%"
-          height="100%"
-          onMouseMove={hoverHandlers.onSvgMouseMove}
-          onMouseLeave={hoverHandlers.onMouseLeave}
-          style={{ cursor: isDragging ? "grabbing" : "grab" }}
-        >
-          <g
-            transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}
-          >
-            {showBoxLevels && (
-              <BoxLevels
-                data={visibleData}
-                histogramBoxes={histogramBoxes}
-                width={chartWidth}
-                height={chartHeight}
-                yAxisScale={yAxisScale}
-                boxOffset={boxOffset}
-                visibleBoxesCount={visibleBoxesCount}
-                boxVisibilityFilter={boxVisibilityFilter}
+        <>
+          <svg width="100%" height="100%" className="min-h-[500px]">
+            <g
+              transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}
+            >
+              <CandleSticks
+                data={initialVisibleData}
+                width={1000}
+                height={500}
                 rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
               />
-            )}
-            <CandleSticks
-              data={visibleData}
-              width={chartWidth}
-              height={chartHeight}
-              rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
-            />
-            <XAxis
-              data={visibleData}
-              chartWidth={chartWidth}
-              chartHeight={chartHeight}
-              hoverInfo={displayedHoverInfo}
-              formatTime={formatTime}
-              rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
-            />
-            <YAxis
-              minY={minY}
-              maxY={maxY}
-              chartHeight={chartHeight}
-              chartWidth={chartWidth}
-              onDrag={handleYAxisDrag}
-              hoverInfo={displayedHoverInfo}
-              onYAxisDragStart={() => setIsYAxisDragging(true)}
-              onYAxisDragEnd={() => setIsYAxisDragging(false)}
-              pair={pair}
-              lastPrice={visibleData[visibleData.length - 1].close}
-              lastPriceY={visibleData[visibleData.length - 1].scaledClose}
-            />
-            {displayedHoverInfo && (
-              <HoverInfoComponent
-                x={displayedHoverInfo.x}
-                y={displayedHoverInfo.y}
+            </g>
+          </svg>
+        </>
+      ) : visibleData.length > 0 ? (
+        <>
+          <svg
+            width="100%"
+            height="100%"
+            onMouseMove={hoverHandlers.onSvgMouseMove}
+            onMouseLeave={hoverHandlers.onMouseLeave}
+            style={{ cursor: isDragging ? "grabbing" : "grab" }}
+          >
+            <g
+              transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}
+            >
+              {showBoxLevels && (
+                <BoxLevels
+                  data={visibleData}
+                  histogramBoxes={histogramBoxes}
+                  width={chartWidth}
+                  height={chartHeight}
+                  yAxisScale={yAxisScale}
+                  boxOffset={boxOffset}
+                  visibleBoxesCount={visibleBoxesCount}
+                  boxVisibilityFilter={boxVisibilityFilter}
+                  rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                  pair={pair}
+                />
+              )}
+              <CandleSticks
+                data={visibleData}
+                width={chartWidth}
+                height={chartHeight}
+                rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+              />
+              <XAxis
+                data={visibleData}
+                chartWidth={chartWidth}
+                chartHeight={chartHeight}
+                hoverInfo={displayedHoverInfo}
+                formatTime={formatTime}
+                rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+              />
+              <YAxis
+                minY={minY}
+                maxY={maxY}
                 chartHeight={chartHeight}
                 chartWidth={chartWidth}
+                onDrag={handleYAxisDrag}
+                hoverInfo={displayedHoverInfo}
+                onYAxisDragStart={() => setIsYAxisDragging(true)}
+                onYAxisDragEnd={() => setIsYAxisDragging(false)}
+                pair={pair}
+                lastPrice={visibleData[visibleData.length - 1].close}
+                lastPriceY={visibleData[visibleData.length - 1].scaledClose}
               />
-            )}
-          </g>
-        </svg>
+              {displayedHoverInfo && (
+                <HoverInfoComponent
+                  x={displayedHoverInfo.x}
+                  y={displayedHoverInfo.y}
+                  chartHeight={chartHeight}
+                  chartWidth={chartWidth}
+                />
+              )}
+            </g>
+          </svg>
+        </>
       ) : (
-        <div className="flex h-full items-center justify-center primary-text">
-          No data to display
-        </div>
+        <>
+          <div className="flex h-full items-center justify-center primary-text bg-yellow-800"></div>
+        </>
       )}
     </div>
   );

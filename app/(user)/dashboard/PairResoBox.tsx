@@ -13,6 +13,7 @@ import { formatPrice } from "@/utils/instruments";
 import { motion } from "framer-motion";
 import React, { useCallback, useMemo } from "react";
 import { FaBell } from "react-icons/fa";
+import PairMiniHistogram from "@/components/Dashboard/PairMiniHistogram";
 
 // Atomic CSS styles using our custom system
 const pulse = keyframes({
@@ -244,6 +245,7 @@ export const PairResoBox = ({
   // Memoize the filtered boxes based on timeframe settings
   const filteredBoxSlice = useMemo(() => {
     if (!boxSlice?.boxes) return undefined;
+
     return {
       ...boxSlice,
       boxes:
@@ -252,7 +254,7 @@ export const PairResoBox = ({
           settings.startIndex + settings.maxBoxCount
         ) || [],
     };
-  }, [boxSlice, settings.startIndex, settings.maxBoxCount]);
+  }, [boxSlice, settings.startIndex, settings.maxBoxCount, pair]);
 
   const showChart = !isLoading && filteredBoxSlice;
   const showPriceLines =
@@ -349,6 +351,18 @@ export const PairResoBox = ({
                     slice={filteredBoxSlice}
                     pair={pair}
                     boxColors={boxColors}
+                  />
+                </div>
+              ) : boxColors?.styles?.viewMode === "histogram" ? (
+                <div {...props(styles.chartInner)}>
+                  <div {...props(styles.chartOverlay)} />
+                  <PairMiniHistogram
+                    pair={pair}
+                    boxSlice={boxSlice}
+                    boxColors={boxColors}
+                    isLoading={isLoading}
+                    histogramData={[]} // You'll need to pass the actual histogram data here
+                    className="h-full w-full"
                   />
                 </div>
               ) : (

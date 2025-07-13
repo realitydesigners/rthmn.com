@@ -26,7 +26,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -41,7 +41,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -56,7 +56,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -71,7 +71,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -86,7 +86,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -101,7 +101,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -116,7 +116,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -131,7 +131,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -146,7 +146,7 @@ const DEFAULT_PRESETS: Preset[] = [
       showBorder: true,
       globalTimeframeControl: false,
       showLineChart: false,
-
+      showBoxHistory: false,
       viewMode: "default",
     },
   },
@@ -171,7 +171,8 @@ export interface BoxColors {
     showBorder: boolean;
     globalTimeframeControl: boolean;
     showLineChart: boolean;
-    viewMode?: "default" | "3d" | "line";
+    showBoxHistory: boolean;
+    viewMode?: "default" | "3d" | "line" | "histogram";
   };
 }
 
@@ -192,7 +193,7 @@ const DEFAULT_BOX_COLORS: BoxColors = {
     showBorder: true,
     globalTimeframeControl: false,
     showLineChart: false,
-
+    showBoxHistory: false,
     viewMode: "default",
   },
 };

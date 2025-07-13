@@ -14,6 +14,7 @@ import { motion } from "framer-motion";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { NoInstruments } from "./LoadingSkeleton";
 import { PairResoBox } from "./PairResoBox";
+import PairMiniHistogram from "@/components/Dashboard/PairMiniHistogram";
 
 // Mock data for non-subscribers to show dashboard structure
 const MOCK_PAIRS = ["EURUSD", "GBPUSD", "USDJPY", "AUDUSD"];
@@ -25,7 +26,11 @@ declare global {
   }
 }
 
-export default function Dashboard() {
+interface DashboardProps {
+  pairHistoricalData: Record<string, any[]>;
+}
+
+export default function Dashboard({ pairHistoricalData }: DashboardProps) {
   const { pairData, isLoading } = useDashboard();
   const { favorites, boxColors } = useUser();
   const { isSubscribed, requireSubscription } = useSubscription();
@@ -43,6 +48,9 @@ export default function Dashboard() {
   const [windowWidth, setWindowWidth] = useState(0);
   const [availableWidth, setAvailableWidth] = useState(0);
   const [showUpgradeBanner, setShowUpgradeBanner] = useState(true);
+  const [dashboardViewMode, setDashboardViewMode] = useState<
+    "boxes" | "histograms"
+  >("boxes");
 
   // Signal alerts - now using real-time subscriptions
   const { signals, newSignals, clearSignalAlert, clearAllAlerts, isConnected } =
@@ -184,11 +192,16 @@ export default function Dashboard() {
     return orderedPairs.length > 0 ? orderedPairs : favorites;
   }, [orderedPairs, favorites, isSubscribed]);
 
-  // Calculate grid columns based on current layout and available width
+  // Calculate grid columns based on current layout, available width, and view mode
   const gridCols = useMemo(() => {
     if (!isClient) return 1;
 
-    // Use the same constants as the store
+    // For histogram view mode, always display one per row
+    if (boxColors?.styles?.viewMode === "histogram") {
+      return 1;
+    }
+
+    // Original box mode logic
     const MIN_WIDTH_PER_COLUMN = {
       compact: { 2: 500, 3: 800, 4: 1200 },
       balanced: { 2: 800, 3: 1200 },
@@ -206,7 +219,7 @@ export default function Dashboard() {
         if (availableWidth >= MIN_WIDTH_PER_COLUMN.balanced[2]) return 2;
         return 1;
     }
-  }, [isClient, availableWidth, currentLayout]);
+  }, [isClient, availableWidth, currentLayout, boxColors?.styles?.viewMode]);
 
   // Handle zen mode toggle - simplified since ZenMode handles its own transitions
   const handleZenModeToggle = useCallback(() => {
@@ -253,6 +266,7 @@ export default function Dashboard() {
             onViewModeChange={setViewMode}
             focusedIndex={focusedIndex}
             onFocusChange={setFocusedIndex}
+            histogramData={pairHistoricalData}
           />
         </div>
       )}
@@ -268,7 +282,6 @@ export default function Dashboard() {
 
       {!isZenMode && (
         <div className="w-full px-2 pb-24 lg:pb-2 pt-14 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {/* Upgrade banner for non-subscribers who completed all onboarding */}
           <OnboardingUpgradeBanner
             isVisible={showUpgradeBanner}
             onUpgrade={handleUpgrade}
@@ -279,11 +292,19 @@ export default function Dashboard() {
             className="grid w-full gap-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
             style={{
               gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
+              gap:
+                boxColors?.styles?.viewMode === "histogram" ? "1rem" : "0.5rem",
+              padding:
+                boxColors?.styles?.viewMode === "histogram"
+                  ? "0 1rem"
+                  : undefined,
             }}
           >
             {isClient &&
               pairsToRender.map((pair) => {
                 const data = pairData[pair];
+                const histogramData = pairHistoricalData[pair] || [];
+
                 return (
                   <motion.div
                     key={pair}
@@ -299,13 +320,24 @@ export default function Dashboard() {
                     className="relative cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
                   >
                     <div data-pair={pair}>
-                      <PairResoBox
-                        pair={pair}
-                        boxSlice={data?.boxes?.[0]}
-                        boxColors={boxColors}
-                        isLoading={isLoading}
-                        activePatterns={getActivePatternsForPair(pair)}
-                      />
+                      {boxColors?.styles?.viewMode === "histogram" ? (
+                        <PairMiniHistogram
+                          pair={pair}
+                          boxSlice={data?.boxes?.[0]}
+                          boxColors={boxColors}
+                          isLoading={isLoading}
+                          histogramData={histogramData}
+                          className="border border-[#222] rounded-lg bg-black/50"
+                        />
+                      ) : (
+                        <PairResoBox
+                          pair={pair}
+                          boxSlice={data?.boxes?.[0]}
+                          boxColors={boxColors}
+                          isLoading={isLoading}
+                          activePatterns={getActivePatternsForPair(pair)}
+                        />
+                      )}
                     </div>
                   </motion.div>
                 );

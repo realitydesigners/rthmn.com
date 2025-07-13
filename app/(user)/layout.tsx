@@ -68,7 +68,7 @@ export default async function UserLayout({ children, modal }: UserLayoutProps) {
             </main>
             {!isSupportPage && <SidebarLeft />}
             {!isSupportPage && <SidebarRight />}
-            <MobileNavbar />
+            {/* <MobileNavbar /> */}
             <ZenModeControlsWrapper />
             {modal}
           </div>

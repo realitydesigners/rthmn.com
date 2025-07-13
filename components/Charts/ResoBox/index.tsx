@@ -328,6 +328,19 @@ export const ResoBox = memo(
       (a, b) => Math.abs(b.value) - Math.abs(a.value)
     );
 
+    // Console log ResoBox data for comparison with histogram
+    console.log("📦 ResoBox Current Data:", {
+      timestamp: slice.timestamp,
+      totalBoxes: slice.boxes.length,
+      sortedBoxes: sortedBoxes.map((b) => ({
+        value: b.value,
+        high: b.high,
+        low: b.low,
+      })),
+      largestBox: sortedBoxes[0],
+      pair: pair,
+    });
+
     return (
       <div
         ref={boxRef}

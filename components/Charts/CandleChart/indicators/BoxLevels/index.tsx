@@ -1,6 +1,6 @@
 import { useColorStore } from "@/stores/colorStore";
 import { formatPrice } from "@/utils/instruments";
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 import type { ChartDataPoint } from "../../index";
 
 // Update BoxLevels props interface
@@ -14,6 +14,7 @@ interface BoxLevelsProps {
   visibleBoxesCount: number;
   boxVisibilityFilter: "all" | "positive" | "negative";
   rightMargin: number;
+  pair: string;
 }
 
 const BoxLevels = memo(
@@ -27,15 +28,15 @@ const BoxLevels = memo(
     visibleBoxesCount,
     boxVisibilityFilter,
     rightMargin,
+    pair,
   }: BoxLevelsProps) => {
     const { boxColors } = useColorStore();
 
     if (!histogramBoxes?.length || !data.length) return null;
 
-    // Create a map of timestamp to candle data for scaling
-    const candleMap = new Map(
-      data.map((point) => [new Date(point.timestamp).getTime(), point])
-    );
+    // Get only the current frame
+    const currentFrame = histogramBoxes[histogramBoxes.length - 1];
+    if (!currentFrame) return null;
 
     // Find min/max prices in visible range
     let minPrice = Number.POSITIVE_INFINITY;
@@ -60,166 +61,111 @@ const BoxLevels = memo(
     };
 
     // Constants for line appearance
-    const LINE_WIDTH = 5;
-    const LINE_STROKE_WIDTH = 0.2;
-    const LINE_OPACITY = 0.8;
+
+    const PRICE_LINE_OPACITY = 0.5;
     const adjustedWidth = width - rightMargin;
 
-    // Process boxes
-    const processedBoxes = histogramBoxes
-      .map((box, index) => {
-        const isCurrentBox = index === histogramBoxes.length - 1;
-        const boxTime = new Date(box.timestamp).getTime();
-
-        let candle;
-        if (isCurrentBox) {
-          candle = data[data.length - 1];
-        } else {
-          candle = candleMap.get(boxTime);
-        }
-
-        if (!candle) return null;
-
-        const relevantBoxes = box.boxes
-          .slice(boxOffset, boxOffset + visibleBoxesCount)
-          .filter((level: any) => {
-            if (boxVisibilityFilter === "positive") return level.value > 0;
-            if (boxVisibilityFilter === "negative") return level.value < 0;
-            return true;
-          })
-          .map((level: any) => ({
-            ...level,
-            scaledHigh: scaleY(level.high),
-            scaledLow: scaleY(level.low),
-            timestamp: boxTime,
-          }));
-
-        if (relevantBoxes.length === 0) return null;
-
-        const xPosition = (candle.scaledX / width) * adjustedWidth;
-
-        return {
-          timestamp: box.timestamp,
-          xPosition,
-          boxes: relevantBoxes,
-          isCurrent: isCurrentBox,
-        };
-      })
-      .filter(Boolean);
-
-    // Use processed boxes as-is - no complex filtering needed
-    const uniqueProcessedBoxes = processedBoxes.filter(
-      (boxFrame) => boxFrame && boxFrame.boxes.length > 0
-    );
-
-    // Find the largest box in the current frame
-    const currentFrame = histogramBoxes[histogramBoxes.length - 1];
-    const visibleBoxes = currentFrame.boxes.slice(
-      boxOffset,
-      boxOffset + visibleBoxesCount
-    );
-    const largestBox = visibleBoxes.reduce((max, box) =>
-      Math.abs(box.value) > Math.abs(max.value) ? box : max
-    );
+    // Get visible boxes from current frame
+    const visibleBoxes = currentFrame.boxes
+      .slice(boxOffset, boxOffset + visibleBoxesCount)
+      .filter((level: any) => {
+        if (boxVisibilityFilter === "positive") return level.value > 0;
+        if (boxVisibilityFilter === "negative") return level.value < 0;
+        return true;
+      });
 
     return (
       <g className="box-levels">
-        {uniqueProcessedBoxes.map((boxFrame, frameIndex) => (
-          <g
-            key={`${boxFrame.timestamp}-${frameIndex}-${boxFrame.isCurrent ? "current" : "historical"}`}
-            transform={`translate(${boxFrame.xPosition}, 0)`}
-          >
-            {boxFrame.boxes.map((level, levelIndex) => {
-              const color =
-                level.value > 0 ? boxColors.positive : boxColors.negative;
-              return (
-                <g
-                  key={`${level.high}-${level.low}-${level.value}-${levelIndex}`}
-                >
+        {/* Horizontal price lines */}
+        {visibleBoxes.map((box: any, index: number) => {
+          const color = box.value > 0 ? boxColors.positive : boxColors.negative;
+          const scaledHigh = scaleY(box.high);
+          const scaledLow = scaleY(box.low);
+
+          return (
+            <g key={`price-line-${box.high}-${box.low}-${index}`}>
+              {/* High price line */}
+              <line
+                x1={0}
+                y1={scaledHigh}
+                x2={adjustedWidth}
+                y2={scaledHigh}
+                stroke={color}
+                strokeWidth={1}
+                strokeDasharray="2,2"
+                opacity={PRICE_LINE_OPACITY}
+              />
+              {/* Low price line */}
+              <line
+                x1={0}
+                y1={scaledLow}
+                x2={adjustedWidth}
+                y2={scaledLow}
+                stroke={color}
+                strokeWidth={1}
+                strokeDasharray="2,2"
+                opacity={PRICE_LINE_OPACITY}
+              />
+            </g>
+          );
+        })}
+
+        {/* Price labels on the right */}
+        <g transform={`translate(${width - rightMargin + 4}, 0)`}>
+          {visibleBoxes.map((box: any, index: number) => {
+            const color =
+              box.value > 0 ? boxColors.positive : boxColors.negative;
+            const scaledHigh = scaleY(box.high);
+            const scaledLow = scaleY(box.low);
+
+            return (
+              <g key={`price-label-${box.high}-${box.low}-${index}`}>
+                {/* High price */}
+                <g transform={`translate(0, ${scaledHigh})`}>
                   <line
-                    x1={-LINE_WIDTH / 2}
-                    x2={LINE_WIDTH / 2}
-                    y1={level.scaledHigh}
-                    y2={level.scaledHigh}
+                    x1={-4}
+                    y1={0}
+                    x2={0}
+                    y2={0}
                     stroke={color}
-                    strokeWidth={LINE_STROKE_WIDTH}
-                    opacity={LINE_OPACITY}
+                    strokeWidth={1}
                   />
-                  <line
-                    x1={-LINE_WIDTH / 2}
-                    x2={LINE_WIDTH / 2}
-                    y1={level.scaledLow}
-                    y2={level.scaledLow}
-                    stroke={color}
-                    strokeWidth={LINE_STROKE_WIDTH}
-                    opacity={LINE_OPACITY}
-                  />
+                  <text
+                    x={8}
+                    y={3}
+                    fill={color}
+                    fontSize={10}
+                    fontFamily="monospace"
+                    textAnchor="start"
+                  >
+                    {formatPrice(box.high, pair)}
+                  </text>
                 </g>
-              );
-            })}
-          </g>
-        ))}
-        {/* Add price labels for the largest box */}
-        {largestBox && (
-          <g transform={`translate(${width - rightMargin + 4}, 0)`}>
-            <g transform={`translate(0, ${scaleY(largestBox.high)})`}>
-              <line
-                x1={-4}
-                y1={0}
-                x2={0}
-                y2={0}
-                stroke={
-                  largestBox.value >= 0
-                    ? boxColors.positive
-                    : boxColors.negative
-                }
-                strokeWidth={1}
-              />
-              <text
-                x={8}
-                y={3}
-                fill={
-                  largestBox.value >= 0
-                    ? boxColors.positive
-                    : boxColors.negative
-                }
-                fontSize={10}
-                fontFamily="monospace"
-                textAnchor="start"
-              >
-                {formatPrice(largestBox.high, "BTC/USD")}
-              </text>
-            </g>
-            <g transform={`translate(0, ${scaleY(largestBox.low)})`}>
-              <line
-                x1={-4}
-                y1={0}
-                x2={0}
-                y2={0}
-                stroke={
-                  largestBox.value >= 0
-                    ? boxColors.positive
-                    : boxColors.negative
-                }
-                strokeWidth={1}
-              />
-              <text
-                x={8}
-                y={3}
-                fill={
-                  largestBox.value >= 0
-                    ? boxColors.positive
-                    : boxColors.negative
-                }
-                fontSize={10}
-                fontFamily="monospace"
-                textAnchor="start"
-              >
-                {formatPrice(largestBox.low, "BTC/USD")}
-              </text>
-            </g>
-          </g>
-        )}
+                {/* Low price */}
+                <g transform={`translate(0, ${scaledLow})`}>
+                  <line
+                    x1={-4}
+                    y1={0}
+                    x2={0}
+                    y2={0}
+                    stroke={color}
+                    strokeWidth={1}
+                  />
+                  <text
+                    x={8}
+                    y={3}
+                    fill={color}
+                    fontSize={10}
+                    fontFamily="monospace"
+                    textAnchor="start"
+                  >
+                    {formatPrice(box.low, pair)}
+                  </text>
+                </g>
+              </g>
+            );
+          })}
+        </g>
       </g>
     );
   }

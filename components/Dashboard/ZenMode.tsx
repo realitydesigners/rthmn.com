@@ -12,6 +12,7 @@ import { LuEye } from "react-icons/lu";
 import { DashboardBoxStructure } from "./DashboardBoxStructure";
 import { useSubscription } from "@/hooks/useSubscription";
 import { ZenModeUpgradeScreen } from "./ZenModeUpgradeScreen";
+import PairMiniHistogram from "@/components/Dashboard/PairMiniHistogram";
 
 interface ZenModeProps {
   pairData: Record<string, { boxes: BoxSlice[] }>;
@@ -23,6 +24,7 @@ interface ZenModeProps {
   onViewModeChange: (mode: "scene" | "focus") => void;
   focusedIndex: number;
   onFocusChange: (index: number) => void;
+  histogramData?: Record<string, any[]>;
 }
 
 // Create structure data from pair data (filtering now handled in DashboardBoxStructure)
@@ -106,6 +108,7 @@ export const ZenMode = memo(
     onViewModeChange,
     focusedIndex,
     onFocusChange,
+    histogramData = {},
   }: ZenModeProps) => {
     const { isClient } = useCanvasSetup();
     const { isSubscribed } = useSubscription();
@@ -204,71 +207,87 @@ export const ZenMode = memo(
 
     return (
       <div className="relative h-full w-full">
-        <Canvas
-          camera={{ position: [0, 0, 70], fov: 50 }}
-          className="absolute inset-0 w-screen h-screen z-[1]"
-          dpr={[1, 2]}
-          gl={{
-            antialias: true,
-            alpha: true,
-            preserveDrawingBuffer: false,
-            powerPreference: "high-performance",
-          }}
-          frameloop={isVisible ? "always" : "never"}
-        >
-          <ambientLight intensity={2} />
-          <directionalLight position={[0, 60, 180]} intensity={1} />
-          <StaticCamera isVisible={isVisible} viewMode={viewMode} />
-          <OrbitControls
-            enabled={viewMode === "focus" && isVisible}
-            enableRotate={viewMode === "focus" && isVisible}
-            maxDistance={100}
-            minDistance={20}
-            autoRotate={false}
-            target={
-              viewMode === "focus"
-                ? [0, 0, 30]
-                : structures[focusedIndex]?.position || [0, 0, 0]
-            }
-            enablePan={false}
-            enableZoom={true}
-            zoomSpeed={0.5}
-          />
-
-          {/* Render all structures - only when visible */}
-          {isVisible &&
-            structures.map((structure, index) => {
-              const currentSlice = createStructureFromPair(
-                structure.pair,
-                pairData[structure.pair]?.boxes?.[0]
-              );
-
-              const isFocused = index === focusedIndex;
-
-              // In focus mode, only show the focused structure
-              if (viewMode === "focus" && !isFocused) {
-                return null;
+        {boxColors?.styles?.viewMode === "histogram" ? (
+          <div className="grid grid-cols-1 gap-4 p-4">
+            {orderedPairs.map((pair) => (
+              <PairMiniHistogram
+                key={pair}
+                pair={pair}
+                boxSlice={pairData[pair]?.boxes?.[0]}
+                boxColors={boxColors}
+                isLoading={isLoading}
+                histogramData={histogramData[pair] || []}
+                className="border border-[#222] rounded-lg bg-black/50"
+              />
+            ))}
+          </div>
+        ) : (
+          <Canvas
+            camera={{ position: [0, 0, 70], fov: 50 }}
+            className="absolute inset-0 w-screen h-screen z-[1]"
+            dpr={[1, 2]}
+            gl={{
+              antialias: true,
+              alpha: true,
+              preserveDrawingBuffer: false,
+              powerPreference: "high-performance",
+            }}
+            frameloop={isVisible ? "always" : "never"}
+          >
+            <ambientLight intensity={2} />
+            <directionalLight position={[0, 60, 180]} intensity={1} />
+            <StaticCamera isVisible={isVisible} viewMode={viewMode} />
+            <OrbitControls
+              enabled={viewMode === "focus" && isVisible}
+              enableRotate={viewMode === "focus" && isVisible}
+              maxDistance={100}
+              minDistance={20}
+              autoRotate={false}
+              target={
+                viewMode === "focus"
+                  ? [0, 0, 30]
+                  : structures[focusedIndex]?.position || [0, 0, 0]
               }
+              enablePan={false}
+              enableZoom={true}
+              zoomSpeed={0.5}
+            />
 
-              return (
-                <DashboardBoxStructure
-                  key={structure.pair}
-                  slice={currentSlice}
-                  pair={structure.pair}
-                  structure={{
-                    position: structure.position,
-                    scale: structure.scale,
-                    opacity: structure.opacity,
-                    rotation: structure.rotation,
-                  }}
-                  isFocused={isFocused}
-                  boxColors={boxColors}
-                  isVisible={isVisible}
-                  enableTransitions={true}
-                />
-              );
-            })}
-        </Canvas>
+            {/* Render all structures - only when visible */}
+            {isVisible &&
+              structures.map((structure, index) => {
+                const currentSlice = createStructureFromPair(
+                  structure.pair,
+                  pairData[structure.pair]?.boxes?.[0]
+                );
+
+                const isFocused = index === focusedIndex;
+
+                // In focus mode, only show the focused structure
+                if (viewMode === "focus" && !isFocused) {
+                  return null;
+                }
+
+                return (
+                  <DashboardBoxStructure
+                    key={structure.pair}
+                    slice={currentSlice}
+                    pair={structure.pair}
+                    structure={{
+                      position: structure.position,
+                      scale: structure.scale,
+                      opacity: structure.opacity,
+                      rotation: structure.rotation,
+                    }}
+                    isFocused={isFocused}
+                    boxColors={boxColors}
+                    isVisible={isVisible}
+                    enableTransitions={true}
+                  />
+                );
+              })}
+          </Canvas>
+        )}
       </div>
     );
   }

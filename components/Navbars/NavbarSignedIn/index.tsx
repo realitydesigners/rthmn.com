@@ -1,7 +1,8 @@
 "use client";
 import { useZenModeStore } from "@/stores/zenModeStore";
 import { cn } from "@/utils/cn";
-import type { User } from "@supabase/supabase-js";
+import { useWebSocket } from "@/providers/WebsocketProvider";
+import { formatPrice } from "@/utils/instruments";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -106,11 +107,19 @@ const ZenModeToggle = ({
 export const NavbarSignedIn = () => {
   const pathname = usePathname();
   const { isZenMode, toggleZenMode, hasBeenAccessed } = useZenModeStore();
+  const { priceData } = useWebSocket();
 
   if (pathname === "/account" || pathname === "/pricing") return null;
 
   // Check if we're on dashboard to show zen mode toggle
   const isDashboard = pathname === "/dashboard";
+
+  // Check if we're on a pair page
+  const isPairPage = pathname.startsWith("/pair/");
+  const currentPair = isPairPage
+    ? pathname.split("/").pop()?.toUpperCase()
+    : null;
+  const currentPrice = currentPair ? priceData[currentPair]?.price : null;
 
   // Get icon for path segment
   const getSegmentIcon = (segment: string) => {
@@ -165,9 +174,22 @@ export const NavbarSignedIn = () => {
               </Link>
             </div>
 
-            {/* Breadcrumb */}
+            {/* Breadcrumb or Pair Info */}
             <div className="flex hidden items-center text-[#818181] lg:flex">
-              {Array.isArray(pathSegments) ? (
+              {isPairPage && currentPair ? (
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1.5 px-1.5 py-1">
+                    <span className="font-russo text-lg font-medium tracking-wide text-white uppercase">
+                      {currentPair}
+                    </span>
+                  </div>
+                  {currentPrice && (
+                    <div className="font-kodemono text-sm font-medium text-[#818181] tabular-nums">
+                      {formatPrice(currentPrice, currentPair)}
+                    </div>
+                  )}
+                </div>
+              ) : Array.isArray(pathSegments) ? (
                 pathSegments.map((segment, index, array) => (
                   <div key={segment} className="flex items-center gap-1.5">
                     <div className="flex items-center gap-1.5 px-1.5 py-1">

@@ -1,6 +1,7 @@
 import type React from "react";
 import { BsBoxArrowInDown, BsBoxArrowInUp, BsBoxes } from "react-icons/bs";
 import { RiBarChartBoxLine } from "react-icons/ri";
+import { cn } from "@/utils/cn";
 
 interface ChartControlsProps {
   showBoxLevels: boolean;
@@ -20,67 +21,171 @@ const ChartControls: React.FC<ChartControlsProps> = ({
   pair,
 }) => {
   return (
-    <div className="absolute top-4 right-16 left-0 z[9000] flex items-center justify-between px-4">
-      <div className="flex items-baseline gap-2 ml-12">
-        <h1 className="font-russo text-xl font-bold tracking-wider text-white">
-          {pair}
-        </h1>
-        <div className="font-kodemono  text-sm font-medium text-neutral-200">
-          {currentPrice || "-"}
-        </div>
-      </div>
-      <div className="flex gap-2 mt-20">
-        <button
-          onClick={() => setShowBoxLevels(!showBoxLevels)}
-          className="group relative flex items-center gap-2 overflow-hidden rounded-xl border border-blue-400/20 bg-gradient-to-b from-blue-400/10 via-blue-400/5 to-transparent px-3 py-1.5 text-xs font-medium text-blue-400 shadow-[0_0_15px_rgba(63,255,162,0.15)] transition-all duration-300 hover:border-blue-400/30 hover:text-blue-400 hover:shadow-[0_0_25px_rgba(63,255,162,0.25)] active:scale-[0.98]"
-        >
-          <div className="absolute inset-0 rounded-xl bg-blue-400/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-blue-400/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-blue-400/10 to-transparent" />
-          <RiBarChartBoxLine className="relative h-4 w-4" />
-          <span className="font-russo relative">Box Levels</span>
-        </button>
-        {showBoxLevels && (
-          <>
-            <button
-              onClick={() => setBoxVisibilityFilter("all")}
-              className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-[0.98] ${
-                boxVisibilityFilter === "all"
-                  ? "border border-blue-500/20 bg-gradient-to-b from-blue-500/10 via-blue-500/5 to-transparent text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.15)] hover:border-blue-500/30 hover:shadow-[0_0_25px_rgba(59,130,246,0.25)]"
-                  : "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent primary-text hover:border-neutral-500/30"
-              }`}
-            >
-              <div className="absolute inset-0 rounded-xl bg-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <BsBoxes className="relative h-4 w-4" />
-              <span className="font-russo relative">All</span>
-            </button>
-            <button
-              onClick={() => setBoxVisibilityFilter("positive")}
-              className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-[0.98] ${
-                boxVisibilityFilter === "positive"
-                  ? "border border-blue-500/20 bg-gradient-to-b from-blue-500/10 via-blue-500/5 to-transparent text-blue-400 shadow-[0_0_15px_rgba(34,197,94,0.15)] hover:border-blue-500/30 hover:shadow-[0_0_25px_rgba(34,197,94,0.25)]"
-                  : "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent primary-text hover:border-neutral-500/30"
-              }`}
-            >
-              <div className="absolute inset-0 rounded-xl bg-blue-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <BsBoxArrowInUp className="relative h-4 w-4" />
-              <span className="font-russo relative">Positive</span>
-            </button>
-            <button
-              onClick={() => setBoxVisibilityFilter("negative")}
-              className={`group relative flex items-center gap-2 overflow-hidden rounded-xl px-3 py-1.5 text-xs font-medium transition-all duration-300 active:scale-[0.98] ${
-                boxVisibilityFilter === "negative"
-                  ? "border border-red-500/20 bg-gradient-to-b from-red-500/10 via-red-500/5 to-transparent text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.15)] hover:border-red-500/30 hover:shadow-[0_0_25px_rgba(239,68,68,0.25)]"
-                  : "border border-neutral-500/20 bg-gradient-to-b from-neutral-500/10 via-neutral-500/5 to-transparent primary-text hover:border-neutral-500/30"
-              }`}
-            >
-              <div className="absolute inset-0 rounded-xl bg-red-500/[0.03] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-              <BsBoxArrowInDown className="relative h-4 w-4" />
-              <span className="font-russo relative">Negative</span>
-            </button>
-          </>
+    <div
+      className="flex flex-col gap-2 p-2 rounded-2xl border backdrop-blur-md shadow-lg shadow-black/40"
+      style={{
+        background: "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)",
+        border: "1px solid #16181C",
+        boxShadow:
+          "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)",
+      }}
+    >
+      {/* Box Levels Toggle */}
+      <button
+        onClick={() => setShowBoxLevels(!showBoxLevels)}
+        className={cn(
+          "group relative overflow-hidden w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ease-out",
+          !showBoxLevels && "text-[#B0B0B0] hover:text-white",
+          showBoxLevels && ""
         )}
-      </div>
+        style={{
+          background: showBoxLevels
+            ? "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)"
+            : "linear-gradient(180deg, #0A0B0D 0%, #070809 100%)",
+          boxShadow: showBoxLevels
+            ? "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)"
+            : "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+        }}
+      >
+        <div
+          className={cn(
+            "absolute inset-0 transition-all duration-300 rounded-xl",
+            showBoxLevels ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          )}
+          style={{
+            background: "linear-gradient(180deg, #16181C 0%, #1C1E23 100%)",
+            boxShadow:
+              "inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.1)",
+          }}
+        />
+        <RiBarChartBoxLine
+          className={cn(
+            "w-5 h-5 relative z-10 transition-colors duration-200",
+            showBoxLevels ? "text-white" : ""
+          )}
+        />
+      </button>
+
+      {/* Box Visibility Filters */}
+      {showBoxLevels && (
+        <>
+          <button
+            onClick={() => setBoxVisibilityFilter("all")}
+            className={cn(
+              "group relative overflow-hidden w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ease-out",
+              boxVisibilityFilter !== "all" && "text-[#B0B0B0] hover:text-white"
+            )}
+            style={{
+              background:
+                boxVisibilityFilter === "all"
+                  ? "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)"
+                  : "linear-gradient(180deg, #0A0B0D 0%, #070809 100%)",
+              boxShadow:
+                boxVisibilityFilter === "all"
+                  ? "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)"
+                  : "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <div
+              className={cn(
+                "absolute inset-0 transition-all duration-300 rounded-xl",
+                boxVisibilityFilter === "all"
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
+              )}
+              style={{
+                background: "linear-gradient(180deg, #16181C 0%, #1C1E23 100%)",
+                boxShadow:
+                  "inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.1)",
+              }}
+            />
+            <BsBoxes
+              className={cn(
+                "w-5 h-5 relative z-10 transition-colors duration-200",
+                boxVisibilityFilter === "all" ? "text-white" : ""
+              )}
+            />
+          </button>
+
+          <button
+            onClick={() => setBoxVisibilityFilter("positive")}
+            className={cn(
+              "group relative overflow-hidden w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ease-out",
+              boxVisibilityFilter !== "positive" &&
+                "text-[#B0B0B0] hover:text-white"
+            )}
+            style={{
+              background:
+                boxVisibilityFilter === "positive"
+                  ? "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)"
+                  : "linear-gradient(180deg, #0A0B0D 0%, #070809 100%)",
+              boxShadow:
+                boxVisibilityFilter === "positive"
+                  ? "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)"
+                  : "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <div
+              className={cn(
+                "absolute inset-0 transition-all duration-300 rounded-xl",
+                boxVisibilityFilter === "positive"
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
+              )}
+              style={{
+                background: "linear-gradient(180deg, #16181C 0%, #1C1E23 100%)",
+                boxShadow:
+                  "inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.1)",
+              }}
+            />
+            <BsBoxArrowInUp
+              className={cn(
+                "w-5 h-5 relative z-10 transition-colors duration-200",
+                boxVisibilityFilter === "positive" ? "text-white" : ""
+              )}
+            />
+          </button>
+
+          <button
+            onClick={() => setBoxVisibilityFilter("negative")}
+            className={cn(
+              "group relative overflow-hidden w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-200 ease-out",
+              boxVisibilityFilter !== "negative" &&
+                "text-[#B0B0B0] hover:text-white"
+            )}
+            style={{
+              background:
+                boxVisibilityFilter === "negative"
+                  ? "linear-gradient(180deg, #1A1D22 -10.71%, #0D0F12 100%)"
+                  : "linear-gradient(180deg, #0A0B0D 0%, #070809 100%)",
+              boxShadow:
+                boxVisibilityFilter === "negative"
+                  ? "0px 12px 40px rgba(0, 0, 0, 0.6), 0px 8px 16px rgba(0, 0, 0, 0.4), 0px 4px 8px rgba(0, 0, 0, 0.25), inset 0px 1px 0px rgba(255, 255, 255, 0.02)"
+                  : "inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+            }}
+          >
+            <div
+              className={cn(
+                "absolute inset-0 transition-all duration-300 rounded-xl",
+                boxVisibilityFilter === "negative"
+                  ? "opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
+              )}
+              style={{
+                background: "linear-gradient(180deg, #16181C 0%, #1C1E23 100%)",
+                boxShadow:
+                  "inset 0 2px 4px rgba(0, 0, 0, 0.6), inset 0 -1px 0 rgba(255, 255, 255, 0.1)",
+              }}
+            />
+            <BsBoxArrowInDown
+              className={cn(
+                "w-5 h-5 relative z-10 transition-colors duration-200",
+                boxVisibilityFilter === "negative" ? "text-white" : ""
+              )}
+            />
+          </button>
+        </>
+      )}
     </div>
   );
 };
