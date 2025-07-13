@@ -35,7 +35,7 @@ const LoadingSpinner = ({ color = "#3b82f6" }: LoadingSpinnerProps) => {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       setShowFallback(true);
-    }, 10000);
+    }, 5000); // Reduced timeout to 5 seconds
 
     return () => clearTimeout(timer);
   }, []);
@@ -43,7 +43,7 @@ const LoadingSpinner = ({ color = "#3b82f6" }: LoadingSpinnerProps) => {
   if (showFallback) {
     return (
       <span className="font-mono text-[11px] tracking-wider opacity-50">
-        N/A
+        ---
       </span>
     );
   }

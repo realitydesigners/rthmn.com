@@ -8,6 +8,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { XAxis } from "./Xaxis";
 import { YAxis } from "./YAxis";
 import BoxLevels from "./indicators/BoxLevels";
+import { CandleSticks } from "./CandleSticks";
+import { LineChart } from "./LineChart";
 
 export interface ChartDataPoint {
   timestamp: number;
@@ -132,7 +134,7 @@ export const CHART_CONFIG = {
     MIN_WIDTH: 3,
     MAX_WIDTH: 20,
     MIN_SPACING: 2,
-    WICK_WIDTH: 1.5,
+    WICK_WIDTH: 2,
     GAP_RATIO: 0.15, // 15% gap between candles (much tighter)
     RIGHT_MARGIN: 64,
   },
@@ -157,140 +159,6 @@ export const useInstrumentConfig = (pair: string) => {
     return { point: 0.00001, digits: 5 };
   }, [pair]);
 };
-
-// Update CandleSticks props interface
-interface CandleSticksProps {
-  data: ChartDataPoint[];
-  width: number;
-  height: number;
-  rightMargin: number;
-}
-
-const CandleSticks = memo(
-  ({
-    data,
-    width,
-    height,
-    rightMargin,
-    chartType,
-  }: CandleSticksProps & { chartType: "candle" | "line" }) => {
-    const { boxColors } = useColorStore();
-
-    // Use passed rightMargin
-    const adjustedWidth = width - rightMargin;
-
-    // Adjust x positions to account for right margin and proper spacing
-    const adjustedData = data.map((point, index) => ({
-      ...point,
-      scaledX:
-        index * (adjustedWidth / data.length) + adjustedWidth / data.length / 2,
-    }));
-
-    // Filter visible points
-    const visiblePoints = adjustedData.filter((point) => {
-      const isVisible = point.scaledX >= 0 && point.scaledX <= adjustedWidth;
-      return isVisible;
-    });
-
-    if (chartType === "line") {
-      if (visiblePoints.length < 2) return null;
-
-      // Create path string for the line using extreme values (high or low)
-      const pathData = visiblePoints
-        .map((point, index) => {
-          const command = index === 0 ? "M" : "L";
-
-          // For the last point, use close price
-          if (index === visiblePoints.length - 1) {
-            return `${command} ${point.scaledX} ${point.scaledClose}`;
-          }
-
-          // For other points, determine which is more extreme
-          // Get the center line (midpoint between high and low)
-          const midPoint = (point.scaledHigh + point.scaledLow) / 2;
-
-          // Use the value that's furthest from the center
-          const highDistance = Math.abs(point.scaledHigh - midPoint);
-          const lowDistance = Math.abs(point.scaledLow - midPoint);
-
-          const useHigh = highDistance >= lowDistance;
-          const yValue = useHigh ? point.scaledHigh : point.scaledLow;
-
-          return `${command} ${point.scaledX} ${yValue}`;
-        })
-        .join(" ");
-
-      return (
-        <g>
-          <path
-            d={pathData}
-            stroke="white"
-            strokeWidth={2}
-            fill="none"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </g>
-      );
-    }
-
-    // Candlestick mode - calculate consistent width and spacing
-    const totalCandleSpace = adjustedWidth / data.length;
-    const gapSpace = totalCandleSpace * CHART_CONFIG.CANDLES.GAP_RATIO;
-    const candleWidth = Math.max(
-      CHART_CONFIG.CANDLES.MIN_WIDTH,
-      Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, totalCandleSpace - gapSpace)
-    );
-    const halfCandleWidth = candleWidth / 2;
-
-    return (
-      <g>
-        {visiblePoints.map((point) => {
-          const candle = point.close > point.open;
-          const candleColor = candle ? boxColors.positive : boxColors.negative;
-
-          const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
-          const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
-          const rawBodyHeight = bodyBottom - bodyTop;
-          const bodyHeight = Math.max(6, rawBodyHeight);
-
-          return (
-            <g
-              key={point.timestamp}
-              transform={`translate(${point.scaledX - halfCandleWidth}, 0)`}
-            >
-              <line
-                x1={halfCandleWidth}
-                y1={point.scaledHigh}
-                x2={halfCandleWidth}
-                y2={bodyTop}
-                stroke={candleColor}
-                strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH}
-              />
-              <line
-                x1={halfCandleWidth}
-                y1={bodyBottom}
-                x2={halfCandleWidth}
-                y2={point.scaledLow}
-                stroke={candleColor}
-                strokeWidth={CHART_CONFIG.CANDLES.WICK_WIDTH}
-              />
-              <rect
-                x={0}
-                y={bodyTop}
-                width={candleWidth}
-                height={bodyHeight}
-                fill="none"
-                stroke={candleColor}
-                strokeWidth={1}
-              />
-            </g>
-          );
-        })}
-      </g>
-    );
-  }
-);
 
 const CandleChart = ({
   candles = [],
@@ -596,13 +464,21 @@ const CandleChart = ({
             <g
               transform={`translate(${CHART_CONFIG.PADDING.left},${CHART_CONFIG.PADDING.top})`}
             >
-              <CandleSticks
-                data={initialVisibleData}
-                width={1000}
-                height={500}
-                rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
-                chartType={chartType}
-              />
+              {chartType === "line" ? (
+                <LineChart
+                  data={initialVisibleData}
+                  width={1000}
+                  height={500}
+                  rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                />
+              ) : (
+                <CandleSticks
+                  data={initialVisibleData}
+                  width={1000}
+                  height={500}
+                  rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                />
+              )}
             </g>
           </svg>
         </>
@@ -632,13 +508,21 @@ const CandleChart = ({
                   pair={pair}
                 />
               )}
-              <CandleSticks
-                data={visibleData}
-                width={chartWidth}
-                height={chartHeight}
-                rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
-                chartType={chartType}
-              />
+              {chartType === "line" ? (
+                <LineChart
+                  data={visibleData}
+                  width={chartWidth}
+                  height={chartHeight}
+                  rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                />
+              ) : (
+                <CandleSticks
+                  data={visibleData}
+                  width={chartWidth}
+                  height={chartHeight}
+                  rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                />
+              )}
               <XAxis
                 data={visibleData}
                 chartWidth={chartWidth}

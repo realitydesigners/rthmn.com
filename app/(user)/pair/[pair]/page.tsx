@@ -32,8 +32,8 @@ async function fetchApiData(
     // Add timestamp to prevent caching and ensure fresh data
     const timestamp = Date.now();
     const endpoint = hasSubscription
-      ? `/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`
-      : `/public/candles/${pair.toUpperCase()}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`;
+      ? `/candles/${pair}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`
+      : `/public/candles/${pair}?limit=${CANDLE_LIMIT}&interval=1min&recent=true&_t=${timestamp}`;
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_SERVER_URL}${endpoint}`,
