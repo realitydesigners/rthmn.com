@@ -42,7 +42,7 @@ const styles = create({
     position: "relative",
     display: "block",
     height: "100%",
-    overflowY: "hidden",
+    overflowY: "",
   },
 
   // Price axis
@@ -74,9 +74,8 @@ const styles = create({
 
   // Price label
   priceLabel: {
-    marginLeft: "0.25rem",
     fontFamily: "Kodemono, monospace",
-    fontSize: "8px",
+
     letterSpacing: "0.05em",
   },
 
@@ -121,6 +120,7 @@ interface BoxTimelineProps {
   className?: string;
   hoveredTimestamp?: number | null;
   showLine?: boolean;
+  pair?: string; // Add pair prop for proper price formatting
 }
 
 const Histogram: React.FC<BoxTimelineProps> = ({
@@ -132,6 +132,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
   className = "",
   hoveredTimestamp,
   showLine = true,
+  pair = "EURUSD", // Default pair
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -183,29 +184,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
     if (framesToDraw.length === 0) return;
 
-    // Console log histogram's most current frame for comparison with ResoBox
-    const mostCurrentFrame = framesToDraw[framesToDraw.length - 1];
-    // console.log("📊 Histogram Most Current Frame:", {
-    //   timestamp: mostCurrentFrame.timestamp,
-    //   totalFrames: framesToDraw.length,
-    //   currentFrameBoxes: mostCurrentFrame.progressiveValues.map((b) => ({
-    //     value: b.value,
-    //     high: b.high,
-    //     low: b.low,
-    //   })),
-    //   sortedByAbsValue: [...mostCurrentFrame.progressiveValues]
-    //     .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
-    //     .map((b) => ({
-    //       value: b.value,
-    //       high: b.high,
-    //       low: b.low,
-    //     })),
-    //   largestBox: [...mostCurrentFrame.progressiveValues].sort(
-    //     (a, b) => Math.abs(b.value) - Math.abs(a.value)
-    //   )[0],
-    // });
-
-    // Build frame to timestamp mapping for hover functionality
     frameToRealTimestampRef.current.clear();
     framesToDraw.forEach((frame, index) => {
       const frameTimestamp = new Date(frame.timestamp).getTime();
@@ -362,7 +340,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         // Draw box borders for visualization
         orderedBoxes.forEach((box, boxIndex) => {
           const y = boxIndex * boxSize;
-          ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
           ctx.lineWidth = 1;
           ctx.strokeRect(x, y, boxSize, boxSize);
         });
@@ -523,7 +501,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         ctx.fill();
       }
 
-      // Draw white line
       ctx.beginPath();
       linePoints.forEach((point, index) => {
         if (index === 0) {
@@ -541,17 +518,46 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       ctx.strokeStyle = LINE_COLOR;
       ctx.stroke();
 
-      // Draw white circle at the end
       if (linePoints.length > 0) {
         const lastPoint = linePoints[linePoints.length - 1];
         ctx.beginPath();
         ctx.arc(lastPoint.x + boxSize, lastPoint.y, 3, 0, Math.PI * 2);
         ctx.fillStyle = LINE_COLOR;
         ctx.fill();
+
+        // Add current price text next to the white dot
+        const currentFrame = framesToDraw[framesToDraw.length - 1];
+        if (currentFrame?.currentOHLC?.close) {
+          const currentPrice = currentFrame.currentOHLC.close;
+
+          ctx.font = "8px Kodemono, monospace";
+          ctx.textAlign = "left";
+          ctx.textBaseline = "middle";
+
+          // Position the price text to the right of the dot with some padding
+          const textX = lastPoint.x + boxSize + 8;
+          const textY = lastPoint.y;
+
+          // Add a small background for better readability
+          const text = formatPrice(currentPrice, pair);
+          const textMetrics = ctx.measureText(text);
+          const padding = 3;
+
+          ctx.fillStyle = "rgba(0, 0, 0, 0.8)";
+          ctx.fillRect(
+            textX - padding,
+            textY - 7,
+            textMetrics.width + padding * 2,
+            14
+          );
+
+          // Draw the price text
+          ctx.fillStyle = "white";
+          ctx.fillText(text, textX, textY);
+        }
       }
     }
 
-    // After all drawing is done, scroll to the highlighted frame if needed
     if (highlightIndex !== -1 && scrollContainerRef.current) {
       const scrollContainer = scrollContainerRef.current;
       const highlightX = highlightIndex * boxSize;
@@ -572,7 +578,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       });
     }
 
-    // After all drawing is done, scroll to the latest data point
     if (scrollContainerRef.current) {
       const scrollContainer = scrollContainerRef.current;
       scrollContainer.scrollLeft =
@@ -590,6 +595,7 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     boxVisibilityFilter,
     hoveredTimestamp,
     hoveredFrame,
+    pair,
   ]);
 
   // Handle mouse events for hover tooltip
@@ -629,9 +635,8 @@ const Histogram: React.FC<BoxTimelineProps> = ({
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, []); // No dependencies needed since we use fixed 5px frame width
+  }, []);
 
-  // Helper function to convert hex to rgba
   const hexToRgba = (hex: string, alpha: number) => {
     try {
       const r = parseInt(hex.slice(1, 3), 16);
@@ -646,7 +651,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
   return (
     <div {...props(styles.container, className)}>
-      {/* Hover tooltip */}
       {hoveredFrame && (
         <div {...props(styles.tooltip)}>
           {new Date(hoveredFrame.timestamp).toLocaleString("en-US", {
@@ -665,64 +669,113 @@ const Histogram: React.FC<BoxTimelineProps> = ({
         </div>
       </div>
 
-      {/* Price axis */}
       {data.length > 0 && (
         <div {...props(styles.priceAxis)}>
           {(() => {
-            // Get the current/latest frame
             const currentFrame = data[data.length - 1];
             if (!currentFrame?.progressiveValues?.length) return null;
 
-            // Get visible boxes based on offset and count
             const visibleBoxes = currentFrame.progressiveValues.slice(
               boxOffset,
               boxOffset + visibleBoxesCount
             );
 
-            const color = "#797E86"; // Use consistent gray color
+            const negativeBoxes: Array<
+              (typeof visibleBoxes)[0] & { index: number }
+            > = [];
+            const positiveBoxes: Array<
+              (typeof visibleBoxes)[0] & { index: number }
+            > = [];
+            const zeroBoxes: Array<
+              (typeof visibleBoxes)[0] & { index: number }
+            > = [];
+
+            visibleBoxes.forEach((box, index) => {
+              const boxWithIndex = { ...box, index };
+              if (box.value < 0) {
+                negativeBoxes.push(boxWithIndex);
+              } else if (box.value > 0) {
+                positiveBoxes.push(boxWithIndex);
+              } else {
+                zeroBoxes.push(boxWithIndex);
+              }
+            });
+
+            negativeBoxes.sort((a, b) => a.value - b.value);
+            positiveBoxes.sort((a, b) => a.value - b.value);
+
+            const repositionedBoxes = [
+              ...negativeBoxes,
+              ...zeroBoxes,
+              ...positiveBoxes,
+            ];
+
+            const maxHigh = Math.max(...repositionedBoxes.map((b) => b.high));
+            const minLow = Math.min(...repositionedBoxes.map((b) => b.low));
+            const hasPositiveBoxes = repositionedBoxes.some((b) => b.value > 0);
 
             return (
               <>
-                {/* Render price lines for each visible box */}
-                {visibleBoxes.map((box, index) => {
-                  const boxHeight = 100 / visibleBoxesCount; // Height percentage for each box
-                  const yPosition = index * boxHeight;
+                {hasPositiveBoxes && (
+                  <>
+                    {/* Show max HIGH at the top */}
+                    <div
+                      {...props(styles.priceLabel)}
+                      style={{
+                        position: "absolute",
+                        top: "-2%",
+                        transform: "translateY(-50%)",
+                        fontSize: "7px",
+                        color: "#797E86",
+                      }}
+                    >
+                      {formatPrice(maxHigh, pair)}
+                    </div>
+
+                    {/* Show min LOW at the bottom */}
+                    <div
+                      {...props(styles.priceLabel)}
+                      style={{
+                        position: "absolute",
+                        bottom: "1%",
+                        transform: "translateY(50%)",
+                        fontSize: "7px",
+                        color: "#797E86",
+                      }}
+                    >
+                      {formatPrice(minLow, pair)}
+                    </div>
+                  </>
+                )}
+
+                {/* Show all individual box prices except duplicates */}
+                {repositionedBoxes.map((box, displayIndex) => {
+                  const price = box.value < 0 ? box.high : box.low;
+                  const boxHeight = 100 / repositionedBoxes.length;
+
+                  // Skip if this price would duplicate the summary prices
+                  const isDuplicateTop = hasPositiveBoxes && price === maxHigh;
+                  const isDuplicateBottom =
+                    hasPositiveBoxes && price === minLow;
+
+                  if (isDuplicateTop || isDuplicateBottom) {
+                    return null; // Skip duplicate prices
+                  }
 
                   return (
-                    <div key={`price-${index}`}>
-                      {/* Show high price for negative boxes */}
-                      {box.value < 0 && (
-                        <div
-                          {...props(styles.priceLine)}
-                          style={{
-                            position: "absolute",
-                            top: `${yPosition}%`,
-                          }}
-                        >
-                          <span {...props(styles.priceLabel)} style={{ color }}>
-                            {formatPrice(box.high, "EURUSD")}
-                          </span>
-                        </div>
-                      )}
-                      {/* Show low price for positive boxes */}
-                      {box.value >= 0 && (
-                        <div
-                          {...props(styles.priceLine)}
-                          style={{
-                            position: "absolute",
-                            top: `${yPosition + boxHeight}%`,
-                            transform: "translateY(-100%)",
-                          }}
-                        >
-                          <div
-                            {...props(styles.priceLineSeparator)}
-                            style={{ backgroundColor: color }}
-                          />
-                          <span {...props(styles.priceLabel)} style={{ color }}>
-                            {formatPrice(box.low, "EURUSD")}
-                          </span>
-                        </div>
-                      )}
+                    <div
+                      key={displayIndex}
+                      {...props(styles.priceLabel)}
+                      style={{
+                        position: "absolute",
+                        top: `${displayIndex * boxHeight + boxHeight / 1.3}%`,
+                        transform: "translateY(-50%)",
+                        fontSize: "7px",
+                        marginBottom: "px",
+                        color: "#797E86", // Gray color
+                      }}
+                    >
+                      {formatPrice(price, pair)}
                     </div>
                   );
                 })}

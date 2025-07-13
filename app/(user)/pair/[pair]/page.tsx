@@ -168,6 +168,43 @@ export default async function PairPage(props: PageProps) {
     `📊 Pair ${pair}: Processed ${candleData.length} 1min candles and ${boxData.length} 5min candles`
   );
 
+  // Log the latest histogram data point from 5min processing
+  if (histogramBoxes.length > 0) {
+    const latestFrame = histogramBoxes[histogramBoxes.length - 1];
+    console.log(`📈 ${pair} Latest Histogram Frame (5min data):`, {
+      timestamp: latestFrame.timestamp,
+      boxCount: latestFrame.progressiveValues?.length || 0,
+      firstFewBoxes:
+        latestFrame.progressiveValues?.slice(0, 5).map((box) => ({
+          high: box.high,
+          low: box.low,
+          value: box.value,
+        })) || [],
+      comparison: {
+        candleData_1min: {
+          count: candleData.length,
+          latest:
+            candleData.length > 0
+              ? {
+                  timestamp: candleData[candleData.length - 1]?.timestamp,
+                  close: candleData[candleData.length - 1]?.close,
+                }
+              : null,
+        },
+        boxData_5min: {
+          count: boxData.length,
+          latest:
+            boxData.length > 0
+              ? {
+                  timestamp: boxData[boxData.length - 1]?.timestamp,
+                  close: boxData[boxData.length - 1]?.close,
+                }
+              : null,
+        },
+      },
+    });
+  }
+
   const chartData = {
     processedCandles,
     initialVisibleData,

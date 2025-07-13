@@ -128,6 +128,26 @@ export default async function DashboardPage() {
           const { histogramBoxes } = processInitialBoxData(boxCandleData, pair);
           pairHistoricalData[pair] = histogramBoxes;
 
+          // Console log the latest histogram data point
+          if (histogramBoxes.length > 0) {
+            const latestFrame = histogramBoxes[histogramBoxes.length - 1];
+            console.log(`📊 ${pair} Latest Histogram Frame (5min data):`, {
+              timestamp: latestFrame.timestamp,
+              boxCount: latestFrame.progressiveValues?.length || 0,
+              firstFewBoxes:
+                latestFrame.progressiveValues?.slice(0, 3).map((box) => ({
+                  high: box.high,
+                  low: box.low,
+                  value: box.value,
+                })) || [],
+              candleDataLength: boxCandleData.length,
+              latestCandle: {
+                timestamp: boxCandleData[boxCandleData.length - 1]?.timestamp,
+                close: boxCandleData[boxCandleData.length - 1]?.close,
+              },
+            });
+          }
+
           const pairEndTime = performance.now();
           const pairDuration = pairEndTime - pairStartTime;
         } else {

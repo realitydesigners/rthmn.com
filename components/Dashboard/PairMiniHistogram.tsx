@@ -42,6 +42,16 @@ const PairMiniHistogram: React.FC<{
     // Start with historical data
     let processedData = [...histogramData];
 
+    // Console log the latest historical frame
+    if (processedData.length > 0) {
+      const latestHistorical = processedData[processedData.length - 1];
+      console.log(`🎯 ${pair} Historical Data (5min):`, {
+        frameCount: processedData.length,
+        latestTimestamp: latestHistorical.timestamp,
+        latestBoxCount: latestHistorical.progressiveValues?.length || 0,
+      });
+    }
+
     // FIXED: Add current live data as the most recent frame when available
     if (boxSlice && boxSlice.boxes && boxSlice.boxes.length > 0) {
       // Create a live frame that matches the histogram data structure
@@ -85,6 +95,20 @@ const PairMiniHistogram: React.FC<{
           settings.startIndex + settings.maxBoxCount
         ) || [],
     }));
+
+    // Log final filtered result
+    if (filtered.length > 0) {
+      const finalFrame = filtered[filtered.length - 1];
+      console.log(`✅ ${pair} Final Filtered Data:`, {
+        totalFrames: filtered.length,
+        latestTimestamp: finalFrame.timestamp,
+        visibleBoxes: finalFrame.progressiveValues?.length || 0,
+        settings: {
+          startIndex: settings.startIndex,
+          maxBoxCount: settings.maxBoxCount,
+        },
+      });
+    }
 
     return filtered;
   }, [
@@ -135,7 +159,7 @@ const PairMiniHistogram: React.FC<{
   const latestFrame = filteredHistogramData[filteredHistogramData.length - 1];
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 rounded-lg ">
       <div className="flex items-center gap-4 ">
         <div className="font-russo text-lg text-white/90">
           {pair?.toUpperCase()}
@@ -144,14 +168,7 @@ const PairMiniHistogram: React.FC<{
           {currentPrice ? formatPrice(currentPrice, pair) : "---"}
         </div>
       </div>
-      <div
-        className={`relative h-[200px] bg-[#0A0B0D] border border-[#1C1E23] rounded-lg ${className}`}
-      >
-        <div className="absolute bottom-1 right-1 z-10">
-          <span className="text-xs font-mono text-white/70 bg-black/50 px-1 rounded">
-            {latestFrame?.progressiveValues?.length || 0}
-          </span>
-        </div>
+      <div className={`relative h-[18vh] py-4 ${className}`}>
         <Histogram
           data={filteredHistogramData}
           boxOffset={0}
@@ -163,6 +180,7 @@ const PairMiniHistogram: React.FC<{
           boxColors={boxColors}
           className="h-full"
           showLine={true}
+          pair={pair}
         />
       </div>
     </div>

@@ -244,6 +244,7 @@ const PairClient = ({
                 boxColors={boxColors}
                 hoveredTimestamp={hoveredTimestamp}
                 className="h-full"
+                pair={pair}
               />
             ) : (
               <div className="flex h-full items-center justify-center primary-text">
