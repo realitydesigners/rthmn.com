@@ -43,11 +43,13 @@ async function fetchApiData(
       return [];
     }
 
-    // Process data exactly like pair page
     const processedData = data
       .map((candle) => {
+        // --- Corrected: Directly use getUnixTimestamp ---
         const timestamp = getUnixTimestamp(candle.timestamp);
+        // --- End Correction ---
 
+        // Simple validation - skip invalid candles
         if (
           isNaN(timestamp) ||
           candle.open == null ||
@@ -90,12 +92,21 @@ async function fetchApiData(
           low: number;
           close: number;
         } => candle !== null
-      );
+      ); // Filter out nulls and type guard
 
-    // Sort by timestamp (oldest to newest)
-    return processedData.sort((a, b) => a.timestamp - b.timestamp);
+    // Early exit if no valid data remained after processing
+    if (!processedData.length) {
+      console.error(
+        "No valid candle data remained after processing timestamps and OHLC."
+      );
+      return [];
+    }
+    // Sort by timestamp to ensure chronological order (oldest to newest)
+    const sortedData = processedData.sort((a, b) => a.timestamp - b.timestamp);
+
+    return sortedData;
   } catch (error) {
-    console.error(`Error fetching candle data for ${pair}:`, error);
+    console.error(`Error fetching data for ${pair}:`, error);
     return [];
   }
 }
