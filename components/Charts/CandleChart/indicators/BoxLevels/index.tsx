@@ -1,5 +1,6 @@
 import { useColorStore } from "@/stores/colorStore";
 import { formatPrice } from "@/utils/instruments";
+import { INSTRUMENTS } from "@/utils/instruments";
 import React, { memo, useMemo } from "react";
 import type { ChartDataPoint } from "../../index";
 
@@ -46,10 +47,27 @@ const BoxLevels = memo(
       maxPrice = Math.max(maxPrice, point.high);
     });
 
-    // Calculate the center price and range
+    // Calculate the center price and range using the same logic as useChartData
     const centerPrice = (minPrice + maxPrice) / 2;
     const baseRange = maxPrice - minPrice;
-    const scaledRange = baseRange / yAxisScale;
+
+    // Ensure minimum range based on instrument precision
+    const minRangeMultiplier = 200; // Show at least 200 pips worth of range
+    let instrumentPoint = 0.00001; // Default forex point size
+    if (pair) {
+      const upperPair = pair.toUpperCase();
+      // Search in all instrument categories
+      for (const category of Object.values(INSTRUMENTS)) {
+        if (upperPair in category) {
+          instrumentPoint = (category as any)[upperPair].point;
+          break;
+        }
+      }
+    }
+
+    const minRange = instrumentPoint * minRangeMultiplier;
+    const adjustedRange = Math.max(baseRange, minRange);
+    const scaledRange = adjustedRange / yAxisScale;
     const padding = scaledRange * 0.05;
     const paddedMin = centerPrice - scaledRange / 2 - padding;
     const paddedMax = centerPrice + scaledRange / 2 + padding;
@@ -61,7 +79,6 @@ const BoxLevels = memo(
     };
 
     // Constants for line appearance
-
     const PRICE_LINE_OPACITY = 0.5;
     const adjustedWidth = width - rightMargin;
 
