@@ -178,8 +178,6 @@ const Histogram: React.FC<BoxTimelineProps> = ({
     if (!container) return;
     const rect = container.getBoundingClientRect();
 
-    // Since data is now pre-repositioned, we can use it directly
-    // Use all available data to support full timeframe slider functionality
     const framesToDraw = data;
     framesToDrawRef.current = framesToDraw;
 
@@ -187,25 +185,25 @@ const Histogram: React.FC<BoxTimelineProps> = ({
 
     // Console log histogram's most current frame for comparison with ResoBox
     const mostCurrentFrame = framesToDraw[framesToDraw.length - 1];
-    console.log("📊 Histogram Most Current Frame:", {
-      timestamp: mostCurrentFrame.timestamp,
-      totalFrames: framesToDraw.length,
-      currentFrameBoxes: mostCurrentFrame.progressiveValues.map((b) => ({
-        value: b.value,
-        high: b.high,
-        low: b.low,
-      })),
-      sortedByAbsValue: [...mostCurrentFrame.progressiveValues]
-        .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
-        .map((b) => ({
-          value: b.value,
-          high: b.high,
-          low: b.low,
-        })),
-      largestBox: [...mostCurrentFrame.progressiveValues].sort(
-        (a, b) => Math.abs(b.value) - Math.abs(a.value)
-      )[0],
-    });
+    // console.log("📊 Histogram Most Current Frame:", {
+    //   timestamp: mostCurrentFrame.timestamp,
+    //   totalFrames: framesToDraw.length,
+    //   currentFrameBoxes: mostCurrentFrame.progressiveValues.map((b) => ({
+    //     value: b.value,
+    //     high: b.high,
+    //     low: b.low,
+    //   })),
+    //   sortedByAbsValue: [...mostCurrentFrame.progressiveValues]
+    //     .sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+    //     .map((b) => ({
+    //       value: b.value,
+    //       high: b.high,
+    //       low: b.low,
+    //     })),
+    //   largestBox: [...mostCurrentFrame.progressiveValues].sort(
+    //     (a, b) => Math.abs(b.value) - Math.abs(a.value)
+    //   )[0],
+    // });
 
     // Build frame to timestamp mapping for hover functionality
     frameToRealTimestampRef.current.clear();

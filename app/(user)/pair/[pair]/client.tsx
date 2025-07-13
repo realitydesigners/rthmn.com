@@ -59,12 +59,47 @@ const PairClient = ({
     "all" | "positive" | "negative"
   >("all");
   const [showBoxLevels, setShowBoxLevels] = useState(true); // Set to true by default
+  const [chartType, setChartType] = useState<"candle" | "line">("candle");
+  const [zoomLevel, setZoomLevel] = useState(50); // Default to 50 candles
+  const [scrollOffset, setScrollOffset] = useState(0); // For horizontal scrolling
   const [hoveredTimestamp, setHoveredTimestamp] = useState<number | null>(null);
   const [isClient, setIsClient] = useState(false);
 
   const handleHoverChange = useCallback((timestamp: number | null) => {
     setHoveredTimestamp(timestamp);
   }, []);
+
+  // Calculate visible candles based on zoom level and scroll offset
+  const visibleCandles = useMemo(() => {
+    if (!candleData || candleData.length === 0) return [];
+
+    // Calculate the start index based on scroll offset
+    const maxStartIndex = Math.max(0, candleData.length - zoomLevel);
+    const startIndex = Math.max(
+      0,
+      Math.min(maxStartIndex, candleData.length - zoomLevel - scrollOffset)
+    );
+
+    // Return the slice of candles to display
+    return candleData.slice(startIndex, startIndex + zoomLevel);
+  }, [candleData, zoomLevel, scrollOffset]);
+
+  // Reset scroll when zoom changes to prevent out-of-bounds
+  useEffect(() => {
+    setScrollOffset(0);
+  }, [zoomLevel]);
+
+  // Handle horizontal scrolling
+  const handleScroll = useCallback(
+    (delta: number) => {
+      setScrollOffset((prev) => {
+        const maxOffset = Math.max(0, candleData.length - zoomLevel);
+        const newOffset = Math.max(0, Math.min(maxOffset, prev + delta));
+        return newOffset;
+      });
+    },
+    [candleData.length, zoomLevel]
+  );
 
   const settings = useTimeframeStore(
     useCallback(
@@ -171,9 +206,10 @@ const PairClient = ({
         <div className="relative flex h-[70vh] w-full flex-col">
           {candleData && candleData.length > 0 ? (
             <CandleChart
-              candles={candleData}
-              initialVisibleData={candleData}
+              candles={visibleCandles}
+              initialVisibleData={visibleCandles}
               pair={pair}
+              chartType={chartType}
               histogramBoxes={histogramData.map((frame, index) => ({
                 timestamp: frame.timestamp,
                 boxes: frame.progressiveValues,
@@ -185,6 +221,7 @@ const PairClient = ({
               hoveredTimestamp={hoveredTimestamp}
               onHoverChange={handleHoverChange}
               showBoxLevels={showBoxLevels}
+              onScroll={handleScroll}
             />
           ) : (
             <div className="flex h-full items-center justify-center text-white">
@@ -222,7 +259,6 @@ const PairClient = ({
             <div className="h-auto w-auto pl-8 pr-16 py-8">
               <ResoBox
                 slice={filteredBoxSlice}
-                className="h-full w-full"
                 boxColors={boxColors}
                 pair={pair}
                 showPriceLines={settings.showPriceLines}
@@ -235,10 +271,14 @@ const PairClient = ({
       {/* Chart Controls - Now positioned on left side */}
       <div className="fixed left-12 top-1/3 transform -translate-y-1/2 z-30 pointer-events-auto z-[10]">
         <ChartControls
+          chartType={chartType}
+          setChartType={setChartType}
           showBoxLevels={showBoxLevels}
           setShowBoxLevels={setShowBoxLevels}
           boxVisibilityFilter={boxVisibilityFilter}
           setBoxVisibilityFilter={setBoxVisibilityFilter}
+          zoomLevel={zoomLevel}
+          setZoomLevel={setZoomLevel}
           currentPrice={formatPrice(currentPrice, pair)}
           pair={pair}
         />

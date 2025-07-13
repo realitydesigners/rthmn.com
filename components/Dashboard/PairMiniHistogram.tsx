@@ -136,7 +136,7 @@ const PairMiniHistogram: React.FC<{
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-4 px-2">
+      <div className="flex items-center gap-4 ">
         <div className="font-russo text-lg text-white/90">
           {pair?.toUpperCase()}
         </div>

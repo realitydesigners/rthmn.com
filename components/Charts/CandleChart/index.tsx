@@ -129,11 +129,11 @@ export const CHART_CONFIG = {
     LABEL_WIDTH: 65,
   },
   CANDLES: {
-    MIN_WIDTH: 2,
-    MAX_WIDTH: 15,
-    MIN_SPACING: 1,
+    MIN_WIDTH: 3,
+    MAX_WIDTH: 20,
+    MIN_SPACING: 2,
     WICK_WIDTH: 1.5,
-    GAP_RATIO: 0.5, // 40% gap between candles
+    GAP_RATIO: 0.15, // 15% gap between candles (much tighter)
     RIGHT_MARGIN: 64,
   },
   BOX_LEVELS: {
@@ -167,87 +167,92 @@ interface CandleSticksProps {
 }
 
 const CandleSticks = memo(
-  ({ data, width, height, rightMargin }: CandleSticksProps) => {
+  ({
+    data,
+    width,
+    height,
+    rightMargin,
+    chartType,
+  }: CandleSticksProps & { chartType: "candle" | "line" }) => {
     const { boxColors } = useColorStore();
 
     // Use passed rightMargin
     const adjustedWidth = width - rightMargin;
 
-    // Calculate candle width to use 80% of available space (leaving 20% for gaps)
-    const candleWidth = Math.max(
-      CHART_CONFIG.CANDLES.MIN_WIDTH,
-      Math.min(
-        CHART_CONFIG.CANDLES.MAX_WIDTH,
-        (adjustedWidth / data.length) * (1 - CHART_CONFIG.CANDLES.GAP_RATIO)
-      )
-    );
-    const halfCandleWidth = candleWidth / 2;
-
-    // Debug candle data to understand dots issue
-    if (data.length > 0) {
-      const sampleCandles = data.slice(0, 5);
-      console.log("🕯️ Candle Debug (first 5):", {
-        totalCandles: data.length,
-        candleWidth,
-        adjustedWidth,
-        sampleCandles: sampleCandles.map((candle) => ({
-          timestamp: new Date(candle.timestamp).toISOString(),
-          ohlc: {
-            open: candle.open,
-            high: candle.high,
-            low: candle.low,
-            close: candle.close,
-          },
-          scaled: {
-            open: candle.scaledOpen,
-            high: candle.scaledHigh,
-            low: candle.scaledLow,
-            close: candle.scaledClose,
-          },
-          rawBodyHeight: Math.abs(candle.scaledClose - candle.scaledOpen),
-          finalBodyHeight: Math.max(
-            6,
-            Math.abs(candle.scaledClose - candle.scaledOpen)
-          ),
-          wickHeight: Math.abs(candle.scaledHigh - candle.scaledLow),
-          priceRange: candle.high - candle.low,
-          bodyRange: Math.abs(candle.close - candle.open),
-          scalingDifference: {
-            priceRange: candle.high - candle.low,
-            scaledRange: Math.abs(candle.scaledHigh - candle.scaledLow),
-            scalingFactor:
-              Math.abs(candle.scaledHigh - candle.scaledLow) /
-              (candle.high - candle.low),
-          },
-        })),
-      });
-    }
-
-    // Adjust x positions to account for right margin
-    const adjustedData = data.map((point) => ({
+    // Adjust x positions to account for right margin and proper spacing
+    const adjustedData = data.map((point, index) => ({
       ...point,
-      scaledX: (point.scaledX / width) * adjustedWidth,
+      scaledX:
+        index * (adjustedWidth / data.length) + adjustedWidth / data.length / 2,
     }));
 
-    // Filter visible candles before mapping
-    const visibleCandles = adjustedData.filter((point) => {
-      const isVisible =
-        point.scaledX >= -candleWidth &&
-        point.scaledX <= adjustedWidth + candleWidth;
+    // Filter visible points
+    const visiblePoints = adjustedData.filter((point) => {
+      const isVisible = point.scaledX >= 0 && point.scaledX <= adjustedWidth;
       return isVisible;
     });
 
+    if (chartType === "line") {
+      if (visiblePoints.length < 2) return null;
+
+      // Create path string for the line using extreme values (high or low)
+      const pathData = visiblePoints
+        .map((point, index) => {
+          const command = index === 0 ? "M" : "L";
+
+          // For the last point, use close price
+          if (index === visiblePoints.length - 1) {
+            return `${command} ${point.scaledX} ${point.scaledClose}`;
+          }
+
+          // For other points, determine which is more extreme
+          // Get the center line (midpoint between high and low)
+          const midPoint = (point.scaledHigh + point.scaledLow) / 2;
+
+          // Use the value that's furthest from the center
+          const highDistance = Math.abs(point.scaledHigh - midPoint);
+          const lowDistance = Math.abs(point.scaledLow - midPoint);
+
+          const useHigh = highDistance >= lowDistance;
+          const yValue = useHigh ? point.scaledHigh : point.scaledLow;
+
+          return `${command} ${point.scaledX} ${yValue}`;
+        })
+        .join(" ");
+
+      return (
+        <g>
+          <path
+            d={pathData}
+            stroke="white"
+            strokeWidth={2}
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
+      );
+    }
+
+    // Candlestick mode - calculate consistent width and spacing
+    const totalCandleSpace = adjustedWidth / data.length;
+    const gapSpace = totalCandleSpace * CHART_CONFIG.CANDLES.GAP_RATIO;
+    const candleWidth = Math.max(
+      CHART_CONFIG.CANDLES.MIN_WIDTH,
+      Math.min(CHART_CONFIG.CANDLES.MAX_WIDTH, totalCandleSpace - gapSpace)
+    );
+    const halfCandleWidth = candleWidth / 2;
+
     return (
       <g>
-        {visibleCandles.map((point) => {
+        {visiblePoints.map((point) => {
           const candle = point.close > point.open;
           const candleColor = candle ? boxColors.positive : boxColors.negative;
 
           const bodyTop = Math.min(point.scaledOpen, point.scaledClose);
           const bodyBottom = Math.max(point.scaledOpen, point.scaledClose);
-          // Ensure minimum body height for visibility, especially for small forex movements
           const rawBodyHeight = bodyBottom - bodyTop;
-          const bodyHeight = Math.max(6, rawBodyHeight); // Minimum 6px height
+          const bodyHeight = Math.max(6, rawBodyHeight);
 
           return (
             <g
@@ -291,6 +296,7 @@ const CandleChart = ({
   candles = [],
   initialVisibleData,
   pair,
+  chartType = "candle",
   histogramBoxes = [],
   boxOffset = 0,
   visibleBoxesCount = 7,
@@ -298,10 +304,12 @@ const CandleChart = ({
   hoveredTimestamp,
   onHoverChange,
   showBoxLevels = true,
+  onScroll,
 }: {
   candles?: ChartDataPoint[];
   initialVisibleData: ChartDataPoint[];
   pair: string;
+  chartType?: "candle" | "line";
   histogramBoxes?: any[];
   boxOffset?: number;
   visibleBoxesCount?: number;
@@ -309,6 +317,7 @@ const CandleChart = ({
   hoveredTimestamp?: number | null;
   onHoverChange?: (timestamp: number | null) => void;
   showBoxLevels?: boolean;
+  onScroll?: (delta: number) => void;
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -320,15 +329,6 @@ const CandleChart = ({
   const [scrollStart, setScrollStart] = useState(0);
 
   // Debug CandleChart rendering
-  console.log("📊 CandleChart Debug:", {
-    candlesCount: candles?.length || 0,
-    pair: pair,
-    dimensions: dimensions,
-    yAxisScale: yAxisScale,
-    firstCandle: candles?.[0],
-    lastCandle: candles?.[candles.length - 1],
-    containerExists: !!containerRef.current,
-  });
 
   const chartPadding = CHART_CONFIG.PADDING;
   const chartWidth = dimensions.width - chartPadding.left - chartPadding.right;
@@ -388,6 +388,25 @@ const CandleChart = ({
     [chartHeight]
   );
 
+  // Handle horizontal scrolling with mouse wheel
+  const handleWheel = useCallback(
+    (event: React.WheelEvent) => {
+      if (!onScroll) return;
+
+      event.preventDefault();
+
+      // Use horizontal scroll or shift+vertical scroll
+      const deltaX = event.deltaX || (event.shiftKey ? event.deltaY : 0);
+
+      if (Math.abs(deltaX) > 0) {
+        // Normalize scroll delta and apply to scroll offset
+        const scrollDelta = Math.sign(deltaX);
+        onScroll(scrollDelta);
+      }
+    },
+    [onScroll]
+  );
+
   // Optimize drag handlers with throttling
   const dragHandlers = useMemo(() => {
     let lastDragTime = 0;
@@ -396,21 +415,16 @@ const CandleChart = ({
 
     const updateScroll = (clientX: number) => {
       const now = Date.now();
-      if (now - lastScrollUpdate < THROTTLE_MS) return;
+      if (now - lastScrollUpdate < THROTTLE_MS || !onScroll) return;
 
       const deltaX = clientX - dragStart;
-      const maxScroll = Math.max(
-        0,
-        candles.length *
-          (CHART_CONFIG.CANDLES.MIN_WIDTH + CHART_CONFIG.CANDLES.MIN_SPACING) -
-          chartWidth
-      );
-      const newScrollLeft = Math.max(
-        0,
-        Math.min(maxScroll, scrollStart - deltaX)
-      );
+      // Convert pixel movement to scroll steps
+      const scrollDelta = Math.round(deltaX / 20); // Adjust sensitivity
 
-      setScrollLeft(newScrollLeft);
+      if (scrollDelta !== 0) {
+        onScroll(-scrollDelta); // Negative for natural scrolling
+      }
+
       lastScrollUpdate = now;
     };
 
@@ -445,9 +459,8 @@ const CandleChart = ({
     isYAxisDragging,
     dragStart,
     scrollStart,
-    chartWidth,
-    candles.length,
     scrollLeft,
+    onScroll,
   ]);
 
   // --- Derive displayed hover info from the hoveredTimestamp prop ---
@@ -566,23 +579,6 @@ const CandleChart = ({
   };
 
   // Debug rendering path
-  console.log("🎯 CandleChart Render Path:", {
-    chartWidth: chartWidth,
-    chartHeight: chartHeight,
-    initialVisibleDataLength: initialVisibleData?.length || 0,
-    visibleDataLength: visibleData?.length || 0,
-    path1:
-      (!chartWidth || !chartHeight) && initialVisibleData
-        ? "INITIAL_VISIBLE"
-        : "NO",
-    path2: visibleData.length > 0 ? "VISIBLE_DATA" : "NO_DATA",
-    finalPath:
-      (!chartWidth || !chartHeight) && initialVisibleData
-        ? "INITIAL_VISIBLE"
-        : visibleData.length > 0
-          ? "VISIBLE_DATA"
-          : "NO_DATA",
-  });
 
   return (
     <div
@@ -592,6 +588,7 @@ const CandleChart = ({
       onMouseMove={dragHandlers.onMouseMove}
       onMouseUp={dragHandlers.onMouseUp}
       onMouseLeave={dragHandlers.onMouseLeave}
+      onWheel={handleWheel}
     >
       {(!chartWidth || !chartHeight) && initialVisibleData ? (
         <>
@@ -604,6 +601,7 @@ const CandleChart = ({
                 width={1000}
                 height={500}
                 rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                chartType={chartType}
               />
             </g>
           </svg>
@@ -639,6 +637,7 @@ const CandleChart = ({
                 width={chartWidth}
                 height={chartHeight}
                 rightMargin={CHART_CONFIG.CANDLES.RIGHT_MARGIN}
+                chartType={chartType}
               />
               <XAxis
                 data={visibleData}

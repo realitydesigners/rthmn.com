@@ -255,7 +255,7 @@ export default function Dashboard({
       )} */}
 
       {!isZenMode && (
-        <div className="w-full px-2 pb-24 lg:pb-2 pt-14 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="w-full  pb-24 lg:pb-2 pt-14 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <OnboardingUpgradeBanner
             isVisible={showUpgradeBanner}
             onUpgrade={handleUpgrade}
