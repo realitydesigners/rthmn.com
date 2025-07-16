@@ -122,34 +122,26 @@ const PairMiniHistogram: React.FC<{
   if (isLoading) {
     return (
       <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between px-2">
+        <div className="flex items-center gap-6">
           <div className="font-russo text-lg text-white/90">
             {pair?.toUpperCase()}
           </div>
-          <div className="font-mono text-sm text-white/70">Loading...</div>
+          <div
+            className="h-4 w-16 bg-[#0F1012] rounded animate-pulse"
+            style={{
+              animationDuration: "2s",
+            }}
+          />
         </div>
         <div
           className={`flex items-center justify-center h-[200px] bg-[#0A0B0D] border border-[#1C1E23] rounded-lg ${className}`}
         >
-          <div className="text-xs text-gray-400">Loading...</div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!filteredHistogramData || filteredHistogramData.length === 0) {
-    return (
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center justify-between px-2">
-          <div className="font-russo text-lg text-white/90">
-            {pair?.toUpperCase()}
-          </div>
-          <div className="font-mono text-sm text-white/70">No Data</div>
-        </div>
-        <div
-          className={`flex items-center justify-center h-[200px] bg-[#0A0B0D] border border-[#1C1E23] rounded-lg ${className}`}
-        >
-          <div className="text-xs text-gray-400">No Data</div>
+          <div
+            className="w-full h-full bg-[#0F1012] rounded animate-pulse"
+            style={{
+              animationDuration: "2s",
+            }}
+          />
         </div>
       </div>
     );
@@ -159,8 +151,8 @@ const PairMiniHistogram: React.FC<{
   const latestFrame = filteredHistogramData[filteredHistogramData.length - 1];
 
   return (
-    <div className="flex flex-col gap-2 rounded-lg ">
-      <div className="flex items-center gap-4 ">
+    <div className="flex flex-col gap-6 rounded-lg ">
+      <div className="flex items-center gap-6">
         <div className="font-russo text-lg text-white/90">
           {pair?.toUpperCase()}
         </div>

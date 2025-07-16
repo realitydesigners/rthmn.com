@@ -160,9 +160,6 @@ export default async function DashboardPage() {
   );
 
   const totalDashboardTime = performance.now() - dashboardStartTime;
-  console.log(
-    `🏁 Dashboard loading completed: ${totalDashboardTime.toFixed(2)}ms for ${DASHBOARD_PAIRS.length} pairs`
-  );
 
   return <DashboardClient pairHistoricalData={pairHistoricalData} />;
 }

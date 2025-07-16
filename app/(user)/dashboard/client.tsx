@@ -267,7 +267,7 @@ export default function Dashboard({
             style={{
               gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))`,
               gap:
-                boxColors?.styles?.viewMode === "histogram" ? "1rem" : "0.5rem",
+                boxColors?.styles?.viewMode === "histogram" ? "1rem" : "0rem",
               padding:
                 boxColors?.styles?.viewMode === "histogram"
                   ? "0 1rem"
@@ -278,60 +278,6 @@ export default function Dashboard({
               orderedPairs.map((pair) => {
                 const data = pairData[pair];
                 const histogramData = pairHistoricalData[pair] || [];
-
-                // Log complete slice data for the most recent timestamp
-                if (data?.boxes?.[0] || histogramData.length > 0) {
-                  console.log(`🔍 ${pair} COMPLETE SLICE DATA:`, {
-                    pair,
-                    liveData: {
-                      hasLiveBoxSlice: !!data?.boxes?.[0],
-                      liveTimestamp: data?.boxes?.[0]?.timestamp,
-                      liveBoxCount: data?.boxes?.[0]?.boxes?.length || 0,
-                      completeLiveSlice: data?.boxes?.[0], // ENTIRE live slice
-                    },
-                    historicalData: {
-                      totalFrames: histogramData.length,
-                      timestamps: histogramData.map((frame) => frame.timestamp),
-                      timestampsInOrder: histogramData
-                        .map((frame) => frame.timestamp)
-                        .join(" -> "),
-                      isReversed:
-                        histogramData.length > 1
-                          ? new Date(histogramData[0].timestamp).getTime() >
-                            new Date(
-                              histogramData[histogramData.length - 1].timestamp
-                            ).getTime()
-                          : false,
-                      lastFrame:
-                        histogramData.length > 0
-                          ? {
-                              timestamp:
-                                histogramData[histogramData.length - 1]
-                                  ?.timestamp,
-                              boxCount:
-                                histogramData[histogramData.length - 1]
-                                  ?.progressiveValues?.length || 0,
-                              completeLastSlice:
-                                histogramData[histogramData.length - 1], // ENTIRE last historical slice
-                            }
-                          : null,
-                      firstFrame:
-                        histogramData.length > 0
-                          ? {
-                              timestamp: histogramData[0]?.timestamp,
-                              boxCount:
-                                histogramData[0]?.progressiveValues?.length ||
-                                0,
-                            }
-                          : null,
-                    },
-                    dataComparison: {
-                      usingLiveData: !!data?.boxes?.[0],
-                      usingHistoricalData: histogramData.length > 0,
-                      viewMode: boxColors?.styles?.viewMode,
-                    },
-                  });
-                }
 
                 return (
                   <motion.div
