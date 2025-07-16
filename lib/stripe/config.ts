@@ -1,5 +1,6 @@
 import Stripe from "stripe";
 
+// New Stripe instance (primary)
 export const stripe = new Stripe(
 	process.env.STRIPE_SECRET_KEY_LIVE ?? process.env.STRIPE_SECRET_KEY ?? "",
 	{
@@ -10,9 +11,28 @@ export const stripe = new Stripe(
 		// Register this as an official Stripe plugin.
 		// https://stripe.com/docs/building-plugins#setappinfo
 		appInfo: {
-			name: "Next.js Subscription Starter",
-			version: "0.0.0",
-			url: "https://github.com/vercel/nextjs-subscription-payments",
+			name: "RTHMN Trading Platform",
+			version: "2.0.0",
+			url: "https://rthmn.com",
 		},
 	},
 );
+
+// Legacy Stripe instance (for backwards compatibility with existing subscribers)
+export const stripeLegacy = new Stripe(
+	process.env.STRIPE_SECRET_KEY_LEGACY ?? "",
+	{
+		// @ts-ignore
+		apiVersion: null,
+		appInfo: {
+			name: "RTHMN Trading Platform",
+			version: "1.0.0",
+			url: "https://rthmn.com",
+		},
+	},
+);
+
+// Helper function to get the right Stripe instance
+export const getStripeInstance = (isLegacy: boolean = false): Stripe => {
+	return isLegacy ? stripeLegacy : stripe;
+};
