@@ -159,7 +159,7 @@ export async function createStripePortal(currentPath: string) {
 		try {
 			const { url } = await stripeInstance.billingPortal.sessions.create({
 				customer,
-				return_url: getURL("/account"),
+				return_url: getURL("/dashboard"),
 			});
 			if (!url) {
 				throw new Error("Could not create billing portal");
