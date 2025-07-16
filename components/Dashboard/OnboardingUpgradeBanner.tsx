@@ -1,13 +1,13 @@
 "use client";
 
 import { useSubscription } from "@/hooks/useSubscription";
+import { useUserStripeType } from "@/hooks/useUserStripeType";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuSparkles, LuTrendingUp, LuZap, LuCheck } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import { checkoutWithStripe } from "@/lib/stripe/server";
 import { getStripe } from "@/lib/stripe/client";
-import { isLegacyUserClient } from "@/lib/stripe/helpers";
 import { createClient } from "@/lib/supabase/client";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/providers/SupabaseProvider";
@@ -62,6 +62,7 @@ export function OnboardingUpgradeBanner({
   const { isSubscribed } = useSubscription();
   const { hasCompletedAllSteps } = useOnboardingStore();
   const { user } = useAuth();
+  const { isLegacy, isLoading: stripeTypeLoading } = useUserStripeType();
   const pathname = usePathname();
   const [currentMessage, setCurrentMessage] = useState(BANNER_MESSAGES[0]);
   const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +127,11 @@ export function OnboardingUpgradeBanner({
         return;
       }
 
+      if (stripeTypeLoading) {
+        console.log("Waiting for stripe type to load...");
+        return;
+      }
+
       const product = products[0];
       const price = product?.prices?.[0];
 
@@ -152,8 +158,8 @@ export function OnboardingUpgradeBanner({
         return;
       }
 
-      // Determine if user is legacy and get the appropriate Stripe instance
-      const isLegacy = isLegacyUserClient(user.id);
+      // Get the appropriate Stripe instance based on database lookup
+      console.log(`🔍 CLIENT - User ${user.id} isLegacy: ${isLegacy}`);
       const stripe = await getStripe(isLegacy);
       
       if (stripe) {

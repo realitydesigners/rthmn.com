@@ -29,31 +29,30 @@ const getStripeInstance = (isLegacy: boolean = false): Stripe => {
 	return isLegacy ? stripeLegacy : stripe;
 };
 
-// Helper function to determine if a user is a legacy customer
-const LEGACY_USER_IDS = [
-	'851e1dab-50aa-44a9-b73f-08e4ef748ed6',
-	'8ad039b3-d3a5-447b-bdda-80b9f854b0fe',
-	'c3d7587a-31ff-4aa8-9d98-be63b8f6d613',
-	'0ab91c3e-483b-46b0-afa7-64bad4df6da4',
-	'50790fb7-4df9-4fb8-a4fa-a6cd9c1f3306',
-	'bef0d6a5-ccb6-46c6-be68-aadad101b65f',
-	'c8c40404-85fb-466f-ac22-c0ec255e171f',
-];
-
 const isLegacyUser = async (userId: string): Promise<boolean> => {
-	// Option 1: Use hardcoded list (for now)
-	if (LEGACY_USER_IDS.includes(userId)) {
-		return true;
+	// First check the customers table (most reliable source)
+	const { data: customerData } = await supabaseAdmin
+		.from("customers")
+		.select("stripe_account_type")
+		.eq("id", userId)
+		.single();
+	
+	if (customerData?.stripe_account_type) {
+		return customerData.stripe_account_type === 'legacy';
 	}
 	
-	// Option 2: Check database field (future implementation)
-	// const { data } = await supabaseAdmin
-	//   .from("users")
-	//   .select("stripe_account_type")
-	//   .eq("id", userId)
-	//   .single();
-	// return data?.stripe_account_type === 'legacy';
+	// Fallback to users table
+	const { data: userData } = await supabaseAdmin
+		.from("users")
+		.select("stripe_account_type")
+		.eq("id", userId)
+		.single();
 	
+	if (userData?.stripe_account_type) {
+		return userData.stripe_account_type === 'legacy';
+	}
+	
+	// Default: new users are 'new' account type
 	return false;
 };
 
