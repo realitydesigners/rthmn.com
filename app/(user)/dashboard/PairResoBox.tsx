@@ -370,7 +370,6 @@ export const PairResoBox = ({
                   <div {...props(styles.chartOverlay)} />
                   <ResoBox
                     slice={filteredBoxSlice}
-                    className="h-full w-full"
                     boxColors={boxColors}
                     pair={pair}
                     showPriceLines={settings.showPriceLines}

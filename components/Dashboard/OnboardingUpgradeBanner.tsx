@@ -144,14 +144,13 @@ export function OnboardingUpgradeBanner({
         return;
       }
 
-      // Get Stripe instance and redirect to checkout in new tab
+      // Get Stripe instance and redirect to checkout
       const stripe = await getStripe();
       if (stripe) {
-        // Open checkout in new tab
-        const checkoutUrl = `https://checkout.stripe.com/c/pay/${sessionId}`;
-        window.open(checkoutUrl, "_blank", "noopener,noreferrer");
-
-        // Don't hide the banner - let them complete the purchase first
+        const { error } = await stripe.redirectToCheckout({ sessionId });
+        if (error) {
+          console.error("Stripe redirect error:", error);
+        }
       }
     } catch (error) {
       console.error("Error creating checkout session:", error);
