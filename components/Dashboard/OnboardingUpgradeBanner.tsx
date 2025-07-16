@@ -7,8 +7,10 @@ import { LuSparkles, LuTrendingUp, LuZap, LuCheck } from "react-icons/lu";
 import { useState, useEffect } from "react";
 import { checkoutWithStripe } from "@/lib/stripe/server";
 import { getStripe } from "@/lib/stripe/client";
+import { isLegacyUserClient } from "@/lib/stripe/helpers";
 import { createClient } from "@/lib/supabase/client";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/providers/SupabaseProvider";
 
 interface OnboardingUpgradeBannerProps {
   isVisible: boolean;
@@ -59,6 +61,7 @@ export function OnboardingUpgradeBanner({
 }: OnboardingUpgradeBannerProps) {
   const { isSubscribed } = useSubscription();
   const { hasCompletedAllSteps } = useOnboardingStore();
+  const { user } = useAuth();
   const pathname = usePathname();
   const [currentMessage, setCurrentMessage] = useState(BANNER_MESSAGES[0]);
   const [isLoading, setIsLoading] = useState(false);
@@ -118,6 +121,11 @@ export function OnboardingUpgradeBanner({
     setIsLoading(true);
 
     try {
+      if (!user) {
+        console.error("User not found");
+        return;
+      }
+
       const product = products[0];
       const price = product?.prices?.[0];
 
@@ -130,7 +138,7 @@ export function OnboardingUpgradeBanner({
       const { errorRedirect, sessionId } = await checkoutWithStripe(
         price,
         price.type === "recurring",
-        "/account",
+        "/dashboard",
         "/dashboard"
       );
 
@@ -144,14 +152,13 @@ export function OnboardingUpgradeBanner({
         return;
       }
 
-      // Get Stripe instance and redirect to checkout in new tab
-      const stripe = await getStripe();
+      // Determine if user is legacy and get the appropriate Stripe instance
+      const isLegacy = isLegacyUserClient(user.id);
+      const stripe = await getStripe(isLegacy);
+      
       if (stripe) {
-        // Open checkout in new tab
-        const checkoutUrl = `https://checkout.stripe.com/c/pay/${sessionId}`;
-        window.open(checkoutUrl, "_blank", "noopener,noreferrer");
-
-        // Don't hide the banner - let them complete the purchase first
+        // Use Stripe's redirectToCheckout instead of manually constructing URL
+        await stripe.redirectToCheckout({ sessionId });
       }
     } catch (error) {
       console.error("Error creating checkout session:", error);

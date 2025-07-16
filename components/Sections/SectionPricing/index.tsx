@@ -177,7 +177,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
       const { errorRedirect, sessionId } = await checkoutWithStripe(
         price,
         price.type === "recurring", // isSubscription
-        "/account", // successPath
+        "/dashboard", // successPath
         currentPath // cancelPath
       );
 
