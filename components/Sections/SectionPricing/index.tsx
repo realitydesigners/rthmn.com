@@ -2,6 +2,7 @@
 
 import { StartButton } from "@/components/Sections/StartNowButton";
 import { getStripe } from "@/lib/stripe/client";
+import { isLegacyUserClient } from "@/lib/stripe/helpers";
 import { checkoutWithStripe } from "@/lib/stripe/server";
 import { getErrorRedirect } from "@/utils/helpers";
 import type { User } from "@supabase/supabase-js";
@@ -194,7 +195,9 @@ export function SectionPricing({ user, products, subscription }: Props) {
         );
       }
 
-      const stripe = await getStripe();
+      // Determine if user is legacy and get the appropriate Stripe instance
+      const isLegacy = isLegacyUserClient(user.id);
+      const stripe = await getStripe(isLegacy);
       await stripe?.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error("Stripe checkout error:", error);
