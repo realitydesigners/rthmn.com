@@ -1,7 +1,7 @@
 "use server";
 
-import { stripe } from "@/lib/stripe/config";
-import { createOrRetrieveCustomer } from "@/lib/supabase/admin";
+import { getStripeInstance } from "@/lib/stripe/config";
+import { createOrRetrieveCustomer, isLegacyUser } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import {
 	calculateTrialEndUnixTimestamp,
@@ -41,6 +41,10 @@ export async function checkoutWithStripe(
 				),
 			};
 		}
+
+		// Determine if this is a legacy user
+		const isLegacy = await isLegacyUser(user.id);
+		const stripeInstance = getStripeInstance(isLegacy);
 
 		// Retrieve or create the customer in Stripe
 		let customer: string;
@@ -93,7 +97,7 @@ export async function checkoutWithStripe(
 		// Create a checkout session in Stripe
 		let session;
 		try {
-			session = await stripe.checkout.sessions.create(params);
+			session = await stripeInstance.checkout.sessions.create(params);
 		} catch (err) {
 			console.error(err);
 			throw new Error("Unable to create checkout session.");
@@ -133,6 +137,10 @@ export async function createStripePortal(currentPath: string) {
 			throw new Error("Could not get user session.");
 		}
 
+		// Determine if this is a legacy user
+		const isLegacy = await isLegacyUser(user.id);
+		const stripeInstance = getStripeInstance(isLegacy);
+
 		let customer;
 		try {
 			customer = await createOrRetrieveCustomer({
@@ -149,9 +157,9 @@ export async function createStripePortal(currentPath: string) {
 		}
 
 		try {
-			const { url } = await stripe.billingPortal.sessions.create({
+			const { url } = await stripeInstance.billingPortal.sessions.create({
 				customer,
-				return_url: getURL("/account"),
+				return_url: getURL("/dashboard"),
 			});
 			if (!url) {
 				throw new Error("Could not create billing portal");

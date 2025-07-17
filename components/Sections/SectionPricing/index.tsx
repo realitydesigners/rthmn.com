@@ -3,6 +3,7 @@
 import { StartButton } from "@/components/Sections/StartNowButton";
 import { getStripe } from "@/lib/stripe/client";
 import { checkoutWithStripe } from "@/lib/stripe/server";
+import { useUserStripeType } from "@/hooks/useUserStripeType";
 import { getErrorRedirect } from "@/utils/helpers";
 import type { User } from "@supabase/supabase-js";
 import { motion } from "framer-motion";
@@ -161,6 +162,7 @@ export function SectionPricing({ user, products, subscription }: Props) {
   const router = useRouter();
   const [priceIdLoading, setPriceIdLoading] = useState<string>();
   const currentPath = usePathname();
+  const { isLegacy, isLoading: stripeTypeLoading } = useUserStripeType();
 
   const product = products[0];
   const price = product?.prices?.[0];
@@ -173,10 +175,15 @@ export function SectionPricing({ user, products, subscription }: Props) {
         return router.push("/signin");
       }
 
+      if (stripeTypeLoading) {
+        console.log("Waiting for stripe type to load...");
+        return;
+      }
+
       const { errorRedirect, sessionId } = await checkoutWithStripe(
         price,
         price.type === "recurring", // isSubscription
-        "/account", // successPath
+        "/dashboard", // successPath
         currentPath // cancelPath
       );
 
@@ -194,7 +201,9 @@ export function SectionPricing({ user, products, subscription }: Props) {
         );
       }
 
-      const stripe = await getStripe();
+      // Get the appropriate Stripe instance based on database lookup
+      console.log(`🔍 PRICING - User ${user.id} isLegacy: ${isLegacy}`);
+      const stripe = await getStripe(isLegacy);
       await stripe?.redirectToCheckout({ sessionId });
     } catch (error) {
       console.error("Stripe checkout error:", error);

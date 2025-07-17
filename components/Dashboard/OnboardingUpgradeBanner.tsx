@@ -1,6 +1,7 @@
 "use client";
 
 import { useSubscription } from "@/hooks/useSubscription";
+import { useUserStripeType } from "@/hooks/useUserStripeType";
 import { useOnboardingStore } from "@/stores/onboardingStore";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuSparkles, LuTrendingUp, LuZap, LuCheck } from "react-icons/lu";
@@ -9,6 +10,7 @@ import { checkoutWithStripe } from "@/lib/stripe/server";
 import { getStripe } from "@/lib/stripe/client";
 import { createClient } from "@/lib/supabase/client";
 import { usePathname } from "next/navigation";
+import { useAuth } from "@/providers/SupabaseProvider";
 
 interface OnboardingUpgradeBannerProps {
   isVisible: boolean;
@@ -59,6 +61,8 @@ export function OnboardingUpgradeBanner({
 }: OnboardingUpgradeBannerProps) {
   const { isSubscribed } = useSubscription();
   const { hasCompletedAllSteps } = useOnboardingStore();
+  const { user } = useAuth();
+  const { isLegacy, isLoading: stripeTypeLoading } = useUserStripeType();
   const pathname = usePathname();
   const [currentMessage, setCurrentMessage] = useState(BANNER_MESSAGES[0]);
   const [isLoading, setIsLoading] = useState(false);
@@ -118,6 +122,16 @@ export function OnboardingUpgradeBanner({
     setIsLoading(true);
 
     try {
+      if (!user) {
+        console.error("User not found");
+        return;
+      }
+
+      if (stripeTypeLoading) {
+        console.log("Waiting for stripe type to load...");
+        return;
+      }
+
       const product = products[0];
       const price = product?.prices?.[0];
 
@@ -130,7 +144,7 @@ export function OnboardingUpgradeBanner({
       const { errorRedirect, sessionId } = await checkoutWithStripe(
         price,
         price.type === "recurring",
-        "/account",
+        "/dashboard",
         "/dashboard"
       );
 
@@ -144,13 +158,13 @@ export function OnboardingUpgradeBanner({
         return;
       }
 
-      // Get Stripe instance and redirect to checkout
-      const stripe = await getStripe();
+      // Get the appropriate Stripe instance based on database lookup
+      console.log(`🔍 CLIENT - User ${user.id} isLegacy: ${isLegacy}`);
+      const stripe = await getStripe(isLegacy);
+      
       if (stripe) {
-        const { error } = await stripe.redirectToCheckout({ sessionId });
-        if (error) {
-          console.error("Stripe redirect error:", error);
-        }
+        // Use Stripe's redirectToCheckout instead of manually constructing URL
+        await stripe.redirectToCheckout({ sessionId });
       }
     } catch (error) {
       console.error("Error creating checkout session:", error);

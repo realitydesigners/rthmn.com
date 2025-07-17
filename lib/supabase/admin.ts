@@ -9,10 +9,52 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
 		version: "0.1.0",
 	},
 });
+
+// Legacy Stripe instance for backwards compatibility
+const stripeLegacy = new Stripe(process.env.STRIPE_SECRET_KEY_LEGACY ?? "", {
+	apiVersion: "2025-02-24.acacia",
+	appInfo: {
+		name: "ai2saas",
+		version: "0.1.0",
+	},
+});
+
 export const supabaseAdmin = createClient<any>(
 	process.env.NEXT_PUBLIC_SUPABASE_URL || "",
 	process.env.SUPABASE_SERVICE_ROLE_KEY || "",
 );
+
+// Helper function to get the right Stripe instance
+const getStripeInstance = (isLegacy: boolean = false): Stripe => {
+	return isLegacy ? stripeLegacy : stripe;
+};
+
+const isLegacyUser = async (userId: string): Promise<boolean> => {
+	// First check the customers table (most reliable source)
+	const { data: customerData } = await supabaseAdmin
+		.from("customers")
+		.select("stripe_account_type")
+		.eq("id", userId)
+		.single();
+	
+	if (customerData?.stripe_account_type) {
+		return customerData.stripe_account_type === 'legacy';
+	}
+	
+	// Fallback to users table
+	const { data: userData } = await supabaseAdmin
+		.from("users")
+		.select("stripe_account_type")
+		.eq("id", userId)
+		.single();
+	
+	if (userData?.stripe_account_type) {
+		return userData.stripe_account_type === 'legacy';
+	}
+	
+	// Default: new users are 'new' account type
+	return false;
+};
 
 const upsertProductRecord = async (product: Stripe.Product) => {
 	const productData = {
@@ -66,10 +108,15 @@ const createOrRetrieveCustomer = async ({
 }: { email: string; uuid: string }) => {
 	const { data, error } = await supabaseAdmin
 		.from("customers")
-		.select("stripe_customer_id")
+		.select("stripe_customer_id, stripe_account_type")
 		.eq("id", uuid)
 		.single();
+	
 	if (error || !data?.stripe_customer_id) {
+		// Determine if this is a legacy user
+		const isLegacy = await isLegacyUser(uuid);
+		const stripeInstance = getStripeInstance(isLegacy);
+		
 		const customerData: { metadata: { supabaseUUID: string }; email?: string } =
 			{
 				metadata: {
@@ -77,12 +124,17 @@ const createOrRetrieveCustomer = async ({
 				},
 			};
 		if (email) customerData.email = email;
-		const customer = await stripe.customers.create(customerData);
+		
+		const customer = await stripeInstance.customers.create(customerData);
 		const { error: supabaseError } = await supabaseAdmin
 			.from("customers")
-			.insert([{ id: uuid, stripe_customer_id: customer.id }]);
+			.insert([{ 
+				id: uuid, 
+				stripe_customer_id: customer.id,
+				stripe_account_type: isLegacy ? 'legacy' : 'new'
+			}]);
 		if (supabaseError) throw supabaseError;
-		console.log(`New customer created and inserted for ${uuid}.`);
+		console.log(`New customer created and inserted for ${uuid} (${isLegacy ? 'legacy' : 'new'} account).`);
 		return customer.id;
 	}
 	return data.stripe_customer_id;
@@ -91,13 +143,19 @@ const createOrRetrieveCustomer = async ({
 const copyBillingDetailsToCustomer = async (
 	uuid: string,
 	payment_method: Stripe.PaymentMethod,
+	stripeInstance?: Stripe,
 ) => {
 	//Todo: check this assertion
 	const customer = payment_method.customer as string;
 	const { name, phone, address } = payment_method.billing_details;
 	if (!name || !phone || !address) return;
+	
+	// Determine which stripe instance to use
+	const isLegacy = await isLegacyUser(uuid);
+	const stripeToUse = stripeInstance || getStripeInstance(isLegacy);
+	
 	//@ts-ignore
-	await stripe.customers.update(customer, { name, phone, address });
+	await stripeToUse.customers.update(customer, { name, phone, address });
 	const { error } = await supabaseAdmin
 		.from("users")
 		.update({
@@ -112,18 +170,22 @@ const manageSubscriptionStatusChange = async (
 	subscriptionId: string,
 	customerId: string,
 	createAction = false,
+	stripeInstance?: Stripe,
 ) => {
 	// Get customer's UUID from mapping table.
 	const { data: customerData, error: noCustomerError } = await supabaseAdmin
 		.from("customers")
-		.select("id")
+		.select("id, stripe_account_type")
 		.eq("stripe_customer_id", customerId)
 		.single();
 	if (noCustomerError) throw noCustomerError;
 
-	const { id: uuid } = customerData!;
+	const { id: uuid, stripe_account_type } = customerData!;
 
-	const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+	// Use the passed stripe instance or determine from account type
+	const stripeToUse = stripeInstance || getStripeInstance(stripe_account_type === 'legacy');
+
+	const subscription = await stripeToUse.subscriptions.retrieve(subscriptionId, {
 		expand: ["default_payment_method"],
 	});
 	// Upsert the latest status of the subscription object.
@@ -182,6 +244,7 @@ const manageSubscriptionStatusChange = async (
 		await copyBillingDetailsToCustomer(
 			uuid,
 			subscription.default_payment_method as Stripe.PaymentMethod,
+			stripeToUse,
 		);
 };
 
@@ -190,4 +253,5 @@ export {
 	upsertPriceRecord,
 	createOrRetrieveCustomer,
 	manageSubscriptionStatusChange,
+	isLegacyUser,
 };

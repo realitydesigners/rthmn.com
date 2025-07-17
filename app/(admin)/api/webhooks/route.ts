@@ -1,4 +1,5 @@
 import { manageDiscordAccess } from "@/lib/discord/server";
+import { stripe, stripeLegacy } from "@/lib/stripe/config";
 import {
 	deleteProductRecord,
 	manageSubscriptionStatusChange,
@@ -8,14 +9,6 @@ import {
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-	apiVersion: "2025-02-24.acacia",
-	appInfo: {
-		name: "ai2saas",
-		version: "0.1.0",
-	},
-});
 
 const relevantEvents = new Set([
 	"product.created",
@@ -34,16 +27,31 @@ export async function POST(request: Request) {
 	const headersList = await headers();
 	const signature = headersList.get("stripe-signature");
 	const body = await request.text();
-	const webhookSecret =
-		process.env.STRIPE_WEBHOOK_SECRET_LIVE ?? process.env.STRIPE_WEBHOOK_SECRET;
+	
 	let event: Stripe.Event;
+	let stripeInstance: Stripe;
+	let isLegacyEvent = false;
 
+	// Try to construct event with primary webhook secret first
 	try {
-		// if (!sig || !webhookSecret) return;
+		const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_LIVE ?? process.env.STRIPE_WEBHOOK_SECRET;
 		event = stripe.webhooks.constructEvent(body, signature!, webhookSecret!);
+		stripeInstance = stripe;
 	} catch (err: any) {
-		console.log(`❌ Error message: ${err.message}`);
-		return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+		// If primary fails, try legacy webhook secret
+		try {
+			const legacyWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET_LEGACY;
+			if (!legacyWebhookSecret) {
+				throw new Error("Legacy webhook secret not configured");
+			}
+			event = stripeLegacy.webhooks.constructEvent(body, signature!, legacyWebhookSecret);
+			stripeInstance = stripeLegacy;
+			isLegacyEvent = true;
+			console.log("✅ Processing legacy Stripe webhook event");
+		} catch (legacyErr: any) {
+			console.log(`❌ Error message: ${legacyErr.message}`);
+			return new NextResponse(`Webhook Error: ${legacyErr.message}`, { status: 400 });
+		}
 	}
 
 	if (relevantEvents.has(event.type)) {
@@ -72,6 +80,7 @@ export async function POST(request: Request) {
 						subscription.id,
 						subscription.customer as string,
 						event.type === "customer.subscription.created",
+						stripeInstance,
 					);
 
 					// Manage Discord access
@@ -85,6 +94,7 @@ export async function POST(request: Request) {
 							subscriptionId as string,
 							checkoutSession.customer as string,
 							true,
+							stripeInstance,
 						);
 
 						// Add Discord access for new subscribers
